@@ -1,4 +1,4 @@
-include ../../CompBio/src/Makefile.inc
+include ../../candock/Makefile.inc
 
 OBJLIBS	= libprobis.a
 OBJS	= probis.o ligands.o bsite.o eelement.o probe.o \

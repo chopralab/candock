@@ -1,4 +1,4 @@
-include ../../CompBio/src/Makefile.inc
+include ../../candock/Makefile.inc
 #~ include Makefile.inc
 
 CFLAGS	= $(PRJCFLAGS) -I..

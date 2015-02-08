@@ -1,4 +1,4 @@
-include ../../CompBio/src/Makefile.inc
+include ../../candock/Makefile.inc
 
 OBJLIBS	= libpdb.a
 OBJS	= molecule.o bond.o pdbreader.o element.o internal.o idatm.o \

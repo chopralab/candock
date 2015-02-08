@@ -1,4 +1,4 @@
-include ../../CompBio/src/Makefile.inc
+include ../../candock/Makefile.inc
 
 CFLAGS	= $(PRJCFLAGS) -I..
 OBJLIBS	= libscore.a
