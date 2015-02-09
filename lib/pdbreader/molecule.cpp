@@ -217,6 +217,12 @@ namespace Molib {
 		for (auto &chain : model)
 		for (auto &residue : chain) {
 			if (residue.resn() == "HIS") residue.set_resn("HID");
+			for (auto &atom : residue) {
+				if (atom.atom_name() == "OXT") {
+					residue.set_resn("C" + residue.resn()); // last residue is renamed to CALA, CGLY,...
+					break;
+				}
+			}
 		}
 		/* Add bonds to protein atoms according to the topology file.
 		 */
@@ -294,10 +300,13 @@ namespace Molib {
 		for (auto &patom : this->get_atoms()) {
 			auto &atom = *patom;
 			Residue &residue = const_cast<Residue&>(atom.br());
+			//~ if (atom.atom_name() == "N" && !atom.is_adjacent("C")) {
+				//~ residue.set_resn("N" + residue.resn()); // first residue is renamed to NALA, NGLY,...
+			//~ } else if (atom.atom_name() == "C" && !atom.is_adjacent("N")) {
+				//~ residue.set_resn("C" + residue.resn()); // first residue is renamed to CALA, CGLY,...
+			//~ }
 			if (atom.atom_name() == "N" && !atom.is_adjacent("C")) {
 				residue.set_resn("N" + residue.resn()); // first residue is renamed to NALA, NGLY,...
-			} else if (atom.atom_name() == "C" && !atom.is_adjacent("N")) {
-				residue.set_resn("C" + residue.resn()); // first residue is renamed to CALA, CGLY,...
 			}
 		}
 		dbgmsg("MOLECULE AFTER PREPARING FOR MOLECULAR MECHANICS" << endl << *this);
