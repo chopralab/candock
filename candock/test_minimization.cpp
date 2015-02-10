@@ -52,13 +52,13 @@ int main(int argc, char* argv[]) {
 		Molib::MolGrid gridrec(receptors[0].get_atoms(cmdl.receptor_chain_id(), 
 			Molib::Residue::protein));
 
-		{
-			OMMIface::ForceField ffield;
-			ffield
-				.parse_forcefield_file(cmdl.amber_xml_file());
-			receptors[0].prepare_for_mm(ffield, gridrec);
-			throw Error ("exit after prepare for mm");
-		}
+		//~ {
+			//~ OMMIface::ForceField ffield;
+			//~ ffield
+				//~ .parse_forcefield_file(cmdl.amber_xml_file());
+			//~ receptors[0].prepare_for_mm(ffield, gridrec);
+			//~ throw Error ("exit after prepare for mm");
+		//~ }
 
 		Molib::Molecules ligands = lpdb.parse_molecule();
 
