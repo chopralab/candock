@@ -203,28 +203,19 @@ namespace Molib {
 	void Molecule::prepare_for_mm(const OMMIface::ForceField &ff, MolGrid &grid) {
 		/* Rename some residues
 		 */
-		//~ for (auto &assembly : *this)
-		//~ for (auto &model : assembly)
-		//~ for (auto &chain : model) {
-			//~ // chain.first().set_resn("N" + chain.first().resn()); // first residue is renamed to NALA, NGLY,...
-			//~ // chain.last().set_resn("C" + chain.last().resn()); // first residue is renamed to CALA, CGLY,...
-			//~ for (auto &residue : chain) {
-				//~ if (residue.resn() == "HIS") residue.set_resn("HID");
-			//~ }
-		//~ }
 		for (auto &assembly : *this)
 		for (auto &model : assembly)
 		for (auto &chain : model)
 		for (auto &residue : chain) {
 			if (residue.resn() == "HIS") residue.set_resn("HID");
 			for (auto &atom : residue) {
-				if (atom.atom_name() == "OXT") {
+				if (atom.atom_name() == "OXT") { // not foolproof, sometimes OXT is missing !!!
 					residue.set_resn("C" + residue.resn()); // last residue is renamed to CALA, CGLY,...
 					break;
 				}
 			}
 		}
-		/* Add bonds to protein atoms according to the topology file.
+		/* Add bonds inside residues to protein atoms according to the topology file.
 		 */
 		//~ AtomVec main_chain, disulfide;
 		for (auto &assembly : *this)
@@ -236,16 +227,17 @@ namespace Molib {
 				dbgmsg("residue topology for residue " << residue.resn());
 				const OMMIface::ForceField::ResidueTopology &rtop = ff.residue_topology.at(residue.resn());
 				for (auto &atom1 : residue) {
-					for (auto &atom2 : residue) {
-						if(rtop.bond.count(atom1.atom_name()) && 
-							rtop.bond.at(atom1.atom_name()).count(atom2.atom_name())) {
-							if (!atom1.is_adjacent(atom2)) {
-								dbgmsg("added bond between atom " << atom1.atom_number() << " and atom "
-									<< atom2.atom_number());
-								atom1.add(&atom2);
-								atom2.add(&atom1);
-								atom1.insert_bond(atom2, new Bond(&atom1, &atom2)); // insert if not exists
-								atom2.insert_bond(atom1, atom1.get_shared_ptr_bond(atom2)); // insert if not exists
+					if(rtop.bond.count(atom1.atom_name())) {
+						for (auto &atom2 : residue) {
+							if (rtop.bond.at(atom1.atom_name()).count(atom2.atom_name())) {
+								if (!atom1.is_adjacent(atom2)) {
+									dbgmsg("added bond between atom " << atom1.atom_number() << " and atom "
+										<< atom2.atom_number());
+									atom1.add(&atom2);
+									atom2.add(&atom1);
+									atom1.insert_bond(atom2, new Bond(&atom1, &atom2)); // insert if not exists
+									atom2.insert_bond(atom1, atom1.get_shared_ptr_bond(atom2)); // insert if not exists
+								}
 							}
 						}
 					}
@@ -300,14 +292,16 @@ namespace Molib {
 		for (auto &patom : this->get_atoms()) {
 			auto &atom = *patom;
 			Residue &residue = const_cast<Residue&>(atom.br());
+			if (residue.resn().size() == 3) {
+				if (atom.atom_name() == "N" && !atom.is_adjacent("C")) {
+					residue.set_resn("N" + residue.resn()); // first residue is renamed to NALA, NGLY,...
+				} else if (atom.atom_name() == "C" && !atom.is_adjacent("N")) {
+						residue.set_resn("C" + residue.resn()); // IF NOT ALREADY, rename last residue to CALA, CGLY,...
+				}
+			}
 			//~ if (atom.atom_name() == "N" && !atom.is_adjacent("C")) {
 				//~ residue.set_resn("N" + residue.resn()); // first residue is renamed to NALA, NGLY,...
-			//~ } else if (atom.atom_name() == "C" && !atom.is_adjacent("N")) {
-				//~ residue.set_resn("C" + residue.resn()); // first residue is renamed to CALA, CGLY,...
 			//~ }
-			if (atom.atom_name() == "N" && !atom.is_adjacent("C")) {
-				residue.set_resn("N" + residue.resn()); // first residue is renamed to NALA, NGLY,...
-			}
 		}
 		dbgmsg("MOLECULE AFTER PREPARING FOR MOLECULAR MECHANICS" << endl << *this);
 	}

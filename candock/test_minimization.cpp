@@ -33,7 +33,7 @@ int main(int argc, char* argv[]) {
 		cmdl.display_time("started");
 		cout << cmdl << endl;
 		Molib::PDBreader rpdb(cmdl.receptor_file(), 
-			Molib::PDBreader::first_model|Molib::PDBreader::hydrogens);
+			Molib::PDBreader::first_model|Molib::PDBreader::skip_hetatm);
 		Molib::Molecules receptors = rpdb.parse_molecule();
 		
 		Molib::PDBreader lpdb(cmdl.ligand_file(), 

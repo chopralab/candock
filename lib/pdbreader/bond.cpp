@@ -249,6 +249,7 @@ namespace Molib {
 		map<int, int> added;
 		AtomVec atoms;
 		vector<unique_ptr<Bond>> bonds;
+		dbgmsg("creating bond graph from smiles");
 		for (auto &e : edges) {
 			auto s1 = help::ssplit(e.atom_property1, "#", true);
 			auto s2 = help::ssplit(e.atom_property2, "#", true);

@@ -50,9 +50,9 @@ int main(int argc, char* argv[]) {
 		 */
 		vector<common::Centroid> centroids;
 		if (cmdl.centroid_file().empty()) {
-			probis::compare_against_bslib(argc, argv, cmdl.receptor_file(), 
-				cmdl.receptor_chain_id(), cmdl.bslib_file(), cmdl.ncpu(),
-				cmdl.nosql_file(), cmdl.json_file());
+			//~ probis::compare_against_bslib(argc, argv, cmdl.receptor_file(), 
+				//~ cmdl.receptor_chain_id(), cmdl.bslib_file(), cmdl.ncpu(),
+				//~ cmdl.nosql_file(), cmdl.json_file());
 			genclus::generate_clusters_of_ligands(cmdl.json_file(), cmdl.json_with_ligs_file(),
 				cmdl.geo_dir(), cmdl.names_dir(), cmdl.neighb(), cmdl.probis_clus_rad(),
 				cmdl.probis_min_pts());
@@ -69,7 +69,8 @@ int main(int argc, char* argv[]) {
 		 * the receptor molecule(s)
 		 * 
 		 */
-		Molib::PDBreader rpdb(cmdl.receptor_file(), Molib::PDBreader::first_model);
+		Molib::PDBreader rpdb(cmdl.receptor_file(), 
+			Molib::PDBreader::first_model|Molib::PDBreader::skip_hetatm);
 		Molib::Molecules receptors = rpdb.parse_molecule();
 		Molib::PDBreader lpdb(cmdl.ligand_file(), Molib::PDBreader::all_models, 
 			cmdl.max_num_ligands());
@@ -120,6 +121,7 @@ int main(int argc, char* argv[]) {
 			// Compute properties, such as idatm atom types, fragments, seeds,
 			// rotatable bonds
 			ligands.compute_idatm_type().compute_rotatable_bonds()
+				.compute_overlapping_rigid_segments()
 				.compute_seeds(cmdl.seeds_file());
 			ligand_idatm_types = Molib::get_idatm_types(ligands, ligand_idatm_types);
 			common::create_mols_from_seeds(added, seeds, ligands);
@@ -152,7 +154,7 @@ int main(int argc, char* argv[]) {
 			common::HCPoints hcp = common::filter_scores(attep, cmdl.top_percent());
 			
 			inout::output_file(attep, cmdl.egrid_file(), ios_base::app); // output energy grid
-
+			dbgmsg("after output energy grid");
 			/* Create template grids using ProBiS-ligands algorithm
 			 * WORK IN PROGESS WORK IN PROGESS WORK IN PROGESS WORK IN PROGESS 
 			 * WORK IN PROGESS WORK IN PROGESS WORK IN PROGESS WORK IN PROGESS 

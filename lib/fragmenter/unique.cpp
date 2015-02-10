@@ -91,15 +91,18 @@ namespace Molib {
 				}
 			}
 		}
+		dbgmsg("before outputting edges");
 		dbgmsg(edges);
 //~ #ifndef NDEBUG
 		//~ for (auto &kv : s)
 			//~ dbgmsg("vertex1 = " << kv.first << " vertex2 = " << kv.second);
 //~ #endif
+		dbgmsg("before calculating hash");
 		size_t hsh = __hash(seed);
 		size_t si = 0;
 		//~ Glib::Graph<AtomTag> g(create_atom_tags(s), true, false);
 		//~ MolGraph g = create_graph(edges);
+		dbgmsg("before creating bond graph");
 		BondGraph g = create_graph(edges);
 		dbgmsg(hsh);
 		auto ret = __unique_seeds.equal_range(hsh);

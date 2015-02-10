@@ -8,5 +8,6 @@ namespace help {
 				<< " vertex2 = " << e.atom_property2
 				<< " bond_property = " << e.bond_property 
 				<< endl;
+		return os;
 	}
 };

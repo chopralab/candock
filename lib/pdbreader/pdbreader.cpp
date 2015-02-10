@@ -180,6 +180,7 @@ namespace Molib {
 		bool found_molecule = false, found_assembly = false, found_model = false;
 		map<const Model*, map<const int, Atom*>> atom_number_to_atom;
 		for (string &line : pdb_raw) {
+			if ((__hm & PDBreader::skip_hetatm) && line.compare(0, 6, "HETATM") == 0) continue;
 			if (line.compare(0, 4, "ATOM") == 0 || line.compare(0, 6, "HETATM") == 0) {
 				__generate_molecule(mols, found_molecule, "");
 				__generate_assembly(mols, found_assembly, 0, "ASYMMETRIC UNIT");
@@ -408,10 +409,13 @@ namespace Molib {
 					//~ a2.add(new Bond(&a2, &a1)); // add bond
 				//~ a1.get_bond(a2).set_rotatable(vs[0]);
 				//~ a2.get_bond(a1).set_rotatable(vs[0]);
-				a1.add(&a2);
-				a1.insert_bond(a2, new Bond(&a1, &a2)); // insert if not exists
-				auto &pbond = a2.insert_bond(a1, a1.get_shared_ptr_bond(a2)); // insert if not exists
-				pbond->set_rotatable(vs[0]);
+				if (!a1.is_adjacent(a2)) {
+					a1.add(&a2);
+					a2.add(&a1);
+					a1.insert_bond(a2, new Bond(&a1, &a2)); // insert if not exists
+					auto &pbond = a2.insert_bond(a1, a1.get_shared_ptr_bond(a2)); // insert if not exists
+					pbond->set_rotatable(vs[0]);
+				}
 				//~ const Atom *a1 = atom_number_to_atom[&model][stoi(vs[1])];
 				//~ const Atom *a2 = atom_number_to_atom[&model][stoi(vs[2])];
 				//~ model.rotatable[(a1->atom_number() < a2->atom_number() ? 
