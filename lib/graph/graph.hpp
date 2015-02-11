@@ -47,6 +47,7 @@ namespace Glib {
 				const bool) : __vertices(std::move(vertices)) { // here graph owns the vertices
 			__init(__vertices, ict);
 		}
+		Graph(const Graph&); // copy constructor
 		void init_conn() { 
 			__conn.resize(this->size()); 
 			for (auto &row : __conn) 
@@ -80,6 +81,33 @@ namespace Glib {
 			inserter(v, v.begin()));
 		return v;
 	}
+
+	template<class Vertex> 
+	Graph<Vertex>::Graph(const Graph<Vertex> &other) { // copy constructor
+		//~ if (!other.__vertices.empty()) {
+			//~ for (auto &pvertex : other.__vertices) {
+				//~ __vertices.push_back(unique_ptr<Vertex>(new Vertex(*pvertex)));
+			//~ }
+			//~ bool ict = !other.__conn.empty();
+			//~ __init(__vertices, ict);
+		//~ }
+		//~ if (!other.__vertices.empty()) {
+		dbgmsg("Graph copy constructor");
+		for (auto &pvertex : other.__vertices) {
+			__vertices.push_back(unique_ptr<Vertex>(new Vertex(*pvertex)));
+		}
+		bool ict = !other.__conn.empty();
+		if (__vertices.empty()) {
+			vector<Vertex*> vertices;
+			for (auto &vertex : other) vertices.push_back(&vertex);
+			__init(vertices, ict);
+		} else {
+			__init(__vertices, ict);
+		}
+		dbgmsg("ORIGINAL GRAPH : " << endl << other);
+		dbgmsg("COPIED GRAPH : " << endl << *this);
+		//~ }
+	}
 	
 	//~ template<class Vertex> // finds connected vertices that fullfill condition
 	//~ typename Graph<Vertex>::VertexSet find_connected_if(Vertex& v1, 
@@ -111,6 +139,7 @@ namespace Glib {
 			for (auto &adj_v : *v) {
 				//~ dbgmsg("pv1 = " << &*v << " (" << v << ") " << " pv2 = " << &adj_v);
 				dbgmsg("pv1 = " << &*v << " pv2 = " << &adj_v);
+				dbgmsg("v1 = " << v->atom_number() << " v2 = " << adj_v.atom_number());
 			}
 #endif
 		}
@@ -122,6 +151,7 @@ namespace Glib {
 				for (auto &adj_v : v) {
 					if (idx.count(&adj_v)) {
 						const node_id i2 = idx.at(&adj_v);
+						dbgmsg("new2");
 						dbgmsg("__init : set_conn " << i1 << " " << i2
 							<< " v1 " << v << " v2 " << adj_v);
 						set_conn(i1, i2);

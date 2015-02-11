@@ -74,7 +74,8 @@ namespace Molib {
 			//~ __smiles_label(smiles_label), __num_bonds(num_bonds), __props(props) {}
 		Atom(const int atom_number, const string &smiles_label, 
 			const map<string, int> smiles_prop) : __atom_number(atom_number), 
-			__smiles_label(smiles_label), __smiles_prop(smiles_prop), __element("") {}
+			__smiles_label(smiles_label), __smiles_prop(smiles_prop), __element(""),
+			__br(nullptr) {}
 		Atom(const Geom3D::Coordinate &crd) : __crd(crd), __element("") {}
 		Atom(const Geom3D::Coordinate &crd, const int &idatm_type) : __crd(crd), 
 			__idatm_type(idatm_type), __element("") {}
@@ -497,6 +498,7 @@ namespace Molib {
 
 	MolGraph create_graph(const AtomVec &atoms);
 	MolGraph create_graph(const AtomSet &atoms);
+	MolGraph create_mol_graph(const help::smiles &edges);
 
 	ostream& operator<< (ostream& stream, const AtomSet&atoms);
 	ostream& operator<< (ostream& stream, const AtomVec&atoms);

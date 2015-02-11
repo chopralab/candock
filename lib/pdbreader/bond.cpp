@@ -245,6 +245,28 @@ namespace Molib {
 		//~ }
 		//~ return BondGraph(std::move(bonds), true, false);
 	//~ }
+	
+	map<string, int> decode_smiles_prop(const vector<string> &s) {
+		map<string, int> smiles_prop;
+		if (s.size() > 2) {
+			auto bonds = help::ssplit(s.at(2), ",", true);
+			if (bonds.size() > 0) {
+				smiles_prop["B"] = stoi(bonds.at(0));
+			}
+			if (bonds.size() == 2) {
+				smiles_prop["H"] = stoi(bonds.at(1).substr(0, 1)); // e.g. 3H
+			}
+		}
+		if (s.size() > 3) { 
+			auto vec = help::ssplit(s.at(3), ",", true); 
+			for (auto &prop : vec) {
+				int cnt = isdigit(prop.at(0)) ? stoi(prop.substr(0, 1)) : -1;
+				string nm = isdigit(prop.at(0)) ? prop.substr(1) : prop;
+				smiles_prop[nm] = cnt;
+			}
+		}
+		return smiles_prop;
+	}
 	BondGraph create_graph(const help::smiles &edges) {
 		map<int, int> added;
 		AtomVec atoms;
@@ -257,46 +279,48 @@ namespace Molib {
 			string smiles_label2 = s2.at(0);
 			int idx1 = stoi(s1.at(1));
 			int idx2 = stoi(s2.at(1));
-			map<string, int> smiles_prop1, smiles_prop2;
-			if (s1.size() > 2) {
-				auto bonds = help::ssplit(s1.at(2), ",", true);
-				if (bonds.size() > 0) {
-					smiles_prop1["B"] = stoi(bonds.at(0));
-				}
-				if (bonds.size() == 2) {
-					smiles_prop1["H"] = stoi(bonds.at(1).substr(0, 1)); // e.g. 3H
-				}
-			}
-			if (s2.size() > 2) {
-				auto bonds = help::ssplit(s2.at(2), ",", true);
-				if (bonds.size() > 0) {
-					smiles_prop2["B"] = stoi(bonds.at(0));
-				}
-				if (bonds.size() == 2) {
-					smiles_prop2["H"] = stoi(bonds.at(1).substr(0, 1)); // e.g. 3H
-				}
-			}
-			if (s1.size() > 3) { 
-				auto vec = help::ssplit(s1.at(3), ",", true); 
-				for (auto &prop : vec) {
-					int cnt = isdigit(prop.at(0)) ? stoi(prop.substr(0, 1)) : -1;
-					string nm = isdigit(prop.at(0)) ? prop.substr(1) : prop;
-					smiles_prop1[nm] = cnt;
-				}
-			}
-			if (s2.size() > 3) { 
-				auto vec = help::ssplit(s2.at(3), ",", true); 
-				for (auto &prop : vec) {
-					int cnt = isdigit(prop.at(0)) ? stoi(prop.substr(0, 1)) : -1;
-					string nm = isdigit(prop.at(0)) ? prop.substr(1) : prop;
-					smiles_prop2[nm] = cnt;
-				}
-			}
+			//~ map<string, int> smiles_prop1, smiles_prop2;
+			//~ if (s1.size() > 2) {
+				//~ auto bonds = help::ssplit(s1.at(2), ",", true);
+				//~ if (bonds.size() > 0) {
+					//~ smiles_prop1["B"] = stoi(bonds.at(0));
+				//~ }
+				//~ if (bonds.size() == 2) {
+					//~ smiles_prop1["H"] = stoi(bonds.at(1).substr(0, 1)); // e.g. 3H
+				//~ }
+			//~ }
+			//~ if (s2.size() > 2) {
+				//~ auto bonds = help::ssplit(s2.at(2), ",", true);
+				//~ if (bonds.size() > 0) {
+					//~ smiles_prop2["B"] = stoi(bonds.at(0));
+				//~ }
+				//~ if (bonds.size() == 2) {
+					//~ smiles_prop2["H"] = stoi(bonds.at(1).substr(0, 1)); // e.g. 3H
+				//~ }
+			//~ }
+			//~ if (s1.size() > 3) { 
+				//~ auto vec = help::ssplit(s1.at(3), ",", true); 
+				//~ for (auto &prop : vec) {
+					//~ int cnt = isdigit(prop.at(0)) ? stoi(prop.substr(0, 1)) : -1;
+					//~ string nm = isdigit(prop.at(0)) ? prop.substr(1) : prop;
+					//~ smiles_prop1[nm] = cnt;
+				//~ }
+			//~ }
+			//~ if (s2.size() > 3) { 
+				//~ auto vec = help::ssplit(s2.at(3), ",", true); 
+				//~ for (auto &prop : vec) {
+					//~ int cnt = isdigit(prop.at(0)) ? stoi(prop.substr(0, 1)) : -1;
+					//~ string nm = isdigit(prop.at(0)) ? prop.substr(1) : prop;
+					//~ smiles_prop2[nm] = cnt;
+				//~ }
+			//~ }
 			if (!added.count(idx1)) {
+				map<string, int> smiles_prop1 = decode_smiles_prop(s1);
 				atoms.push_back(new Atom(idx1, smiles_label1, smiles_prop1));
 				added[idx1] = atoms.size() - 1;
 			}
 			if (!added.count(idx2)) {
+				map<string, int> smiles_prop2 = decode_smiles_prop(s2);
 				atoms.push_back(new Atom(idx2, smiles_label2, smiles_prop2));
 				added[idx2] = atoms.size() - 1;
 			}
