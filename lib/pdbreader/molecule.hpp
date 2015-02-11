@@ -498,7 +498,7 @@ namespace Molib {
 
 	MolGraph create_graph(const AtomVec &atoms);
 	MolGraph create_graph(const AtomSet &atoms);
-	MolGraph create_mol_graph(const help::smiles &edges);
+	//~ MolGraph create_mol_graph(const help::smiles &edges);
 
 	ostream& operator<< (ostream& stream, const AtomSet&atoms);
 	ostream& operator<< (ostream& stream, const AtomVec&atoms);

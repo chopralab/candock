@@ -27,6 +27,25 @@ CmdLnOpts cmdl;
 
 int main(int argc, char* argv[]) {
 	try {
+//~ 
+//~ ///////////////////
+		//~ vector<thread> th2;
+		//~ dbgmsg("testing shared_ptr thread safety ncpu = " << 8);
+		//~ th2.clear();
+		//~ int j = 123;
+		//~ for(int i = 0; i < 8; ++i) {
+			//~ th2.push_back(
+				//~ thread([&] () {
+					//~ cout << "i = " << j << endl;
+				//~ }));
+		//~ }
+		//~ for(auto& thread : th2) {
+			//~ thread.join();
+		//~ }
+		//~ throw Error("exiting after test");
+//~ ////////////////////
+//~ 
+//~ 
 		cmdl.init(argc, argv);
 		cmdl.display_time("started");
 		cout << cmdl << endl;
@@ -141,6 +160,7 @@ int main(int argc, char* argv[]) {
 		vector<thread> threads;
 		std::mutex mutex;
 
+
 		/* Go over the predicted (or manually set) binding sites
 		 * 
 		 */
@@ -155,6 +175,9 @@ int main(int argc, char* argv[]) {
 			
 			inout::output_file(attep, cmdl.egrid_file(), ios_base::app); // output energy grid
 			dbgmsg("after output energy grid");
+
+
+
 			/* Create template grids using ProBiS-ligands algorithm
 			 * WORK IN PROGESS WORK IN PROGESS WORK IN PROGESS WORK IN PROGESS 
 			 * WORK IN PROGESS WORK IN PROGESS WORK IN PROGESS WORK IN PROGESS 
@@ -171,8 +194,15 @@ int main(int argc, char* argv[]) {
 			for(int i = 0; i < cmdl.ncpu(); ++i) {
 				threads.push_back(
 					thread([&non_clashing_seeds, &m_non_clashing_seeds, &seeds, &gridrec, &score, &hcp, &mutex, i] () {
+						{
+							// Guard non_clashing_seeds as it is the only variable that can 
+							// get changed concurrently by different threads
+							std::lock_guard<std::mutex> guard(mutex);
+							dbgmsg(seeds);
+						}
 						// iterate over docked seeds and dock unique seeds
 						for (int j = i; j < seeds.size(); j+= cmdl.ncpu()) {
+							dbgmsg(seeds[j]);
 							// make product graph between seed and hcp grid, cutoffs top_percent ?
 							common::ProductGraph graph = 
 								common::product_graph(hcp, seeds[j], cmdl.grid_spacing()); 

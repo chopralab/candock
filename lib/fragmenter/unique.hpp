@@ -17,8 +17,9 @@ namespace Molib {
 		struct SeedData {
 			//~ unique_ptr<Glib::Graph<AtomTag>> graph;
 			//~ unique_ptr<MolGraph> graph;
-			MolGraph graph;
+			//~ MolGraph graph;
 			//~ BondGraph graph;
+			unique_ptr<BondGraph> graph;
 			size_t seed_id;
 		};
 		typedef multimap<size_t, SeedData> USeeds;
@@ -27,8 +28,8 @@ namespace Molib {
 		const string __seeds_file;
 		void __read_seeds_file();
 		//~ bool __match(Glib::Graph<AtomTag>&, USeeds::iterator, USeeds::iterator, size_t&);
-		bool __match(MolGraph&, USeeds::iterator, USeeds::iterator, size_t&);
-		//~ bool __match(BondGraph&, USeeds::iterator, USeeds::iterator, size_t&);
+		//~ bool __match(MolGraph&, USeeds::iterator, USeeds::iterator, size_t&);
+		bool __match(BondGraph&, USeeds::iterator, USeeds::iterator, size_t&);
 		size_t __hash(const AtomSet&);
 		size_t __unique(const AtomSet&);
 	public:

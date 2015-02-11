@@ -53,58 +53,39 @@ namespace Molib {
 		return MolGraph(atoms, true);
 	}
 
-	MolGraph create_mol_graph(const help::smiles &edges) {
-		map<int, int> added;
-		//~ AtomVec atoms;
-		//~ vector<unique_ptr<Bond>> bonds;
-		vector<unique_ptr<Atom>> atoms;
-		dbgmsg("creating atom graph from smiles");
-		for (auto &e : edges) {
-			auto s1 = help::ssplit(e.atom_property1, "#", true);
-			auto s2 = help::ssplit(e.atom_property2, "#", true);
-			string smiles_label1 = s1.at(0);
-			string smiles_label2 = s2.at(0);
-			int idx1 = stoi(s1.at(1));
-			int idx2 = stoi(s2.at(1));
-			if (!added.count(idx1)) {
-				map<string, int> smiles_prop1 = decode_smiles_prop(s1);
-				atoms.push_back(unique_ptr<Atom>(new Atom(idx1, smiles_label1, smiles_prop1)));
-				added[idx1] = atoms.size() - 1;
-			}
-			if (!added.count(idx2)) {
-				map<string, int> smiles_prop2 = decode_smiles_prop(s2);
-				atoms.push_back(unique_ptr<Atom>(new Atom(idx2, smiles_label2, smiles_prop2)));
-				added[idx2] = atoms.size() - 1;
-			}
-			Atom &atom1 = *atoms[added[idx1]];
-			Atom &atom2 = *atoms[added[idx2]];
-
-			if (!atom1.is_adjacent(atom2)) {
-				atom1.add(&atom2); // add bond
-				atom2.add(&atom1); // add bond
-				atom1.insert_bond(atom2, new Bond(&atom1, &atom2)); // insert if not exists
-				atom2.insert_bond(atom1, atom1.get_shared_ptr_bond(atom2)); // insert if not exists
-			}
-			// here bond "owns" atoms and must delete them in destructor
-			//~ bonds.push_back(unique_ptr<Bond>(new Bond(&atom1, &atom2, true)));
-			//~ bonds.push_back(unique_ptr<Bond>(new Bond(new Atom(atom1), new Atom(atom2), true)));
-			//~ bonds.back()->set_bond_gaff_type(e.bond_property);
-			//~ bonds.back()->set_members(e.bond_property);
-		}
-		//~ for (int i = 0; i < bonds.size(); ++i) {
-			//~ Bond &bond1 = *bonds[i];
-			//~ for (int j = i + 1; j < bonds.size(); ++j) {
-				//~ Bond &bond2 = *bonds[j];
-				//~ if (bond1.is_adjacent(bond2)) {
-					//~ bond1.add(&bond2);
-					//~ bond2.add(&bond1);
-				//~ }
+	//~ MolGraph create_mol_graph(const help::smiles &edges) {
+		//~ map<int, int> added;
+		//~ vector<unique_ptr<Atom>> atoms;
+		//~ dbgmsg("creating atom graph from smiles");
+		//~ for (auto &e : edges) {
+			//~ auto s1 = help::ssplit(e.atom_property1, "#", true);
+			//~ auto s2 = help::ssplit(e.atom_property2, "#", true);
+			//~ string smiles_label1 = s1.at(0);
+			//~ string smiles_label2 = s2.at(0);
+			//~ int idx1 = stoi(s1.at(1));
+			//~ int idx2 = stoi(s2.at(1));
+			//~ if (!added.count(idx1)) {
+				//~ map<string, int> smiles_prop1 = decode_smiles_prop(s1);
+				//~ atoms.push_back(unique_ptr<Atom>(new Atom(idx1, smiles_label1, smiles_prop1)));
+				//~ added[idx1] = atoms.size() - 1;
+			//~ }
+			//~ if (!added.count(idx2)) {
+				//~ map<string, int> smiles_prop2 = decode_smiles_prop(s2);
+				//~ atoms.push_back(unique_ptr<Atom>(new Atom(idx2, smiles_label2, smiles_prop2)));
+				//~ added[idx2] = atoms.size() - 1;
+			//~ }
+			//~ Atom &atom1 = *atoms[added[idx1]];
+			//~ Atom &atom2 = *atoms[added[idx2]];
+//~ 
+			//~ if (!atom1.is_adjacent(atom2)) {
+				//~ atom1.add(&atom2); // add bond
+				//~ atom2.add(&atom1); // add bond
+				//~ atom1.insert_bond(atom2, new Bond(&atom1, &atom2)); // insert if not exists
+				//~ atom2.insert_bond(atom1, atom1.get_shared_ptr_bond(atom2)); // insert if not exists
 			//~ }
 		//~ }
-		//~ return BondGraph(std::move(bonds), true, false);
-		return MolGraph(std::move(atoms), true, false);
-		//~ return MolGraph();
-	}
+		//~ return MolGraph(std::move(atoms), true, false);
+	//~ }
 
 
 	//~ BondVec get_bonds_in(const AtomSet &atoms, bool in) {

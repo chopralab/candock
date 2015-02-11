@@ -9,9 +9,16 @@ namespace Molib {
 			|| atom1().atom_number() == other.atom2().atom_number() 
 			|| atom2().atom_number() == other.atom1().atom_number();
 	}
+	//~ string Bond::get_label() const { 
+		//~ stringstream ss; 
+		//~ ss << atom1().get_label() << "_" << atom2().get_label()
+			//~ << "_" << get_bond_gaff_type();
+		//~ return ss.str();
+	//~ }
 	string Bond::get_label() const { 
 		stringstream ss; 
-		ss << atom1().get_label() << "_" << atom2().get_label()
+		ss << atom1().get_label() << "#" << atom1().atom_number() << "_" 
+			<< atom2().get_label() << "#" << atom2().atom_number()
 			<< "_" << get_bond_gaff_type();
 		return ss.str();
 	}
@@ -267,7 +274,85 @@ namespace Molib {
 		}
 		return smiles_prop;
 	}
-	BondGraph create_graph(const help::smiles &edges) {
+	//~ BondGraph create_graph(const help::smiles &edges) {
+		//~ map<int, int> added;
+		//~ AtomVec atoms;
+		//~ vector<unique_ptr<Bond>> bonds;
+		//~ dbgmsg("creating bond graph from smiles");
+		//~ for (auto &e : edges) {
+			//~ auto s1 = help::ssplit(e.atom_property1, "#", true);
+			//~ auto s2 = help::ssplit(e.atom_property2, "#", true);
+			//~ string smiles_label1 = s1.at(0);
+			//~ string smiles_label2 = s2.at(0);
+			//~ int idx1 = stoi(s1.at(1));
+			//~ int idx2 = stoi(s2.at(1));
+			// map<string, int> smiles_prop1, smiles_prop2;
+			// if (s1.size() > 2) {
+			// 	auto bonds = help::ssplit(s1.at(2), ",", true);
+			// 	if (bonds.size() > 0) {
+			// 		smiles_prop1["B"] = stoi(bonds.at(0));
+			// 	}
+			// 	if (bonds.size() == 2) {
+			// 		smiles_prop1["H"] = stoi(bonds.at(1).substr(0, 1)); // e.g. 3H
+			// 	}
+			// }
+			// if (s2.size() > 2) {
+			// 	auto bonds = help::ssplit(s2.at(2), ",", true);
+			// 	if (bonds.size() > 0) {
+			// 		smiles_prop2["B"] = stoi(bonds.at(0));
+			// 	}
+			// 	if (bonds.size() == 2) {
+			// 		smiles_prop2["H"] = stoi(bonds.at(1).substr(0, 1)); // e.g. 3H
+			// 	}
+			// }
+			// if (s1.size() > 3) { 
+			// 	auto vec = help::ssplit(s1.at(3), ",", true); 
+			// 	for (auto &prop : vec) {
+			// 		int cnt = isdigit(prop.at(0)) ? stoi(prop.substr(0, 1)) : -1;
+			// 		string nm = isdigit(prop.at(0)) ? prop.substr(1) : prop;
+			// 		smiles_prop1[nm] = cnt;
+			// 	}
+			// }
+			// if (s2.size() > 3) { 
+			// 	auto vec = help::ssplit(s2.at(3), ",", true); 
+			// 	for (auto &prop : vec) {
+			// 		int cnt = isdigit(prop.at(0)) ? stoi(prop.substr(0, 1)) : -1;
+			// 		string nm = isdigit(prop.at(0)) ? prop.substr(1) : prop;
+			// 		smiles_prop2[nm] = cnt;
+			// 	}
+			// }
+			//~ if (!added.count(idx1)) {
+				//~ map<string, int> smiles_prop1 = decode_smiles_prop(s1);
+				//~ atoms.push_back(new Atom(idx1, smiles_label1, smiles_prop1));
+				//~ added[idx1] = atoms.size() - 1;
+			//~ }
+			//~ if (!added.count(idx2)) {
+				//~ map<string, int> smiles_prop2 = decode_smiles_prop(s2);
+				//~ atoms.push_back(new Atom(idx2, smiles_label2, smiles_prop2));
+				//~ added[idx2] = atoms.size() - 1;
+			//~ }
+			//~ Atom &atom1 = *atoms[added[idx1]];
+			//~ Atom &atom2 = *atoms[added[idx2]];
+			//~ // here bond "owns" atoms and must delete them in destructor
+			// bonds.push_back(unique_ptr<Bond>(new Bond(&atom1, &atom2, true)));
+			//~ bonds.push_back(unique_ptr<Bond>(new Bond(new Atom(atom1), new Atom(atom2), true)));
+			// bonds.back()->set_bond_gaff_type(e.bond_property);
+			//~ bonds.back()->set_members(e.bond_property);
+		//~ }
+		//~ for (int i = 0; i < bonds.size(); ++i) {
+			//~ Bond &bond1 = *bonds[i];
+			//~ for (int j = i + 1; j < bonds.size(); ++j) {
+				//~ Bond &bond2 = *bonds[j];
+				//~ if (bond1.is_adjacent(bond2)) {
+					//~ bond1.add(&bond2);
+					//~ bond2.add(&bond1);
+				//~ }
+			//~ }
+		//~ }
+		//~ return BondGraph(std::move(bonds), true, false);
+		// return MolGraph(bonds, true, false);
+	//~ }
+	vector<unique_ptr<Bond>> create_bonds(const help::smiles &edges) {
 		map<int, int> added;
 		AtomVec atoms;
 		vector<unique_ptr<Bond>> bonds;
@@ -279,57 +364,26 @@ namespace Molib {
 			string smiles_label2 = s2.at(0);
 			int idx1 = stoi(s1.at(1));
 			int idx2 = stoi(s2.at(1));
-			//~ map<string, int> smiles_prop1, smiles_prop2;
-			//~ if (s1.size() > 2) {
-				//~ auto bonds = help::ssplit(s1.at(2), ",", true);
-				//~ if (bonds.size() > 0) {
-					//~ smiles_prop1["B"] = stoi(bonds.at(0));
-				//~ }
-				//~ if (bonds.size() == 2) {
-					//~ smiles_prop1["H"] = stoi(bonds.at(1).substr(0, 1)); // e.g. 3H
-				//~ }
-			//~ }
-			//~ if (s2.size() > 2) {
-				//~ auto bonds = help::ssplit(s2.at(2), ",", true);
-				//~ if (bonds.size() > 0) {
-					//~ smiles_prop2["B"] = stoi(bonds.at(0));
-				//~ }
-				//~ if (bonds.size() == 2) {
-					//~ smiles_prop2["H"] = stoi(bonds.at(1).substr(0, 1)); // e.g. 3H
-				//~ }
-			//~ }
-			//~ if (s1.size() > 3) { 
-				//~ auto vec = help::ssplit(s1.at(3), ",", true); 
-				//~ for (auto &prop : vec) {
-					//~ int cnt = isdigit(prop.at(0)) ? stoi(prop.substr(0, 1)) : -1;
-					//~ string nm = isdigit(prop.at(0)) ? prop.substr(1) : prop;
-					//~ smiles_prop1[nm] = cnt;
-				//~ }
-			//~ }
-			//~ if (s2.size() > 3) { 
-				//~ auto vec = help::ssplit(s2.at(3), ",", true); 
-				//~ for (auto &prop : vec) {
-					//~ int cnt = isdigit(prop.at(0)) ? stoi(prop.substr(0, 1)) : -1;
-					//~ string nm = isdigit(prop.at(0)) ? prop.substr(1) : prop;
-					//~ smiles_prop2[nm] = cnt;
-				//~ }
-			//~ }
 			if (!added.count(idx1)) {
+				added[idx1] = atoms.size();
 				map<string, int> smiles_prop1 = decode_smiles_prop(s1);
-				atoms.push_back(new Atom(idx1, smiles_label1, smiles_prop1));
-				added[idx1] = atoms.size() - 1;
+				//~ atoms.push_back(new Atom(idx1, smiles_label1, smiles_prop1));
+				//~ atoms.push_back(new Atom(atoms.size(), smiles_label1, smiles_prop1));
+				atoms.push_back(new Atom(added[idx1] + 1, smiles_label1, smiles_prop1));
+				dbgmsg("idx1 = " << idx1 << " added[idx1] = " << added[idx1]);
 			}
 			if (!added.count(idx2)) {
+				added[idx2] = atoms.size();
 				map<string, int> smiles_prop2 = decode_smiles_prop(s2);
-				atoms.push_back(new Atom(idx2, smiles_label2, smiles_prop2));
-				added[idx2] = atoms.size() - 1;
+				//~ atoms.push_back(new Atom(idx2, smiles_label2, smiles_prop2));
+				//~ atoms.push_back(new Atom(atoms.size(), smiles_label2, smiles_prop2));
+				atoms.push_back(new Atom(added[idx2] + 1, smiles_label2, smiles_prop2));
+				dbgmsg("idx2 = " << idx2 << " added[idx2] = " << added[idx2]);
 			}
 			Atom &atom1 = *atoms[added[idx1]];
 			Atom &atom2 = *atoms[added[idx2]];
 			// here bond "owns" atoms and must delete them in destructor
-			//~ bonds.push_back(unique_ptr<Bond>(new Bond(&atom1, &atom2, true)));
 			bonds.push_back(unique_ptr<Bond>(new Bond(new Atom(atom1), new Atom(atom2), true)));
-			//~ bonds.back()->set_bond_gaff_type(e.bond_property);
 			bonds.back()->set_members(e.bond_property);
 		}
 		for (int i = 0; i < bonds.size(); ++i) {
@@ -342,8 +396,10 @@ namespace Molib {
 				}
 			}
 		}
-		return BondGraph(std::move(bonds), true, false);
-		//~ return MolGraph(bonds, true, false);
+		return bonds;
+	}
+	BondGraph create_graph(const help::smiles &edges) {
+		return BondGraph(std::move(create_bonds(edges)), true, false);
 	}
 	//~ MolGraph create_graph(const help::smiles &edges) {
 		//~ map<int, int> added;

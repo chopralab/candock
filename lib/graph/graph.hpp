@@ -47,7 +47,7 @@ namespace Glib {
 				const bool) : __vertices(std::move(vertices)) { // here graph owns the vertices
 			__init(__vertices, ict);
 		}
-		Graph(const Graph&); // copy constructor
+		//~ Graph(const Graph&); // copy constructor
 		void init_conn() { 
 			__conn.resize(this->size()); 
 			for (auto &row : __conn) 
@@ -82,32 +82,23 @@ namespace Glib {
 		return v;
 	}
 
-	template<class Vertex> 
-	Graph<Vertex>::Graph(const Graph<Vertex> &other) { // copy constructor
-		//~ if (!other.__vertices.empty()) {
-			//~ for (auto &pvertex : other.__vertices) {
-				//~ __vertices.push_back(unique_ptr<Vertex>(new Vertex(*pvertex)));
-			//~ }
-			//~ bool ict = !other.__conn.empty();
+	//~ template<class Vertex> 
+	//~ Graph<Vertex>::Graph(const Graph<Vertex> &other) { // copy constructor
+		//~ dbgmsg("Graph copy constructor");
+		//~ for (auto &pvertex : other.__vertices) {
+			//~ __vertices.push_back(unique_ptr<Vertex>(new Vertex(*pvertex)));
+		//~ }
+		//~ bool ict = !other.__conn.empty();
+		//~ if (__vertices.empty()) {
+			//~ vector<Vertex*> vertices;
+			//~ for (auto &vertex : other) vertices.push_back(&vertex);
+			//~ __init(vertices, ict);
+		//~ } else {
 			//~ __init(__vertices, ict);
 		//~ }
-		//~ if (!other.__vertices.empty()) {
-		dbgmsg("Graph copy constructor");
-		for (auto &pvertex : other.__vertices) {
-			__vertices.push_back(unique_ptr<Vertex>(new Vertex(*pvertex)));
-		}
-		bool ict = !other.__conn.empty();
-		if (__vertices.empty()) {
-			vector<Vertex*> vertices;
-			for (auto &vertex : other) vertices.push_back(&vertex);
-			__init(vertices, ict);
-		} else {
-			__init(__vertices, ict);
-		}
-		dbgmsg("ORIGINAL GRAPH : " << endl << other);
-		dbgmsg("COPIED GRAPH : " << endl << *this);
-		//~ }
-	}
+		//~ dbgmsg("ORIGINAL GRAPH : " << endl << other);
+		//~ dbgmsg("COPIED GRAPH : " << endl << *this);
+	//~ }
 	
 	//~ template<class Vertex> // finds connected vertices that fullfill condition
 	//~ typename Graph<Vertex>::VertexSet find_connected_if(Vertex& v1, 
@@ -139,7 +130,7 @@ namespace Glib {
 			for (auto &adj_v : *v) {
 				//~ dbgmsg("pv1 = " << &*v << " (" << v << ") " << " pv2 = " << &adj_v);
 				dbgmsg("pv1 = " << &*v << " pv2 = " << &adj_v);
-				dbgmsg("v1 = " << v->atom_number() << " v2 = " << adj_v.atom_number());
+				//~ dbgmsg("v1 = " << v->atom_number() << " v2 = " << adj_v.atom_number());
 			}
 #endif
 		}
@@ -161,6 +152,7 @@ namespace Glib {
 				}
 			}
 		}
+		dbgmsg("exiting __init");
 	}
 
 	template<class Vertex>
@@ -460,20 +452,28 @@ namespace Glib {
 		return cycles;
 	}
 	
+	//~ template<class Vertex>
+	//~ string Graph<Vertex>::get_smiles() const {
+		//~ stringstream ss;
+		//~ map<Vertex*, int> idx;
+		//~ int i=0;
+		//~ for (auto &v : *this) 
+			//~ idx[&v] = i++;
+		//~ for (auto &v : *this)
+			//~ for (auto &adj_v : v)
+				//~ if (idx[&adj_v] > idx[&v])
+					//ss << v.print() << "#" << idx[&v] << "_" 
+					//	<< adj_v.print() << "#" << idx[&adj_v] << " ";
+					//~ ss << v.get_label() << "#" << idx[&v] << "_" 
+						//~ << adj_v.get_label() << "#" << idx[&adj_v] << " ";
+		//~ return ss.str();
+	//~ }
 	template<class Vertex>
 	string Graph<Vertex>::get_smiles() const {
 		stringstream ss;
 		map<Vertex*, int> idx;
-		int i=0;
-		for (auto &v : *this) 
-			idx[&v] = i++;
 		for (auto &v : *this)
-			for (auto &adj_v : v)
-				if (idx[&adj_v] > idx[&v])
-					//~ ss << v.print() << "#" << idx[&v] << "_" 
-						//~ << adj_v.print() << "#" << idx[&adj_v] << " ";
-					ss << v.get_label() << "#" << idx[&v] << "_" 
-						<< adj_v.get_label() << "#" << idx[&adj_v] << " ";
+			ss << v.get_label() << " ";
 		return ss.str();
 	}
 

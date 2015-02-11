@@ -355,6 +355,7 @@ namespace common {
 	ProductGraph product_graph(HCPoints &hcp, const Molib::Molecule &molecule, const double &grid_spacing) {
 		Benchmark::reset();
 		cout << "set up product graph" << endl;
+		dbgmsg("for molecule = " << endl << molecule);
 		int i = 0;
 		vector<unique_ptr<PVertex>> vertices;
 		for (auto &patom : molecule.get_atoms()) {

@@ -3,7 +3,8 @@ CC	= g++
 #~ MPICC = mpic++
 #~ PRJCFLAGS	= -g -O0 -static -pthread -std=c++0x -DNDEBUG
 #~ PRJCFLAGS	= -static -pthread -std=c++0x -O3 -DNDEBUG
-PRJCFLAGS	= -static -pthread -std=c++0x -O3
+#~ PRJCFLAGS	= -static -pthread -std=c++0x -O3
+PRJCFLAGS	= -static -Wl,--whole-archive -lpthread -Wl,--no-whole-archive -std=c++0x -O3
 LD	= g++
 #~ LD	= mpic++
 LDFLAGS	= 

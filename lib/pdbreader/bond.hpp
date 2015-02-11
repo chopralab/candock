@@ -108,6 +108,7 @@ namespace Molib {
 	typedef vector<Bond*> BondVec;
 	typedef set<Bond*> BondSet;
 	map<string, int> decode_smiles_prop(const vector<string> &s);
+	vector<unique_ptr<Bond>> create_bonds(const help::smiles &edges);
 	//~ MolGraph create_graph(const help::smiles &edges);
 	BondGraph create_graph(const help::smiles &edges);
 	//~ void connect_bonds(const BondVec &bonds);
