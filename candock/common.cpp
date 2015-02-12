@@ -318,6 +318,35 @@ namespace common {
 			}
 		}
 	}
+//~ #ifndef NDEBUG
+	void create_mols_from_fragments(set<string> &added, Molib::Molecules &seeds, const Molib::Molecules &mols) {
+		for (auto &molecule : mols)
+		for (auto &assembly : molecule)
+		for (auto &model : assembly) {
+			for (auto &kv : model.get_rigid()) { // iterate over rigid fragments
+				const string &nm = kv.first;
+				dbgmsg("considering to add " << nm);
+				if (!added.count(nm)) { // take seeds that haven't been docked already
+					dbgmsg("added " << nm);
+					added.insert(nm);
+					if (kv.second.empty()) throw Error("die : no seed exists with this name : " + nm);
+					const Molib::AtomSet &seed_atoms = *kv.second.begin();
+					// add to new molecules
+					Molib::Molecule &seed = seeds.add(new Molib::Molecule(nm));
+					Molib::Assembly &a = seed.add(new Molib::Assembly(0));
+					Molib::Model &mod = a.add(new Molib::Model(1));
+					Molib::Chain &c = mod.add(new Molib::Chain('X'));
+					Molib::Residue &r = c.add(new Molib::Residue("XXX", 1, ' ', Molib::Residue::hetero));
+					for (const Molib::Atom *atom : seed_atoms) {
+						Molib::Atom &at = r.add(new Molib::Atom(*atom));
+						dbgmsg("added atom = " << at);
+					}
+					seed.regenerate_bonds(molecule);
+				}
+			}
+		}
+	}
+//~ #endif
 	HCPoints filter_scores(Molib::AtomTypeToEnergyPoint &attep, const double &top_percent) {
 		HCPoints hcp;
 		for (auto &u : attep) {

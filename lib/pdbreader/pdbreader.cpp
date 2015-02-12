@@ -460,6 +460,7 @@ namespace Molib {
 									//~ }
 									if (!a1.is_adjacent(a2)) {
 										a1.add(&a2); // add bondee
+										a2.add(&a1); // add bondee
 										a1.insert_bond(a2, new Bond(&a1, &a2)); // insert if not exists
 										a2.insert_bond(a1, a1.get_shared_ptr_bond(a2)); // insert if not exists
 									}

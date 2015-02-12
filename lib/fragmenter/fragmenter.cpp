@@ -28,7 +28,7 @@ namespace Molib {
 			os << "fragment " << fragment.first << " : " << endl;
 			for (auto &atoms : fragment.second) {
 				for (auto &pa : atoms) {
-					os << "        " << *pa << endl;
+					os << "        " << *pa;
 				}
 				os << "---------------";
 			}

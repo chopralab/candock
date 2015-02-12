@@ -91,6 +91,9 @@ namespace common {
 		const double &excluded_radius, const double &max_interatomic_distance);
 	HCPoints filter_scores(Molib::AtomTypeToEnergyPoint &attep, const double &top_percent);
 	void create_mols_from_seeds(set<string> &added, Molib::Molecules &seeds, const Molib::Molecules &mols);
+//~ #ifndef NDEBUG	
+	void create_mols_from_fragments(set<string> &added, Molib::Molecules &seeds, const Molib::Molecules &mols);
+//~ #endif
 	ProductGraph product_graph(HCPoints &hcp, const Molib::Molecule &molecule, const double &grid_spacing);
 	Molib::Molecules superimpose(ProductGraph::Cliques &maxclq, const Molib::Molecule &molecule);
 	Molib::Molecules filter_clashes(const Molib::Molecules &rot_seeds, Grid<Molib::Atom> &gridrec);

@@ -64,16 +64,25 @@ namespace Molib {
 		dbgmsg(name);
 		if (name == "")
 			return LonePair;
-		string n;
-		std::remove_copy_if(name.begin(), name.end(), std::back_inserter( n ), [](const char &c){ return isdigit(c)||c=='\''; });
-		dbgmsg(n << " " << n.size());
-		symbol.push_back(n[0]);
-		if (n.size() > 1) {
-			 if(isupper(n[1])) {
-				symbol.push_back(tolower(n[1]));
-			} else {
-				symbol.push_back(n[1]);
-			}
+		//~ string n;
+		//~ std::remove_copy_if(name.begin(), name.end(), std::back_inserter( n ), [](const char &c){ return isdigit(c)||c=='\''; });
+		//~ dbgmsg(n << " " << n.size());
+		//~ symbol.push_back(n[0]);
+		//~ if (n.size() > 1) {
+			 //~ if(isupper(n[1])) {
+				//~ symbol.push_back(tolower(n[1]));
+			//~ } else {
+				//~ symbol.push_back(n[1]);
+			//~ }
+		//~ }
+		//~ dbgmsg(symbol);
+		
+		//~ string n;
+		//~ std::remove_copy_if(name.begin(), name.end(), std::back_inserter( n ), [](const char &c){ return isdigit(c)||c=='\''; });
+		//~ dbgmsg(n << " " << n.size());
+		symbol.push_back(name[0]);
+		if (name.size() > 1 && isalpha(name[1])) {
+			symbol.push_back(tolower(name[1]));
 		}
 		dbgmsg(symbol);
 	

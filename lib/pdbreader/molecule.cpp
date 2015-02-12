@@ -463,6 +463,7 @@ namespace Molib {
 		f.substitute_bonds(help::rotatable);
 		// rotatable bond inside a ring is changed back to non-rotatable
 		Rings rings = f.identify_fused_rings();
+		//~ Rings rings = f.identify_rings();
 		for (auto &ring : rings) {
 			for (auto &pbond : get_bonds_in(ring)) {
 				pbond->set_rotatable("");

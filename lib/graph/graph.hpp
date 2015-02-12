@@ -71,6 +71,8 @@ namespace Glib {
 			//~ return true; return false; }
 		template<class P>
 		friend ostream& operator<< (ostream& stream, const Graph<P>& g);
+		//~ template<class P>
+		//~ friend ostream& operator<< (ostream& stream, const typename Graph<P>::Cycles& cycles);
 	};
 
 	template<typename T>
@@ -129,8 +131,8 @@ namespace Glib {
 #ifndef NDEBUG
 			for (auto &adj_v : *v) {
 				//~ dbgmsg("pv1 = " << &*v << " (" << v << ") " << " pv2 = " << &adj_v);
-				dbgmsg("pv1 = " << &*v << " pv2 = " << &adj_v);
-				//~ dbgmsg("v1 = " << v->atom_number() << " v2 = " << adj_v.atom_number());
+				//~ dbgmsg("pv1 = " << &*v << " pv2 = " << &adj_v);
+				dbgmsg("v1 = " << v->atom_number() << " v2 = " << adj_v.atom_number());
 			}
 #endif
 		}
@@ -449,6 +451,15 @@ namespace Glib {
 		dbgmsg("expanding the vertices");
 		__expand(this->first(), path, cycles, visited);
 		dbgmsg("after expanding the vertices");
+		dbgmsg("CYCLES FOUND : ");
+		for (auto &cycle : cycles) {
+			dbgmsg("CYCLE : ");
+			for (auto &pvertex : cycle) {
+				dbgmsg(*pvertex);
+			}
+		}
+
+		//~ dbgmsg("CYCLES FOUND : " << cycles);
 		return cycles;
 	}
 	
@@ -512,5 +523,15 @@ namespace Glib {
 		}
 		return stream;
 	}
+	//~ template<class P>
+	//~ ostream& operator<< (ostream& stream, const typename Graph<P>::Cycles &cycles) {
+		//~ for (auto &cycle : cycles) {
+			//~ stream << "CYCLE : " << endl;
+			//~ for (auto &pvertex : cycle) {
+				//~ stream << *pvertex << endl;
+			//~ }
+		//~ }
+		//~ return stream;
+	//~ }
 };
 #endif
