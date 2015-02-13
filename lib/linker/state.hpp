@@ -35,5 +35,6 @@ namespace Molib {
 		string pdb() const;
 		friend ostream& operator<< (ostream& stream, const State& s);
 	};
+	ostream& operator<< (ostream& stream, const StateVec& sv);
 };
 #endif

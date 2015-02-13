@@ -74,11 +74,15 @@ namespace Molib {
 		// find out which rigid segments are seeds
 		for (auto &kv : model.get_seeds()) { 
 			const string &nm = kv.first;
+			//~ dbgmsg("nm = " << nm << " seed_atoms = " << endl << kv.second
+			dbgmsg("nm = " << nm);
 			for (auto &seed_atoms : kv.second) {
+				dbgmsg("seed atoms = " << seed_atoms);
 				// loop over segments and find the largest one
 				int max_sz = 0;
 				Segment *largest;
 				for (auto &psegment : vertices) {
+					dbgmsg("segment atoms = " << psegment->get_atoms());
 					auto inter = Glib::intersection(seed_atoms, psegment->get_atoms());
 					if (inter.size() > max_sz) {
 						max_sz = inter.size();
@@ -625,6 +629,7 @@ namespace Molib {
 						if (pstate1->clashes(*pstate4, excluded14) 
 							|| pstate2->clashes(*pstate4, excluded24)) continue;
 						possibles4.push_back({pstate1, pstate2, pstate3, pstate4});
+						dbgmsg("just added four-state : " << endl << possibles4.back());
 					}
 				}
 			}

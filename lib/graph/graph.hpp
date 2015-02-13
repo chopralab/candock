@@ -131,8 +131,8 @@ namespace Glib {
 #ifndef NDEBUG
 			for (auto &adj_v : *v) {
 				//~ dbgmsg("pv1 = " << &*v << " (" << v << ") " << " pv2 = " << &adj_v);
-				//~ dbgmsg("pv1 = " << &*v << " pv2 = " << &adj_v);
-				dbgmsg("v1 = " << v->atom_number() << " v2 = " << adj_v.atom_number());
+				dbgmsg("pv1 = " << &*v << " pv2 = " << &adj_v);
+				//~ dbgmsg("v1 = " << v->atom_number() << " v2 = " << adj_v.atom_number());
 			}
 #endif
 		}

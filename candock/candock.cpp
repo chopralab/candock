@@ -293,7 +293,8 @@ int main(int argc, char* argv[]) {
 				.compute_gaff_type()
 				.erase_hydrogen()
 				.compute_rotatable_bonds()
-				.compute_overlapping_rigid_segments();
+				.compute_overlapping_rigid_segments()
+				.compute_seeds(cmdl.seeds_file());
 
 			/* Forcefield stuff : create forcefield for small molecules (and KB 
 			 * non-bonded with receptor) and read receptor's forcefield xml file(s) into 
@@ -306,6 +307,12 @@ int main(int argc, char* argv[]) {
 				.add_kb_forcefield(score, cmdl.step_non_bond(), cmdl.scale_non_bond())
 				.parse_forcefield_file(cmdl.amber_xml_file());
 
+			/* Erase atom properties since they make the graph matching incorrect
+			 *
+			 */
+			ligands.erase_properties();
+			top_seeds.erase_properties();
+			 
 			threads.clear();
 			for(int i = 0; i < cmdl.ncpu(); ++i) {
 				threads.push_back(

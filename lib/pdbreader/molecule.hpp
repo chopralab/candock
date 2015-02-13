@@ -115,6 +115,7 @@ namespace Molib {
 		Atom& insert_property(const string &prop, const int count) { __smiles_prop.insert({prop, count}); return *this; }
 		Atom& add_property(const string &prop) { __smiles_prop[prop]++; return *this; }
 		Atom& erase_property(const string &prop) { __smiles_prop.erase(prop); return *this; }
+		Atom& erase_properties() { __smiles_prop.clear(); return *this; }
 		bool has_property(const string &prop) const { return __smiles_prop.count(prop); }
 		int get_num_property(const string &prop) const { 
 			dbgmsg("__smiles prop(" << prop << ") count = " << __smiles_prop.count(prop)); 
@@ -187,6 +188,7 @@ namespace Molib {
 		char ins_code() const { return __ins_code; }
 		Residue::res_type rest() const { return __rest; }
 		AtomVec get_atoms() const;
+		Residue& erase_properties() { for (auto &atom : *this) atom.erase_properties(); return *this; }
 		//~ BondVec get_bonds() const { BondVec bonds; for (auto &atom : *this) 
 		friend ostream& operator<< (ostream& stream, const Residue& r);
 	};
@@ -230,6 +232,7 @@ namespace Molib {
 		bool has_residue(Residue::res_pair p) { return this->has_element(p); }
 		char chain_id() const { return __chain_id; }
 		AtomVec get_atoms(const Residue::res_type &rest=Residue::res_type::notassigned) const;
+		Chain& erase_properties() { for (auto &residue : *this) residue.erase_properties(); return *this; }
 		friend ostream& operator<< (ostream& stream, const Chain& c);
 	};
 	
@@ -284,6 +287,7 @@ namespace Molib {
 		}
 		AtomVec get_atoms(const string &chain_ids="", 
 			const Residue::res_type &rest=Residue::res_type::notassigned) const;
+		Model& erase_properties() { for (auto &chain : *this) chain.erase_properties(); return *this; }
 		friend ostream& operator<< (ostream& stream, const Model& m);
 	};
 	
@@ -319,6 +323,7 @@ namespace Molib {
 		AtomVec get_atoms(const string &chain_ids="", 
 			const Residue::res_type &rest=Residue::res_type::notassigned,
 			const int model_number=-1) const;
+		Assembly& erase_properties() { for (auto &model : *this) model.erase_properties(); return *this; }
 		friend ostream& operator<< (ostream& stream, const Assembly& a);
 	};
 	
@@ -394,6 +399,7 @@ namespace Molib {
 		void add_bio_chain(const int &biomolecule_number, set<char> bio_chain) {
 			__bio_chain[biomolecule_number] = bio_chain;
 		}
+		Molecule& erase_properties() { for (auto &assembly : *this) assembly.erase_properties(); return *this; }
 		friend ostream& operator<< (ostream& stream, const Molecule& m);
 	};
 	
@@ -458,12 +464,14 @@ namespace Molib {
 		Molecules& compute_seeds(const string &seeds_file="");
 			//~ Unique u(seeds_file); for (auto &molecule : *this) 
 			//~ molecule.compute_seeds(u); return *this; }
+		Molecules& erase_properties() { for (auto &molecule : *this) molecule.erase_properties(); return *this; }
 		friend ostream& operator<< (ostream& stream, const Molecules& m);
 	};
 	
 	class NRset : public template_map_container<Molecules, NRset, NRset> {
 	public:
 		Molecules& add(Molecules *m) { return this->aadd(m, this); }
+		NRset& erase_properties() { for (auto &molecules : *this) molecules.erase_properties(); return *this; }
 		friend ostream& operator<< (ostream& stream, const NRset& m);
 	};
 	
