@@ -173,14 +173,20 @@ namespace Molib {
 									&& help::gaff_group_1.count(bondee.gaff_type())
 									|| help::gaff_group_2.count(current.gaff_type()) 
 									&& help::gaff_group_2.count(bondee.gaff_type())) {
+									dbgmsg("bondee gaff type (case 1) = "
+										<< bondee.gaff_type());
 									bondee.set_gaff_type(help::gaff_flip.at(bondee.gaff_type()));
+									visited.insert(&bondee);
 								}
 							} else if (bond.is_single()) {
 								if (help::gaff_group_1.count(current.gaff_type()) 
 									&& help::gaff_group_2.count(bondee.gaff_type())
 									|| help::gaff_group_2.count(current.gaff_type()) 
 									&& help::gaff_group_1.count(bondee.gaff_type())) {
+									dbgmsg("bondee gaff type (case 2) = "
+										<< bondee.gaff_type());
 									bondee.set_gaff_type(help::gaff_flip.at(bondee.gaff_type()));
+									visited.insert(&bondee);
 								}
 							}
 							//~ q.push(&bond.second_atom());

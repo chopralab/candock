@@ -713,7 +713,11 @@ namespace help {
 	        { "HC", { Single, 1, "hydrogen bonded to carbon" } },
 	        { "H", { Single, 1, "other hydrogen" } },
 	        { "DC", { Single, 1, "deuterium bonded to carbon" } },
-	        { "D", { Single, 1, "other deuterium" } }
+	        { "D", { Single, 1, "other deuterium" } },
+	        { "F", { Single, 1, "fluoride" } },
+	        { "Cl", { Single, 1, "chloride" } },
+	        { "Br", { Single, 1, "bromium" } },
+	        { "I", { Single, 1, "iodide" } }
 	};
 	const char* const idatm_unmask[] {	
 	//~ const vector<string> idatm_unmask {	
@@ -1686,7 +1690,9 @@ namespace help {
 		{{{"^S#1#2","Car#2",""},{"#1","Car#3",""}}, {{"1:idatm=Sar"}}}, // aromatic sulfur
 		{{{"^O#1#2","Car#2",""},{"#1","Car#3",""}}, {{"1:idatm=Oar+"}}}, // aromatic oxygen, formally positive (pyrylium)
 		{{{"Npl#1#2#ag","Npl#2#3#ag",""},{"#1","Car#3#3",""}}, {{"1:idatm=N2"}}}, // change aromatic Npl (bonded to Npl and Car) to N2
-		{{{"Npl#1##1ag,ag6",".*#2",""}}, {{"1:idatm=N2"}}}, // change Npl in 6-membered aromatic ring to N2
+		//~ {{{"Npl#1##1ag,ag6",".*#2",""}}, {{"1:idatm=N2"}}}, // change Npl in 6-membered aromatic ring to N2
+		{{{"Npl#1#2#1ag,ag6",".*#2",""}}, {{"1:idatm=N2"}}}, // change 2-substituted Npl in 6-membered aromatic ring to N2
+		{{{"Npl#1#3,1H#1ag,ag6",".*#2",""}}, {{"1:idatm=N2"}}}, // change 3-substituted (one bondee is hydrogen) Npl in 6-membered aromatic ring to N2
 		//~ {{{"^N#1","Car#2",""},{"#1","Car#3",""}}, {{"1:idatm=Xe"}}}, // JUST A TEST !!!!!!!!
 	};	
 	//~ const rename_rules bond_gaff_type {
@@ -2522,7 +2528,10 @@ namespace help {
 		{{{"^P#1#4",".*#2",""}}, {{"1:gaff=p5"}}}, // Phosphate with four connected atoms, such as O=P(OH)3
 		{{{"^P#1#5",".*#2",""}}, {{"1:gaff=p5"}}}, // Phosphate with four connected atoms, such as O=P(OH)3
 		{{{"^P#1#6",".*#2",""}}, {{"1:gaff=p5"}}}, // Phosphate with four connected atoms, such as O=P(OH)3
-		{{{"^N#1#3","^C#2#3",""},{"#2",XA + "#2#1",""}}, {{"1:gaff=n"}}}, // Sp2 nitrogen in amide groups N-CO, N-SO2, N-PO
+
+		//~ {{{"^N#1#3","^C#2#3",""},{"#2",XA + "#2#1",""}}, {{"1:gaff=n"}}}, // Sp2 nitrogen in amide groups N-CO, N-SO2, N-PO
+		{{{"^N#1#3","^C#2#3",""},{"#2",XA + "#3#1",""}}, {{"1:gaff=n"}}}, // Sp2 nitrogen in amide groups N-CO, N-SO2, N-PO
+
 		{{{"^N#1#4",".*#2",""}}, {{"1:gaff=n4"}}}, // Sp3 N with four connected atoms
 		{{{"^N#1#3","^O#2#1",""},{"#1","^O#3#1",""}}, {{"1:gaff=no"}}}, // Nitro N
 		

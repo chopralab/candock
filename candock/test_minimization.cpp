@@ -101,28 +101,36 @@ int main(int argc, char* argv[]) {
 			.parse_forcefield_file(cmdl.amber_xml_file());
 
 		receptors[0].prepare_for_mm(ffield, gridrec);
-			
-		OMMIface::OMM omm(receptors[0], ligands.first(), ffield, 
-			cmdl.fftype(), cmdl.dist_cutoff());
-		omm.minimize(cmdl.tolerance(), cmdl.max_iterations()); // minimize
-		//~ omm.minimize(0.0000000000000001, cmdl.max_iterations()); // minimize
-		dbgmsg(ligands.first());
-		auto ret = omm.get_state(receptors[0], ligands.first());
-		Molib::Molecules mini;
-		Molib::Molecule &minimized_receptor = 
-			mini.add(new Molib::Molecule(ret.first));
-		Molib::Molecule &minimized_ligand = 
-			mini.add(new Molib::Molecule(ret.second));
 
-		minimized_receptor.undo_mm_specific();
+		for (auto &ligand : ligands) {
+			try {
+				OMMIface::OMM omm(receptors[0], ligand, ffield, 
+					cmdl.fftype(), cmdl.dist_cutoff());
+				omm.minimize(cmdl.tolerance(), cmdl.max_iterations()); // minimize
+				//~ omm.minimize(0.0000000000000001, cmdl.max_iterations()); // minimize
+				dbgmsg(ligand);
+				auto ret = omm.get_state(receptors[0], ligand);
+				Molib::Molecules mini;
+				Molib::Molecule &minimized_receptor = 
+					mini.add(new Molib::Molecule(ret.first));
+				Molib::Molecule &minimized_ligand = 
+					mini.add(new Molib::Molecule(ret.second));
+		
+				minimized_receptor.undo_mm_specific();
+		
+				dbgmsg("MOLECULES AFTER MINIMIZATION : " << endl 
+					<< minimized_ligand << endl 
+					<< minimized_receptor);
+				//~ OMMIface::Energies energies;
+				//~ energies[&minimized_ligand] = omm.get_energy_components(
+					//~ minimized_receptor, minimized_ligand, cmdl.dist_cutoff());
+				//~ minimized_receptor.undo_mm_specific();
+			} catch (exception& e) {
+				cerr << "MINIMIZATION FAILED FOR LIGAND " << ligand.name() 
+					<< " because of " << e.what() << endl;
+			}
 
-		dbgmsg("MOLECULES AFTER MINIMIZATION : " << endl 
-			<< minimized_ligand << endl 
-			<< minimized_receptor);
-		//~ OMMIface::Energies energies;
-		//~ energies[&minimized_ligand] = omm.get_energy_components(
-			//~ minimized_receptor, minimized_ligand, cmdl.dist_cutoff());
-		//~ minimized_receptor.undo_mm_specific();
+		}
 		cmdl.display_time("finished");
 	} catch (exception& e) {
 		cerr << e.what() << endl;

@@ -518,6 +518,30 @@ namespace Molib {
 		//~ return MolGraph(bonds, true, false);
 	//~ }
 	
+
+	void Bond::erase_stale_refs(const Bond &deleted_bond, const BondVec &bonds) {
+		for (auto &pbond : bonds) {
+			auto &bond = *pbond;
+#ifndef NDEBUG
+			dbgmsg("bonds before deletion");
+			for (auto &adj : bond) dbgmsg(adj);
+#endif
+			for (int j = 0; j < bond.size(); ++j) {
+				if (&deleted_bond == &bond[j]) {
+					dbgmsg("deleting reference to bond"
+						<< endl << " bond " << bond 
+						<< " is no longer connected to bond "
+						<< bond[j]);
+					bond.erase(j--);
+				}
+			}
+#ifndef NDEBUG
+			dbgmsg("bonds after deletion");
+			for (auto &adj : bond) dbgmsg(adj);
+#endif
+		}
+	}
+
 	ostream& operator<< (ostream& stream, const Bond& b) {
 		return stream << "(address = " << &b << " atom1 = " << b.atom1().atom_number() 
 			<< ", atom2 = " << b.atom2().atom_number() << ", bond_gaff_type = " 

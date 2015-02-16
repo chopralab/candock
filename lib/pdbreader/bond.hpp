@@ -14,7 +14,11 @@ using namespace std;
 
 namespace Molib {	
 	class Atom;
+	class Bond;
 	//~ typedef pair<Atom*, Atom*> AtomPair;
+
+	typedef vector<Bond*> BondVec;
+	typedef set<Bond*> BondSet;
 	
 	class Bond : public template_vector_container<Bond*, Bond> {
 		Atom *__atom1, *__atom2;
@@ -90,6 +94,7 @@ namespace Molib {
 			//~ && &second_atom() == &rhs.second_atom() || &first_atom() == &rhs.second_atom() 
 			//~ && &second_atom() == &rhs.first_atom(); }
 		//~ bool operator!=(const Bond& rhs) { return !(*this == rhs); }
+		static void erase_stale_refs(const Bond &deleted_bond, const BondVec &bonds);
 		friend ostream& operator<< (ostream& stream, const Bond& b);
 		// the following are required for BondGraph :-)
 		bool compatible(const Bond &other) const;
@@ -105,8 +110,6 @@ namespace Molib {
 	
 	typedef Glib::Graph<Bond> BondGraph;
 
-	typedef vector<Bond*> BondVec;
-	typedef set<Bond*> BondSet;
 	map<string, int> decode_smiles_prop(const vector<string> &s);
 	vector<unique_ptr<Bond>> create_bonds(const help::smiles &edges);
 	//~ MolGraph create_graph(const help::smiles &edges);

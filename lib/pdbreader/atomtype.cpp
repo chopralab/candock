@@ -823,11 +823,17 @@ namespace Molib {
 			//~ if (pbond->is_double()) num_double++;
 		//~ return num_double;
 	//~ }
-	int num_double(const BondSet &bonds) {
-		int num_double = 0;
+	//~ int num_double(const BondSet &bonds) {
+		//~ int num_double = 0;
+		//~ for (auto &pbond : bonds)
+			//~ if (pbond->is_double()) num_double++;
+		//~ return num_double;
+	//~ }
+	BondVec get_double_bonds(const BondSet &bonds) {
+		BondVec dbl;
 		for (auto &pbond : bonds)
-			if (pbond->is_double()) num_double++;
-		return num_double;
+			if (pbond->is_double()) dbl.push_back(pbond);
+		return dbl;
 	}
 	//~ bool two_continuous_single_bonds(const BondVec &bonds) {
 		//~ AtomSet cont;
@@ -873,6 +879,69 @@ namespace Molib {
 		return false;
 	}
 	
+	//~ void AtomType::compute_ring_type(Molecule &molecule) {
+		//~ dbgmsg("Computing ring types for molecule " << molecule.name());
+		//~ for (auto &assembly : molecule)
+		//~ for (auto &model : assembly)
+		//~ for (auto &chain : model)
+		//~ for (auto &residue : chain) {
+			//~ if (! help::standard_residues.count(residue.resn())) {
+				//~ for (auto &atom : residue)
+					//~ atom.insert_property("NG", 1); // atom belongs to chain
+				//~ Fragmenter frag(residue.get_atoms());
+				//~ Rings rings = frag.identify_rings();
+				//Rings rings = frag.identify_fused_rings();
+				//~ int r_id = 0;
+				//~ for (auto &ring : rings) {
+					//~ auto ring_bonds = get_bonds_in(ring);
+					//~ auto out_bonds = get_bonds_in(ring, false);
+					//~ for (auto &pbond : ring_bonds) {
+						//~ Bond &bond = *pbond;
+						//~ bond.set_ring(true); // ring bond
+					//~ }
+					//~ // Pure aliphatic atom in a ring, which is made of sp3 carbon
+					//~ string aromatic_type = "AR5"; 
+					//~ // determine the type of aromatic ring
+					//~ if (aromatic(ring)) {
+						//int num_c = 0, num_n = 0, num_s = 0, num_o = 0;
+						//for (auto &pa : ring) {
+						//	if (pa->element() == Element::C) num_c++;
+						//	else if (pa->element() == Element::N) num_n++;
+						//	else if (pa->element() == Element::S) num_s++;
+						//	else if (pa->element() == Element::O) num_o++;
+						//}
+						//~ if (ring.size() == 6 && num_double(ring_bonds) == 3) {
+							//~ // Pure aromatic atom (such as benzene and pyridine)
+							//~ aromatic_type = "AR1";
+						//~ } else if (num_double(out_bonds) > 0) {
+							//~ // Atom in a planar ring, which has one or several double bonds 
+							//~ // formed between non-ring atoms and the ring atoms
+							//~ aromatic_type = "AR3";
+						//~ } else if (num_double(ring_bonds) >= 2 
+							//~ && two_continuous_single_bonds(ring_bonds)) {
+							//~ // Atom in a planar ring, usually the ring has two 
+							//~ // continous single bonds and at least two double bonds
+							//~ aromatic_type = "AR2";
+						//~ } else {
+							//~ // Atom other than AR1, AR2, AR3 and AR5.
+							//~ aromatic_type = "AR4";
+						//~ }
+					//~ }
+					//~ const string ring_type = "RG" + help::to_string(ring.size());
+					//~ for (auto &pa : ring) {
+						//~ Atom &a = const_cast<Atom&>(*pa); // ugly trick
+						//a.erase_property("NG")
+						//	.insert_property(ring_type)
+						//	.insert_property(aromatic_type);
+						//~ a.erase_property("NG")
+							//~ .add_property(ring_type)
+							//~ .add_property(aromatic_type);
+					//~ }
+				//~ }
+			//~ }
+		//~ }
+		//~ dbgmsg("MOLECULE AFTER RING TYPING" << endl << molecule);
+	//~ }
 	void AtomType::compute_ring_type(Molecule &molecule) {
 		dbgmsg("Computing ring types for molecule " << molecule.name());
 		for (auto &assembly : molecule)
@@ -883,8 +952,13 @@ namespace Molib {
 				for (auto &atom : residue)
 					atom.insert_property("NG", 1); // atom belongs to chain
 				Fragmenter frag(residue.get_atoms());
-				//~ Rings rings = frag.identify_rings();
-				Rings rings = frag.identify_fused_rings();
+				Rings rings = frag.identify_rings();
+				//~ Rings rings = frag.identify_fused_rings();
+				for (auto &ring : rings) {
+					for (auto &pa : ring) {
+						pa->erase_property("NG"); // atom belongs to ring
+					}
+				}
 				int r_id = 0;
 				for (auto &ring : rings) {
 					auto ring_bonds = get_bonds_in(ring);
@@ -898,20 +972,45 @@ namespace Molib {
 					// determine the type of aromatic ring
 					if (aromatic(ring)) {
 						//~ int num_c = 0, num_n = 0, num_s = 0, num_o = 0;
-						//~ for (auto &pa : ring) {
+						int num_c = 0, num_n = 0;
+						for (auto &pa : ring) {
 							//~ if (pa->element() == Element::C) num_c++;
+							if (pa->idatm_type_unmask() == "Car") num_c++;
 							//~ else if (pa->element() == Element::N) num_n++;
+							else if (pa->idatm_type_unmask() == "N2" 
+								|| pa->idatm_type_unmask() == "N2+") num_n++;
 							//~ else if (pa->element() == Element::S) num_s++;
 							//~ else if (pa->element() == Element::O) num_o++;
-						//~ }
-						if (ring.size() == 6 && num_double(ring_bonds) == 3) {
+						}
+						// calculate number of out-of-ring double bonds
+						auto dbl = get_double_bonds(out_bonds);
+						int num_double_out = 0;
+						for (auto &pbond : dbl) {
+							if (pbond->atom1().has_property("NG")
+							 || pbond->atom2().has_property("NG"))
+								++num_double_out;
+						}			 
+						//~ dbgmsg("num_c = " << num_c << " num_n = " << num_n
+							//~ << "num_s = " << num_s << " num_o = " << num_o);
+						dbgmsg("num_c = " << num_c << " num_n = " << num_n
+							<< " num_double_out = " << num_double_out);
+						//~ if (ring.size() == 6 && num_double(ring_bonds) == 3) {
+						//~ if (ring.size() == 6 && (num_c == 6
+							//~ || num_c == 5 && num_n == 1
+							//~ || num_c == 3 && num_n == 3)) {
+							//~ // Pure aromatic atom (such as benzene and pyridine)
+							//~ aromatic_type = "AR1";
+						if (ring.size() == 6 && num_c + num_n == 6) {
 							// Pure aromatic atom (such as benzene and pyridine)
 							aromatic_type = "AR1";
-						} else if (num_double(out_bonds) > 0) {
+						//~ } else if (num_double(out_bonds) > 0) {
+						//~ } else if (num_double(out_bonds) > 0) {
+						} else if (num_double_out > 0) {
 							// Atom in a planar ring, which has one or several double bonds 
 							// formed between non-ring atoms and the ring atoms
 							aromatic_type = "AR3";
-						} else if (num_double(ring_bonds) >= 2 
+						//~ } else if (num_double(ring_bonds) >= 2 
+						} else if (get_double_bonds(ring_bonds).size() >= 2 
 							&& two_continuous_single_bonds(ring_bonds)) {
 							// Atom in a planar ring, usually the ring has two 
 							// continous single bonds and at least two double bonds
@@ -923,12 +1022,14 @@ namespace Molib {
 					}
 					const string ring_type = "RG" + help::to_string(ring.size());
 					for (auto &pa : ring) {
-						Atom &a = const_cast<Atom&>(*pa); // ugly trick
+						//~ Atom &a = const_cast<Atom&>(*pa); // ugly trick
 						//~ a.erase_property("NG")
 							//~ .insert_property(ring_type)
 							//~ .insert_property(aromatic_type);
-						a.erase_property("NG")
-							.add_property(ring_type)
+						//~ a.erase_property("NG")
+							//~ .add_property(ring_type)
+							//~ .add_property(aromatic_type);
+						pa->add_property(ring_type)
 							.add_property(aromatic_type);
 					}
 				}
