@@ -334,26 +334,29 @@ namespace OMMIface {
 		dbgmsg("IMPROPERS ARE : " << endl << this->improper);
 		return *this;
 	}
+	//~ MoleculeInfo& MoleculeInfo::get_kb_force_info(const Molib::Molecule &receptor, 
+					//~ const Molib::Molecule &ligand, const ForceField &ff,
+					//~ const int &dist_cutoff) {
 	MoleculeInfo& MoleculeInfo::get_kb_force_info(const Molib::Molecule &receptor, 
-					const Molib::Molecule &ligand, const ForceField &ff,
-					const int &dist_cutoff) {
+					const Molib::Molecule &ligand, const int &dist_cutoff) {
 		dbgmsg("get_kb_force_info");
 		// 1-2 and 1-3 bonded exclusions for knowledge-based forcefield
 		Molib::AtomVec rec_atoms = receptor.get_atoms();
 		Molib::AtomVec lig_atoms = ligand.get_atoms();
 		Molib::AtomVec atoms;
 		atoms.reserve(rec_atoms.size() + lig_atoms.size());
-
-#ifndef NDEBUG
-		for (auto &pa : rec_atoms) {
-			Molib::Atom &atom1 = *pa;
-			dbgmsg("receptor atom1 = " << atom1);
-		}
-		for (auto &pa : lig_atoms) {
-			Molib::Atom &atom1 = *pa;
-			dbgmsg("ligand atom1 = " << atom1);
-		}
-#endif
+//~ #ifndef NDEBUG
+		//~ for (auto &pa : rec_atoms) {
+			//~ Molib::Atom &atom1 = *pa;
+			//~ dbgmsg("receptor atom1 = " << atom1);
+		//~ }
+		//~ for (auto &pa : lig_atoms) {
+			//~ Molib::Atom &atom1 = *pa;
+			//~ dbgmsg("ligand atom1 = " << atom1);
+		//~ }
+//~ #endif
+		dbgmsg("receptor atoms are : " << endl << rec_atoms);
+		dbgmsg("ligand atoms are : " << endl << lig_atoms);
 
 		atoms.insert(atoms.end(), rec_atoms.begin(), rec_atoms.end());
 		atoms.insert(atoms.end(), lig_atoms.begin(), lig_atoms.end());
@@ -374,14 +377,14 @@ namespace OMMIface {
 				}
 			}
 		}
-#ifndef NDEBUG
-		dbgmsg("get_kb_force_info3");
-		// calculate max distance to compute forces
-		const int sz = ((ff.kb_force_type.begin()->second).begin()->second).potential.size(); // number 
-		const double max_dist = ff.step * sz;
-		dbgmsg("max distance to compute knowledge-based ff " << max_dist 
-				<< " currently selected distance cutoff is " << dist_cutoff);
-#endif
+//~ #ifndef NDEBUG
+		//~ dbgmsg("get_kb_force_info3");
+		//~ // calculate max distance to compute forces
+		//~ const int sz = ((ff.kb_force_type.begin()->second).begin()->second).potential.size(); // number 
+		//~ const double max_dist = ff.step * sz;
+		//~ dbgmsg("max distance to compute knowledge-based ff " << max_dist 
+				//~ << " currently selected distance cutoff is " << dist_cutoff);
+//~ #endif
 		//~ // knowledge-based forces between atoms except between bonded exclusions
 		//~ Molib::MolGrid g(atoms);
 		//~ for (auto &pa1 : atoms) {

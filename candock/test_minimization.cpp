@@ -96,7 +96,7 @@ int main(int argc, char* argv[]) {
 		 */
 		OMMIface::ForceField ffield;
 		ffield.parse_gaff_dat_file(cmdl.gaff_dat_file())
-			.add_residue_topology(ligands)
+			//~ .add_residue_topology(ligands)
 			.add_kb_forcefield(score, cmdl.step_non_bond(), cmdl.scale_non_bond())
 			.parse_forcefield_file(cmdl.amber_xml_file());
 
@@ -104,6 +104,7 @@ int main(int argc, char* argv[]) {
 
 		for (auto &ligand : ligands) {
 			try {
+				ffield.insert_topology(ligand);
 				OMMIface::OMM omm(receptors[0], ligand, ffield, 
 					cmdl.fftype(), cmdl.dist_cutoff());
 				omm.minimize(cmdl.tolerance(), cmdl.max_iterations()); // minimize
@@ -125,6 +126,7 @@ int main(int argc, char* argv[]) {
 				//~ energies[&minimized_ligand] = omm.get_energy_components(
 					//~ minimized_receptor, minimized_ligand, cmdl.dist_cutoff());
 				//~ minimized_receptor.undo_mm_specific();
+				ffield.erase_topology(ligand);
 			} catch (exception& e) {
 				cerr << "MINIMIZATION FAILED FOR LIGAND " << ligand.name() 
 					<< " because of " << e.what() << endl;

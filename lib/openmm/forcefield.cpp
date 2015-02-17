@@ -260,33 +260,51 @@ namespace OMMIface {
 		throw ParameterError("warning : missing improper type " + aclass1 
 			+ "-" + aclass2 + "-" + aclass3 + "-" + aclass4);
 	}
-	ForceField& ForceField::add_residue_topology(const Molib::Molecules &mols) {
-		Residues &residue_topology = this->residue_topology;
-		Atoms &atom_type = this->atom_type;
+	//~ ForceField& ForceField::insert_topology(const Molib::Molecules &mols) {
+	ForceField& ForceField::insert_topology(const Molib::Molecule &molecule) {
+		//~ Residues &residue_topology = this->residue_topology;
+		//~ Atoms &atom_type = this->atom_type;
 		map<const string, const int> atom_name_to_type;
-		for (auto &kv : atom_type) {
+		for (auto &kv : this->atom_type) {
 			const int &type = kv.first;
 			AtomType &at = kv.second;
 			atom_name_to_type.insert({at.cl, type});
 		}
-		for (auto &molecule : mols)
+		//~ for (auto &molecule : mols)
 		for (auto &assembly : molecule)
 		for (auto &model : assembly)
 		for (auto &chain : model)
 		for (auto &residue : chain) {
-			residue_topology.insert({residue.resn(), ResidueTopology()});
-			ResidueTopology &rt = residue_topology.at(residue.resn());
+			this->residue_topology.insert({residue.resn(), ResidueTopology()});
+			//~ this->residue_topology.insert({&residue, ResidueTopology()});
+			ResidueTopology &rtop = this->residue_topology.at(residue.resn());
+			//~ ResidueTopology &rtop = this->residue_topology.at(&residue);
 			for (auto &atom : residue) {
-				rt.atom.insert({atom.atom_name(), atom_name_to_type.at(atom.gaff_type())});
+				rtop.atom.insert({atom.atom_name(), atom_name_to_type.at(atom.gaff_type())});
 			}
+			//~ set<AtomPair> visited;
 			for (auto &atom : residue) {
 				for (auto &adj_a : atom) {
+					//~ if (!visited.count({&adj_a, &atom)) {
+						//~ visited.insert({&atom, &adj_a});
 				//~ for (auto &bond : atom) {
 					//~ auto &adj_a = bond.second_atom();
 					if (atom.atom_number() < adj_a.atom_number())
-						rt.bond[atom.atom_name()][adj_a.atom_name()] = true;
+						rtop.bond[atom.atom_name()][adj_a.atom_name()] = true;
+					//~ }
 				}
 			}
+		}
+		return *this;
+	}
+	//~ ForceField& ForceField::erase_topology(const Molib::Molecules &mols) {
+	ForceField& ForceField::erase_topology(const Molib::Molecule &molecule) {
+		//~ for (auto &molecule : mols)
+		for (auto &assembly : molecule)
+		for (auto &model : assembly)
+		for (auto &chain : model)
+		for (auto &residue : chain) {
+			this->residue_topology.erase(residue.resn());
 		}
 		return *this;
 	}
@@ -489,13 +507,13 @@ namespace OMMIface {
 		ff_node->append_node(residues_node);
 		for (auto &kv : this->residue_topology) {
 			const string &name = kv.first;
-			const ResidueTopology &rt = kv.second;
+			const ResidueTopology &rtop = kv.second;
 			xml_node<> *residue_node = doc.allocate_node(node_element, "Residue");
 			residues_node->append_node(residue_node);
 			residue_node->append_attribute(doc.allocate_attribute("name", name.c_str()));
 			map<const string, const int> atom_name_to_index;
 			int i = 0;
-			for (auto &kv2 : rt.atom) {
+			for (auto &kv2 : rtop.atom) {
 				const string &name = kv2.first;
 				const int &type = kv2.second;
 				atom_name_to_index.insert({name, i++});
@@ -504,7 +522,7 @@ namespace OMMIface {
 				atom_node->append_attribute(doc.allocate_attribute("name", name.c_str()));
 				atom_node->append_attribute(doc.allocate_attribute("type", str(doc, type)));
 			}
-			for (auto &kv2 : rt.bond) {
+			for (auto &kv2 : rtop.bond) {
 				const int from = atom_name_to_index.at(kv2.first);
 				for (auto &kv3 : kv2.second) {
 					const int to = atom_name_to_index.at(kv3.first);

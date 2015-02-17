@@ -303,7 +303,7 @@ int main(int argc, char* argv[]) {
 			 */
 			OMMIface::ForceField ffield;
 			ffield.parse_gaff_dat_file(cmdl.gaff_dat_file())
-				.add_residue_topology(ligands)
+				//~ .add_residue_topology(ligands)
 				.add_kb_forcefield(score, cmdl.step_non_bond(), cmdl.scale_non_bond())
 				.parse_forcefield_file(cmdl.amber_xml_file());
 
@@ -317,11 +317,16 @@ int main(int argc, char* argv[]) {
 			for(int i = 0; i < cmdl.ncpu(); ++i) {
 				threads.push_back(
 					thread([&ligands, &receptors, &top_seeds, &gridrec, &score, &ffield, &mutex, i] () {
+					//~ thread([&ligands, &receptors, &top_seeds, &gridrec, &score, ffield, &mutex, i] () {
+						OMMIface::ForceField ffield_copy = ffield; // make a local copy of the forcefield
 						// iterate over docked seeds and dock unique seeds
 						for (int j = i; j < ligands.size(); j+= cmdl.ncpu()) {
 							// if one ligand fails docking of others shall continue
 							try {
 								auto &ligand = ligands[j];
+								
+								ffield_copy.insert_topology(ligand);
+
 								cerr << "Quack quack ligand: " << endl << ligand << endl;
 								/* Connect seeds with rotatable linkers, symmetry, optimize 
 								 * seeds with appendices. A graph of segments is constructed in 
@@ -359,7 +364,7 @@ int main(int argc, char* argv[]) {
 		
 								for (int k = 0; k < docked_representatives.size(); ++k) {
 									auto &docked_ligand = docked_representatives[k];
-									OMMIface::OMM omm(receptors[0], docked_ligand, ffield, 
+									OMMIface::OMM omm(receptors[0], docked_ligand, ffield_copy, 
 										cmdl.fftype(), cmdl.dist_cutoff());
 									omm.minimize(cmdl.tolerance(), cmdl.max_iterations()); // minimize
 									auto ret = omm.get_state(receptors[0], docked_ligand);
@@ -373,6 +378,8 @@ int main(int argc, char* argv[]) {
 									ios_base::app); // output docked & minimized ligands
 								inout::output_file(energies, cmdl.energy_file(), 
 									ios_base::app); // output energies of docked & minimized ligands
+								
+								ffield_copy.erase_topology(ligand); // he he
 							}
 							catch (Error& e) { cerr << "skipping ligand due to : " << e.what() << endl; } 
 							catch (out_of_range& e) { 

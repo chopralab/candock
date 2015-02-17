@@ -50,6 +50,7 @@ namespace OMMIface {
 		//~ typedef map<const string, map<const string, map<const string, map<const string, pair<proper_t, TorsionTypeVec>>>>> Torsions;
 		typedef map<const string, map<const string, map<const string, map<const string, TorsionTypeVec>>>> Torsions;
 		typedef map<const string, ResidueTopology> Residues;
+		//~ typedef map<const Residue*, ResidueTopology> Residues;
 		typedef map<const int, map<const int, KBType>> KBForces;
 		Atoms atom_type;
 		Bonds bond_type;
@@ -69,7 +70,10 @@ namespace OMMIface {
 		ForceField& parse_forcefield_file(const string&);
 		void output_forcefield_file(const string&);
 		ForceField& parse_gaff_dat_file(const string&);
-		ForceField& add_residue_topology(const Molib::Molecules&);
+		//~ ForceField& insert_topology(const Molib::Molecules&);
+		//~ ForceField& erase_topology(const Molib::Molecules &mols);
+		ForceField& insert_topology(const Molib::Molecule&);
+		ForceField& erase_topology(const Molib::Molecule&);
 		ForceField& add_kb_forcefield(const Molib::Score&, const double step, const double scale);
 	};
 }

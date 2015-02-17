@@ -62,7 +62,8 @@ namespace OMMIface {
 		MoleculeInfo mol_info;
 		mol_info.get_molecule_info(receptor, __ffield)
 			.get_molecule_info(ligand, __ffield)
-			.get_kb_force_info(receptor, ligand, __ffield, dist_cutoff);				
+			//~ .get_kb_force_info(receptor, ligand, __ffield, dist_cutoff);				
+			.get_kb_force_info(receptor, ligand, dist_cutoff);				
 		// Set up OpenMM data structures; returns OpenMM Platform name.
 		__initialize_openmm(__omm, mol_info, OMMIface::torsional|OMMIface::non_bond); 
 	}
@@ -384,17 +385,20 @@ namespace OMMIface {
 		MoleculeInfo complex_info;
 		complex_info.get_molecule_info(receptor, __ffield)
 			.get_molecule_info(ligand, __ffield)
-			.get_kb_force_info(receptor, ligand, __ffield, cur_dist_cutoff);
+			//~ .get_kb_force_info(receptor, ligand, __ffield, cur_dist_cutoff);
+			.get_kb_force_info(receptor, ligand, cur_dist_cutoff);
 		MoleculeInfo interaction_info;
 		interaction_info.get_molecule_info(receptor, __ffield)
 			.get_molecule_info(ligand, __ffield)
 			.get_interaction_force_info(receptor, ligand, cur_dist_cutoff);
 		MoleculeInfo ligand_info;					
 		ligand_info.get_molecule_info(ligand, __ffield)
-			.get_kb_force_info(Molib::Molecule("dummy"), ligand, __ffield, cur_dist_cutoff);
+			//~ .get_kb_force_info(Molib::Molecule("dummy"), ligand, __ffield, cur_dist_cutoff);
+			.get_kb_force_info(Molib::Molecule("dummy"), ligand, cur_dist_cutoff);
 		MoleculeInfo receptor_info;					
 		receptor_info.get_molecule_info(receptor, __ffield)
-			.get_kb_force_info(receptor, Molib::Molecule("dummy"), __ffield, cur_dist_cutoff);
+			//~ .get_kb_force_info(receptor, Molib::Molecule("dummy"), __ffield, cur_dist_cutoff);
+			.get_kb_force_info(receptor, Molib::Molecule("dummy"), cur_dist_cutoff);
 
 		dbgmsg("after moleculeinfo");
 		MyOpenMMData omm_tot, omm_ie, omm_lie, omm_lte, omm_rie, omm_rte;
