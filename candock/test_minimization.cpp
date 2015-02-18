@@ -103,8 +103,8 @@ int main(int argc, char* argv[]) {
 		receptors[0].prepare_for_mm(ffield, gridrec);
 
 		for (auto &ligand : ligands) {
+			ffield.insert_topology(ligand);
 			try {
-				ffield.insert_topology(ligand);
 				OMMIface::OMM omm(receptors[0], ligand, ffield, 
 					cmdl.fftype(), cmdl.dist_cutoff());
 				omm.minimize(cmdl.tolerance(), cmdl.max_iterations()); // minimize
@@ -126,11 +126,11 @@ int main(int argc, char* argv[]) {
 				//~ energies[&minimized_ligand] = omm.get_energy_components(
 					//~ minimized_receptor, minimized_ligand, cmdl.dist_cutoff());
 				//~ minimized_receptor.undo_mm_specific();
-				ffield.erase_topology(ligand);
 			} catch (exception& e) {
 				cerr << "MINIMIZATION FAILED FOR LIGAND " << ligand.name() 
 					<< " because of " << e.what() << endl;
 			}
+			ffield.erase_topology(ligand);
 
 		}
 		cmdl.display_time("finished");

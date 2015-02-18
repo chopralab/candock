@@ -15,6 +15,20 @@
 using namespace std;
 
 namespace OMMIface {
+	ostream& operator<< (ostream& stream, const ForceField::ResidueTopology& r) {
+		for (auto &kv : r.atom) {
+			stream << "atom " << kv.first << " = " << kv.second << endl;
+		}
+		for (auto &kv1 : r.bond) {
+			for (auto &kv2 : kv1.second) {
+				stream << "bond " << kv1.first << " " << kv2.first << " = " << kv2.second << endl;
+			}
+		}
+		for (auto &from : r.external_bond) {
+			stream << "external bond " << from << endl;
+		}
+		return stream;
+	}
 	ostream& operator<<(ostream& os, const ForceField::KBForces &kb) {
 		for (auto &kv1 : kb) {
 			const int aclass1 = kv1.first;
@@ -294,6 +308,8 @@ namespace OMMIface {
 					//~ }
 				}
 			}
+			dbgmsg("inserted topology for residue " << residue.resn()
+				<< endl << rtop);
 		}
 		return *this;
 	}
@@ -304,6 +320,8 @@ namespace OMMIface {
 		for (auto &model : assembly)
 		for (auto &chain : model)
 		for (auto &residue : chain) {
+			dbgmsg("erasing topology for residue " << residue.resn()
+				<< endl << residue_topology.at(residue.resn()));
 			this->residue_topology.erase(residue.resn());
 		}
 		return *this;

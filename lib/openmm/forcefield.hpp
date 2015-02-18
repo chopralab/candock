@@ -75,6 +75,8 @@ namespace OMMIface {
 		ForceField& insert_topology(const Molib::Molecule&);
 		ForceField& erase_topology(const Molib::Molecule&);
 		ForceField& add_kb_forcefield(const Molib::Score&, const double step, const double scale);
+
 	};
+	ostream& operator<< (ostream& stream, const ForceField::ResidueTopology& r);
 }
 #endif
