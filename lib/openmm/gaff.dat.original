@@ -1861,7 +1861,6 @@ nd-cc-nh   72.41      120.11	SOURCE3            5	0.9313
 nd-cc-no   69.90      122.68	SOURCE4           16	0.3393
 nd-cc-oh   72.93      121.54      CORR           22
 nd-cc-os   73.85      116.29      CORR          209
-nc-cc-os   73.85      116.29      CORR          209     Janez : copy of nd-cc-os
 nd-cc-sh   62.75      124.92	SOURCE4            5	0.9563
 nd-cc-ss   66.51      114.51	SOURCE3            8	0.3449
 nd-cc-sx   60.81      127.60	SOURCE4           14	1.1650
@@ -1980,8 +1979,6 @@ c -cd-n2   68.54      120.89      CORR            2
 c -cd-n    68.11      116.32      CORR           21
 c -cd-nc   67.50      121.67      CORR           47
 c -cd-nd   66.19      123.47      CORR           24
-c -cd-na   66.19      123.47      CORR           24     Janez : copy of c -cd-nd
-c -cc-na   66.19      123.47      CORR           24     Janez : copy of c -cd-nd
 c -cd-oh   70.04      113.64      CORR           53
 c -cd-os   67.83      119.39      CORR           78
 h4-cd-n    50.39      117.62	SOURCE3           53	0.9721
@@ -5331,8 +5328,6 @@ X -ca-ca-X    4   14.500       180.000           2.000      intrpol.bsd.on C6H6
 X -ca-cp-X    4   14.500       180.000           2.000      intrpol.bsd.on C6H6
 X -ca-cq-X    4   14.500       180.000           2.000      intrpol.bsd.on C6H6
 X -cp-cp-X    4    4.000       180.000           2.000      estimated, intrpol. 
-X -cc-ca-X    4    4.000       180.000           2.000      Janez : copy of X -cp-cp-X
-X -cd-ca-X    4    4.000       180.000           2.000      Janez : copy of X -cp-cp-X
 X -cq-cq-X    4    4.000       180.000           2.000      estimated, intrpol. 
 X -ca-n -X    4    1.800       180.000           2.000
 X -ca-n2-X    2    0.000       180.000           3.000
@@ -5349,8 +5344,6 @@ X -cd-nh-X    4    4.200       180.000           2.000      same as X-ca-nh-X
 X -ca-no-X    4    2.400       180.000           2.000
 X -ca-oh-X    2    1.800       180.000           2.000      Junmei et al, 99
 X -ca-os-X    2    1.800       180.000           2.000      same as X-ca-oh-X 
-X -cd-os-X    2    1.800       180.000           2.000      Janez : copy of X -ca-os-X
-X -cc-os-X    2    1.800       180.000           2.000      Janez : copy of X -ca-os-X
 X -ca-p2-X    2    1.200       180.000           2.000
 X -ca-pe-X    2    1.200       180.000           2.000      same as X-ca-p2-X
 X -ca-pf-X    2    1.200       180.000           2.000      same as X-ca-p2-X
@@ -5363,8 +5356,6 @@ X -ca-p5-X    6    8.800       180.000           2.000
 X -ca-py-X    6    8.800       180.000           2.000      estimated, same as X-ca-p5-X
 X -ca-sh-X    2    0.000       180.000           2.000
 X -ca-ss-X    2    0.800       180.000           2.000
-X -cc-ss-X    2    0.800       180.000           2.000      Janez : copy of X -ca-ss-X
-X -cd-ss-X    2    0.800       180.000           2.000      Janez : copy of X -ca-ss-X
 X -ca-s4-X    4    1.200         0.000           2.000
 X -ca-sx-X    4    1.200         0.000           2.000      estimated, same as X-ca-s4-X
 X -ca-s6-X    6    7.800       180.000           2.000
