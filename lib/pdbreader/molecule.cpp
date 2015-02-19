@@ -265,14 +265,15 @@ namespace Molib {
 					if(rtop.bond.count(atom1.atom_name())) {
 						for (auto &atom2 : residue) {
 							if (rtop.bond.at(atom1.atom_name()).count(atom2.atom_name())) {
-								if (!atom1.is_adjacent(atom2)) {
-									dbgmsg("added bond between atom " << atom1.atom_number() << " and atom "
-										<< atom2.atom_number());
-									atom1.add(&atom2);
-									atom2.add(&atom1);
-									atom1.insert_bond(atom2, new Bond(&atom1, &atom2)); // insert if not exists
-									atom2.insert_bond(atom1, atom1.get_shared_ptr_bond(atom2)); // insert if not exists
-								}
+								//~ if (!atom1.is_adjacent(atom2)) {
+									//~ dbgmsg("added bond between atom " << atom1.atom_number() << " and atom "
+										//~ << atom2.atom_number());
+									//~ atom1.add(&atom2);
+									//~ atom2.add(&atom1);
+									//~ atom1.insert_bond(atom2, new Bond(&atom1, &atom2)); // insert if not exists
+									//~ atom2.insert_bond(atom1, atom1.get_shared_ptr_bond(atom2)); // insert if not exists
+								//~ }
+								atom1.connect(atom2);
 							}
 						}
 					}
@@ -307,11 +308,13 @@ namespace Molib {
 				auto &atom2 = *patom2;
 				Residue &residue1 = const_cast<Residue&>(atom1.br());
 				Residue &residue2 = const_cast<Residue&>(atom2.br());
-				if (!atom1.is_adjacent(atom2) && &residue1 != &residue2) {
-					atom1.add(&atom2);
-					atom2.add(&atom1);
-					atom1.insert_bond(atom2, new Bond(&atom1, &atom2)); // insert if not exists
-					atom2.insert_bond(atom1, atom1.get_shared_ptr_bond(atom2)); // insert if not exists
+				if (&residue1 != &residue2) {
+					atom1.connect(atom2);
+				//~ if (!atom1.is_adjacent(atom2) && &residue1 != &residue2) {
+					//~ atom1.add(&atom2);
+					//~ atom2.add(&atom1);
+					//~ atom1.insert_bond(atom2, new Bond(&atom1, &atom2)); // insert if not exists
+					//~ atom2.insert_bond(atom1, atom1.get_shared_ptr_bond(atom2)); // insert if not exists
 					dbgmsg("added inter-residue bond between atom " << atom1.atom_name() << " " 
 						<< atom1.atom_number() << " and atom " << atom2.atom_name() << " " 
 						<< atom2.atom_number());
@@ -617,11 +620,14 @@ namespace Molib {
 			copy1.clear_bonds();
 			for (auto &atom2 : atom1) {
 				if (atom1_to_copy1.count(&atom2)) {
-					Atom &copy2 = *atom1_to_copy1.at(&atom2);
-					copy1.add(&copy2);
 					// copying of bonds does not preserve bond properties !!!
-					copy1.insert_bond(copy2, new Bond(&copy1, &copy2)); // insert if not exists
-					copy2.insert_bond(copy1, copy1.get_shared_ptr_bond(copy2)); // insert if not exists
+					Atom &copy2 = *atom1_to_copy1.at(&atom2);
+					copy1.connect(copy2);
+					//~ Atom &copy2 = *atom1_to_copy1.at(&atom2);
+					//~ copy1.add(&copy2);
+					//~ // copying of bonds does not preserve bond properties !!!
+					//~ copy1.insert_bond(copy2, new Bond(&copy1, &copy2)); // insert if not exists
+					//~ copy2.insert_bond(copy1, copy1.get_shared_ptr_bond(copy2)); // insert if not exists
 				}
 			}
 		}
@@ -660,21 +666,54 @@ namespace Molib {
 				num_h++;
 		return num_h;
 	}
+	Bond& Atom::connect(Atom &a2) {
+		Atom &a1 = *this;
+		if (!a1.is_adjacent(a2)) {
+			a1.add(&a2);
+			a2.add(&a1);
+			a1.insert_bond(a2, new Bond(&a1, &a2)); // insert if not exists
+			return *a2.insert_bond(a1, a1.get_shared_ptr_bond(a2)); // insert if not exists
+		}
+		return a1.get_bond(a2); // if already connected return existing bond
+	}
 	void Atom::set_members(const string &str) {
 		// set atomic penalty scores
-		boost::match_results<string::const_iterator> matches;
-		string::const_iterator begin = str.begin(), end = str.end();
-		while (boost::regex_search(begin, end, matches, boost::regex("\\{(\\d+,\\d+)\\}"))) {
-			string s(matches[1].first, matches[1].second);
-			auto vec = help::ssplit(s, ",");
-			int val = stoi(vec[0]);
-			int aps = stoi(vec[1]);
-			__aps[val] = aps;
-			//~ cout << s << endl;
-			begin = matches[1].second;
+		boost::smatch m;
+		if (boost::regex_search(str, m, boost::regex("aps=(\\S+)"))) {
+			if (m[1].matched) {
+				string aps_str = m[1].str();
+				dbgmsg("aps_str = " << aps_str);
+				boost::match_results<string::const_iterator> matches;
+				string::const_iterator begin = aps_str.begin(), end = aps_str.end();
+				while (boost::regex_search(begin, end, matches, boost::regex("\\{(\\d+,\\d+)\\}"))) {
+					string s(matches[1].first, matches[1].second);
+					auto vec = help::ssplit(s, ",");
+					int val = stoi(vec[0]);
+					int aps = stoi(vec[1]);
+					__aps[val] = aps;
+					begin = matches[1].second;
+				}
+			}
+		}
+		// set properties
+		if (boost::regex_search(str, m, boost::regex("prop=(\\S+)"))) {
+			if (m[1].matched) {
+				string prop_str = m[1].str();
+				dbgmsg("prop = " << prop_str);
+				boost::match_results<string::const_iterator> matches;
+				string::const_iterator begin = prop_str.begin(), end = prop_str.end();
+				while (boost::regex_search(begin, end, matches, boost::regex("\\{(\\w+,\\d+)\\}"))) {
+					string s(matches[1].first, matches[1].second);
+					auto vec = help::ssplit(s, ",");
+					string val = vec[0];
+					int count = stoi(vec[1]);
+					__smiles_prop[val] = count;
+					begin = matches[1].second;
+				}
+			}
 		}
 		// set gaff type
-		boost::smatch m;
+		//~ boost::smatch m;
 		if (boost::regex_search(str, m, boost::regex("gaff=(\\w+)"))) {
 			if (m[1].matched) {
 				set_gaff_type(m[1].str());
@@ -833,10 +872,11 @@ namespace Molib {
 						dbgmsg("idatm_mask = " << help::idatm_mask.at(idatm_type));
 						Atom &hatom = residue.add(new Atom(++max_atom_number, "H", 
 							Geom3D::Coordinate(), help::idatm_mask.at(idatm_type)));
-						atom.add(&hatom);
-						hatom.add(&atom);
-						atom.insert_bond(hatom, new Bond(&atom, &hatom)); // insert if not exists
-						hatom.insert_bond(atom, atom.get_shared_ptr_bond(hatom)); // insert if not exists
+						//~ atom.add(&hatom);
+						//~ hatom.add(&atom);
+						//~ atom.insert_bond(hatom, new Bond(&atom, &hatom)); // insert if not exists
+						//~ hatom.insert_bond(atom, atom.get_shared_ptr_bond(hatom)); // insert if not exists
+						atom.connect(hatom);
 						dbgmsg("added hydrogen");
 					}
 				} else if (num_h < 0) {
@@ -923,13 +963,32 @@ namespace Molib {
 		stream << setw(6) << setprecision(2) << fixed << right << 1.0;
 		stream << setw(5) << right << a.idatm_type_unmask();
 		stream << setw(5) << right << a.gaff_type();
-		stream << setw(5) << right << a.__smiles_label;
+		//~ stream << setw(5) << right << a.__smiles_label;
 		//~ stream << " ";
 		//~ copy(a.__props.begin(), a.__props.end(), ostream_iterator<string>(stream, " "));
-		for (auto &kv : a.__aps) 
-			stream << setw(5) << right << kv.first << ":" << kv.second << " ";
-		for (auto &kv : a.__smiles_prop) 
-			stream << setw(5) << right << kv.first << ":" << kv.second << " ";
+		stringstream ss;
+		//~ ss << " aps={";
+		ss << " aps={";
+		//~ for (auto &kv : a.__aps) 
+		for (auto it = a.__aps.begin(); it != a.__aps.end(); ++it) {
+			//~ stream << setw(5) << right << kv.first << ":" << kv.second << " ";
+			auto it_plus_one = it;
+			ss << "{" << it->first << "," << it->second << "}" 
+				<< (++it_plus_one == a.__aps.end() ? "" : ",");
+		}
+		//~ for (auto &kv : a.__smiles_prop) 
+			//~ stream << setw(5) << right << kv.first << ":" << kv.second << " ";
+		//~ stream << setw(40) << ss.str() << "}"; 
+		stream << ss.str() << "}"; 
+		//~ ss.str("prop={");
+		ss.str("");
+		ss << " prop={";
+		for (auto it = a.__smiles_prop.begin(); it != a.__smiles_prop.end(); ++it) {
+			auto it_plus_one = it;
+			ss << "{" << it->first << "," << it->second << "}" 
+				<< (++it_plus_one == a.__smiles_prop.end() ? "" : ",");
+		}
+		stream << ss.str() << "}"; 
 		stream << endl;
 		return stream;
 	}

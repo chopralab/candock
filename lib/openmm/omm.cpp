@@ -274,7 +274,7 @@ namespace OMMIface {
 				}
 			} catch (ParameterError& e) {
 				//~ // cerr << e.what() << " (" << ++warn << ")" << endl;
-				cerr << e.what() << " (WARNINGS ARE NOT INCREASED)" << endl;
+				dbgmsg(e.what() << " (WARNINGS ARE NOT INCREASED)");
 			}
 		}
 		// Create the knowledge-based forcefield terms.

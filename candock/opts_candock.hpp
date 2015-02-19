@@ -154,7 +154,8 @@ public:
 				'normalized_frequency'",false,"radial",&allowedValsRad, cmd);
 			vector<int> allowedDistCutoff{4,5,6,7,8,9,10,11,12,13,14,15};
 			TCLAP::ValuesConstraint<int> allowedValsDistCutoff( allowedDistCutoff );
-			TCLAP::ValueArg<int> dist_cutoffArg("","cutoff","Cutoff length (default is 6)",false,6,&allowedValsDistCutoff, cmd);
+			//~ TCLAP::ValueArg<int> dist_cutoffArg("","cutoff","Cutoff length (default is 6)",false,6,&allowedValsDistCutoff, cmd);
+			TCLAP::ValueArg<int> dist_cutoffArg("","cutoff","Cutoff length (default is 8)",false,8,&allowedValsDistCutoff, cmd);
 			TCLAP::ValueArg<string> distributions_fileArg("","dist","Select one of the interatomic distance distribution \
 				file(s) provided with this script",false,"data/csd_complete_distance_distributions.txt","string", cmd);
 			TCLAP::ValueArg<double> step_non_bondArg("","step","Step for spline generation of non-bonded knowledge-based \
@@ -222,7 +223,7 @@ public:
 
 			TCLAP::ValueArg<double> clus_radArg("","clus_rad","Cluster radius for docked seeds (default is 1.0)",false,1.0,"double", cmd);
 			TCLAP::ValueArg<int> min_ptsArg("","min_pts","The minimum number of points (docked seeds) required to form a cluster (default is 5)",false,5,"int", cmd);
-			TCLAP::ValueArg<int> max_num_clusArg("","max_num_clus","Maximum number of clustered seeds to consider further (default is 70)",false,70,"int", cmd);
+			TCLAP::ValueArg<int> max_num_clusArg("","max_num_clus","Maximum number of clustered seeds to consider further (default is 500)",false,500,"int", cmd);
 			TCLAP::ValueArg<int> max_seeds_to_clusterArg("","max_seeds_to_cluster","Maximum number of seeds to cluster (default is 2000)",false,2000,"int", cmd);
 
 			TCLAP::ValueArg<int> num_iterArg("","num_iter","Number of iterations for maximum weight clique algorithm (default is 1000)",false,1000,"int", cmd);

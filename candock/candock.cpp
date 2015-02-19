@@ -91,7 +91,8 @@ int main(int argc, char* argv[]) {
 		Molib::PDBreader rpdb(cmdl.receptor_file(), 
 			Molib::PDBreader::first_model|Molib::PDBreader::skip_hetatm);
 		Molib::Molecules receptors = rpdb.parse_molecule();
-		Molib::PDBreader lpdb(cmdl.ligand_file(), Molib::PDBreader::all_models, 
+		Molib::PDBreader lpdb(cmdl.ligand_file(), 
+			Molib::PDBreader::all_models|Molib::PDBreader::hydrogens, 
 			cmdl.max_num_ligands());
 
 		/* Compute atom types for receptor (gaff types not needed since 
@@ -138,8 +139,18 @@ int main(int argc, char* argv[]) {
 			if (ligands.empty()) break;
 
 			// Compute properties, such as idatm atom types, fragments, seeds,
-			// rotatable bonds
-			ligands.compute_idatm_type().compute_rotatable_bonds()
+			// rotatable bonds etc.
+			//~ ligands.compute_idatm_type().compute_rotatable_bonds()
+				//~ .compute_overlapping_rigid_segments()
+				//~ .compute_seeds(cmdl.seeds_file());
+			ligands.compute_idatm_type()
+				.compute_hydrogen()
+				.compute_bond_order()
+				.compute_ring_type()
+				.compute_bond_gaff_type()
+				.compute_gaff_type()
+				.erase_hydrogen()
+				.compute_rotatable_bonds()
 				.compute_overlapping_rigid_segments()
 				.compute_seeds(cmdl.seeds_file());
 			ligand_idatm_types = Molib::get_idatm_types(ligands, ligand_idatm_types);
@@ -147,7 +158,18 @@ int main(int argc, char* argv[]) {
 			inout::output_file(ligands, cmdl.prep_file(), ios_base::app);
 		}
 		dbgmsg(seeds);
-		
+
+		/* Erase atom properties since they make the graph matching incorrect
+		 *
+		 */
+		seeds.erase_properties();
+
+		//~ {
+			//~ Molib::PDBreader lpdb2(cmdl.prep_file(), Molib::PDBreader::all_models, 
+				//~ cmdl.max_num_ligands());
+			//~ Molib::Molecules ligands = lpdb2.parse_molecule();
+		//~ }
+		//~ throw Error("exit after reading and writing properties");
 		/* Read distributions file and initialize scores
 		 * 
 		 */
@@ -194,12 +216,12 @@ int main(int argc, char* argv[]) {
 			for(int i = 0; i < cmdl.ncpu(); ++i) {
 				threads.push_back(
 					thread([&non_clashing_seeds, &m_non_clashing_seeds, &seeds, &gridrec, &score, &hcp, &mutex, i] () {
-						{
-							// Guard non_clashing_seeds as it is the only variable that can 
-							// get changed concurrently by different threads
-							std::lock_guard<std::mutex> guard(mutex);
-							dbgmsg(seeds);
-						}
+						//~ {
+							//~ // Guard non_clashing_seeds as it is the only variable that can 
+							//~ // get changed concurrently by different threads
+							//~ std::lock_guard<std::mutex> guard(mutex);
+							//~ dbgmsg(seeds);
+						//~ }
 						// iterate over docked seeds and dock unique seeds
 						for (int j = i; j < seeds.size(); j+= cmdl.ncpu()) {
 							dbgmsg(seeds[j]);
@@ -277,24 +299,26 @@ int main(int argc, char* argv[]) {
 		 * minimization
 		 * 
 		 */
-		lpdb.rewind();
-		lpdb.set_flags(Molib::PDBreader::all_models|Molib::PDBreader::hydrogens);
+		Molib::PDBreader lpdb2(cmdl.prep_file(), Molib::PDBreader::all_models, 
+			cmdl.max_num_ligands());
+		//~ lpdb.rewind();
+		//~ lpdb.set_flags(Molib::PDBreader::all_models|Molib::PDBreader::hydrogens);
 		while (1 != 0) {
-			Molib::Molecules ligands = lpdb.parse_molecule();
+			Molib::Molecules ligands = lpdb2.parse_molecule();
 			if (ligands.empty()) break;
 			
 			// again, compute idatm types etc... 
 			// CORRECTED (correct in compute_fragment: seeds is not needed here)
-			ligands.compute_idatm_type()
-				.compute_hydrogen()
-				.compute_bond_order()
-				.compute_ring_type()
-				.compute_bond_gaff_type()
-				.compute_gaff_type()
-				.erase_hydrogen()
-				.compute_rotatable_bonds()
-				.compute_overlapping_rigid_segments()
-				.compute_seeds(cmdl.seeds_file());
+			//~ ligands.compute_idatm_type()
+				//~ .compute_hydrogen()
+				//~ .compute_bond_order()
+				//~ .compute_ring_type()
+				//~ .compute_bond_gaff_type()
+				//~ .compute_gaff_type()
+				//~ .erase_hydrogen()
+				//~ .compute_rotatable_bonds()
+				//~ .compute_overlapping_rigid_segments()
+				//~ .compute_seeds(cmdl.seeds_file());
 
 			/* Forcefield stuff : create forcefield for small molecules (and KB 
 			 * non-bonded with receptor) and read receptor's forcefield xml file(s) into 

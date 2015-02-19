@@ -89,6 +89,7 @@ namespace Molib {
 		//~ Bond& get_bond(const Atom &atom2) const { return this->template_map_container<Bond, Atom, Residue, Atom*>::element(&atom2); }
 		//~ Bond& get_bond(Atom &atom2) const { return this->
 			//~ template_map_container<Bond, Atom, Residue, Atom*>::element(&atom2); }
+		Bond& connect(Atom &a2);
 		void clear_bonds() { __bonds.clear(); }
 		BondVec get_bonds() const { BondVec bonds; for (auto &kv : __bonds) 
 			bonds.push_back(&*kv.second); return bonds; }

@@ -560,6 +560,12 @@ namespace Molib {
 						const double min_dist = __tol_min_coeff * max_linker_length;
 						const Bond &excluded = (segment1.is_adjacent(segment2) 
 							? segment1.get_bond(segment2) : Bond());
+						dbgmsg("segment1 = " << segment1 << endl
+							<< "segment2 = " << segment2);
+#ifndef NDEBUG
+						if (segment1.is_adjacent(segment2))
+							dbgmsg("excluded bond is " << excluded);
+#endif
 						for (auto &pstate2 : segment2.get_states()) {
 							State &state2 = *pstate2;
 							const double dist = __distance(state1, state2);

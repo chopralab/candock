@@ -148,13 +148,12 @@ namespace Molib {
 								&& it2 != atom_number_to_atom[&model].end()) {
 								Atom &a1 = *it1->second;
 								Atom &a2 = *it2->second;
-								a1.add(&a2); // add bond
-								a2.add(&a1); // add bond
-								//~ a1.insert_bond(a2, new Bond(&a1, &a2)); // insert if not exists
-								//~ a2.insert_bond(a1, a1.get_shared_ptr_bond(a2)); // insert if not exists
-								auto &shp1 = a1.insert_bond(a2, new Bond(&a1, &a2)); // insert if not exists
-								auto &shp2 = a2.insert_bond(a1, a1.get_shared_ptr_bond(a2)); // insert if not exists
-								dbgmsg("p1 = " << &*shp1 << " p2 = " << &*shp2);
+								//~ a1.add(&a2); // add bond
+								//~ a2.add(&a1); // add bond
+								//~ auto &shp1 = a1.insert_bond(a2, new Bond(&a1, &a2)); // insert if not exists
+								//~ auto &shp2 = a2.insert_bond(a1, a1.get_shared_ptr_bond(a2)); // insert if not exists
+								//~ dbgmsg("p1 = " << &*shp1 << " p2 = " << &*shp2);
+								a1.connect(a2);
 								//~ a1.add(new Bond(&a1, &a2)); // add bond
 								//~ a2.add(new Bond(&a2, &a1)); // add bond
 							}
@@ -200,6 +199,7 @@ namespace Molib {
 				string idatm_type = line.size() > 70 ? boost::algorithm::trim_copy(line.substr(67, 4)) : "???";
 				idatm_type = help::idatm_mask.count(idatm_type) ? idatm_type : "???";
 				string gaff_type = line.size() > 74 ? boost::algorithm::trim_copy(line.substr(72, 4)) : "???";
+				string rest_of_line = line.size() > 76 ? boost::algorithm::trim_copy(line.substr(76)) : "";
 				dbgmsg("is hydrogen = " << (__hm & PDBreader::hydrogens) << " atom_name = " << atom_name.at(0));
 				if ((__hm & PDBreader::hydrogens) || atom_name.at(0) != 'H') {
 					if (alt_loc == ' ' || alt_loc == 'A') {
@@ -225,6 +225,8 @@ namespace Molib {
 															));
 								if (gaff_type != "???")
 									a.set_gaff_type(gaff_type);
+								if (rest_of_line != "")
+									a.set_members(rest_of_line);
 								atom_number_to_atom[&model][atom_number] = &a;
 							}
 						}
@@ -409,18 +411,42 @@ namespace Molib {
 					//~ a2.add(new Bond(&a2, &a1)); // add bond
 				//~ a1.get_bond(a2).set_rotatable(vs[0]);
 				//~ a2.get_bond(a1).set_rotatable(vs[0]);
-				if (!a1.is_adjacent(a2)) {
-					a1.add(&a2);
-					a2.add(&a1);
-					a1.insert_bond(a2, new Bond(&a1, &a2)); // insert if not exists
-					auto &pbond = a2.insert_bond(a1, a1.get_shared_ptr_bond(a2)); // insert if not exists
-					pbond->set_rotatable(vs[0]);
-				}
+				//~ shared_ptr<Bond> pbond;
+				//~ if (!a1.is_adjacent(a2)) {
+					//~ pbond = a1.connect(a2);
+					//~ a1.add(&a2);
+					//~ a2.add(&a1);
+					//~ a1.insert_bond(a2, new Bond(&a1, &a2)); // insert if not exists
+					//~ pbond = a2.insert_bond(a1, a1.get_shared_ptr_bond(a2)); // insert if not exists
+				//~ }
+				//~ if (pbond)
+					//~ pbond->set_rotatable(vs[0]);
+				a1.connect(a2).set_rotatable(vs[0]);
 				//~ const Atom *a1 = atom_number_to_atom[&model][stoi(vs[1])];
 				//~ const Atom *a2 = atom_number_to_atom[&model][stoi(vs[2])];
 				//~ model.rotatable[(a1->atom_number() < a2->atom_number() ? 
 					//~ BondKey(a1, a2) : BondKey(a2, a1))].set_type(vs[0]);  // overwrite existing bond type with more specialized one
 				
+			}
+			else if (line.compare(0, 19, "REMARK   8 BONDTYPE") == 0) {
+				Model &model = mols.last().last().last();
+				vector<string> vs = help::ssplit(line.substr(20), " ");
+				Atom &a1 = *atom_number_to_atom[&model][stoi(vs[2])];
+				Atom &a2 = *atom_number_to_atom[&model][stoi(vs[3])];
+				//~ shared_ptr<Bond> pbond;
+				//~ if (!a1.is_adjacent(a2)) {
+					//~ a1.add(&a2);
+					//~ a2.add(&a1);
+					//~ a1.insert_bond(a2, new Bond(&a1, &a2)); // insert if not exists
+					//~ pbond = a2.insert_bond(a1, a1.get_shared_ptr_bond(a2)); // insert if not exists
+				//~ }
+				//~ if (pbond) {
+					//~ pbond->set_bo(stoi(vs[0]));
+					//~ pbond->set_bond_gaff_type(vs[1]);
+				//~ }
+				auto &bond = a1.connect(a2);
+				bond.set_bo(stoi(vs[0]));
+				bond.set_bond_gaff_type(vs[1]);
 			}
 			else if (line.compare(0, 6, "CONECT") == 0) {
 				const string ln = boost::algorithm::trim_right_copy(line.substr(6));
@@ -458,12 +484,13 @@ namespace Molib {
 										//~ a2.insert_bond(a1, a1.get_shared_ptr_bond(a2)); // insert if not exists
 										// a1.add(new Bond(&a1, &a2)); // add bond
 									//~ }
-									if (!a1.is_adjacent(a2)) {
-										a1.add(&a2); // add bondee
-										a2.add(&a1); // add bondee
-										a1.insert_bond(a2, new Bond(&a1, &a2)); // insert if not exists
-										a2.insert_bond(a1, a1.get_shared_ptr_bond(a2)); // insert if not exists
-									}
+									//~ if (!a1.is_adjacent(a2)) {
+										//~ a1.add(&a2); // add bondee
+										//~ a2.add(&a1); // add bondee
+										//~ a1.insert_bond(a2, new Bond(&a1, &a2)); // insert if not exists
+										//~ a2.insert_bond(a1, a1.get_shared_ptr_bond(a2)); // insert if not exists
+									//~ }
+									a1.connect(a2);
 								}
 								it++;
 							}
