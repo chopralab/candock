@@ -783,7 +783,7 @@ namespace Molib {
 			}
 			dbgmsg("pass 8  : " << a.idatm_type_unmask());
 		}
-		// "pass 9": change O2- to O3- for sulfates, phosphates, N-oxide, S3- for thiophosphate ...
+		// "pass 9": change O2- to O3- for sulfates, phosphates, N-oxide, S3- for thiophosphate ... 
 		for (auto &assembly : molecule)
 		for (auto &model : assembly)
 		for (auto &chain : model)
@@ -797,7 +797,7 @@ namespace Molib {
 		// still missing types: C1-,N2+,N1+,O1+,O1
 		// no longer missing : Sar,Oar+
 		dbgmsg("MOLECULE AFTER IDATM TYPING" << endl << molecule);
-	}
+	}	
 	
 	void AtomType::compute_gaff_type(Molecule &molecule) {
 		for (auto &assembly : molecule)

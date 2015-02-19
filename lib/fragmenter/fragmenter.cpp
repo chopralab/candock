@@ -30,7 +30,7 @@ namespace Molib {
 				for (auto &pa : atoms) {
 					os << "        " << *pa;
 				}
-				os << "---------------";
+				os << "-------------------";
 			}
 		}
 		return os;

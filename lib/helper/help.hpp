@@ -1694,6 +1694,9 @@ namespace help {
 		{{{"Npl#1#2#1ag,ag6",".*#2",""}}, {{"1:idatm=N2"}}}, // change 2-substituted Npl in 6-membered aromatic ring to N2
 		{{{"Npl#1#3,1H#1ag,ag6",".*#2",""}}, {{"1:idatm=N2"}}}, // change 3-substituted (one bondee is hydrogen) Npl in 6-membered aromatic ring to N2
 		//~ {{{"^N#1","Car#2",""},{"#1","Car#3",""}}, {{"1:idatm=Xe"}}}, // JUST A TEST !!!!!!!!
+		//~ {{{"^N#1","Car#2",""},{"#1","Car#3",""}}, {{"1:idatm=Xe"}}}, // JUST A TEST !!!!!!!!
+		{{{"Npl#1#3,1H#1ag,ag5","Car#2##1ag,ag5",""},{"#2","Npl#3#3,0H#1ag,ag5",""}}, {{"1:idatm=N2"}}}, // change the first Npl in 5-ring Npl(-H)-Car-Npl(-C,-C,-C) to N2
+		{{{"N2#1#2","C2#2#3",""},{"#2","O3#3#1",""}}, {{"1:idatm=Npl"},{"3:idatm=O2"}}}, // correct peptide bond
 	};	
 	//~ const rename_rules bond_gaff_type {
 		//~ {{{"Cac#1","^O#2",""},{"#1","^O#3",""}}, {{"1,2:bond_gaff_type=DL"},{"1,3:bond_gaff_type=DL"}}},
@@ -2426,8 +2429,23 @@ namespace help {
 		{{{"^C#1#3#sb,db,AR3",XB + "#2#2","bond_gaff_type=sb"}}, {{"1:gaff=cc"}}}, // sp2 C of conjugated ring systems
 		{{{"^C#1#3#sb,db,AR3",XD + "#2#3#db","bond_gaff_type=sb"}}, {{"1:gaff=cc"}}}, // sp2 C of conjugated ring systems
 		{{{"^C#1#3#sb,db,AR3",XD + "#2#4#db","bond_gaff_type=sb"}}, {{"1:gaff=cc"}}}, // sp2 C of conjugated ring systems
+
+		{{{"^C#1#3#sb,db,AR4","^C#2#3",""},{"#2","^C#3#3",""}}, {{"1:gaff=cc"}}}, // sp2 C of conjugated ring systems
+		{{{"^C#1#3#sb,db,AR4","^C#2#3",""},{"#2","^C#3#2",""}}, {{"1:gaff=cc"}}}, // sp2 C of conjugated ring systems
+		{{{"^C#1#3#sb,db,AR4","^C#2#3",""},{"#2",XB + "#3#2",""}}, {{"1:gaff=cc"}}}, // sp2 C of conjugated ring systems
+		{{{"^C#1#3#sb,db,AR4",XB + "#2#2",""},{"#2",XB + "#3#2",""}}, {{"1:gaff=cc"}}}, // sp2 C of conjugated ring systems
+		{{{"^C#1#3#sb,db,AR4",XB + "#2#2",""},{"#2","^C#3#2",""}}, {{"1:gaff=cc"}}}, // sp2 C of conjugated ring systems
+		{{{"^C#1#3#sb,db,AR4",XB + "#2#2",""},{"#2","^C#3#3",""}}, {{"1:gaff=cc"}}}, // sp2 C of conjugated ring systems
+		{{{"^C#1#3#sb,db,AR4","^C#2#3","bond_gaff_type=sb"}}, {{"1:gaff=cc"}}}, // sp2 C of conjugated ring systems
+		{{{"^C#1#3#sb,db,AR4",XB + "#2#2","bond_gaff_type=sb"}}, {{"1:gaff=cc"}}}, // sp2 C of conjugated ring systems
+		{{{"^C#1#3#sb,db,AR4",XD + "#2#3#db","bond_gaff_type=sb"}}, {{"1:gaff=cc"}}}, // sp2 C of conjugated ring systems
+		{{{"^C#1#3#sb,db,AR4",XD + "#2#4#db","bond_gaff_type=sb"}}, {{"1:gaff=cc"}}}, // sp2 C of conjugated ring systems
+
 		{{{"^C#1#3#sb,db,AR2",".*#2",""}}, {{"1:gaff=cc"}}}, // sp2 C of conjugated ring systems
 		{{{"^C#1#3#sb,db,AR3",".*#2",""}}, {{"1:gaff=cc"}}}, // sp2 C of conjugated ring systems
+
+		{{{"^C#1#3#sb,db,AR4",".*#2",""}}, {{"1:gaff=cc"}}}, // sp2 C of conjugated ring systems
+
 		// sp2 C of conjugated chain systems
 		//~ {{{"^C#1#3#sb,db","^C#2#3","bond_gaff_type=SB"}}, {{"1:gaff=ce"}}}, // sp2 C of conjugated chain systems
 		//~ {{{"^C#1#3#sb,db","^C#2#2","bond_gaff_type=SB"}}, {{"1:gaff=ce"}}}, // sp2 C of conjugated chain systems
@@ -2570,6 +2588,7 @@ namespace help {
 		{{{"^N#1#2#sb,db,AR2",XB + "#2#2","bond_gaff_type=sb"}}, {{"1:gaff=nc"}}}, // sp2 N of conjugated ring systems
 		{{{"^N#1#2#sb,db,AR2",XD + "#2#3#db","bond_gaff_type=sb"}}, {{"1:gaff=nc"}}}, // sp2 N of conjugated ring systems
 		{{{"^N#1#2#sb,db,AR2",XD + "#2#4#db","bond_gaff_type=sb"}}, {{"1:gaff=nc"}}}, // sp2 N of conjugated ring systems
+
 		{{{"^N#1#2#sb,db,AR3","^C#2#3",""},{"#2","^C#3#3",""}}, {{"1:gaff=nc"}}}, // sp2 N of conjugated ring systems
 		{{{"^N#1#2#sb,db,AR3","^C#2#3",""},{"#2","^C#3#2",""}}, {{"1:gaff=nc"}}}, // sp2 N of conjugated ring systems
 		{{{"^N#1#2#sb,db,AR3","^C#2#3",""},{"#2",XB + "#3#2",""}}, {{"1:gaff=nc"}}}, // sp2 N of conjugated ring systems
@@ -2580,6 +2599,18 @@ namespace help {
 		{{{"^N#1#2#sb,db,AR3",XB + "#2#2","bond_gaff_type=sb"}}, {{"1:gaff=nc"}}}, // sp2 N of conjugated ring systems
 		{{{"^N#1#2#sb,db,AR3",XD + "#2#3#db","bond_gaff_type=sb"}}, {{"1:gaff=nc"}}}, // sp2 N of conjugated ring systems
 		{{{"^N#1#2#sb,db,AR3",XD + "#2#4#db","bond_gaff_type=sb"}}, {{"1:gaff=nc"}}}, // sp2 N of conjugated ring systems
+
+		{{{"^N#1#2#sb,db,AR4","^C#2#3",""},{"#2","^C#3#3",""}}, {{"1:gaff=nc"}}}, // sp2 N of conjugated ring systems
+		{{{"^N#1#2#sb,db,AR4","^C#2#3",""},{"#2","^C#3#2",""}}, {{"1:gaff=nc"}}}, // sp2 N of conjugated ring systems
+		{{{"^N#1#2#sb,db,AR4","^C#2#3",""},{"#2",XB + "#3#2",""}}, {{"1:gaff=nc"}}}, // sp2 N of conjugated ring systems
+		{{{"^N#1#2#sb,db,AR4",XB + "#2#2",""},{"#2","^C#3#3",""}}, {{"1:gaff=nc"}}}, // sp2 N of conjugated ring systems
+		{{{"^N#1#2#sb,db,AR4",XB + "#2#2",""},{"#2","^C#3#2",""}}, {{"1:gaff=nc"}}}, // sp2 N of conjugated ring systems
+		{{{"^N#1#2#sb,db,AR4",XB + "#2#2",""},{"#2",XB + "#3#2",""}}, {{"1:gaff=nc"}}}, // sp2 N of conjugated ring systems
+		{{{"^N#1#2#sb,db,AR4","^C#2#3","bond_gaff_type=sb"}}, {{"1:gaff=nc"}}}, // sp2 N of conjugated ring systems
+		{{{"^N#1#2#sb,db,AR4",XB + "#2#2","bond_gaff_type=sb"}}, {{"1:gaff=nc"}}}, // sp2 N of conjugated ring systems
+		{{{"^N#1#2#sb,db,AR4",XD + "#2#3#db","bond_gaff_type=sb"}}, {{"1:gaff=nc"}}}, // sp2 N of conjugated ring systems
+		{{{"^N#1#2#sb,db,AR4",XD + "#2#4#db","bond_gaff_type=sb"}}, {{"1:gaff=nc"}}}, // sp2 N of conjugated ring systems
+
 		{{{"^N#1#2#RG5","^N#2#2#RG5",""},{"#2","^N#3#2#RG5",""},{"#3","^N#4#2#RG5",""}}, {{"1:gaff=nc"}}}, // sp2 N of conjugated ring systems
 		{{{"^N#1#2#RG5","^N#2#2#RG5",""},{"#1","^N#3#2#RG5",""},{"#3","^N#4#2#RG5",""}}, {{"1:gaff=nc"}}}, // sp2 N of conjugated ring systems
 		// sp2 N of conjugated chain systems
