@@ -23,18 +23,15 @@ long_line_behaviour=1
 long_line_column=72
 
 [files]
-current_page=10
+current_page=5
 FILE_NAME_0=363;Make;0;EUTF-8;1;1;0;%2Fhome%2Fkonc%2FDropbox%2FCompBio%2Fdev%2Fcandock%2Fcandock%2FMakefile.inc;0;4
-FILE_NAME_1=0;Make;0;EUTF-8;1;1;0;%2Fhome%2Fkonc%2FDropbox%2FCompBio%2Fdev%2Fcandock%2Fcandock%2FMakefile;0;4
+FILE_NAME_1=3666;Make;0;EUTF-8;1;1;0;%2Fhome%2Fkonc%2FDropbox%2FCompBio%2Fdev%2Fcandock%2Fcandock%2FMakefile;0;4
 FILE_NAME_2=13396;C++;0;EUTF-8;1;1;0;%2Fhome%2Fkonc%2FDropbox%2FCompBio%2Fdev%2Fcandock%2Fcandock%2Fcandock.cpp;0;4
-FILE_NAME_3=10108;C++;0;EUTF-8;1;1;0;%2Fhome%2Fkonc%2FDropbox%2FCompBio%2Fdev%2Fcandock%2Flib%2Fpdbreader%2Fpdbreader.cpp;0;4
-FILE_NAME_4=2707;C++;0;EUTF-8;1;1;0;%2Fhome%2Fkonc%2FDropbox%2FCompBio%2Fdev%2Fcandock%2Flib%2Fpdbreader%2Fmolecule.hpp;0;4
-FILE_NAME_5=17;C++;0;EUTF-8;1;1;0;%2Fhome%2Fkonc%2FDropbox%2FCompBio%2Fdev%2Fcandock%2Flib%2Fpdbreader%2Fmolecule.cpp;0;4
-FILE_NAME_6=1955;C++;0;EUTF-8;1;1;0;%2Fhome%2Fkonc%2FDropbox%2FCompBio%2Fdev%2Fcandock%2Flib%2Fhelper%2Fhelp.hpp;0;4
-FILE_NAME_7=3072;C++;0;EUTF-8;1;1;0;%2Fhome%2Fkonc%2FDropbox%2FCompBio%2Fdev%2Fcandock%2Flib%2Fpdbreader%2Fbond.hpp;0;4
-FILE_NAME_8=907;C++;0;EUTF-8;1;1;0;%2Fhome%2Fkonc%2FDropbox%2FCompBio%2Fdev%2Fcandock%2Fcandock%2Fcommon.cpp;0;4
-FILE_NAME_9=22811;C++;0;EUTF-8;1;1;0;%2Fhome%2Fkonc%2FDropbox%2FCompBio%2Fdev%2Fcandock%2Flib%2Flinker%2Flinker.cpp;0;4
-FILE_NAME_10=9336;C++;0;EUTF-8;1;1;0;%2Fhome%2Fkonc%2FDropbox%2FCompBio%2Fdev%2Fcandock%2Fcandock%2Fopts_candock.hpp;0;4
+FILE_NAME_3=1955;C++;0;EUTF-8;1;1;0;%2Fhome%2Fkonc%2FDropbox%2FCompBio%2Fdev%2Fcandock%2Flib%2Fhelper%2Fhelp.hpp;0;4
+FILE_NAME_4=3072;C++;0;EUTF-8;1;1;0;%2Fhome%2Fkonc%2FDropbox%2FCompBio%2Fdev%2Fcandock%2Flib%2Fpdbreader%2Fbond.hpp;0;4
+FILE_NAME_5=12416;C++;0;EUTF-8;1;1;0;%2Fhome%2Fkonc%2FDropbox%2FCompBio%2Fdev%2Fcandock%2Fcandock%2Fcommon.cpp;0;4
+FILE_NAME_6=22811;C++;0;EUTF-8;1;1;0;%2Fhome%2Fkonc%2FDropbox%2FCompBio%2Fdev%2Fcandock%2Flib%2Flinker%2Flinker.cpp;0;4
+FILE_NAME_7=9336;C++;0;EUTF-8;1;1;0;%2Fhome%2Fkonc%2FDropbox%2FCompBio%2Fdev%2Fcandock%2Fcandock%2Fopts_candock.hpp;0;4
 
 [VTE]
 last_dir=/home/konc

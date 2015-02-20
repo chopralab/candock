@@ -104,7 +104,7 @@ libomm.a: force_look
 
 clean :
 	$(ECHO) cleaning up in .
-	-$(RM) -f $(EXE) $(TEST) $(OBJS) $(OBJS_TEST) $(OBJLIBS)
+	-$(RM) -f $(EXE) $(TEST) $(TEST2) $(OBJS) $(OBJS_TEST) $(OBJS_TEST2) $(OBJLIBS)
 	-for d in $(DIRS); do (cd $$d; $(MAKE) clean ); done
 
 force_look :
