@@ -52,7 +52,7 @@ namespace Geom3D {
 		void normalize() { const double length = this->distance(Coordinate(0.0, 0.0, 0.0)); if (length == 0) throw Error("Coordinate::operator/  division by zero\n"); this->__x /= length; this->__y /= length; this->__z /= length; }
 		Coordinate norm() { Coordinate c = *this; c.normalize(); return c; }
 		string pdb() const { stringstream outs; outs<<fixed<<right<<setprecision(3)<<setw(8)<<__x<<fixed<<right<<setprecision(3)<<setw(8)<<__y<<fixed<<right<<setprecision(3)<<setw(8)<<__z; return outs.str(); }								
-		string simple() const { stringstream outs; outs<<fixed<<setprecision(3)<<__x<<" "<<fixed<<setprecision(3)<<__y<<" "<<fixed<<setprecision(3)<<__z; return outs.str(); }								
+		string simple() const { stringstream outs; outs<<fixed<<setprecision(3)<<__x<<" "<<fixed<<setprecision(3)<<__y<<" "<<fixed<<setprecision(3)<<__z; return outs.str(); }
 		string with_underscores() const { stringstream outs; outs<<setprecision(3)<<__x<<"_"<<setprecision(3)<<__y<<"_"<<setprecision(3)<<__z; return outs.str(); }								
 		void rotate_inline(const Matrix&);
 		unique_ptr<Coordinate> rotate(const Matrix&);
