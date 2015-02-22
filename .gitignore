@@ -1,0 +1,5 @@
+*.o
+*.a
+candock/candock
+candock/test_minimization
+candock/test_fragmenting
