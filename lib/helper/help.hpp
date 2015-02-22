@@ -636,6 +636,7 @@ namespace help {
 		{"ACE", {"ACETYL GROUP", ""}},
 		{"BEZ", {"BENZOIC ACID", ""}},
 		{"XYP", {"BETA-D-XYLOPYRANOSE", ""}},
+		{"NAG", {"2-(ACETYLAMINO)-2-DEOXY-A-D-GLUCOPYRANOSE", ""}},
 		{"NDG", {"2-(ACETYLAMINO)-2-DEOXY-A-D-GLUCOPYRANOSE", ""}},
 		{"MSE", {"SELENOMETHIONINE", ""}},
 		{"PO4", {"PHOSPHATE ION", ""}},

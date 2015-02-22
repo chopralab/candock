@@ -126,7 +126,7 @@ public:
 			TCLAP::ValueArg<string> json_with_ligs_fileArg("","jsonwl","Json-formatted ProBiS alignments with transposed ligands output file (default is probis_with_ligands.json",false,"probis_with_ligands.json","string", cmd);
 			TCLAP::ValueArg<string> geo_dirArg("","geo","Directory with ProBiS-ligands geo database (default is data/probis_ligands/geo)",false,"data/probis_ligands/geo","string", cmd);
 			TCLAP::ValueArg<string> names_dirArg("","names","Directory with ligand names (default is data/probis_ligands/names)",false,"data/probis_ligands/names","string", cmd);
-			TCLAP::SwitchArg neighbSwitch("","neighb","Allow only ligands that are in the similar regions according to REMARKs", cmd, false);
+			TCLAP::SwitchArg neighbSwitch("","neighb","Allow only ligands that are in the similar regions according to REMARKs (not enabled by default)", cmd, false);
 
 			TCLAP::ValueArg<double> probis_clus_radArg("","probis_clus_rad","Cluster radius for predicted ligands by probis (default is 2.0)",false,2.0,"double", cmd);
 			TCLAP::ValueArg<int> probis_min_ptsArg("","probis_min_pts","The minimum number of points (for predicted ligands) required to form a cluster (default is 10)",false,10,"int", cmd);
@@ -141,8 +141,7 @@ public:
 
 			vector<string> allowedRef{"mean","cumulative"};
 			TCLAP::ValuesConstraint<string> allowedValsRef( allowedRef );
-			TCLAP::ValueArg<string> ref_stateArg("","ref", "Normalization method for the reference state ('mean' is averaged over all atom \
-				type pairs, whereas 'cumulative' is a summation for atom type pairs)",false,"mean",&allowedValsRef, cmd);
+			TCLAP::ValueArg<string> ref_stateArg("","ref", "Normalization method for the reference state ('mean' (default) is averaged over all atom type pairs, whereas 'cumulative' is a summation for atom type pairs)",false,"mean",&allowedValsRef, cmd);
 			vector<string> allowedComp{"reduced","complete"};
 			TCLAP::ValuesConstraint<string> allowedValsComp( allowedComp );
 			TCLAP::ValueArg<string> compArg("","comp", "Atom types used in calculating reference state 'reduced' (default) or 'complete' \
