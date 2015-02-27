@@ -3,3 +3,7 @@
 candock/candock
 candock/test_minimization
 candock/test_fragmenting
+lib/ligands/gbio
+lib/ligands/gclus
+lib/ligands/glig
+*.geany

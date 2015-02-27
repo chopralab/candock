@@ -12,11 +12,15 @@
 using namespace std;
 
 class CmdLnOpts {
-	string __infile;
-	string __pdb_dirname;
+	string __json_file;
+	string __json_with_ligs_file;
+	string __geo_dir;
 	string __names_dir;
-	bool __quiet;
 	bool __neighb;
+	double __probis_clus_rad;
+	int __probis_min_pts;
+
+	bool __quiet;
 	string __program_name;
 	string __version;
 public:
@@ -26,17 +30,22 @@ public:
 		try {			
 			TCLAP::CmdLine cmd("Command description message", ' ', __version);
 			TCLAP::SwitchArg quietSwitch("q","quiet","Quiet mode (default is verbose)", cmd, false);
-			TCLAP::SwitchArg neighbSwitch("","neighb","Allow only ligands that are in the similar regions according to REMARKs", cmd, false);
-			TCLAP::ValueArg<string> pdb_dirnameArg("","pdbdir","Directory containing PDB files (default is .)",false,".","string", cmd);
-			TCLAP::ValueArg<string> names_dirArg("","lndir","Directory with names of ligands (default is .)",false,".","string", cmd);
-			TCLAP::ValueArg<string> infileArg("","infile","JSON or NOSQL filename with ProBiS alignments",true,"","string", cmd);
+			TCLAP::ValueArg<string> json_fileArg("","json","Json-formatted ProBiS alignments output file (default is probis.json",false,"probis.json","string", cmd);
+			TCLAP::ValueArg<string> json_with_ligs_fileArg("","jsonwl","Json-formatted ProBiS alignments with transposed ligands output file (default is probis_with_ligands.json",false,"probis_with_ligands.json","string", cmd);
+			TCLAP::ValueArg<string> geo_dirArg("","geo","Directory with ProBiS-ligands geo database (default is data/probis_ligands/geo)",false,"data/probis_ligands/geo","string", cmd);
+			TCLAP::ValueArg<string> names_dirArg("","names","Directory with ligand names (default is data/probis_ligands/names)",false,"data/probis_ligands/names","string", cmd);
+			TCLAP::SwitchArg neighbSwitch("","neighb","Allow only ligands that are in the similar regions according to REMARKs (not enabled by default)", cmd, false);
+			TCLAP::ValueArg<double> probis_clus_radArg("","probis_clus_rad","Cluster radius for predicted ligands by probis (default is 2.0)",false,2.0,"double", cmd);
+			TCLAP::ValueArg<int> probis_min_ptsArg("","probis_min_pts","The minimum number of points (for predicted ligands) required to form a cluster (default is 10)",false,10,"int", cmd);
 			//~ Parse the argv array.
 			cmd.parse(argc, argv);
-			__infile = infileArg.getValue();
-			__pdb_dirname = pdb_dirnameArg.getValue();
+			__json_file = json_fileArg.getValue();
+			__json_with_ligs_file = json_with_ligs_fileArg.getValue();
+			__geo_dir = geo_dirArg.getValue();
 			__names_dir = names_dirArg.getValue();
-			__quiet = quietSwitch.getValue();
 			__neighb = neighbSwitch.getValue();
+			__probis_clus_rad = probis_clus_radArg.getValue();
+			__probis_min_pts = probis_min_ptsArg.getValue();
 		} 
 		catch (TCLAP::ArgException &e) { 
 			cerr << "error: " << e.error() << " for arg " << e.argId() << endl; 
@@ -48,11 +57,14 @@ public:
 		cout << "running " << __program_name << " version " << __version << " on hostname " << boost::asio::ip::host_name() << "\n";
 	}
 	// interface
-	string infile() const {return __infile; }
-	string pdb_dirname() const { return __pdb_dirname; }
+	string json_file() const { return __json_file; }
+	string json_with_ligs_file() const { return __json_with_ligs_file; }
+	string geo_dir() const { return __geo_dir; }
 	string names_dir() const { return __names_dir; }
-	bool quiet() const { return __quiet; }
 	bool neighb() const { return __neighb; }
+	double probis_clus_rad() const { return __probis_clus_rad; }
+	int probis_min_pts() const { return __probis_min_pts; }
+
 	string version() const { return __version; }
 	string program_name() const { return __program_name; }
 };

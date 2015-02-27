@@ -2,6 +2,12 @@
 #include "pdbreader/pdbreader.hpp"
 #include "common.hpp"
 
+ostream& operator<< (ostream& stream, const ResidueSet& residues) {
+	for (auto &presidue : residues)
+		stream << *presidue << endl;
+	return stream;
+}
+
 namespace common_ligands {
 	ResMap json_to_map(const Json::Value &aligned_residues) {
 		ResMap a;

@@ -32,9 +32,13 @@ namespace genlig {
 				for (auto &chain : model) {
 					for (auto &residue : chain) {
 						for (auto &atom : residue) {
-							vector<Molib::Atom*> neighbors = grid.get_neighbors(atom, 4.0);
+							dbgmsg("before get neighbors");
+							Molib::AtomVec neighbors = grid.get_neighbors(atom, 4.0);
+							dbgmsg("number of neighbors = " << neighbors.size());
 							for (auto &pa : neighbors) {
+								dbgmsg("pa = " << *pa);
 								Molib::Residue &query_residue = const_cast<Molib::Residue&>(pa->br());
+								dbgmsg("query_residue = " << query_residue);
 								neighbor_residues.insert(&query_residue);
 							}
 						}
@@ -49,6 +53,7 @@ namespace genlig {
 		ResSet binding_site;
 		vector<string> lc = help::ssplit(lig_code, ":");
 		for (auto &molecule : mols) {
+			dbgmsg("molecule.name = " << molecule.name() << " lc[5[ = " << lc[5]);
 			if (molecule.name() == lc[5]) {
 				for (auto &assembly : molecule) {
 					if (assembly.number() == stoi(lc[4])) {
@@ -137,19 +142,29 @@ namespace genlig {
 		}
 		return bsite;
 	}
-	Molib::MolGrid parse_receptor(const string &receptor_file, const string &receptor_chain_id) {
+	//~ Molib::MolGrid parse_receptor(const string &receptor_file, const string &receptor_chain_id) {
+		//~ // read query PDB protein
+		//~ Molib::PDBreader qpdb(receptor_file, 
+			//~ Molib::PDBreader::first_model|Molib::PDBreader::hydrogens);
+		//~ Molib::Molecules query_mols = qpdb.parse_molecule();
+		//~ return Molib::MolGrid(query_mols[0].get_atoms(receptor_chain_id, 
+			//~ Molib::Residue::protein));
+	//~ }
+	void generate_ligands(const string &receptor_file, const string &receptor_chain_id, 
+		const string &json_file, const string &bio_dir, const string &lig_code,
+		const string &lig_file, const string &bsite_file) {
+	//~ void generate_ligs(Molib::MolGrid &gridrec, const string &json_file, 
+		//~ const string &bio_dir, const string &lig_code, const string &lig_file, 
+		//~ const string &bsite_file) {
+
 		// read query PDB protein
 		Molib::PDBreader qpdb(receptor_file, 
 			Molib::PDBreader::first_model|Molib::PDBreader::hydrogens);
 		Molib::Molecules query_mols = qpdb.parse_molecule();
-		return Molib::MolGrid(query_mols[0].get_atoms(receptor_chain_id, 
+		Molib::MolGrid gridrec(query_mols[0].get_atoms(receptor_chain_id, 
 			Molib::Residue::protein));
-	}
-	void generate_ligs(Molib::MolGrid &gridrec, const string &json_file, 
-		const string &bio_dir, const string &lig_code, const string &lig_file, 
-		const string &bsite_file) {
+
 		JsonReader jr;
-		NosqlReader nr;
 		Molib::NRset nrset;
 		// read bio PDBs
 		//~ Molib::PDBreader biopdb(Molib::PDBreader::all_models|Molib::PDBreader::hydrogens);
@@ -159,10 +174,11 @@ namespace genlig {
 			try { // if something goes wrong, e.g., pdb file is not found, don't exit..
 				const string pdb_id = d["pdb_id"].asString();
 				const string chain_ids = d["chain_id"].asString();
-				//~ const string mols_name = pdb_id + " " + chain_ids;
-				//~ const string pdb_file = bio_dir + "/" + pdb_id + chain_ids + ".pdb";
-				const string mols_name = pdb_id;
-				const string pdb_file = bio_dir + "/" + pdb_id + ".pdb";
+				const string mols_name = pdb_id + " " + chain_ids;
+				const string pdb_file = bio_dir + "/" + pdb_id + chain_ids + ".pdb";
+				//~ const string mols_name = pdb_id;
+				//~ const string pdb_file = bio_dir + "/" + pdb_id + ".pdb";
+				//~ cout << mols_name << " " << pdb_file << endl;
 				if (lig_code.find(mols_name) != string::npos) {
 					//~ Molib::Molecules &mols = nrset.add(new Molib::Molecules());
 					//~ biopdb.parse_PDB(mols, pdb_file);
@@ -190,7 +206,9 @@ namespace genlig {
 					ResSet aligned_part_of_binding_site = find_binding_site(mols, lig_code, aligned_to_query);
 					Molib::Molecules ligands;
 					ligands.add(new Molib::Molecule(get_ligand(mols, lig_code)));
+					dbgmsg(ligands);
 					ResidueSet neighbor_residues = find_neighbor_residues(ligands.first(), gridrec);
+					dbgmsg(neighbor_residues);
 					Molib::Molecules binding_sites;
 					binding_sites.add(new Molib::Molecule(mark(neighbor_residues, 
 						aligned_part_of_binding_site, lig_code)));
@@ -205,13 +223,14 @@ namespace genlig {
 			}
 		}
 	}
-	void generate_ligands(const string &receptor_file, const string &receptor_chain_id, 
-		const string &json_file, const string &bio_dir, const string &lig_code,
-		const string &lig_file, const string &bsite_file) {
-		Molib::MolGrid gridrec = parse_receptor(receptor_file, receptor_chain_id);
-		generate_ligs(gridrec, json_file, bio_dir, lig_code, lig_file, bsite_file);
-	
-	}
+	//~ void generate_ligands(const string &receptor_file, const string &receptor_chain_id, 
+		//~ const string &json_file, const string &bio_dir, const string &lig_code,
+		//~ const string &lig_file, const string &bsite_file) {
+//~ 
+//~ 
+		//~ generate_ligs(gridrec, json_file, bio_dir, lig_code, lig_file, bsite_file);
+	//~ 
+	//~ }
 	BindingSiteClusters generate_binding_site_prediction(const string &json_with_ligs_file, 
 		const string &bio_dir, const int num_bsites) {
 		JsonReader jr;

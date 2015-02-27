@@ -45,7 +45,7 @@ namespace genclus {
 		return atoms;
 	}
 	void add_to_json(JsonReader &jr, cluster::Clusters<Molib::Atom> ligand_clusters, 
-		string cluster_name, const string &names_dir) {
+		string cluster_name, const string &names_dir, const bool for_gclus) {
 
 		map<string, unique_ptr<Json::Value>> ligands;
 		for (auto &kv : ligand_clusters) {
@@ -57,6 +57,7 @@ namespace genclus {
 			const Molib::Model &model = atom.br().br().br();
 			const Molib::Chain &chain = atom.br().br();
 			const Molib::Residue &residue = atom.br();
+			dbgmsg(mols.name());
 			if (ligands.find(mols.name()) == ligands.end()) {
 				ligands.insert(make_pair(mols.name(), unique_ptr<Json::Value>(new Json::Value(Json::arrayValue))));
 			}
@@ -74,22 +75,33 @@ namespace genclus {
 				//~ cerr << e.what() << " ... skipping ... " << endl;
 				dbgmsg(e.what() << " ... skipping ... ");
 			}
-			ligands[mols.name()]->append(to_string(cluster_id) + ":" + residue.resn() + ":" + to_string(residue.resi()) + ":" + chain.chain_id() + ":" + to_string(model.number()) 
-											+ ":" + to_string(assembly.number()) + ":" + molecule.name() + ":" + mols.name() + ":" 
-											+ (lig_name.empty() ? "-" : remove_special_characters(lig_name[0])) + ":"
-											+ (help::non_specific_binders.find(residue.resn()) == help::non_specific_binders.end() ? "S" : "N")
+			ligands[mols.name()]->append(to_string(cluster_id) + ":" + residue.resn() + ":" + to_string(residue.resi()) 
+				+ ":" + chain.chain_id() + ":" + to_string(model.number()) 
+				+ ":" + to_string(assembly.number()) + ":" + molecule.name() + ":" + mols.name() + ":" 
+				+ (lig_name.empty() ? "-" : remove_special_characters(lig_name[0])) + ":"
+				+ (help::non_specific_binders.find(residue.resn()) == help::non_specific_binders.end() ? "S" : "N")
 										);
 			dbgmsg(residue.resn() << ":" << to_string(cluster_id) << " molecule_name = " << molecule.name() << " mols_name = " << mols.name());
 		}
 		for (auto &i : ligands) {
-			const string &pdb_id = i.first;
-			dbgmsg("pdb_id = " << pdb_id);
+			//~ const string &pdb_id = i.first;
+			const string &mols_name = i.first;
+			//~ dbgmsg("pdb_id = " << pdb_id);
+			dbgmsg("mols_name = " << mols_name);
 			Json::Value &vec = *(i.second);
-			JsonReader::iterator it = jr.find({make_pair("pdb_id", pdb_id)});
+			//~ JsonReader::iterator it = jr.find({make_pair("pdb_id", pdb_id)});
+			JsonReader::iterator it = jr.end();
+			if(for_gclus) {
+				auto vs = help::ssplit(mols_name, " ");
+				 it = jr.find({make_pair("pdb_id", vs[0]), make_pair("chain_id", vs[1])});
+				 dbgmsg("vs[0] = " << vs[0] << " vs[1] = " << vs[1]);
+			} else {
+				 it = jr.find({make_pair("pdb_id", mols_name)});
+			}
 			if (it != jr.end()) {
-				dbgmsg("found json value " << pdb_id);
+				dbgmsg("found json value " << mols_name);
 				(*it)[cluster_name] = vec;
-				dbgmsg("after found json value " << pdb_id);
+				dbgmsg("after found json value " << mols_name);
 			}
 		}
 	}
@@ -144,7 +156,7 @@ namespace genclus {
 	}
 	void generate_clusters_of_ligands(const string &json_file, const string &json_with_ligs_file, 
 		const string &geo_dir, const string &names_dir, const bool neighb, 
-		const double hetero_clus_rad, const int hetero_min_pts) {
+		const double hetero_clus_rad, const int hetero_min_pts, const bool for_gclus) {
 		JsonReader jr;
 		Molib::NRset nrset;
 		//~ Molib::PDBreader pr(Molib::PDBreader::all_models);
@@ -159,7 +171,8 @@ namespace genclus {
 				const string pdb_id = d["pdb_id"].asString();
 				const string chain_ids = d["chain_id"].asString();
 				const double z_score = d["alignment"][0]["scores"]["z_score"].asDouble();
-				const string pdb_file = geo_dir + "/" + pdb_id + ".pdb";
+				const string pdb_file = geo_dir + "/" 
+					+ (for_gclus ? (pdb_id + chain_ids) : pdb_id) + ".pdb";
 				dbgmsg(pdb_id + " " + chain_ids);
 				//~ pr.rewind();
 				Molib::PDBreader pr(pdb_file, Molib::PDBreader::all_models);
@@ -211,10 +224,10 @@ namespace genclus {
 		auto hetero_clusters = oh.extract_dbscan(hetero_clus_rad, 100, true);
 		auto ion_clusters = oi.extract_dbscan(3.0);
 		//~ vector<pair<Molib::Atom*, int>> water_clusters = ow.extract_dbscan(2.0);
-		add_to_json(jr, protein_clusters.first, "protein", names_dir);
-		add_to_json(jr, nucleic_clusters.first, "nucleic", names_dir);
-		add_to_json(jr, hetero_clusters.first, "hetero", names_dir);
-		add_to_json(jr, ion_clusters.first, "ion", names_dir);
+		add_to_json(jr, protein_clusters.first, "protein", names_dir, for_gclus);
+		add_to_json(jr, nucleic_clusters.first, "nucleic", names_dir, for_gclus);
+		add_to_json(jr, hetero_clusters.first, "hetero", names_dir, for_gclus);
+		add_to_json(jr, ion_clusters.first, "ion", names_dir, for_gclus);
 		//~ add_to_json(jr, water_clusters.first, "water");
 		inout::Inout::file_open_put_stream(json_with_ligs_file, stringstream(jr.output_json()));
 		//~ cout << jr.root() << endl;

@@ -235,16 +235,19 @@ namespace Molib {
 			}
 			else if(line.compare(0, 14, "REMARK   4 NRP") == 0) { 
 				string name = "";
-				if (boost::regex_search(line, m, boost::regex("REMARK   4 NRPDB\\s+(\\S+)"))) {
+				//~ if (boost::regex_search(line, m, boost::regex("REMARK   4 NRPDB\\s+(\\S+)"))) {
+				if (boost::regex_search(line, m, boost::regex("REMARK   4 NRPDB\\s+(.*)"))) {
 					if (m[1].matched) {
 						name = m[1].str();
+						dbgmsg(name);
 					}
 				}
 				mols.set_name(name);
 			}
 			else if(line.compare(0, 14, "REMARK   5 MOL") == 0) { 
 				string name = "";
-				if (boost::regex_search(line, m, boost::regex("REMARK   5 MOLECULE\\s+(\\S+)"))) {
+				//~ if (boost::regex_search(line, m, boost::regex("REMARK   5 MOLECULE\\s+(\\S+)"))) {
+				if (boost::regex_search(line, m, boost::regex("REMARK   5 MOLECULE\\s+(.*)"))) {
 					if (m[1].matched) {
 						name = m[1].str();
 						dbgmsg(name);

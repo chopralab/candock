@@ -12,28 +12,18 @@
 using namespace std;
 
 class CmdLnOpts {
-	string __query_file;
-	string __infile;
-	string __outfile;
-	string __query_chain_id;
-	//~ string __qpdb_file;
-	//~ string __qcid;
-	string __pdb_dirname;
+
+	string __receptor_file;
+	string __ligand_file;
+	string __receptor_chain_id;
+
+	string __json_file;
+	string __bio_dir;
+
 	string __lig_code;
 	string __bsite_file;
-	//~ string __nrpdb_file;
-	//~ string __bio;
-	//~ string __models;
-	//~ bool __hydrogens;
-	//~ bool __neighb;
-	//~ bool __cluster;
-	//~ bool __noalch;
-	//~ bool __ralch;
+
 	bool __quiet;
-	//~ bool __bsite;
-	//~ bool __geo;
-	//~ bool __rnolig;
-	//~ bool __nrpdb;
 	string __program_name;
 	string __version;
 public:
@@ -43,26 +33,31 @@ public:
 		try {			
 			TCLAP::CmdLine cmd("Command description message", ' ', __version);
 			TCLAP::SwitchArg quietSwitch("q","quiet","Quiet mode (default is verbose)", cmd, false);
-			//~ TCLAP::SwitchArg bsiteSwitch("","bsite","Output binding site residues too", cmd, false);
-			TCLAP::ValueArg<string> bsite_fileArg("","bsitefile","Output binding site residues to this file",true,"","string", cmd);
-			//~ TCLAP::ValueArg<string> nrpdb_fileArg("","nrpdbfile","Read binding site residues from this file",false,"bsite.pdb","string", cmd);
-			TCLAP::ValueArg<string> outfileArg("","outfile","Output ligand to this file",true,"ligand.pdb","string", cmd);
+
+			TCLAP::ValueArg<string> receptor_fileArg("","receptor","Receptor filename",true,"default","string", cmd);
+			TCLAP::ValueArg<string> ligand_fileArg("","ligand","Ligand filename",true,"default","string", cmd);
+			TCLAP::ValueArg<string> receptor_chain_idArg("","receptor_chain_id","Chain id(s) of the receptor (default is A)",
+				false,"A","string", cmd);
+
+			TCLAP::ValueArg<string> json_fileArg("","json","Json-formatted ProBiS alignments output file (default is probis.json",false,"probis.json","string", cmd);
+			TCLAP::ValueArg<string> bio_dirArg("","bio","Directory with ProBiS-ligands bio database (default is data/probis_ligands/bio)",false,"data/probis_ligands/bio","string", cmd);
+
 			TCLAP::ValueArg<string> lig_codeArg("","ligcode","Ligand codes to extract", true, "", "string", cmd);
-			TCLAP::ValueArg<string> pdb_dirnameArg("","pdbdir","Directory containing PDB files (default is .)",false,".","string", cmd);
-			TCLAP::ValueArg<string> infileArg("","infile","JSON or NOSQL filename with ProBiS alignments",true,"","string", cmd);
-			TCLAP::ValueArg<string> query_fileArg("","query","Query PDB filename",true,"","string", cmd);
-			TCLAP::ValueArg<string> query_chain_idArg("","qcid","Query chain id",true,"","string", cmd);
+			TCLAP::ValueArg<string> bsite_fileArg("","bsitefile","Output binding site residues to this file",true,"","string", cmd);
+
 			//~ Parse the argv array.
 			cmd.parse(argc, argv);
-			__outfile = outfileArg.getValue();
-			__infile = infileArg.getValue();
-			__query_file = query_fileArg.getValue();
-			__query_chain_id = query_chain_idArg.getValue();
-			__bsite_file = bsite_fileArg.getValue();
-			//~ __nrpdb_file = nrpdb_fileArg.getValue();
+
+			__receptor_file = receptor_fileArg.getValue();
+			__ligand_file = ligand_fileArg.getValue();
+			__receptor_chain_id = receptor_chain_idArg.getValue();
+
+			__json_file = json_fileArg.getValue();
+			__bio_dir = bio_dirArg.getValue();
+
 			__lig_code = lig_codeArg.getValue();
-			__pdb_dirname = pdb_dirnameArg.getValue();
-			//~ __bsite = bsiteSwitch.getValue();
+			__bsite_file = bsite_fileArg.getValue();
+
 			__quiet = quietSwitch.getValue();
 		} 
 		catch (TCLAP::ArgException &e) { 
@@ -75,15 +70,16 @@ public:
 		cout << "running " << __program_name << " version " << __version << " on hostname " << boost::asio::ip::host_name() << "\n";
 	}
 	// interface
-	string outfile() const {return __outfile; }
-	string infile() const {return __infile; }
-	string query_file() const {return __query_file; }
-	string query_chain_id() const {return __query_chain_id; }
-	string bsite_file() const {return __bsite_file; }
-	//~ string nrpdb_file() const {return __nrpdb_file; }
+	string receptor_file() const { return __receptor_file; }
+	string ligand_file() const { return __ligand_file; }
+	string receptor_chain_id() const { return __receptor_chain_id; }
+
+	string json_file() const { return __json_file; }
+	string bio_dir() const { return __bio_dir; }
+
 	string lig_code() const { return __lig_code; }
-	string pdb_dirname() const { return __pdb_dirname; }
-	//~ bool bsite() const { return __bsite; }
+	string bsite_file() const {return __bsite_file; }
+
 	bool quiet() const { return __quiet; }
 	string version() const { return __version; }
 	string program_name() const { return __program_name; }
