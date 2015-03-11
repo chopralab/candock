@@ -30,7 +30,7 @@ public:
 		try {			
 			TCLAP::CmdLine cmd("Command description message", ' ', __version);
 			TCLAP::SwitchArg quietSwitch("q","quiet","Quiet mode (default is verbose)", cmd, false);
-			TCLAP::ValueArg<string> json_fileArg("","json","Json-formatted ProBiS alignments output file (default is probis.json",false,"probis.json","string", cmd);
+			TCLAP::ValueArg<string> json_fileArg("","json","Json-formatted ProBiS alignments input file (default is probis.json)",true,"probis.json","string", cmd);
 			TCLAP::ValueArg<string> json_with_ligs_fileArg("","jsonwl","Json-formatted ProBiS alignments with transposed ligands output file (default is probis_with_ligands.json",false,"probis_with_ligands.json","string", cmd);
 			TCLAP::ValueArg<string> geo_dirArg("","geo","Directory with ProBiS-ligands geo database (default is data/probis_ligands/geo)",false,"data/probis_ligands/geo","string", cmd);
 			TCLAP::ValueArg<string> names_dirArg("","names","Directory with ligand names (default is data/probis_ligands/names)",false,"data/probis_ligands/names","string", cmd);

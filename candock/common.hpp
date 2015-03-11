@@ -105,7 +105,7 @@ namespace common {
 	//~ void get_representatives(Molib::Molecules &rep_mols, 
 		//~ const cluster::Clusters<Molib::Molecule> &representatives,
 		//~ const Molib::Score &score);
-	ostream& operator<<(ostream& os, const vector<Centroid>& centroids);
 };
 
+ostream& operator<<(ostream& os, const vector<common::Centroid>& centroids);
 ostream& operator<<(ostream& os, const cluster::MapD<Molib::Molecule>& scores);
