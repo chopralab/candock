@@ -125,20 +125,30 @@ namespace Molib {
 			}
 #endif
 		}
-		gsl_interp_accel *acc = gsl_interp_accel_alloc();
-		gsl_spline *spline = gsl_spline_alloc(gsl_interp_cspline, x.size());
-		gsl_spline_init(spline, &x[0], &y[0], x.size());
-		dbgmsg("min_bound = " << x.front() << " max_bound = " << x.back());
-		for (int i = 0; i < energy.size(); ++i) {
-			inter.potential.push_back(gsl_spline_eval(spline, __get_lower_bound(i), acc));
+		if (x.size() < 10) { // ?#! this is crappy, not enough points for interpolation
+			dbgmsg("not enough points for interpolation, just zeroing everything!");
+			for (int i = 0; i < energy.size(); ++i) {
+				inter.potential.push_back(0.0);
+			}
+			for (int i = 0; i < inter.potential.size() - 1; ++i) {
+				inter.derivative.push_back(0.0);
+			}
+		} else {
+			gsl_interp_accel *acc = gsl_interp_accel_alloc();
+			gsl_spline *spline = gsl_spline_alloc(gsl_interp_cspline, x.size());
+			gsl_spline_init(spline, &x[0], &y[0], x.size());
+			dbgmsg("min_bound = " << x.front() << " max_bound = " << x.back());
+			for (int i = 0; i < energy.size(); ++i) {
+				inter.potential.push_back(gsl_spline_eval(spline, __get_lower_bound(i), acc));
+			}
+			for (int i = 0; i < inter.potential.size() - 1; ++i) {
+				// gsl_spline_eval_deriv gave WRONG derivatives ???
+				inter.derivative.push_back((inter.potential[i + 1] - inter.potential[i]) / __step_non_bond);
+			}
+			inter.derivative.push_back(0); // last
+			gsl_spline_free(spline);
+			gsl_interp_accel_free(acc);
 		}
-		for (int i = 0; i < inter.potential.size() - 1; ++i) {
-			// gsl_spline_eval_deriv gave WRONG derivatives ???
-			inter.derivative.push_back((inter.potential[i + 1] - inter.potential[i]) / __step_non_bond);
-		}
-		inter.derivative.push_back(0); // last
-		gsl_spline_free(spline);
-		gsl_interp_accel_free(acc);
 		return inter;
 	}
 	//~ void Score::__compile_scoring_function() {

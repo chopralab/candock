@@ -27,25 +27,6 @@ CmdLnOpts cmdl;
 
 int main(int argc, char* argv[]) {
 	try {
-//~ 
-//~ ///////////////////
-		//~ vector<thread> th2;
-		//~ dbgmsg("testing shared_ptr thread safety ncpu = " << 8);
-		//~ th2.clear();
-		//~ int j = 123;
-		//~ for(int i = 0; i < 8; ++i) {
-			//~ th2.push_back(
-				//~ thread([&] () {
-					//~ cout << "i = " << j << endl;
-				//~ }));
-		//~ }
-		//~ for(auto& thread : th2) {
-			//~ thread.join();
-		//~ }
-		//~ throw Error("exiting after test");
-//~ ////////////////////
-//~ 
-//~ 
 		cmdl.init(argc, argv);
 		cmdl.display_time("started");
 		cout << cmdl << endl;
@@ -69,9 +50,9 @@ int main(int argc, char* argv[]) {
 		 */
 		vector<common::Centroid> centroids;
 		if (cmdl.centroid_file().empty()) {
-			probis::compare_against_bslib(argc, argv, cmdl.receptor_file(), 
-				cmdl.receptor_chain_id(), cmdl.bslib_file(), cmdl.ncpu(),
-				cmdl.nosql_file(), cmdl.json_file());
+			//~ probis::compare_against_bslib(argc, argv, cmdl.receptor_file(), 
+				//~ cmdl.receptor_chain_id(), cmdl.bslib_file(), cmdl.ncpu(),
+				//~ cmdl.nosql_file(), cmdl.json_file());
 			genclus::generate_clusters_of_ligands(cmdl.json_file(), cmdl.json_with_ligs_file(),
 				cmdl.geo_dir(), cmdl.names_dir(), cmdl.neighb(), cmdl.probis_clus_rad(),
 				cmdl.probis_min_pts());
