@@ -196,10 +196,12 @@ namespace Molib {
 				double y_coord = stof(line.substr(38, 8));
 				double z_coord = stof(line.substr(46, 8));
 				Geom3D::Coordinate crd(x_coord, y_coord, z_coord);
-				string idatm_type = line.size() > 70 ? boost::algorithm::trim_copy(line.substr(67, 4)) : "???";
+				string element = line.size() > 77 ? boost::algorithm::trim_copy(line.substr(76,2)) : "";
+				string idatm_type = line.size() > 80 ? boost::algorithm::trim_copy(line.substr(80, 5)) : "???";
 				idatm_type = help::idatm_mask.count(idatm_type) ? idatm_type : "???";
-				string gaff_type = line.size() > 74 ? boost::algorithm::trim_copy(line.substr(72, 4)) : "???";
-				string rest_of_line = line.size() > 76 ? boost::algorithm::trim_copy(line.substr(76)) : "";
+				string gaff_type = line.size() > 85 ? boost::algorithm::trim_copy(line.substr(85, 5)) : "???";
+				//~ string rest_of_line = line.size() > 76 ? boost::algorithm::trim_copy(line.substr(76)) : "";
+				string rest_of_line = line.size() > 90 ? boost::algorithm::trim_copy(line.substr(90)) : "";
 				dbgmsg("is hydrogen = " << (__hm & PDBreader::hydrogens) << " atom_name = " << atom_name.at(0));
 				if ((__hm & PDBreader::hydrogens) || atom_name.at(0) != 'H') {
 					if (alt_loc == ' ' || alt_loc == 'A') {
@@ -221,7 +223,8 @@ namespace Molib {
 								Atom &a = residue->add(new Atom(atom_number, 
 																atom_name, 
 																crd, 
-																help::idatm_mask.at(idatm_type)
+																help::idatm_mask.at(idatm_type),
+																element
 															));
 								if (gaff_type != "???")
 									a.set_gaff_type(gaff_type);

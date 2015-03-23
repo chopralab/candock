@@ -34,7 +34,7 @@ int main(int argc, char* argv[]) {
 		cout << cmdl << endl;
 		Molib::PDBreader rpdb(cmdl.receptor_file(), 
 			Molib::PDBreader::first_model|Molib::PDBreader::skip_hetatm);
-		Molib::Molecules receptors = rpdb.parse_molecule();
+		//~ Molib::Molecules receptors = rpdb.parse_molecule();
 		
 		Molib::PDBreader lpdb(cmdl.ligand_file(), 
 			Molib::PDBreader::all_models|Molib::PDBreader::hydrogens, 
@@ -50,10 +50,19 @@ int main(int argc, char* argv[]) {
 
 			// Compute properties, such as idatm atom types, fragments, seeds,
 			// rotatable bonds
+			//~ ligands.compute_idatm_type()
+				//~ .compute_ring_type()
+				//~ .compute_rotatable_bonds()
+				//~ .compute_overlapping_rigid_segments()
+				//~ .compute_seeds(cmdl.seeds_file());
 			ligands.compute_idatm_type()
-				//~ .erase_hydrogen()
+				.compute_hydrogen()
+				.compute_bond_order()
 				.compute_ring_type()
-				.compute_rotatable_bonds()
+				.compute_bond_gaff_type()
+				.compute_gaff_type()
+				.compute_rotatable_bonds() // relies on hydrogens being assigned
+				.erase_hydrogen()
 				.compute_overlapping_rigid_segments()
 				.compute_seeds(cmdl.seeds_file());
 			//~ common::create_mols_from_seeds(added, seeds, ligands);

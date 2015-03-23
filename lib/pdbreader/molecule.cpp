@@ -462,6 +462,7 @@ namespace Molib {
 
 	Molecule& Molecule::compute_rotatable_bonds() {
 		//~ Fragmenter f(*this);
+		dbgmsg("starting compute_rotatable_bonds");
 		Fragmenter f(this->get_atoms());
 		f.substitute_bonds(help::rotatable);
 		// rotatable bond inside a ring is changed back to non-rotatable
@@ -612,12 +613,13 @@ namespace Molib {
 		map<const Atom*, Atom*> atom1_to_copy1;
 		for (auto &patom : this->get_atoms()) {
 			patom->clear(); // clear bondees as they refer to the template molecule
+			patom->clear_bonds(); // clear bonds : fixes double CONECT words bug in PDB output
 			atom1_to_copy1[atom_number_to_atom.at(patom->atom_number())] = patom;
 		}
 		for (auto &kv : atom1_to_copy1) { // regenerate bonds
 			const Atom &atom1 = *kv.first;
 			Atom &copy1 = *kv.second;
-			copy1.clear_bonds();
+			//~ copy1.clear_bonds();
 			for (auto &atom2 : atom1) {
 				if (atom1_to_copy1.count(&atom2)) {
 					// copying of bonds does not preserve bond properties !!!
@@ -669,6 +671,7 @@ namespace Molib {
 	Bond& Atom::connect(Atom &a2) {
 		Atom &a1 = *this;
 		if (!a1.is_adjacent(a2)) {
+			dbgmsg("connecting atoms " << a1.atom_number() << " and " << a2.atom_number());
 			a1.add(&a2);
 			a2.add(&a1);
 			a1.insert_bond(a2, new Bond(&a1, &a2)); // insert if not exists
@@ -913,6 +916,9 @@ namespace Molib {
 				}
 			}
 		}
+		// connect the new hydrogen bonds with the rest of the bond-graph
+		erase_bonds(get_bonds_in(molecule.get_atoms()));
+		connect_bonds(get_bonds_in(molecule.get_atoms()));
 		dbgmsg("MOLECULE AFTER COMPUTING HYDROGENS " << endl << *this);
 		dbgmsg("BONDS AFTER COMPUTING HYDROGENS " << endl << get_bonds_in(this->get_atoms()));
 		return *this;
@@ -961,6 +967,8 @@ namespace Molib {
 		stream << setw(27) << a.crd().pdb();
 		stream << setw(6) << setprecision(2) << fixed << right << 1.0;
 		stream << setw(6) << setprecision(2) << fixed << right << 1.0;
+		stream << setw(12) << right << a.element();
+		stream << setw(2) << "  ";
 		stream << setw(5) << right << a.idatm_type_unmask();
 		stream << setw(5) << right << a.gaff_type();
 		//~ stream << setw(5) << right << a.__smiles_label;
@@ -1052,7 +1060,8 @@ namespace Molib {
 		for (auto &pbond : get_bonds_in(m.get_atoms())) {
 		//~ for (auto &pbond : m.get_atoms()) {
 			Bond &bond = *pbond;
-			if (bond.get_rotatable() != "") {
+			//~ if (bond.get_rotatable() != "") {
+			if (bond.is_rotatable()) {
 				stream << "REMARK   8 ROTA " << bond.get_rotatable() 
 					<< " " << bond.atom1().atom_number() 
 					<< " " << bond.atom2().atom_number() 
@@ -1060,7 +1069,7 @@ namespace Molib {
 			}
 		}
 		for (auto &pbond : get_bonds_in(m.get_atoms())) {
-		//~ for (auto &pbond : m.get_atoms()) {
+		//~ for (auto &pbond : m.get_atoms()) { // dsagfkh 
 			Bond &bond = *pbond;
 			stream << "REMARK   8 BONDTYPE " << bond.get_bo() 
 				<< " " << bond.get_bond_gaff_type() 

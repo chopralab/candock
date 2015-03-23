@@ -24,6 +24,9 @@ namespace help {
 		vector<string> rule;
 	};
 	typedef vector<rename_rule> rename_rules;
+
+	ostream& operator<<(ostream& os, const rename_rule& rule);
+	
 	enum IdatmGeometry {
 		Ion=0, Single=1, Linear=2, Planar=3, Tetrahedral=4
 	};
@@ -1726,6 +1729,7 @@ namespace help {
 		{{{".*#1",".*#2","bo=1"}}, {{"1,2:bond_gaff_type=sb"}}},
 	};	
 	const rename_rules rotatable {
+		{{{"Npl#1","C2#2",""}, {"#1","^H$#3",""}, {"#2","O2#4",""}}, {{"1,2:rota=amide,angles={180},drive_id=1"}}},
 		{{{"3$#1","3$#2",""}, {"#1","^[^H]#3",""}}, {{"1,2:rota=sp3-sp3,angles={-60,60,180},drive_id=3"}}},
 		{{{"3$#1","2$#2",""}, {"#1","^[^H]#3",""}, {"#2","^[^H]#4",""}}, {{"1,2:rota=sp3-sp2,angles={-150,-90,-30,30,90,150},drive_id=6"}}},
 		{{{"3$#1","ar$#2",""}, {"#1","^[^H]#3",""}}, {{"1,2:rota=sp3-aromatic,angles={-150,-90,-30,30,90,150},drive_id=6"}}},
@@ -1764,7 +1768,6 @@ namespace help {
 		{{{"^S#1","Car#2",""}, {"#1","^O#3",""}, {"#1","^O#4",""}, {"#2","^[^H]#5",""}}, {{"1,2:rota=sulfone-aromatic,angles={-120,-90,-60,60,90,120},drive_id=122"}}},
 		{{{"Si#1","3$#2",""}, {"#1","^[^H]#3",""}, {"#2","^[^H]#4",""}}, {{"1,2:rota=silicon-sp3,angles={-150,-90,-30,30,90,150},drive_id=6"}}},
 		{{{"Si#1","O3#2",""}, {"#1","^[^H]#3",""}}, {{"1,2:rota=silicon-oxygen,angles={-60,60,180},drive_id=3"}}},
-		{{{"Npl#1","C2#2",""}, {"#1","^H$#3",""}, {"#2","O2#4",""}}, {{"1,2:rota=amide,angles={180},drive_id=1"}}},
 		{{{"Car#1","Car#2",""}, {"#1","^[^H]#3",""}, {"#1","^[^H]#4",""}}, {{"1,2:rota=biphenyl,angles={-140,-40,40,140},drive_id=1000"}}}, // biphenly single bond
 	};
 	//~ const rename_rules gaff { // GAFF atom types

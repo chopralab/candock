@@ -134,8 +134,8 @@ int main(int argc, char* argv[]) {
 				.compute_ring_type()
 				.compute_bond_gaff_type()
 				.compute_gaff_type()
+				.compute_rotatable_bonds() // relies on hydrogens being there
 				.erase_hydrogen()
-				.compute_rotatable_bonds()
 				.compute_overlapping_rigid_segments()
 				.compute_seeds(cmdl.seeds_file());
 			ligand_idatm_types = Molib::get_idatm_types(ligands, ligand_idatm_types);

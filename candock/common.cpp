@@ -37,16 +37,18 @@ ostream& operator<<(ostream& os, const cluster::MapD<Molib::Molecule>& scores)	{
 	return os;
 }
 
-ostream& operator<<(ostream& os, const vector<common::Centroid>& centroids) {
-	for (auto &centroid : centroids) {
-		os << centroid.get_centroid().simple() << " " << fixed
-			<< setprecision(3) << centroid.get_radial_check() << endl;
-	}
-	return os;
-}
-
-
 namespace common {
+
+	//~ ostream& operator<<(ostream& os, const vector<common::Centroid>& centroids) {
+	ostream& operator<<(ostream& os, const vector<Centroid>& centroids) {
+		for (auto &centroid : centroids) {
+			os << centroid.get_centroid().simple() << " " << fixed
+				<< setprecision(3) << centroid.get_radial_check() << endl;
+		}
+		return os;
+	}
+	
+
 
 	/* Cluster stuff
 	 * 

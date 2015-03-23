@@ -79,11 +79,15 @@ namespace Molib {
 		Atom(const Geom3D::Coordinate &crd) : __crd(crd), __element("") {}
 		Atom(const Geom3D::Coordinate &crd, const int &idatm_type) : __crd(crd), 
 			__idatm_type(idatm_type), __element("") {}
-		Atom(int atom_number, string atom_name, const Geom3D::Coordinate &crd, 
-			const int idatm_type) : __atom_number(atom_number), 
+		//~ Atom(int atom_number, string atom_name, const Geom3D::Coordinate &crd, 
+			//~ const int idatm_type) : __atom_number(atom_number), 
+			//~ __atom_name(atom_name), __crd(crd), __idatm_type(idatm_type), 
+			//~ __gaff_type("???"), __element(atom_name) {}
+		// if element is missing, try to guess it from atom name
+		Atom(int atom_number, const string &atom_name, const Geom3D::Coordinate &crd, 
+			const int idatm_type, const string &element="") : __atom_number(atom_number), 
 			__atom_name(atom_name), __crd(crd), __idatm_type(idatm_type), 
-			__gaff_type("???"), __element(atom_name) {}
-			
+			__gaff_type("???"), __element(element == "" ? atom_name : element) {}			
 		//~ Bond& add(Bond *b) { return this->aadd(&b->second_atom(), b, this); }
 		//~ Bond& add(Bond *b) { return this->aadd_no_br(&b->second_atom(), b); }
 		//~ Bond& get_bond(const Atom &atom2) const { return this->template_map_container<Bond, Atom, Residue, Atom*>::element(&atom2); }

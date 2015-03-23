@@ -335,9 +335,11 @@ namespace Molib {
 		}
 	}
 	void Fragmenter::substitute_bonds(const help::rename_rules &rrules) {
+		dbgmsg("starting substitute_bonds");
 		BondSet visited;
 		Fragmenter &fragmenter = *this;
 		for (auto &p : rrules) {
+			dbgmsg("grepping for rule = " << p);
 			AtomMatchVec atom_matches = fragmenter.grep(p.pattern);
 			for (auto &m : atom_matches)
 				fragmenter.apply_rule(m, p.rule, visited);

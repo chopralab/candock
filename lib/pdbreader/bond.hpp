@@ -31,13 +31,13 @@ namespace Molib {
 		int __drive_id;
 	public:
 		Bond() : __atom1(nullptr), __atom2(nullptr), __owns_atoms(false),
-			__ring(false), __bo(0), __drive_id(0), __rotatable(""),
+			__ring(false), __bo(0), __drive_id(0), __angles(set<int>()), __rotatable(""),
 			__bond_gaff_type("") {}
 		//~ Bond(Atom *atom1, Atom *atom2, bool owns_atoms=false) : __atom1(atom1), __atom2(atom2), 
 			//~ __owns_atoms(owns_atoms), __ring(false) {}
 		Bond(Atom *atom1, Atom *atom2, bool owns_atoms=false) : __atom1(atom1), 
 			__atom2(atom2), __owns_atoms(owns_atoms), __ring(false), __bo(0), 
-			__drive_id(0), __rotatable(""), __bond_gaff_type("") {}
+			__angles(set<int>()), __drive_id(0), __rotatable(""), __bond_gaff_type("") {}
 		//~ Bond(Atom *atom1, Atom *atom2, const string &rotatable) : __atom1(atom1), 
 			//~ __atom2(atom2), __owns_atoms(false), __rotatable(rotatable), __ring(false) {}
 		//~ Bond(Atom *atom1, Atom *atom2, const string &order) 
@@ -67,7 +67,9 @@ namespace Molib {
 		const string& get_rotatable() const { return __rotatable; }
 		void set_ring(bool ring) { __ring = ring; }
 		bool is_ring() const { return __ring; }
-		bool is_rotatable() const { return !__rotatable.empty(); }
+		bool is_rotatable() const { return !__rotatable.empty() && __rotatable != "amide"; }
+		//~ bool is_rotatable() const { return !__rotatable.empty(); }
+		//~ bool is_rotatable() const { return __angles.size() > 2; }
 		//~ void set_bond_atoms(Atom &atom1, Atom &atom2) { __atom1 = &atom1; __atom2 = &atom2; }
 		//~ void set_bond_type(const string &bond_type) { __bond_type = bond_type; }
 		//~ const string& get_bond_type() const { return __bond_type; }
@@ -116,6 +118,7 @@ namespace Molib {
 	BondGraph create_graph(const help::smiles &edges);
 	//~ void connect_bonds(const BondVec &bonds);
 	void connect_bonds(const BondSet &bonds);
+	void erase_bonds(const BondSet &bonds);
 	//~ void connect_bonds(BondVec &bonds);
 
 	//~ template<typename T>

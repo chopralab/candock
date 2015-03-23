@@ -23,17 +23,25 @@ long_line_behaviour=1
 long_line_column=72
 
 [files]
-current_page=3
-FILE_NAME_0=0;Make;0;EUTF-8;1;1;0;%2Fhome%2Fkonc%2FDropbox%2Ftmp%2Fcandock%2Fcandock%2FMakefile;0;4
+current_page=1
+FILE_NAME_0=21;Make;0;EUTF-8;1;1;0;%2Fhome%2Fkonc%2FDropbox%2Ftmp%2Fcandock%2Fcandock%2FMakefile;0;4
 FILE_NAME_1=354;Make;0;EUTF-8;1;1;0;%2Fhome%2Fkonc%2FDropbox%2Ftmp%2Fcandock%2Fcandock%2FMakefile.inc;0;4
 FILE_NAME_2=13042;C++;0;EUTF-8;1;1;0;%2Fhome%2Fkonc%2FDropbox%2Ftmp%2Fcandock%2Fcandock%2Fopts_candock.hpp;0;4
-FILE_NAME_3=332;C++;0;EUTF-8;1;1;0;%2Fhome%2Fkonc%2FDropbox%2Ftmp%2Fcandock%2Fcandock%2Fcandock.cpp;0;4
-FILE_NAME_4=0;C++;0;EUTF-8;1;1;0;%2Fhome%2Fkonc%2FDropbox%2Ftmp%2Fcandock%2Fcandock%2Fcommon.cpp;0;4
-FILE_NAME_5=0;C++;0;EUTF-8;1;1;0;%2Fhome%2Fkonc%2FDropbox%2Ftmp%2Fcandock%2Flib%2Fpdbreader%2Fmolecule.hpp;0;4
-FILE_NAME_6=17;C++;0;EUTF-8;1;1;0;%2Fhome%2Fkonc%2FDropbox%2Ftmp%2Fcandock%2Flib%2Fpdbreader%2Fpdbreader.cpp;0;4
-FILE_NAME_7=1767;C++;0;EUTF-8;1;1;0;%2Fhome%2Fkonc%2FDropbox%2Ftmp%2Fcandock%2Flib%2Fhelper%2Fhelp.hpp;0;4
-FILE_NAME_8=5062;C++;0;EUTF-8;1;1;0;%2Fhome%2Fkonc%2FDropbox%2Ftmp%2Fcandock%2Flib%2Fscore%2Fscore.cpp;0;4
-FILE_NAME_9=0;C++;0;EUTF-8;1;1;0;%2Fhome%2Fkonc%2FDropbox%2Ftmp%2Fcandock%2Flib%2Fscore%2Fscore.hpp;0;4
+FILE_NAME_3=6947;C++;0;EUTF-8;1;1;0;%2Fhome%2Fkonc%2FDropbox%2Ftmp%2Fcandock%2Fcandock%2Fcandock.cpp;0;4
+FILE_NAME_4=1398;C++;0;EUTF-8;1;1;0;%2Fhome%2Fkonc%2FDropbox%2Ftmp%2Fcandock%2Fcandock%2Fcommon.cpp;0;4
+FILE_NAME_5=5001;C++;0;EUTF-8;1;1;0;%2Fhome%2Fkonc%2FDropbox%2Ftmp%2Fcandock%2Fcandock%2Fcommon.hpp;0;4
+FILE_NAME_6=3812;C++;0;EUTF-8;1;1;0;%2Fhome%2Fkonc%2FDropbox%2Ftmp%2Fcandock%2Flib%2Fpdbreader%2Fmolecule.hpp;0;4
+FILE_NAME_7=34555;C++;0;EUTF-8;1;1;0;%2Fhome%2Fkonc%2FDropbox%2Ftmp%2Fcandock%2Flib%2Fpdbreader%2Fmolecule.cpp;0;4
+FILE_NAME_8=7705;C++;0;EUTF-8;1;1;0;%2Fhome%2Fkonc%2FDropbox%2Ftmp%2Fcandock%2Flib%2Fpdbreader%2Fpdbreader.cpp;0;4
+FILE_NAME_9=73630;C++;0;EUTF-8;1;1;0;%2Fhome%2Fkonc%2FDropbox%2Ftmp%2Fcandock%2Flib%2Fhelper%2Fhelp.hpp;0;4
+FILE_NAME_10=414;C++;0;EUTF-8;1;1;0;%2Fhome%2Fkonc%2FDropbox%2Ftmp%2Fcandock%2Flib%2Fhelper%2Fhelp.cpp;0;4
+FILE_NAME_11=1752;C++;0;EUTF-8;1;1;0;%2Fhome%2Fkonc%2FDropbox%2Ftmp%2Fcandock%2Fcandock%2Ftest_fragmenting.cpp;0;4
+FILE_NAME_12=2731;C++;0;EUTF-8;1;1;0;%2Fhome%2Fkonc%2FDropbox%2Ftmp%2Fcandock%2Flib%2Fpdbreader%2Fbond.hpp;0;4
+FILE_NAME_13=6396;C++;0;EUTF-8;1;1;0;%2Fhome%2Fkonc%2FDropbox%2Ftmp%2Fcandock%2Flib%2Fpdbreader%2Fbond.cpp;0;4
+FILE_NAME_14=15644;C++;0;EUTF-8;1;1;0;%2Fhome%2Fkonc%2FDropbox%2Ftmp%2Fcandock%2Flib%2Ffragmenter%2Ffragmenter.cpp;0;4
+FILE_NAME_15=3481;C++;0;EUTF-8;1;1;0;%2Fhome%2Fkonc%2FDropbox%2Ftmp%2Fcandock%2Flib%2Fpdbreader%2Fit.hpp;0;4
+FILE_NAME_16=0;C++;0;EUTF-8;1;1;0;%2Fhome%2Fkonc%2FDropbox%2Ftmp%2Fcandock%2Flib%2Fgeom3d%2Fcoordinate.cpp;0;4
+FILE_NAME_17=3784;C++;0;EUTF-8;1;1;0;%2Fhome%2Fkonc%2FDropbox%2Ftmp%2Fcandock%2Flib%2Fgeom3d%2Fcoordinate.hpp;0;4
 
 [VTE]
 last_dir=/home/konc

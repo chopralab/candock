@@ -10,4 +10,13 @@ namespace help {
 				<< endl;
 		return os;
 	}
+
+	ostream& operator<<(ostream& os, const rename_rule& rule) {
+		os << "pattern = " << rule.pattern;
+		for (auto &txt : rule.rule) 
+			os << " txt = " << txt;
+		os << endl;
+		return os;
+	}
+
 };

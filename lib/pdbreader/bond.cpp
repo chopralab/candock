@@ -177,6 +177,13 @@ namespace Molib {
 		dbgmsg("connected bonds : " << endl << bonds
 			<< endl << "----------------");
 	}
+	
+	void erase_bonds(const BondSet &bonds) {
+		for (auto &pbond : bonds) {
+			pbond->clear();
+		}
+	}
+	
 	BondGraph create_graph(const BondSet &bonds) {
 		return BondGraph(bonds, true);
 	}
