@@ -252,18 +252,35 @@ int main(int argc, char* argv[]) {
 		 * 
 		 */
 		Molib::NRset top_seeds;
+
+//~ #define GAURAV
+
+#ifdef GAURAV
+		inout::output_file("", "clusters.txt");
+#endif
 		threads.clear();
 		for(int i = 0; i < cmdl.ncpu(); ++i) {
 			threads.push_back(
 				thread([&non_clashing_seeds, &top_seeds, &score, &mutex, i] () {
 					// iterate over non clashing seeds and cluster
 					for (int j = i; j < non_clashing_seeds.size(); j+= cmdl.ncpu()) {
-						cluster::Clusters<Molib::Molecule> representatives = 
+						//~ cluster::Clusters<Molib::Molecule> representatives = 
+							//~ common::cluster_molecules(non_clashing_seeds[j], score,
+							//~ cmdl.clus_rad(), cmdl.min_pts(), cmdl.max_num_clus(), 
+							//~ cmdl.max_seeds_to_cluster());
+						//~ common::convert_clusters_to_mols(top_seeds.add(new Molib::Molecules()),
+							//~ representatives);
+						auto clusters_reps_pair = 
 							common::cluster_molecules(non_clashing_seeds[j], score,
 							cmdl.clus_rad(), cmdl.min_pts(), cmdl.max_num_clus(), 
 							cmdl.max_seeds_to_cluster());
-						common::get_representatives(top_seeds.add(new Molib::Molecules()),
-							representatives);
+						common::convert_clusters_to_mols(top_seeds.add(new Molib::Molecules()),
+							clusters_reps_pair.second);
+
+#ifdef GAURAV
+						inout::output_file(clusters_reps_pair.first, "clusters.txt", ios_base::app); // get the PDB file with all the docked fragment clusters
+#endif
+						
 #ifndef NDEBUG
 						cluster::MapD<Molib::Molecule> scores = 
 							score.many_ligands_score(top_seeds.last());
@@ -276,7 +293,9 @@ int main(int argc, char* argv[]) {
 			thread.join();
 		}
 		inout::output_file(top_seeds, cmdl.top_seeds_file(), ios_base::app); // output docked & filtered fragment poses
-		
+#ifdef GAURAV
+		throw Error("finished : getting docked fragment clusters and exiting...");
+#endif		
 		non_clashing_seeds.clear();	
 		seeds.clear();
 
@@ -358,11 +377,15 @@ int main(int argc, char* argv[]) {
 								 * representatives for further minimization
 								 * 
 								 */
-								cluster::Clusters<Molib::Molecule> representatives = 
-									common::cluster_molecules(docked, score,
+								//~ cluster::Clusters<Molib::Molecule> representatives = 
+									//~ common::cluster_molecules(docked, score,
+									//~ cmdl.docked_clus_rad(), cmdl.docked_min_pts(), cmdl.docked_max_num_clus());
+								//~ Molib::Molecules docked_representatives; 
+								//~ common::convert_clusters_to_mols(docked_representatives, representatives);
+								auto clusters_reps_pair = common::cluster_molecules(docked, score,
 									cmdl.docked_clus_rad(), cmdl.docked_min_pts(), cmdl.docked_max_num_clus());
 								Molib::Molecules docked_representatives; 
-								common::get_representatives(docked_representatives, representatives);
+								common::convert_clusters_to_mols(docked_representatives, clusters_reps_pair.second);
 								
 								/* Minimize each representative docked ligand conformation
 								 * with full flexibility of both ligand and receptor

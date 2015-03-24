@@ -51,10 +51,7 @@ int main(int argc, char* argv[]) {
 			// Compute properties, such as idatm atom types, fragments, seeds,
 			// rotatable bonds
 			//~ ligands.compute_idatm_type()
-				//~ .compute_ring_type()
-				//~ .compute_rotatable_bonds()
-				//~ .compute_overlapping_rigid_segments()
-				//~ .compute_seeds(cmdl.seeds_file());
+				//~ .compute_hydrogen();
 			ligands.compute_idatm_type()
 				.compute_hydrogen()
 				.compute_bond_order()
@@ -67,12 +64,12 @@ int main(int argc, char* argv[]) {
 				.compute_seeds(cmdl.seeds_file());
 			//~ common::create_mols_from_seeds(added, seeds, ligands);
 			common::create_mols_from_fragments(added, seeds, ligands);
-			//~ inout::output_file(ligands, cmdl.prep_file(), ios_base::app);
+			inout::output_file(ligands, cmdl.prep_file(), ios_base::app);
 		}
-		int i = 0;
-		for (auto &seed : seeds) {
-			inout::output_file(seed, cmdl.prep_file() + "." + help::to_string(i++));
-		}
+		//~ int i = 0;
+		//~ for (auto &seed : seeds) {
+			//~ inout::output_file(seed, cmdl.prep_file() + "." + help::to_string(i++));
+		//~ }
 		dbgmsg("SEEDS FOUND IN THE MOLECULE : " << endl << seeds);
 		cmdl.display_time("finished");
 	} catch (exception& e) {

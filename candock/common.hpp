@@ -78,8 +78,15 @@ namespace common {
 
 	typedef Glib::Graph<PVertex> ProductGraph;
 
-	cluster::Clusters<Molib::Molecule> cluster_molecules(const Molib::Molecules &mols, 
-		const Molib::Score &score, const double clus_rad, const int min_pts, const int max_num_clus,
+	//~ cluster::Clusters<Molib::Molecule> cluster_molecules(const Molib::Molecules &mols, 
+		//~ const Molib::Score &score, const double clus_rad, const int min_pts, const int max_num_clus,
+		//~ const int max_mols_to_cluster=999999);
+	//~ void cluster_molecules(const Molib::Molecules &mols, Molib::Molecules &rep_mols,
+		//~ const Molib::Score &score, const double clus_rad, const int min_pts, const int max_num_clus,
+		//~ const int max_mols_to_cluster=999999);
+	pair<cluster::Clusters<Molib::Molecule>, cluster::Clusters<Molib::Molecule>>
+		cluster_molecules(const Molib::Molecules &mols,	const Molib::Score &score, 
+		const double clus_rad, const int min_pts, const int max_num_clus, 
 		const int max_mols_to_cluster=999999);
 
 	vector<Centroid> set_centroids(const genlig::BindingSiteClusters &binding_site_clusters, 
@@ -98,11 +105,11 @@ namespace common {
 	Molib::Molecules superimpose(ProductGraph::Cliques &maxclq, const Molib::Molecule &molecule);
 	Molib::Molecules filter_clashes(const Molib::Molecules &rot_seeds, Grid<Molib::Atom> &gridrec);
 	cluster::PairwiseDistances<Molib::Molecule> all_all_rmsd(const vector<Molib::Molecule*> &mols, const double &clus_rad);
-	void read_rmsd(const string &rmsd_file, const double &clus_rad);
-	void read_scores(const string &score_file);
-	void cluster(const string &cluster_file, const double &clus_rad);
-	void get_representatives(Molib::Molecules &rep_mols, const cluster::Clusters<Molib::Molecule> &representatives);
-	//~ void get_representatives(Molib::Molecules &rep_mols, 
+	//~ void read_rmsd(const string &rmsd_file, const double &clus_rad);
+	//~ void read_scores(const string &score_file);
+	//~ void cluster(const string &cluster_file, const double &clus_rad);
+	void convert_clusters_to_mols(Molib::Molecules &rep_mols, const cluster::Clusters<Molib::Molecule> &representatives);
+	//~ void convert_clusters_to_mols(Molib::Molecules &rep_mols, 
 		//~ const cluster::Clusters<Molib::Molecule> &representatives,
 		//~ const Molib::Score &score);
 
@@ -110,3 +117,4 @@ namespace common {
 };
 
 ostream& operator<<(ostream& os, const cluster::MapD<Molib::Molecule>& scores);
+ostream& operator<<(ostream& os, const cluster::Clusters<Molib::Molecule>& molclus);

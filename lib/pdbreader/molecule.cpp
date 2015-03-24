@@ -912,7 +912,8 @@ namespace Molib {
 						}
 					}
 					if (h_excess > 0)
-						throw Error("die : deleting of excess hydrogens failed");
+						throw Error("die : deleting of excess hydrogens failed for molecule "
+							+ molecule.name());
 				}
 			}
 		}
