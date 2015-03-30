@@ -23,13 +23,13 @@ long_line_behaviour=1
 long_line_column=72
 
 [files]
-current_page=8
+current_page=5
 FILE_NAME_0=299;Make;0;EUTF-8;1;1;0;%2Fhome%2Fkonc%2FDropbox%2Ftmp%2Fcandock%2Fcandock%2FMakefile;0;4
 FILE_NAME_1=354;Make;0;EUTF-8;1;1;0;%2Fhome%2Fkonc%2FDropbox%2Ftmp%2Fcandock%2Fcandock%2FMakefile.inc;0;4
 FILE_NAME_2=926;C++;0;EUTF-8;1;1;0;%2Fhome%2Fkonc%2FDropbox%2Ftmp%2Fcandock%2Fcandock%2Ftest_fragmenting.cpp;0;4
 FILE_NAME_3=0;C++;0;EUTF-8;1;1;0;%2Fhome%2Fkonc%2FDropbox%2Ftmp%2Fcandock%2Fcandock%2Ftest_minimization.cpp;0;4
-FILE_NAME_4=1000;C++;0;EUTF-8;1;1;0;%2Fhome%2Fkonc%2FDropbox%2Ftmp%2Fcandock%2Fcandock%2Fcandock.cpp;0;4
-FILE_NAME_5=1489;C++;0;EUTF-8;1;1;0;%2Fhome%2Fkonc%2FDropbox%2Ftmp%2Fcandock%2Fcandock%2Fcommon.cpp;0;4
+FILE_NAME_4=2965;C++;0;EUTF-8;1;1;0;%2Fhome%2Fkonc%2FDropbox%2Ftmp%2Fcandock%2Fcandock%2Fcandock.cpp;0;4
+FILE_NAME_5=7550;C++;0;EUTF-8;1;1;0;%2Fhome%2Fkonc%2FDropbox%2Ftmp%2Fcandock%2Fcandock%2Fcommon.cpp;0;4
 FILE_NAME_6=5700;C++;0;EUTF-8;1;1;0;%2Fhome%2Fkonc%2FDropbox%2Ftmp%2Fcandock%2Fcandock%2Fcommon.hpp;0;4
 FILE_NAME_7=6324;C++;0;EUTF-8;1;1;0;%2Fhome%2Fkonc%2FDropbox%2Ftmp%2Fcandock%2Flib%2Fpdbreader%2Fmolecule.hpp;0;4
 FILE_NAME_8=32699;C++;0;EUTF-8;1;1;0;%2Fhome%2Fkonc%2FDropbox%2Ftmp%2Fcandock%2Flib%2Fpdbreader%2Fmolecule.cpp;0;4
@@ -38,6 +38,7 @@ FILE_NAME_10=27046;C++;0;EUTF-8;1;1;0;%2Fhome%2Fkonc%2FDropbox%2Ftmp%2Fcandock%2
 FILE_NAME_11=25841;C++;0;EUTF-8;1;1;0;%2Fhome%2Fkonc%2FDropbox%2Ftmp%2Fcandock%2Flib%2Fpdbreader%2Fatomtype.cpp;0;4
 FILE_NAME_12=11198;C++;0;EUTF-8;1;1;0;%2Fhome%2Fkonc%2FDropbox%2Ftmp%2Fcandock%2Flib%2Ffragmenter%2Ffragmenter.cpp;0;4
 FILE_NAME_13=113;C++;0;EUTF-8;1;1;0;%2Fhome%2Fkonc%2FDropbox%2Ftmp%2Fcandock%2Flib%2Ffragmenter%2Funique.cpp;0;4
+FILE_NAME_14=4950;C++;0;EUTF-8;1;1;0;%2Fhome%2Fkonc%2FDropbox%2Ftmp%2Fcandock%2Fcandock%2Fopts_candock.hpp;0;4
 
 [VTE]
 last_dir=/home/konc

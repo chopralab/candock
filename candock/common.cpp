@@ -189,21 +189,23 @@ namespace common {
 			const int cluster_number = kv.first;
 			const Molib::Molecules &binding_site_ligands = kv.second;
 			double radial_check = 2 * binding_site_ligands.compute_max_radius();
-			if (radial_check <= def_radial_check) {
-				cerr << "note : radial check calculated using ProBiS " 
-					<< " binding site detection is too small (" << radial_check
-					<< ") using default value of " << def_radial_check << endl;
-				radial_check = def_radial_check;
-				centroids.push_back(Centroid(binding_site_ligands.compute_geometric_center(), 
-					radial_check));
-			} else {
-				auto result = split_binding_site(binding_site_ligands, def_radial_check);
-				cerr << "note : radial check calculated using ProBiS " 
-					<< " binding site detection is too LARGE (" << radial_check
-					<< ") splitting to " << result.size() << " smaller binding sites of "
-					<< def_radial_check << " Angstroms." << endl;
-				centroids.insert(centroids.end(), result.begin(), result.end()); 
-			}
+			centroids.push_back(Centroid(binding_site_ligands.compute_geometric_center(), 
+				radial_check));
+			//~ if (radial_check <= def_radial_check) {
+				//~ cerr << "note : radial check calculated using ProBiS " 
+					//~ << " binding site detection is too small (" << radial_check
+					//~ << ") using default value of " << def_radial_check << endl;
+				//~ radial_check = def_radial_check;
+				//~ centroids.push_back(Centroid(binding_site_ligands.compute_geometric_center(), 
+					//~ radial_check));
+			//~ } else {
+				//~ auto result = split_binding_site(binding_site_ligands, def_radial_check);
+				//~ cerr << "note : radial check calculated using ProBiS " 
+					//~ << " binding site detection is too LARGE (" << radial_check
+					//~ << ") splitting to " << result.size() << " smaller binding sites of "
+					//~ << def_radial_check << " Angstroms." << endl;
+				//~ centroids.insert(centroids.end(), result.begin(), result.end()); 
+			//~ }
 			dbgmsg("setting centroids from predicted binding sites"
 				<< " cluster number " << cluster_number 
 				<< " radial check = " << centroids.back().get_radial_check() 

@@ -7,3 +7,4 @@ lib/ligands/gbio
 lib/ligands/gclus
 lib/ligands/glig
 *.geany
+candock/candock_for_centroid_quick
