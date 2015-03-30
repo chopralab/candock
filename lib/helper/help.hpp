@@ -721,7 +721,8 @@ namespace help {
 	        { "F", { Single, 1, "fluoride" } },
 	        { "Cl", { Single, 1, "chloride" } },
 	        { "Br", { Single, 1, "bromium" } },
-	        { "I", { Single, 1, "iodide" } }
+	        { "I", { Single, 1, "iodide" } },
+	        { "Si", { Tetrahedral, 4, "silicon" } } // Janez : added for CHEMBL95846 and alike
 	};
 	const char* const idatm_unmask[] {	
 	//~ const vector<string> idatm_unmask {	
@@ -1689,18 +1690,21 @@ namespace help {
 	//~ };
 	const rename_rules special { // idatm rules for complicated groups
 		{{{"^O#1#1","^P|^S#2",""},{"#2","^O#3",""},{"#2","^O|^N|^S#4",""}}, {{"1:idatm=O3-"}}}, // phosphate, sulfate,...
-		{{{"^O#1#1","N3+|N2+#2",""}}, {{"1:idatm=O3-"}}}, // amine-N-oxide, pyridine-N-oxide
-		{{{"^S#1#1","Pox|Pac|P3+#2",""}}, {{"1:idatm=S3-"}}}, // terminal sulfur on tetrahedral center (thiophosphate)
-		{{{"^S#1#2","Car#2",""},{"#1","Car#3",""}}, {{"1:idatm=Sar"}}}, // aromatic sulfur
+		{{{"^O#1#1","N3\\+|N2\\+#2",""}}, {{"1:idatm=O3-"}}}, // amine-N-oxide, pyridine-N-oxide
+		{{{"^S#1#1","Pox|Pac|P3\\+#2",""}}, {{"1:idatm=S3-"}}}, // terminal sulfur on tetrahedral center (thiophosphate)
+		//~ {{{"^S#1#2","Car#2",""},{"#1","Car#3",""}}, {{"1:idatm=Sar"}}}, // aromatic sulfur
+		{{{"^S#1#2#ag",".*#2",""}}, {{"1:idatm=Sar"}}}, // aromatic sulfur
 		{{{"^O#1#2","Car#2",""},{"#1","Car#3",""}}, {{"1:idatm=Oar+"}}}, // aromatic oxygen, formally positive (pyrylium)
 		{{{"Npl#1#2#ag","Npl#2#3#ag",""},{"#1","Car#3#3",""}}, {{"1:idatm=N2"}}}, // change aromatic Npl (bonded to Npl and Car) to N2
 		//~ {{{"Npl#1##1ag,ag6",".*#2",""}}, {{"1:idatm=N2"}}}, // change Npl in 6-membered aromatic ring to N2
 		{{{"Npl#1#2#1ag,ag6",".*#2",""}}, {{"1:idatm=N2"}}}, // change 2-substituted Npl in 6-membered aromatic ring to N2
-		{{{"Npl#1#3,1H#1ag,ag6",".*#2",""}}, {{"1:idatm=N2"}}}, // change 3-substituted (one bondee is hydrogen) Npl in 6-membered aromatic ring to N2
-		//~ {{{"^N#1","Car#2",""},{"#1","Car#3",""}}, {{"1:idatm=Xe"}}}, // JUST A TEST !!!!!!!!
-		//~ {{{"^N#1","Car#2",""},{"#1","Car#3",""}}, {{"1:idatm=Xe"}}}, // JUST A TEST !!!!!!!!
+		//~ {{{"Npl#1#3,1H#1ag,ag6",".*#2",""}}, {{"1:idatm=N2"}}}, // change 3-substituted (one bondee is hydrogen) Npl in 6-membered aromatic ring to N2
 		{{{"Npl#1#3,1H#1ag,ag5","Car#2##1ag,ag5",""},{"#2","Npl#3#3,0H#1ag,ag5",""}}, {{"1:idatm=N2"}}}, // change the first Npl in 5-ring Npl(-H)-Car-Npl(-C,-C,-C) to N2
+		{{{"Npl#1#3,1H#1ag,ag5","^S#2#2#1ag,ag5",""}}, {{"1:idatm=N2"}}}, // change the Npl bound to S in 5-ring to N2
 		{{{"N2#1#2","C2#2#3",""},{"#2","O3#3#1",""}}, {{"1:idatm=Npl"},{"3:idatm=O2"}}}, // correct peptide bond
+		{{{"N1$#1#2",".*#2",""}}, {{"1:idatm=N1+"}}}, // change 2-substituted N1 to N1+
+		{{{"Npl#1#1",".*#2",""}}, {{"1:idatm=N1"}}}, // change 1-substituted Npl (terminal -N=N=N) to N1
+		{{{"Npl#1#3,1H","N1|N1\\+#2",""}}, {{"1:idatm=N2+"}}}, // change 3-substituted Npl (first nitrogen in -N(-H)=N=N) to N2+
 	};	
 	//~ const rename_rules bond_gaff_type {
 		//~ {{{"Cac#1","^O#2",""},{"#1","^O#3",""}}, {{"1,2:bond_gaff_type=DL"},{"1,3:bond_gaff_type=DL"}}},

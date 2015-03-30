@@ -50,18 +50,18 @@ int main(int argc, char* argv[]) {
 
 			// Compute properties, such as idatm atom types, fragments, seeds,
 			// rotatable bonds
-			//~ ligands.compute_idatm_type()
-				//~ .compute_hydrogen();
 			ligands.compute_idatm_type()
-				.compute_hydrogen()
-				.compute_bond_order()
-				.compute_ring_type()
-				.compute_bond_gaff_type()
-				.compute_gaff_type()
-				.compute_rotatable_bonds() // relies on hydrogens being assigned
-				.erase_hydrogen()
-				.compute_overlapping_rigid_segments()
-				.compute_seeds(cmdl.seeds_file());
+				.compute_hydrogen();
+			//~ ligands.compute_idatm_type()
+				//~ .compute_hydrogen()
+				//~ .compute_bond_order()
+				//~ .compute_ring_type()
+				//~ .compute_bond_gaff_type()
+				//~ .compute_gaff_type()
+				//~ .compute_rotatable_bonds() // relies on hydrogens being assigned
+				//~ .erase_hydrogen()
+				//~ .compute_overlapping_rigid_segments()
+				//~ .compute_seeds(cmdl.seeds_file());
 			//~ common::create_mols_from_seeds(added, seeds, ligands);
 			common::create_mols_from_fragments(added, seeds, ligands);
 			inout::output_file(ligands, cmdl.prep_file(), ios_base::app);

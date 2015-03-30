@@ -794,8 +794,8 @@ namespace Molib {
 			}
 		}
 		//~ // missing types: C1-,N2+,N1+,Oar+,O1+,O1,Sar
-		// still missing types: C1-,N2+,N1+,O1+,O1
-		// no longer missing : Sar,Oar+
+		// still missing types: C1-,O1+,O1
+		// no longer missing : Sar,Oar+,N1+,N2+
 		dbgmsg("MOLECULE AFTER IDATM TYPING" << endl << molecule);
 	}	
 	

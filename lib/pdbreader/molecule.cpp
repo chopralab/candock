@@ -717,14 +717,19 @@ namespace Molib {
 		}
 		// set gaff type
 		//~ boost::smatch m;
-		if (boost::regex_search(str, m, boost::regex("gaff=(\\w+)"))) {
+		//~ if (boost::regex_search(str, m, boost::regex("gaff=(\\w+)"))) {
+		if (boost::regex_search(str, m, boost::regex("gaff=([^,$]+)"))) {
 			if (m[1].matched) {
+				dbgmsg(m[1].str());
 				set_gaff_type(m[1].str());
 			}
 		}
 		// set idatm type
-		if (boost::regex_search(str, m, boost::regex("idatm=(\\w+)"))) {
+		//~ if (boost::regex_search(str, m, boost::regex("idatm=(\\w+)"))) {
+		//~ if (boost::regex_search(str, m, boost::regex("idatm=([\\w\\+]+)"))) {
+		if (boost::regex_search(str, m, boost::regex("idatm=([^,$]+)"))) {
 			if (m[1].matched) {
+				dbgmsg(m[1].str());
 				set_idatm_type(m[1].str());
 			}
 		}
@@ -851,77 +856,82 @@ namespace Molib {
 	//~ }
 	Molecule& Molecule::compute_hydrogen() {
 		Molecule &molecule = *this;
-		int max_atom_number = 0;
-		for (auto &patom : molecule.get_atoms()) 
-			if (patom->atom_number() > max_atom_number)
-				max_atom_number = patom->atom_number();
-		for (auto &patom : molecule.get_atoms()) {
-			Atom &atom = *patom;
-			Residue &residue = const_cast<Residue&> (atom.br());
-			if (atom.element() != Element::H) { // don't visit "just added" hydrogens
-				dbgmsg("computing hydrogens for " << atom.idatm_type_unmask());
-				int con = help::infoMap.at(atom.idatm_type_unmask()).substituents;
-				int num_h = con - atom.size();
-				if (num_h > 0) {
-					dbgmsg("computing missing hydrogens for molecule " << molecule.name()
-						<< " atom " << atom << " con = " << con
-						<< " atom.size() = " << atom.size() << " number of added hydrogens = "
-						<< num_h);
-					// add dummy hydrogen atoms with zero coordinates
-					for (int i = 0; i < num_h; ++i) {
-						const string idatm_type = (atom.element() == Element::C 
-							? "HC" : "H");
-						dbgmsg("idatm_type = " << idatm_type);
-						dbgmsg("idatm_mask = " << help::idatm_mask.at(idatm_type));
-						Atom &hatom = residue.add(new Atom(++max_atom_number, "H", 
-							Geom3D::Coordinate(), help::idatm_mask.at(idatm_type)));
-						//~ atom.add(&hatom);
-						//~ hatom.add(&atom);
-						//~ atom.insert_bond(hatom, new Bond(&atom, &hatom)); // insert if not exists
-						//~ hatom.insert_bond(atom, atom.get_shared_ptr_bond(hatom)); // insert if not exists
-						atom.connect(hatom);
-						dbgmsg("added hydrogen");
-					}
-				} else if (num_h < 0) {
-					int h_excess = abs(num_h);
-					dbgmsg("deleting excess hydrogens for molecule " << molecule.name()
-						<< " because according to IDATM type : " 
-						<< atom.idatm_type_unmask() << " this atom : "
-						<< atom << " should have " << h_excess 
-						<< " less hydrogens!");
-					// deleting hydrogens
-					for (int i = 0; i < atom.size(); ++i) {
-						auto &bondee = atom[i];
-						if (bondee.element() == Element::H) {
-							if (h_excess-- > 0) {
-								atom.erase(i--);
-								auto &shpbond = atom.get_shared_ptr_bond(bondee);
-								const Bond &deleted_bond = *shpbond;
-								Bond::erase_stale_refs(deleted_bond, atom.get_bonds()); // delete references 
-								dbgmsg("shared_count1 = " << shpbond.use_count());
-								atom.erase_bond(bondee);
-								dbgmsg("shared_count2 = " << shpbond.use_count());
-								bondee.erase_bond(atom);
-								dbgmsg("shared_count3 = " << shpbond.use_count());
-								dbgmsg("residue before erasing hydrogen " << bondee.atom_number() << " for molecule " 
-									<< molecule.name() << endl << residue);
-								residue.erase(bondee.atom_number());
-								dbgmsg("residue after erasing hydrogen " << bondee.atom_number() << " for molecule " 
-									<< molecule.name() << endl << residue);
+		try {
+			int max_atom_number = 0;
+			for (auto &patom : molecule.get_atoms()) 
+				if (patom->atom_number() > max_atom_number)
+					max_atom_number = patom->atom_number();
+			for (auto &patom : molecule.get_atoms()) {
+				Atom &atom = *patom;
+				Residue &residue = const_cast<Residue&> (atom.br());
+				if (atom.element() != Element::H) { // don't visit "just added" hydrogens
+					int con = help::infoMap.at(atom.idatm_type_unmask()).substituents;
+					int num_h = con - atom.size();
+					dbgmsg("computing hydrogens for " << atom.idatm_type_unmask() << " con = "
+						<< con << " atom.size() = " << atom.size());
+					if (num_h > 0) {
+						dbgmsg("computing missing hydrogens for molecule " << molecule.name()
+							<< " atom " << atom << " con = " << con
+							<< " atom.size() = " << atom.size() << " number of added hydrogens = "
+							<< num_h);
+						// add dummy hydrogen atoms with zero coordinates
+						for (int i = 0; i < num_h; ++i) {
+							const string idatm_type = (atom.element() == Element::C 
+								? "HC" : "H");
+							dbgmsg("idatm_type = " << idatm_type);
+							dbgmsg("idatm_mask = " << help::idatm_mask.at(idatm_type));
+							Atom &hatom = residue.add(new Atom(++max_atom_number, "H", 
+								Geom3D::Coordinate(), help::idatm_mask.at(idatm_type)));
+							//~ atom.add(&hatom);
+							//~ hatom.add(&atom);
+							//~ atom.insert_bond(hatom, new Bond(&atom, &hatom)); // insert if not exists
+							//~ hatom.insert_bond(atom, atom.get_shared_ptr_bond(hatom)); // insert if not exists
+							atom.connect(hatom);
+							dbgmsg("added hydrogen");
+						}
+					} else if (num_h < 0) {
+						int h_excess = abs(num_h);
+						dbgmsg("deleting excess hydrogens for molecule " << molecule.name()
+							<< " because according to IDATM type : " 
+							<< atom.idatm_type_unmask() << " this atom : "
+							<< atom << " should have " << h_excess 
+							<< " less hydrogens!");
+						// deleting hydrogens
+						for (int i = 0; i < atom.size(); ++i) {
+							auto &bondee = atom[i];
+							if (bondee.element() == Element::H) {
+								if (h_excess-- > 0) {
+									atom.erase(i--);
+									auto &shpbond = atom.get_shared_ptr_bond(bondee);
+									const Bond &deleted_bond = *shpbond;
+									Bond::erase_stale_refs(deleted_bond, atom.get_bonds()); // delete references 
+									dbgmsg("shared_count1 = " << shpbond.use_count());
+									atom.erase_bond(bondee);
+									dbgmsg("shared_count2 = " << shpbond.use_count());
+									bondee.erase_bond(atom);
+									dbgmsg("shared_count3 = " << shpbond.use_count());
+									dbgmsg("residue before erasing hydrogen " << bondee.atom_number() << " for molecule " 
+										<< molecule.name() << endl << residue);
+									residue.erase(bondee.atom_number());
+									dbgmsg("residue after erasing hydrogen " << bondee.atom_number() << " for molecule " 
+										<< molecule.name() << endl << residue);
+								}
 							}
 						}
+						if (h_excess > 0)
+							throw Error("die : deleting of excess hydrogens failed for molecule "
+								+ molecule.name());
 					}
-					if (h_excess > 0)
-						throw Error("die : deleting of excess hydrogens failed for molecule "
-							+ molecule.name());
 				}
 			}
+			// connect the new hydrogen bonds with the rest of the bond-graph
+			erase_bonds(get_bonds_in(molecule.get_atoms()));
+			connect_bonds(get_bonds_in(molecule.get_atoms()));
+			dbgmsg("MOLECULE AFTER COMPUTING HYDROGENS " << endl << *this);
+			dbgmsg("BONDS AFTER COMPUTING HYDROGENS " << endl << get_bonds_in(this->get_atoms()));
+		} catch (exception& e) {
+			cerr << "errmesg : " << e.what() << endl;
 		}
-		// connect the new hydrogen bonds with the rest of the bond-graph
-		erase_bonds(get_bonds_in(molecule.get_atoms()));
-		connect_bonds(get_bonds_in(molecule.get_atoms()));
-		dbgmsg("MOLECULE AFTER COMPUTING HYDROGENS " << endl << *this);
-		dbgmsg("BONDS AFTER COMPUTING HYDROGENS " << endl << get_bonds_in(this->get_atoms()));
 		return *this;
 	}
 	Molecule& Molecule::erase_hydrogen() {
