@@ -28,7 +28,7 @@ namespace help {
 	ostream& operator<<(ostream& os, const rename_rule& rule);
 	
 	enum IdatmGeometry {
-		Ion=0, Single=1, Linear=2, Planar=3, Tetrahedral=4
+		Ion=0, Single=1, Linear=2, Planar=3, Tetrahedral=4, TrigonalBipyramidal=5
 	};
 	struct IdatmEntry {
 		IdatmGeometry geometry;
@@ -711,9 +711,11 @@ namespace help {
 	        { "Sac", { Tetrahedral, 4, "sulfate, sulfonate, or sulfamate sulfur" } },
 	        { "Son", { Tetrahedral, 4, "sulfone sulfur" } },
 	        { "Sxd", { Tetrahedral, 3, "sulfoxide sulfur" } },
+	        { "S", { Tetrahedral, 4, "other sulfur" } },
 	        { "Pac", { Tetrahedral, 4, "phosphate phosphorus" } },
 	        { "Pox", { Tetrahedral, 4, "P-oxide phosphorus" } },
 	        { "P3+", { Tetrahedral, 4, "sp3-hybridized phosphorus, formal positive charge" } },
+	        { "P", { TrigonalBipyramidal, 5, "other phosphorus" } },
 	        { "HC", { Single, 1, "hydrogen bonded to carbon" } },
 	        { "H", { Single, 1, "other hydrogen" } },
 	        { "DC", { Single, 1, "deuterium bonded to carbon" } },
@@ -1702,9 +1704,10 @@ namespace help {
 		{{{"Npl#1#3,1H#1ag,ag5","Car#2##1ag,ag5",""},{"#2","Npl#3#3,0H#1ag,ag5",""}}, {{"1:idatm=N2"}}}, // change the first Npl in 5-ring Npl(-H)-Car-Npl(-C,-C,-C) to N2
 		{{{"Npl#1#3,1H#1ag,ag5","^S#2#2#1ag,ag5",""}}, {{"1:idatm=N2"}}}, // change the Npl bound to S in 5-ring to N2
 		{{{"N2#1#2","C2#2#3",""},{"#2","O3#3#1",""}}, {{"1:idatm=Npl"},{"3:idatm=O2"}}}, // correct peptide bond
-		{{{"N1$#1#2",".*#2",""}}, {{"1:idatm=N1+"}}}, // change 2-substituted N1 to N1+
-		{{{"Npl#1#1",".*#2",""}}, {{"1:idatm=N1"}}}, // change 1-substituted Npl (terminal -N=N=N) to N1
-		{{{"Npl#1#3,1H","N1|N1\\+#2",""}}, {{"1:idatm=N2+"}}}, // change 3-substituted Npl (first nitrogen in -N(-H)=N=N) to N2+
+		{{{"N1$#1#2",".*#2",""}}, {{"1:idatm=N1+"}}}, // change 2-substituted N1 to N1+ (e.g. azide)
+		{{{"Npl#1#1",".*#2",""}}, {{"1:idatm=N1"}}}, // change 1-substituted Npl (terminal -N=N=N) to N1 (e.g. azide)
+		{{{"Npl#1#3,1H","N1|N1\\+#2",""}}, {{"1:idatm=N2+"}}}, // change 3-substituted Npl (first nitrogen in -N(-H)=N=N) to N2+ (e.g. azide)
+		{{{"S#1#4","Npl#2#2",""},{"#1","Npl#3#2",""},{"#1","^C#4",""},{"#1","^C#5",""}}, {{"2:idatm=N2"},{"3:idatm=N2"}}}, // (R-)(R-)S(=N-)(=N-)
 	};	
 	//~ const rename_rules bond_gaff_type {
 		//~ {{{"Cac#1","^O#2",""},{"#1","^O#3",""}}, {{"1,2:bond_gaff_type=DL"},{"1,3:bond_gaff_type=DL"}}},
