@@ -19,6 +19,7 @@ class CmdLnOpts {
 	bool __neighb;
 	double __probis_clus_rad;
 	int __probis_min_pts;
+	double __probis_min_z_score;
 
 	bool __quiet;
 	string __program_name;
@@ -37,6 +38,7 @@ public:
 			TCLAP::SwitchArg neighbSwitch("","neighb","Allow only ligands that are in the similar regions according to REMARKs (not enabled by default)", cmd, false);
 			TCLAP::ValueArg<double> probis_clus_radArg("","probis_clus_rad","Cluster radius for predicted ligands by probis (default is 2.0)",false,2.0,"double", cmd);
 			TCLAP::ValueArg<int> probis_min_ptsArg("","probis_min_pts","The minimum number of points (for predicted ligands) required to form a cluster (default is 10)",false,10,"int", cmd);
+			TCLAP::ValueArg<double> probis_min_z_scoreArg("","probis_min_z_score","Minimium z-score of ligands to be considered in clustering (default is 2.0)",false,2.0,"double", cmd);
 			//~ Parse the argv array.
 			cmd.parse(argc, argv);
 			__json_file = json_fileArg.getValue();
@@ -46,6 +48,7 @@ public:
 			__neighb = neighbSwitch.getValue();
 			__probis_clus_rad = probis_clus_radArg.getValue();
 			__probis_min_pts = probis_min_ptsArg.getValue();
+			__probis_min_z_score = probis_min_z_scoreArg.getValue();
 		} 
 		catch (TCLAP::ArgException &e) { 
 			cerr << "error: " << e.error() << " for arg " << e.argId() << endl; 
@@ -64,6 +67,7 @@ public:
 	bool neighb() const { return __neighb; }
 	double probis_clus_rad() const { return __probis_clus_rad; }
 	int probis_min_pts() const { return __probis_min_pts; }
+	double probis_min_z_score() const { return __probis_min_z_score; }
 
 	string version() const { return __version; }
 	string program_name() const { return __program_name; }

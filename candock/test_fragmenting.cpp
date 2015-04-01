@@ -51,7 +51,8 @@ int main(int argc, char* argv[]) {
 			// Compute properties, such as idatm atom types, fragments, seeds,
 			// rotatable bonds
 			ligands.compute_idatm_type()
-				.compute_hydrogen();
+				.compute_hydrogen()
+				.compute_bond_order();
 			//~ ligands.compute_idatm_type()
 				//~ .compute_hydrogen()
 				//~ .compute_bond_order()

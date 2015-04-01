@@ -155,8 +155,8 @@ namespace genclus {
 		return pairwise_distances;
 	}
 	void generate_clusters_of_ligands(const string &json_file, const string &json_with_ligs_file, 
-		const string &geo_dir, const string &names_dir, const bool neighb, 
-		const double hetero_clus_rad, const int hetero_min_pts, const bool for_gclus) {
+		const string &geo_dir, const string &names_dir, const bool neighb, const double hetero_clus_rad, 
+		const int hetero_min_pts, const double min_z_score, const bool for_gclus) {
 		JsonReader jr;
 		Molib::NRset nrset;
 		//~ Molib::PDBreader pr(Molib::PDBreader::all_models);
@@ -171,6 +171,7 @@ namespace genclus {
 				const string pdb_id = d["pdb_id"].asString();
 				const string chain_ids = d["chain_id"].asString();
 				const double z_score = d["alignment"][0]["scores"]["z_score"].asDouble();
+				if (z_score < min_z_score) continue;
 				const string pdb_file = geo_dir + "/" 
 					+ (for_gclus ? (pdb_id + chain_ids) : pdb_id) + ".pdb";
 				dbgmsg(pdb_id + " " + chain_ids);
