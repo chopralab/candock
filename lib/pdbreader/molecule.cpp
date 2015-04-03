@@ -866,6 +866,12 @@ namespace Molib {
 				Residue &residue = const_cast<Residue&> (atom.br());
 				if (atom.element() != Element::H) { // don't visit "just added" hydrogens
 					int con = help::infoMap.at(atom.idatm_type_unmask()).substituents;
+			
+					/* EXCEPTION for 3-substituted P */
+					if (atom.idatm_type_unmask() == "P" && atom.size() == 3) 
+						con = 3;
+					/* ***************************** */
+
 					int num_h = con - atom.size();
 					dbgmsg("computing hydrogens for " << atom.idatm_type_unmask() << " con = "
 						<< con << " atom.size() = " << atom.size());

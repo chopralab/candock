@@ -91,41 +91,45 @@ namespace Molib {
 			<< molecule);
 	}
 	void BondOrder::compute_bond_order(Molecule &molecule) {
-		// assign atom types for atomic penalty scores
-		Fragmenter(molecule.get_atoms())
-			.substitute_atoms(help::atomic_penalty_scores);
-		dbgmsg("MOLECULE AFTER ASSIGNING ATOMIC PENALTY SCORES " << endl
-			<< molecule);
-		// for tps 0, 1, 2, 3, ..., N create all possible combinations of valence states
-		// total number of valence states < 2000
-		const int max_valence_states = 2000;
-		ValenceStateVec valence_states = 
-			__create_valence_states(molecule, max_valence_states);
-		dbgmsg("VALENCE STATES ARE " << endl << valence_states << "-----");
-		// for each valence state determine bond orders (boaf procedure)
-		for (auto &valence_state : valence_states) {
-			dbgmsg("determining bond orders for valence state");
-			try {
-				BondToOrder bond_orders;
-				if (__basic_rules(valence_state, bond_orders)) {
-					dbgmsg("successfully determined bond orders for molecule " 
-						<< molecule.name() << " : " << endl << bond_orders);
-					// set the newly determined bond orders
-					for (auto &kv : bond_orders) {
-						Bond &bond = *kv.first;
-						bond.set_bo(kv.second);
+		try {
+			// assign atom types for atomic penalty scores
+			Fragmenter(molecule.get_atoms())
+				.substitute_atoms(help::atomic_penalty_scores);
+			dbgmsg("MOLECULE AFTER ASSIGNING ATOMIC PENALTY SCORES " << endl
+				<< molecule);
+			// for tps 0, 1, 2, 3, ..., N create all possible combinations of valence states
+			// total number of valence states < 2000
+			const int max_valence_states = 2000;
+			ValenceStateVec valence_states = 
+				__create_valence_states(molecule, max_valence_states);
+			dbgmsg("VALENCE STATES ARE " << endl << valence_states << "-----");
+			// for each valence state determine bond orders (boaf procedure)
+			for (auto &valence_state : valence_states) {
+				dbgmsg("determining bond orders for valence state");
+				try {
+					BondToOrder bond_orders;
+					if (__basic_rules(valence_state, bond_orders)) {
+						dbgmsg("successfully determined bond orders for molecule " 
+							<< molecule.name() << " : " << endl << bond_orders);
+						// set the newly determined bond orders
+						for (auto &kv : bond_orders) {
+							Bond &bond = *kv.first;
+							bond.set_bo(kv.second);
+						}
+						dbgmsg("MOLECULE AFTER COMPUTING BOND ORDERS" 
+							<< endl << molecule);
+						return;
 					}
-					dbgmsg("MOLECULE AFTER COMPUTING BOND ORDERS" 
-						<< endl << molecule);
-					return;
+				} catch(BondOrderError &e) {
+					cerr << e.what() << endl;
 				}
-			} catch(BondOrderError &e) {
-				cerr << e.what() << endl;
 			}
+			// if boaf fails for all saved valence states, a warning message is given
+			throw Error("die : bond order assignment failed for molecule "
+				+ molecule.name());
+		} catch (exception& e) {
+			cerr << "errmesg : " << e.what() << " for molecule = " << molecule.name() << endl;
 		}
-		// if boaf fails for all saved valence states, a warning message is given
-		throw Error("die : bond order assignment failed for molecule "
-			+ molecule.name());
 	}
 	
 	//~ void dfs(int level, int sum, int tps, const vector<vector<AtomParams> &V) {
@@ -162,7 +166,9 @@ namespace Molib {
 	}
 	ValenceStateVec BondOrder::__create_valence_states(const Molecule &molecule, 
 		const int max_valence_states) {
+#ifndef NDEBUG
 		Benchmark::reset();
+#endif
 		vector<Atom*> atoms;
 		vector<vector<AtomParams>> V; // vector of AtomParams are sorted by increasing aps
 		vector<vector<AtomParams>> valence_states;
@@ -170,6 +176,7 @@ namespace Molib {
 		// prepare for recursive valence state determination
 		for (auto &patom : molecule.get_atoms()) {
 			Atom &atom = *patom;
+			dbgmsg(atom);
 			atoms.push_back(&atom);
 			V.push_back(vector<AtomParams>());
 			auto &aps = V.back();
@@ -179,6 +186,9 @@ namespace Molib {
 			}
 			sort(aps.begin(), aps.end(), [] (const AtomParams &i, 
 				const AtomParams &j) { return i.aps < j.aps; });
+#ifndef NDEBUG			
+			for (auto &x : aps) dbgmsg(x.val << " " << x.aps << " " << x.con);
+#endif
 		}
 		// recursively find valence states
 		for (int tps = 0; tps < 32; ++tps) {
@@ -192,10 +202,13 @@ namespace Molib {
 			for (int i = 0; i < valence_state.size(); ++i) {
 				vs[atoms[i]] = valence_state[i];
 			}
-		}	
+		}
+		dbgmsg(vss);
+#ifndef NDEBUG
 		double wall_secs = Benchmark::seconds_from_start();
-		cout << "Creating valence states took " << wall_secs << " seconds\n";
+		dbgmsg("Creating valence states took " << wall_secs << " seconds");
 		Benchmark::reset();
+#endif
 		return vss;
 	}
 

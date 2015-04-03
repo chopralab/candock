@@ -4,6 +4,7 @@
 #include <iostream>
 #include <set>
 #include <map>
+#include <unordered_map>
 #include <string>
 #include <vector>
 #include <cstdlib>
@@ -19,6 +20,7 @@ namespace Molib {
 		int con;
 	};
 	//~ typedef vector<pair<Atom*, AtomParams>> AtomValencePairVec;
+	//~ typedef unordered_map<Atom*, AtomParams> ValenceState;
 	typedef map<Atom*, AtomParams> ValenceState;
 	typedef vector<ValenceState> ValenceStateVec;
 	typedef map<Bond*, int> BondToOrder;

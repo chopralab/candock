@@ -297,7 +297,7 @@ namespace Molib {
 	void Fragmenter::apply_rule(const AtomMatch &m, 
 		const vector<string> &rules, AtomSet &visited) { // atom rule
 		for (auto &rule : rules) {
-			dbgmsg(rule);
+			dbgmsg("atom_match = " << m << " rule = " << rule);
 			auto vec1 = help::ssplit(rule, ":", true);
 			assert(vec1.size() == 2);
 			dbgmsg(vec1[0] << " " << vec1[1]);
@@ -436,15 +436,11 @@ namespace Molib {
 				bond_match[&bond1] = &bond2;
 			}
 			dbgmsg("in grep : bond match is " << endl << bond_match);
-			try {
-				AtomMatch m = __convert_to_atom_match(bond_match);
-				mvec.push_back(m);
-				dbgmsg("in grep : atom match (try 1) is " << endl << m);
-			} catch(Error &e) {
+			for (bool reverse : {false, true}) { // two tries : forward and reverse
 				try {
-					AtomMatch m = __convert_to_atom_match(bond_match, true);
+					AtomMatch m = __convert_to_atom_match(bond_match, reverse);
 					mvec.push_back(m);
-					dbgmsg("in grep : atom match (try 2) is " << endl << m);
+					dbgmsg("in grep : atom match (try " << reverse << ") is " << endl << m);
 				} catch(Error &e) {}
 			}
 		}
