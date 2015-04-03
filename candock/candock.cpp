@@ -55,7 +55,7 @@ int main(int argc, char* argv[]) {
 				//~ cmdl.nosql_file(), cmdl.json_file());
 			genclus::generate_clusters_of_ligands(cmdl.json_file(), cmdl.json_with_ligs_file(),
 				cmdl.geo_dir(), cmdl.names_dir(), cmdl.neighb(), cmdl.probis_clus_rad(),
-				cmdl.probis_min_pts());
+				cmdl.probis_min_pts(), cmdl.probis_min_z_score());
 			const genlig::BindingSiteClusters binding_site_clusters = 
 				genlig::generate_binding_site_prediction(cmdl.json_with_ligs_file(), 
 				cmdl.bio_dir(), cmdl.num_bsites());

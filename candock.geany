@@ -23,11 +23,11 @@ long_line_behaviour=1
 long_line_column=72
 
 [files]
-current_page=8
+current_page=3
 FILE_NAME_0=299;Make;0;EUTF-8;1;1;0;%2Fhome%2Fkonc%2FDropbox%2Ftmp%2Fcandock%2Fcandock%2FMakefile;0;4
 FILE_NAME_1=354;Make;0;EUTF-8;1;1;0;%2Fhome%2Fkonc%2FDropbox%2Ftmp%2Fcandock%2Fcandock%2FMakefile.inc;0;4
 FILE_NAME_2=2130;C++;0;EUTF-8;1;1;0;%2Fhome%2Fkonc%2FDropbox%2Ftmp%2Fcandock%2Fcandock%2Ftest_fragmenting.cpp;0;4
-FILE_NAME_3=712;C++;0;EUTF-8;1;1;0;%2Fhome%2Fkonc%2FDropbox%2Ftmp%2Fcandock%2Fcandock%2Fcandock.cpp;0;4
+FILE_NAME_3=2789;C++;0;EUTF-8;1;1;0;%2Fhome%2Fkonc%2FDropbox%2Ftmp%2Fcandock%2Fcandock%2Fcandock.cpp;0;4
 FILE_NAME_4=911;C++;0;EUTF-8;1;1;0;%2Fhome%2Fkonc%2FDropbox%2Ftmp%2Fcandock%2Flib%2Fpdbreader%2Fmolecule.hpp;0;4
 FILE_NAME_5=24352;C++;0;EUTF-8;1;1;0;%2Fhome%2Fkonc%2FDropbox%2Ftmp%2Fcandock%2Flib%2Fpdbreader%2Fmolecule.cpp;0;4
 FILE_NAME_6=1855;C++;0;EUTF-8;1;1;0;%2Fhome%2Fkonc%2FDropbox%2Ftmp%2Fcandock%2Flib%2Fpdbreader%2Fbondtype.hpp;0;4
@@ -39,6 +39,7 @@ FILE_NAME_11=354;C++;0;EUTF-8;1;1;0;%2Fhome%2Fkonc%2FDropbox%2Ftmp%2Fcandock%2Fl
 FILE_NAME_12=4688;C++;0;EUTF-8;1;1;0;%2Fhome%2Fkonc%2FDropbox%2Ftmp%2Fcandock%2Flib%2Fpdbreader%2Fbond.hpp;0;4
 FILE_NAME_13=3017;C++;0;EUTF-8;1;1;0;%2Fhome%2Fkonc%2FDropbox%2Ftmp%2Fcandock%2Flib%2Fpdbreader%2Fpdbreader.cpp;0;4
 FILE_NAME_14=1752;C++;0;EUTF-8;1;1;0;%2Fhome%2Fkonc%2FDropbox%2Ftmp%2Fcandock%2Flib%2Fpdbreader%2Fbond.cpp;0;4
+FILE_NAME_15=7983;C++;0;EUTF-8;1;1;0;%2Fhome%2Fkonc%2FDropbox%2Ftmp%2Fcandock%2Fcandock%2Fcommon.cpp;0;4
 
 [VTE]
 last_dir=/home/konc

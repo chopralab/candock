@@ -28,6 +28,7 @@ class CmdLnOpts {
 	bool __neighb;
 	double __probis_clus_rad;
 	int __probis_min_pts;
+	double __probis_min_z_score;
 	
 	
 	string __bio_dir;
@@ -130,6 +131,7 @@ public:
 
 			TCLAP::ValueArg<double> probis_clus_radArg("","probis_clus_rad","Cluster radius for predicted ligands by probis (default is 2.0)",false,2.0,"double", cmd);
 			TCLAP::ValueArg<int> probis_min_ptsArg("","probis_min_pts","The minimum number of points (for predicted ligands) required to form a cluster (default is 10)",false,10,"int", cmd);
+			TCLAP::ValueArg<double> probis_min_z_scoreArg("","probis_min_z_score","Minimium z-score of ligands to be considered in clustering (default is 2.0)",false,2.0,"double", cmd);
 
 			TCLAP::ValueArg<string> bio_dirArg("","bio","Directory with ProBiS-ligands bio database (default is data/probis_ligands/bio)",false,"data/probis_ligands/bio","string", cmd);
 			TCLAP::ValueArg<string> lig_clus_fileArg("","lig_clus_file","Ligand clusters found by ProBiS are outputted to this file",false,"ligand_clusters.pdb","string", cmd);
@@ -211,7 +213,7 @@ public:
 
 			TCLAP::ValueArg<double> def_radial_checkArg("","radial","Radial check - the 2*r of the sphere around the binding site central point (default is 10.0)",false,10.0,"double", cmd);
 			//~ TCLAP::ValueArg<double> max_radial_checkArg("","max_radial","Maximum radial check - the 2*r of the sphere around the binding site central point (default is 20.0)",false,20.0,"double", cmd);
-			TCLAP::ValueArg<int> num_bsitesArg("","num_bsites","Maximum number of predicted (or given) binding sites to consider for docking (default is 1)",false,1,"int", cmd);
+			TCLAP::ValueArg<int> num_bsitesArg("","num_bsites","Maximum number of predicted (or given) binding sites to consider for docking (default is 3)",false,3,"int", cmd);
 
 			//~ TCLAP::ValueArg<double> grid_spacingArg("","grid","Grid spacing (default is 0.375)",false,0.375,"double", cmd);
 			TCLAP::ValueArg<double> grid_spacingArg("","grid","Grid spacing (default is 2.0)",false,2.0,"double", cmd);
@@ -246,6 +248,7 @@ public:
 			__neighb = neighbSwitch.getValue();
 			__probis_clus_rad = probis_clus_radArg.getValue();
 			__probis_min_pts = probis_min_ptsArg.getValue();
+			__probis_min_z_score = probis_min_z_scoreArg.getValue();
 			__bio_dir = bio_dirArg.getValue();
 			__lig_clus_file = lig_clus_fileArg.getValue();
 			__centroid_file = centroid_fileArg.getValue();
@@ -325,6 +328,7 @@ public:
 	bool neighb() const { return __neighb; }
 	double probis_clus_rad() const { return __probis_clus_rad; }
 	int probis_min_pts() const { return __probis_min_pts; }
+	double probis_min_z_score() const { return __probis_min_z_score; }
 	string bio_dir() const { return __bio_dir; }
 	string lig_clus_file() const { return __lig_clus_file; }
 	string centroid_file() const { return __centroid_file; }
