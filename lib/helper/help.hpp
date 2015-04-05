@@ -1696,7 +1696,8 @@ namespace help {
 		{{{"^S#1#1","Pox|Pac|P3\\+#2",""}}, {{"1:idatm=S3-"}}}, // terminal sulfur on tetrahedral center (thiophosphate)
 		//~ {{{"^S#1#2","Car#2",""},{"#1","Car#3",""}}, {{"1:idatm=Sar"}}}, // aromatic sulfur
 		{{{"^S#1#2#ag",".*#2",""}}, {{"1:idatm=Sar"}}}, // aromatic sulfur
-		{{{"^O#1#2","Car#2",""},{"#1","Car#3",""}}, {{"1:idatm=Oar+"}}}, // aromatic oxygen, formally positive (pyrylium)
+		//~ {{{"^O#1#2","Car#2",""},{"#1","Car#3",""}}, {{"1:idatm=Oar+"}}}, // aromatic oxygen, formally positive (pyrylium)
+		{{{"^O#1#2#1ag,ag6","Car#2",""},{"#1","Car#3",""}}, {{"1:idatm=Oar+"}}}, // aromatic oxygen, formally positive (pyrylium)
 		{{{"Npl#1#2#ag","Npl#2#3#ag",""},{"#1","Car#3#3",""}}, {{"1:idatm=N2"}}}, // change aromatic Npl (bonded to Npl and Car) to N2
 		//~ {{{"Npl#1##1ag,ag6",".*#2",""}}, {{"1:idatm=N2"}}}, // change Npl in 6-membered aromatic ring to N2
 		{{{"Npl#1#2#1ag,ag6",".*#2",""}}, {{"1:idatm=N2"}}}, // change 2-substituted Npl in 6-membered aromatic ring to N2

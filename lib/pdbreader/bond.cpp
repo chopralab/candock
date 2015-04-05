@@ -403,6 +403,8 @@ namespace Molib {
 				}
 			}
 		}
+		// must delete pointers after work...
+		for (auto &patom : atoms) delete patom;
 		return bonds;
 	}
 	BondGraph create_graph(const help::smiles &edges) {
