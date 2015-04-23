@@ -81,6 +81,11 @@ namespace OMMIface {
 			<< aclass1 << " aclass2 = " << aclass2);
 		try { return bond_type.at(aclass1).at(aclass2); } catch(const out_of_range&) {}
 		try { return bond_type.at(aclass2).at(aclass1); } catch(const out_of_range&) {}
+		// if this fails, we try finding a similar bond parameter
+		for (auto &sclass : help::get_replacement({aclass1, aclass2})) {
+			try { return bond_type.at(sclass[0]).at(sclass[1]); } catch(const out_of_range&) {}
+			try { return bond_type.at(sclass[1]).at(sclass[0]); } catch(const out_of_range&) {}
+		}
 		throw ParameterError("warning : missing bond type " + aclass1 
 			+ "-" + aclass2);
 	}
@@ -100,6 +105,13 @@ namespace OMMIface {
 		// See note under bond stretch above regarding the factor of 2 here.
 		try { return angle_type.at(aclass1).at(aclass2).at(aclass3); } catch(const out_of_range&) {}
 		try { return angle_type.at(aclass3).at(aclass2).at(aclass1); } catch(const out_of_range&) {}
+		// if this fails, we try finding a similar angle parameter
+		for (auto &sclass : help::get_replacement({aclass1, aclass2, aclass3})) {
+			cerr << "replacement angle type [" << sclass[0] << " " << sclass[1] 
+				<< " " << sclass[2] << "]" << endl;
+			try { return angle_type.at(sclass[0]).at(sclass[1]).at(sclass[2]); } catch(const out_of_range&) {}
+			try { return angle_type.at(sclass[2]).at(sclass[1]).at(sclass[0]); } catch(const out_of_range&) {}
+		}
 		throw ParameterError("warning : missing angle type " + aclass1 
 			+ "-" + aclass2 + "-" + aclass3);
 	}
@@ -221,6 +233,13 @@ namespace OMMIface {
 		catch(const out_of_range&) {}
 		try { return torsion_type.at("X").at(aclass3).at(aclass2).at("X"); } 
 		catch(const out_of_range&) {}
+		// if this fails, we try finding a similar dihedral parameter
+		for (auto &sclass : help::get_replacement({aclass1, aclass2, aclass3, aclass4})) {
+			try { return torsion_type.at(sclass[0]).at(sclass[1]).at(sclass[2]).at(sclass[3]); } catch(const out_of_range&) {}
+			try { return torsion_type.at(sclass[3]).at(sclass[2]).at(sclass[1]).at(sclass[0]); } catch(const out_of_range&) {}
+			try { return torsion_type.at("X").at(sclass[1]).at(sclass[2]).at("X"); } catch(const out_of_range&) {}
+			try { return torsion_type.at("X").at(sclass[2]).at(sclass[1]).at("X"); } catch(const out_of_range&) {}
+		}
 		throw ParameterError("warning : missing dihedral type " + aclass1 
 			+ "-" + aclass2 + "-" + aclass3 + "-" + aclass4);
 	}

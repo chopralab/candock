@@ -1691,25 +1691,34 @@ namespace help {
 		//~ {{{"Ni#1#5",".*#2",""}}, {{"atom(1):aps={{5,1},{6,0},{7,1}}"}}}, // Ni(X5)
 	//~ };
 	const rename_rules special { // idatm rules for complicated groups
-		{{{"^O#1#1","^P|^S#2",""},{"#2","^O#3",""},{"#2","^O|^N|^S#4",""}}, {{"1:idatm=O3-"}}}, // phosphate, sulfate,...
+		//~ {{{"^O#1#1","^P|^S#2",""},{"#2","^O#3",""},{"#2","^O|^N|^S#4",""}}, {{"1:idatm=O3-"}}}, // phosphate, sulfate, N-oxide...
+		{{{"^O#1#1","^Pox|^Pac|^Son|^Sac|^Sxd#2",""}}, {{"1:idatm=O3-"}}}, // resonance equivalent terminal oxygen on tetrahedral center (phosphate, sulfate, sulfone...)
 		{{{"^O#1#1","N3\\+|N2\\+#2",""}}, {{"1:idatm=O3-"}}}, // amine-N-oxide, pyridine-N-oxide
 		{{{"^S#1#1","Pox|Pac|P3\\+#2",""}}, {{"1:idatm=S3-"}}}, // terminal sulfur on tetrahedral center (thiophosphate)
 		//~ {{{"^S#1#2","Car#2",""},{"#1","Car#3",""}}, {{"1:idatm=Sar"}}}, // aromatic sulfur
 		{{{"^S#1#2#ag",".*#2",""}}, {{"1:idatm=Sar"}}}, // aromatic sulfur
 		//~ {{{"^O#1#2","Car#2",""},{"#1","Car#3",""}}, {{"1:idatm=Oar+"}}}, // aromatic oxygen, formally positive (pyrylium)
-		{{{"^O#1#2#1ag,ag6","Car#2",""},{"#1","Car#3",""}}, {{"1:idatm=Oar+"}}}, // aromatic oxygen, formally positive (pyrylium)
+		//~ {{{"^O#1#2#1ag,ag6","Car#2",""},{"#1","Car#3",""}}, {{"1:idatm=Oar+"}}}, // aromatic oxygen, formally positive (pyrylium)
 		{{{"Npl#1#2#ag","Npl#2#3#ag",""},{"#1","Car#3#3",""}}, {{"1:idatm=N2"}}}, // change aromatic Npl (bonded to Npl and Car) to N2
 		//~ {{{"Npl#1##1ag,ag6",".*#2",""}}, {{"1:idatm=N2"}}}, // change Npl in 6-membered aromatic ring to N2
 		{{{"Npl#1#2#1ag,ag6",".*#2",""}}, {{"1:idatm=N2"}}}, // change 2-substituted Npl in 6-membered aromatic ring to N2
+		//~ {{{"Npl#1#3#1ag,ag6",".*#2",""}}, {{"1:idatm=N2+"}}}, // change 3-substituted Npl in 6-membered aromatic ring to N2+
 		//~ {{{"Npl#1#3,1H#1ag,ag6",".*#2",""}}, {{"1:idatm=N2"}}}, // change 3-substituted (one bondee is hydrogen) Npl in 6-membered aromatic ring to N2
 		{{{"Npl#1#3,1H#1ag,ag5","Car#2##1ag,ag5",""},{"#2","Npl#3#3,0H#1ag,ag5",""}}, {{"1:idatm=N2"}}}, // change the first Npl in 5-ring Npl(-H)-Car-Npl(-C,-C,-C) to N2
-		{{{"Npl#1#3,1H#1ag,ag5","^S#2#2#1ag,ag5",""}}, {{"1:idatm=N2"}}}, // change the Npl bound to S in 5-ring to N2
+		{{{"Npl#1#3,1H#1ag,ag5","^S|^Oar#2#2#1ag,ag5",""}}, {{"1:idatm=N2"}}}, // change 3-substituted Npl bound to S or O in 5-ring to N2
+		{{{"Npl#1#2#1ag,ag5","^S|^Oar#2#2#1ag,ag5",""}}, {{"1:idatm=N2"}}}, // change 2-substituted Npl bound to S or O in 5-ring to N2
 		{{{"N2#1#2","C2#2#3",""},{"#2","O3#3#1",""}}, {{"1:idatm=Npl"},{"3:idatm=O2"}}}, // correct peptide bond
 		{{{"N1$#1#2",".*#2",""}}, {{"1:idatm=N1+"}}}, // change 2-substituted N1 to N1+ (e.g. azide)
 		{{{"Npl#1#1",".*#2",""}}, {{"1:idatm=N1"}}}, // change 1-substituted Npl (terminal -N=N=N) to N1 (e.g. azide)
 		{{{"Npl#1#3,1H","N1|N1\\+#2",""}}, {{"1:idatm=N2+"}}}, // change 3-substituted Npl (first nitrogen in -N(-H)=N=N) to N2+ (e.g. azide)
 		{{{"^S#1#4","Npl#2#2",""},{"#1","Npl#3#2",""},{"#1","^C#4",""},{"#1","^C#5",""}}, {{"2:idatm=N2"},{"3:idatm=N2"}}}, // (R-)(R-)S(=N-)(=N-)
 		{{{"^P#1#3","Npl#2#2",""},{"#1","Npl#3#2",""}}, {{"2:idatm=N2"},{"3:idatm=N2"}}}, // (R-)P(=N-)(=N-)
+		{{{"Npl#1#2","C2#2#3",""},{"#2","C3#3",""},{"#2","C3#4",""}}, {{"1:idatm=N2"}}}, // change 2-substituted Npl bound to isolated C2 to N2
+	};	
+	const rename_rules refine { // idatm rules for final refinement (relies on bond gaff types)
+		{{{"Npl#1#3#sb,db,ag6",".*#2",""}}, {{"1:idatm=N2+"}}}, // change 3-substituted Npl in 6-membered aromatic ring to N2+
+		{{{"Npl#1#3,1H#sb,db",".*#2",""}}, {{"1:idatm=N2"}}}, // change double-bonded Npl(-H) to N2 (deletes one hydrogen)
+		{{{"Oar#1#2#sb,db,ag",".*#2",""}}, {{"1:idatm=Oar+"}}}, // aromatic oxygen, formally positive (pyrylium)
 	};	
 	//~ const rename_rules bond_gaff_type {
 		//~ {{{"Cac#1","^O#2",""},{"#1","^O#3",""}}, {{"1,2:bond_gaff_type=DL"},{"1,3:bond_gaff_type=DL"}}},
@@ -1728,13 +1737,13 @@ namespace help {
 		{{{"Cac#1","^O#2",""},{"#1","^O#3",""}}, {{"1,2:bond_gaff_type=DL"},{"1,3:bond_gaff_type=DL"}}},
 		{{{"Ntr#1","^O#2",""},{"#1","^O#3",""}}, {{"1,2:bond_gaff_type=DL"},{"1,3:bond_gaff_type=DL"}}},
 		{{{".*#1",".*#2","bo=3"}}, {{"1,2:bond_gaff_type=tb"}}},
-		{{{".*#1##AR1",".*#2##AR1","bo=2"}}, {{"1,2:bond_gaff_type=db"}}},
-		{{{".*#1##AR1",".*#2##AR2","bo=2"}}, {{"1,2:bond_gaff_type=db"}}},
-		{{{".*#1##AR2",".*#2##AR2","bo=2"}}, {{"1,2:bond_gaff_type=db"}}},
+		//~ {{{".*#1##AR1",".*#2##AR1","bo=2"}}, {{"1,2:bond_gaff_type=db"}}},
+		//~ {{{".*#1##AR1",".*#2##AR2","bo=2"}}, {{"1,2:bond_gaff_type=db"}}},
+		//~ {{{".*#1##AR2",".*#2##AR2","bo=2"}}, {{"1,2:bond_gaff_type=db"}}},
 		{{{".*#1",".*#2","bo=2"}}, {{"1,2:bond_gaff_type=db"}}},
-		{{{".*#1##AR1",".*#2##AR1","bo=1"}}, {{"1,2:bond_gaff_type=sb"}}},
-		{{{".*#1##AR1",".*#2##AR2","bo=1"}}, {{"1,2:bond_gaff_type=sb"}}},
-		{{{".*#1##AR2",".*#2##AR2","bo=1"}}, {{"1,2:bond_gaff_type=sb"}}},
+		//~ {{{".*#1##AR1",".*#2##AR1","bo=1"}}, {{"1,2:bond_gaff_type=sb"}}},
+		//~ {{{".*#1##AR1",".*#2##AR2","bo=1"}}, {{"1,2:bond_gaff_type=sb"}}},
+		//~ {{{".*#1##AR2",".*#2##AR2","bo=1"}}, {{"1,2:bond_gaff_type=sb"}}},
 		{{{".*#1",".*#2","bo=1"}}, {{"1,2:bond_gaff_type=sb"}}},
 	};	
 	const rename_rules rotatable {
@@ -2401,6 +2410,80 @@ namespace help {
 		//~ {{{"lp#1",".*#2",""}}, {{"1:gaff=lp"}}},
 		//~ {{{"DU#1",".*#2",""}}, {{"1:gaff=DU"}}},
 	//~ };
+
+	const map<string, vector<string>> gaff_replacement {
+		{"cl",{"cl"}},
+		{"Si",{"Si"}},
+		{"cx",{"cx","c3"}},
+		{"cy",{"cy","c3"}},
+		{"c3",{"c3"}},
+		{"c",{"c","c2"}},
+		{"cz",{"cz"}},
+		{"cp",{"cp","ca","cc","cd","c2"}},
+		{"ca",{"ca","cp","cc","cd","c2"}},
+		{"cc",{"cc","ca","c2"}},
+		{"cd",{"cd","ca","c2"}},
+		{"ce",{"ce","c2"}},
+		{"cf",{"cf","c2"}},
+		{"cu",{"cu","c2"}},
+		{"cv",{"cv","c2"}},
+		{"c2",{"c2","ce","cf"}},
+		{"cg",{"cg","c1"}},
+		{"c1",{"c1","cg"}},
+		{"hn",{"hn"}},
+		{"ho",{"ho"}},
+		{"hs",{"hs"}},
+		{"hp",{"hp"}},
+		{"hx",{"hx"}},
+		{"hw",{"hw"}},
+		{"h3",{"h3"}},
+		{"h2",{"h2"}},
+		{"h1",{"h1"}},
+		{"hc",{"hc"}},
+		{"h5",{"h5"}},
+		{"h4",{"h4"}},
+		{"ha",{"ha"}},
+		{"f",{"f"}},
+		{"br",{"br"}},
+		{"i",{"i"}},
+		{"pc",{"pc","pb","p2"}},
+		{"pd",{"pd","pb","p2"}},
+		{"pe",{"pe","p2"}},
+		{"pf",{"pf","p2"}},
+		{"px",{"px","p4","p3"}},
+		{"p4",{"p4","px","p3"}},
+		{"p3",{"p3","px","p4"}},
+		{"py",{"py","p5"}},
+		{"p5",{"p5","py"}},
+		{"n",{"n","n3"}},
+		{"n4",{"n4","n3"}},
+		{"no",{"no","n3"}},
+		{"na",{"na","n3"}},
+		{"nh",{"nh","n3"}},
+		{"n",{"n","n3"}},
+		{"n3",{"n3","nh"}},
+		{"nb",{"nb","nc","nd","n2"}},
+		{"nc",{"nc","nb","n2"}},
+		{"nd",{"nd","nb","n2"}},
+		{"ne",{"ne","n2"}},
+		{"nf",{"nf","n2"}},
+		{"n1",{"n1"}},
+		{"n2",{"n2"}},
+		{"o",{"o"}},
+		{"oh",{"oh"}},
+		{"os",{"os"}},
+		{"s",{"s"}},
+		{"s2",{"s2","sh"}},
+		{"sh",{"sh","s2"}},
+		{"ss",{"ss","s2"}},
+		{"sx",{"sx","s4"}},
+		{"s4",{"s4","sx"}},
+		{"sy",{"sy","s6"}},
+		{"s6",{"s6","sy"}},
+	};
+
+	vector<vector<string>> get_replacement(const vector<string> &initial);
+
 	const rename_rules gaff { // GAFF atom types
 		{{{"Cl#1",".*#2",""}}, {{"1:gaff=cl"}}}, // Cl is first to not mistake it with C
 		{{{"Si#1",".*#2",""}}, {{"1:gaff=Si"}}},
@@ -2416,7 +2499,8 @@ namespace help {
 		{{{"^C#1#3#1db,0DL",XA + "#2#1",""}}, {{"1:gaff=c"}}}, // C=O or C=S
 		{{{"^C#1#3#3sb",XA + "#2#1",""}}, {{"1:gaff=c"}}}, // C=O or C=S
 		// sp2 C in guanidine group
-		{{{"^C#1#3","^N#2#3",""},{"#1","^N#3#3",""},{"#1","^N#4#3",""}}, {{"1:gaff=cz"}}}, // sp2 C in guanidine group
+		//~ {{{"^C#1#3","^N#2#3",""},{"#1","^N#3#3",""},{"#1","^N#4#3",""}}, {{"1:gaff=cz"}}}, // sp2 C in guanidine group
+		{{{"^C#1#3#NG","^N#2#3",""},{"#1","^N#3#3",""},{"#1","^N#4#3",""}}, {{"1:gaff=cz"}}}, // sp2 C in guanidine group (Janez added NG)
 		// pure aromatic atom that can form an aromatic single bond 
 		{{{"^C#1#3#AR1,1RG6",XX + "#2##AR1",""},{"#1",XX + "#3##AR1",""},{"#1",XX + "#4##AR1",""}}, {{"1:gaff=cp"}}}, // pure aromatic atom that can form an aromatic single bond 
 		// pure aromatic atom 
@@ -2562,6 +2646,8 @@ namespace help {
 
 		//~ {{{"^N#1#3","^C#2#3",""},{"#2",XA + "#2#1",""}}, {{"1:gaff=n"}}}, // Sp2 nitrogen in amide groups N-CO, N-SO2, N-PO
 		{{{"^N#1#3","^C#2#3",""},{"#2",XA + "#3#1",""}}, {{"1:gaff=n"}}}, // Sp2 nitrogen in amide groups N-CO, N-SO2, N-PO
+		{{{"^N#1#3","^S#2#4",""},{"#2",XA + "#3#1",""}}, {{"1:gaff=n"}}}, // Sp2 nitrogen in amide groups N-CO, N-SO2, N-PO
+		{{{"^N#1#3","^P#2#4",""},{"#2",XA + "#3#1",""}}, {{"1:gaff=n"}}}, // Sp2 nitrogen in amide groups N-CO, N-SO2, N-PO
 
 		{{{"^N#1#4",".*#2",""}}, {{"1:gaff=n4"}}}, // Sp3 N with four connected atoms
 		{{{"^N#1#3","^O#2#1",""},{"#1","^O#3#1",""}}, {{"1:gaff=no"}}}, // Nitro N
@@ -2571,10 +2657,11 @@ namespace help {
 		{{{"^N#1#3#AR1",".*#2",""}}, {{"1:gaff=na"}}}, // Sp2 N with three connected atoms
 		{{{"^N#1#3#AR2",".*#2",""}}, {{"1:gaff=na"}}}, // Sp2 N with three connected atoms
 		{{{"^N#1#3#AR3",".*#2",""}}, {{"1:gaff=na"}}}, // Sp2 N with three connected atoms
+
+		{{{"^N#1##NG","^C#2##NG",""},{"#2","^N#3",""},{"#2","^N#4",""}}, {{"1:gaff=nh"}}}, // Janez : Amine N in guanidino group
 		{{{"^N#1#3",XX + "#2##AR1",""}}, {{"1:gaff=nh"}}}, // Amine N connected to one or more aromatic rings
 		{{{"^N#1#3",XX + "#2##AR2",""}}, {{"1:gaff=nh"}}}, // Amine N connected to one or more aromatic rings
 		{{{"^N#1#3",XX + "#2##AR3",""}}, {{"1:gaff=nh"}}}, // Amine N connected to one or more aromatic rings
-
 
 		//~ {{{"^N#1#3","^C#2#3#DB",""}}, {{"1:gaff=nh"}}}, // Amine N connected to one or more aromatic rings
 		//~ {{{"^N#1#3","^N#2#2#DB",""}}, {{"1:gaff=nh"}}}, // Amine N connected to one or more aromatic rings
@@ -2916,7 +3003,6 @@ namespace help {
 		{{{"^S#1#1","^N#2#3",""},{"#2","^O|^S#3#5",""}}, {{"1:aps={{1,0},{2,1}}"}}}, // APSS1- : for S in pyridine 1-oxide etc
 		{{{"^S#1#1","^N#2#3",""},{"#2","^O|^S#3#6",""}}, {{"1:aps={{1,0},{2,1}}"}}}, // APSS1- : for S in pyridine 1-oxide etc
 		{{{"^S#1#1",".*#2",""}}, {{"1:aps={{1,2},{2,0},{3,64}}"}}}, // S(X1)
-
 	};
 };
 #endif

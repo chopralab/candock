@@ -104,8 +104,11 @@ namespace Molib {
 				__create_valence_states(molecule, max_valence_states);
 			dbgmsg("VALENCE STATES ARE " << endl << valence_states << "-----");
 			// for each valence state determine bond orders (boaf procedure)
+#ifndef NDEBUG
+			int val_cnt = 0;
+#endif
 			for (auto &valence_state : valence_states) {
-				dbgmsg("determining bond orders for valence state");
+				dbgmsg("determining bond orders for valence state " << val_cnt++);
 				try {
 					BondToOrder bond_orders;
 					if (__basic_rules(valence_state, bond_orders)) {
@@ -119,9 +122,10 @@ namespace Molib {
 						dbgmsg("MOLECULE AFTER COMPUTING BOND ORDERS" 
 							<< endl << molecule);
 						return;
+						//~ }
 					}
 				} catch(BondOrderError &e) {
-					cerr << e.what() << endl;
+					dbgmsg(e.what());
 				}
 			}
 			// if boaf fails for all saved valence states, a warning message is given
@@ -280,6 +284,8 @@ namespace Molib {
 		// of every atom are both 0 (boaf returns 1 and stops)
 		for (auto &kv : valence_state) {
 			const AtomParams &apar = kv.second;
+			dbgmsg("atom = " << kv.first->atom_name() << " val = " << apar.val
+				<< " con = " << apar.con << " aps = " << apar.aps);
 			if (apar.val != 0 || apar.con != 0) {
 				return false;
 			}
@@ -323,6 +329,11 @@ namespace Molib {
 							// rule 1 : for each atom in a bond, if the bond order bo 
 							// is determined, con is deducted by 1 and av is deducted by bo
 							const int bo = apar.val;
+							// rule NEW (Janez) : if trying to assign a zero bond order then 
+							// try another valence state
+							dbgmsg("bo =" << bo);
+							if (bo <= 0)
+								throw BondOrderError("exception : zero bond order");
 							bond_orders[&bond] = bo;
 							//~ bond_orders[&bond.get_reverse()] = bo;
 							//~ AtomParams &apar2 = valence_state.at(&bond.second_atom());

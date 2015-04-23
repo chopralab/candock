@@ -798,6 +798,19 @@ namespace Molib {
 		// no longer missing : Sar,Oar+,N1+,N2+
 		dbgmsg("MOLECULE AFTER IDATM TYPING" << endl << molecule);
 	}	
+	void AtomType::refine_idatm_type(Molecule &molecule) {
+		// "pass 10": refined idatm typing relying on bond orders... 
+		for (auto &assembly : molecule)
+		for (auto &model : assembly)
+		for (auto &chain : model)
+		for (auto &residue : chain) {
+			if ( ! help::standard_residues.count(residue.resn())) {
+				Fragmenter(residue.get_atoms()).substitute_atoms(help::refine);
+				dbgmsg("pass 10 (refining idatm atom types) : " << endl << residue);
+			}
+		}
+		dbgmsg("MOLECULE AFTER REFINED IDATM TYPING" << endl << molecule);
+	}
 	
 	void AtomType::compute_gaff_type(Molecule &molecule) {
 		for (auto &assembly : molecule)
@@ -1000,7 +1013,7 @@ namespace Molib {
 							//~ || num_c == 3 && num_n == 3)) {
 							//~ // Pure aromatic atom (such as benzene and pyridine)
 							//~ aromatic_type = "AR1";
-						if (ring.size() == 6 && num_c + num_n == 6) {
+						if (ring.size() == 6 && num_c + num_n == 6 && num_double_out == 0) {
 							// Pure aromatic atom (such as benzene and pyridine)
 							aromatic_type = "AR1";
 						//~ } else if (num_double(out_bonds) > 0) {

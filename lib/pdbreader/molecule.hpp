@@ -369,6 +369,7 @@ namespace Molib {
 		const string& name() const { return __name; }
 		//~ bool has_hydrogen() const;
 		Molecule& compute_idatm_type();
+		Molecule& refine_idatm_type();
 		Molecule& compute_gaff_type();
 		Molecule& compute_bond_order();
 		Molecule& compute_ring_type();
@@ -451,6 +452,8 @@ namespace Molib {
 			molecule.compute_bond_gaff_type(); return *this; }
 		Molecules& compute_idatm_type() { for (auto &molecule : *this) 
 			molecule.compute_idatm_type(); return *this; }
+		Molecules& refine_idatm_type() { for (auto &molecule : *this) 
+			molecule.refine_idatm_type(); return *this; }
 		Molecules& compute_gaff_type() { for (auto &molecule : *this) 
 			molecule.compute_gaff_type(); return *this; }
 		Molecules& compute_bond_order() { for (auto &molecule : *this) 

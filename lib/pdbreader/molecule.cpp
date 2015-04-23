@@ -642,6 +642,10 @@ namespace Molib {
 		AtomType::compute_idatm_type(*this);
 		return *this;
 	}
+	Molecule& Molecule::refine_idatm_type() { 
+		AtomType::refine_idatm_type(*this);
+		return *this;
+	}
 	Molecule& Molecule::compute_gaff_type() {
 		AtomType::compute_gaff_type(*this);
 		return *this;
@@ -682,6 +686,7 @@ namespace Molib {
 	void Atom::set_members(const string &str) {
 		// set atomic penalty scores
 		boost::smatch m;
+		dbgmsg("set members for atom " << this->atom_name() << " " << this->atom_number());
 		if (boost::regex_search(str, m, boost::regex("aps=(\\S+)"))) {
 			if (m[1].matched) {
 				string aps_str = m[1].str();
@@ -783,7 +788,7 @@ namespace Molib {
 			prop == "SB" || prop == "DB" || prop == "DL") 
 			return this->get_num_bond_with_bond_gaff_type(prop);
 		else if (prop.substr(0,2) == "AR" || prop.substr(0,2) == "RG"
-			|| prop.substr(0,2) == "ag")
+			 || prop.substr(0,2) == "NG" || prop.substr(0,2) == "ag")
 			return this->get_num_property(prop);
 	}
 	int Atom::get_num_bond_with_bond_gaff_type(const string &prop) const {

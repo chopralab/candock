@@ -7,10 +7,17 @@
 #include "graph/graph.hpp"
 
 namespace Molib {
+	ostream& operator<<(ostream& os, const AtomMatchVec& atom_match_vec) {
+		for (auto &atom_match : atom_match_vec) {
+			os << atom_match << endl;
+		}
+		return os;
+	}
+
 	ostream& operator<<(ostream& os, const AtomMatch& atom_match) {
 		for (auto &kv : atom_match) {
-			os << "smiles atom number = " << kv.first 
-				<< " matched atom = " << *kv.second << endl;
+			os << "[" << kv.first 
+				<< "-->" << kv.second->atom_name() << "] ";
 		}
 		return os;
 	}
@@ -352,6 +359,9 @@ namespace Molib {
 			AtomMatchVec atom_matches = fragmenter.grep(p.pattern);
 			for (auto &m : atom_matches)
 				fragmenter.apply_rule(m, p.rule, visited);
+			dbgmsg("RENAME RULE : " << p << endl
+				<< "MATCHES : " << atom_matches);
+
 		}
 	}
 	//~ Fragmenter::AtomMatchVec Fragmenter::grep(const help::smiles &smi) {
@@ -426,8 +436,10 @@ namespace Molib {
 		BondGraph smiles_graph = create_graph(smi);
 		BondGraph bond_graph = create_graph(get_bonds_in(__atoms));
 		BondGraph::Matches matches = smiles_graph.match(bond_graph);
+		dbgmsg("NUM MATCHES FOUND = " << matches.size());
 		for (auto &match : matches) {
 			map<Bond*, Bond*> bond_match;
+			dbgmsg("MATCH SIZE = " << match.first.size());
 			for (int i = 0; i < match.first.size(); ++i) {
 				auto &nid1 = match.first[i];
 				auto &nid2 = match.second[i];
@@ -546,10 +558,10 @@ namespace Molib {
 					} else throw Error("exception : ran out of options");
 				}
 			} else { // not first bond
-				if (amatch[anum11] == &atom21) amatch[anum12] = &atom22;
-				else if (amatch[anum11] == &atom22) amatch[anum12] = &atom21;
-				else if (amatch[anum12] == &atom21) amatch[anum11] = &atom22;
-				else if (amatch[anum12] == &atom22) amatch[anum11] = &atom21;
+				if (amatch[anum11] == &atom21 && atom12.compatible(atom22)) amatch[anum12] = &atom22;
+				else if (amatch[anum11] == &atom22 && atom12.compatible(atom21)) amatch[anum12] = &atom21;
+				else if (amatch[anum12] == &atom21 && atom11.compatible(atom22)) amatch[anum11] = &atom22;
+				else if (amatch[anum12] == &atom22 && atom11.compatible(atom21)) amatch[anum11] = &atom21;
 				else throw Error("exception : cannot convert from bond match to atom match");
 			}
 			visited.insert(&bond1);

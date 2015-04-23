@@ -63,6 +63,7 @@ namespace Molib {
 		void flip_conjugated_gaff_types(const AtomVec &atoms);
 	};
 	ostream& operator<<(ostream& os, const Fragments& fragments);
+	ostream& operator<<(ostream& os, const AtomMatchVec& atom_match_vec);
 	ostream& operator<<(ostream& os, const AtomMatch& atom_match);
 	ostream& operator<<(ostream& os, const map<Bond*, Bond*>& bond_match);
 }

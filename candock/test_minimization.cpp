@@ -35,7 +35,11 @@ int main(int argc, char* argv[]) {
 		Molib::PDBreader rpdb(cmdl.receptor_file(), 
 			Molib::PDBreader::first_model|Molib::PDBreader::skip_hetatm);
 		Molib::Molecules receptors = rpdb.parse_molecule();
-		
+
+		// if empty, add dummy receptor
+		if (receptors.empty())
+			receptors.add(new Molib::Molecule("dummy"));
+			
 		Molib::PDBreader lpdb(cmdl.ligand_file(), 
 			Molib::PDBreader::all_models|Molib::PDBreader::hydrogens, 
 			cmdl.max_num_ligands());
@@ -62,24 +66,16 @@ int main(int argc, char* argv[]) {
 
 		Molib::Molecules ligands = lpdb.parse_molecule();
 
-		ligands.compute_idatm_type();
-		//~ throw Error("exit after idatm typing");
-		ligands.compute_hydrogen();
-		//~ throw Error("exit after compute hydrogen");
-		ligands.compute_bond_order();
-		//~ throw Error("exit after compute bond order");
-		ligands.compute_ring_type();
-		//~ throw Error("exit after ring typing");
-		ligands.compute_bond_gaff_type();
-		//~ throw Error("exit after bond gaff typing");
-		ligands.compute_gaff_type();
-		//~ throw Error("exit after ligand atom typing");
-		ligands.erase_hydrogen();
-		//~ throw Error("exit after erasing hydrogens");
-		ligands.compute_rotatable_bonds();
-		//~ throw Error("exit after computing rotatable bonds");
-		ligands.compute_overlapping_rigid_segments();
-		//~ throw Error("exit after computing overlapping rigid segments");
+		//~ ligands.compute_idatm_type()
+			//~ .compute_hydrogen()
+			//~ .compute_bond_order()
+			//~ .compute_ring_type()
+			//~ .compute_bond_gaff_type()
+			//~ .compute_gaff_type()
+			//~ .compute_rotatable_bonds() // relies on hydrogens being assigned
+			//~ .erase_hydrogen()
+			//~ .compute_overlapping_rigid_segments()
+			//~ .compute_seeds(cmdl.seeds_file());
 		
 		set<int> ligand_idatm_types;
 		ligand_idatm_types = Molib::get_idatm_types(ligands, ligand_idatm_types);
@@ -100,6 +96,7 @@ int main(int argc, char* argv[]) {
 			.add_kb_forcefield(score, cmdl.step_non_bond(), cmdl.scale_non_bond())
 			.parse_forcefield_file(cmdl.amber_xml_file());
 
+	
 		receptors[0].prepare_for_mm(ffield, gridrec);
 
 		for (auto &ligand : ligands) {
@@ -122,6 +119,7 @@ int main(int argc, char* argv[]) {
 				dbgmsg("MOLECULES AFTER MINIMIZATION : " << endl 
 					<< minimized_ligand << endl 
 					<< minimized_receptor);
+				inout::output_file(minimized_ligand, cmdl.mini_ligands_file(), ios_base::app);
 				//~ OMMIface::Energies energies;
 				//~ energies[&minimized_ligand] = omm.get_energy_components(
 					//~ minimized_receptor, minimized_ligand, cmdl.dist_cutoff());

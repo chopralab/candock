@@ -53,8 +53,12 @@ int main(int argc, char* argv[]) {
 			ligands.compute_idatm_type()
 				.compute_hydrogen()
 				.compute_bond_order()
-				.compute_ring_type()
 				.compute_bond_gaff_type()
+				.refine_idatm_type()
+				.erase_hydrogen()  // needed because refine changes connectivities
+				.compute_hydrogen()   // needed because refine changes connectivities
+				.compute_ring_type()
+				//~ .compute_bond_gaff_type()
 				.compute_gaff_type()
 				.compute_rotatable_bonds() // relies on hydrogens being assigned
 				.erase_hydrogen()
