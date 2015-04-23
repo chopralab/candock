@@ -30,8 +30,6 @@ namespace Molib {
 
 	public:
 		Internal() {}
-		//~ Internal(const MolGraph &graph) { build(graph); }
-		//~ void build(const MolGraph &);
 		Internal(const AtomVec &atoms) { build(atoms); }
 		void build(const AtomVec &atoms);
 		AtomToCrd cartesian(const Atom&, const Atom&, const Atom&, const Geom3D::Coordinate&, const Geom3D::Coordinate&, const Geom3D::Coordinate&, const AtomSet&) const;
@@ -39,7 +37,6 @@ namespace Molib {
 		double get_dihedral(const Atom &a1, const Atom &a2, const Atom &a3, const Atom &a4) const { return __ic_dihedral.at(&a1).at(&a2).at(&a3).at(&a4); }
 		void set_dihedral(const Torsion &t, const double angle) { __ic_dihedral[t.a1][t.a2][t.a3][t.a4] = angle; }
 		double get_dihedral(const Torsion &t) const { return __ic_dihedral.at(t.a1).at(t.a2).at(t.a3).at(t.a4); }
-		//~ friend ostream& operator<< (ostream& stream, Graph<P>& g);
 	};
 };
 #endif

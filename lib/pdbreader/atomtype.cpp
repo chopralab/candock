@@ -24,8 +24,6 @@ namespace Molib {
 	int freeOxygens(const Atom &a, map<const Atom*, int> &heavys) {
 		int freeOxygens = 0;
 		for (auto &bondee : a) {
-		//~ for (auto &bond : a) {
-			//~ auto &bondee = bond.second_atom();
 			if (bondee.element() == Element::O && heavys[&bondee] == 1)
 				freeOxygens++;
 		}
@@ -41,13 +39,10 @@ namespace Molib {
 			<< ring_bonds << endl << "--------------------");
 		for (auto &pbond : ring_bonds) {
 			Bond &bond = *pbond;
-			//~ const Atom &atom1 = bond.first_atom();
-			//~ const Atom &atom2 = bond.second_atom();
 			const Atom &atom1 = bond.atom1();
 			const Atom &atom2 = bond.atom2();
 			const Element &e1 = atom1.element();
 			const Element &e2 = atom2.element();
-			//~ double d = atom1.crd().distance(atom2.crd());
 			double d = bond.length();
 			dbgmsg(e1 << " " << e2);
 			if (e1 == Element::C && e2 == Element::C) {
@@ -77,7 +72,6 @@ namespace Molib {
 		return true;
 	}
 	void AtomType::compute_idatm_type(Molecule &molecule) {
-		//~ Molecule &molecule = *this;
 		// angle values used to discriminate between hybridization states
 		const double angle23val1 = 115.0;
 		const double angle23val2 = 122.0;
@@ -137,8 +131,6 @@ namespace Molib {
 					isHyd = false;
 				bool bondedToCarbon = false;
 				for (auto &bondee : a) {
-				//~ for (auto &bond : a) {
-					//~ auto &bondee = bond.second_atom();
 					if (bondee.element() == Element::C) {
 						bondedToCarbon = true;
 						break;
@@ -150,8 +142,6 @@ namespace Molib {
 	
 			int heavyCount = 0;
 			for (auto &bondee : a) {
-			//~ for (auto &bond : a) {
-				//~ auto &bondee = bond.second_atom();
 				if (bondee.element().number() > 1) {
 					heavyCount++;
 				}
@@ -281,17 +271,6 @@ namespace Molib {
 							a[n2].crd()));
 					}
 				}
-				//~ for (auto it1 = a.begin(); it1 != a.end(); ++it1) {
-					//~ auto it2 = it1;
-					//~ for (++it2; it2 != a.end(); ++it2) {
-						//~ auto &a1 = it1->second_atom();
-						//~ auto &a2 = it2->second_atom();
-						//~ avgAngle += Geom3D::degrees(Geom3D::angle(
-							//~ a1.crd(),
-							//~ a.crd(),
-							//~ a2.crd()));
-					//~ }
-				//~ }
 				avgAngle /= 3.0;
 	
 				if (element == Element::C) {
@@ -308,9 +287,6 @@ namespace Molib {
 					bool hasOxy = false;
 					for (int i = 0; i < 3; ++i) {
 						if (a[i].element() == Element::O) {
-					//~ for (auto &bond : a) {
-						//~ auto &bondee = bond.second_atom();
-						//~ if (bondee.element() == Molib::Element::O) {
 						  	hasOxy = true;
 							break;
 						}
@@ -330,8 +306,6 @@ namespace Molib {
 			//	O and S are sp3 (O3 and S3, respectively)
 			else if (a.size() == 2) {
 				double ang = Geom3D::degrees(Geom3D::angle(a[0].crd(), a.crd(), a[1].crd()));
-				//~ double ang = Geom3D::degrees(Geom3D::angle(a.first().second_atom().crd(), 
-					//~ a.crd(), a.last().second_atom().crd()));
 	
 				if (element == Element::C) {
 					if (ang < angle23val1) {
@@ -369,14 +343,11 @@ namespace Molib {
 		// by element only in previous pass, but can be typed more accurately
 		// now that the atoms they are bonded to have been typed.  Bond
 		// lengths are used in this pass.  
-		//~ for (Atoms::iterator ai = Atoms_.begin(); ai != Atoms_.end(); ++ai) {
 		for (auto &pa : molecule.get_atoms()) {
 			Atom &a = *pa;
 			if (a.size() != 1)
 				continue;
 			
-			//~ Bond &bond = a.first();
-			//~ Atom &bondee = bond.second_atom();
 			Atom &bondee = a[0];
 			double sqlen = bondee.crd().distance_sq(a.crd());
 			string bondeeType = bondee.idatm_type_unmask();
@@ -463,8 +434,6 @@ namespace Molib {
 			
 			bool c3able = false;
 			for (auto &bondee : a) {
-			//~ for (auto &bond : a) {
-				//~ auto &bondee = bond.second_atom();
 				const Element &bondeeElement = bondee.element();
 				double sqlen = bondee.crd().distance_sq(a.crd());
 	
@@ -515,8 +484,6 @@ namespace Molib {
 				continue;
 			
 			bool c2possible = false;
-			//~ for (auto &bond : a) {
-				//~ auto &bondee = bond.second_atom();
 			for (auto &bondee : a) {
 				const string bondeeType = bondee.idatm_type_unmask();
 	
@@ -556,8 +523,6 @@ namespace Molib {
 				if (mapped[&a])
 					continue;
 				bool positive = true;
-				//~ for (auto &bond : a) {
-					//~ auto &bondee = bond.second_atom();
 				for (auto &bondee : a) {
 					const string bondeeType = bondee.idatm_type_unmask();
 	
@@ -572,8 +537,6 @@ namespace Molib {
 			} else if (a.idatm_type_unmask() == "C2") {
 				int numNpls = 0;
 				for (auto &bondee : a) {
-				//~ for (auto &bond : a) {
-					//~ auto &bondee = bond.second_atom();
 					if ((bondee.idatm_type_unmask() == "Npl" && !mapped[&bondee]) || bondee.idatm_type_unmask() == "Ng+")
 						// Ng+ possible through template typing
 						numNpls++;
@@ -581,8 +544,6 @@ namespace Molib {
 	
 				bool noplus = false;
 				if (numNpls == 3) {
-					//~ for (auto &bond : a) {
-						//~ auto &bondee = bond.second_atom();
 					for (auto &bondee : a) {
 	
 						if (bondee.idatm_type_unmask() != "Npl")
@@ -591,8 +552,6 @@ namespace Molib {
 							continue;
 						
 						bondee.set_idatm_type("Ng+");
-						//~ for (auto &bond2 : bondee) {
-							//~ auto &bondee2 = bond2.second_atom();
 						for (auto &bondee2 : bondee) {
 
 							const string bondee2type = bondee2.idatm_type_unmask();
@@ -606,8 +565,6 @@ namespace Molib {
 					}
 				}
 				if (noplus) {
-					//~ for (auto &bond : a) {
-						//~ auto &bondee = bond.second_atom();
 					for (auto &bondee : a) {
 						if (mapped[&bondee])
 							continue;
@@ -616,8 +573,6 @@ namespace Molib {
 					}
 				}
 			} else if (a.idatm_type_unmask() == "Cac") {
-				//~ for (auto &bond : a) {
-					//~ auto &bondee = bond.second_atom();
 				for (auto &bondee : a) {
 					if (mapped[&bondee])
 						continue;
@@ -684,10 +639,7 @@ namespace Molib {
 
 					// Correct types to be aromatic
 					for (auto &pa : r) {
-						//~ Atom &a = const_cast<Atom&>(*pa);  // ugly trick
 						Atom &a = *pa;
-						//~ a.insert_property("aring" + help::to_string(r.size()), 1)
-							//~ .insert_property("aring", 1);
 						a.add_property("ag" + help::to_string(r.size()))
 							.add_property("ag");
 						if (a.idatm_type_unmask() == "C2")
@@ -729,8 +681,6 @@ namespace Molib {
 			bool bothC = true;
 			bool bothN = true;
 			bool other = false;
-			//~ for (auto &bond : a) {
-				//~ auto &bondee = bond.second_atom();
 			for (auto &bondee : a) {
 				const string idatmType = bondee.idatm_type_unmask();
 	
@@ -765,8 +715,6 @@ namespace Molib {
 			}
 			double avgLen = 0.0;
 			for (auto &bondee : a) {
-			//~ for (auto &bond : a) {
-				//~ auto &bondee = bond.second_atom();
 				double sqlen = bondee.crd().distance_sq(a.crd());
 				avgLen += sqlen;
 			}
@@ -830,52 +778,13 @@ namespace Molib {
 		dbgmsg("MOLECULE AFTER GAFF TYPING" << endl << molecule);
 	}
 
-	//~ int num_double(const BondVec &bonds) {
-		//~ int num_double = 0;
-		//~ for (auto &pbond : bonds)
-			//~ if (pbond->is_double()) num_double++;
-		//~ return num_double;
-	//~ }
-	//~ int num_double(const BondSet &bonds) {
-		//~ int num_double = 0;
-		//~ for (auto &pbond : bonds)
-			//~ if (pbond->is_double()) num_double++;
-		//~ return num_double;
-	//~ }
 	BondVec get_double_bonds(const BondSet &bonds) {
 		BondVec dbl;
 		for (auto &pbond : bonds)
 			if (pbond->is_double()) dbl.push_back(pbond);
 		return dbl;
 	}
-	//~ bool two_continuous_single_bonds(const BondVec &bonds) {
-		//~ AtomSet cont;
-		//~ for (auto &pbond : bonds) {
-			//~ if (pbond->is_single()) {
-				//~ if (cont.count(&pbond->atom1()) 
-					//~ || cont.count(&pbond->atom2())) {
-					//~ return true;
-				//~ }
-				//~ cont.insert(&pbond->atom1());
-				//~ cont.insert(&pbond->atom2());
-			//~ }
-		//~ }
-		//~ return false;
-	//~ }
-	//~ bool two_continuous_single_bonds(const BondVec &bonds) {
-		//~ for (int i = 0; i < bonds.size(); ++i) {
-			//~ if (bonds[i]->is_single()) {
-				//~ for (int j = i + 1; j < bonds.size(); ++j) {
-					//~ if (bonds[j]->is_single()) {
-						//~ if (bonds[i]->is_adjacent(*bonds[j])) {
-							//~ return true;
-						//~ }
-					//~ }
-				//~ }
-			//~ }
-		//~ }
-		//~ return false;
-	//~ }
+
 	bool two_continuous_single_bonds(const BondSet &bonds) {
 		for (auto i = bonds.begin(); i != bonds.end(); ++i) {
 			if ((*i)->is_single()) {
@@ -892,69 +801,6 @@ namespace Molib {
 		return false;
 	}
 	
-	//~ void AtomType::compute_ring_type(Molecule &molecule) {
-		//~ dbgmsg("Computing ring types for molecule " << molecule.name());
-		//~ for (auto &assembly : molecule)
-		//~ for (auto &model : assembly)
-		//~ for (auto &chain : model)
-		//~ for (auto &residue : chain) {
-			//~ if (! help::standard_residues.count(residue.resn())) {
-				//~ for (auto &atom : residue)
-					//~ atom.insert_property("NG", 1); // atom belongs to chain
-				//~ Fragmenter frag(residue.get_atoms());
-				//~ Rings rings = frag.identify_rings();
-				//Rings rings = frag.identify_fused_rings();
-				//~ int r_id = 0;
-				//~ for (auto &ring : rings) {
-					//~ auto ring_bonds = get_bonds_in(ring);
-					//~ auto out_bonds = get_bonds_in(ring, false);
-					//~ for (auto &pbond : ring_bonds) {
-						//~ Bond &bond = *pbond;
-						//~ bond.set_ring(true); // ring bond
-					//~ }
-					//~ // Pure aliphatic atom in a ring, which is made of sp3 carbon
-					//~ string aromatic_type = "AR5"; 
-					//~ // determine the type of aromatic ring
-					//~ if (aromatic(ring)) {
-						//int num_c = 0, num_n = 0, num_s = 0, num_o = 0;
-						//for (auto &pa : ring) {
-						//	if (pa->element() == Element::C) num_c++;
-						//	else if (pa->element() == Element::N) num_n++;
-						//	else if (pa->element() == Element::S) num_s++;
-						//	else if (pa->element() == Element::O) num_o++;
-						//}
-						//~ if (ring.size() == 6 && num_double(ring_bonds) == 3) {
-							//~ // Pure aromatic atom (such as benzene and pyridine)
-							//~ aromatic_type = "AR1";
-						//~ } else if (num_double(out_bonds) > 0) {
-							//~ // Atom in a planar ring, which has one or several double bonds 
-							//~ // formed between non-ring atoms and the ring atoms
-							//~ aromatic_type = "AR3";
-						//~ } else if (num_double(ring_bonds) >= 2 
-							//~ && two_continuous_single_bonds(ring_bonds)) {
-							//~ // Atom in a planar ring, usually the ring has two 
-							//~ // continous single bonds and at least two double bonds
-							//~ aromatic_type = "AR2";
-						//~ } else {
-							//~ // Atom other than AR1, AR2, AR3 and AR5.
-							//~ aromatic_type = "AR4";
-						//~ }
-					//~ }
-					//~ const string ring_type = "RG" + help::to_string(ring.size());
-					//~ for (auto &pa : ring) {
-						//~ Atom &a = const_cast<Atom&>(*pa); // ugly trick
-						//a.erase_property("NG")
-						//	.insert_property(ring_type)
-						//	.insert_property(aromatic_type);
-						//~ a.erase_property("NG")
-							//~ .add_property(ring_type)
-							//~ .add_property(aromatic_type);
-					//~ }
-				//~ }
-			//~ }
-		//~ }
-		//~ dbgmsg("MOLECULE AFTER RING TYPING" << endl << molecule);
-	//~ }
 	void AtomType::compute_ring_type(Molecule &molecule) {
 		dbgmsg("Computing ring types for molecule " << molecule.name());
 		for (auto &assembly : molecule)
@@ -984,16 +830,11 @@ namespace Molib {
 					string aromatic_type = "AR5"; 
 					// determine the type of aromatic ring
 					if (aromatic(ring)) {
-						//~ int num_c = 0, num_n = 0, num_s = 0, num_o = 0;
 						int num_c = 0, num_n = 0;
 						for (auto &pa : ring) {
-							//~ if (pa->element() == Element::C) num_c++;
 							if (pa->idatm_type_unmask() == "Car") num_c++;
-							//~ else if (pa->element() == Element::N) num_n++;
 							else if (pa->idatm_type_unmask() == "N2" 
 								|| pa->idatm_type_unmask() == "N2+") num_n++;
-							//~ else if (pa->element() == Element::S) num_s++;
-							//~ else if (pa->element() == Element::O) num_o++;
 						}
 						// calculate number of out-of-ring double bonds
 						auto dbl = get_double_bonds(out_bonds);
@@ -1003,26 +844,15 @@ namespace Molib {
 							 || pbond->atom2().has_property("NG"))
 								++num_double_out;
 						}			 
-						//~ dbgmsg("num_c = " << num_c << " num_n = " << num_n
-							//~ << "num_s = " << num_s << " num_o = " << num_o);
 						dbgmsg("num_c = " << num_c << " num_n = " << num_n
 							<< " num_double_out = " << num_double_out);
-						//~ if (ring.size() == 6 && num_double(ring_bonds) == 3) {
-						//~ if (ring.size() == 6 && (num_c == 6
-							//~ || num_c == 5 && num_n == 1
-							//~ || num_c == 3 && num_n == 3)) {
-							//~ // Pure aromatic atom (such as benzene and pyridine)
-							//~ aromatic_type = "AR1";
 						if (ring.size() == 6 && num_c + num_n == 6 && num_double_out == 0) {
 							// Pure aromatic atom (such as benzene and pyridine)
 							aromatic_type = "AR1";
-						//~ } else if (num_double(out_bonds) > 0) {
-						//~ } else if (num_double(out_bonds) > 0) {
 						} else if (num_double_out > 0) {
 							// Atom in a planar ring, which has one or several double bonds 
 							// formed between non-ring atoms and the ring atoms
 							aromatic_type = "AR3";
-						//~ } else if (num_double(ring_bonds) >= 2 
 						} else if (get_double_bonds(ring_bonds).size() >= 2 
 							&& two_continuous_single_bonds(ring_bonds)) {
 							// Atom in a planar ring, usually the ring has two 
@@ -1035,13 +865,6 @@ namespace Molib {
 					}
 					const string ring_type = "RG" + help::to_string(ring.size());
 					for (auto &pa : ring) {
-						//~ Atom &a = const_cast<Atom&>(*pa); // ugly trick
-						//~ a.erase_property("NG")
-							//~ .insert_property(ring_type)
-							//~ .insert_property(aromatic_type);
-						//~ a.erase_property("NG")
-							//~ .add_property(ring_type)
-							//~ .add_property(aromatic_type);
 						pa->add_property(ring_type)
 							.add_property(aromatic_type);
 					}

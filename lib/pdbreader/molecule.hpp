@@ -20,7 +20,6 @@
 #include "element.hpp"
 #include "fragmenter/fragmenter.hpp"
 #include "helper/help.hpp"
-//~ #include "fragmenter/unique.hpp"
 #include "grid.hpp"
 #include "bond.hpp"
 #include "graph/graph.hpp"
@@ -47,7 +46,6 @@ namespace Molib {
 	typedef vector<Atom*> AtomVec;
 	typedef pair<Atom*, Atom*> AtomPair;
 
-	//~ class Atom : public template_map_container<Bond, Atom, Residue, Atom*> {
 	class Atom : public template_vector_container<Atom*, Atom> {
 		int __atom_number;
 		string __atom_name;
@@ -69,9 +67,6 @@ namespace Molib {
 			dbgmsg("Copy constructor : atom");
 		}
 		typedef tuple<int, string, unique_ptr<Geom3D::Coordinate>, double> atom_tuple;
-		//~ Atom(const int atom_number, const string &smiles_label, const set<int> num_bonds, 
-			//~ const set<string> props) : __atom_number(atom_number), 
-			//~ __smiles_label(smiles_label), __num_bonds(num_bonds), __props(props) {}
 		Atom(const int atom_number, const string &smiles_label, 
 			const map<string, int> smiles_prop) : __atom_number(atom_number), 
 			__smiles_label(smiles_label), __smiles_prop(smiles_prop), __element(""),
@@ -79,20 +74,11 @@ namespace Molib {
 		Atom(const Geom3D::Coordinate &crd) : __crd(crd), __element("") {}
 		Atom(const Geom3D::Coordinate &crd, const int &idatm_type) : __crd(crd), 
 			__idatm_type(idatm_type), __element("") {}
-		//~ Atom(int atom_number, string atom_name, const Geom3D::Coordinate &crd, 
-			//~ const int idatm_type) : __atom_number(atom_number), 
-			//~ __atom_name(atom_name), __crd(crd), __idatm_type(idatm_type), 
-			//~ __gaff_type("???"), __element(atom_name) {}
 		// if element is missing, try to guess it from atom name
 		Atom(int atom_number, const string &atom_name, const Geom3D::Coordinate &crd, 
 			const int idatm_type, const string &element="") : __atom_number(atom_number), 
 			__atom_name(atom_name), __crd(crd), __idatm_type(idatm_type), 
 			__gaff_type("???"), __element(element == "" ? atom_name : element) {}			
-		//~ Bond& add(Bond *b) { return this->aadd(&b->second_atom(), b, this); }
-		//~ Bond& add(Bond *b) { return this->aadd_no_br(&b->second_atom(), b); }
-		//~ Bond& get_bond(const Atom &atom2) const { return this->template_map_container<Bond, Atom, Residue, Atom*>::element(&atom2); }
-		//~ Bond& get_bond(Atom &atom2) const { return this->
-			//~ template_map_container<Bond, Atom, Residue, Atom*>::element(&atom2); }
 		Bond& connect(Atom &a2);
 		void clear_bonds() { __bonds.clear(); }
 		BondVec get_bonds() const { BondVec bonds; for (auto &kv : __bonds) 
@@ -102,21 +88,13 @@ namespace Molib {
 		shared_ptr<Bond>& insert_bond(Atom &other, const shared_ptr<Bond> &bond) { return __bonds.insert({&other, bond}).first->second; }
 		shared_ptr<Bond>& insert_bond(Atom &other, Bond *bond) { return __bonds.insert({&other, shared_ptr<Bond>(bond)}).first->second; }
 		void erase_bond(Atom &other) { __bonds.erase(&other); }
-		//~ void insert_bond(Atom &other, shared_ptr<Bond> &bond) { bonds.insert({&other, bond}); }
-		//~ bool has_bond(Atom &other) const { return __bonds.count(&other); }
 		bool is_adjacent(Atom &other) const { return __bonds.count(&other); }
 		bool is_adjacent(const string &atom_name) const { for (auto &other : *this) if (other.atom_name() == atom_name) return true; return false; }
-		//~ int get_num_hydrogens() const { return __num_hydrogens; }
-		//~ void set_num_hydrogens(const int num_h) { __num_hydrogens = num_h; }
 		int get_num_hydrogens() const;
-		//~ bool is_adjacent(Atom &atom2) { return this->has_element(&atom2); }
 		int atom_number() const { return __atom_number; }
 		void set_atom_name(const string &atom_name) { __atom_name = atom_name; }
 		void set_idatm_type(const string &idatm_type) { __idatm_type = help::idatm_mask.at(idatm_type); }
 		void set_gaff_type(const string &gaff_type) { __gaff_type = gaff_type; }
-		//~ Atom& insert_property(const string &prop) { __props.insert(prop); return *this; }
-		//~ Atom& erase_property(const string &prop) { __props.erase(prop); return *this; }
-		//~ bool has_property(const string &prop) const { return __props.count(prop); }
 		Atom& insert_property(const string &prop, const int count) { __smiles_prop.insert({prop, count}); return *this; }
 		Atom& add_property(const string &prop) { __smiles_prop[prop]++; return *this; }
 		Atom& erase_property(const string &prop) { __smiles_prop.erase(prop); return *this; }
@@ -145,10 +123,8 @@ namespace Molib {
 		void set_br(void *br) { __br = br; }
 		// the following are required for MolGraph :-)
 		bool compatible(const Atom &atom) const;
-		//~ string get_label() const { return help::idatm_unmask[__idatm_type]; }
 		string get_label() const { return (__smiles_label.empty() 
 			? help::idatm_unmask[__idatm_type] : __smiles_label); }
-		//~ string print() const { return get_label(); }
 		const int weight() const { return 0; } // dummy for graph ostream operator
 	};
 	
@@ -194,7 +170,6 @@ namespace Molib {
 		Residue::res_type rest() const { return __rest; }
 		AtomVec get_atoms() const;
 		Residue& erase_properties() { for (auto &atom : *this) atom.erase_properties(); return *this; }
-		//~ BondVec get_bonds() const { BondVec bonds; for (auto &atom : *this) 
 		friend ostream& operator<< (ostream& stream, const Residue& r);
 	};
 	
@@ -340,7 +315,6 @@ namespace Molib {
 		typedef map<int, M0> M1;
 		M1 __bio_rota;
 		map<int, set<char> > __bio_chain;
-		//~ Fragments __seeds, __rigid;
 	public:
 		Molecule(const string name) : __name(name) {}
 		Molecule(const Molecule &rhs) : __name(rhs.__name), __modified(rhs.__modified), 
@@ -356,18 +330,14 @@ namespace Molib {
 		AtomVec get_atoms(const string &chain_ids="", 
 			const Residue::res_type &rest=Residue::res_type::notassigned,
 			const int model_number=-1) const;
-		//~ Fragments& get_seeds() { return __seeds; }
-		//~ Fragments& get_rigid() { return __rigid; }
 		double max_dist() const;
 		void prepare_for_mm(const OMMIface::ForceField &ff, MolGrid &grid);
-		//~ void prepare_for_mm(const OMMIface::ForceField&);
 		void undo_mm_specific();
 		void add_modified(Residue::res_tuple2 t) { __modified.insert(t); }
 		bool is_modified(Residue::res_tuple2 t2) const { return (__modified.find(t2) != __modified.end()); }
 		void add_site(const string &name, Residue::res_tuple2 t) { __site.insert(make_pair(name, t)); }
 		void set_name(const string &name) { __name = name; }
 		const string& name() const { return __name; }
-		//~ bool has_hydrogen() const;
 		Molecule& compute_idatm_type();
 		Molecule& refine_idatm_type();
 		Molecule& compute_gaff_type();
@@ -376,7 +346,6 @@ namespace Molib {
 		Molecule& compute_bond_gaff_type();
 		Molecule& compute_hydrogen();
 		Molecule& erase_hydrogen();
-		//~ Molecule& compute_fragment(Unique&);
 		Molecule& regenerate_bonds(const Molecule&);
 		Molecule& compute_rotatable_bonds();
 		Molecule& compute_overlapping_rigid_segments();
@@ -466,12 +435,7 @@ namespace Molib {
 			molecule.compute_rotatable_bonds(); return *this; }
 		Molecules& compute_overlapping_rigid_segments() { for (auto &molecule : *this) 
 			molecule.compute_overlapping_rigid_segments(); return *this; }
-		//~ Molecules& compute_fragment(const string &seeds_file="") { 
-			//~ Unique u(seeds_file); for (auto &molecule : *this) 
-			//~ molecule.compute_fragment(u); return *this; }
 		Molecules& compute_seeds(const string &seeds_file="");
-			//~ Unique u(seeds_file); for (auto &molecule : *this) 
-			//~ molecule.compute_seeds(u); return *this; }
 		Molecules& erase_properties() { for (auto &molecule : *this) molecule.erase_properties(); return *this; }
 		friend ostream& operator<< (ostream& stream, const Molecules& m);
 	};
@@ -489,32 +453,11 @@ namespace Molib {
 	double compute_rmsd(const MolGraph&, const MolGraph&, const MolGraph::Matches&);
 	set<int> get_idatm_types(const Molecules&, set<int> previous=set<int>());
 
-	//~ template<typename T>
-	//~ BondVec get_bonds_in(const T &atoms, bool in=true) {
-		//~ set<AtomPair> visited;
-		//~ BondVec bonds;
-		//~ for (auto &patom : atoms) {
-			//~ Atom &atom1 = *patom;
-			//~ for (auto &bond : atom1) {
-				//~ Atom &atom2 = bond.second_atom();
-				//~ if ((in || !atoms.count(&atom2)) 
-					//~ && (!in || atoms.count(&atom2)) 
-					//~ && !visited.count({&atom2, &atom1})) {
-					//~ visited.insert({&atom1, &atom2});
-					//~ bonds.push_back(&bond);
-				//~ }
-			//~ }
-		//~ }
-		//~ return bonds;
-	//~ }
-	//~ BondVec get_bonds_in(const AtomSet &atoms, bool in=true);
-	//~ BondVec get_bonds_in(const AtomVec &atoms, bool in=true);
 	BondSet get_bonds_in(const AtomSet &atoms, bool in=true);
 	BondSet get_bonds_in(const AtomVec &atoms, bool in=true);
 
 	MolGraph create_graph(const AtomVec &atoms);
 	MolGraph create_graph(const AtomSet &atoms);
-	//~ MolGraph create_mol_graph(const help::smiles &edges);
 
 	ostream& operator<< (ostream& stream, const AtomSet&atoms);
 	ostream& operator<< (ostream& stream, const AtomVec&atoms);

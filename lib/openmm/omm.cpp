@@ -62,7 +62,6 @@ namespace OMMIface {
 		MoleculeInfo mol_info;
 		mol_info.get_molecule_info(receptor, __ffield)
 			.get_molecule_info(ligand, __ffield)
-			//~ .get_kb_force_info(receptor, ligand, __ffield, dist_cutoff);				
 			.get_kb_force_info(receptor, ligand, dist_cutoff);				
 		// Set up OpenMM data structures; returns OpenMM Platform name.
 		__initialize_openmm(__omm, mol_info, OMMIface::torsional|OMMIface::non_bond); 
@@ -192,34 +191,6 @@ namespace OMMIface {
 			}
 			dbgmsg("checkpoint8");
 		}
-		//~ // Create the 1-2-3-4 bond torsion (dihedral) terms.
-		//~ for (auto &dihedral : mol_info.dihedral) {
-			//~ dbgmsg("checkpoint9");
-			//~ const Molib::Atom &atom1 = *get<0>(dihedral);
-			//~ const Molib::Atom &atom2 = *get<1>(dihedral);
-			//~ const Molib::Atom &atom3 = *get<2>(dihedral);
-			//~ const Molib::Atom &atom4 = *get<3>(dihedral);
-			//~ const int idx1 = atom_to_index.at(&atom1);
-			//~ const int idx2 = atom_to_index.at(&atom2);
-			//~ const int idx3 = atom_to_index.at(&atom3);
-			//~ const int idx4 = atom_to_index.at(&atom4);
-			//~ const int type1 = mol_info.atom_to_type.at(&atom1);
-			//~ const int type2 = mol_info.atom_to_type.at(&atom2);
-			//~ const int type3 = mol_info.atom_to_type.at(&atom3);
-			//~ const int type4 = mol_info.atom_to_type.at(&atom4);
-			//~ try {
-				//~ const ForceField::TorsionTypeVec& v_ttype = 
-					//~ __ffield.get_torsion_type(type1, type2, type3, type4); // cannot make it const ??
-				//~ for (auto &ttype : v_ttype) {
-					//~ bondTorsion.addTorsion(idx1, idx2, idx3, idx4, 
-									//~ ttype.periodicity, 
-									//~ ttype.phase,
-									//~ ttype.k);
-				//~ }
-			//~ } catch (ParameterError& e) {
-				//~ cerr << e.what() << " (" << ++warn << ")" << endl;
-			//~ }
-		//~ }
 		// Create the 1-2-3-4 bond torsion (dihedral) terms.
 		for (auto &dihedral : mol_info.dihedral) {
 			dbgmsg("checkpoint9");
@@ -273,7 +244,6 @@ namespace OMMIface {
 									ttype.k);
 				}
 			} catch (ParameterError& e) {
-				//~ // cerr << e.what() << " (" << ++warn << ")" << endl;
 				dbgmsg(e.what() << " (WARNINGS ARE NOT INCREASED)");
 			}
 		}
@@ -320,13 +290,10 @@ namespace OMMIface {
 		const OpenMM::State state = omm->context->getState(infoMask);
 		// Copy OpenMM positions into atoms array and change units from nm to Angstroms.
 		const vector<OpenMM::Vec3>& positions_in_nm = state.getPositions();
-		//~ dbgmsg("before receptor");
 		Molib::Molecule minimized_receptor(receptor); // receptor and ligand are two separate molecules
-		//~ dbgmsg("before ligand " << ligand);
 		Molib::Molecule minimized_ligand(ligand); // receptor and ligand are two separate molecules
 
 		int i = 0;
-		//~ dbgmsg("before iterating receptor");
 		for (auto &patom : minimized_receptor.get_atoms()) {
 			 // change coordinates of initial system to new coordinates
 			patom->set_crd(Geom3D::Coordinate(positions_in_nm[i][0] * OpenMM::AngstromsPerNm,
@@ -334,7 +301,6 @@ namespace OMMIface {
 										positions_in_nm[i][2] * OpenMM::AngstromsPerNm));
 			++i;
 		}
-		//~ dbgmsg("before iterating ligand");
 		for (auto &patom : minimized_ligand.get_atoms()) {
 			 // change coordinates of initial system to new coordinates
 			patom->set_crd(Geom3D::Coordinate(positions_in_nm[i][0] * OpenMM::AngstromsPerNm,
@@ -385,7 +351,6 @@ namespace OMMIface {
 		MoleculeInfo complex_info;
 		complex_info.get_molecule_info(receptor, __ffield)
 			.get_molecule_info(ligand, __ffield)
-			//~ .get_kb_force_info(receptor, ligand, __ffield, cur_dist_cutoff);
 			.get_kb_force_info(receptor, ligand, cur_dist_cutoff);
 		MoleculeInfo interaction_info;
 		interaction_info.get_molecule_info(receptor, __ffield)
@@ -393,11 +358,9 @@ namespace OMMIface {
 			.get_interaction_force_info(receptor, ligand, cur_dist_cutoff);
 		MoleculeInfo ligand_info;					
 		ligand_info.get_molecule_info(ligand, __ffield)
-			//~ .get_kb_force_info(Molib::Molecule("dummy"), ligand, __ffield, cur_dist_cutoff);
 			.get_kb_force_info(Molib::Molecule("dummy"), ligand, cur_dist_cutoff);
 		MoleculeInfo receptor_info;					
 		receptor_info.get_molecule_info(receptor, __ffield)
-			//~ .get_kb_force_info(receptor, Molib::Molecule("dummy"), __ffield, cur_dist_cutoff);
 			.get_kb_force_info(receptor, Molib::Molecule("dummy"), cur_dist_cutoff);
 
 		dbgmsg("after moleculeinfo");

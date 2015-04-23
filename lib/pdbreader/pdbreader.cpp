@@ -148,21 +148,11 @@ namespace Molib {
 								&& it2 != atom_number_to_atom[&model].end()) {
 								Atom &a1 = *it1->second;
 								Atom &a2 = *it2->second;
-								//~ a1.add(&a2); // add bond
-								//~ a2.add(&a1); // add bond
-								//~ auto &shp1 = a1.insert_bond(a2, new Bond(&a1, &a2)); // insert if not exists
-								//~ auto &shp2 = a2.insert_bond(a1, a1.get_shared_ptr_bond(a2)); // insert if not exists
-								//~ dbgmsg("p1 = " << &*shp1 << " p2 = " << &*shp2);
 								a1.connect(a2);
-								//~ a1.add(new Bond(&a1, &a2)); // add bond
-								//~ a2.add(new Bond(&a2, &a1)); // add bond
 							}
 						}
 					}
 				}
-				//~ connect_bonds(molecule.get_bonds());
-				//~ auto bonds = get_bonds_in(molecule.get_atoms());
-				//~ connect_bonds(bonds);
 				connect_bonds(get_bonds_in(molecule.get_atoms()));
 				--i;
 			}
@@ -200,7 +190,6 @@ namespace Molib {
 				string idatm_type = line.size() > 80 ? boost::algorithm::trim_copy(line.substr(80, 5)) : "???";
 				idatm_type = help::idatm_mask.count(idatm_type) ? idatm_type : "???";
 				string gaff_type = line.size() > 85 ? boost::algorithm::trim_copy(line.substr(85, 5)) : "???";
-				//~ string rest_of_line = line.size() > 76 ? boost::algorithm::trim_copy(line.substr(76)) : "";
 				string rest_of_line = line.size() > 90 ? boost::algorithm::trim_copy(line.substr(90)) : "";
 				dbgmsg("is hydrogen = " << (__hm & PDBreader::hydrogens) << " atom_name = " << atom_name.at(0));
 				if ((__hm & PDBreader::hydrogens) || atom_name.at(0) != 'H') {
@@ -238,7 +227,6 @@ namespace Molib {
 			}
 			else if(line.compare(0, 14, "REMARK   4 NRP") == 0) { 
 				string name = "";
-				//~ if (boost::regex_search(line, m, boost::regex("REMARK   4 NRPDB\\s+(\\S+)"))) {
 				if (boost::regex_search(line, m, boost::regex("REMARK   4 NRPDB\\s+(.*)"))) {
 					if (m[1].matched) {
 						name = m[1].str();
@@ -249,7 +237,6 @@ namespace Molib {
 			}
 			else if(line.compare(0, 14, "REMARK   5 MOL") == 0) { 
 				string name = "";
-				//~ if (boost::regex_search(line, m, boost::regex("REMARK   5 MOLECULE\\s+(\\S+)"))) {
 				if (boost::regex_search(line, m, boost::regex("REMARK   5 MOLECULE\\s+(.*)"))) {
 					if (m[1].matched) {
 						name = m[1].str();
@@ -392,7 +379,6 @@ namespace Molib {
 				for (int i = 1; i < vs.size(); i++) dbgmsg(vs[i]);
 				for (auto &a : as) dbgmsg(*a);
 				dbgmsg(model.get_rigid());
-				//~ for (auto &kv : model.rigid) { for (auto &kv2 : kv.second) for (auto &atom : kv2) dbgmsg(kv.first << " " << *atom); }
 #endif
 			}
 			else if (line.compare(0, 15, "REMARK   8 SEED") == 0) {
@@ -402,54 +388,19 @@ namespace Molib {
 				for (int i = 1; i < vs.size(); i++)	as.insert(atom_number_to_atom[&model][stoi(vs[i])]);
 				model.get_seeds()[vs[0]].insert(as);
 				dbgmsg(model.get_seeds());
-//~ #ifndef NDEBUG
-				//~ for (auto &kv : model.seeds) { for (auto &kv2 : kv.second) for (auto &atom : kv2) dbgmsg(kv.first << " " << *atom); }
-//~ #endif
 			}
 			else if (line.compare(0, 15, "REMARK   8 ROTA") == 0) {
 				Model &model = mols.last().last().last();
 				vector<string> vs = help::ssplit(line.substr(16), " ");
 				Atom &a1 = *atom_number_to_atom[&model][stoi(vs[1])];
 				Atom &a2 = *atom_number_to_atom[&model][stoi(vs[2])];
-				//~ if (!a1.is_adjacent(a2)) 
-					//~ a1.add(new Bond(&a1, &a2)); // add bond
-				//~ if (!a2.is_adjacent(a1)) 
-					//~ a2.add(new Bond(&a2, &a1)); // add bond
-				//~ a1.get_bond(a2).set_rotatable(vs[0]);
-				//~ a2.get_bond(a1).set_rotatable(vs[0]);
-				//~ shared_ptr<Bond> pbond;
-				//~ if (!a1.is_adjacent(a2)) {
-					//~ pbond = a1.connect(a2);
-					//~ a1.add(&a2);
-					//~ a2.add(&a1);
-					//~ a1.insert_bond(a2, new Bond(&a1, &a2)); // insert if not exists
-					//~ pbond = a2.insert_bond(a1, a1.get_shared_ptr_bond(a2)); // insert if not exists
-				//~ }
-				//~ if (pbond)
-					//~ pbond->set_rotatable(vs[0]);
 				a1.connect(a2).set_rotatable(vs[0]);
-				//~ const Atom *a1 = atom_number_to_atom[&model][stoi(vs[1])];
-				//~ const Atom *a2 = atom_number_to_atom[&model][stoi(vs[2])];
-				//~ model.rotatable[(a1->atom_number() < a2->atom_number() ? 
-					//~ BondKey(a1, a2) : BondKey(a2, a1))].set_type(vs[0]);  // overwrite existing bond type with more specialized one
-				
 			}
 			else if (line.compare(0, 19, "REMARK   8 BONDTYPE") == 0) {
 				Model &model = mols.last().last().last();
 				vector<string> vs = help::ssplit(line.substr(20), " ");
 				Atom &a1 = *atom_number_to_atom[&model][stoi(vs[2])];
 				Atom &a2 = *atom_number_to_atom[&model][stoi(vs[3])];
-				//~ shared_ptr<Bond> pbond;
-				//~ if (!a1.is_adjacent(a2)) {
-					//~ a1.add(&a2);
-					//~ a2.add(&a1);
-					//~ a1.insert_bond(a2, new Bond(&a1, &a2)); // insert if not exists
-					//~ pbond = a2.insert_bond(a1, a1.get_shared_ptr_bond(a2)); // insert if not exists
-				//~ }
-				//~ if (pbond) {
-					//~ pbond->set_bo(stoi(vs[0]));
-					//~ pbond->set_bond_gaff_type(vs[1]);
-				//~ }
 				auto &bond = a1.connect(a2);
 				bond.set_bo(stoi(vs[0]));
 				bond.set_bond_gaff_type(vs[1]);
@@ -484,18 +435,6 @@ namespace Molib {
 										<< (atom_iterator2 != atom_number_to_atom[&model].end()));
 									Atom &a2 = *atom_iterator2->second;
 									dbgmsg(a1 << " " << a2);
-									//~ if (!a1.is_adjacent(a2)) {
-										//~ a1.add(&a2); // add bondee atom
-										//~ a1.insert_bond(a2, new Bond(&a1, &a2)); // insert if not exists
-										//~ a2.insert_bond(a1, a1.get_shared_ptr_bond(a2)); // insert if not exists
-										// a1.add(new Bond(&a1, &a2)); // add bond
-									//~ }
-									//~ if (!a1.is_adjacent(a2)) {
-										//~ a1.add(&a2); // add bondee
-										//~ a2.add(&a1); // add bondee
-										//~ a1.insert_bond(a2, new Bond(&a1, &a2)); // insert if not exists
-										//~ a2.insert_bond(a1, a1.get_shared_ptr_bond(a2)); // insert if not exists
-									//~ }
 									a1.connect(a2);
 								}
 								it++;
@@ -503,7 +442,6 @@ namespace Molib {
 						}
 					}
 				}
-				//~ connect_bonds(molecule.get_bonds());
 				connect_bonds(get_bonds_in(molecule.get_atoms()));
 			}
 		}

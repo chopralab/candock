@@ -21,19 +21,6 @@ private:
 	int szi, szj, szk;
 	Geom3D::Coordinate __min_crd;
 	
-	//~ Geom3D::Coordinate __correct(const T &point, const double &dist) const {
-		//~ Geom3D::Coordinate crd = point.crd() - __min_crd + dist;
-		//~ if (dist < 0) {
-			//~ if (crd.x() < 0) crd.set_x(0);
-			//~ if (crd.y() < 0) crd.set_y(0);
-			//~ if (crd.z() < 0) crd.set_z(0);
-		//~ } else {
-			//~ if (crd.x() > szi) crd.set_x(szi);
-			//~ if (crd.y() > szj) crd.set_y(szj);
-			//~ if (crd.z() > szk) crd.set_z(szk);
-		//~ }
-		//~ return crd;
-	//~ }
 	Geom3D::Coordinate __correct(const T &point, const double &dist) const {
 		Geom3D::Coordinate crd = point.crd() - __min_crd + dist;
 		if (dist < 0) {
@@ -121,25 +108,7 @@ public:
 	~Grid() {
 		this->__deallocate();
 	}
-	//~ Points get_neighbors(const T &point, const double &dist) {
-		//~ Geom3D::Coordinate cmin = __correct(point, -dist);
-		//~ Geom3D::Coordinate cmax = __correct(point, dist);
-		//~ Points points;
-		//~ const double dist_sq = pow(dist, 2);
-		//~ for (int i = cmin.i(); i <= cmax.i(); ++i)
-			//~ for (int j = cmin.j(); j <= cmax.j(); ++j)
-				//~ for (int k = cmin.k(); k <= cmax.k(); ++k)
-					//~ for (auto neighbor : storage[i][j][k]) {
-						//~ const double d_sq = point.crd().distance_sq(neighbor->crd());
-						//~ if (d_sq < dist_sq) {
-							//~ if (neighbor != &point) {
-								//~ neighbor->distance(d_sq);
-								//~ points.push_back(neighbor);
-							//~ }
-						//~ }
-					//~ }
-		//~ return points;
-	//~ }
+
 	Points get_neighbors(const T &point, const double &dist) {
 		Geom3D::Coordinate cmin = __correct(point, -dist);
 		Geom3D::Coordinate cmax = __correct(point, dist);
@@ -163,6 +132,7 @@ public:
 				}
 		return points;
 	}
+
 	bool has_neighbor_within(const T &point, const double &dist) {
 		Geom3D::Coordinate cmin = __correct(point, -dist);
 		Geom3D::Coordinate cmax = __correct(point, dist);
@@ -180,6 +150,7 @@ public:
 					}
 		return false;
 	}
+
 	bool clashes(const T &point) {
 		const double dist = 3.0;
 		const double vdw1 = help::vdw_radius[point.idatm_type()];
@@ -203,6 +174,7 @@ public:
 					}
 		return false;
 	}
+
 	Points get_sorted_neighbors(const T &point, const double &dist) {
 		Points points = get_neighbors(point, dist);
 		sort(points.begin(), points.end(), [](T* i,T* j){ return (i->distance()<j->distance());}); // sort in ascending order

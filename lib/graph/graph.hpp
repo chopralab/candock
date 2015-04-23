@@ -26,8 +26,6 @@ namespace Glib {
 		typedef vector<Path> Cliques;
 		typedef set<VertexSet> Cycles;
 		typedef pair<vector<node_id>, vector<node_id>> MatchedVertices;
-		//~ typedef map<node_id, node_id> MatchedVertices;
-		//~ typedef map<Vertex*, Vertex*> MatchedVertices;
 		typedef vector<MatchedVertices> Matches;
 	private:
 		vector<unique_ptr<Vertex>> __vertices; // if graph owns the vertices, they (the unique_ptrs) are stored here
@@ -47,7 +45,6 @@ namespace Glib {
 				const bool) : __vertices(std::move(vertices)) { // here graph owns the vertices
 			__init(__vertices, ict);
 		}
-		//~ Graph(const Graph&); // copy constructor
 		void init_conn() { 
 			__conn.resize(this->size()); 
 			for (auto &row : __conn) 
@@ -66,13 +63,8 @@ namespace Glib {
 		bool isomorphic(Graph &g) { Matches m = match(g); if (m.size() > 0 
 			&& m[0].first.size() == g.size() && this->size() == g.size()) 
 			return true; return false; }
-		//~ bool isomorphic(Graph &g) { Matches m = match(g); if (m.size() > 0 
-			//~ && m[0].size() == g.size() && this->size() == g.size()) 
-			//~ return true; return false; }
 		template<class P>
 		friend ostream& operator<< (ostream& stream, const Graph<P>& g);
-		//~ template<class P>
-		//~ friend ostream& operator<< (ostream& stream, const typename Graph<P>::Cycles& cycles);
 	};
 
 	template<typename T>
@@ -84,42 +76,6 @@ namespace Glib {
 		return v;
 	}
 
-	//~ template<class Vertex> 
-	//~ Graph<Vertex>::Graph(const Graph<Vertex> &other) { // copy constructor
-		//~ dbgmsg("Graph copy constructor");
-		//~ for (auto &pvertex : other.__vertices) {
-			//~ __vertices.push_back(unique_ptr<Vertex>(new Vertex(*pvertex)));
-		//~ }
-		//~ bool ict = !other.__conn.empty();
-		//~ if (__vertices.empty()) {
-			//~ vector<Vertex*> vertices;
-			//~ for (auto &vertex : other) vertices.push_back(&vertex);
-			//~ __init(vertices, ict);
-		//~ } else {
-			//~ __init(__vertices, ict);
-		//~ }
-		//~ dbgmsg("ORIGINAL GRAPH : " << endl << other);
-		//~ dbgmsg("COPIED GRAPH : " << endl << *this);
-	//~ }
-	
-	//~ template<class Vertex> // finds connected vertices that fullfill condition
-	//~ typename Graph<Vertex>::VertexSet find_connected_if(Vertex& v1, 
-		//~ typename Graph<Vertex>::VertexSet &visited, 
-		//~ std::function<bool (const Vertex &i, const Vertex&j)> cond) {
-//~ 
-		//~ typename Graph<Vertex>::VertexSet cnff;
-		//~ queue<Vertex*> q;
-		//~ q.push(&v1);
-		//~ while (!q.empty()) {
-			//~ Vertex &current = *q.front(); q.pop();
-			//~ cnff.insert(&current);
-			//~ visited.insert(&current);
-			//~ for (auto &adjacent : current)
-				//~ if (!visited.count(&adjacent) && cond(current, adjacent))
-					//~ q.push(&adjacent);
-		//~ }
-		//~ return cnff;
-	//~ }
 
 	template<class Vertex> 
 	template<class T> // vertices is any container of unique_ptr<Vertex> or Vertex*
@@ -265,63 +221,6 @@ namespace Glib {
 		return m;
 	}
 	
-	//~ template<class Vertex>
-	//~ typename Graph<Vertex>::Cliques Graph<Vertex>::max_clique() {
-		//~ Maxclique m(__conn->data(), __conn->size());
-		//~ int qsize;
-		//~ std::vector<std::vector<int>> qmax;
-		//~ m.mcqdyn(qmax, qsize);
-		//~ Cliques clique;
-		//~ for (auto &rows : qmax) {
-			//~ clique.push_back(Path());
-			//~ for (auto &vnum : rows) {
-				//~ clique.back().push_back(&this->operator[](vnum));
-				//~ dbgmsg("clique push vertex = " << vnum);
-			//~ }
-		//~ }
-		//~ dbgmsg("found max clique of " + to_string(qsize) + " vertices");
-		//~ return clique;
-	//~ }
-//~ 
-	//~ template<class Vertex>
-	//~ typename Graph<Vertex>::Cliques Graph<Vertex>::max_weight_clique(const int iter) {
-		//~ Benchmark::reset();
-		//~ unique_ptr<int[]> weight(new int[this->size()]);
-		//~ for (int i = 0; i < this->size(); ++i) weight[i] = this->element(i).weight();
-		//~ unique_ptr<int[]> adjaclen(new int[this->size()]);
-		//~ unique_ptr<unique_ptr<int[]>[]> adjacMatrix(new unique_ptr<int[]>[this->size()]);
-		//~ dbgmsg("max_weight_clique --- start filling : Size of graph = " 
-			//~ << this->size());
-		//~ for (auto &v : *this) {
-			//~ const int &x = v.get_index();
-			//~ adjaclen[x] = 0;
-			//~ adjacMatrix[x] = unique_ptr<int[]>(new int[v.size()]);
-			//~ dbgmsg("v.size() = " << v.size());
-			//~ for (auto &adj_v : v) {
-				//~ const int &y = adj_v.get_index();
-				//~ adjacMatrix[x][adjaclen[x]] = y;
-				//~ dbgmsg("max_weight_clique : x = " << x << " y = " << y
-					//~ << " adjacMatrix = " << adjacMatrix[x][adjaclen[x]]);
-				//~ adjaclen[x]++;
-			//~ }
-		//~ }
-		//~ dbgmsg("max_weight_clique --- end filling");
-		//~ vector<vector<int>> qmax;
-		//~ MNTS m(qmax, __conn, weight.get(), adjacMatrix, adjaclen, iter);
-		//~ Cliques clique;
-		//~ for (auto &rows : qmax) {
-			//~ dbgmsg("found max weight clique of " << to_string(rows.size()) 
-				//~ << " vertices");
-			//~ clique.push_back(Path());
-			//~ for (auto &vnum : rows) {
-				//~ clique.back().push_back(&this->operator[](vnum));
-				//~ dbgmsg("clique push vertex = " << vnum);
-			//~ }
-		//~ }
-		//~ cout << "time to find max.weight clique " << Benchmark::seconds_from_start() << " wallclock seconds" << endl;
-		//~ return clique;
-	//~ }
-//~ 
 	template<class Vertex>
 	typename Graph<Vertex>::Cliques Graph<Vertex>::max_weight_clique(const int iter) {
 		Benchmark::reset();
@@ -463,22 +362,6 @@ namespace Glib {
 		return cycles;
 	}
 	
-	//~ template<class Vertex>
-	//~ string Graph<Vertex>::get_smiles() const {
-		//~ stringstream ss;
-		//~ map<Vertex*, int> idx;
-		//~ int i=0;
-		//~ for (auto &v : *this) 
-			//~ idx[&v] = i++;
-		//~ for (auto &v : *this)
-			//~ for (auto &adj_v : v)
-				//~ if (idx[&adj_v] > idx[&v])
-					//ss << v.print() << "#" << idx[&v] << "_" 
-					//	<< adj_v.print() << "#" << idx[&adj_v] << " ";
-					//~ ss << v.get_label() << "#" << idx[&v] << "_" 
-						//~ << adj_v.get_label() << "#" << idx[&adj_v] << " ";
-		//~ return ss.str();
-	//~ }
 	template<class Vertex>
 	string Graph<Vertex>::get_smiles() const {
 		stringstream ss;
@@ -523,15 +406,5 @@ namespace Glib {
 		}
 		return stream;
 	}
-	//~ template<class P>
-	//~ ostream& operator<< (ostream& stream, const typename Graph<P>::Cycles &cycles) {
-		//~ for (auto &cycle : cycles) {
-			//~ stream << "CYCLE : " << endl;
-			//~ for (auto &pvertex : cycle) {
-				//~ stream << *pvertex << endl;
-			//~ }
-		//~ }
-		//~ return stream;
-	//~ }
 };
 #endif

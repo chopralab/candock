@@ -50,7 +50,6 @@ ostream& operator<<(ostream& os, const cluster::Clusters<Molib::Molecule>& molcl
 
 namespace common {
 
-	//~ ostream& operator<<(ostream& os, const vector<common::Centroid>& centroids) {
 	ostream& operator<<(ostream& os, const vector<Centroid>& centroids) {
 		for (auto &centroid : centroids) {
 			os << centroid.get_centroid().simple() << " " << fixed
@@ -77,27 +76,16 @@ namespace common {
 	}
 	
 	pair<cluster::Clusters<Molib::Molecule>, cluster::Clusters<Molib::Molecule>>
-		//~ cluster_molecules(const Molib::Molecules &mols, Molib::Molecules &rep_mols,
 		cluster_molecules(const Molib::Molecules &mols,	const Molib::Score &score, 
 		const double clus_rad, const int min_pts, const int max_num_clus, const int max_mols_to_cluster) {
 
 		// if only one molecule, just return it ... (cluster algorithm
 		// requires at least two molecules due to pairwise_distances)
-		//~ if (mols.size() == 1)
-			//~ return cluster::Clusters<Molib::Molecule> {{1, &mols.first()}};
 		if (mols.size() == 1)
 			return make_pair(cluster::Clusters<Molib::Molecule> {{1, &mols.first()}},
 				cluster::Clusters<Molib::Molecule> {{1, &mols.first()}});
 		cluster::MapD<Molib::Molecule> scores = 
 			score.many_ligands_score(mols);
-//~ //////////////////////
-		//~ cluster::MapD<Molib::Molecule> scores;
-		//~ double sc = -100;
-		//~ for (auto &molecule : mols) {
-			//~ scores.insert({&molecule, sc});
-			//~ sc += 200;
-		//~ }
-//~ ////////////////////////
 		dbgmsg(scores);
 		vector<Molib::Molecule*> mols_to_cluster;
 		set<double> top_scores;
@@ -114,14 +102,7 @@ namespace common {
 		dbgmsg(pairwise_distances);
 		cluster::Optics<Molib::Molecule, std::less<double>, std::greater<double>> optics(
 			pairwise_distances, scores, clus_rad + 0.1, min_pts);
-		//~ return optics.extract_dbscan(clus_rad, max_num_clus, true).second;
 		return optics.extract_dbscan(clus_rad, max_num_clus, true);
-		//~ auto clusters_reps_pair = optics.extract_dbscan(clus_rad, max_num_clus, true);
-		//~ convert_clusters_to_mols(rep_mols, clusters_reps_pair.second);
-		//~ if (1 == 1) {
-			//~ inout::output_file(clusters_reps_pair.first, "clusters.txt", ios_base::app); // get the PDB file with all the docked fragment clusters
-			//~ throw Error("finished : getting docked fragment clusters...exiting...");
-		//~ }
 	}
 
 	/* Centroid stuff
@@ -156,7 +137,6 @@ namespace common {
 		const double min_value = *ret.first, max_value = *ret.second;
 		const double max_dist = max_value - min_value;
 		const int num_centroids = ceil(max_dist / def_radial_check);
-		//~ const int num_centroids = 1 + ceil(max_dist / def_radial_check); // add one just in case...
 		dbgmsg("num_centroids = " << num_centroids << " min_value = " << min_value
 			<< " max_dist = " << max_dist);
 		const double interval = max_dist / (num_centroids + 1);
@@ -554,7 +534,6 @@ namespace common {
 			 */
 			for (int i = 0; i < mols.size(); ++i) {
 				int sz = 0;
-				//~ mol_graphs.push_back(create_graph(*mols[i]));
 				mol_graphs.push_back(create_graph(mols[i]->get_atoms()));
 				for (auto &patom : mols[i]->get_atoms()) {
 					geom_centers[i] = geom_centers[i] + patom->crd();
@@ -582,17 +561,4 @@ namespace common {
 			<< Benchmark::seconds_from_start() << " wallclock seconds\n";
 		return pairwise_distances;
 	}
-	//~ /* Part9 stuff
-	 //~ * 
-	 //~ */
-	//~ void convert_clusters_to_mols(Molib::Molecules &rep_mols, 
-		//~ const cluster::Clusters<Molib::Molecule> &representatives) {
-//~ 
-		//~ for (auto &kv : representatives) {			
-			//~ Molib::Molecule &rep = *kv.second;
-			//~ dbgmsg("representative of cluster number " << kv.first << " is molecule " 
-				//~ << rep.name() << " conformation " << rep.first().first().number());
-			//~ rep_mols.add(new Molib::Molecule(rep));
-		//~ }
-	//~ }
 };

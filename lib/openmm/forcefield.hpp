@@ -43,19 +43,15 @@ namespace OMMIface {
 			set<string> external_bond; // from
 		};
 		struct KBType { vector<double> potential, derivative; };
-		//~ enum proper_t {Proper, Improper};
 		typedef map<const int, AtomType> Atoms;
 		typedef map<const string, map<const string, BondType>> Bonds;
 		typedef map<const string, map<const string, map<const string, AngleType>>> Angles;
-		//~ typedef map<const string, map<const string, map<const string, map<const string, pair<proper_t, TorsionTypeVec>>>>> Torsions;
 		typedef map<const string, map<const string, map<const string, map<const string, TorsionTypeVec>>>> Torsions;
 		typedef map<const string, ResidueTopology> Residues;
-		//~ typedef map<const Residue*, ResidueTopology> Residues;
 		typedef map<const int, map<const int, KBType>> KBForces;
 		Atoms atom_type;
 		Bonds bond_type;
 		Angles angle_type;
-		//~ Torsions torsion_type;
 		Torsions torsion_type, improper_type;
 		Residues residue_topology;
 		KBForces kb_force_type;
@@ -64,14 +60,11 @@ namespace OMMIface {
 		const AtomType& get_atom_type(const int type) const;
 		const BondType& get_bond_type(const int type1, const int type2) const;
 		const AngleType& get_angle_type(const int type1, const int type2, const int type3) const;
-		//~ const TorsionTypeVec& get_torsion_type(const int type1, const int type2, const int type3, const int type4) const;
 		const TorsionTypeVec& get_dihedral_type(const int type1, const int type2, const int type3, const int type4) const;
 		const TorsionTypeVec& get_improper_type(const int type1, const int type2, const int type3, const int type4) const;
 		ForceField& parse_forcefield_file(const string&);
 		void output_forcefield_file(const string&);
 		ForceField& parse_gaff_dat_file(const string&);
-		//~ ForceField& insert_topology(const Molib::Molecules&);
-		//~ ForceField& erase_topology(const Molib::Molecules &mols);
 		ForceField& insert_topology(const Molib::Molecule&);
 		ForceField& erase_topology(const Molib::Molecule&);
 		ForceField& add_kb_forcefield(const Molib::Score&, const double step, const double scale);

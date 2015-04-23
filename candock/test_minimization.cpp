@@ -56,26 +56,8 @@ int main(int argc, char* argv[]) {
 		Molib::MolGrid gridrec(receptors[0].get_atoms(cmdl.receptor_chain_id(), 
 			Molib::Residue::protein));
 
-		//~ {
-			//~ OMMIface::ForceField ffield;
-			//~ ffield
-				//~ .parse_forcefield_file(cmdl.amber_xml_file());
-			//~ receptors[0].prepare_for_mm(ffield, gridrec);
-			//~ throw Error ("exit after prepare for mm");
-		//~ }
-
 		Molib::Molecules ligands = lpdb.parse_molecule();
 
-		//~ ligands.compute_idatm_type()
-			//~ .compute_hydrogen()
-			//~ .compute_bond_order()
-			//~ .compute_ring_type()
-			//~ .compute_bond_gaff_type()
-			//~ .compute_gaff_type()
-			//~ .compute_rotatable_bonds() // relies on hydrogens being assigned
-			//~ .erase_hydrogen()
-			//~ .compute_overlapping_rigid_segments()
-			//~ .compute_seeds(cmdl.seeds_file());
 		
 		set<int> ligand_idatm_types;
 		ligand_idatm_types = Molib::get_idatm_types(ligands, ligand_idatm_types);
@@ -92,7 +74,6 @@ int main(int argc, char* argv[]) {
 		 */
 		OMMIface::ForceField ffield;
 		ffield.parse_gaff_dat_file(cmdl.gaff_dat_file())
-			//~ .add_residue_topology(ligands)
 			.add_kb_forcefield(score, cmdl.step_non_bond(), cmdl.scale_non_bond())
 			.parse_forcefield_file(cmdl.amber_xml_file());
 
@@ -105,7 +86,6 @@ int main(int argc, char* argv[]) {
 				OMMIface::OMM omm(receptors[0], ligand, ffield, 
 					cmdl.fftype(), cmdl.dist_cutoff());
 				omm.minimize(cmdl.tolerance(), cmdl.max_iterations()); // minimize
-				//~ omm.minimize(0.0000000000000001, cmdl.max_iterations()); // minimize
 				dbgmsg(ligand);
 				auto ret = omm.get_state(receptors[0], ligand);
 				Molib::Molecules mini;

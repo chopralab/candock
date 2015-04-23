@@ -58,22 +58,11 @@ int main(int argc, char* argv[]) {
 				.erase_hydrogen()  // needed because refine changes connectivities
 				.compute_hydrogen()   // needed because refine changes connectivities
 				.compute_ring_type()
-				//~ .compute_bond_gaff_type()
 				.compute_gaff_type()
 				.compute_rotatable_bonds() // relies on hydrogens being assigned
 				.erase_hydrogen()
 				.compute_overlapping_rigid_segments()
 				.compute_seeds(cmdl.seeds_file());
-			//~ ligands.compute_idatm_type()
-				//~ .compute_hydrogen()
-				//~ .compute_bond_order()
-				//~ .compute_ring_type()
-				//~ .compute_bond_gaff_type()
-				//~ .compute_gaff_type()
-				//~ .compute_rotatable_bonds() // relies on hydrogens being assigned
-				//~ .erase_hydrogen()
-				//~ .compute_overlapping_rigid_segments()
-				//~ .compute_seeds(cmdl.seeds_file());
 
 			//~ common::create_mols_from_seeds(added, seeds, ligands);
 

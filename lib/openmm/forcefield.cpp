@@ -116,101 +116,6 @@ namespace OMMIface {
 			+ "-" + aclass2 + "-" + aclass3);
 	}
 
-	//~ const ForceField::TorsionTypeVec& ForceField::get_torsion_type(const int type1, 
-		//~ const int type2, const int type3, const int type4) const {
-//~ 
-		//~ const AtomType &atype1 = atom_type.at(type1);
-		//~ const AtomType &atype2 = atom_type.at(type2);
-		//~ const AtomType &atype3 = atom_type.at(type3);
-		//~ const AtomType &atype4 = atom_type.at(type4);
-		//~ const string &aclass1 = atype1.cl;
-		//~ const string &aclass2 = atype2.cl;
-		//~ const string &aclass3 = atype3.cl;
-		//~ const string &aclass4 = atype4.cl;
-		//~ dbgmsg("add torsion type1 = " << type1 << " type2 = " << type2 
-			//~ << " type3 = " << type3 << " type4 = " << type4 << " aclass1 = " << aclass1 
-			//~ << " aclass2 = " << aclass2 << " aclass3 = " << aclass3 << " aclass4 = " << aclass4);
-		//~ try { return torsion_type.at(aclass1).at(aclass2).at(aclass3).at(aclass4).second; } 
-		//~ catch(const out_of_range&) {}
-		//~ try { return torsion_type.at("X").at(aclass2).at(aclass3).at(aclass4).second; } 
-		//~ catch(const out_of_range&) {}
-		//~ try { return torsion_type.at("X").at(aclass2).at(aclass3).at("X").second; } 
-		//~ catch(const out_of_range&) {}
-		//~ try { return torsion_type.at("X").at("X").at(aclass3).at(aclass4).second; } 
-		//~ catch(const out_of_range&) {}
-		//~ throw ParameterError("warning : missing torsion type " + aclass1 
-			//~ + "-" + aclass2 + "-" + aclass3 + "-" + aclass4);
-	//~ }
-	//~ const ForceField::TorsionTypeVec& ForceField::get_torsion_type(const int type1, 
-		//~ const int type2, const int type3, const int type4) const {
-//~ 
-		//~ const AtomType &atype1 = atom_type.at(type1);
-		//~ const AtomType &atype2 = atom_type.at(type2);
-		//~ const AtomType &atype3 = atom_type.at(type3);
-		//~ const AtomType &atype4 = atom_type.at(type4);
-		//~ const string &aclass1 = atype1.cl;
-		//~ const string &aclass2 = atype2.cl;
-		//~ const string &aclass3 = atype3.cl;
-		//~ const string &aclass4 = atype4.cl;
-		//~ dbgmsg("add torsion type1 = " << type1 << " type2 = " << type2 
-			//~ << " type3 = " << type3 << " type4 = " << type4 << " aclass1 = " << aclass1 
-			//~ << " aclass2 = " << aclass2 << " aclass3 = " << aclass3 << " aclass4 = " << aclass4);
-		//~ try { return torsion_type.at(aclass1).at(aclass2).at(aclass3).at(aclass4).second; } 
-		//~ catch(const out_of_range&) {}
-		//~ try { return torsion_type.at("X").at(aclass2).at(aclass3).at(aclass4).second; } 
-		//~ catch(const out_of_range&) {}
-		//~ try { return torsion_type.at("X").at(aclass2).at(aclass3).at("X").second; } 
-		//~ catch(const out_of_range&) {}
-		//~ try { return torsion_type.at("X").at("X").at(aclass3).at(aclass4).second; } 
-		//~ catch(const out_of_range&) {}
-//~ 
-		//~ try { return torsion_type.at(aclass4).at(aclass3).at(aclass2).at(aclass1).second; } 
-		//~ catch(const out_of_range&) {}
-		//~ try { return torsion_type.at("X").at(aclass3).at(aclass2).at(aclass1).second; } 
-		//~ catch(const out_of_range&) {}
-		//~ try { return torsion_type.at("X").at(aclass3).at(aclass2).at("X").second; } 
-		//~ catch(const out_of_range&) {}
-		//~ try { return torsion_type.at("X").at("X").at(aclass2).at(aclass1).second; } 
-		//~ catch(const out_of_range&) {}
-		//~ throw ParameterError("warning : missing torsion type " + aclass1 
-			//~ + "-" + aclass2 + "-" + aclass3 + "-" + aclass4);
-	//~ }
-	//~ const ForceField::TorsionTypeVec& ForceField::get_torsion_type(const int type1, 
-		//~ const int type2, const int type3, const int type4) const {
-//~ 
-		//~ const AtomType &atype1 = atom_type.at(type1);
-		//~ const AtomType &atype2 = atom_type.at(type2);
-		//~ const AtomType &atype3 = atom_type.at(type3);
-		//~ const AtomType &atype4 = atom_type.at(type4);
-		//~ const string &aclass1 = atype1.cl;
-		//~ const string &aclass2 = atype2.cl;
-		//~ const string &aclass3 = atype3.cl;
-		//~ const string &aclass4 = atype4.cl;
-		//~ dbgmsg("add torsion type1 = " << type1 << " type2 = " << type2 
-			//~ << " type3 = " << type3 << " type4 = " << type4 << " aclass1 = " << aclass1 
-			//~ << " aclass2 = " << aclass2 << " aclass3 = " << aclass3 << " aclass4 = " << aclass4);
-		//~ try { return torsion_type.at(aclass1).at(aclass2).at(aclass3).at(aclass4).second; } 
-		//~ catch(const out_of_range&) {}
-		//~ try { return torsion_type.at(aclass4).at(aclass3).at(aclass2).at(aclass1).second; } 
-		//~ catch(const out_of_range&) {}
-		//~ try { return torsion_type.at("X").at(aclass2).at(aclass3).at("X").second; } 
-		//~ catch(const out_of_range&) {}
-		//~ try { return torsion_type.at("X").at(aclass3).at(aclass2).at("X").second; } 
-		//~ catch(const out_of_range&) {}
-//~ 
-//~ 
-		//~ try { return torsion_type.at("X").at(aclass2).at(aclass3).at(aclass4).second; } 
-		//~ catch(const out_of_range&) {}
-		//~ try { return torsion_type.at("X").at("X").at(aclass3).at(aclass4).second; } 
-		//~ catch(const out_of_range&) {}
-//~ 
-		//~ try { return torsion_type.at("X").at(aclass3).at(aclass2).at(aclass1).second; } 
-		//~ catch(const out_of_range&) {}
-		//~ try { return torsion_type.at("X").at("X").at(aclass2).at(aclass1).second; } 
-		//~ catch(const out_of_range&) {}
-		//~ throw ParameterError("warning : missing torsion type " + aclass1 
-			//~ + "-" + aclass2 + "-" + aclass3 + "-" + aclass4);
-	//~ }
 	const ForceField::TorsionTypeVec& ForceField::get_dihedral_type(const int type1, 
 		const int type2, const int type3, const int type4) const {
 
@@ -293,38 +198,27 @@ namespace OMMIface {
 		throw ParameterError("warning : missing improper type " + aclass1 
 			+ "-" + aclass2 + "-" + aclass3 + "-" + aclass4);
 	}
-	//~ ForceField& ForceField::insert_topology(const Molib::Molecules &mols) {
+
 	ForceField& ForceField::insert_topology(const Molib::Molecule &molecule) {
-		//~ Residues &residue_topology = this->residue_topology;
-		//~ Atoms &atom_type = this->atom_type;
 		map<const string, const int> atom_name_to_type;
 		for (auto &kv : this->atom_type) {
 			const int &type = kv.first;
 			AtomType &at = kv.second;
 			atom_name_to_type.insert({at.cl, type});
 		}
-		//~ for (auto &molecule : mols)
 		for (auto &assembly : molecule)
 		for (auto &model : assembly)
 		for (auto &chain : model)
 		for (auto &residue : chain) {
 			this->residue_topology.insert({residue.resn(), ResidueTopology()});
-			//~ this->residue_topology.insert({&residue, ResidueTopology()});
 			ResidueTopology &rtop = this->residue_topology.at(residue.resn());
-			//~ ResidueTopology &rtop = this->residue_topology.at(&residue);
 			for (auto &atom : residue) {
 				rtop.atom.insert({atom.atom_name(), atom_name_to_type.at(atom.gaff_type())});
 			}
-			//~ set<AtomPair> visited;
 			for (auto &atom : residue) {
 				for (auto &adj_a : atom) {
-					//~ if (!visited.count({&adj_a, &atom)) {
-						//~ visited.insert({&atom, &adj_a});
-				//~ for (auto &bond : atom) {
-					//~ auto &adj_a = bond.second_atom();
 					if (atom.atom_number() < adj_a.atom_number())
 						rtop.bond[atom.atom_name()][adj_a.atom_name()] = true;
-					//~ }
 				}
 			}
 			dbgmsg("inserted topology for residue " << residue.resn()
@@ -332,9 +226,8 @@ namespace OMMIface {
 		}
 		return *this;
 	}
-	//~ ForceField& ForceField::erase_topology(const Molib::Molecules &mols) {
+
 	ForceField& ForceField::erase_topology(const Molib::Molecule &molecule) {
-		//~ for (auto &molecule : mols)
 		for (auto &assembly : molecule)
 		for (auto &model : assembly)
 		for (auto &chain : model)
@@ -345,6 +238,7 @@ namespace OMMIface {
 		}
 		return *this;
 	}
+
 	ForceField& ForceField::add_kb_forcefield(const Molib::Score &score, 
 		const double step, const double scale) {
 		this->step = step * OpenMM::NmPerAngstrom;
@@ -363,6 +257,7 @@ namespace OMMIface {
 			//~ << endl << kb_force_type);
 		return *this;
 	}
+
 	ForceField& ForceField::parse_gaff_dat_file(const string &gaff_dat_file) {
 		boost::smatch m;
 		vector<string> gdf;
@@ -441,10 +336,7 @@ namespace OMMIface {
 					const double k = (1 / idivf) * stod(m[6].str()) * OpenMM::KJPerKcal;
 					const double phase = stod(m[7].str())  * OpenMM::RadiansPerDegree;
 					const int periodicity = abs(stoi(m[8].str()));
-					//~ TorsionTypeVec &tt = this->torsion_type[cl1][cl2][cl3][cl4].second;
 					TorsionTypeVec &dihedral = this->torsion_type[cl1][cl2][cl3][cl4];
-					//~ proper_t &is_proper = this->torsion_type[cl1][cl2][cl3][cl4].first;
-					//~ is_proper = Proper;
 					dihedral.push_back(TorsionType{periodicity, phase, k});
 					dbgmsg("periodic (proper) torsion force between " 
 							<< cl1 << " and " << cl2 << " and " << cl3 << " and " << cl4 << " is "
@@ -453,28 +345,6 @@ namespace OMMIface {
 							<< " k" << dihedral.size() << " = " << k);
 				}
 			}
-			//~ // parse improper torsions (there is no IDIVF)
-			//~ if (semaphore == 4 && boost::regex_search(line, m, boost::regex("^(\\S{1,2})\\s*-(\\S{1,2})\\s*-(\\S{1,2})\\s*-(\\S{1,2})\\s+(\\S+)\\s+(\\S+)\\s+(\\S+)"))) {
-				//~ if (m[1].matched && m[2].matched && m[3].matched && m[4].matched 
-					//~ && m[5].matched && m[6].matched && m[7].matched) {
-					//~ const string cl1 = m[1].str();
-					//~ const string cl2 = m[2].str();
-					//~ const string cl3 = m[3].str();
-					//~ const string cl4 = m[4].str();
-					//~ const double k = stod(m[5].str()) * OpenMM::KJPerKcal;
-					//~ const double phase = stod(m[6].str())  * OpenMM::RadiansPerDegree;
-					//~ const int periodicity = abs(stoi(m[7].str()));
-					//~ TorsionTypeVec &tt = this->torsion_type[cl1][cl2][cl3][cl4].second;
-					//~ proper_t &is_proper = this->torsion_type[cl1][cl2][cl3][cl4].first;
-					//~ is_proper = Improper;
-					//~ tt.push_back(TorsionType{periodicity, phase, k});
-						//~ dbgmsg("periodic (improper) torsion force between " 
-								//~ << cl1 << " and " << cl2 << " and " << cl3 << " and " << cl4 << " is "
-								//~ << " periodicity" << tt.size() << " = " << periodicity
-								//~ << " phase" << tt.size() << " = " << phase
-								//~ << " k" << tt.size() << " = " << k);
-				//~ }
-			//~ }
 			// parse improper torsions (there is no IDIVF)
 			if (semaphore == 4 && boost::regex_search(line, m, boost::regex("^(\\S{1,2})\\s*-(\\S{1,2})\\s*-(\\S{1,2})\\s*-(\\S{1,2})\\s+(\\S+)\\s+(\\S+)\\s+(\\S+)"))) {
 				if (m[1].matched && m[2].matched && m[3].matched && m[4].matched 
@@ -487,8 +357,6 @@ namespace OMMIface {
 					const double phase = stod(m[6].str())  * OpenMM::RadiansPerDegree;
 					const int periodicity = abs(stoi(m[7].str()));
 					TorsionTypeVec &improper = this->improper_type[cl1][cl2][cl3][cl4];
-					//~ proper_t &is_proper = this->improper_type[cl1][cl2][cl3][cl4].first;
-					//~ is_proper = Improper;
 					improper.push_back(TorsionType{periodicity, phase, k});
 					dbgmsg("periodic (improper) torsion force between (third atom is central) " 
 							<< cl1 << " and " << cl2 << " and " << cl3 << " and " << cl4 << " is "
@@ -517,10 +385,12 @@ namespace OMMIface {
 		this->lj14scale = 0.5;
 		return *this;
 	}
+
 	template<typename T>
 	const char* str(rapidxml::xml_document<> &doc, const T &i) {
 		return doc.allocate_string(help::to_string(i).c_str());
 	}
+
 	void ForceField::output_forcefield_file(const string &fn) { // output XML forcefield & topology file
 		using namespace rapidxml;
 		xml_document<> doc; // character type defaults to char
@@ -606,36 +476,6 @@ namespace OMMIface {
 				}
 			}
 		}
-		//~ // periodic torsions to XML
-		//~ xml_node<> *pt_node = doc.allocate_node(node_element, "PeriodicTorsionForce");
-		//~ ff_node->append_node(pt_node);
-		//~ for (auto &kv : this->torsion_type) {
-			//~ const string &cl1 = kv.first;
-			//~ for (auto &kv2 : kv.second) {
-				//~ const string &cl2 = kv2.first;
-				//~ for (auto &kv3 : kv2.second) {
-					//~ const string &cl3 = kv3.first;
-					//~ for (auto &kv4 : kv3.second) {
-						//~ const string &cl4 = kv4.first;
-						//~ const proper_t &is_proper = kv4.second.first;
-						//~ xml_node<> *torsion_node = doc.allocate_node(node_element, 
-								//~ (is_proper == Proper ? "Proper" : "Improper"));
-						//~ pt_node->append_node(torsion_node);
-						//~ torsion_node->append_attribute(doc.allocate_attribute("class1", cl1.c_str()));
-						//~ torsion_node->append_attribute(doc.allocate_attribute("class2", cl2.c_str()));
-						//~ torsion_node->append_attribute(doc.allocate_attribute("class3", cl3.c_str()));
-						//~ torsion_node->append_attribute(doc.allocate_attribute("class4", cl4.c_str()));
-						//~ int i = 0;
-						//~ for (auto &tt : kv4.second.second) {
-							//~ const string &num = help::to_string(++i);
-							//~ torsion_node->append_attribute(doc.allocate_attribute(str(doc, ("periodicity" + num)), str(doc, tt.periodicity)));
-							//~ torsion_node->append_attribute(doc.allocate_attribute(str(doc, "phase" + num), str(doc, tt.phase)));
-							//~ torsion_node->append_attribute(doc.allocate_attribute(str(doc, "k" + num), str(doc, tt.k)));
-						//~ }
-					//~ }
-				//~ }
-			//~ }
-		//~ }
 		// periodic proper torsions to XML
 		xml_node<> *pt_node = doc.allocate_node(node_element, "PeriodicTorsionForce");
 		ff_node->append_node(pt_node);
@@ -647,7 +487,6 @@ namespace OMMIface {
 					const string &cl3 = kv3.first;
 					for (auto &kv4 : kv3.second) {
 						const string &cl4 = kv4.first;
-						//~ const proper_t &is_proper = kv4.second.first;
 						xml_node<> *torsion_node = doc.allocate_node(node_element, "Proper");
 						pt_node->append_node(torsion_node);
 						torsion_node->append_attribute(doc.allocate_attribute("class1", cl1.c_str()));
@@ -655,7 +494,6 @@ namespace OMMIface {
 						torsion_node->append_attribute(doc.allocate_attribute("class3", cl3.c_str()));
 						torsion_node->append_attribute(doc.allocate_attribute("class4", cl4.c_str()));
 						int i = 0;
-						//~ for (auto &tt : kv4.second.second) {
 						for (auto &tt : kv4.second) {
 							const string &num = help::to_string(++i);
 							torsion_node->append_attribute(doc.allocate_attribute(str(doc, ("periodicity" + num)), str(doc, tt.periodicity)));
@@ -667,8 +505,6 @@ namespace OMMIface {
 			}
 		}
 		// periodic improper torsions to XML
-		//~ xml_node<> *pt_node = doc.allocate_node(node_element, "PeriodicTorsionForce");
-		//~ ff_node->append_node(pt_node);
 		for (auto &kv : this->improper_type) {
 			const string &cl1 = kv.first;
 			for (auto &kv2 : kv.second) {
@@ -810,43 +646,13 @@ namespace OMMIface {
 					<< " angle = " << stod(node->first_attribute("angle")->value())
 					<< " k = " << stod(node->first_attribute("k")->value()));
 		}
-		//~ // parse torsions
-		//~ for (xml_node<> *node = doc.first_node("ForceField")->first_node("PeriodicTorsionForce")->first_node(); node; node = node->next_sibling()) {
-			//~ const string cl1 = node->first_attribute("class1")->value();
-			//~ const string cl2 = node->first_attribute("class2")->value();
-			//~ const string cl3 = node->first_attribute("class3")->value();
-			//~ const string cl4 = node->first_attribute("class4")->value();
-			//~ TorsionTypeVec &tt = this->torsion_type[cl1][cl2][cl3][cl4].second;
-			//~ proper_t &is_proper = this->torsion_type[cl1][cl2][cl3][cl4].first;
-			//~ is_proper = (node->name() == "Proper" ? Proper : Improper);
-			//~ xml_attribute<> *attr = node->first_attribute("periodicity1");
-			//~ while(attr) {
-				//~ const int periodicity = stoi(attr->value());
-				//~ attr = attr->next_attribute();
-				//~ const double phase = stod(attr->value());
-				//~ attr = attr->next_attribute();
-				//~ const double k = stod(attr->value());
-				//~ attr = attr->next_attribute();
-				//~ tt.push_back(TorsionType{periodicity, phase, k});
-				//~ dbgmsg("periodic torsion force between " << cl1 << " and " << cl2 << " and " << cl3 << " and " << cl4 << " is "
-						//~ << " periodicity" << tt.size() << " = " << periodicity
-						//~ << " phase" << tt.size() << " = " << phase
-						//~ << " k" << tt.size() << " = " << k);
-			//~ }
-		//~ }
 		// parse torsions
 		for (xml_node<> *node = doc.first_node("ForceField")->first_node("PeriodicTorsionForce")->first_node(); node; node = node->next_sibling()) {
 			const string cl1 = (node->first_attribute("class1")->value_size() == 0 ? "X" : node->first_attribute("class1")->value());
 			const string cl2 = (node->first_attribute("class2")->value_size() == 0 ? "X" : node->first_attribute("class2")->value());
 			const string cl3 = (node->first_attribute("class3")->value_size() == 0 ? "X" : node->first_attribute("class3")->value());
 			const string cl4 = (node->first_attribute("class4")->value_size() == 0 ? "X" : node->first_attribute("class4")->value());
-			//~ TorsionTypeVec &tt = this->torsion_type[cl1][cl2][cl3][cl4];
-			//~ proper_t &is_proper = this->torsion_type[cl1][cl2][cl3][cl4].first;
-			//~ const string node_name = node->name();
-			//~ const bool is_proper = (node->name() == "Proper");
 			const bool is_proper = (string("Proper").compare(node->name()) == 0);
-			//~ const bool is_proper = (node_name == "Proper");
-			//~ dbgmsg("node_name = " << node_name << " is_proper = " << is_proper);
 			dbgmsg("node_name = " << node->name() << " is_proper = " << is_proper);
 			xml_attribute<> *attr = node->first_attribute("periodicity1");
 			while(attr) {
@@ -865,7 +671,6 @@ namespace OMMIface {
 						<< " phase" << dihedral.size() << " = " << phase
 						<< " k" << dihedral.size() << " = " << k);
 				} else {
-					//~ TorsionTypeVec &improper = this->improper_type[cl1][cl2][cl3][cl4];
 					TorsionTypeVec &improper = this->improper_type[cl2][cl3][cl1][cl4];
 					improper.push_back(TorsionType{periodicity, phase, k});
 					dbgmsg("periodic torsion (improper) force between " 
@@ -905,8 +710,6 @@ namespace OMMIface {
 				vector<string> pot = help::ssplit(node->first_attribute("potential")->value());
 				vector<string> der = help::ssplit(node->first_attribute("derivative")->value());
 				vector<double> potential(pot.size()), derivative(der.size());
-				//~ transform(pot.begin(), pot.end(), potential.begin(), [this](const std::string& val) { return this->scale * stod(val); });
-				//~ transform(der.begin(), der.end(), derivative.begin(), [this](const std::string& val) { return this->scale * stod(val); });
 				transform(pot.begin(), pot.end(), potential.begin(), [this](const std::string& val) { return stod(val); });
 				transform(der.begin(), der.end(), derivative.begin(), [this](const std::string& val) { return stod(val); });
 				this->kb_force_type[cl1][cl2] = KBType{potential, derivative};

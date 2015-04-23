@@ -41,48 +41,12 @@ namespace Molib {
 	ostream& operator<< (ostream& os, const BondToOrder& bond_orders) {
 		for (auto &kv : bond_orders) {
 			const Bond &b = *kv.first;
-			//~ os << "bond_order(" << b.first_atom().atom_number() << ","
-				//~ << b.second_atom().atom_number() << ") = " 
 			os << "bond_order(" << b.atom1().atom_number() << ","
 				<< b.atom2().atom_number() << ") = " 
 				<< kv.second << endl;
 		}
 		return os;
 	}
-	//~ void BondOrder::compute_bond_order(Molecule &molecule) {
-		//~ // assign atom types for atomic penalty scores
-		//~ Fragmenter(molecule.get_atoms())
-			//~ .substitute_atoms(help::atomic_penalty_scores);
-		//~ dbgmsg("MOLECULE AFTER ASSIGNING ATOMIC PENALTY SCORES " << endl
-			//~ << molecule);
-		//~ // for tps 0, 1, 2, 3, ..., N create all possible combinations of valence states
-		//~ // total number of valence states < 2000
-		//~ const int max_valence_states = 2000;
-		//~ ValenceStateVec valence_states = 
-			//~ __create_valence_states(molecule, max_valence_states);
-		//~ dbgmsg("VALENCE STATES ARE " << endl << valence_states);
-		//~ // for each valence state determine bond orders (boaf procedure)
-		//~ for (auto &valence_state : valence_states) {
-			//~ try {
-				//~ BondToOrder bond_orders;
-				//~ if (__basic_rules(valence_state, bond_orders)) {
-					//~ dbgmsg("successfully determined bond orders for molecule " 
-						//~ << molecule.name() << " : " << endl << bond_orders);
-					//~ // set the newly determined bond orders
-					//~ for (auto &kv : bond_orders) {
-						//~ Bond &bond = *kv.first;
-						//~ bond.set_bo(kv.second);
-					//~ }
-					//~ return;
-				//~ }
-			//~ } catch(BondOrderError &e) {
-				//~ cerr << e.what() << endl;
-			//~ }
-		//~ }
-		//~ // if boaf fails for all saved valence states, a warning message is given
-		//~ throw Error("die : bond order assignment failed for molecule "
-			//~ + molecule.name());
-	//~ }
 	void BondOrder::compute_bond_gaff_type(Molecule &molecule) {
 		// assign atom types for atomic penalty scores
 		Fragmenter(molecule.get_atoms())
@@ -122,7 +86,6 @@ namespace Molib {
 						dbgmsg("MOLECULE AFTER COMPUTING BOND ORDERS" 
 							<< endl << molecule);
 						return;
-						//~ }
 					}
 				} catch(BondOrderError &e) {
 					dbgmsg(e.what());
@@ -136,19 +99,6 @@ namespace Molib {
 		}
 	}
 	
-	//~ void dfs(int level, int sum, int tps, const vector<vector<AtomParams> &V) {
-		//~ auto &params = V[level];
-		//~ for (auto &p : params) {
-			//~ if (p.aps + sum < tps) {
-				//~ Q.push(p);
-				//~ dfs(level + 1, p.aps + sum, V[level + 1]);
-				//~ Q.pop();
-			//~ } else if (p.aps + sum == tps) {
-				//~ // extend this valence state till the end
-				//~ // save valence state
-			//~ }
-		//~ }
-	//~ }
 	void BondOrder::__dfs(const int level, const int sum, const int tps, 
 		const vector<vector<AtomParams>> &V, vector<AtomParams> &Q, 
 		vector<vector<AtomParams>> &valence_states, const int max_valence_states) {
@@ -168,6 +118,7 @@ namespace Molib {
 			}
 		}
 	}
+
 	ValenceStateVec BondOrder::__create_valence_states(const Molecule &molecule, 
 		const int max_valence_states) {
 #ifndef NDEBUG
@@ -216,56 +167,6 @@ namespace Molib {
 		return vss;
 	}
 
-	//~ ValenceStateVec BondOrder::__create_valence_states(const Molecule &molecule, const int max_valence_states) {
-		//~ ValenceStateVec valence_states;
-		//~ AtomValencePairVec numbers;
-		//~ for (auto &patom : molecule.get_atoms()) {
-			//~ Atom &atom = *patom;
-			//~ for (auto &kv : atom.get_aps()) {
-				//~ numbers.push_back({&atom, 
-					//~ AtomParams{kv.first, kv.second, (int) atom.size()}});
-			//~ }
-		//~ }
-		//~ for (int tps = 0; tps < 1000; ++tps) {
-			//~ if (!__sum_up_recursive(numbers, tps, AtomValencePairVec(), 
-				//~ valence_states, max_valence_states))
-				//~ break;
-		//~ }
-		//~ return valence_states;
-	//~ }
-	//~ bool BondOrder::__sum_up_recursive(const AtomValencePairVec &numbers, const int tps, 
-		//~ const AtomValencePairVec &partial, ValenceStateVec &valence_states,
-		//~ const int max_valence_states) {
-		//~ if (valence_states.size() <= max_valence_states) {
-			//~ int s = 0;
-			//~ for (auto &x : partial) 
-				//~ s += x.second.aps;
-			//~ if (s == tps) {
-				//~ ValenceState valence_state;
-				//~ for (auto &pp : partial)
-					//~ valence_state.insert({pp.first, pp.second});
-				//~ valence_states.push_back(valence_state);
-			//~ } else if (s > tps)
-				//~ return true;
-			//~ for (int i = 0; i < numbers.size(); ++i) {
-				//~ AtomValencePairVec remaining;
-				//~ auto n = numbers[i];
-				//~ for (int j = i + 1; j < numbers.size(); ++j) {
-					//~ if (numbers[i].first != numbers[j].first) {
-						//~ remaining.push_back(numbers[j]);
-					//~ }
-				//~ }
-				//~ AtomValencePairVec partial_rec = partial;
-				//~ partial_rec.push_back(n);
-				//~ if (!__sum_up_recursive(remaining, tps, partial_rec, 
-					//~ valence_states, max_valence_states))
-					//~ return false;
-			//~ }
-		//~ }
-		//~ dbgmsg("max number of valence states (" << max_valence_states 
-			//~ << ") exceeded at tps = " << tps);
-		//~ return false;
-	//~ }
 	bool BondOrder::__discrepancy(const ValenceState &valence_state) {
 		// b) if discrepancy happens (av is not 0 when con is 0 or av is 0 when con is not 0)
 		// reset the bond order to 2 and then 3.
@@ -279,6 +180,7 @@ namespace Molib {
 		}
 		return false;
 	}
+
 	bool BondOrder::__success(const ValenceState &valence_state) {
 		// rule 4 : if all the bonds are successfully assigned, con and av 
 		// of every atom are both 0 (boaf returns 1 and stops)
@@ -292,6 +194,7 @@ namespace Molib {
 		}
 		return true;
 	}
+
 	bool BondOrder::__basic_rules(ValenceState &valence_state, BondToOrder &bond_orders) {
 		while (!__success(valence_state)) {
 			bool bo_was_set = false;
@@ -301,15 +204,12 @@ namespace Molib {
 				// rule 2 : for one atom, if its con equals to av, the bond 
 				// orders of its unassigned bonds are set to 1
 				if (apar.con == apar.val) {
-					//~ for (auto &bond : atom)
 					for (auto &pbond : atom.get_bonds()) {
 						Bond &bond = *pbond;
 						if (!bond_orders.count(&bond)) { // unassigned bond order
 							// rule 1 : for each atom in a bond, if the bond order bo 
 							// is determined, con is deducted by 1 and av is deducted by bo
 							bond_orders[&bond] = 1;
-							//~ bond_orders[&bond.get_reverse()] = 1;
-							//~ AtomParams &apar2 = valence_state.at(&bond.second_atom());
 							AtomParams &apar2 = valence_state.at(&bond.second_atom(atom));
 							apar.con -= 1;
 							apar.val -= 1;
@@ -322,7 +222,6 @@ namespace Molib {
 				// rule 3 : for one atom, if its con equals to 1, the bond 
 				// order of the last bond is set to av
 				else if (apar.con == 1) {
-					//~ for (auto &bond : atom)
 					for (auto &pbond : atom.get_bonds()) {
 						Bond &bond = *pbond;
 						if (!bond_orders.count(&bond)) { // unassigned bond order
@@ -335,8 +234,6 @@ namespace Molib {
 							if (bo <= 0)
 								throw BondOrderError("exception : zero bond order");
 							bond_orders[&bond] = bo;
-							//~ bond_orders[&bond.get_reverse()] = bo;
-							//~ AtomParams &apar2 = valence_state.at(&bond.second_atom());
 							AtomParams &apar2 = valence_state.at(&bond.second_atom(atom));
 							apar.con -= 1;
 							apar.val -= bo;
@@ -361,7 +258,6 @@ namespace Molib {
 		for (auto &kv : valence_state) {
 			const Atom &atom = *kv.first;
 			const AtomParams &apar = kv.second;
-			//~ for (auto &bond : atom)
 			for (auto &pbond : atom.get_bonds()) {
 				Bond &bond = *pbond;
 				if (!bond_orders.count(&bond)) { // unassigned bond order
@@ -381,9 +277,6 @@ namespace Molib {
 			// bond order assignemnt according to the basic rules
 			Bond &bond = __get_first_unassigned_bond(valence_state, bond_orders);
 			bond_orders[&bond] = bo;
-			//~ bond_orders[&bond.get_reverse()] = bo;
-			//~ AtomParams &apar1 = valence_state.at(&bond.first_atom());
-			//~ AtomParams &apar2 = valence_state.at(&bond.second_atom());
 			AtomParams &apar1 = valence_state.at(&bond.atom1());
 			AtomParams &apar2 = valence_state.at(&bond.atom2());
 			apar1.con -= 1;

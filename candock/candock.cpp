@@ -138,19 +138,6 @@ int main(int argc, char* argv[]) {
 				.erase_hydrogen()
 				.compute_overlapping_rigid_segments()
 				.compute_seeds(cmdl.seeds_file());
-			//~ ligands.compute_idatm_type().compute_rotatable_bonds()
-				//~ .compute_overlapping_rigid_segments()
-				//~ .compute_seeds(cmdl.seeds_file());
-			//~ ligands.compute_idatm_type()
-				//~ .compute_hydrogen()
-				//~ .compute_bond_order()
-				//~ .compute_ring_type()
-				//~ .compute_bond_gaff_type()
-				//~ .compute_gaff_type()
-				//~ .compute_rotatable_bonds() // relies on hydrogens being there
-				//~ .erase_hydrogen()
-				//~ .compute_overlapping_rigid_segments()
-				//~ .compute_seeds(cmdl.seeds_file());
 			ligand_idatm_types = Molib::get_idatm_types(ligands, ligand_idatm_types);
 			common::create_mols_from_seeds(added, seeds, ligands);
 			inout::output_file(ligands, cmdl.prep_file(), ios_base::app);
@@ -162,12 +149,6 @@ int main(int argc, char* argv[]) {
 		 */
 		seeds.erase_properties();
 
-		//~ {
-			//~ Molib::PDBreader lpdb2(cmdl.prep_file(), Molib::PDBreader::all_models, 
-				//~ cmdl.max_num_ligands());
-			//~ Molib::Molecules ligands = lpdb2.parse_molecule();
-		//~ }
-		//~ throw Error("exit after reading and writing properties");
 		/* Read distributions file and initialize scores
 		 * 
 		 */
@@ -214,12 +195,6 @@ int main(int argc, char* argv[]) {
 			for(int i = 0; i < cmdl.ncpu(); ++i) {
 				threads.push_back(
 					thread([&non_clashing_seeds, &m_non_clashing_seeds, &seeds, &gridrec, &score, &hcp, &mutex, i] () {
-						//~ {
-							//~ // Guard non_clashing_seeds as it is the only variable that can 
-							//~ // get changed concurrently by different threads
-							//~ std::lock_guard<std::mutex> guard(mutex);
-							//~ dbgmsg(seeds);
-						//~ }
 						// iterate over docked seeds and dock unique seeds
 						for (int j = i; j < seeds.size(); j+= cmdl.ncpu()) {
 							dbgmsg(seeds[j]);
@@ -277,12 +252,6 @@ int main(int argc, char* argv[]) {
 				thread([&non_clashing_seeds, &top_seeds, &score, &mutex, i] () {
 					// iterate over non clashing seeds and cluster
 					for (int j = i; j < non_clashing_seeds.size(); j+= cmdl.ncpu()) {
-						//~ cluster::Clusters<Molib::Molecule> representatives = 
-							//~ common::cluster_molecules(non_clashing_seeds[j], score,
-							//~ cmdl.clus_rad(), cmdl.min_pts(), cmdl.max_num_clus(), 
-							//~ cmdl.max_seeds_to_cluster());
-						//~ common::convert_clusters_to_mols(top_seeds.add(new Molib::Molecules()),
-							//~ representatives);
 						auto clusters_reps_pair = 
 							common::cluster_molecules(non_clashing_seeds[j], score,
 							cmdl.clus_rad(), cmdl.min_pts(), cmdl.max_num_clus(), 
@@ -318,25 +287,10 @@ int main(int argc, char* argv[]) {
 		 */
 		Molib::PDBreader lpdb2(cmdl.prep_file(), Molib::PDBreader::all_models, 
 			cmdl.max_num_ligands());
-		//~ lpdb.rewind();
-		//~ lpdb.set_flags(Molib::PDBreader::all_models|Molib::PDBreader::hydrogens);
 		while (1 != 0) {
 			Molib::Molecules ligands = lpdb2.parse_molecule();
 			if (ligands.empty()) break;
 			
-			// again, compute idatm types etc... 
-			// CORRECTED (correct in compute_fragment: seeds is not needed here)
-			//~ ligands.compute_idatm_type()
-				//~ .compute_hydrogen()
-				//~ .compute_bond_order()
-				//~ .compute_ring_type()
-				//~ .compute_bond_gaff_type()
-				//~ .compute_gaff_type()
-				//~ .erase_hydrogen()
-				//~ .compute_rotatable_bonds()
-				//~ .compute_overlapping_rigid_segments()
-				//~ .compute_seeds(cmdl.seeds_file());
-
 			/* Forcefield stuff : create forcefield for small molecules (and KB 
 			 * non-bonded with receptor) and read receptor's forcefield xml file(s) into 
 			 * forcefield object
@@ -344,7 +298,6 @@ int main(int argc, char* argv[]) {
 			 */
 			OMMIface::ForceField ffield;
 			ffield.parse_gaff_dat_file(cmdl.gaff_dat_file())
-				//~ .add_residue_topology(ligands)
 				.add_kb_forcefield(score, cmdl.step_non_bond(), cmdl.scale_non_bond())
 				.parse_forcefield_file(cmdl.amber_xml_file());
 
@@ -358,7 +311,6 @@ int main(int argc, char* argv[]) {
 			for(int i = 0; i < cmdl.ncpu(); ++i) {
 				threads.push_back(
 					thread([&ligands, &receptors, &top_seeds, &gridrec, &score, &ffield, &mutex, i] () {
-					//~ thread([&ligands, &receptors, &top_seeds, &gridrec, &score, ffield, &mutex, i] () {
 						OMMIface::ForceField ffield_copy = ffield; // make a local copy of the forcefield
 						// iterate over docked seeds and dock unique seeds
 						for (int j = i; j < ligands.size(); j+= cmdl.ncpu()) {
@@ -390,11 +342,6 @@ int main(int argc, char* argv[]) {
 								 * representatives for further minimization
 								 * 
 								 */
-								//~ cluster::Clusters<Molib::Molecule> representatives = 
-									//~ common::cluster_molecules(docked, score,
-									//~ cmdl.docked_clus_rad(), cmdl.docked_min_pts(), cmdl.docked_max_num_clus());
-								//~ Molib::Molecules docked_representatives; 
-								//~ common::convert_clusters_to_mols(docked_representatives, representatives);
 								auto clusters_reps_pair = common::cluster_molecules(docked, score,
 									cmdl.docked_clus_rad(), cmdl.docked_min_pts(), cmdl.docked_max_num_clus());
 								Molib::Molecules docked_representatives; 

@@ -19,8 +19,6 @@ namespace Molib {
 		int aps;
 		int con;
 	};
-	//~ typedef vector<pair<Atom*, AtomParams>> AtomValencePairVec;
-	//~ typedef unordered_map<Atom*, AtomParams> ValenceState;
 	typedef map<Atom*, AtomParams> ValenceState;
 	typedef vector<ValenceState> ValenceStateVec;
 	typedef map<Bond*, int> BondToOrder;
@@ -30,10 +28,6 @@ namespace Molib {
 		public: 
 			BondOrderError(const string &msg) : Error(msg) {}
 		};
-		//~ static ValenceStateVec __create_valence_states(const Molecule &molecule, const int max_valence_states);
-		//~ static bool __sum_up_recursive(const AtomValencePairVec &numbers, const int tps,
-			//~ const AtomValencePairVec &partial, ValenceStateVec &valence_states,
-			//~ const int max_valence_states);
 		static ValenceStateVec __create_valence_states(const Molecule &molecule, const int max_valence_states);
 		static void __dfs(const int level, const int sum, const int tps, const vector<vector<AtomParams>> &V,
 			vector<AtomParams> &Q, vector<vector<AtomParams>> &valence_states, const int max_valence_states);

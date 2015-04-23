@@ -42,11 +42,6 @@ namespace Molib {
 		for (auto &key : receptor_idatm_types) idatm_types.insert(key);
 		for (auto &key : ligand_idatm_types) idatm_types.insert(key);
 		if (__comp == "reduced") {
-			//~ for (auto &prot_key : receptor_idatm_types) {
-				//~ for (auto &lig_key : ligand_idatm_types) {
-					//~ __prot_lig_pairs.insert(minmax(prot_key, lig_key));
-				//~ }
-			//~ }
 			for (auto &prot_key : idatm_types) {
 				for (auto &lig_key : idatm_types) {
 					__prot_lig_pairs.insert(minmax(prot_key, lig_key));
@@ -151,70 +146,7 @@ namespace Molib {
 		}
 		return inter;
 	}
-	//~ void Score::__compile_scoring_function() {
-		//~ cout << "compiling scoring function ...\n";
-		//~ dbgmsg("her i am");
-		//~ auto energy_function = __ref_state == "mean" ? 
-			//~ mem_fn(&Score::__energy_mean) : mem_fn(&Score::__energy_cumulative);
-		//~ for (auto &el1 : __gij_of_r_numerator) {
-			//~ const pair_of_ints &atom_pair = el1.first;
-			//~ const M0 &gij_of_r_vals = el1.second;
-			//~ const double w1 = help::vdw_radius[atom_pair.first];
-			//~ const double w2 = help::vdw_radius[atom_pair.second];
-			//~ const double vdW_sum = ((w1 > 0 && w2 > 0) ? w1 + w2 : 4.500);
-			//~ dbgmsg(atom_pair.first << " " << atom_pair.second << " " << vdW_sum);
-			//~ M0 energy(gij_of_r_vals.size(), -HUGE_VAL);
-			//~ for (int i = 0; i < gij_of_r_vals.size(); ++i) {
-				//~ const double lower_bound = __get_lower_bound(i);
-				//~ const double &gij_of_r_numerator = gij_of_r_vals[i];
-				//~ dbgmsg("lower bound for atom_pair " << help::idatm_unmask[atom_pair.first] 
-					//~ << " " << help::idatm_unmask[atom_pair.second] 
-					//~ << " " << lower_bound << " gij_of_r_numerator = "
-					//~ << gij_of_r_numerator << " __sum_gij_of_r_numerator[atom_pair] = "
-					//~ << __sum_gij_of_r_numerator[atom_pair]);
-				//~ if (gij_of_r_numerator >= __eps)
-					//~ energy[i] = energy_function(*this, atom_pair, lower_bound);
-			//~ }
-			//~ double max_energy = -HUGE_VAL;
-			//~ int max_index = -1;
-			//~ for (int i = 0; i < energy.size() - 2; ++i) {
-				//~ const double curr_energy = (energy[i] + energy[i + 1] + energy[i + 2]) / 3;
-				//~ if (curr_energy > max_energy) {
-					//~ max_energy = curr_energy;
-					//~ max_index = i + 1;
-				//~ }
-			//~ }
-			//~ dbgmsg("maximum is at " << __get_lower_bound(max_index) 
-				//~ << " and is " << max_energy);
-			//~ dbgmsg("raw energies before interpolations : " << endl << energy);
-			//~ if (max_index == -1 || __get_lower_bound(max_index) > 4.5 || __get_lower_bound(max_index) < 2.0) { // there are no data for this atom type
-				//~ for (int i = 0; i < gij_of_r_vals.size(); ++i)
-					//~ energy[i] = 0;
-			//~ } else {
-				//~ for (int i = 0; i <= max_index; ++i) // unset everything below this value
-					//~ energy[i] = -HUGE_VAL;
-				//~ energy.front() = 280000; // set the lower bound energy to arbitrary high value
-				//~ if (energy.back() == -HUGE_VAL) energy.back() = 0; // take care about the non-assigned values
-			//~ }
-			//~ dbgmsg("energies before interpolations : " << endl << energy);
-			//~ auto inter = __interpolate(energy); // interpolate data points to get a smooth function
-			//~ __energies[atom_pair].assign(inter.potential.begin(), inter.potential.end());
-			//~ __derivatives[atom_pair].assign(inter.derivative.begin(), inter.derivative.end());
-//~ #ifndef NDEBUG
-			//~ for (int i = 0; i < inter.potential.size(); ++i) {
-				//~ dbgmsg("inter.potential " << help::idatm_unmask[atom_pair.first] 
-					//~ << " " << help::idatm_unmask[atom_pair.second]
-					//~ << " " << __get_lower_bound(i) << " " << inter.potential[i]); 
-			//~ }
-			//~ for (int i = 0; i < inter.derivative.size(); ++i) {
-				//~ dbgmsg("inter.derivative " << help::idatm_unmask[atom_pair.first] 
-					//~ << " " << help::idatm_unmask[atom_pair.second]
-					//~ << " " << __get_lower_bound(i) << " " << inter.derivative[i]); 
-			//~ }
-//~ #endif
-		//~ }
-		//~ dbgmsg("out of loop");
-	//~ }
+
 	void Score::__compile_scoring_function() {
 		cout << "compiling scoring function ...\n";
 		dbgmsg("her i am");
