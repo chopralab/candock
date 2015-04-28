@@ -76,6 +76,9 @@ int main(int argc, char* argv[]) {
 		Molib::PDBreader rpdb(cmdl.receptor_file(), 
 			Molib::PDBreader::first_model|Molib::PDBreader::skip_hetatm);
 		Molib::Molecules receptors = rpdb.parse_molecule();
+		
+		receptors[0].filter(Molib::Residue::protein, cmdl.receptor_chain_id());
+
 		Molib::PDBreader lpdb(cmdl.ligand_file(), 
 			Molib::PDBreader::all_models|Molib::PDBreader::hydrogens, 
 			cmdl.max_num_ligands());
@@ -89,8 +92,7 @@ int main(int argc, char* argv[]) {
 		/* Create receptor grid
 		 * 
 		 */
-		Molib::MolGrid gridrec(receptors[0].get_atoms(cmdl.receptor_chain_id(), 
-			Molib::Residue::protein));
+		Molib::MolGrid gridrec(receptors[0].get_atoms());
 
 		/* Prepare receptor for molecular mechanics: histidines, N-[C-]terminals,
 		 * bonds, disulfide bonds, main chain bonds

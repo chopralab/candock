@@ -130,7 +130,8 @@ namespace Molib {
 	
 	class Residue : public template_map_container<Atom, Residue, Chain, int> {
 	public:
-		typedef enum {protein, nucleic, ion, water, hetero, notassigned} res_type;
+		//~ typedef enum {protein, nucleic, ion, water, hetero, notassigned} res_type;
+		typedef enum {notassigned=1, protein=2, nucleic=4, ion=8, water=16, hetero=32} res_type;
 		typedef tuple<char, string, int, char> res_tuple2;
 		typedef pair<int, char> res_pair;
 	private:
@@ -338,6 +339,7 @@ namespace Molib {
 		void add_site(const string &name, Residue::res_tuple2 t) { __site.insert(make_pair(name, t)); }
 		void set_name(const string &name) { __name = name; }
 		const string& name() const { return __name; }
+		Molecule& filter(const unsigned int hm=Residue::notassigned, const string &chain_ids="");
 		Molecule& compute_idatm_type();
 		Molecule& refine_idatm_type();
 		Molecule& compute_gaff_type();
@@ -415,6 +417,9 @@ namespace Molib {
 			}
 			return gc / (double) i;
 		}
+		AtomVec get_atoms(const string &chain_ids="", 
+			const Residue::res_type &rest=Residue::res_type::notassigned,
+			const int model_number=-1) const;
 		Molecules& compute_ring_type() { for (auto &molecule : *this) 
 			molecule.compute_ring_type(); return *this; }
 		Molecules& compute_bond_gaff_type() { for (auto &molecule : *this) 
@@ -444,6 +449,9 @@ namespace Molib {
 	public:
 		Molecules& add(Molecules *m) { return this->aadd(m, this); }
 		NRset& erase_properties() { for (auto &molecules : *this) molecules.erase_properties(); return *this; }
+		AtomVec get_atoms(const string &chain_ids="", 
+			const Residue::res_type &rest=Residue::res_type::notassigned,
+			const int model_number=-1) const;
 		friend ostream& operator<< (ostream& stream, const NRset& m);
 	};
 	

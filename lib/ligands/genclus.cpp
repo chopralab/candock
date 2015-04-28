@@ -23,27 +23,6 @@ namespace genclus {
 		str.erase(std::remove_if(str.begin(), str.end(), [](const char &c ) { return c==':'||c=='"'||c=='\\';}), str.end());
 		return str;
 	}
-	Molib::AtomVec get_atoms(Molib::NRset &nrset, Molib::Residue::res_type rest) {
-		Molib::AtomVec atoms;
-		for (auto &mols : nrset) {
-			for (auto &molecule : mols) {
-				for (auto &assembly : molecule) {
-					for (auto &model : assembly) {
-						for (auto &chain : model) {
-							for (auto &residue : chain) {
-								if (residue.rest() == rest) {
-									for (auto &atom : residue) {
-										atoms.push_back(&atom);
-									}
-								}
-							}
-						}
-					}
-				}
-			}
-		}
-		return atoms;
-	}
 	void add_to_json(JsonReader &jr, cluster::Clusters<Molib::Atom> ligand_clusters, 
 		string cluster_name, const string &names_dir, const bool for_gclus) {
 
@@ -197,10 +176,14 @@ namespace genclus {
 			dbgmsg("molecules name = " << mols.name());
 		}
 #endif
-		Molib::AtomVec protein_ligands = get_atoms(nrset, Molib::Residue::protein);
-		Molib::AtomVec nucleic_ligands = get_atoms(nrset, Molib::Residue::nucleic);
-		Molib::AtomVec hetero_ligands = get_atoms(nrset, Molib::Residue::hetero);
-		Molib::AtomVec ion_ligands = get_atoms(nrset, Molib::Residue::ion);
+		//~ Molib::AtomVec protein_ligands = get_atoms(nrset, Molib::Residue::protein);
+		//~ Molib::AtomVec nucleic_ligands = get_atoms(nrset, Molib::Residue::nucleic);
+		//~ Molib::AtomVec hetero_ligands = get_atoms(nrset, Molib::Residue::hetero);
+		//~ Molib::AtomVec ion_ligands = get_atoms(nrset, Molib::Residue::ion);
+		Molib::AtomVec protein_ligands = nrset.get_atoms("", Molib::Residue::protein);
+		Molib::AtomVec nucleic_ligands = nrset.get_atoms("", Molib::Residue::nucleic);
+		Molib::AtomVec hetero_ligands = nrset.get_atoms("", Molib::Residue::hetero);
+		Molib::AtomVec ion_ligands = nrset.get_atoms("", Molib::Residue::ion);
 		//~ Molib::AtomVec water_ligands = get_atoms(nrset, Molib::Residue::water);
 		//~ cluster::MapD<Molib::Atom> scores; // we don't use scores
 		//~ cluster::MapD<Molib::Atom> scores; // we don't use scores

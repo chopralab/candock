@@ -26,6 +26,8 @@ namespace help {
 			for (auto &repclass1 : gaff_replacement.at(iniclass1)) {
 				for (auto &repclass2 : gaff_replacement.at(iniclass2)) {
 					if (!(repclass1 == iniclass1 && repclass2 == iniclass2)) {
+						dbgmsg("replacement bond type [" << repclass1 << " " 
+							<< repclass2 << "]");
 						result.push_back({repclass1, repclass2});
 					}
 				}
@@ -38,6 +40,8 @@ namespace help {
 				for (auto &repclass2 : gaff_replacement.at(iniclass2)) {
 					for (auto &repclass3 : gaff_replacement.at(iniclass3)) {
 						if (!(repclass1 == iniclass1 && repclass2 == iniclass2 && repclass3 == iniclass3)) {
+							dbgmsg("replacement angle type [" << repclass1 << " " 
+								<< repclass2 << " " << repclass3 << "]");
 							result.push_back({repclass1, repclass2, repclass3});
 						}
 					}
@@ -54,6 +58,8 @@ namespace help {
 						for (auto &repclass4 : gaff_replacement.at(iniclass4)) {
 							if (!(repclass1 == iniclass1 && repclass2 == iniclass2 
 								&& repclass3 == iniclass3 && repclass4 == iniclass4)) {
+								dbgmsg("replacement dihedral type [" << repclass1 << " " 
+									<< repclass2 << " " << repclass3 << " " << repclass4 << "]");
 								result.push_back({repclass1, repclass2, repclass3, repclass4});
 							}
 						}

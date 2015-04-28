@@ -23,18 +23,19 @@ long_line_behaviour=1
 long_line_column=72
 
 [files]
-current_page=2
+current_page=11
 FILE_NAME_0=930;Make;0;EUTF-8;1;1;0;%2Fhome%2Fkonc%2FDropbox%2Ftmp%2Fcandock%2Fcandock%2FMakefile;0;4
 FILE_NAME_1=389;Make;0;EUTF-8;1;1;0;%2Fhome%2Fkonc%2FDropbox%2Ftmp%2Fcandock%2Fcandock%2FMakefile.inc;0;4
-FILE_NAME_2=843;C++;0;EUTF-8;1;1;0;%2Fhome%2Fkonc%2FDropbox%2Ftmp%2Fcandock%2Fcandock%2Fcandock.cpp;0;4
+FILE_NAME_2=0;C++;0;EUTF-8;1;1;0;%2Fhome%2Fkonc%2FDropbox%2Ftmp%2Fcandock%2Fcandock%2Fcandock.cpp;0;4
 FILE_NAME_3=3227;C++;0;EUTF-8;1;1;0;%2Fhome%2Fkonc%2FDropbox%2Ftmp%2Fcandock%2Fcandock%2Ftest_minimization.cpp;0;4
 FILE_NAME_4=1462;C++;0;EUTF-8;1;1;0;%2Fhome%2Fkonc%2FDropbox%2Ftmp%2Fcandock%2Fcandock%2Ftest_fragmenting.cpp;0;4
 FILE_NAME_5=75;C++;0;EUTF-8;1;1;0;%2Fhome%2Fkonc%2FDropbox%2Ftmp%2Fcandock%2Flib%2Fopenmm%2Fforcefield.hpp;0;4
-FILE_NAME_6=35284;C++;0;EUTF-8;1;1;0;%2Fhome%2Fkonc%2FDropbox%2Ftmp%2Fcandock%2Flib%2Fopenmm%2Fforcefield.cpp;0;4
+FILE_NAME_6=35172;C++;0;EUTF-8;1;1;0;%2Fhome%2Fkonc%2FDropbox%2Ftmp%2Fcandock%2Flib%2Fopenmm%2Fforcefield.cpp;0;4
 FILE_NAME_7=15627;C++;0;EUTF-8;1;1;0;%2Fhome%2Fkonc%2FDropbox%2Ftmp%2Fcandock%2Flib%2Fopenmm%2Fomm.cpp;0;4
 FILE_NAME_8=2805;C++;0;EUTF-8;1;1;0;%2Fhome%2Fkonc%2FDropbox%2Ftmp%2Fcandock%2Flib%2Fopenmm%2Fomm.hpp;0;4
 FILE_NAME_9=637;C++;0;EUTF-8;1;1;0;%2Fhome%2Fkonc%2FDropbox%2Ftmp%2Fcandock%2Flib%2Fopenmm%2Fmoleculeinfo.hpp;0;4
 FILE_NAME_10=7156;C++;0;EUTF-8;1;1;0;%2Fhome%2Fkonc%2FDropbox%2Ftmp%2Fcandock%2Flib%2Fopenmm%2Fmoleculeinfo.cpp;0;4
+FILE_NAME_11=722;C++;0;EUTF-8;1;1;0;%2Fhome%2Fkonc%2FDropbox%2Ftmp%2Fcandock%2Flib%2Fligands%2Fgenclus.cpp;0;4
 
 [VTE]
 last_dir=/home/konc

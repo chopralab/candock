@@ -32,6 +32,9 @@ int main(int argc, char* argv[]) {
 		cmdl.init(argc, argv);
 		cmdl.display_time("started");
 		cout << cmdl << endl;
+		
+		inout::output_file("", cmdl.mini_ligands_file()); // output docked & minimized ligands conformations
+
 		Molib::PDBreader rpdb(cmdl.receptor_file(), 
 			Molib::PDBreader::first_model|Molib::PDBreader::skip_hetatm);
 		Molib::Molecules receptors = rpdb.parse_molecule();
@@ -39,6 +42,9 @@ int main(int argc, char* argv[]) {
 		// if empty, add dummy receptor
 		if (receptors.empty())
 			receptors.add(new Molib::Molecule("dummy"));
+
+		receptors[0].filter(Molib::Residue::protein, cmdl.receptor_chain_id());
+
 			
 		Molib::PDBreader lpdb(cmdl.ligand_file(), 
 			Molib::PDBreader::all_models|Molib::PDBreader::hydrogens, 
@@ -53,8 +59,10 @@ int main(int argc, char* argv[]) {
 		/* Create receptor grid
 		 * 
 		 */
-		Molib::MolGrid gridrec(receptors[0].get_atoms(cmdl.receptor_chain_id(), 
-			Molib::Residue::protein));
+		//~ Molib::MolGrid gridrec(receptors[0].get_atoms(cmdl.receptor_chain_id(), 
+			//~ Molib::Residue::protein));
+		Molib::MolGrid gridrec(receptors[0].get_atoms());
+		
 
 		Molib::Molecules ligands = lpdb.parse_molecule();
 
@@ -99,7 +107,8 @@ int main(int argc, char* argv[]) {
 				dbgmsg("MOLECULES AFTER MINIMIZATION : " << endl 
 					<< minimized_ligand << endl 
 					<< minimized_receptor);
-				inout::output_file(minimized_ligand, cmdl.mini_ligands_file(), ios_base::app);
+				//~ inout::output_file(minimized_ligand, cmdl.mini_ligands_file(), ios_base::app);
+				inout::output_file(mini, cmdl.mini_ligands_file(), ios_base::app);
 				//~ OMMIface::Energies energies;
 				//~ energies[&minimized_ligand] = omm.get_energy_components(
 					//~ minimized_receptor, minimized_ligand, cmdl.dist_cutoff());

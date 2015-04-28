@@ -107,8 +107,6 @@ namespace OMMIface {
 		try { return angle_type.at(aclass3).at(aclass2).at(aclass1); } catch(const out_of_range&) {}
 		// if this fails, we try finding a similar angle parameter
 		for (auto &sclass : help::get_replacement({aclass1, aclass2, aclass3})) {
-			cerr << "replacement angle type [" << sclass[0] << " " << sclass[1] 
-				<< " " << sclass[2] << "]" << endl;
 			try { return angle_type.at(sclass[0]).at(sclass[1]).at(sclass[2]); } catch(const out_of_range&) {}
 			try { return angle_type.at(sclass[2]).at(sclass[1]).at(sclass[0]); } catch(const out_of_range&) {}
 		}

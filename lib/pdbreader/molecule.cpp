@@ -169,6 +169,24 @@ namespace Molib {
 		}
 		dbgmsg("MOLECULE AFTER PREPARING FOR MOLECULAR MECHANICS" << endl << *this);
 	}
+	AtomVec NRset::get_atoms(const string &chain_ids, const Residue::res_type &rest,
+		const int model_number) const {
+		AtomVec atoms;
+		for (auto &mols : *this) {
+			auto ret = mols.get_atoms(chain_ids, rest, model_number);
+			atoms.insert(atoms.end(), ret.begin(), ret.end());
+		}
+		return atoms;
+	}
+	AtomVec Molecules::get_atoms(const string &chain_ids, const Residue::res_type &rest,
+		const int model_number) const {
+		AtomVec atoms;
+		for (auto &molecule : *this) {
+			auto ret = molecule.get_atoms(chain_ids, rest, model_number);
+			atoms.insert(atoms.end(), ret.begin(), ret.end());
+		}
+		return atoms;
+	}
 	AtomVec Molecule::get_atoms(const string &chain_ids, const Residue::res_type &rest,
 		const int model_number) const {
 		AtomVec atoms;
@@ -355,6 +373,22 @@ namespace Molib {
 		return *this;
 	}
 
+	Molecule& Molecule::filter(const unsigned int hm, const string &chain_ids) {
+		for (auto &assembly : *this)
+		for (auto &model : assembly)
+		for (auto &chain : model)
+			if (chain_ids == "" || chain_ids.find(chain.chain_id()) != string::npos)
+				for (auto &residue : chain)
+					if ((hm & Residue::protein) && residue.rest() == Residue::protein
+						|| (hm & Residue::nucleic) && residue.rest() == Residue::nucleic
+						|| (hm & Residue::ion) && residue.rest() == Residue::ion
+						|| (hm & Residue::water) && residue.rest() == Residue::water
+						|| (hm & Residue::hetero) && residue.rest() == Residue::hetero) {
+					} else
+						chain.erase(Residue::res_pair(residue.resi(), residue.ins_code()));
+			else
+				model.erase(chain.chain_id());
+	}
 	
 	Molecule& Molecule::compute_idatm_type() { 
 		AtomType::compute_idatm_type(*this);
