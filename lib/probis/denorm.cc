@@ -64,7 +64,7 @@ bool Denorm::read_one(string &row) {
 }
 
 bool Denorm::read(string &row, bool filter) {
-  /*
+/*
     Preberemo denormalizirano vrstico in podatke zapisemo v interne strukture. Hkrati tudi filtriramo 
     ven klastre s slabimi score-i.
   */

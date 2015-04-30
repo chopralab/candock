@@ -11,6 +11,7 @@
 #include "output.h"
 #include "clusterdata.h"
 #include "motif.h"
+#include "debug.hpp"
 
 /* callback funkcije */
 bool by_flx_cluster_score(const pair<Residue*, Residue*> &i, const pair<Residue*, Residue*> &j) { 
@@ -2670,6 +2671,7 @@ void Molecule::out_alignments(Subgraph *s, const string &json_file) {
   out_file<<"[";
 
   for (vector<Molecule*>::iterator it=lista_molekul.begin(); it != lista_molekul.end(); it++) {
+	dbgmsg("pdb_id : " << (*it)->pdb_id);
 
     if (it != lista_molekul.begin())
       out_file<<",";

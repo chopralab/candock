@@ -65,10 +65,7 @@ int main(int argc, char* argv[]) {
 			centroids = common::set_centroids(cmdl.centroid_file(), 
 				cmdl.def_radial_check(), cmdl.num_bsites());
 		}
-		//~ inout::output_file(centroids, "centroid_" + boost::filesystem::basename(cmdl.receptor_file())
-			//~ + "_" + cmdl.receptor_chain_id() + ".txt"); // probis local structural alignments
-		//~ inout::output_file(centroids, "centroid.txt"); // probis local structural alignments
-		//~ throw Error("exit after computing centroid");
+
 		/* Initialize parsers for receptor (and ligands) and read
 		 * the receptor molecule(s)
 		 * 

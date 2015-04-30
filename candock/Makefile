@@ -7,9 +7,11 @@ $(LIBDIR)/openmm $(LIBDIR)/probis $(LIBDIR)/ligands
 EXE	= candock
 TEST = test_minimization
 TEST2 = test_fragmenting
+TEST3 = test_bsite
 OBJS	= candock.o common.o
 OBJS_TEST	= test_minimization.o common.o
 OBJS_TEST2	= test_fragmenting.o common.o
+OBJS_TEST3	= test_bsite.o common.o
 OBJLIBS	=  libfragmenter.a libgeom3d.a libgraph.a libhelper.a libkabsch.a \
 libkbforce.a liblinker.a libomm.a libpdb.a libscore.a libprobis.a libligands.a
 LIBS	= -L. -L$(LIBDIR)/linker -L $(LIBDIR)/pdbreader -L $(LIBDIR)/kabsch \
@@ -26,6 +28,7 @@ INCL = -I $(LIBDIR)/tclap-1.2.1/include -I $(LIBDIR)/jsoncpp-src-0.6.0-rc2/inclu
 all : $(EXE)
 test : $(TEST)
 test2 : $(TEST2)
+test3 : $(TEST3)
 
 $(TEST) : test_minimization.o common.o $(OBJLIBS)
 	$(ECHO) $(LD) $(PRJCFLAGS) -o $(TEST) $(OBJS_TEST) $(LIBS)
@@ -35,9 +38,17 @@ $(TEST2) : test_fragmenting.o common.o $(OBJLIBS)
 	$(ECHO) $(LD) $(PRJCFLAGS) -o $(TEST2) $(OBJS_TEST2) $(LIBS)
 	$(LD) $(PRJCFLAGS) -o $(TEST2) $(OBJS_TEST2) $(LIBS)
 
+$(TEST3) : test_bsite.o common.o $(OBJLIBS)
+	$(ECHO) $(LD) $(PRJCFLAGS) -o $(TEST3) $(OBJS_TEST3) $(LIBS)
+	$(LD) $(PRJCFLAGS) -o $(TEST3) $(OBJS_TEST3) $(LIBS)
+
 $(EXE) : candock.o common.o $(OBJLIBS)
 	$(ECHO) $(LD) $(PRJCFLAGS) -o $(EXE) $(OBJS) $(LIBS)
 	$(LD) $(PRJCFLAGS) -o $(EXE) $(OBJS) $(LIBS)
+
+test_bsite.o: test_bsite.cpp common.cpp common.hpp \
+	   opts_candock.hpp
+	$(CC) $(PRJCFLAGS) $(INCL) -c $<
 
 test_minimization.o: test_minimization.cpp common.cpp common.hpp \
 	   opts_candock.hpp
@@ -104,7 +115,7 @@ libomm.a: force_look
 
 clean :
 	$(ECHO) cleaning up in .
-	-$(RM) -f $(EXE) $(TEST) $(TEST2) $(OBJS) $(OBJS_TEST) $(OBJS_TEST2) $(OBJLIBS)
+	-$(RM) -f $(EXE) $(TEST) $(TEST2) $(TEST3) $(OBJS) $(OBJS_TEST) $(OBJS_TEST2) $(OBJS_TEST3) $(OBJLIBS)
 	-for d in $(DIRS); do (cd $$d; $(MAKE) clean ); done
 
 force_look :

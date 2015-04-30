@@ -3,6 +3,7 @@
 candock/candock
 candock/test_minimization
 candock/test_fragmenting
+candock/test_bsite
 lib/ligands/gbio
 lib/ligands/gclus
 lib/ligands/glig

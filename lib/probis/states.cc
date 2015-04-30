@@ -444,28 +444,34 @@ void state7(Args *args) {
     NoSql nosql(&mol1, NOSQL_FILE);
     nosql.read();
 
-    /* dolocis kolikokrat je vsak query residue ohranjen (upostevas le dobro prilegane sekvence) */
+/* NOT FOR CANDOCK
+    // dolocis kolikokrat je vsak query residue ohranjen (upostevas le dobro prilegane sekvence)
     if (! (_pairwise || _nofp)) { // ce je pairwise ali nofp (no fingerprint), ne filtriramo po fingerprint residue-jih
       mol1.conservation(Z_SCORE_FP); // z_score > 3
       mol1.binarize_cons_seq();
       //dolocis fingerprint residueje
       mol1.fingerprint();
     }
-    
-    /* se enkrat dolocis ohranjenost tokrat upostevas vse prilegane sekvence (kar jih je ostalo) */
+*/    
+
+/* NOT FOR CANDOCK
+    // se enkrat dolocis ohranjenost tokrat upostevas vse prilegane sekvence (kar jih je ostalo)
     mol1.conservation(Z_SCORE_CONS); // z_score > 2
-    /* izpisi aminokislinsko zaporedje proteina in za vsako aminokislino, kolikokrat je ohranjena */
+    // izpisi aminokislinsko zaporedje proteina in za vsako aminokislino, kolikokrat je ohranjena
     mol1.binarize_cons_seq();
-    /* izpisemo asymetric unit */
+    // izpisemo asymetric unit
     mol1.output_cons_pdb();
-    /* generiramo biounite za query protein in jih izpisemo */
+    // generiramo biounite za query protein in jih izpisemo
     mol1.gen_cons_biounit();
+*/    
     
     /* kadar server poganja probis, izpise spletno stran z rezultati */
 //    if (_html) {
     mol1.out_alignments(&subgraph, JSON_FILE);
+/* NOT FOR CANDOCK
     mol1.out_info();
     mol1.out_query();
+*/
 //    }
     
     /* samo, ce je _html flag in ni _pairwise in je v parameters.inp nastavljen LIGDIR (_lig = true), dodamo informacijo o ligandih v html results datoteko */

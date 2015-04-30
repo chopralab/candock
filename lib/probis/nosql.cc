@@ -8,6 +8,7 @@
 #include "product.h"
 #include "desc.h"
 #include "atom.h"
+#include "debug.hpp"
 
 #include <sys/file.h> /* for flock(2) */
 #include <sys/stat.h> /* for S_* constants */
@@ -137,7 +138,9 @@ void NoSql::read() {
   for (vector<string>::iterator it = rows.begin(); it != rows.end(); it++) {
     Denorm *denorm = new Denorm();
     // ce je prebrana vrstica v pravilnem formatu in ce je sploh kaksen dober alignment ...
+	dbgmsg("before if " << *it);
     if (denorm->read(*it, !_pairwise)) {
+		dbgmsg(*it);
       this->mol1->lista_molekul.push_back(new Molecule(denorm->get_pdb_id() + ".pdb", denorm->get_chain_id()) );
       // preberemo vse klastre ...
       denorm->reset_cluster();
@@ -176,6 +179,10 @@ void NoSql::read() {
   
   /* po first_cluster_score, nato znotraj enakega cluster_score-a po unique_seq_length */
   sort(this->mol1->lista_molekul.begin(), this->mol1->lista_molekul.end(), by_cluster_score_unique_seq_length);
+	for (vector<Molecule*>::iterator it=this->mol1->lista_molekul.begin(); it != this->mol1->lista_molekul.end(); it++) {
+		dbgmsg("pdb_id : " << (*it)->pdb_id);
+	}
+
 }
 
 void NoSql::get_rota_trans_resi(Molecule *mol2, Item *one_clq) {
