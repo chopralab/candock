@@ -42,9 +42,9 @@ using namespace std;
 KBForce::KBForce() {
 }
 
-//~ KBForce::~KBForce() {
-	//~ cout << "calling destructor of KBForce" << endl;
-//~ }
+KBForce::~KBForce() {
+	//~ std::cout << "calling destructor of KBForce" << endl;
+}
 
 //~ int KBForce::addBond(int particle1, int particle2, double length, double k) {
     //~ bonds.push_back(BondInfo(particle1, particle2, length, k));
@@ -86,6 +86,7 @@ void KBForce::setBondParameters(int index, int particle1, int particle2, vector<
 }
 
 ForceImpl* KBForce::createImpl() const {
+	//~ std::cout << "calling createImpl" << endl;
     return new KBForceImpl(*this);
 }
 

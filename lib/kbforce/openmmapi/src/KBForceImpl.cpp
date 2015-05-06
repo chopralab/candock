@@ -40,15 +40,18 @@
 #include <map>
 #include <set>
 #include <sstream>
+#include <iostream>
 
 using namespace KBPlugin;
 using namespace OpenMM;
 using namespace std;
 
 KBForceImpl::KBForceImpl(const KBForce& owner) : owner(owner) {
+	//~ std::cout << "calling constructor of KBForceImpl" << endl;
 }
 
 KBForceImpl::~KBForceImpl() {
+	//~ std::cout << "calling destructor of KBForceImpl" << endl;
 }
 
 void KBForceImpl::initialize(ContextImpl& context) {

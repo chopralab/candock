@@ -56,7 +56,7 @@ namespace Molib {
 		~PDBreader() { delete p; }
 		void rewind();
 		void set_flags(unsigned int hm);
-		void parse_molecule(Molecules &mols);
+		bool parse_molecule(Molecules &mols);
 		Molecules parse_molecule();
 	};
 };

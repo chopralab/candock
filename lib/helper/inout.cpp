@@ -9,6 +9,15 @@
 #include "inout.hpp"
 
 namespace inout {
+	void Inout::__mkdir(const string &dir_path) {
+		// makes a path "janez/aska/mia from e.g. "janez/aska/mia/test.txt"
+		boost::filesystem::path dir(dir_path);
+		dir.remove_filename();
+		if(!dir.string().empty() && !boost::filesystem::create_directories(dir)) {
+			throw Error("die : Cannot create directory path " + dir_path);
+		}
+	}
+
 	int Inout::__lock(const string &name) {
 		int fd = open(name.c_str(),O_RDWR|O_CREAT,S_IRUSR|S_IWUSR); 	
 		if (flock(fd,LOCK_EX) == -1) {
@@ -30,12 +39,13 @@ namespace inout {
 	}
 	streampos Inout::read_file(const string &name, vector<string> &s, 
 		f_not_found w, const streampos &pos, const int num_occur, const string &pattern) {
-
-		ifstream in(name.c_str());
-		in.seekg(pos);
+		int fd = __lock(name);
+		ifstream in(name);
 		if (!in.is_open() && w == panic) {
+			__unlock(fd);
 			throw Error("Cannot read " + name);
 		}
+		in.seekg(pos);
 		string line;
 		int i = 0;
 		while (getline(in, line)) {
@@ -44,6 +54,7 @@ namespace inout {
 		}
 		streampos last_pos = in.tellg();
 		in.close();
+		__unlock(fd);
 		return last_pos;
 	}	
 
@@ -55,6 +66,7 @@ namespace inout {
 	}
 	void Inout::file_open_put_stream(const string &name, 
 		const stringstream &ss, ios_base::openmode mode) {
+		__mkdir(name);
 		int fd = __lock(name);
 		ofstream output_file(name, mode);
 		if (!output_file.is_open()) {

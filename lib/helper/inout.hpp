@@ -18,6 +18,7 @@ namespace inout {
 	class Inout {
 		static int __lock(const string &name);
 		static void __unlock(int fd);
+		static void __mkdir(const string&);
 	public:
 		enum f_not_found {panic=0, no_panic=1};
 		static streampos read_file(const string &name, vector<string>&, 

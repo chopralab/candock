@@ -8,10 +8,14 @@ EXE	= candock
 TEST = test_minimization
 TEST2 = test_fragmenting
 TEST3 = test_bsite
+TEST4 = test_clq
+TEST5 = test_link
 OBJS	= candock.o common.o
 OBJS_TEST	= test_minimization.o common.o
 OBJS_TEST2	= test_fragmenting.o common.o
 OBJS_TEST3	= test_bsite.o common.o
+OBJS_TEST4	= test_clq.o common.o
+OBJS_TEST5	= test_link.o common.o
 OBJLIBS	=  libfragmenter.a libgeom3d.a libgraph.a libhelper.a libkabsch.a \
 libkbforce.a liblinker.a libomm.a libpdb.a libscore.a libprobis.a libligands.a
 LIBS	= -L. -L$(LIBDIR)/linker -L $(LIBDIR)/pdbreader -L $(LIBDIR)/kabsch \
@@ -29,6 +33,8 @@ all : $(EXE)
 test : $(TEST)
 test2 : $(TEST2)
 test3 : $(TEST3)
+test4 : $(TEST4)
+test5 : $(TEST5)
 
 $(TEST) : test_minimization.o common.o $(OBJLIBS)
 	$(ECHO) $(LD) $(PRJCFLAGS) -o $(TEST) $(OBJS_TEST) $(LIBS)
@@ -42,9 +48,25 @@ $(TEST3) : test_bsite.o common.o $(OBJLIBS)
 	$(ECHO) $(LD) $(PRJCFLAGS) -o $(TEST3) $(OBJS_TEST3) $(LIBS)
 	$(LD) $(PRJCFLAGS) -o $(TEST3) $(OBJS_TEST3) $(LIBS)
 
+$(TEST4) : test_clq.o common.o $(OBJLIBS)
+	$(ECHO) $(LD) $(PRJCFLAGS) -o $(TEST4) $(OBJS_TEST4) $(LIBS)
+	$(LD) $(PRJCFLAGS) -o $(TEST4) $(OBJS_TEST4) $(LIBS)
+
+$(TEST5) : test_link.o common.o $(OBJLIBS)
+	$(ECHO) $(LD) $(PRJCFLAGS) -o $(TEST5) $(OBJS_TEST5) $(LIBS)
+	$(LD) $(PRJCFLAGS) -o $(TEST5) $(OBJS_TEST5) $(LIBS)
+
 $(EXE) : candock.o common.o $(OBJLIBS)
 	$(ECHO) $(LD) $(PRJCFLAGS) -o $(EXE) $(OBJS) $(LIBS)
 	$(LD) $(PRJCFLAGS) -o $(EXE) $(OBJS) $(LIBS)
+
+test_link.o: test_link.cpp common.cpp common.hpp \
+	   opts_candock.hpp
+	$(CC) $(PRJCFLAGS) $(INCL) -c $<
+
+test_clq.o: test_clq.cpp common.cpp common.hpp \
+	   opts_candock.hpp
+	$(CC) $(PRJCFLAGS) $(INCL) -c $<
 
 test_bsite.o: test_bsite.cpp common.cpp common.hpp \
 	   opts_candock.hpp
@@ -115,7 +137,7 @@ libomm.a: force_look
 
 clean :
 	$(ECHO) cleaning up in .
-	-$(RM) -f $(EXE) $(TEST) $(TEST2) $(TEST3) $(OBJS) $(OBJS_TEST) $(OBJS_TEST2) $(OBJS_TEST3) $(OBJLIBS)
+	-$(RM) -f $(EXE) $(TEST) $(TEST2) $(TEST3) $(TEST4) $(TEST5) $(OBJS) $(OBJS_TEST) $(OBJS_TEST2) $(OBJS_TEST3) $(OBJS_TEST4) $(OBJS_TEST5) $(OBJLIBS)
 	-for d in $(DIRS); do (cd $$d; $(MAKE) clean ); done
 
 force_look :

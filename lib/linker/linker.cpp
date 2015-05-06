@@ -775,7 +775,6 @@ namespace Molib {
 						<< good_conformations.back());
 				} catch (ConnectionError& e) {
 					dbgmsg("exception : " << e.what());
-					cout << "exception : " << e.what() << endl;
 					for (auto &failed_pair : e.get_failed_state_pairs())
 						blacklist.insert(failed_pair);
 				}

@@ -9,3 +9,5 @@ lib/ligands/gclus
 lib/ligands/glig
 *.geany
 candock/candock_for_centroid_quick
+candock/test_clq
+candock/test_link

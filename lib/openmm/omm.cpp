@@ -56,15 +56,23 @@ namespace OMMIface {
 		const bool use_constraints, const double step_size_in_fs) : 
 		__ffield(ff), __fftype(fftype), __dist_cutoff(dist_cutoff), 
 		__use_constraints(use_constraints), __step_size_in_fs(step_size_in_fs), 
-		__omm(new MyOpenMMData()) {
+		__ligand(ligand), __omm(new MyOpenMMData()) {
 
-		// Init Coords, Bonds, Angles, Torsions...
-		MoleculeInfo mol_info;
-		mol_info.get_molecule_info(receptor, __ffield)
-			.get_molecule_info(ligand, __ffield)
-			.get_kb_force_info(receptor, ligand, dist_cutoff);				
-		// Set up OpenMM data structures; returns OpenMM Platform name.
-		__initialize_openmm(__omm, mol_info, OMMIface::torsional|OMMIface::non_bond); 
+		try {
+			//~ cout << "calling constructor of OMM for molecule " << __ligand.name() << endl;
+			// Init Coords, Bonds, Angles, Torsions...
+			MoleculeInfo mol_info;
+			mol_info.get_molecule_info(receptor, __ffield)
+				.get_molecule_info(ligand, __ffield)
+				.get_kb_force_info(receptor, ligand, dist_cutoff);				
+			// Set up OpenMM data structures; returns OpenMM Platform name.
+			__initialize_openmm(__omm, mol_info, OMMIface::torsional|OMMIface::non_bond); 
+		} catch(...) {
+			dbgmsg("FAILURE: constructor of OMM failed for molecule " 
+				<< __ligand.name() << " ... cleaning up resources...");
+			delete __omm;
+			throw;
+		}
 	}
 
 	void OMM::__initialize_openmm(MyOpenMMData *omm, const MoleculeInfo &mol_info, 
@@ -89,10 +97,13 @@ namespace OMMIface {
 		OpenMM::PeriodicTorsionForce&   bondTorsion = *new OpenMM::PeriodicTorsionForce();
 		KBPlugin::KBForce&			    kbforce     = *new KBPlugin::KBForce();
 		if (ene_opts & OMMIface::non_bond) {
-			if (__fftype == "phy")
+			if (__fftype == "phy") {
+				delete &kbforce;
 				system.addForce(&nonbond);
-			else
+			} else {
+				delete &nonbond;
 				system.addForce(&kbforce);
+			}
 		}
 		if (ene_opts & OMMIface::torsional) {
 			system.addForce(&bondStretch);
@@ -280,8 +291,10 @@ namespace OMMIface {
 		omm->context->setPositions(initialPosInNm);
 		dbgmsg("REMARK  Using OpenMM platform "
 			<< omm->context->getPlatform().getName());
-		if (warn > 0)
-			throw Error("die : missing parameters detected");
+		if (warn > 0) {
+			throw Error("die : missing parameters detected for molecule "
+				+ __ligand.name());
+		}
 	}
 	pair<Molib::Molecule, Molib::Molecule> OMM::__get_openmm_state(const MyOpenMMData* omm, 
 		const Molib::Molecule &receptor, const Molib::Molecule &ligand) const {

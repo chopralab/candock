@@ -91,6 +91,7 @@ namespace common {
 		Molib::MolGrid &grid, const double &radial_check, const double &grid_spacing, const int &dist_cutoff,
 		const double &excluded_radius, const double &max_interatomic_distance);
 	HCPoints filter_scores(Molib::AtomTypeToEnergyPoint &attep, const double &top_percent);
+	Molib::NRset read_top_seeds_files(const Molib::Molecule &ligand, const string &top_seeds_file);
 	void create_mols_from_seeds(set<string> &added, Molib::Molecules &seeds, const Molib::Molecules &mols);
 //~ #ifndef NDEBUG	
 	void create_mols_from_fragments(set<string> &added, Molib::Molecules &seeds, const Molib::Molecules &mols);

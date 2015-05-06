@@ -23,9 +23,10 @@ using namespace std;
 namespace Molib {
 	void PDBreader::rewind() { p->set_pos(0); }
 	void PDBreader::set_flags(unsigned int hm) { p->set_hm(hm); }
-	void PDBreader::parse_molecule(Molecules &mols) { 
+	bool PDBreader::parse_molecule(Molecules &mols) { 
 		p->parse_molecule(mols); 
 		dbgmsg("PARSED MOLECULES : " << endl << mols);
+		return !mols.empty();
 	}
 	Molecules PDBreader::parse_molecule() { 
 		Molecules mols; 
@@ -397,13 +398,15 @@ namespace Molib {
 				a1.connect(a2).set_rotatable(vs[0]);
 			}
 			else if (line.compare(0, 19, "REMARK   8 BONDTYPE") == 0) {
-				Model &model = mols.last().last().last();
 				vector<string> vs = help::ssplit(line.substr(20), " ");
-				Atom &a1 = *atom_number_to_atom[&model][stoi(vs[2])];
-				Atom &a2 = *atom_number_to_atom[&model][stoi(vs[3])];
-				auto &bond = a1.connect(a2);
-				bond.set_bo(stoi(vs[0]));
-				bond.set_bond_gaff_type(vs[1]);
+				if (vs.size() == 4) { // to avoid when bond_gaff_type is undefined
+					Model &model = mols.last().last().last();
+					Atom &a1 = *atom_number_to_atom[&model][stoi(vs[2])];
+					Atom &a2 = *atom_number_to_atom[&model][stoi(vs[3])];
+					auto &bond = a1.connect(a2);
+					bond.set_bo(stoi(vs[0]));
+					bond.set_bond_gaff_type(vs[1]);
+				}
 			}
 			else if (line.compare(0, 6, "CONECT") == 0) {
 				const string ln = boost::algorithm::trim_right_copy(line.substr(6));

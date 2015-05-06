@@ -54,7 +54,7 @@ public:
     //~ /**
      //~ * Destroy an KBForce.
      //~ */
-    //~ ~KBForce();
+    ~KBForce();
     /**
      * Set global parameters
      */

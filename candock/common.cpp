@@ -8,6 +8,7 @@
 #include "geom3d/geom3d.hpp"
 #include "kabsch/kabsch.hpp"
 #include "score/score.hpp"
+#include "pdbreader/pdbreader.hpp"
 #include <gsl/gsl_matrix_double.h>
 #include <gsl/gsl_statistics_double.h>
 #include <gsl/gsl_eigen.h>
@@ -312,10 +313,22 @@ namespace common {
 			<< " total gridpoints\n";
 		return gridpoints;
 	}
-	
+
 	/* Part7a stuff
 	 * 
 	 */
+	Molib::NRset read_top_seeds_files(const Molib::Molecule &ligand, const string &top_seeds_file) {
+		Molib::NRset top_seeds;
+		const Molib::Model &model = ligand.first().first();
+		for (auto &kv : model.get_seeds()) { // iterate over seeds
+			const string &nm = kv.first;
+			dbgmsg("reading top_seeds_file for seed number = " << nm);
+			Molib::PDBreader pdb("tmp/" + nm + "/" + top_seeds_file, 
+				Molib::PDBreader::all_models);
+			top_seeds.add(new Molib::Molecules(pdb.parse_molecule()));
+		}
+		return top_seeds;
+	}
 	void create_mols_from_seeds(set<string> &added, Molib::Molecules &seeds, const Molib::Molecules &mols) {
 		for (auto &molecule : mols)
 		for (auto &assembly : molecule)

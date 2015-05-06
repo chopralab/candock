@@ -46,12 +46,14 @@ namespace OMMIface {
 		const double __dist_cutoff;
 		const bool __use_constraints;
 		const double __step_size_in_fs; // integration step size (fs)
+		const Molib::Molecule &__ligand;
 	public:
 		OMM(const Molib::Molecule &receptor, const Molib::Molecule &ligand,
 			const ForceField &ff, const string &fftype, const double dist_cutoff, 
 			const bool use_constraints=false, const double step_size_in_fs=2);
 		~OMM() {
-			dbgmsg("calling destructor of OMM");
+			//~ dbgmsg("calling destructor of OMM");
+			//~ cout << "calling destructor of OMM for molecule " << __ligand.name() << endl;
 			//~ __terminate_openmm(__omm); // Clean up OpenMM data structures.
 			delete __omm; // Clean up OpenMM data structures.
 		}
