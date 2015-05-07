@@ -83,6 +83,8 @@ namespace Molib {
 				__generate_molecule(mols, found_molecule, "");
 				__generate_assembly(mols, found_assembly, 0, "ASYMMETRIC UNIT");
 				__generate_model(mols, found_model, 1);
+				Chain *chain = nullptr;
+				Residue *residue = nullptr;
 				for (i = i + 1; i < mol2_raw.size(); ++i) {
 					const string &atom_line = mol2_raw[i];
 					dbgmsg(atom_line);
@@ -104,10 +106,8 @@ namespace Molib {
 						Residue::res_type rest(Residue::hetero);
 						if (!__giant_molecule || rest != Residue::protein || atom_name == "CA") {
 							Model &model = mols.last().last().last();
-							Chain *chain;
 							if (!model.has_chain('A'))
 								chain = &model.add(new Chain('A'));
-							Residue *residue;
 							if (!chain->has_residue(Residue::res_pair(subst_id, ' ')))
 								residue = &chain->add(new Residue(subst_name, subst_id, ' ', rest));
 							Atom &a = residue->add(new Atom(atom_id, 
@@ -169,6 +169,8 @@ namespace Molib {
 		int coord_index = 1;
 		bool found_molecule = false, found_assembly = false, found_model = false;
 		map<const Model*, map<const int, Atom*>> atom_number_to_atom;
+		Chain *chain = nullptr;
+		Residue *residue = nullptr;
 		for (string &line : pdb_raw) {
 			if ((__hm & PDBreader::skip_hetatm) && line.compare(0, 6, "HETATM") == 0) continue;
 			if (line.compare(0, 4, "ATOM") == 0 || line.compare(0, 6, "HETATM") == 0) {
@@ -204,10 +206,8 @@ namespace Molib {
 							else rest = Residue::hetero;  // if nothing known then hetero...
 							if (!__giant_molecule || rest != Residue::protein || atom_name == "CA") {
 								Model &model = mols.last().last().last();
-								Chain *chain;
 								if (!model.has_chain(chain_id))
 									chain = &model.add(new Chain(chain_id));
-								Residue *residue;
 								if (!chain->has_residue(Residue::res_pair(resi, ins_code)))
 									residue = &chain->add(new Residue(resn, resi, ins_code, rest));
 								Atom &a = residue->add(new Atom(atom_number, 

@@ -1,4 +1,7 @@
 #include "help.hpp"
+#include <string>
+#include <iostream>
+#include <stdio.h>
 
 namespace help {
 
@@ -16,6 +19,21 @@ namespace help {
 		os << "}";
 		//~ os << endl;
 		return os;
+	}
+
+	string memusage(const string &msg) {
+		const string cmd = "ps ax -o rss,command | sort -nr | head -n 10|grep test_link|cut -f1 -d' '";
+	    FILE* pipe = popen(cmd.c_str(), "r");
+	    if (!pipe) return "ERROR";
+	    char buffer[128];
+	    string result = "";
+	    while(!feof(pipe)) {
+	    	if(fgets(buffer, 128, pipe) != NULL)
+	    		result += buffer;
+	    }
+	    pclose(pipe);
+	    cerr << "Memusage:"  << msg << ":" << result << endl;
+	    return result;
 	}
 
 	vector<vector<string>> get_replacement(const vector<string> &initial) {

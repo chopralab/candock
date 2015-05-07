@@ -110,6 +110,8 @@ int main(int argc, char* argv[]) {
 
 		Molib::PDBreader lpdb2(cmdl.ligand_file(), Molib::PDBreader::all_models, 1);
 
+		OMMIface::OMM::loadPlugins();
+		
 		for(int i = 0; i < cmdl.ncpu(); ++i) {
 			threads.push_back(thread([&lpdb2, &receptors, &gridrec, &score, &ffield] () {
 
@@ -118,17 +120,19 @@ int main(int argc, char* argv[]) {
 
 				while (lpdb2.parse_molecule(ligands)) {
 					Molib::Molecule &ligand = ligands.first();
-					//~ OMMIface::ForceField ffield_copy = ffield; // make a local copy of the forcefield
+
 					ffield_copy.insert_topology(ligand);
+					
 					dbgmsg("LINKING LIGAND : " << endl << ligand);
 					try { // if ligand fails docking of others continues...
 
 						// read top seeds for this ligand
 						Molib::NRset top_seeds = common::read_top_seeds_files(ligand,
 							cmdl.top_seeds_file());
-
+						
 						ligand.erase_properties(); // required for graph matching
 						top_seeds.erase_properties(); // required for graph matching
+						
 
 						/* Connect seeds with rotatable linkers, symmetry, optimize 
 						 * seeds with appendices. A graph of segments is constructed in 
@@ -136,6 +140,7 @@ int main(int argc, char* argv[]) {
 						 * part of seeds are identified.
 						 * 
 						 */
+						
 						Molib::Internal ic(ligand.get_atoms());
 						Molib::Linker linker(ligand, top_seeds, gridrec, score, ic, 
 							cmdl.dist_cutoff(), cmdl.spin_degrees(), cmdl.tol_dist(),
@@ -148,16 +153,17 @@ int main(int argc, char* argv[]) {
 
 							inout::output_file(docked, cmdl.docked_ligands_file(), 
 								ios_base::app); // output docked molecule conformations
-	
+
 							/* Cluster docked conformations and take only cluster
 							 * representatives for further minimization
 							 * 
 							 */
+							
 							auto clusters_reps_pair = common::cluster_molecules(docked, score,
 								cmdl.docked_clus_rad(), cmdl.docked_min_pts(), cmdl.docked_max_num_clus());
 							Molib::Molecules docked_representatives; 
 							common::convert_clusters_to_mols(docked_representatives, clusters_reps_pair.second);
-							
+
 							/* Minimize each representative docked ligand conformation
 							 * with full flexibility of both ligand and receptor
 							 * 
@@ -166,7 +172,6 @@ int main(int argc, char* argv[]) {
 							OMMIface::Energies energies;
 	
 							for (auto &docked_ligand : docked_representatives) {
-								//~ cout << "version1" << endl;
 								OMMIface::OMM omm(receptors[0], docked_ligand, ffield_copy, 
 									cmdl.fftype(), cmdl.dist_cutoff());
 								omm.minimize(cmdl.tolerance(), cmdl.max_iterations()); // minimize
@@ -183,11 +188,13 @@ int main(int argc, char* argv[]) {
 								ios_base::app); // output energies of docked & minimized ligands
 						}
 					}
-					catch (Error& e) { cerr << "skipping ligand due to : " << e.what() << endl; } 
+					catch (Error& e) { 
+						cerr << "skipping ligand due to : " << e.what() << endl; 
+					} 
 					catch (out_of_range& e) { 
 						cerr << "skipping ligand due to : " << e.what() << endl; 
 						cerr << "This is the ligand that failed: " << endl << ligands << endl;
-					}
+					}	
 					
 					ffield_copy.erase_topology(ligand); // he he
 					ligands.clear();

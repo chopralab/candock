@@ -34,6 +34,7 @@
 #include "openmm/reference/ReferencePlatform.h"
 #include "openmm/internal/ContextImpl.h"
 #include "openmm/OpenMMException.h"
+#include <iostream>
 
 using namespace KBPlugin;
 using namespace OpenMM;
@@ -42,6 +43,7 @@ extern "C" OPENMM_EXPORT void registerPlatforms() {
 }
 
 extern "C" OPENMM_EXPORT void registerKernelFactories() {
+	//~ std::cout << "register kernel factories num = " << Platform::getNumPlatforms() << std::endl;
     for (int i = 0; i < Platform::getNumPlatforms(); i++) {
         Platform& platform = Platform::getPlatform(i);
         if (dynamic_cast<ReferencePlatform*>(&platform) != NULL) {

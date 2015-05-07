@@ -117,9 +117,6 @@ public:
 		for (int i = cmin.i(); i <= cmax.i(); ++i)
 			for (int j = cmin.j(); j <= cmax.j(); ++j)
 				for (int k = cmin.k(); k <= cmax.k(); ++k) {
-					//~ if (i >= szi) dbgmsg("i = " << i << " szi = " << szi);
-					//~ if (j >= szj) dbgmsg("j = " << j << " szj = " << szj);
-					//~ if (k >= szk) dbgmsg("k = " << k << " szk = " << szk);
 					for (auto neighbor : storage[i][j][k]) {
 						const double d_sq = point.crd().distance_sq(neighbor->crd());
 						if (d_sq < dist_sq) {
@@ -139,7 +136,7 @@ public:
 		const double dist_sq = pow(dist, 2);
 		for (int i = cmin.i(); i <= cmax.i(); ++i)
 			for (int j = cmin.j(); j <= cmax.j(); ++j)
-				for (int k = cmin.k(); k <= cmax.k(); ++k)
+				for (int k = cmin.k(); k <= cmax.k(); ++k) {
 					for (auto neighbor : storage[i][j][k]) {
 						const double d_sq = point.crd().distance_sq(neighbor->crd());
 						if ( d_sq < dist_sq) {
@@ -148,6 +145,7 @@ public:
 							}
 						}
 					}
+				}
 		return false;
 	}
 
@@ -158,7 +156,7 @@ public:
 		Geom3D::Coordinate cmax = __correct(point, dist);
 		for (int i = cmin.i(); i <= cmax.i(); ++i)
 			for (int j = cmin.j(); j <= cmax.j(); ++j)
-				for (int k = cmin.k(); k <= cmax.k(); ++k)
+				for (int k = cmin.k(); k <= cmax.k(); ++k) {
 					for (auto neighbor : storage[i][j][k]) {
 						const double d_sq = point.crd().distance_sq(neighbor->crd());
 						const double vdw2 = help::vdw_radius[neighbor->idatm_type()];
@@ -172,6 +170,7 @@ public:
 							}
 						}
 					}
+				}
 		return false;
 	}
 

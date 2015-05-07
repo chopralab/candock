@@ -250,6 +250,8 @@ int main(int argc, char* argv[]) {
 		Molib::PDBreader lpdb2(cmdl.prep_file(), Molib::PDBreader::all_models, 1);
 		threads.clear();
 
+		OMMIface::OMM::loadPlugins();
+
 		for(int i = 0; i < cmdl.ncpu(); ++i) {
 			threads.push_back(thread([&lpdb2, &receptors, &gridrec, &score, &ffield] () {
 

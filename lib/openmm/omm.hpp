@@ -70,6 +70,7 @@ namespace OMMIface {
 			const Molib::Molecule &receptor, const Molib::Molecule &ligand) const { 
 			return __get_openmm_state(__omm, receptor, ligand);
 		}
+	static void loadPlugins();
 	Components get_energy_components(const Molib::Molecule &receptor, 
 		const Molib::Molecule &ligand, const double cur_dist_cutoff);
 	};

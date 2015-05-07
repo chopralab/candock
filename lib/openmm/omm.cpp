@@ -51,6 +51,17 @@ namespace OMMIface {
 		return ss.str();
 	}
 
+	void OMM::loadPlugins() {
+		// Load all available OpenMM plugins from their default location.
+		
+		dbgmsg("before loading plugins");
+		OpenMM::Platform::loadPluginsFromDirectory
+			(OpenMM::Platform::getDefaultPluginsDirectory());
+		registerKBReferenceKernelFactories();
+		dbgmsg("after loading plugins");
+		
+	}
+
 	OMM::OMM(const Molib::Molecule &receptor, const Molib::Molecule &ligand,
 		const ForceField &ff, const string &fftype, const double dist_cutoff, 
 		const bool use_constraints, const double step_size_in_fs) : 
@@ -60,11 +71,12 @@ namespace OMMIface {
 
 		try {
 			//~ cout << "calling constructor of OMM for molecule " << __ligand.name() << endl;
-			// Init Coords, Bonds, Angles, Torsions...
+			// Init Coords, Bonds, Angles, Torsions...			
 			MoleculeInfo mol_info;
 			mol_info.get_molecule_info(receptor, __ffield)
 				.get_molecule_info(ligand, __ffield)
 				.get_kb_force_info(receptor, ligand, dist_cutoff);				
+			
 			// Set up OpenMM data structures; returns OpenMM Platform name.
 			__initialize_openmm(__omm, mol_info, OMMIface::torsional|OMMIface::non_bond); 
 		} catch(...) {
@@ -81,35 +93,30 @@ namespace OMMIface {
 		int warn = 0;
 		
 		dbgmsg("initializing openmm");
-		// Load all available OpenMM plugins from their default location.
-		OpenMM::Platform::loadPluginsFromDirectory
-			(OpenMM::Platform::getDefaultPluginsDirectory());
-		registerKBReferenceKernelFactories();
-		dbgmsg("after loading plugins");
+		
+		//~ // Load all available OpenMM plugins from their default location.
+		//~ OpenMM::Platform::loadPluginsFromDirectory
+			//~ (OpenMM::Platform::getDefaultPluginsDirectory());
+		//~ registerKBReferenceKernelFactories();
+		//~ dbgmsg("after loading plugins");
+		const bool nb = ((ene_opts & OMMIface::non_bond) && __fftype == "phy");
+		const bool kb = ((ene_opts & OMMIface::non_bond) && __fftype == "kb");
+		const bool tor = (ene_opts & OMMIface::torsional);
 		// Allocate space to hold OpenMM objects while we're using them.
 		// Create a System and Force objects within the System. Retain a reference
 		// to each force object so we can fill in the forces. Note: the System owns
 		// the force objects and will take care of deleting them; don't do it yourself!
 		OpenMM::System&                 system      = *(omm->system = new OpenMM::System());
-		OpenMM::NonbondedForce&         nonbond     = *new OpenMM::NonbondedForce();
-		OpenMM::HarmonicBondForce&      bondStretch = *new OpenMM::HarmonicBondForce();
-		OpenMM::HarmonicAngleForce&     bondBend    = *new OpenMM::HarmonicAngleForce();
-		OpenMM::PeriodicTorsionForce&   bondTorsion = *new OpenMM::PeriodicTorsionForce();
-		KBPlugin::KBForce&			    kbforce     = *new KBPlugin::KBForce();
-		if (ene_opts & OMMIface::non_bond) {
-			if (__fftype == "phy") {
-				delete &kbforce;
-				system.addForce(&nonbond);
-			} else {
-				delete &nonbond;
-				system.addForce(&kbforce);
-			}
-		}
-		if (ene_opts & OMMIface::torsional) {
-			system.addForce(&bondStretch);
-			system.addForce(&bondBend);
-			system.addForce(&bondTorsion);
-		}
+		OpenMM::NonbondedForce*         nonbond     = (nb ? new OpenMM::NonbondedForce() : nullptr);
+		OpenMM::HarmonicBondForce*      bondStretch = (tor ? new OpenMM::HarmonicBondForce() : nullptr);
+		OpenMM::HarmonicAngleForce*     bondBend    = (tor ? new OpenMM::HarmonicAngleForce() : nullptr);
+		OpenMM::PeriodicTorsionForce*   bondTorsion = (tor ? new OpenMM::PeriodicTorsionForce() : nullptr);
+		KBPlugin::KBForce*			    kbforce     = (kb ? new KBPlugin::KBForce() : nullptr);
+ 		if (nonbond) system.addForce(nonbond);
+		if (kbforce) system.addForce(kbforce);
+		if (bondStretch) system.addForce(bondStretch);
+		if (bondBend) system.addForce(bondBend);
+		if (bondTorsion) system.addForce(bondTorsion);
 		// Specify the atoms and their properties:
 		//  (1) System needs to know the masses.
 		//  (2) NonbondedForce needs charges,van der Waals properties (in MD units!).
@@ -124,8 +131,9 @@ namespace OMMIface {
 			try {
 				const ForceField::AtomType& atype = __ffield.get_atom_type(type);
 				system.addParticle(atype.mass);
-				if (__fftype == "phy")
-					nonbond.addParticle(atype.charge, atype.sigma, atype.epsilon);
+				
+				if (nonbond) nonbond->addParticle(atype.charge, atype.sigma, atype.epsilon);
+
 				dbgmsg("add particle type = " << type << " crd = " << atom.crd() << " mass = " 
 					<< atype.mass << " charge = " << atype.charge << " sigma = " << atype.sigma
 					<< " epsilon = " << atype.epsilon << " representing atom = "
@@ -166,7 +174,7 @@ namespace OMMIface {
 					// Note factor of 2 for stiffness below because Amber specifies the constant
 					// as it is used in the harmonic energy term kx^2 with force 2kx; OpenMM wants 
 					// it as used in the force term kx, with energy kx^2/2.
-					bondStretch.addBond(idx1, idx2, btype.length, btype.k);
+					if (bondStretch) bondStretch->addBond(idx1, idx2, btype.length, btype.k);
 				}
 				bondPairs.push_back({idx1, idx2});
 			} catch (ParameterError& e) {
@@ -175,8 +183,8 @@ namespace OMMIface {
 		}
 		dbgmsg("checkpoint3");
 		// Exclude 1-2, 1-3 bonded atoms from nonbonded forces, and scale down 1-4 bonded atoms.
-		if (__fftype == "phy")
-			nonbond.createExceptionsFromBonds(bondPairs, __ffield.coulomb14scale, __ffield.lj14scale);
+		if (nonbond)
+			nonbond->createExceptionsFromBonds(bondPairs, __ffield.coulomb14scale, __ffield.lj14scale);
 		// Create the 1-2-3 bond angle harmonic terms.
 		for (auto &angle : mol_info.angle) {
 			dbgmsg("checkpoint4");
@@ -196,7 +204,7 @@ namespace OMMIface {
 					<< atom1 << endl << atom2 << endl << atom3);
 				const ForceField::AngleType& atype = 
 					__ffield.get_angle_type(type1, type2, type3);
-				bondBend.addAngle(idx1, idx2, idx3, atype.angle, atype.k);
+				if (bondBend) bondBend->addAngle(idx1, idx2, idx3, atype.angle, atype.k);
 			} catch (ParameterError& e) {
 				cerr << e.what() << " (" << ++warn << ")" << endl;
 			}
@@ -221,10 +229,11 @@ namespace OMMIface {
 				const ForceField::TorsionTypeVec& v_ttype = 
 					__ffield.get_dihedral_type(type1, type2, type3, type4); // cannot make it const ??
 				for (auto &ttype : v_ttype) {
-					bondTorsion.addTorsion(idx1, idx2, idx3, idx4, 
-									ttype.periodicity, 
-									ttype.phase,
-									ttype.k);
+					if (bondTorsion)
+						bondTorsion->addTorsion(idx1, idx2, idx3, idx4, 
+							ttype.periodicity, 
+							ttype.phase,
+							ttype.k);
 				}
 			} catch (ParameterError& e) {
 				cerr << e.what() << " (" << ++warn << ")" << endl;
@@ -249,19 +258,20 @@ namespace OMMIface {
 				const ForceField::TorsionTypeVec& v_ttype = 
 					__ffield.get_improper_type(type1, type2, type3, type4); // cannot make it const ??
 				for (auto &ttype : v_ttype) {
-					bondTorsion.addTorsion(idx1, idx2, idx3, idx4, 
-									ttype.periodicity, 
-									ttype.phase,
-									ttype.k);
+					if (bondTorsion)
+						bondTorsion->addTorsion(idx1, idx2, idx3, idx4, 
+							ttype.periodicity, 
+							ttype.phase,
+							ttype.k);
 				}
 			} catch (ParameterError& e) {
 				dbgmsg(e.what() << " (WARNINGS ARE NOT INCREASED)");
 			}
 		}
 		// Create the knowledge-based forcefield terms.
-		if (__fftype == "kb") {
-			kbforce.setStep(__ffield.step);
-			kbforce.setScale(__ffield.scale);
+		if (kbforce) {
+			kbforce->setStep(__ffield.step);
+			kbforce->setScale(__ffield.scale);
 			dbgmsg("kbforce scale = " << __ffield.scale 
 				<< " step = " << __ffield.step);
 			for (auto &bond : mol_info.kbforce) {
@@ -274,7 +284,7 @@ namespace OMMIface {
 				try {
 					const ForceField::KBType& kbtype = 
 						__ffield.get_kb_force_type(atom1, atom2, type1, type2);
-					kbforce.addBond(idx1, idx2, 
+					kbforce->addBond(idx1, idx2, 
 						const_cast<vector<double>&>(kbtype.potential), 
 						const_cast<vector<double>&>(kbtype.derivative));
 				} catch (ParameterError& e) {
@@ -289,8 +299,7 @@ namespace OMMIface {
 		omm->integrator = new OpenMM::VerletIntegrator(__step_size_in_fs * OpenMM::PsPerFs);
 		omm->context    = new OpenMM::Context(*omm->system, *omm->integrator);
 		omm->context->setPositions(initialPosInNm);
-		dbgmsg("REMARK  Using OpenMM platform "
-			<< omm->context->getPlatform().getName());
+		dbgmsg("REMARK  Using OpenMM platform "	<< omm->context->getPlatform().getName());
 		if (warn > 0) {
 			throw Error("die : missing parameters detected for molecule "
 				+ __ligand.name());
@@ -328,12 +337,14 @@ namespace OMMIface {
 		 * 
 		 */
 		int infoMask = 0;
+		
 		//~ infoMask += OpenMM::State::Velocities; // for kinetic energy (cheap)
 		infoMask += OpenMM::State::Energy;     // for pot. energy (expensive)
 		const OpenMM::State state = omm->context->getState(infoMask);
 		double time_in_ps = state.getTime(); // OpenMM time is in ps already
 		double energy_in_kcal = (state.getPotentialEnergy() + state.getKineticEnergy())
 						* OpenMM::KcalPerKJ;
+		
 		return energy_in_kcal;
 	}
 	void OMM::md(const double simulation_time_in_ps, 
@@ -375,24 +386,24 @@ namespace OMMIface {
 		MoleculeInfo receptor_info;					
 		receptor_info.get_molecule_info(receptor, __ffield)
 			.get_kb_force_info(receptor, Molib::Molecule("dummy"), cur_dist_cutoff);
-
+		
 		dbgmsg("after moleculeinfo");
 		MyOpenMMData omm_tot, omm_ie, omm_lie, omm_lte, omm_rie, omm_rte;
 		__initialize_openmm(&omm_tot, complex_info, OMMIface::non_bond|OMMIface::torsional); 
 		double total_energy = __get_openmm_energy(&omm_tot);
-
+		
 		__initialize_openmm(&omm_ie, interaction_info, OMMIface::non_bond); 
 		double interaction_energy = __get_openmm_energy(&omm_ie);
-
+		
 		__initialize_openmm(&omm_lie, ligand_info, OMMIface::non_bond); 
 		double ligand_internal_energy = __get_openmm_energy(&omm_lie);
-
+		
 		__initialize_openmm(&omm_lte, ligand_info, OMMIface::torsional); 
 		double ligand_torsional_energy = __get_openmm_energy(&omm_lte);
-
+		
 		__initialize_openmm(&omm_rie, receptor_info, OMMIface::non_bond); 
 		double receptor_internal_energy = __get_openmm_energy(&omm_rie);
-
+		
 		__initialize_openmm(&omm_rte, receptor_info, OMMIface::torsional); 
 		double receptor_torsional_energy = __get_openmm_energy(&omm_rte);
 		

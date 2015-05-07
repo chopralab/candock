@@ -381,6 +381,7 @@ public:
 	int max_seeds_to_cluster() const { return __max_seeds_to_cluster; }
 	int num_iter() const { return __num_iter; }
 	int ncpu() const { return __ncpu; }
+	//~ int program_name() const { return __program_name; }
 	
 	friend ostream& operator<< (ostream& stream, const CmdLnOpts &cmdl) {
 		unsigned int n = thread::hardware_concurrency();

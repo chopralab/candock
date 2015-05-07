@@ -657,6 +657,7 @@ namespace Molib {
 		} else {
 			auto pos = __find_compatible_state_pairs(seed_graph);
 			auto all_possibles = __grow_possibles(pos);
+			
 			cout << "Report for possible conformations of ligand " 
 				<< __ligand.name() << " : " << endl 
 				<< "# of 2-state conformations : " << all_possibles[0].size() << endl 
@@ -682,6 +683,7 @@ namespace Molib {
 			for (auto &pstate : conformation) energy += pstate->get_energy();
 			possibles_w_energy.push_back({conformation, energy});
 		}
+		
 		sort(possibles_w_energy.begin(), possibles_w_energy.end(), 
 			[] (const LinkEnergy &i, const LinkEnergy &j) { 
 			return i.second < j.second;	});
@@ -714,6 +716,7 @@ namespace Molib {
 	Molecules Linker::connect() {
 		Benchmark::reset();
 		cout << "Starting connection of seeds for ligand " << __ligand.name() << endl;
+		
 		SegGraph segment_graph = __create_segment_graph(__ligand);
 		if (!segment_graph.find_cycles_connected_graph().empty()) {
 			throw Error("die : cyclic molecules are currently not supported");
@@ -725,8 +728,10 @@ namespace Molib {
 		__set_branching_rules(paths);
 		const SeedGraph seed_graph = __create_seed_graph(segment_graph, paths);
 		dbgmsg("seed graph for ligand " << __ligand.name() << " = " << seed_graph);
+		
 		Conformations good_conformations = __connect(segment_graph.size(), 
 			__find_possible_states(seed_graph));
+		
 		cout << "Connection of seeds for ligand " << __ligand.name() 
 			<< " resulted in " << good_conformations.size() 
 			<< " conformations and took " 

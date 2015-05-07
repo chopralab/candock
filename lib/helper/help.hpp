@@ -12,6 +12,7 @@
 using namespace std;
 
 namespace help {
+	string memusage(const string&);
 	struct edge { 
 		string atom_property1;
 		string atom_property2;

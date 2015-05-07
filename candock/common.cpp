@@ -79,14 +79,16 @@ namespace common {
 	pair<cluster::Clusters<Molib::Molecule>, cluster::Clusters<Molib::Molecule>>
 		cluster_molecules(const Molib::Molecules &mols,	const Molib::Score &score, 
 		const double clus_rad, const int min_pts, const int max_num_clus, const int max_mols_to_cluster) {
-
+		
 		// if only one molecule, just return it ... (cluster algorithm
 		// requires at least two molecules due to pairwise_distances)
 		if (mols.size() == 1)
 			return make_pair(cluster::Clusters<Molib::Molecule> {{1, &mols.first()}},
 				cluster::Clusters<Molib::Molecule> {{1, &mols.first()}});
+		
 		cluster::MapD<Molib::Molecule> scores = 
 			score.many_ligands_score(mols);
+		
 		dbgmsg(scores);
 		vector<Molib::Molecule*> mols_to_cluster;
 		set<double> top_scores;
@@ -98,11 +100,14 @@ namespace common {
 				mols_to_cluster.push_back(&molecule);
 			}
 		}
+		
 		cluster::PairwiseDistances<Molib::Molecule> pairwise_distances = 
 			common::all_all_rmsd(mols_to_cluster, clus_rad);
+		
 		dbgmsg(pairwise_distances);
 		cluster::Optics<Molib::Molecule, std::less<double>, std::greater<double>> optics(
 			pairwise_distances, scores, clus_rad + 0.1, min_pts);
+		
 		return optics.extract_dbscan(clus_rad, max_num_clus, true);
 	}
 
