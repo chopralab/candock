@@ -102,6 +102,8 @@ int main(int argc, char* argv[]) {
 			inout::output_file(gridpoints.back(), cmdl.gridpdb_hcp_file(), ios_base::app);
 		}
 
+		vector<thread> threads;
+		mutex mtx;
 		/* Read ligands from the ligands file - this file may contain millions
 		 * of ligands, and we read only a few at one time, to save memory
 		 * 
@@ -109,27 +111,37 @@ int main(int argc, char* argv[]) {
 		Molib::Molecules seeds;
 		set<string> added;
 		set<int> ligand_idatm_types;
-		Molib::Molecules ligands;
-		while(lpdb.parse_molecule(ligands)) {
-			// Compute properties, such as idatm atom types, fragments, seeds,
-			// rotatable bonds etc.
-			ligands.compute_idatm_type()
-				.compute_hydrogen()
-				.compute_bond_order()
-				.compute_bond_gaff_type()
-				.refine_idatm_type()
-				.erase_hydrogen()  // needed because refine changes connectivities
-				.compute_hydrogen()   // needed because refine changes connectivities
-				.compute_ring_type()
-				.compute_gaff_type()
-				.compute_rotatable_bonds() // relies on hydrogens being assigned
-				.erase_hydrogen()
-				.compute_overlapping_rigid_segments()
-				.compute_seeds(cmdl.seeds_file());
-			ligand_idatm_types = Molib::get_idatm_types(ligands, ligand_idatm_types);
-			common::create_mols_from_seeds(added, seeds, ligands);
-			inout::output_file(ligands, cmdl.prep_file(), ios_base::app);
-			ligands.clear();
+		for(int i = 0; i < cmdl.ncpu(); ++i) {
+			threads.push_back(thread([&lpdb, &seeds, &added, &ligand_idatm_types, &mtx] () {
+				Molib::Molecules ligands;
+				while(lpdb.parse_molecule(ligands)) {
+					// Compute properties, such as idatm atom types, fragments, seeds,
+					// rotatable bonds etc.
+					ligands.compute_idatm_type()
+						.compute_hydrogen()
+						.compute_bond_order()
+						.compute_bond_gaff_type()
+						.refine_idatm_type()
+						.erase_hydrogen()  // needed because refine changes connectivities
+						.compute_hydrogen()   // needed because refine changes connectivities
+						.compute_ring_type()
+						.compute_gaff_type()
+						.compute_rotatable_bonds() // relies on hydrogens being assigned
+						.erase_hydrogen()
+						.compute_overlapping_rigid_segments();
+					{
+						lock_guard<std::mutex> guard(mtx);
+						ligands.compute_seeds(cmdl.seeds_file());
+						ligand_idatm_types = Molib::get_idatm_types(ligands, ligand_idatm_types);
+						common::create_mols_from_seeds(added, seeds, ligands);
+					}
+					inout::output_file(ligands, cmdl.prep_file(), ios_base::app);
+					ligands.clear();
+				}
+			}));
+		}
+		for(auto& thread : threads) {
+			thread.join();
 		}
 		dbgmsg(seeds);
 
@@ -179,16 +191,13 @@ int main(int argc, char* argv[]) {
 			 */
 		}
 
-		vector<thread> threads;
-		threads.clear();
-
 		/* Main loop A with threading support : dock seeds with maximum 
 		 * weight clique algorithm to the binding site and filter docked
 		 * seeds that clash with the receptor (in the future we could 
 		 * give more/less weight to more/less frequent seeds)
 		 * 
 		 */
-
+		threads.clear();
 		for(int i = 0; i < cmdl.ncpu(); ++i) {
 			threads.push_back(
 				thread([&seeds, &gridrec, &score, &hcp_vec, i] () {
@@ -248,10 +257,9 @@ int main(int argc, char* argv[]) {
 		 * 
 		 */
 		Molib::PDBreader lpdb2(cmdl.prep_file(), Molib::PDBreader::all_models, 1);
-		threads.clear();
-
 		OMMIface::OMM::loadPlugins();
 
+		threads.clear();
 		for(int i = 0; i < cmdl.ncpu(); ++i) {
 			threads.push_back(thread([&lpdb2, &receptors, &gridrec, &score, &ffield] () {
 

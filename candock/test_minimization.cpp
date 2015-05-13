@@ -66,7 +66,6 @@ int main(int argc, char* argv[]) {
 
 		Molib::Molecules ligands = lpdb.parse_molecule();
 
-		
 		set<int> ligand_idatm_types;
 		ligand_idatm_types = Molib::get_idatm_types(ligands, ligand_idatm_types);
 
@@ -75,6 +74,7 @@ int main(int argc, char* argv[]) {
 			gridrec, cmdl.ref_state(), cmdl.comp(), cmdl.rad_or_raw(), 
 			cmdl.dist_cutoff(), cmdl.distributions_file(), cmdl.step_non_bond());
 
+		dbgmsg("out of score");
 		/* Forcefield stuff : create forcefield for small molecules (and KB 
 		 * non-bonded with receptor) and read receptor's forcefield xml file(s) into 
 		 * forcefield object
@@ -87,6 +87,8 @@ int main(int argc, char* argv[]) {
 
 	
 		receptors[0].prepare_for_mm(ffield, gridrec);
+
+		OMMIface::OMM::loadPlugins();
 
 		for (auto &ligand : ligands) {
 			ffield.insert_topology(ligand);

@@ -21,18 +21,24 @@ namespace inout {
 		static void __mkdir(const string&);
 	public:
 		enum f_not_found {panic=0, no_panic=1};
-		static streampos read_file(const string &name, vector<string>&, 
-			f_not_found=panic, const streampos &pos=0, const int num_occur=-1, 
+		static void read_file(const string &name, vector<string>&, 
+			f_not_found=panic, const int num_occur=-1, 
 			const string &pattern=""); // throws Error
-		static streampos read_file(const string &name, string&, 
-			f_not_found=panic, const streampos &pos=0, const int num_occur=-1, 
+		static void read_file(const string &name, string&, 
+			f_not_found=panic, const int num_occur=-1, 
+			const string &pattern=""); // throws Error
+		static void read_file(const string &name, vector<string>&, 
+			streampos &pos_in_file, f_not_found=panic, const int num_occur=-1, 
+			const string &pattern=""); // throws Error
+		static void read_file(const string &name, string&, 
+			streampos &pos_in_file, f_not_found=panic, const int num_occur=-1, 
 			const string &pattern=""); // throws Error
 		static void file_open_put_contents(const string &name, 
 			const vector<string> &v, ios_base::openmode=ios_base::out);
 		static void file_open_put_stream(const string &name, 
 			const stringstream &ss, ios_base::openmode=ios_base::out);
 		static vector<string> files_matching_pattern(const string&, const string&);
-	};	
+	};
 	template<class T>
 	void output_file(T &anything, const string &filename, ios_base::openmode mode=ios_base::out) {
 		stringstream ss;

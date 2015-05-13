@@ -73,8 +73,8 @@ namespace Molib {
 	}
 	void PDBreader::Mol2Parser::parse_molecule(Molecules &mols) {
 		vector<string> mol2_raw;
-		__pos = inout::Inout::read_file(__molecule_file, mol2_raw, 
-			inout::Inout::panic, __pos, __num_occur, "@<TRIPOS>MOLECULE");
+		inout::Inout::read_file(__molecule_file, mol2_raw, __pos,
+			inout::Inout::panic, __num_occur, "@<TRIPOS>MOLECULE");
 		bool found_molecule = false, found_assembly = false, found_model = false;
 		map<const Model*, map<const int, Atom*>> atom_number_to_atom;
 		for (int i = 0; i < mol2_raw.size(); ++i) {
@@ -161,8 +161,8 @@ namespace Molib {
 	}
 	void PDBreader::PdbParser::parse_molecule(Molecules &mols) {
 		vector<string> pdb_raw;
-		__pos = inout::Inout::read_file(__molecule_file, pdb_raw, inout::Inout::panic, 
-			__pos, __num_occur, "REMARK   5 END");
+		inout::Inout::read_file(__molecule_file, pdb_raw, __pos,
+			inout::Inout::panic, __num_occur, "REMARK   5 END");
 		boost::smatch m;
 		set<char> bio_chain;
 		int biomolecule_number = -1;

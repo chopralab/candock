@@ -177,7 +177,7 @@ public:
 			TCLAP::ValueArg<string> top_seeds_fileArg("","topseedsfile","Top seeds \
 				output file",false,"top_seeds.pdb","string", cmd);
 
-			TCLAP::ValueArg<int> max_num_ligandsArg("","max_num_ligands","Maximum number of ligands to read in one chunk (default is 1000)",false,1000,"int", cmd);
+			TCLAP::ValueArg<int> max_num_ligandsArg("","max_num_ligands","Maximum number of ligands to read in one chunk (default is 10)",false,10,"int", cmd);
 
 			TCLAP::ValueArg<string> gaff_dat_fileArg("","gaff_dat","Gaff DAT forcefield input file",false,"data/gaff.dat","string", cmd);
 			TCLAP::ValueArg<string> gaff_xml_fileArg("","gaff_xml","Gaff XML forcefield and ligand topology output file",false,"gaff.xml","string", cmd);

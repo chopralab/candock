@@ -259,6 +259,7 @@ namespace OMMIface {
 	ForceField& ForceField::parse_gaff_dat_file(const string &gaff_dat_file) {
 		boost::smatch m;
 		vector<string> gdf;
+		dbgmsg("reading gaff file = " << gaff_dat_file);
 		inout::Inout::read_file(gaff_dat_file, gdf);
 		bool non_bonded = false;
 		int semaphore = 0;

@@ -7,8 +7,10 @@
 #include <boost/algorithm/string/join.hpp>
 #include "error.hpp"
 #include "inout.hpp"
+#include "debug.hpp"
 
 namespace inout {
+
 	void Inout::__mkdir(const string &dir_path) {
 		// makes a path "janez/aska/mia from e.g. "janez/aska/mia/test.txt"
 		boost::filesystem::path dir(dir_path);
@@ -30,32 +32,45 @@ namespace inout {
 	    if (close(fd)==-1) {
 	    }
 	}
-	streampos Inout::read_file(const string &name, string &s, 
-		f_not_found w, const streampos &pos, const int num_occur, const string &pattern) {
-		vector<string> vs;
-		streampos p = read_file(name, vs, w, pos, num_occur, pattern);
-		s = boost::algorithm::join(vs, "\n");
-		return p;
+	void Inout::read_file(const string &name, string &s, f_not_found w, 
+		const int num_occur, const string &pattern) {
+		streampos pos_in_file = 0;
+		read_file(name, s, pos_in_file, w, num_occur, pattern);
 	}
-	streampos Inout::read_file(const string &name, vector<string> &s, 
-		f_not_found w, const streampos &pos, const int num_occur, const string &pattern) {
+	void Inout::read_file(const string &name, vector<string> &s,
+		f_not_found w, const int num_occur, const string &pattern) {
+		streampos pos_in_file = 0;
+		read_file(name, s, pos_in_file, w, num_occur, pattern);
+	}
+	void Inout::read_file(const string &name, string &s, streampos &pos_in_file, 
+		f_not_found w, const int num_occur, const string &pattern) {
+		vector<string> vs;
+		read_file(name, vs, pos_in_file, w, num_occur, pattern);
+		s = boost::algorithm::join(vs, "\n");
+	}
+	void Inout::read_file(const string &name, vector<string> &s, streampos &pos_in_file, 
+		f_not_found w, const int num_occur, const string &pattern) {
+		dbgmsg(pos_in_file);
 		int fd = __lock(name);
 		ifstream in(name);
 		if (!in.is_open() && w == panic) {
 			__unlock(fd);
 			throw Error("Cannot read " + name);
 		}
-		in.seekg(pos);
+		in.seekg(pos_in_file);
 		string line;
 		int i = 0;
+		streampos pos = in.tellg();
 		while (getline(in, line)) {
-			if (num_occur != -1 && (line == pattern && ++i == num_occur)) break;
+			if (num_occur != -1 && (line == pattern && ++i == num_occur))
+				break;
+			else
+				pos = in.tellg();
 			s.push_back(line);
 		}
-		streampos last_pos = in.tellg();
+		pos_in_file = pos;
 		in.close();
 		__unlock(fd);
-		return last_pos;
 	}	
 
 	void Inout::file_open_put_contents(const string &name, 
