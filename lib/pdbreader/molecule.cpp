@@ -59,7 +59,7 @@ namespace Molib {
 		for (auto &model : assembly)
 		for (auto &chain : model) {
 			for (auto &residue : chain) {
-				if (residue.resn() == "HSD") residue.set_resn("HIS");
+				if (residue.resn() == "HIP") residue.set_resn("HIS");
 				if (residue.resn() == "CYX") residue.set_resn("CYS");
 				if (residue.resn().size() == 4) residue.set_resn(residue.resn().substr(1)); // NALA -> ALA
 			}
@@ -88,7 +88,7 @@ namespace Molib {
 		for (auto &model : assembly)
 		for (auto &chain : model)
 		for (auto &residue : chain) {
-			if (residue.resn() == "HIS") residue.set_resn("HID");
+			if (residue.resn() == "HIS") residue.set_resn("HIP");
 			for (auto &atom : residue) {
 				if (atom.atom_name() == "OXT") { // not foolproof, sometimes OXT is missing !!!
 					residue.set_resn("C" + residue.resn()); // last residue is renamed to CALA, CGLY,...

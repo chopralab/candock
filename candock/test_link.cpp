@@ -10,7 +10,6 @@
 #include "helper/error.hpp"
 #include "pdbreader/grid.hpp"
 #include "pdbreader/molecule.hpp"
-//~ #include "pdbreader/idatm.hpp"
 #include "pdbreader/pdbreader.hpp"
 #include "openmm/forcefield.hpp"
 #include "openmm/moleculeinfo.hpp"
@@ -122,7 +121,6 @@ int main(int argc, char* argv[]) {
 					Molib::Molecule &ligand = ligands.first();
 
 					ffield_copy.insert_topology(ligand);
-					
 					dbgmsg("LINKING LIGAND : " << endl << ligand);
 					try { // if ligand fails docking of others continues...
 
@@ -165,7 +163,7 @@ int main(int argc, char* argv[]) {
 							common::convert_clusters_to_mols(docked_representatives, clusters_reps_pair.second);
 
 							/* Minimize each representative docked ligand conformation
-							 * with full flexibility of both ligand and receptor
+							* with full flexibility of both ligand and receptor
 							 * 
 							 */
 							Molib::Molecules mini;

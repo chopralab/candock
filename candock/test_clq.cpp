@@ -10,7 +10,6 @@
 #include "helper/error.hpp"
 #include "pdbreader/grid.hpp"
 #include "pdbreader/molecule.hpp"
-//~ #include "pdbreader/idatm.hpp"
 #include "pdbreader/pdbreader.hpp"
 #include "openmm/forcefield.hpp"
 #include "openmm/moleculeinfo.hpp"

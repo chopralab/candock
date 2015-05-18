@@ -10,7 +10,6 @@
 #include "helper/error.hpp"
 #include "pdbreader/grid.hpp"
 #include "pdbreader/molecule.hpp"
-//~ #include "pdbreader/idatm.hpp"
 #include "pdbreader/pdbreader.hpp"
 #include "openmm/forcefield.hpp"
 #include "openmm/moleculeinfo.hpp"
@@ -36,7 +35,7 @@ int main(int argc, char* argv[]) {
 		inout::output_file("", cmdl.mini_ligands_file()); // output docked & minimized ligands conformations
 
 		Molib::PDBreader rpdb(cmdl.receptor_file(), 
-			Molib::PDBreader::first_model|Molib::PDBreader::skip_hetatm);
+			Molib::PDBreader::first_model|Molib::PDBreader::skip_hetatm|Molib::PDBreader::hydrogens);
 		Molib::Molecules receptors = rpdb.parse_molecule();
 
 		// if empty, add dummy receptor
@@ -59,12 +58,14 @@ int main(int argc, char* argv[]) {
 		/* Create receptor grid
 		 * 
 		 */
-		//~ Molib::MolGrid gridrec(receptors[0].get_atoms(cmdl.receptor_chain_id(), 
-			//~ Molib::Residue::protein));
 		Molib::MolGrid gridrec(receptors[0].get_atoms());
 		
 
 		Molib::Molecules ligands = lpdb.parse_molecule();
+
+		// if empty, add dummy receptor
+		if (ligands.empty())
+			ligands.add(new Molib::Molecule("dummy"));
 
 		set<int> ligand_idatm_types;
 		ligand_idatm_types = Molib::get_idatm_types(ligands, ligand_idatm_types);
@@ -74,7 +75,6 @@ int main(int argc, char* argv[]) {
 			gridrec, cmdl.ref_state(), cmdl.comp(), cmdl.rad_or_raw(), 
 			cmdl.dist_cutoff(), cmdl.distributions_file(), cmdl.step_non_bond());
 
-		dbgmsg("out of score");
 		/* Forcefield stuff : create forcefield for small molecules (and KB 
 		 * non-bonded with receptor) and read receptor's forcefield xml file(s) into 
 		 * forcefield object

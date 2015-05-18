@@ -59,11 +59,11 @@ namespace OMMIface {
 		}
 		void minimize(double tolerance, int max_iterations) {
 			Benchmark::reset();
-			cout << "Doing energy minimization ..." << endl;
+			cout << "Doing energy minimization of ligand " << __ligand.name() << endl;
 			OpenMM::LocalEnergyMinimizer::minimize(*__omm->context, 
 										tolerance, max_iterations);
-			cout << "time to minimize took " << Benchmark::seconds_from_start() 
-				<< " wallclock seconds" << endl;
+			cout << "time to minimize ligand " << __ligand.name() << " took " 
+				<< Benchmark::seconds_from_start() << " wallclock seconds" << endl;
 		}
 		void md(const double=100, const double=10, const bool=false) const;
 		pair<Molib::Molecule, Molib::Molecule> get_state(

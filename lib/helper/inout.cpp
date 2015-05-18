@@ -62,9 +62,10 @@ namespace inout {
 		int i = 0;
 		streampos pos = in.tellg();
 		while (getline(in, line)) {
-			if (num_occur != -1 && (line == pattern && ++i == num_occur))
+			if (num_occur != -1 && (line.find(pattern) != string::npos && i++ == num_occur)) {
+				dbgmsg("breaking on line = " << line);
 				break;
-			else
+			} else
 				pos = in.tellg();
 			s.push_back(line);
 		}

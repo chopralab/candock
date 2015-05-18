@@ -182,9 +182,9 @@ public:
 			TCLAP::ValueArg<string> gaff_dat_fileArg("","gaff_dat","Gaff DAT forcefield input file",false,"data/gaff.dat","string", cmd);
 			TCLAP::ValueArg<string> gaff_xml_fileArg("","gaff_xml","Gaff XML forcefield and ligand topology output file",false,"gaff.xml","string", cmd);
 
-			vector<int> allowedSpinDegrees{5,10,15,20,30};
+			vector<int> allowedSpinDegrees{5,10,15,20,30,60};
 			TCLAP::ValuesConstraint<int> allowedValsSpinDegrees( allowedSpinDegrees );
-			TCLAP::ValueArg<int> spin_degreesArg("","spin","Spin degrees to rotate ligand (default 15)",false,15,&allowedValsSpinDegrees, cmd);
+			TCLAP::ValueArg<int> spin_degreesArg("","spin","Spin degrees to rotate ligand (default 30)",false,30,&allowedValsSpinDegrees, cmd);
 			TCLAP::ValueArg<double> tol_distArg("","tol_dist","Allowed distance between last path- and goal- state in linker (default is 3.0)",false,3.0,"double", cmd);
 
 			TCLAP::ValueArg<double> tol_max_coeffArg("","tol_max_coeff","Multiply maximum linker length (upper bound) (default is 1.3)",false,1.3,"double", cmd);

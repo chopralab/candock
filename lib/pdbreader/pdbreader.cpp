@@ -162,7 +162,8 @@ namespace Molib {
 	void PDBreader::PdbParser::parse_molecule(Molecules &mols) {
 		vector<string> pdb_raw;
 		inout::Inout::read_file(__molecule_file, pdb_raw, __pos,
-			inout::Inout::panic, __num_occur, "REMARK   5 END");
+			//~ inout::Inout::panic, __num_occur, "REMARK   5 END");
+			inout::Inout::panic, __num_occur, "REMARK   5 MOLECULE");
 		boost::smatch m;
 		set<char> bio_chain;
 		int biomolecule_number = -1;
