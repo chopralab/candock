@@ -22,14 +22,15 @@ namespace Molib {
 			auto atom_pair = minmax(atom_1, ligand_atom_type);
 			const int index = __get_index(dist);
 #ifndef NDEBUG
-			dbgmsg("atom pairs = " << atom_pair.first << " " 
-				<< atom_pair.second << " index = " << index
-				<< " dist = " << dist << " __energies.at(atom_pair).size() = " 
-				<< __energies.at(atom_pair).size());
 			if (!__energies.count(atom_pair))
 				throw Error("undefined atom_pair in __energies");
 			if (index >= __energies.at(atom_pair).size())
 				throw Error("undefined index in __energies");
+			dbgmsg("atom pairs = " << help::idatm_unmask[atom_pair.first] << " " 
+				<< help::idatm_unmask[atom_pair.second] << " index = " << index
+				<< " dist = " << dist << " __energies.at(atom_pair).size() = " 
+				<< __energies.at(atom_pair).size() << " partial energy = "
+				<< __energies[atom_pair][index]);
 #endif
 			energy_sum += __energies[atom_pair][index];
 		}
@@ -182,9 +183,15 @@ namespace Molib {
 			dbgmsg("raw energies before interpolations : " << endl << energy);
 			// correct for outliers
 			for (int i = 0; i < energy.size() - 2; ++i) {
-				if (energy[i] != -HUGE_VAL && energy[i + 1] == -HUGE_VAL
-					&& energy[i + 2] != -HUGE_VAL) {
-					energy[i + 1] = (energy[i] + energy[i + 2]) / 2;
+				if (energy[i] != -HUGE_VAL) {
+					int j = i + 1;
+					while (j < energy.size() && energy[j] == -HUGE_VAL) { ++j; }
+					if (j > i + 1 && j < energy.size()) {
+						const double k0 = (energy[j] - energy[i]) / (j - i);
+						for (int k = 1; k < j - i; ++k) {
+							energy[i + k] = energy[i] + k0 * k;
+						}
+					}
 				}
 				if (energy[i] == HUGE_VAL) energy[i] = -HUGE_VAL;
 			}
@@ -367,15 +374,30 @@ namespace Molib {
 };
 
 ostream& operator<<(ostream& os, const Molib::AtomTypeToEnergyPoint &attep) {
+	int i = 1;
 	for (auto &kv : attep) {
 		const int ligand_atom_type = kv.first;
+		os << "MODEL" << setw(9) << i++ << endl;
 		for (auto &ep : kv.second) {
 			const Geom3D::Coordinate &point = ep.first;
 			const double energy_sum = ep.second;
-			os << help::idatm_unmask[ligand_atom_type] << "\t" 
-				<< point.with_underscores() << "\t" << setw(9) 
-				<< setprecision(5) << fixed << energy_sum << endl;
+
+			os << setw(6) << left << "HETATM";
+			os << setw(5) << right << 1;
+			os << setw(1) << " ";
+			os << setw(4) << left << help::idatm_unmask[ligand_atom_type];
+			os << setw(1) << " ";
+			os << setw(3) << right << "DIK";
+			os << setw(1) << " ";
+			os << setw(1) << "A";
+			os << setw(4) << right << 1;
+			os << setw(1) << " ";
+			os << setw(27) << point.pdb();
+			os << setw(6) << setprecision(2) << fixed << right << 1.0;
+			os << setw(6) << setprecision(2) << fixed << (energy_sum > 10 ? 10 : 
+				(energy_sum < -10 ? -10 : energy_sum)) << endl;
 		}
+		os << "ENDMDL" << endl;
 	}
 	return os;
 }	

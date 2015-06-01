@@ -82,7 +82,7 @@ class CmdLnOpts {
 	string __mini_ligands_file;
 	string __energy_file;
 	
-	double __def_radial_check;
+	//~ double __def_radial_check;
 	//~ double __max_radial_check;
 	int __num_bsites;
 	double __grid_spacing;
@@ -120,20 +120,20 @@ public:
 			TCLAP::ValueArg<string> prep_fileArg("","prep","Prepared small molecule(s) are outputted to this filename",
 				false,"prepared_ligands.pdb","string", cmd);
 
-			TCLAP::ValueArg<string> bslib_fileArg("","bslib","Read binding sites library from this file (default is data/probis_ligands/bslib.txt)",
-				false,"data/probis_ligands/bslib.txt","string", cmd);
+			TCLAP::ValueArg<string> bslib_fileArg("","bslib","Read binding sites library from this file (default is bslibdb/bslib.txt)",
+				false,"bslibdb/bslib.txt","string", cmd);
 			TCLAP::ValueArg<string> nosql_fileArg("","nosql","NoSql-formatted ProBiS alignments output file (default is probis.nosql)",false,"probis.nosql","string", cmd);
 			TCLAP::ValueArg<string> json_fileArg("","json","Json-formatted ProBiS alignments output file (default is probis.json",false,"probis.json","string", cmd);
 			TCLAP::ValueArg<string> json_with_ligs_fileArg("","jsonwl","Json-formatted ProBiS alignments with transposed ligands output file (default is probis_with_ligands.json",false,"probis_with_ligands.json","string", cmd);
-			TCLAP::ValueArg<string> geo_dirArg("","geo","Directory with ProBiS-ligands geo database (default is data/probis_ligands/geo)",false,"data/probis_ligands/geo","string", cmd);
-			TCLAP::ValueArg<string> names_dirArg("","names","Directory with ligand names (default is data/probis_ligands/names)",false,"data/probis_ligands/names","string", cmd);
+			TCLAP::ValueArg<string> geo_dirArg("","geo","Directory with ProBiS-ligands geo database (default is bslibdb/geo)",false,"bslibdb/geo","string", cmd);
+			TCLAP::ValueArg<string> names_dirArg("","names","Directory with ligand names (default is bslibdb/names)",false,"bslibdb/names","string", cmd);
 			TCLAP::SwitchArg neighbSwitch("","neighb","Allow only ligands that are in the similar regions according to REMARKs (not enabled by default)", cmd, false);
 
 			TCLAP::ValueArg<double> probis_clus_radArg("","probis_clus_rad","Cluster radius for predicted ligands by probis (default is 2.0)",false,2.0,"double", cmd);
 			TCLAP::ValueArg<int> probis_min_ptsArg("","probis_min_pts","The minimum number of points (for predicted ligands) required to form a cluster (default is 10)",false,10,"int", cmd);
 			TCLAP::ValueArg<double> probis_min_z_scoreArg("","probis_min_z_score","Minimium z-score of ligands to be considered in clustering (default is 2.5)",false,2.5,"double", cmd);
 
-			TCLAP::ValueArg<string> bio_dirArg("","bio","Directory with ProBiS-ligands bio database (default is data/probis_ligands/bio)",false,"data/probis_ligands/bio","string", cmd);
+			TCLAP::ValueArg<string> bio_dirArg("","bio","Directory with ProBiS-ligands bio database (default is bslibdb/bio)",false,"bslibdb/bio","string", cmd);
 			TCLAP::ValueArg<string> lig_clus_fileArg("","lig_clus_file","Ligand clusters found by ProBiS are outputted to this file",false,"ligand_clusters.pdb","string", cmd);
 
 			TCLAP::ValueArg<string> centroid_fileArg("","centroid","Centroid filename",false,"","string", cmd);
@@ -164,7 +164,7 @@ public:
 			TCLAP::ValueArg<double> scale_non_bondArg("","scale","Scale non-bonded forces and energy for knowledge-based \
 				potential [0.0-1.0] (default is 0.01)",false,0.01,"double", cmd);
 
-			TCLAP::ValueArg<string> egrid_fileArg("","egrid", "Energy grid output file",false,"energy_grid.txt","string", cmd);
+			TCLAP::ValueArg<string> egrid_fileArg("","egrid", "Energy grid output file",false,"energy_grid.pdb","string", cmd);
 			TCLAP::ValueArg<string> docked_seeds_fileArg("","docked_seeds_file", "Docked seeds output file",false,
 				"docked_seeds.pdb","string", cmd);
 			//~ TCLAP::ValueArg<string> score_fileArg("","scorefile", "Scores for docked seeds output file",false,
@@ -211,7 +211,7 @@ public:
 			TCLAP::ValueArg<string> mini_ligands_fileArg("","mini_ligands","Docked & minimized ligands output filename (default minimized.pdb)",false,"minimized.pdb","string", cmd);
 			TCLAP::ValueArg<string> energy_fileArg("","energy","Energies of minimized ligands output filename (default energies.txt)",false,"energies.txt","string", cmd);
 
-			TCLAP::ValueArg<double> def_radial_checkArg("","radial","Radial check - the 2*r of the sphere around the binding site central point (default is 10.0)",false,10.0,"double", cmd);
+			//~ TCLAP::ValueArg<double> def_radial_checkArg("","radial","Radial check - the radius of the sphere around the binding site central point (default is 5.0)",false,5.0,"double", cmd);
 			//~ TCLAP::ValueArg<double> max_radial_checkArg("","max_radial","Maximum radial check - the 2*r of the sphere around the binding site central point (default is 20.0)",false,20.0,"double", cmd);
 			TCLAP::ValueArg<int> num_bsitesArg("","num_bsites","Maximum number of predicted (or given) binding sites to consider for docking (default is 3)",false,3,"int", cmd);
 
@@ -288,7 +288,7 @@ public:
 			__max_iterations = max_iterationsArg.getValue();
 			__mini_ligands_file = mini_ligands_fileArg.getValue();
 			__energy_file = energy_fileArg.getValue();
-			__def_radial_check = def_radial_checkArg.getValue();
+			//~ __def_radial_check = def_radial_checkArg.getValue();
 			//~ __max_radial_check = max_radial_checkArg.getValue();
 			__num_bsites = num_bsitesArg.getValue();
 			__grid_spacing = grid_spacingArg.getValue();
@@ -368,7 +368,7 @@ public:
 	int max_iterations() const { return __max_iterations; }
 	string mini_ligands_file() const { return __mini_ligands_file; }
 	string energy_file() const { return __energy_file; }
-	double def_radial_check() const { return __def_radial_check; }
+	//~ double def_radial_check() const { return __def_radial_check; }
 	//~ double max_radial_check() const { return __max_radial_check; }
 	int num_bsites() const { return __num_bsites; }
 	double grid_spacing() const { return __grid_spacing; }

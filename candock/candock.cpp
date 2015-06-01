@@ -59,10 +59,9 @@ int main(int argc, char* argv[]) {
 				genlig::generate_binding_site_prediction(cmdl.json_with_ligs_file(), 
 				cmdl.bio_dir(), cmdl.num_bsites());
 			inout::output_file(binding_site_clusters, cmdl.lig_clus_file());
-			centroids = common::set_centroids(binding_site_clusters, cmdl.def_radial_check());	
+			centroids = common::set_centroids(binding_site_clusters);	
 		} else { // ... or else set binding sites from file
-			centroids = common::set_centroids(cmdl.centroid_file(), 
-				cmdl.def_radial_check(), cmdl.num_bsites());
+			centroids = common::set_centroids(cmdl.centroid_file());
 		}
 
 		/* Initialize parsers for receptor (and ligands) and read
@@ -90,20 +89,17 @@ int main(int argc, char* argv[]) {
 		 */
 		Molib::MolGrid gridrec(receptors[0].get_atoms());
 
-		/* Create gridpoints for each binding site represented by a centroid
+		/* Create gridpoints for ALL centroids representing one or more binding sites
 		 * 
 		 */
-		vector<Geom3D::PointVec> gridpoints;
-		for (auto &centroid : centroids) {
-			gridpoints.push_back(common::identify_gridpoints(receptors[0], 
-				centroid.get_centroid(), gridrec, centroid.get_radial_check(), 
-				cmdl.grid_spacing(), cmdl.dist_cutoff(), cmdl.excluded_radius(), 
-				cmdl.max_interatomic_distance()));
-			inout::output_file(gridpoints.back(), cmdl.gridpdb_hcp_file(), ios_base::app);
-		}
+		Geom3D::PointVec gridpoints = common::identify_gridpoints(receptors[0], 
+			centroids, gridrec,	cmdl.grid_spacing(), cmdl.dist_cutoff(), 
+			cmdl.excluded_radius(), cmdl.max_interatomic_distance());
+		inout::output_file(gridpoints, cmdl.gridpdb_hcp_file(), ios_base::app);
 
 		vector<thread> threads;
 		mutex mtx;
+
 		/* Read ligands from the ligands file - this file may contain millions
 		 * of ligands, and we read only a few at one time, to save memory
 		 * 
@@ -167,29 +163,21 @@ int main(int argc, char* argv[]) {
 			.add_kb_forcefield(score, cmdl.step_non_bond(), cmdl.scale_non_bond())
 			.parse_forcefield_file(cmdl.amber_xml_file());
 
-		/* Go over the predicted (or manually set) binding sites and filter
-		 * top scores
-		 * 
+		/* Create energy grids for all atom types that appear in small molecules
+		 * for the combined binding site
 		 */
 		vector<common::HCPoints> hcp_vec;
-		for (auto &gpoints : gridpoints) {
-			
-			/* Create energy grids for all atom types that appear in small molecules
-			 * 
-			 */
-			Molib::AtomTypeToEnergyPoint attep = score.compute_energy_grid(
-				ligand_idatm_types, gpoints);
-			hcp_vec.push_back(common::filter_scores(attep, cmdl.top_percent()));
+		Molib::AtomTypeToEnergyPoint attep = score.compute_energy_grid(
+			ligand_idatm_types, gridpoints);
+		hcp_vec.push_back(common::filter_scores(attep, cmdl.top_percent()));
 
-			inout::output_file(attep, cmdl.egrid_file(), ios_base::app); // output energy grid
-			dbgmsg("after output energy grid");
+		inout::output_file(attep, cmdl.egrid_file(), ios_base::app); // output energy grid
 
-			/* Create template grids using ProBiS-ligands algorithm
-			 * WORK IN PROGESS WORK IN PROGESS WORK IN PROGESS WORK IN PROGESS 
-			 * WORK IN PROGESS WORK IN PROGESS WORK IN PROGESS WORK IN PROGESS 
-			 * WORK IN PROGESS WORK IN PROGESS WORK IN PROGESS WORK IN PROGESS 
-			 */
-		}
+		/* Create template grids using ProBiS-ligands algorithm
+		 * WORK IN PROGESS WORK IN PROGESS WORK IN PROGESS WORK IN PROGESS 
+		 * WORK IN PROGESS WORK IN PROGESS WORK IN PROGESS WORK IN PROGESS 
+		 * WORK IN PROGESS WORK IN PROGESS WORK IN PROGESS WORK IN PROGESS 
+		 */
 
 		/* Main loop A with threading support : dock seeds with maximum 
 		 * weight clique algorithm to the binding site and filter docked

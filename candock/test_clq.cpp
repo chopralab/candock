@@ -50,8 +50,7 @@ int main(int argc, char* argv[]) {
 		if (cmdl.centroid_file().empty()) {
 			throw Error("For testing use --centroid option to provide a centroid file");
 		} else { // ... or else set binding sites from file
-			centroids = common::set_centroids(cmdl.centroid_file(), 
-				cmdl.def_radial_check(), cmdl.num_bsites());
+			centroids = common::set_centroids(cmdl.centroid_file());
 		}
 
 		/* Initialize parsers for receptor (and ligands) and read
@@ -86,17 +85,13 @@ int main(int argc, char* argv[]) {
 		ffield.parse_forcefield_file(cmdl.amber_xml_file());
 		receptors[0].prepare_for_mm(ffield, gridrec);
 
-		/* Create gridpoints for each binding site represented by a centroid
+		/* Create gridpoints for ALL centroids representing one or more binding sites
 		 * 
 		 */
-		vector<Geom3D::PointVec> gridpoints;
-		for (auto &centroid : centroids) {
-			gridpoints.push_back(common::identify_gridpoints(receptors[0], 
-				centroid.get_centroid(), gridrec, centroid.get_radial_check(), 
-				cmdl.grid_spacing(), cmdl.dist_cutoff(), cmdl.excluded_radius(), 
-				cmdl.max_interatomic_distance()));
-			inout::output_file(gridpoints.back(), cmdl.gridpdb_hcp_file(), ios_base::app);
-		}
+		Geom3D::PointVec gridpoints = common::identify_gridpoints(receptors[0], 
+			centroids, gridrec,	cmdl.grid_spacing(), cmdl.dist_cutoff(), 
+			cmdl.excluded_radius(), cmdl.max_interatomic_distance());
+		inout::output_file(gridpoints, cmdl.gridpdb_hcp_file(), ios_base::app);
 
 		/* Read ligands from the ligands file - this file may contain millions
 		 * of ligands, and we read only a few at one time, to save memory
@@ -126,59 +121,38 @@ int main(int argc, char* argv[]) {
 			gridrec, cmdl.ref_state(),cmdl.comp(), cmdl.rad_or_raw(), 
 			cmdl.dist_cutoff(), cmdl.distributions_file(), cmdl.step_non_bond());
 
-		/* Go over the predicted (or manually set) binding sites and filter
-		 * top scores
-		 * 
+		/* Create energy grids for all atom types that appear in small molecules
+		 * for the combined binding site
 		 */
-		vector<common::HCPoints> hcp_vec;
-		for (auto &gpoints : gridpoints) {
-			
-			/* Create energy grids for all atom types that appear in small molecules
-			 * 
-			 */
-			Molib::AtomTypeToEnergyPoint attep = score.compute_energy_grid(
-				ligand_idatm_types, gpoints);
-			hcp_vec.push_back(common::filter_scores(attep, cmdl.top_percent()));
+		Molib::AtomTypeToEnergyPoint attep = score.compute_energy_grid(
+			ligand_idatm_types, gridpoints);
+		common::HCPoints hcp = common::filter_scores(attep, cmdl.top_percent());
 
-			inout::output_file(attep, cmdl.egrid_file(), ios_base::app); // output energy grid
-			dbgmsg("after output energy grid");
+		inout::output_file(attep, cmdl.egrid_file(), ios_base::app); // output energy grid
+		dbgmsg("after output energy grid");
 
-			/* Create template grids using ProBiS-ligands algorithm
-			 * WORK IN PROGESS WORK IN PROGESS WORK IN PROGESS WORK IN PROGESS 
-			 * WORK IN PROGESS WORK IN PROGESS WORK IN PROGESS WORK IN PROGESS 
-			 * WORK IN PROGESS WORK IN PROGESS WORK IN PROGESS WORK IN PROGESS 
-			 */
-		 }
+		/* Create template grids using ProBiS-ligands algorithm
+		 * WORK IN PROGESS WORK IN PROGESS WORK IN PROGESS WORK IN PROGESS 
+		 * WORK IN PROGESS WORK IN PROGESS WORK IN PROGESS WORK IN PROGESS 
+		 * WORK IN PROGESS WORK IN PROGESS WORK IN PROGESS WORK IN PROGESS 
+		 */
 
 		vector<thread> threads;
-		//~ std::mutex my_mutex;
-
-		//~ Molib::NRset top_seeds;
 
 		threads.clear();
 		for(int i = 0; i < cmdl.ncpu(); ++i) {
 			threads.push_back(
-				thread([&seeds, &gridrec, &score, &hcp_vec, i] () {
-					// iterate over docked seeds and dock unique seeds
+				thread([&seeds, &gridrec, &score, &hcp, i] () {
+					// iterate over seeds and dock unique seeds
 					for (int j = i; j < seeds.size(); j+= cmdl.ncpu()) {
 						dbgmsg(seeds[j]);
-						// iterate over top scores for each centroid
-						Molib::Molecules non_clashing_seeds;
-						for (auto &hcp : hcp_vec) {
-							
-							// make product graph between seed and hcp grid, cutoffs top_percent ?
-							common::ProductGraph graph = 
-								common::product_graph(hcp, seeds[j], cmdl.grid_spacing()); 
-							common::ProductGraph::Cliques maxclq = 
-								graph.max_weight_clique(cmdl.num_iter());
-
-							// Superimpose fragment coordinates onto clique and 
-							// filter out those that clash with the receptor
-							for (auto &molecule : common::filter_clashes(
-								common::superimpose(maxclq, seeds[j]), gridrec)) {
-								non_clashing_seeds.add(new Molib::Molecule(molecule));
-							}
-						}
+						
+						/* Dock seed to the entire grid
+						 *
+						 */ 
+						Molib::Molecules non_clashing_seeds = 
+							common::dock_seeds(hcp, seeds[j], cmdl.grid_spacing());
+						
 						inout::output_file(non_clashing_seeds, cmdl.docked_seeds_file(), ios_base::app); // output docked & filtered fragment poses
 						// cluster non clashing seeds based on rmsd and 
 						// find best-scored cluster representatives

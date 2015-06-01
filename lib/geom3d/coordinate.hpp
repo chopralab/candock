@@ -38,6 +38,7 @@ namespace Geom3D {
 		Coordinate floor() { return Coordinate(::floor(__x), ::floor(__y), ::floor(__z)); } 
 		bool operator==(const Coordinate& right) const { return (fabs(this->x() - right.x()) < numeric_limits<float>::epsilon() && fabs(this->y() - right.y()) < numeric_limits<float>::epsilon() && fabs(this->z() - right.z()) < numeric_limits<float>::epsilon()); }
 		bool operator<(const Coordinate& right) const { return (!(*this == right)) && std::tie(this->__x, this->__y, this->__z) < std::tie(right.__x, right.__y, right.__z); }
+		bool operator>(const Coordinate& right) const { return (!(*this == right)) && std::tie(this->__x, this->__y, this->__z) > std::tie(right.__x, right.__y, right.__z); }
 		static Coordinate cross(const Coordinate& l, const Coordinate& r) { return Coordinate(l.y()*r.z() - l.z()*r.y(), -l.x()*r.z() + l.z()*r.x(), l.x()*r.y() - l.y()*r.x()); }
 		static double scalar(const Coordinate& l, const Coordinate& r) { return l.x()*r.x() + l.y()*r.y() + l.z()*r.z(); }
 		Coordinate operator+(const double& right) const { return Coordinate(__x + right, __y + right, __z + right); }

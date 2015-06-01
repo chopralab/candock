@@ -114,48 +114,65 @@ namespace common {
 	/* Centroid stuff
 	 * 
 	 */
-	vector<Centroid> split_binding_site(const Molib::Molecules &binding_site_ligands, 
-		const double def_radial_check) {
+	vector<Centroid> split_binding_site(const Molib::Molecules &binding_site_ligands) {
 
 		vector<Centroid> centroids;
-		Molib::AtomVec atoms;
-		for (auto &molecule : binding_site_ligands) {
-			auto molecule_atoms = molecule.get_atoms();
-			atoms.insert(atoms.end(), molecule_atoms.begin(), molecule_atoms.end());
-		}
+		Molib::AtomVec atoms = binding_site_ligands.get_atoms();
+
 		gsl_matrix *data = gsl_matrix_alloc(3, atoms.size());
 		for (int i = 0; i < atoms.size(); ++i) {
 			gsl_matrix_set(data, 0, i, atoms[i]->crd().x());
 			gsl_matrix_set(data, 1, i, atoms[i]->crd().y());
 			gsl_matrix_set(data, 2, i, atoms[i]->crd().z());
 		}
+
 		gsl_matrix *projection, *eigenmatrix;
 		gsl_vector *mean;
+
 		// get the first principal component only
 		tie(projection, eigenmatrix, mean) = Geom3D::pca(data, 1);
+
 		const Geom3D::Point geom_center = *mean;
 		const Geom3D::Vector3 unit_vector = gsl_matrix_column(eigenmatrix, 0).vector;
 		vector<double> projected_points;
 		const unsigned int cols = projection->size2;
+
 		for (int i = 0; i < cols; ++i) 
 			projected_points.push_back(gsl_matrix_get(projection, 0, i)); 
+
 		auto ret = minmax_element(projected_points.begin(), projected_points.end());
 		const double min_value = *ret.first, max_value = *ret.second;
 		const double max_dist = max_value - min_value;
-		const int num_centroids = ceil(max_dist / def_radial_check);
-		dbgmsg("num_centroids = " << num_centroids << " min_value = " << min_value
-			<< " max_dist = " << max_dist);
+		const int num_centroids = ceil(max_dist / 5.0); // default radial check is hardcoded to 5.0 A
+		dbgmsg("num_centroids = " << num_centroids << " min_value = " 
+			<< min_value << " max_dist = " << max_dist);
 		const double interval = max_dist / (num_centroids + 1);
+
+		Molib::AtomSet visited;
+
 		for (int i = 1; i <= num_centroids; ++i) {
 			const double position = min_value + i * interval;
-			centroids.push_back(Centroid(Geom3D::line_evaluate(
-				geom_center, unit_vector, position), def_radial_check));
+			const Geom3D::Point center = Geom3D::line_evaluate(geom_center, 
+				unit_vector, position);
+			// find the most distant atom left of center (angle is => 90 degrees)
+			// exception is the last center where angle is not checked
+			double max_l_dist = 0.0;
+			for (auto &atom : atoms) { 
+				if (i == num_centroids || Geom3D::degrees(Geom3D::angle(atom->crd() - center, unit_vector)) >= 90) {
+					if (!visited.count(atom)) {
+						visited.insert(atom);
+						const double dist = atom->crd().distance(center);
+						if (dist > max_l_dist) max_l_dist = dist;
+					}
+				}
+			}
+			centroids.push_back(Centroid(center, max_l_dist + 2.0)); // add 2.0 A tolerance
 			dbgmsg("original centroid geom_center = " << geom_center
 				<< " unit_vector = " << unit_vector << " position = "
-				<< position << " : adding splitted centroid[" << i << "] at center = "
-				<< Geom3D::line_evaluate(geom_center, unit_vector, position));
-			dbgmsg("ATOM      1  X   GEO X   1    " 
-				<< Geom3D::line_evaluate(geom_center, unit_vector, position).pdb()
+				<< position << " : adding splitted centroid[" << i 
+				<< "] at center = " << centroids.back().get_centroid() 
+				<< " radial_check = " << centroids.back().get_radial_check());
+			dbgmsg("ATOM      1  X   GEO X   1    " << center.pdb()	
 				<< "  1.00  0.00           N  ");
 		}
 		gsl_matrix_free(data);
@@ -165,80 +182,67 @@ namespace common {
 		return centroids;
 	}
 
-	vector<Centroid> set_centroids(const genlig::BindingSiteClusters &binding_site_clusters, 
-		const double def_radial_check) {
+	vector<Centroid> set_centroids(const genlig::BindingSiteClusters &binding_site_clusters) {
 		vector<Centroid> centroids;
 		if (binding_site_clusters.empty()) 
-			throw Error("die : no binding sites could be predicted for this protein \
-(set binding site(s) centroids manually through centroid file)");
+			throw Error("die : no binding sites could be predicted for this protein - define its binding site(s) using the centroid option");
 		for (auto &kv : binding_site_clusters) {
 			const int cluster_number = kv.first;
 			const Molib::Molecules &binding_site_ligands = kv.second;
-			double radial_check = 2 * binding_site_ligands.compute_max_radius();
-			if (radial_check <= def_radial_check) {
-				cerr << "note : radial check calculated using ProBiS " 
-					<< " binding site detection is too small (" << radial_check
-					<< ") using default value of " << def_radial_check << endl;
-				radial_check = def_radial_check;
-				centroids.push_back(Centroid(binding_site_ligands.compute_geometric_center(), 
-					radial_check));
-			} else {
-				auto result = split_binding_site(binding_site_ligands, def_radial_check);
-				cerr << "note : radial check calculated using ProBiS " 
-					<< " binding site detection is too LARGE (" << radial_check
-					<< ") splitting to " << result.size() << " smaller binding sites of "
-					<< def_radial_check << " Angstroms." << endl;
-				centroids.insert(centroids.end(), result.begin(), result.end()); 
-			}
-			dbgmsg("setting centroids from predicted binding sites"
-				<< " cluster number " << cluster_number 
-				<< " radial check = " << centroids.back().get_radial_check() 
-				<< " centroid = " << centroids.back().get_centroid());
+			auto result = split_binding_site(binding_site_ligands);
+			centroids.insert(centroids.end(), result.begin(), result.end()); 
+			dbgmsg("to better capture the shape of the binding site "
+				<< " it has been split into " << result.size() << " centroids");
 		}
-		dbgmsg(centroids);
+		dbgmsg("setting centroids from ProBiS predicted binding sites : " 
+			<< endl << centroids);
 		return centroids;
 	}
-	vector<Centroid> set_centroids(const string &centroid_file, const double def_radial_check,
-		const int num_bsites) {
-			
+	vector<Centroid> set_centroids(const string &centroid_file) {
 		vector<Centroid> centroids;
 		vector<string> data;
 		inout::Inout::read_file(centroid_file, data);
 		for (string &line : data) {
 			stringstream ss(line);
-			double x, y, z, rc = -1;
-			ss >> x >> y >> z;
-			ss >> rc;
-			if (rc == -1) {
-				rc = def_radial_check;
-				cerr << "warning : radial check is missing in the centroid file - "
-					<< "using default value of " << rc << endl;
-			}
+			double x, y, z, rc;
+			ss >> x >> y >> z >> rc;
 			centroids.push_back(Centroid(Geom3D::Coordinate(x, y, z), rc));
-			dbgmsg("setting centroids from file"
-				<< " number " << centroids.size() 
-				<< " radial check = " << centroids.back().get_radial_check() 
-				<< " centroid = " << centroids.back().get_centroid());
-			if (centroids.size() >= num_bsites)
-				break;
 		}
 		if (centroids.empty()) 
 			throw Error("die: could not find centroid in centroid file " 
 				+ centroid_file + "\n");
+		dbgmsg("setting centroids from file : " << endl << centroids);
 		return centroids;
 	}
 
 	/* Part1 stuff
 	 * 
 	 */
-	Geom3D::PointVec identify_gridpoints(const Molib::Molecule &molecule, const Geom3D::Coordinate &centroid, 
-		Molib::MolGrid &grid, const double &radial_check, const double &grid_spacing, const int &dist_cutoff,
+	Geom3D::PointVec identify_gridpoints(const Molib::Molecule &molecule, const vector<Centroid> &centroids, 
+		Molib::MolGrid &grid, const double &grid_spacing, const int &dist_cutoff, 
 		const double &excluded_radius, const double &max_interatomic_distance) {
+
+		if (centroids.empty()) 
+			throw Error("die : there are no centroids");
 			
 		Geom3D::PointVec gridpoints;
 		Benchmark::reset();
-		Geom3D::Coordinate min = centroid - ceil(radial_check);
-		Geom3D::Coordinate max = centroid + ceil(radial_check);
+
+		// find the absolute minimium and maximum coordinates of all centroids
+		Geom3D::Coordinate min = centroids[0].get_centroid() - ceil(centroids[0].get_radial_check());
+		Geom3D::Coordinate max = centroids[0].get_centroid() + ceil(centroids[0].get_radial_check());
+		for (auto &centroid : centroids) {
+			Geom3D::Coordinate min2 = centroid.get_centroid() - ceil(centroid.get_radial_check());
+			Geom3D::Coordinate max2 = centroid.get_centroid() + ceil(centroid.get_radial_check());
+			if (min2.x() < min.x()) min.set_x(min2.x());
+			if (min2.y() < min.y()) min.set_y(min2.y());
+			if (min2.z() < min.z()) min.set_z(min2.z());
+			if (max2.x() > max.x()) max.set_x(max2.x());
+			if (max2.y() > max.y()) max.set_y(max2.y());
+			if (max2.z() > max.z()) max.set_z(max2.z());
+		}
+		dbgmsg("min point = " << min.pdb());
+		dbgmsg("max point = " << max.pdb());
 		const int total_gridpoints = 3*ceil((max.x()-min.x())/grid_spacing)
 									*ceil((max.y()-min.y())/grid_spacing)
 									*ceil((max.z()-min.z())/grid_spacing);
@@ -247,9 +251,10 @@ namespace common {
 		int points_kept = 0;
 		int gridpoint_counter = 0;
 		const double r = grid_spacing/2;
-		const int last_column = ceil(2*radial_check/r);
-		const int last_row = ceil(2*radial_check/(sqrt(3)*r));
-		const int last_layer = ceil(2*radial_check/(2*r*sqrt(6)/3));
+		const double max_d = min.distance(max); // distance between min and max
+		const int last_column = ceil(max_d/r);
+		const int last_row = ceil(max_d/(sqrt(3)*r));
+		const int last_layer = ceil(max_d/(2*r*sqrt(6)/3));
 		Geom3D::Coordinate eval;
 		for(int column=0;column<=last_column;column++) {
 			int even_column=(column%2==0) ? 1 : 0; // 1 if odd, 0 if even
@@ -271,8 +276,15 @@ namespace common {
 						int okay_min=1;
 						int okay_max=1;
 						double closest = 10000.0;
-						const double radial_dist = eval.distance(centroid);
-						if (radial_dist <= radial_check) {
+						// if the point is within the radial_check of ANY of the centroids... 
+						bool is_within = false;
+						for (auto &centroid : centroids) {
+							if (eval.distance(centroid.get_centroid()) <= centroid.get_radial_check()) {
+								is_within = true;
+								break;
+							}
+						}
+						if (is_within) {
 							Molib::Atom at(eval);
 							vector<Molib::Atom*> neighbors = grid.get_neighbors(at, dist_cutoff);
 							for (Molib::Atom *a : neighbors) {

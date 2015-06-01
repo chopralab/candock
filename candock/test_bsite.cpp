@@ -55,7 +55,7 @@ int main(int argc, char* argv[]) {
 			genlig::generate_binding_site_prediction(cmdl.json_with_ligs_file(), 
 			cmdl.bio_dir(), cmdl.num_bsites());
 		inout::output_file(binding_site_clusters, cmdl.lig_clus_file());
-		centroids = common::set_centroids(binding_site_clusters, cmdl.def_radial_check());	
+		centroids = common::set_centroids(binding_site_clusters);	
 		//~ } else { // ... or else set binding sites from file
 			//~ centroids = common::set_centroids(cmdl.centroid_file(), 
 				//~ cmdl.def_radial_check(), cmdl.num_bsites());
@@ -88,13 +88,10 @@ int main(int argc, char* argv[]) {
 		 * 
 		 */
 		vector<Geom3D::PointVec> gridpoints;
-		for (auto &centroid : centroids) {
-			gridpoints.push_back(common::identify_gridpoints(receptors[0], 
-				centroid.get_centroid(), gridrec, centroid.get_radial_check(), 
-				cmdl.grid_spacing(), cmdl.dist_cutoff(), cmdl.excluded_radius(), 
-				cmdl.max_interatomic_distance()));
-			inout::output_file(gridpoints.back(), cmdl.gridpdb_hcp_file(), ios_base::app);
-		}
+		gridpoints.push_back(common::identify_gridpoints(receptors[0], 
+			centroids, gridrec,	cmdl.grid_spacing(), cmdl.dist_cutoff(), cmdl.excluded_radius(), 
+			cmdl.max_interatomic_distance()));
+		inout::output_file(gridpoints.back(), cmdl.gridpdb_hcp_file(), ios_base::app);
 
 
 

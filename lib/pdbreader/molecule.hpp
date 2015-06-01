@@ -287,8 +287,8 @@ namespace Molib {
 			for (auto &i : matrices) {
 				int matrix_number = i.first;
 				Geom3D::Matrix &matrix = i.second;
-				add(new Model(matrix_number));
-				last().init_bio(asym[0], matrix, chains); // asymmetric unit has just one model - the 0-th
+				Model &last = add(new Model(matrix_number));
+				last.init_bio(asym.first(), matrix, chains); // asymmetric unit has just one model - the 1-st
 			}
 		}
 		void set_number(int number) { __number = number; }
@@ -363,8 +363,8 @@ namespace Molib {
 			for(auto &i : __bio_rota) {
 				int biomolecule_number = i.first;
 				M0 &matrices = i.second;
-				add(new Assembly(biomolecule_number, "BIOLOGICAL ASSEMBLY"));
-				last().init_bio(asym(), matrices, __bio_chain[biomolecule_number]);
+				Assembly &last = add(new Assembly(biomolecule_number, "BIOLOGICAL ASSEMBLY"));
+				last.init_bio(asym(), matrices, __bio_chain[biomolecule_number]);
 				if (bhm == Molecule::first_bio) { // exit after initializing the first assembly
 					break;
 				}

@@ -83,12 +83,10 @@ namespace common {
 		const double clus_rad, const int min_pts, const int max_num_clus, 
 		const int max_mols_to_cluster=999999);
 
-	vector<Centroid> set_centroids(const genlig::BindingSiteClusters &binding_site_clusters, 
-		const double min_radial_check);
-	vector<Centroid> set_centroids(const string &centroid_file, const double def_radial_check,
-		const int num_bsites);
-	Geom3D::PointVec identify_gridpoints(const Molib::Molecule &molecule, const Geom3D::Coordinate &centroid, 
-		Molib::MolGrid &grid, const double &radial_check, const double &grid_spacing, const int &dist_cutoff,
+	vector<Centroid> set_centroids(const genlig::BindingSiteClusters &binding_site_clusters);
+	vector<Centroid> set_centroids(const string &centroid_file);
+	Geom3D::PointVec identify_gridpoints(const Molib::Molecule &molecule, const vector<Centroid> &centroids, 
+		Molib::MolGrid &grid, const double &grid_spacing, const int &dist_cutoff,
 		const double &excluded_radius, const double &max_interatomic_distance);
 	HCPoints filter_scores(Molib::AtomTypeToEnergyPoint &attep, const double &top_percent);
 	Molib::NRset read_top_seeds_files(const Molib::Molecule &ligand, const string &top_seeds_file);

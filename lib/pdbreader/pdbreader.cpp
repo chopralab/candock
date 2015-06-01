@@ -209,6 +209,8 @@ namespace Molib {
 								Model &model = mols.last().last().last();
 								if (!model.has_chain(chain_id))
 									chain = &model.add(new Chain(chain_id));
+								else 
+									chain = &model.chain(chain_id); // chains may alternate : A B A ...
 								if (!chain->has_residue(Residue::res_pair(resi, ins_code)))
 									residue = &chain->add(new Residue(resn, resi, ins_code, rest));
 								Atom &a = residue->add(new Atom(atom_number, 
@@ -302,7 +304,7 @@ namespace Molib {
 						double b = stod(m[4].str());
 						double c = stod(m[5].str());
 						double w = stod(m[6].str());
-						if (rn < 10) {
+						if (rn < 15) {
 							if (row == 1) {
 								mols.last().add_bio_chain(biomolecule_number, bio_chain);
 							}
@@ -343,8 +345,8 @@ namespace Molib {
 					}
 				}
 			}
-			else if (line.compare(0, 10, "REMARK   7") == 0) {
-				string text(line.substr(11));
+			else if (line.compare(0, 16, "REMARK   7 ALRES") == 0) { // added ALRES since some PDB's (e.g. 1abw) have remark 7
+				string text(line.substr(17));
 				vector<string> vs = help::ssplit(text, ",");
 				if (vs.empty()) throw("die: remark 7 is empty");
 				vector<string> token = help::ssplit(vs[0], ":");
