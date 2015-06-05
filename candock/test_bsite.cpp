@@ -10,7 +10,6 @@
 #include "helper/error.hpp"
 #include "pdbreader/grid.hpp"
 #include "pdbreader/molecule.hpp"
-//~ #include "pdbreader/idatm.hpp"
 #include "pdbreader/pdbreader.hpp"
 #include "openmm/forcefield.hpp"
 #include "openmm/moleculeinfo.hpp"
@@ -35,32 +34,32 @@ int main(int argc, char* argv[]) {
 		/* Create empty output files
 		 * 
 		 */
-		inout::output_file("", cmdl.gridpdb_hcp_file()); // gridpoints for all binding sites
-		inout::output_file("", cmdl.egrid_file()); // output energy grid
+		//~ inout::output_file("", cmdl.gridpdb_hcp_file()); // gridpoints for all binding sites
+		//~ inout::output_file("", cmdl.aa_file()); // gridpoints for all binding sites
+		//~ inout::output_file("", cmdl.centroid_out_file()); // gridpoints for all binding sites
+		//~ inout::output_file("", cmdl.egrid_file()); // output energy grid
 		inout::output_file("", cmdl.nosql_file()); // probis local structural alignments
 		
 		/* Identify potential binding sites using ProBiS algorithm
 		 * or alternatively set binding sites from file
 		 * 
 		 */
-		vector<common::Centroid> centroids;
-		//~ if (cmdl.centroid_file().empty()) {
+		map<int, vector<common::Centroid>> centroids;
 		probis::compare_against_bslib(argc, argv, cmdl.receptor_file(), 
 			cmdl.receptor_chain_id(), cmdl.bslib_file(), cmdl.ncpu(),
 			cmdl.nosql_file(), cmdl.json_file());
 		genclus::generate_clusters_of_ligands(cmdl.json_file(), cmdl.json_with_ligs_file(),
 			cmdl.geo_dir(), cmdl.names_dir(), cmdl.neighb(), cmdl.probis_clus_rad(),
 			cmdl.probis_min_pts(), cmdl.probis_min_z_score());
-		const genlig::BindingSiteClusters binding_site_clusters = 
+		auto binding_sites = 
 			genlig::generate_binding_site_prediction(cmdl.json_with_ligs_file(), 
 			cmdl.bio_dir(), cmdl.num_bsites());
-		inout::output_file(binding_site_clusters, cmdl.lig_clus_file());
-		centroids = common::set_centroids(binding_site_clusters);	
-		//~ } else { // ... or else set binding sites from file
-			//~ centroids = common::set_centroids(cmdl.centroid_file(), 
-				//~ cmdl.def_radial_check(), cmdl.num_bsites());
-		//~ }
-		inout::output_file(centroids, "centroid.txt"); // probis local structural alignments
+		inout::output_file(binding_sites.first, cmdl.lig_clus_file());
+		inout::output_file(binding_sites.second, cmdl.z_scores_file());
+		
+		centroids = common::set_centroids(binding_sites.first);	
+
+		inout::output_file(centroids, cmdl.centroid_out_file()); // probis local structural alignments
 
 		/* Initialize parsers for receptor (and ligands) and read
 		 * the receptor molecule(s)
@@ -87,13 +86,16 @@ int main(int argc, char* argv[]) {
 		/* Create gridpoints for each binding site represented by a centroid
 		 * 
 		 */
-		vector<Geom3D::PointVec> gridpoints;
-		gridpoints.push_back(common::identify_gridpoints(receptors[0], 
-			centroids, gridrec,	cmdl.grid_spacing(), cmdl.dist_cutoff(), cmdl.excluded_radius(), 
-			cmdl.max_interatomic_distance()));
-		inout::output_file(gridpoints.back(), cmdl.gridpdb_hcp_file(), ios_base::app);
+		map<int, Geom3D::PointVec> gridpoints = common::identify_gridpoints(centroids, 
+			gridrec, cmdl.grid_spacing(), cmdl.dist_cutoff(), cmdl.excluded_radius(), 
+			cmdl.max_interatomic_distance());
+		inout::output_file(gridpoints, cmdl.gridpdb_hcp_file());
 
-
+		//~ /* Identify amino acids that line each binding site
+		 //~ * 
+		 //~ */
+		//~ map<int, set<Molib::Residue*>> amino_acids = common::identify_amino_acids(centroids, gridrec);
+		//~ inout::output_file(amino_acids, cmdl.aa_file(), ios_base::app);
 
 		cmdl.display_time("finished");
 	} catch (exception& e) {

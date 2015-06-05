@@ -24,6 +24,15 @@ ostream& operator<<(ostream& os, const genlig::BindingSiteClusters& bsites)	{
 	return os;
 }	
 
+ostream& operator<<(ostream& os, const genlig::BindingSiteScores& bscores)	{
+	for (auto &kv : bscores) {
+		const int &cluster_number = kv.first;
+		const double &z_score = kv.second;
+		os << cluster_number << " " << z_score << endl;
+	}
+	return os;
+}	
+
 namespace genlig {
 	ResidueSet find_neighbor_residues(Molib::Molecule &ligand, Molib::MolGrid &grid) {
 		ResidueSet neighbor_residues;
@@ -231,20 +240,27 @@ namespace genlig {
 		//~ generate_ligs(gridrec, json_file, bio_dir, lig_code, lig_file, bsite_file);
 	//~ 
 	//~ }
-	BindingSiteClusters generate_binding_site_prediction(const string &json_with_ligs_file, 
+	pair<BindingSiteClusters, BindingSiteScores> generate_binding_site_prediction(const string &json_with_ligs_file, 
 		const string &bio_dir, const int num_bsites) {
 		JsonReader jr;
 		BindingSiteClusters bsites;
+		BindingSiteScores bscores;
 		dbgmsg("starting generate binding site prediction");
 		// read hetero ligands from json_with_ligs file
 		jr.parse_JSON(json_with_ligs_file);
 		map<string, Geom3D::Matrix> bio_file_to_matrix;
-		map<string, vector<pair<int, string>>> ligands_by_bio_file;
+		struct LigandInfo {
+			int cluster_number;
+			string lig_code;
+			double z_score;
+		};
+		map<string, vector<LigandInfo>> ligands_by_bio_file;
 		for (auto &d : jr.root()) {
 			dbgmsg(Geom3D::Matrix(d["alignment"][0]["rotation_matrix"], 
 				d["alignment"][0]["translation_vector"]));
 			Geom3D::Matrix mx(d["alignment"][0]["rotation_matrix"], 
 				d["alignment"][0]["translation_vector"]);
+			const double z_score = d["alignment"][0]["scores"]["z_score"].asDouble();
 			const Json::Value &hetero = d["hetero"];
 			for (int i = 0; i < hetero.size(); ++i) { // go over the hetero ligands only
 				dbgmsg(hetero[i].asString());
@@ -268,7 +284,7 @@ namespace genlig {
 					+ ":" + molecule_name +  ":" + mols_name;
 				dbgmsg("after lig_code");
 				
-				ligands_by_bio_file[bio_file].push_back({cluster_number, lig_code});
+				ligands_by_bio_file[bio_file].push_back(LigandInfo{cluster_number, lig_code, z_score});
 				bio_file_to_matrix[bio_file] = mx;
 			}
 		}
@@ -283,11 +299,10 @@ namespace genlig {
 					Molib::PDBreader::all_models);
 				Molib::Molecules mols = biopdb.parse_molecule();
 				mols.rotate(mx, true); // inverse rotation
-				for (auto &kv2 : kv1.second) {
-					const int cluster_number = kv2.first;
-					if (cluster_number <= num_bsites) { // trim number of binding sites
-						const string &lig_code = kv2.second;
-						bsites[cluster_number].add(new Molib::Molecule(get_ligand(mols, lig_code)));
+				for (auto &linf : kv1.second) {
+					if (linf.cluster_number <= num_bsites) { // trim number of binding sites
+						bsites[linf.cluster_number].add(new Molib::Molecule(get_ligand(mols, linf.lig_code)));
+						bscores[linf.cluster_number] = max(bscores[linf.cluster_number], linf.z_score);
 					}
 				}
 			}
@@ -295,6 +310,6 @@ namespace genlig {
 				cerr << e.what() << " ... skipping ... " << endl;
 			}
 		}
-		return bsites;
+		return {bsites, bscores};
 	}
 }

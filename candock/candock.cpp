@@ -48,7 +48,7 @@ int main(int argc, char* argv[]) {
 		 * 
 		 */
 		vector<common::Centroid> centroids;
-		if (cmdl.centroid_file().empty()) {
+		if (cmdl.centroid_file_in().empty()) {
 			probis::compare_against_bslib(argc, argv, cmdl.receptor_file(), 
 				cmdl.receptor_chain_id(), cmdl.bslib_file(), cmdl.ncpu(),
 				cmdl.nosql_file(), cmdl.json_file());
@@ -61,7 +61,7 @@ int main(int argc, char* argv[]) {
 			inout::output_file(binding_site_clusters, cmdl.lig_clus_file());
 			centroids = common::set_centroids(binding_site_clusters);	
 		} else { // ... or else set binding sites from file
-			centroids = common::set_centroids(cmdl.centroid_file());
+			centroids = common::set_centroids(cmdl.centroid_file_in());
 		}
 
 		/* Initialize parsers for receptor (and ligands) and read

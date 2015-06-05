@@ -33,8 +33,10 @@ class CmdLnOpts {
 	
 	string __bio_dir;
 	string __lig_clus_file;
+	string __z_scores_file;
 	
-	string __centroid_file;
+	string __centroid_in_file;
+	string __centroid_out_file;
 
 	string __gridpdb_hcp_file;
 	//~ string __gridxyz_hcp_file;
@@ -135,8 +137,10 @@ public:
 
 			TCLAP::ValueArg<string> bio_dirArg("","bio","Directory with ProBiS-ligands bio database (default is bslibdb/bio)",false,"bslibdb/bio","string", cmd);
 			TCLAP::ValueArg<string> lig_clus_fileArg("","lig_clus_file","Ligand clusters found by ProBiS are outputted to this file",false,"ligand_clusters.pdb","string", cmd);
+			TCLAP::ValueArg<string> z_scores_fileArg("","z_scores_file","Binding site z-scores are outputted to this file",false,"z_scores.pdb","string", cmd);
 
-			TCLAP::ValueArg<string> centroid_fileArg("","centroid","Centroid filename",false,"","string", cmd);
+			TCLAP::ValueArg<string> centroid_in_fileArg("","centro_in","Filename for reading centroids",false,"","string", cmd);
+			TCLAP::ValueArg<string> centroid_out_fileArg("","centro_out","Filename for outputting calculated centroids",false,"","string", cmd);
 
 			TCLAP::ValueArg<string> gridpdb_hcp_fileArg("","gridpdb_hcp","Grid pdb hcp file for output",false,"gridpdb_hcp.pdb","string", cmd);
 			//~ TCLAP::ValueArg<string> gridxyz_hcp_fileArg("","gridxyz_hcp","Grid xyz hcp file for output",false,"gridxyz_hcp.xyz","string", cmd);
@@ -251,7 +255,9 @@ public:
 			__probis_min_z_score = probis_min_z_scoreArg.getValue();
 			__bio_dir = bio_dirArg.getValue();
 			__lig_clus_file = lig_clus_fileArg.getValue();
-			__centroid_file = centroid_fileArg.getValue();
+			__z_scores_file = z_scores_fileArg.getValue();
+			__centroid_in_file = centroid_in_fileArg.getValue();
+			__centroid_out_file = centroid_out_fileArg.getValue();
 			__gridpdb_hcp_file = gridpdb_hcp_fileArg.getValue();
 			//~ __gridxyz_hcp_file = gridxyz_hcp_fileArg.getValue();
 			__ref_state = ref_stateArg.getValue();
@@ -331,7 +337,9 @@ public:
 	double probis_min_z_score() const { return __probis_min_z_score; }
 	string bio_dir() const { return __bio_dir; }
 	string lig_clus_file() const { return __lig_clus_file; }
-	string centroid_file() const { return __centroid_file; }
+	string z_scores_file() const { return __z_scores_file; }
+	string centroid_in_file() const { return __centroid_in_file; }
+	string centroid_out_file() const { return __centroid_out_file; }
 	string gridpdb_hcp_file() const { return __gridpdb_hcp_file; }
 	//~ string gridxyz_hcp_file() const { return __gridxyz_hcp_file; }
 	string ref_state() const { return __ref_state; }

@@ -83,9 +83,10 @@ namespace common {
 		const double clus_rad, const int min_pts, const int max_num_clus, 
 		const int max_mols_to_cluster=999999);
 
-	vector<Centroid> set_centroids(const genlig::BindingSiteClusters &binding_site_clusters);
-	vector<Centroid> set_centroids(const string &centroid_file);
-	Geom3D::PointVec identify_gridpoints(const Molib::Molecule &molecule, const vector<Centroid> &centroids, 
+	map<int, vector<Centroid>> set_centroids(const genlig::BindingSiteClusters &binding_site_clusters);
+	map<int, vector<Centroid>> set_centroids(const string &centroid_file);
+	//~ map<int, set<Molib::Residue*>> identify_amino_acids(const map<int, vector<Centroid>> &centroids, Molib::MolGrid &grid);
+	map<int, Geom3D::PointVec> identify_gridpoints(const map<int, vector<Centroid>> &centroids, 
 		Molib::MolGrid &grid, const double &grid_spacing, const int &dist_cutoff,
 		const double &excluded_radius, const double &max_interatomic_distance);
 	HCPoints filter_scores(Molib::AtomTypeToEnergyPoint &attep, const double &top_percent);
@@ -94,13 +95,14 @@ namespace common {
 //~ #ifndef NDEBUG	
 	void create_mols_from_fragments(set<string> &added, Molib::Molecules &seeds, const Molib::Molecules &mols);
 //~ #endif
+	Molib::Molecules dock_seeds(Geom3D::PointVec &gridpoints, const Molib::Molecule &molecule, const double &grid_spacing);
 	ProductGraph product_graph(HCPoints &hcp, const Molib::Molecule &molecule, const double &grid_spacing);
 	Molib::Molecules superimpose(ProductGraph::Cliques &maxclq, const Molib::Molecule &molecule);
 	Molib::Molecules filter_clashes(const Molib::Molecules &rot_seeds, Grid<Molib::Atom> &gridrec);
 	cluster::PairwiseDistances<Molib::Molecule> all_all_rmsd(const vector<Molib::Molecule*> &mols, const double &clus_rad);
 	void convert_clusters_to_mols(Molib::Molecules &rep_mols, const cluster::Clusters<Molib::Molecule> &representatives);
 
-	ostream& operator<<(ostream& os, const vector<Centroid>& centroids);
+	ostream& operator<<(ostream& os, const map<int, vector<Centroid>>& centroids);
 };
 
 ostream& operator<<(ostream& os, const cluster::MapD<Molib::Molecule>& scores);

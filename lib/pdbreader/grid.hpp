@@ -12,7 +12,7 @@
 #include "helper/help.hpp"
 using namespace std;
 
-template<class T> // T needs crd(), distance(), element(), and distance(double) interface
+template<class T> // T needs crd(), distance(), and distance(double) interface
 class Grid {
 public:
 	typedef vector<T*> Points;

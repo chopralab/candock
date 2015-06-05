@@ -47,10 +47,10 @@ int main(int argc, char* argv[]) {
 		 * 
 		 */
 		vector<common::Centroid> centroids;
-		if (cmdl.centroid_file().empty()) {
+		if (cmdl.centroid_in_file().empty()) {
 			throw Error("For testing use --centroid option to provide a centroid file");
 		} else { // ... or else set binding sites from file
-			centroids = common::set_centroids(cmdl.centroid_file());
+			centroids = common::set_centroids(cmdl.centroid_in_file());
 		}
 
 		/* Initialize parsers for receptor (and ligands) and read
@@ -142,7 +142,8 @@ int main(int argc, char* argv[]) {
 		threads.clear();
 		for(int i = 0; i < cmdl.ncpu(); ++i) {
 			threads.push_back(
-				thread([&seeds, &gridrec, &score, &hcp, i] () {
+				//~ thread([&seeds, &gridrec, &score, &hcp, i] () {
+				thread([&seeds, &gridrec, &score, &gridpoints, i] () {
 					// iterate over seeds and dock unique seeds
 					for (int j = i; j < seeds.size(); j+= cmdl.ncpu()) {
 						dbgmsg(seeds[j]);
@@ -151,7 +152,8 @@ int main(int argc, char* argv[]) {
 						 *
 						 */ 
 						Molib::Molecules non_clashing_seeds = 
-							common::dock_seeds(hcp, seeds[j], cmdl.grid_spacing());
+							//~ common::dock_seeds(hcp, seeds[j], cmdl.grid_spacing());
+							common::dock_seeds(gridpoints, seeds[j], cmdl.grid_spacing());
 						
 						inout::output_file(non_clashing_seeds, cmdl.docked_seeds_file(), ios_base::app); // output docked & filtered fragment poses
 						// cluster non clashing seeds based on rmsd and 

@@ -15,8 +15,12 @@ namespace inout {
 		// makes a path "janez/aska/mia from e.g. "janez/aska/mia/test.txt"
 		boost::filesystem::path dir(dir_path);
 		dir.remove_filename();
-		if(!dir.string().empty() && !boost::filesystem::create_directories(dir)) {
-			throw Error("die : Cannot create directory path " + dir_path);
+		if(!dir.string().empty()) {
+			if(!boost::filesystem::exists(dir)) {
+				if(!boost::filesystem::create_directories(dir)) {
+					throw Error("die : Cannot create directory " + dir.string());
+				}
+			}
 		}
 	}
 
