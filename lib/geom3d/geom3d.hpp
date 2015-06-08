@@ -7,6 +7,7 @@ namespace Geom3D {
 	typedef Coordinate Point;
 	typedef Coordinate Vector3;
 	typedef vector<Point> PointVec;
+	typedef map<int, Geom3D::PointVec> GridPoints;
 	double degrees(double);
 	double radians(double);
 	double angle(const Vector3 &, const Vector3 &);

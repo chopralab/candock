@@ -48,20 +48,20 @@ ostream& operator<<(ostream& os, const cluster::Clusters<Molib::Molecule>& molcl
 	return os;
 }	
 
+ostream& operator<<(ostream& os, const common::Centroids& centroids) {
+	for (auto &kv : centroids) {
+		const int bsite_id = kv.first;
+		for (auto &centroid : kv.second) {
+			os << bsite_id << " " << centroid.get_centroid().simple() << " " << fixed
+				<< setprecision(3) << centroid.get_radial_check() << endl;
+		}
+	}
+	return os;
+}
+
 
 namespace common {
 
-	ostream& operator<<(ostream& os, const map<int, vector<Centroid>>& centroids) {
-		for (auto &kv : centroids) {
-			const int bsite_id = kv.first;
-			for (auto &centroid : kv.second) {
-				os << bsite_id << " " << centroid.get_centroid().simple() << " " << fixed
-					<< setprecision(3) << centroid.get_radial_check() << endl;
-			}
-		}
-		return os;
-	}
-	
 
 
 	/* Cluster stuff
@@ -185,8 +185,8 @@ namespace common {
 		return centroids;
 	}
 
-	map<int, vector<Centroid>> set_centroids(const genlig::BindingSiteClusters &binding_site_clusters) {
-		map<int, vector<Centroid>> centroids;
+	Centroids set_centroids(const genlig::BindingSiteClusters &binding_site_clusters) {
+		Centroids centroids;
 		if (binding_site_clusters.empty()) 
 			throw Error("die : no binding sites could be predicted for this protein - define its binding site(s) using the centroid option");
 		for (auto &kv : binding_site_clusters) {
@@ -200,8 +200,8 @@ namespace common {
 			<< endl << centroids);
 		return centroids;
 	}
-	map<int, vector<Centroid>> set_centroids(const string &centroid_file) {
-		map<int, vector<Centroid>> centroids;
+	Centroids set_centroids(const string &centroid_file) {
+		Centroids centroids;
 		vector<string> data;
 		inout::Inout::read_file(centroid_file, data);
 		for (string &line : data) {
@@ -221,13 +221,13 @@ namespace common {
 	/* Part1 stuff
 	 * 
 	 */
-	map<int, Geom3D::PointVec> identify_gridpoints(const map<int, vector<Centroid>> &centroids, 
+	Geom3D::GridPoints identify_gridpoints(const Centroids &centroids, 
 		Molib::MolGrid &grid, const double &grid_spacing, const int &dist_cutoff, 
 		const double &excluded_radius, const double &max_interatomic_distance) {
 
 		if (centroids.empty()) 
 			throw Error("die : there are no centroids");
-		map<int, Geom3D::PointVec> gridpoints;
+		Geom3D::GridPoints gridpoints;
 		Benchmark::reset();
 
 		// find the absolute minimium and maximum coordinates of all centroids
@@ -412,44 +412,71 @@ namespace common {
 	}
 //~ #endif
 
-/*
-	//~ Molib::Molecules dock_seeds(HCPoints &hcp, const Molib::Molecule &molecule, const double &grid_spacing) {
-	Molib::Molecules dock_seeds(Geom3D::PointVec &gridpoints, const Molib::Molecule &molecule, const double &grid_spacing) {
+	Molib::Molecules dock_seeds(Geom3D::GridPoints &gridpoints, const Molib::Molecule &molecule, const double &grid_spacing) {
 
 		Benchmark::reset();
-
 		Molib::Molecules non_clashing_seeds;
 
+		// join all points from all predicted binding sites
+		//~ Geom3D::PointVec gpoints;
+		vector<Geom3D::Point*> gpoints;
+		for (auto &kv : gridpoints) {
+			for (auto &point : kv.second) {
+				gpoints.push_back(&point);
+			}
+		}
+		
 		// create grid
-		Grid<Geom3D::PointVec> grid(gridpoints);
-
+		Grid<Geom3D::Point> grid(gpoints);
+		
 		// get maximum distance from atom A in seed to any atom B
 		const double tol = grid_spacing / 2;
-		const double max_seed_dist = molecule.get_max_dist(atomA) + tol;
+		Molib::AtomVec atoms = molecule.get_atoms();
+		Molib::Atom &atomA = *atoms.back(); atoms.pop_back();
+		const double max_seed_dist = molecule.max_dist(atomA) + tol;
+
 		// go over the grid points
-		for (auto &pointA : gridpoints) {
+		for (auto &pointA : gpoints) {
 			// match atom A of seed with this grid point
-			vertices.push_back(unique_ptr<PVertex>(new PVertex(atomA, *pointA, i++)));
+			//~ vector<unique_ptr<PVertex>> vertices;
+			//~ vertices.push_back(unique_ptr<PVertex>(new PVertex(atomA, *pointA, i++)));
+			vector<pair<Molib::Atom*, Geom3D::Point*>> vertices;
+			vertices.push_back(make_pair(&atomA, pointA));
 			// 1. generate product graph vertices
-			for (auto &atomB : seedatoms - atomA) {
-				for (auto &pointB : pgrid.get_neighbors_within_tolerance(pointA, distance(atomA, atomB), tol)) {
-					vertices.push_back(unique_ptr<PVertex>(new PVertex(atomB, *pointB, i++)));
+			for (auto &patomB : atoms) {
+				Molib::Atom &atomB = *patomB;
+				for (auto &pointB : grid.get_neighbors_within_tolerance(*pointA, atomA.crd().distance(atomB.crd()), tol)) {
+					//~ vertices.push_back(unique_ptr<PVertex>(new PVertex(atomB, *pointB, i++)));
+					vertices.push_back(make_pair(&atomB, pointB));
 				}
 			}
 			// 2. generate product graph edges
+			//~ for (int i = 0; i < vertices.size(); ++i) {
+				//~ auto &v1 = *vertices[i];
+				//~ for (int j = i + 1; j < vertices.size(); ++j) {
+					//~ auto &v2 = *vertices[j];
+					//~ if (&v1.v1() != &v2->v1() && &v1.v2() != &v2->v2() 
+						//~ && fabs(v1.v1().crd().distance(v2.v1().crd()) - v1.v2().crd().distance(v2.v2().crd())) < tol) {
+						//~ v1.add(&v2);
+						//~ v2.add(&v1);
+					//~ }
+				//~ }
+			//~ }
 			for (int i = 0; i < vertices.size(); ++i) {
-				auto &v1 = *vertices[i];
+				auto &v1 = vertices[i];
 				for (int j = i + 1; j < vertices.size(); ++j) {
-					auto &v2 = *vertices[j];
-					if (&v1.v1() != &v2->v1() && &v1.v2() != &v2->v2() 
-						&& within_tolerance(v1, v2, tol)) {
-						v1.add(&v2);
-						v2.add(&v1);
+					auto &v2 = vertices[j];
+					if (v1.first != v2.first && v1.second != v2.second 
+						&& fabs(v1.first->crd().distance(v2.first->crd()) - v1.second->crd().distance(v2.second->crd())) < tol) {
+						//~ v1.add(&v2);
+						//~ v2.add(&v1);
 					}
 				}
 			}
 			
 			// find max clique for this subgraph...
+			cout << "intemediate time to make product graph took " 
+				<< Benchmark::seconds_from_start() << " wallclock seconds" << endl;
 			
 		}
 //~ 
@@ -475,8 +502,9 @@ namespace common {
 		//~ }
 		cout << "time to make product graph took " 
 			<< Benchmark::seconds_from_start() << " wallclock seconds" << endl;
+		return non_clashing_seeds;
 	}
-*/
+
 	HCPoints filter_scores(Molib::AtomTypeToEnergyPoint &attep, const double &top_percent) {
 		HCPoints hcp;
 		for (auto &u : attep) {

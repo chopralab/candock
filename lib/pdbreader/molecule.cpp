@@ -284,6 +284,17 @@ namespace Molib {
 		dbgmsg("max_dist between atoms of atoms in AtomSet = " << sqrt(md_sq));
 		return sqrt(md_sq);
 	}
+	double Molecule::max_dist(const Atom &atom) const {
+		dbgmsg("calculate max distance between atom " << atom 
+			<< " and other atoms in molecule ...");
+		double md_sq = 0.0;
+		AtomVec atoms = this->get_atoms();
+		for (int i = 0; i < atoms.size(); ++i) {
+			const double dist_sq = atom.crd().distance_sq(atoms[i]->crd());
+			if (dist_sq > md_sq) md_sq = dist_sq;
+		}
+		return sqrt(md_sq);
+	}
 
 	Molecules& Molecules::compute_seeds(const string &seeds_file) { 
 		Unique u(seeds_file); 

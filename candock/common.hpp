@@ -9,6 +9,7 @@
 #include <mutex>
 
 namespace common {
+
 	class Centroid {
 		Geom3D::Coordinate __centroid;
 		double __radial_check;
@@ -19,6 +20,8 @@ namespace common {
 		Geom3D::Coordinate get_centroid() const { return __centroid; }
 		double get_radial_check() const { return __radial_check; }
 	};
+	
+	typedef map<int, vector<Centroid>> Centroids;
 
 	class HCPoint {
 		unique_ptr<Geom3D::Coordinate> __crd;
@@ -78,15 +81,16 @@ namespace common {
 
 	typedef Glib::Graph<PVertex> ProductGraph;
 
+
 	pair<cluster::Clusters<Molib::Molecule>, cluster::Clusters<Molib::Molecule>>
 		cluster_molecules(const Molib::Molecules &mols,	const Molib::Score &score, 
 		const double clus_rad, const int min_pts, const int max_num_clus, 
 		const int max_mols_to_cluster=999999);
 
-	map<int, vector<Centroid>> set_centroids(const genlig::BindingSiteClusters &binding_site_clusters);
-	map<int, vector<Centroid>> set_centroids(const string &centroid_file);
-	//~ map<int, set<Molib::Residue*>> identify_amino_acids(const map<int, vector<Centroid>> &centroids, Molib::MolGrid &grid);
-	map<int, Geom3D::PointVec> identify_gridpoints(const map<int, vector<Centroid>> &centroids, 
+	Centroids set_centroids(const genlig::BindingSiteClusters &binding_site_clusters);
+	Centroids set_centroids(const string &centroid_file);
+	//~ map<int, set<Molib::Residue*>> identify_amino_acids(const Centroids &centroids, Molib::MolGrid &grid);
+	Geom3D::GridPoints identify_gridpoints(const Centroids &centroids, 
 		Molib::MolGrid &grid, const double &grid_spacing, const int &dist_cutoff,
 		const double &excluded_radius, const double &max_interatomic_distance);
 	HCPoints filter_scores(Molib::AtomTypeToEnergyPoint &attep, const double &top_percent);
@@ -95,15 +99,15 @@ namespace common {
 //~ #ifndef NDEBUG	
 	void create_mols_from_fragments(set<string> &added, Molib::Molecules &seeds, const Molib::Molecules &mols);
 //~ #endif
-	Molib::Molecules dock_seeds(Geom3D::PointVec &gridpoints, const Molib::Molecule &molecule, const double &grid_spacing);
+	Molib::Molecules dock_seeds(Geom3D::GridPoints &gridpoints, const Molib::Molecule &molecule, const double &grid_spacing);
 	ProductGraph product_graph(HCPoints &hcp, const Molib::Molecule &molecule, const double &grid_spacing);
 	Molib::Molecules superimpose(ProductGraph::Cliques &maxclq, const Molib::Molecule &molecule);
 	Molib::Molecules filter_clashes(const Molib::Molecules &rot_seeds, Grid<Molib::Atom> &gridrec);
 	cluster::PairwiseDistances<Molib::Molecule> all_all_rmsd(const vector<Molib::Molecule*> &mols, const double &clus_rad);
 	void convert_clusters_to_mols(Molib::Molecules &rep_mols, const cluster::Clusters<Molib::Molecule> &representatives);
 
-	ostream& operator<<(ostream& os, const map<int, vector<Centroid>>& centroids);
 };
 
 ostream& operator<<(ostream& os, const cluster::MapD<Molib::Molecule>& scores);
 ostream& operator<<(ostream& os, const cluster::Clusters<Molib::Molecule>& molclus);
+ostream& operator<<(ostream& os, const common::Centroids& centroids);

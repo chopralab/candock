@@ -34,17 +34,13 @@ int main(int argc, char* argv[]) {
 		/* Create empty output files
 		 * 
 		 */
-		//~ inout::output_file("", cmdl.gridpdb_hcp_file()); // gridpoints for all binding sites
-		//~ inout::output_file("", cmdl.aa_file()); // gridpoints for all binding sites
-		//~ inout::output_file("", cmdl.centroid_out_file()); // gridpoints for all binding sites
-		//~ inout::output_file("", cmdl.egrid_file()); // output energy grid
 		inout::output_file("", cmdl.nosql_file()); // probis local structural alignments
 		
 		/* Identify potential binding sites using ProBiS algorithm
 		 * or alternatively set binding sites from file
 		 * 
 		 */
-		map<int, vector<common::Centroid>> centroids;
+		common::Centroids centroids;
 		probis::compare_against_bslib(argc, argv, cmdl.receptor_file(), 
 			cmdl.receptor_chain_id(), cmdl.bslib_file(), cmdl.ncpu(),
 			cmdl.nosql_file(), cmdl.json_file());
@@ -86,7 +82,7 @@ int main(int argc, char* argv[]) {
 		/* Create gridpoints for each binding site represented by a centroid
 		 * 
 		 */
-		map<int, Geom3D::PointVec> gridpoints = common::identify_gridpoints(centroids, 
+		Geom3D::GridPoints gridpoints = common::identify_gridpoints(centroids, 
 			gridrec, cmdl.grid_spacing(), cmdl.dist_cutoff(), cmdl.excluded_radius(), 
 			cmdl.max_interatomic_distance());
 		inout::output_file(gridpoints, cmdl.gridpdb_hcp_file());

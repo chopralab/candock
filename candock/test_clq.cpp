@@ -32,21 +32,13 @@ int main(int argc, char* argv[]) {
 		/* Create empty output files
 		 * 
 		 */
-		inout::output_file("", cmdl.gridpdb_hcp_file()); // gridpoints for all binding sites
-		inout::output_file("", cmdl.prep_file()); // output prepared ligands
-		inout::output_file("", cmdl.egrid_file()); // output energy grid
 		inout::output_file("", cmdl.docked_seeds_file()); // output docked & filtered fragment poses
-		inout::output_file("", cmdl.docked_ligands_file()); // output docked molecule conformations
-		inout::output_file("", cmdl.mini_ligands_file()); // output docked & minimized ligands conformations
-		inout::output_file(OMMIface::print_energies_title(), 
-			cmdl.energy_file()); // output energy components of docked & minimized ligands conformations
-		inout::output_file("", cmdl.nosql_file()); // probis local structural alignments
-		
+
 		/* Identify potential binding sites using ProBiS algorithm
 		 * or alternatively set binding sites from file
 		 * 
 		 */
-		vector<common::Centroid> centroids;
+		common::Centroids centroids;
 		if (cmdl.centroid_in_file().empty()) {
 			throw Error("For testing use --centroid option to provide a centroid file");
 		} else { // ... or else set binding sites from file
@@ -88,10 +80,10 @@ int main(int argc, char* argv[]) {
 		/* Create gridpoints for ALL centroids representing one or more binding sites
 		 * 
 		 */
-		Geom3D::PointVec gridpoints = common::identify_gridpoints(receptors[0], 
-			centroids, gridrec,	cmdl.grid_spacing(), cmdl.dist_cutoff(), 
+		Geom3D::GridPoints gridpoints = common::identify_gridpoints(centroids, 
+			gridrec, cmdl.grid_spacing(), cmdl.dist_cutoff(), 
 			cmdl.excluded_radius(), cmdl.max_interatomic_distance());
-		inout::output_file(gridpoints, cmdl.gridpdb_hcp_file(), ios_base::app);
+		inout::output_file(gridpoints, cmdl.gridpdb_hcp_file());
 
 		/* Read ligands from the ligands file - this file may contain millions
 		 * of ligands, and we read only a few at one time, to save memory
@@ -128,7 +120,7 @@ int main(int argc, char* argv[]) {
 			ligand_idatm_types, gridpoints);
 		common::HCPoints hcp = common::filter_scores(attep, cmdl.top_percent());
 
-		inout::output_file(attep, cmdl.egrid_file(), ios_base::app); // output energy grid
+		inout::output_file(attep, cmdl.egrid_file()); // output energy grid
 		dbgmsg("after output energy grid");
 
 		/* Create template grids using ProBiS-ligands algorithm

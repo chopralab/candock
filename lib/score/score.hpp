@@ -65,7 +65,7 @@ namespace Molib {
 		double non_bonded_energy(const AtomToCrd &) const;
 		cluster::MapD<Molib::Molecule> many_ligands_score(const Molib::Molecules &ligands) const;
 		AtomTypeToEnergyPoint compute_energy_grid(const set<int> &ligand_idatm_types, 
-			const Geom3D::PointVec &gridpoints);
+			const Geom3D::GridPoints &gridpoints);
 		AtomTypeToEnergyPoint parse_energy_grid_file(const string&);
 		const M1& get_energies() const { return __energies; }
 		const M1& get_derivatives() const { return __derivatives; }

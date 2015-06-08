@@ -220,7 +220,7 @@ public:
 			TCLAP::ValueArg<int> num_bsitesArg("","num_bsites","Maximum number of predicted (or given) binding sites to consider for docking (default is 3)",false,3,"int", cmd);
 
 			//~ TCLAP::ValueArg<double> grid_spacingArg("","grid","Grid spacing (default is 0.375)",false,0.375,"double", cmd);
-			TCLAP::ValueArg<double> grid_spacingArg("","grid","Grid spacing (default is 2.0)",false,2.0,"double", cmd);
+			TCLAP::ValueArg<double> grid_spacingArg("","grid","Grid spacing (default is 0.5)",false,0.5,"double", cmd);
 			TCLAP::ValueArg<double> excluded_radiusArg("","excluded","Excluded radius (default is 0.8)",false,0.8,"double", cmd);
 			TCLAP::ValueArg<double> max_interatomic_distanceArg("","interatomic","Maximum interatomic distance (default is 8.0)",false,8.0,"double", cmd);
 

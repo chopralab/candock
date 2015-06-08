@@ -332,7 +332,7 @@ namespace Molib {
 		return scores;
 	}
 	AtomTypeToEnergyPoint Score::compute_energy_grid(const set<int> &ligand_idatm_types, 
-		const Geom3D::PointVec &gridpoints) {
+		const Geom3D::GridPoints &gridpoints) {
 
 		AtomTypeToEnergyPoint attep;
 		Benchmark::reset();
@@ -342,12 +342,14 @@ namespace Molib {
 			int num = 0;
 			dbgmsg("ligand_atom_type = " << help::idatm_unmask[ligand_atom_type]);
 #endif
-			for (auto &gridpoint : gridpoints) {
-				double energy_sum = __distances_and_scores(gridpoint, ligand_atom_type);
-				attep[ligand_atom_type].push_back({gridpoint, energy_sum});
-				dbgmsg("compute energy grid : " << help::idatm_unmask[ligand_atom_type] 
-					<< "\t" << gridpoint.with_underscores() << "\t" << setw(9) << setprecision(5) 
-					<< fixed << energy_sum);
+			for (auto &kv : gridpoints) {
+				for (auto &gridpoint : kv.second) {
+					double energy_sum = __distances_and_scores(gridpoint, ligand_atom_type);
+					attep[ligand_atom_type].push_back({gridpoint, energy_sum});
+					dbgmsg("compute energy grid : " << help::idatm_unmask[ligand_atom_type] 
+						<< "\t" << gridpoint.with_underscores() << "\t" << setw(9) << setprecision(5) 
+						<< fixed << energy_sum);
+				}
 			}
 		}
 		cout << "total time required for scoring decoys was " 

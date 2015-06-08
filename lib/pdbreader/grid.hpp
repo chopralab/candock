@@ -130,6 +130,25 @@ public:
 		return points;
 	}
 
+	Points get_neighbors_within_tolerance(const T &point, const double &dist, const double &tol) {
+		Geom3D::Coordinate cmin = __correct(point, -dist);
+		Geom3D::Coordinate cmax = __correct(point, dist);
+		Points points;
+		const double dist_sq_max = pow(dist + tol, 2);
+		const double dist_sq_min = pow(dist - tol, 2);
+		for (int i = cmin.i(); i <= cmax.i(); ++i)
+			for (int j = cmin.j(); j <= cmax.j(); ++j)
+				for (int k = cmin.k(); k <= cmax.k(); ++k) {
+					for (auto neighbor : storage[i][j][k]) {
+						const double d_sq = point.crd().distance_sq(neighbor->crd());
+						if (d_sq > dist_sq_min && d_sq < dist_sq_max) {
+							points.push_back(neighbor);
+						}
+					}
+				}
+		return points;
+	}
+
 	bool has_neighbor_within(const T &point, const double &dist) {
 		Geom3D::Coordinate cmin = __correct(point, -dist);
 		Geom3D::Coordinate cmax = __correct(point, dist);
