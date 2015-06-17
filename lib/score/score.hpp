@@ -19,7 +19,6 @@ namespace Molib {
 	class Molecules;
 	typedef Grid<Atom> MolGrid;
 	typedef map<const Atom*, Geom3D::Coordinate> AtomToCrd;
-	typedef map<int, vector<pair<Geom3D::Coordinate, double>>> AtomTypeToEnergyPoint;
 	class Score {
 		typedef pair<int, int> pair_of_ints;
 		typedef vector<double> M0;
@@ -39,7 +38,6 @@ namespace Molib {
 		void __compile_scoring_function();
 		double __energy_mean(const pair_of_ints&, const double&);
 		double __energy_cumulative(const pair_of_ints&, const double&);
-		double __distances_and_scores(const Geom3D::Coordinate&, int);
 		struct Inter {
 			M0 potential, derivative;
 		};
@@ -51,11 +49,11 @@ namespace Molib {
 				MolGrid &gridrec, const string &ref_state, 
 				const string &comp, const string &rad_or_raw, const double &dist_cutoff, 
 				const string &distributions_file, const double &step_non_bond) 
-				: __gridrec(gridrec), 
-				__ref_state(ref_state), __comp(comp), __rad_or_raw(rad_or_raw), 
-				__dist_cutoff(dist_cutoff),__distributions_file(distributions_file),
-				__step_non_bond(step_non_bond),
+				: __gridrec(gridrec), __ref_state(ref_state), __comp(comp), 
+				__rad_or_raw(rad_or_raw), __dist_cutoff(dist_cutoff), 
+				__distributions_file(distributions_file), __step_non_bond(step_non_bond),
 				__total_quantity(0), __eps(0.0000001) {
+					
 			function<double (Score&, const pair_of_ints&, const double&)> fptr = &Score::__energy_mean;
 			__define_composition(receptor_idatm_types, ligand_idatm_types);
 			__process_distributions_file();
@@ -64,14 +62,10 @@ namespace Molib {
 		double non_bonded_energy(const Molecule&) const; // this was formerly called distances_and_scores_frag_lig
 		double non_bonded_energy(const AtomToCrd &) const;
 		cluster::MapD<Molib::Molecule> many_ligands_score(const Molib::Molecules &ligands) const;
-		AtomTypeToEnergyPoint compute_energy_grid(const set<int> &ligand_idatm_types, 
-			const Geom3D::GridPoints &gridpoints);
-		AtomTypeToEnergyPoint parse_energy_grid_file(const string&);
+		map<int, double> compute_energy(const Geom3D::Coordinate &crd, const set<int> &ligand_atom_types) const;
 		const M1& get_energies() const { return __energies; }
 		const M1& get_derivatives() const { return __derivatives; }
 		friend ostream& operator<< (ostream& stream, const Score::M0 &energy);
 	};
 };
-
-ostream& operator<<(ostream& os, const Molib::AtomTypeToEnergyPoint &attep);
 #endif

@@ -242,6 +242,27 @@ namespace Glib {
 		return clique;
 	}
 
+	//~ template<class Vertex>
+	//~ typename Graph<Vertex>::Cliques Graph<Vertex>::max_clique() {
+		//~ Benchmark::reset();
+		//~ vector<vector<int>> qmax;
+		//~ Maxclique m(__conn, this->size());
+		//~ int qmax_sz;
+		//~ m.mcq(qmax, qmax_sz);
+		//~ Cliques clique;
+		//~ for (auto &rows : qmax) {
+			//~ dbgmsg("found max weight clique of " << to_string(rows.size()) 
+				//~ << " vertices");
+			//~ clique.push_back(Path());
+			//~ for (auto &vnum : rows) {
+				//~ clique.back().push_back(&this->operator[](vnum));
+				//~ dbgmsg("clique push vertex = " << vnum);
+			//~ }
+		//~ }
+		//~ cout << "time to find max.weight clique " << Benchmark::seconds_from_start() << " wallclock seconds" << endl;
+		//~ return clique;
+	//~ }
+
 	template<class Vertex>
 	typename Graph<Vertex>::Cycles Graph<Vertex>::find_fused_rings() {
 		Cycles fused;

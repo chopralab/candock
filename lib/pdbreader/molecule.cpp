@@ -272,6 +272,28 @@ namespace Molib {
 		MolGraph::Matches m = g1.match(g2);
 		return Molib::compute_rmsd(g1, g2, m);
 	}
+
+	Atom& Molecule::get_center_atom() const {
+		Atom *center_atom = nullptr;
+		AtomVec atoms = this->get_atoms();
+		double min_d = HUGE_VAL;
+		for (auto &patom1 : atoms) {
+			double d = 0.0;
+			for (auto &patom2 : atoms) {
+				if (patom1 != patom2) {
+					d += patom1->crd().distance(patom2->crd());
+				}
+			}
+			if (d < min_d) {
+				min_d = d;
+				center_atom = patom1;
+			}
+		}
+		if (!center_atom)
+			throw Error("die : center atom cannot be found");
+		return *center_atom;
+	}
+
 	double Molecule::max_dist() const {
 		dbgmsg("calculate max distance between atoms in an AtomSet ...");
 		double md_sq = 0.0;

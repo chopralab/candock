@@ -3,7 +3,7 @@ include Makefile.inc
 LIBDIR = ../lib
 DIRS	= $(LIBDIR)/pdbreader $(LIBDIR)/kabsch $(LIBDIR)/helper $(LIBDIR)/linker \
 $(LIBDIR)/score $(LIBDIR)/fragmenter $(LIBDIR)/graph $(LIBDIR)/kbforce $(LIBDIR)/geom3d \
-$(LIBDIR)/openmm $(LIBDIR)/probis $(LIBDIR)/ligands
+$(LIBDIR)/openmm $(LIBDIR)/probis $(LIBDIR)/ligands $(LIBDIR)/docker $(LIBDIR)/centro
 EXE	= candock
 TEST = test_minimization
 TEST2 = test_fragmenting
@@ -17,12 +17,13 @@ OBJS_TEST3	= test_bsite.o common.o
 OBJS_TEST4	= test_clq.o common.o
 OBJS_TEST5	= test_link.o common.o
 OBJLIBS	=  libfragmenter.a libgeom3d.a libgraph.a libhelper.a libkabsch.a \
-libkbforce.a liblinker.a libomm.a libpdb.a libscore.a libprobis.a libligands.a
+libkbforce.a liblinker.a libomm.a libpdb.a libscore.a libprobis.a libligands.a \
+libdocker.a libcentro.a
 LIBS	= -L. -L$(LIBDIR)/linker -L $(LIBDIR)/pdbreader -L $(LIBDIR)/kabsch \
 -L $(LIBDIR)/helper -L $(LIBDIR)/score -L $(LIBDIR)/fragmenter -L $(LIBDIR)/graph \
 -L $(LIBDIR)/kbforce -L $(LIBDIR)/geom3d -L $(LIBDIR)/openmm -L $(LIBDIR)/probis \
--L $(LIBDIR)/ligands \
--llinker -lpdb -lscore -lfragmenter -lgraph -lkabsch \
+-L $(LIBDIR)/ligands -L $(LIBDIR)/docker -L $(LIBDIR)/centro \
+-llinker -lpdb -lscore -lfragmenter -ldocker -lgraph -lkabsch -lcentro \
 -lgeom3d -lomm -lhelper -lOpenMM_static -ldl -lc -lkbforce -lprobis -lligands -lpdb \
 -lboost_regex -lboost_filesystem -lboost_system -lpthread -lboost_date_time \
 -lgsl -lgslcblas -lm
@@ -86,6 +87,14 @@ candock.o: candock.cpp common.cpp common.hpp \
 
 common.o: common.cpp common.hpp
 	$(CC) $(PRJCFLAGS) $(INCL) -c $<
+
+libcentro.a : force_look
+	$(ECHO) looking into subdir : $(MAKE) $(MFLAGS)
+	cd $(LIBDIR)/centro; $(MAKE) $(MFLAGS)
+
+libdocker.a : force_look
+	$(ECHO) looking into subdir : $(MAKE) $(MFLAGS)
+	cd $(LIBDIR)/docker; $(MAKE) $(MFLAGS)
 
 libligands.a : force_look
 	$(ECHO) looking into subdir : $(MAKE) $(MFLAGS)

@@ -13,30 +13,33 @@ namespace Molib {
 		return stream;
 	}
 
-	double Score::__distances_and_scores(const Geom3D::Coordinate &crd2, int ligand_atom_type) {
-		double energy_sum = 0.0;
-		Atom at(crd2);
+	map<int, double> Score::compute_energy(const Geom3D::Coordinate &crd, const set<int> &ligand_atom_types) const {
+		map<int, double> energy_sum;
+		Atom at(crd);
 		for (auto &patom : __gridrec.get_neighbors(at, __dist_cutoff)) {
-			const double dist = patom->crd().distance(crd2);
+			const double dist = patom->crd().distance(crd);
 			const auto &atom_1 = patom->idatm_type();
-			auto atom_pair = minmax(atom_1, ligand_atom_type);
 			const int index = __get_index(dist);
+			for (auto &l : ligand_atom_types) {
+				auto atom_pair = minmax(atom_1, l);
 #ifndef NDEBUG
-			if (!__energies.count(atom_pair))
-				throw Error("undefined atom_pair in __energies");
-			if (index >= __energies.at(atom_pair).size())
-				throw Error("undefined index in __energies");
-			dbgmsg("atom pairs = " << help::idatm_unmask[atom_pair.first] << " " 
-				<< help::idatm_unmask[atom_pair.second] << " index = " << index
-				<< " dist = " << dist << " __energies.at(atom_pair).size() = " 
-				<< __energies.at(atom_pair).size() << " partial energy = "
-				<< __energies[atom_pair][index]);
+				if (!__energies.count(atom_pair))
+					throw Error("undefined atom_pair in __energies");
+				if (index >= __energies.at(atom_pair).size())
+					throw Error("undefined index in __energies");
+				dbgmsg("atom pairs = " << help::idatm_unmask[atom_pair.first] << " " 
+					<< help::idatm_unmask[atom_pair.second] << " index = " << index
+					<< " dist = " << dist << " __energies.at(atom_pair).size() = " 
+					<< __energies.at(atom_pair).size() << " partial energy = "
+					<< __energies.at(atom_pair).at(index));
 #endif
-			energy_sum += __energies[atom_pair][index];
+				energy_sum[l] += __energies.at(atom_pair).at(index);
+			}
 		}
-		dbgmsg("out of distances and scores");
+		dbgmsg("out of compute energy");
 		return energy_sum;
 	}
+
 	void Score::__define_composition(const set<int> &receptor_idatm_types, const set<int> &ligand_idatm_types) {
 		// JANEZ: num_pairs is now __prot_lig_pairs.size() !!!
 		set<int> idatm_types;
@@ -331,76 +334,4 @@ namespace Molib {
 			<< " decoys was " << Benchmark::seconds_from_start() << " wallclock seconds\n";
 		return scores;
 	}
-	AtomTypeToEnergyPoint Score::compute_energy_grid(const set<int> &ligand_idatm_types, 
-		const Geom3D::GridPoints &gridpoints) {
-
-		AtomTypeToEnergyPoint attep;
-		Benchmark::reset();
-		cout << "beginning scoring ..." << endl;
-		for (const auto &ligand_atom_type : ligand_idatm_types) {
-#ifndef NDEBUG
-			int num = 0;
-			dbgmsg("ligand_atom_type = " << help::idatm_unmask[ligand_atom_type]);
-#endif
-			for (auto &kv : gridpoints) {
-				for (auto &gridpoint : kv.second) {
-					double energy_sum = __distances_and_scores(gridpoint, ligand_atom_type);
-					attep[ligand_atom_type].push_back({gridpoint, energy_sum});
-					dbgmsg("compute energy grid : " << help::idatm_unmask[ligand_atom_type] 
-						<< "\t" << gridpoint.with_underscores() << "\t" << setw(9) << setprecision(5) 
-						<< fixed << energy_sum);
-				}
-			}
-		}
-		cout << "total time required for scoring decoys was " 
-			<< Benchmark::seconds_from_start() << " wallclock seconds\n";
-		cout << "cleaning up temporary files ...\n";
-		return attep;
-	}
-	AtomTypeToEnergyPoint Score::parse_energy_grid_file(const string &egrid_file) {
-		AtomTypeToEnergyPoint attep;
-		vector<string> scores;
-		inout::Inout::read_file(egrid_file, scores);
-		for (const string &line : scores) {
-			boost::smatch m;
-			if (boost::regex_search(line, m, boost::regex("^(\\S+)\\s+(\\S+)_(\\S+)_(\\S+)\\s+(\\S+)$"))) {
-				if (m[1].matched && m[2].matched && m[3].matched && m[4].matched && m[5].matched) {
-					attep[help::idatm_mask.at(m[1].str())].push_back(make_pair(Geom3D::Coordinate(stod(m[2].str()), 
-						stod(m[3].str()), stod(m[4].str())), stod(m[5].str())));
-					dbgmsg("processing atom type " << m[1].str());
-				}
-			}
-		}
-		return attep;
-	}
 };
-
-ostream& operator<<(ostream& os, const Molib::AtomTypeToEnergyPoint &attep) {
-	int i = 1;
-	for (auto &kv : attep) {
-		const int ligand_atom_type = kv.first;
-		os << "MODEL" << setw(9) << i++ << endl;
-		for (auto &ep : kv.second) {
-			const Geom3D::Coordinate &point = ep.first;
-			const double energy_sum = ep.second;
-
-			os << setw(6) << left << "HETATM";
-			os << setw(5) << right << 1;
-			os << setw(1) << " ";
-			os << setw(4) << left << help::idatm_unmask[ligand_atom_type];
-			os << setw(1) << " ";
-			os << setw(3) << right << "DIK";
-			os << setw(1) << " ";
-			os << setw(1) << "A";
-			os << setw(4) << right << 1;
-			os << setw(1) << " ";
-			os << setw(27) << point.pdb();
-			os << setw(6) << setprecision(2) << fixed << right << 1.0;
-			os << setw(6) << setprecision(2) << fixed << (energy_sum > 10 ? 10 : 
-				(energy_sum < -10 ? -10 : energy_sum)) << endl;
-		}
-		os << "ENDMDL" << endl;
-	}
-	return os;
-}	
-

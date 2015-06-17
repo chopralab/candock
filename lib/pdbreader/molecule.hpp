@@ -333,6 +333,7 @@ namespace Molib {
 			const int model_number=-1) const;
 		double max_dist() const;
 		double max_dist(const Atom &atom) const;
+		Atom& get_center_atom() const;
 		void prepare_for_mm(const OMMIface::ForceField &ff, MolGrid &grid);
 		void undo_mm_specific();
 		void add_modified(Residue::res_tuple2 t) { __modified.insert(t); }

@@ -26,13 +26,15 @@ void Maxclique::_mcq(std::vector<std::vector<int>> &maxclique, int &sz, bool dyn
   }
   else
     expand(V);
+
   for (int i=0; i<QMAXES.size(); i++) {
 	  maxclique.push_back(std::vector<int>());
 	for (int j=0; j<QMAXES[i].size(); j++) { 
 		maxclique.back().push_back(QMAXES[i].at(j));
 	}
   }
-  sz = QMAXES.back().size();
+  sz = (QMAXES.empty() ? 0 : QMAXES.back().size());
+
   //~ maxclique = new int[QMAX.size()]; 
   //~ for (int i=0; i<QMAX.size(); i++) { 
     //~ maxclique[i] = QMAX.at(i);
@@ -104,6 +106,7 @@ void Maxclique::color_sort(Vertices &R) {
 void Maxclique::expand(Vertices R) {
   while (R.size()) {
     if (Q.size() + R.end().get_degree() > QMAX.size()) {
+    //~ if (Q.size() + R.end().get_degree() >= QMAX.size()) {
       Q.push(R.end().get_i());
       Vertices Rp(R.size());
       cut2(R, Rp);
@@ -113,8 +116,11 @@ void Maxclique::expand(Vertices R) {
         expand(Rp);
       }
       else if (Q.size() > QMAX.size()) { 
-		// std::cout << "step = " << pk << " current max. clique size = " << Q.size() << std::endl; 
+      //~ else if (Q.size() >= QMAX.size()) { 
+		//~ std::cout << "step = " << pk << " current max. clique size = " << Q.size() << std::endl; 
 		QMAX = Q;
+		QMAXES.push_back(QMAX);
+		QMAX.pop();
       }    
       Rp.dispose();
       Q.pop();

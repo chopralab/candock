@@ -16,6 +16,4 @@ namespace Geom3D {
 	Point line_evaluate(const Point &, const Vector3 &, const double);
 }
 ostream& operator<<(ostream& os, const Geom3D::PointVec &points);
-ostream& operator<<(ostream& os, const map<int, Geom3D::PointVec> &points);
-
 #endif

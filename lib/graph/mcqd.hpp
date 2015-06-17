@@ -21,8 +21,8 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef MCQD
-#define MCQD
+#ifndef MCQD_H
+#define MCQD_H
 
 #include <iostream>
 #include <algorithm>

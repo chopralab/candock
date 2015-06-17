@@ -43,13 +43,3 @@ ostream& operator<<(ostream& os, const Geom3D::PointVec &points)	{
 	}
 	return os;
 }	
-ostream& operator<<(ostream& os, const map<int, Geom3D::PointVec> &points)	{
-	for (auto &kv : points) {
-		const int bsite_id = kv.first;
-		os << "MODEL" << setw(9) << right << bsite_id << endl;
-		os << kv.second;
-		os << "ENDMDL" << endl;
-	}
-	return os;
-}	
-
