@@ -51,14 +51,6 @@ class Maxclique {
     int sz;
     static bool desc_degree(const Vertex vi, const Vertex vj) { return (vi.get_degree() > vj.get_degree()); }
   public:
-#ifdef DBG
-    void dbg_v(const string msg="") const {
-    //  std::cout << msg << " Vertices: [";
-      for (int i=0; i < sz; i++) 
-//	std::cout << "(" << v[i].get_i() << "," << v[i].get_degree() << ") ";
-  //    std::cout << "]" << std::endl;
-    }
-#endif
     Vertices(int size) : sz(0) { v = new Vertex[size]; }
     ~Vertices () {}
     void dispose() { if (v) delete [] v; }
@@ -75,14 +67,6 @@ class Maxclique {
     int *i;
     int sz;
   public:
-#ifdef DBG
-    void dbg_i(const string msg="") const {
-      //std::cout << msg << " Class: [";
-      for (int ii=0; ii < sz; ii++) 
-	//std::cout << i[ii] << " ";
-      //std::cout << "]" << std::endl;
-    }
-#endif
     ColorClass() : sz(0), i(0) {}
     ColorClass(const int sz) : sz(sz), i(0) { init(sz); }
     ~ColorClass() { if (i) delete [] i;
@@ -124,39 +108,17 @@ class Maxclique {
   void color_sort(Vertices&);
   void expand(Vertices);
   void expand_dyn(Vertices);
-  void _mcq(std::vector<std::vector<int>>&, int&, bool);
-  //~ void _mcq(int**&, int&, bool);
-  //~ void _mcq(int*&, int&, bool);
+  std::vector<std::vector<int>> _mcq(const int, bool);
   void degree_sort(Vertices &R) { R.set_degrees(*this); R.sort(); }
 public:
-#ifdef DBG
-  void dbg_C() const {
-    for (int i=0; i < V.size(); i++) {
-      //std::cout << "C["<< i << "] : ";
-      C[i].dbg_i();
-    }
-  }
-  void dbg_conn() const {
-    for (int i=0; i < V.size(); i++) {
-      for (int j=0; j < V.size(); j++) {
-	//std::cout <<e[i][j];
-      }
-    //  std::cout<< std::endl;
-    }
-  }
-#endif
   class myexception : public std::exception {
     const char* what() const throw() { return "WARNING: Graph is empty."; }
   } exc_empty;
   Maxclique(const bool* const*, const int, const float=0.025);
   int steps() const { return pk; }
-  void mcq(std::vector<std::vector<int>> &maxclique, int &sz) { _mcq(maxclique, sz, false); }
-  //~ void mcq(int** &maxclique, int &sz) { _mcq(maxclique, sz, false); }
-  void mcqdyn(std::vector<std::vector<int>> &maxclique, int &sz) { _mcq(maxclique, sz, true); }
-  //~ void mcqdyn(int** &maxclique, int &sz) { _mcq(maxclique, sz, true); }
-  //~ void mcqdyn(int* &maxclique, int &sz) { _mcq(maxclique, sz, true); }
+  std::vector<std::vector<int>> mcq(const int minsz) { return _mcq(minsz, false); }
+  std::vector<std::vector<int>> mcqdyn(const int minsz) { return _mcq(minsz, true); }
   ~Maxclique() {
-    //std::cout << "Maxclique::~Maxclique" << std::endl;
     if (C) delete [] C;
     if (S) delete [] S;
     V.dispose();

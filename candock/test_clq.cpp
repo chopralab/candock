@@ -145,32 +145,44 @@ int main(int argc, char* argv[]) {
 							 * 
 							 */
 							Docker::Conformations conf(seeds[j], gpoints0, cmdl.grid_spacing());
+
+							inout::output_file(conf, "conformations.pdb"); 
 							
 							/* Dock this seed's conformations to the entire grid
 							 * by moving them over all gridpoints and probe where
 							 * they clash with the receptor
 							 *
 							 */
+							//~ Docker::Dock dock(gpoints, conf, seeds[j], score);
 							Docker::Dock dock(gpoints, conf, seeds[j]);
-							Molib::Molecules non_clashing_seeds = dock.run();
-							inout::output_file(non_clashing_seeds, cmdl.docked_seeds_file(), 
-								ios_base::app); // output docked & filtered fragment poses
-							throw Error("exit after dock");
-							// cluster non clashing seeds based on rmsd and 
+							Docker::AcceptedConformations accepted = dock.run();
+
+							//~ inout::output_file(accepted, cmdl.docked_seeds_file(), 
+								//~ ios_base::app); // output docked & filtered fragment poses
+//~ 
+							// cluster accepted conformations based on rmsd and 
 							// find best-scored cluster representatives
-							auto clusters_reps_pair = common::cluster_molecules(
-								non_clashing_seeds, score, cmdl.clus_rad(), cmdl.min_pts(), 
-								cmdl.max_num_clus(), cmdl.max_seeds_to_cluster());
+							Molib::Molecules docked_seeds = dock.cluster(accepted);
+
+							inout::output_file(docked_seeds, "tmp/" + seeds[j].name() + "/" 
+								+ cmdl.top_seeds_file()); // output docked & clustered seeds
 							
-							Molib::Molecules tseeds;
-							common::convert_clusters_to_mols(tseeds, clusters_reps_pair.second);
-#ifndef NDEBUG
-							cluster::MapD<Molib::Molecule> scores = 
-								score.many_ligands_score(tseeds);
-							dbgmsg(scores);
-#endif
-							inout::output_file(tseeds, "tmp/" + seeds[j].name() + "/" 
-								+ cmdl.top_seeds_file()); // output docked & filtered fragment poses
+							throw Error("exit after dock");
+							//~ // cluster non clashing seeds based on rmsd and 
+							//~ // find best-scored cluster representatives
+							//~ auto clusters_reps_pair = common::cluster_molecules(
+								//~ non_clashing_seeds, score, cmdl.clus_rad(), cmdl.min_pts(), 
+								//~ cmdl.max_num_clus(), cmdl.max_seeds_to_cluster());
+							//~ 
+							//~ Molib::Molecules tseeds;
+							//~ common::convert_clusters_to_mols(tseeds, clusters_reps_pair.second);
+//~ #ifndef NDEBUG
+							//~ cluster::MapD<Molib::Molecule> scores = 
+								//~ score.many_ligands_score(tseeds);
+							//~ dbgmsg(scores);
+//~ #endif
+							//~ inout::output_file(tseeds, "tmp/" + seeds[j].name() + "/" 
+								//~ + cmdl.top_seeds_file()); // output docked & filtered fragment poses
 	
 						}
 						catch (Error& e) {

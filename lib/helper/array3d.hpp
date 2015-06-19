@@ -1,0 +1,38 @@
+#ifndef ARRAY3D_H
+#define ARRAY3D_H
+
+template<typename T>
+struct Array3d {
+	T ***data;
+	int szi, szj, szk;
+
+	void init(int SZI, int SZJ, int SZK) {
+		szi = SZI; szj = SZJ; szk = SZK;
+		data = new T**[szi];
+		for (int i = 0; i < szi; ++i) {
+			data[i] = new T*[szj];
+			for (int j = 0; j < szj; ++j) {
+				data[i][j] = new T[szk];
+				memset(data[i][j], 0, szk * sizeof(T));
+			}
+		}
+	}
+	Array3d(int SZI, int SZJ, int SZK) : data(nullptr) {
+		init(SZI, SZJ, SZK);
+	}
+	Array3d() : data(nullptr), szi(0), szj(0), szk(0) {}
+	~Array3d() {
+		if (data) {
+			for (int i = 0; i < szi; ++i) {
+				for (int j = 0; j < szj; ++j) {
+					delete [] data[i][j];
+				}
+				delete [] data[i];
+			}
+			delete [] data;
+			data = nullptr;
+		}
+	}
+};
+
+#endif
