@@ -20,6 +20,10 @@
 #include "ligands/genclus.hpp"
 #include "ligands/genlig.hpp"
 #include "cluster/optics.hpp"
+#include "docker/gpoints.hpp"
+#include "docker/conformations.hpp"
+#include "docker/dock.hpp"
+#include "centro/centroids.hpp"
 using namespace std;
 
 CmdLnOpts cmdl;
@@ -47,21 +51,26 @@ int main(int argc, char* argv[]) {
 		 * or alternatively set binding sites from file
 		 * 
 		 */
-		vector<common::Centroid> centroids;
-		if (cmdl.centroid_file_in().empty()) {
+		Centro::Centroids centroids;
+		if (cmdl.centroid_in_file().empty()) {
 			probis::compare_against_bslib(argc, argv, cmdl.receptor_file(), 
 				cmdl.receptor_chain_id(), cmdl.bslib_file(), cmdl.ncpu(),
 				cmdl.nosql_file(), cmdl.json_file());
 			genclus::generate_clusters_of_ligands(cmdl.json_file(), cmdl.json_with_ligs_file(),
 				cmdl.geo_dir(), cmdl.names_dir(), cmdl.neighb(), cmdl.probis_clus_rad(),
 				cmdl.probis_min_pts(), cmdl.probis_min_z_score());
-			const genlig::BindingSiteClusters binding_site_clusters = 
+			auto binding_sites = 
 				genlig::generate_binding_site_prediction(cmdl.json_with_ligs_file(), 
 				cmdl.bio_dir(), cmdl.num_bsites());
-			inout::output_file(binding_site_clusters, cmdl.lig_clus_file());
-			centroids = common::set_centroids(binding_site_clusters);	
+
+			inout::output_file(binding_sites.first, cmdl.lig_clus_file());
+			inout::output_file(binding_sites.second, cmdl.z_scores_file());
+
+			centroids = Centro:set_centroids(binding_sites.first);	
+			inout::output_file(centroids, cmdl.centroid_out_file()); // probis local structural alignments
+
 		} else { // ... or else set binding sites from file
-			centroids = common::set_centroids(cmdl.centroid_file_in());
+			centroids = Centro::set_centroids(cmdl.centroid_in_file());
 		}
 
 		/* Initialize parsers for receptor (and ligands) and read
@@ -89,24 +98,34 @@ int main(int argc, char* argv[]) {
 		 */
 		Molib::MolGrid gridrec(receptors[0].get_atoms());
 
-		/* Create gridpoints for ALL centroids representing one or more binding sites
+		/* Forcefield stuff : create forcefield for small molecules (and KB 
+		 * non-bonded with receptor) and read receptor's forcefield xml file(s) into 
+		 * forcefield object
 		 * 
 		 */
-		Geom3D::PointVec gridpoints = common::identify_gridpoints(receptors[0], 
-			centroids, gridrec,	cmdl.grid_spacing(), cmdl.dist_cutoff(), 
-			cmdl.excluded_radius(), cmdl.max_interatomic_distance());
-		inout::output_file(gridpoints, cmdl.gridpdb_hcp_file(), ios_base::app);
+		OMMIface::ForceField ffield;
+		ffield.parse_gaff_dat_file(cmdl.gaff_dat_file())
+			.add_kb_forcefield(score, cmdl.step_non_bond(), cmdl.scale_non_bond())
+			.parse_forcefield_file(cmdl.amber_xml_file());
 
-		vector<thread> threads;
-		mutex mtx;
+		/* Prepare receptor for molecular mechanics: histidines, N-[C-]terminals,
+		 * bonds, disulfide bonds, main chain bonds
+		 * 
+		 */
+		receptors[0].prepare_for_mm(ffield, gridrec);
 
 		/* Read ligands from the ligands file - this file may contain millions
 		 * of ligands, and we read only a few at one time, to save memory
 		 * 
 		 */
+
+		vector<thread> threads;
+		mutex mtx;
+
 		Molib::Molecules seeds;
 		set<string> added;
 		set<int> ligand_idatm_types;
+
 		for(int i = 0; i < cmdl.ncpu(); ++i) {
 			threads.push_back(thread([&lpdb, &seeds, &added, &ligand_idatm_types, &mtx] () {
 				Molib::Molecules ligands;
@@ -150,28 +169,22 @@ int main(int argc, char* argv[]) {
 		 * 
 		 */
 		Molib::Score score(Molib::get_idatm_types(receptors), ligand_idatm_types, 
-			gridrec, cmdl.ref_state(),cmdl.comp(), cmdl.rad_or_raw(), 
+			gridrec, cmdl.ref_state(), cmdl.comp(), cmdl.rad_or_raw(), 
 			cmdl.dist_cutoff(), cmdl.distributions_file(), cmdl.step_non_bond());
 
-		/* Forcefield stuff : create forcefield for small molecules (and KB 
-		 * non-bonded with receptor) and read receptor's forcefield xml file(s) into 
-		 * forcefield object
+		/* Create gridpoints for ALL centroids representing one or more binding sites
 		 * 
 		 */
-		OMMIface::ForceField ffield;
-		ffield.parse_gaff_dat_file(cmdl.gaff_dat_file())
-			.add_kb_forcefield(score, cmdl.step_non_bond(), cmdl.scale_non_bond())
-			.parse_forcefield_file(cmdl.amber_xml_file());
+		Docker::Gpoints gpoints(score, ligand_idatm_types, centroids, gridrec, 
+			cmdl.grid_spacing(), cmdl.dist_cutoff(), cmdl.excluded_radius(), 
+			cmdl.max_interatomic_distance());
+		inout::output_file(gpoints, cmdl.gridpdb_hcp_file());
 
-		/* Create energy grids for all atom types that appear in small molecules
-		 * for the combined binding site
+		/* Create a zero centered centroid with 10 A radius (max fragment 
+		 * radius) for getting all conformations of each seed
+		 * 
 		 */
-		vector<common::HCPoints> hcp_vec;
-		Molib::AtomTypeToEnergyPoint attep = score.compute_energy_grid(
-			ligand_idatm_types, gridpoints);
-		hcp_vec.push_back(common::filter_scores(attep, cmdl.top_percent()));
-
-		inout::output_file(attep, cmdl.egrid_file(), ios_base::app); // output energy grid
+		Docker::Gpoints gpoints0(cmdl.grid_spacing(), 10.0);
 
 		/* Create template grids using ProBiS-ligands algorithm
 		 * WORK IN PROGESS WORK IN PROGESS WORK IN PROGESS WORK IN PROGESS 
@@ -188,43 +201,35 @@ int main(int argc, char* argv[]) {
 		threads.clear();
 		for(int i = 0; i < cmdl.ncpu(); ++i) {
 			threads.push_back(
-				thread([&seeds, &gridrec, &score, &hcp_vec, i] () {
+				thread([&seeds, &gridrec, &score, &gpoints0, &gpoints, i] () {
 					// iterate over docked seeds and dock unique seeds
 					for (int j = i; j < seeds.size(); j+= cmdl.ncpu()) {
-						dbgmsg(seeds[j]);
-						// iterate over top scores for each centroid
-						Molib::Molecules non_clashing_seeds;
-						for (auto &hcp : hcp_vec) {
-							
-							// make product graph between seed and hcp grid, cutoffs top_percent ?
-							common::ProductGraph graph = 
-								common::product_graph(hcp, seeds[j], cmdl.grid_spacing()); 
-							common::ProductGraph::Cliques maxclq = 
-								graph.max_weight_clique(cmdl.num_iter());
+						try {
+							dbgmsg(seeds[j]);
+							/* Compute all conformations of this seed with the center
+							 * atom fixed on coordinate origin using maximum clique algorithm
+							 * 
+							 */
+							Docker::Conformations conf(seeds[j], gpoints0, cmdl.grid_spacing());
 
-							// Superimpose fragment coordinates onto clique and 
-							// filter out those that clash with the receptor
-							for (auto &molecule : common::filter_clashes(
-								common::superimpose(maxclq, seeds[j]), gridrec)) {
-								non_clashing_seeds.add(new Molib::Molecule(molecule));
-							}
+							inout::output_file(conf, "conformations.pdb"); 
+							
+							/* Dock this seed's conformations to the entire grid by moving them 
+							 * over all gridpoints and probe where they clash with the receptor: 
+							 * cluster docked conformations based on rmsd and energy and output 
+							 * only best-scored cluster representatives
+							 *
+							 */
+							Docker::Dock dock(gpoints, conf, seeds[j], 2.0);
+							Molib::Molecules docked_seeds = dock.run();
+
+							inout::output_file(docked_seeds, "tmp/" + seeds[j].name() + "/" 
+								+ cmdl.top_seeds_file()); // output docked & clustered seeds
+	
 						}
-						inout::output_file(non_clashing_seeds, cmdl.docked_seeds_file(), ios_base::app); // output docked & filtered fragment poses
-						// cluster non clashing seeds based on rmsd and 
-						// find best-scored cluster representatives
-						auto clusters_reps_pair = common::cluster_molecules(
-							non_clashing_seeds, score, cmdl.clus_rad(), cmdl.min_pts(), 
-							cmdl.max_num_clus(), cmdl.max_seeds_to_cluster());
-						
-						Molib::Molecules tseeds;
-						common::convert_clusters_to_mols(tseeds, clusters_reps_pair.second);
-#ifndef NDEBUG
-						cluster::MapD<Molib::Molecule> scores = 
-							score.many_ligands_score(tseeds);
-						dbgmsg(scores);
-#endif
-						inout::output_file(tseeds, "tmp/" + seeds[j].name() + "/" 
-							+ cmdl.top_seeds_file()); // output docked & filtered fragment poses
+						catch (Error& e) {
+							cerr << "skipping seed due to : " << e.what() << endl;
+						}
 					}
 			}));
 		}
@@ -233,12 +238,6 @@ int main(int argc, char* argv[]) {
 		}
 
 		seeds.clear();
-
-		/* Prepare receptor for molecular mechanics: histidines, N-[C-]terminals,
-		 * bonds, disulfide bonds, main chain bonds
-		 * 
-		 */
-		receptors[0].prepare_for_mm(ffield, gridrec);
 
 		/* Main loop C with threading support : connection of seeds and
 		 * minimization

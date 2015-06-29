@@ -106,7 +106,7 @@ int main(int argc, char* argv[]) {
 		 * 
 		 */
 		Molib::Score score(Molib::get_idatm_types(receptors), ligand_idatm_types, 
-			gridrec, cmdl.ref_state(),cmdl.comp(), cmdl.rad_or_raw(), 
+			gridrec, cmdl.ref_state(), cmdl.comp(), cmdl.rad_or_raw(), 
 			cmdl.dist_cutoff(), cmdl.distributions_file(), cmdl.step_non_bond());
 
 		/* Create gridpoints for ALL centroids representing one or more binding sites
