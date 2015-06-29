@@ -12,7 +12,7 @@ using namespace std;
 
 namespace Docker {
 
-	ostream& operator<<(ostream& os, const Docker::GpointVec &points)	{
+	ostream& operator<<(ostream& os, const Docker::Gpoints::GpointVec &points)	{
 		for (auto &point : points) {
 			// to add : output of energies
 			os << "ATOM      1   U  DIK     1    " << point.crd().pdb() << endl; 
@@ -54,10 +54,10 @@ namespace Docker {
 		}
 	}
 
-	Gpoint& Gpoints::get_center_point() {
+	Gpoints::Gpoint& Gpoints::get_center_point() {
 		Geom3D::Point center(0,0,0);
 		double min_d = HUGE_VAL;
-		Docker::Gpoint *center_point = nullptr;
+		Gpoints::Gpoint *center_point = nullptr;
 		for (auto &p : get_gridpoints0()) {
 			const double d = p.crd().distance(center);
 			if (d < min_d) {
@@ -277,13 +277,6 @@ namespace Docker {
 		// the last ones that did not get to the next mod==0
 		cout << points_kept << " points kept out of " << gridpoint_counter 
 			<< " total gridpoints\n";
-	}
-
-	GpointVec Gpoints::get_gridpoints_as_vec() { 
-		Docker::GpointVec gvec; 
-		for (auto &kv : __gridpoints)
-			gvec.insert(gvec.end(), kv.second.begin(), kv.second.end());
-		return gvec;
 	}
 
 };

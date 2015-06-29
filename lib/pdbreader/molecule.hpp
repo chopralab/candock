@@ -460,7 +460,6 @@ namespace Molib {
 	typedef Glib::Graph<Atom> MolGraph;
 
 	
-	double compute_rmsd(const MolGraph&, const MolGraph&, const MolGraph::Matches&);
 	set<int> get_idatm_types(const Molecules&, set<int> previous=set<int>());
 
 	BondSet get_bonds_in(const AtomSet &atoms, bool in=true);

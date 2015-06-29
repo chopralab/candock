@@ -22,7 +22,8 @@ struct Array2d {
 	~Array2d() {
 		if (data) {
 			for (int i = 0; i < szi; ++i) {
-				delete [] data[i];
+				if (data[i]) delete [] data[i];
+				data[i] = nullptr;
 			}
 			delete [] data;
 			data = nullptr;

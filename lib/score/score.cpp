@@ -13,8 +13,35 @@ namespace Molib {
 		return stream;
 	}
 
-	map<int, double> Score::compute_energy(const Geom3D::Coordinate &crd, const set<int> &ligand_atom_types) const {
-		map<int, double> energy_sum;
+	//~ map<int, double> Score::compute_energy(const Geom3D::Coordinate &crd, const set<int> &ligand_atom_types) const {
+		//~ map<int, double> energy_sum;
+		//~ Atom at(crd);
+		//~ for (auto &patom : __gridrec.get_neighbors(at, __dist_cutoff)) {
+			//~ const double dist = patom->crd().distance(crd);
+			//~ const auto &atom_1 = patom->idatm_type();
+			//~ const int index = __get_index(dist);
+			//~ for (auto &l : ligand_atom_types) {
+				//~ auto atom_pair = minmax(atom_1, l);
+//~ #ifndef NDEBUG
+				//~ if (!__energies.count(atom_pair))
+					//~ throw Error("undefined atom_pair in __energies");
+				//~ if (index >= __energies.at(atom_pair).size())
+					//~ throw Error("undefined index in __energies");
+				//~ dbgmsg("atom pairs = " << help::idatm_unmask[atom_pair.first] << " " 
+					//~ << help::idatm_unmask[atom_pair.second] << " index = " << index
+					//~ << " dist = " << dist << " __energies.at(atom_pair).size() = " 
+					//~ << __energies.at(atom_pair).size() << " partial energy = "
+					//~ << __energies.at(atom_pair).at(index));
+//~ #endif
+				//~ energy_sum[l] += __energies.at(atom_pair).at(index);
+			//~ }
+		//~ }
+		//~ dbgmsg("out of compute energy");
+		//~ return energy_sum;
+	//~ }
+//~ 
+	Array1d<double> Score::compute_energy(const Geom3D::Coordinate &crd, const set<int> &ligand_atom_types) const {
+		Array1d<double> energy_sum(*ligand_atom_types.rbegin() + 1);
 		Atom at(crd);
 		for (auto &patom : __gridrec.get_neighbors(at, __dist_cutoff)) {
 			const double dist = patom->crd().distance(crd);
@@ -33,7 +60,7 @@ namespace Molib {
 					<< __energies.at(atom_pair).size() << " partial energy = "
 					<< __energies.at(atom_pair).at(index));
 #endif
-				energy_sum[l] += __energies.at(atom_pair).at(index);
+				energy_sum.data[l] += __energies.at(atom_pair).at(index);
 			}
 		}
 		dbgmsg("out of compute energy");

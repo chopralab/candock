@@ -14,121 +14,158 @@
 
 namespace Docker {
 
-	//~ Molib::Molecules Dock::run() {
-	AcceptedConformations Dock::run() {
+	double Dock::DockedConf::compute_rmsd(const Dock::DockedConf &other) const {
+		
+		double min_sum_sq(HUGE_VAL);
+		for (auto &atom_match : this->__conf0.get_atom_matches()) {
+			double sum_sq(0);
+			for (auto &atom_pair : atom_match) {
+				Geom3D::Point crda = this->__cavpoint.crd() + this->__conf0.get_point(atom_pair.first).crd();
+				Geom3D::Point crdb = other.__cavpoint.crd() + other.__conf0.get_point(atom_pair.second).crd();
+				sum_sq += crda.distance_sq(crdb);
+			}
+			if (sum_sq < min_sum_sq)
+				min_sum_sq = sum_sq;
+		}
+		return sqrt(min_sum_sq / this->__conf0.get_points().size());
+	}
+
+	Molib::Molecules Dock::run() {
+		DockedConfVec docked = __dock();
+		DockedConfVec clustered = __cluster(docked);
+		return __convert_to_mols(clustered);
+	}
+
+	Dock::DockedConfVec Dock::__dock() {
 		Benchmark::reset();
 
-		//~ Molib::Molecules docked;
-		AcceptedConformations accepted;
+		DockedConfVec accepted;
 		
-		auto cavity_points = __gpoints.get_gridpoints_as_vec();
 		auto &gmap = __gpoints.get_gmap();
 		auto &conformations = __conformations.get_conformations();
 		auto &confmap = __conformations.get_confmap();
 		Array1d<bool> rejected(conformations.size());
 
-		int acc_i = 0;
-		
 		// go over all cavity points
-		for (auto &cavpoint : cavity_points) {
-			// reset map of rejected conformations to 0
-			rejected.reset();
-			for (int c = 0; c < conformations.size(); ++c) {
-				// test if c-th conformation clashes with receptor: if yes, reject it
-				if (!rejected.data[c]) {
-					// go over coordinates of the c-th conformation
-					dbgmsg("testing conformation " << c);
-					for (auto &pair : conformations[c]) {
-						Docker::Gpoint &gpoint = *pair.second;
-						Docker::IJK confijk = cavpoint.ijk() + gpoint.ijk();
-						dbgmsg("cavpoint.ijk() = " << cavpoint.ijk());
-						dbgmsg("gpoint.ijk() = " << gpoint.ijk());
-						dbgmsg("confijk = " << confijk);
-						dbgmsg("gmap.szi = " << gmap.szi << " gmap.szj = " << gmap.szj
-							<< " gmap.szk = " << gmap.szk);
-						if (confijk.i < 0 || confijk.j < 0 || confijk.k < 0 ||
-							confijk.i >= gmap.szi || confijk.j >= gmap.szj || confijk.k >= gmap.szk
-							|| gmap.data[confijk.i][confijk.j][confijk.k] == nullptr) {
-							// mark as rejected all conformations that have this point
-							for (auto &cr : confmap[gpoint.ijk().i][gpoint.ijk().j][gpoint.ijk().k]) {
-								rejected.data[cr] = true;
-								dbgmsg("rejected conformation " << cr);
-							}
-							break;
-						}
-					}
-					// if no clashes were found ...
+		for (auto &kv : __gpoints.get_gridpoints()) {
+			for (auto &cavpoint : kv.second) {
+				DockedConfVec accepted_tmp;
+				// reset map of rejected conformations to zero
+				rejected.reset();
+				for (int c = 0; c < conformations.size(); ++c) {
+					Conformations::Conf &conf = conformations[c];
+					// test if c-th conformation clashes with receptor: if yes, reject it
 					if (!rejected.data[c]) {
-						++acc_i;
-						accepted.push_back({&cavpoint, &conformations[c]});
-						dbgmsg("conformation accepted");
+						double energy_sum(0);
+						// go over coordinates of the c-th conformation
+						dbgmsg("testing conformation " << c);
+						for (int i = 0; i < conf.get_points().size(); ++i) {
+							Docker::Gpoints::Gpoint &gpoint0 = conf.get_point(i);
+							Docker::Gpoints::IJK confijk = cavpoint.ijk() + gpoint0.ijk();
+
+							dbgmsg("cavpoint.ijk() = " << cavpoint.ijk());
+							dbgmsg("gpoint.ijk() = " << gpoint0.ijk());
+							dbgmsg("confijk = " << confijk);
+							dbgmsg("gmap.szi = " << gmap.szi << " gmap.szj = " << gmap.szj
+								<< " gmap.szk = " << gmap.szk);
+							if (confijk.i < 0 || confijk.j < 0 || confijk.k < 0 ||
+								confijk.i >= gmap.szi || confijk.j >= gmap.szj || confijk.k >= gmap.szk
+								|| gmap.data[confijk.i][confijk.j][confijk.k] == nullptr) {
+								// mark as rejected all conformations that have this point
+								for (auto &r : __conformations.get_confs_at(gpoint0.ijk())) {
+									rejected.data[r] = true;
+									dbgmsg("rejected conformation " << r);
+								}
+								goto ESCAPE;
+							}
+							Docker::Gpoints::Gpoint *pgpoint = gmap.data[confijk.i][confijk.j][confijk.k];
+							Molib::Atom &atom = conf.get_atom(i);
+							energy_sum += pgpoint->energy(atom.idatm_type());
+						}
+						// if no clashes were found ...
+						accepted_tmp.push_back(Dock::DockedConf(cavpoint, conf, energy_sum, c));
+						
+						ESCAPE:
+						;
 					}
 				}
+				__cluster_fast(accepted_tmp, accepted);
 			}
 		}
 		cout << "Fragment docking took " << Benchmark::seconds_from_start() << " seconds"
-			<< " number of accepted confomations is " << acc_i << endl;
+			<< " number of accepted confomations is " << accepted.size() << endl;
 
-		//~ return docked;
 		return accepted;
 	}
 
-	Molib::Molecules Dock::cluster(const AcceptedConformations &accepted) {
+	void Dock::__cluster_fast(const DockedConfVec &conformations, DockedConfVec &reps) {
+
+		set<const Dock::DockedConf*, Dock::DockedConf::by_energy> confs;
+		for (auto &conf : conformations) confs.insert(&conf);
+
+		while (!confs.empty()) {
+			// accept lowest energy conformation as representative
+			const Dock::DockedConf &lowest_point = **confs.begin();
+			reps.push_back(lowest_point);
+			confs.erase(confs.begin());
+			// delete all conformations within RMSD tolerance of this lowest energy conformation
+			for (auto it = confs.begin(); it != confs.end(); ++it) {
+				if (__conformations.get_rmsd(lowest_point.get_i(), (*it)->get_i()) < __rmsd_tol) {
+					confs.erase(it);
+				}
+			}
+		}
+	}
+
+	Dock::DockedConfVec Dock::__cluster(const DockedConfVec &conformations) {
 
 		Benchmark::reset();
+		DockedConfVec reps;
 
+		set<const Dock::DockedConf*, Dock::DockedConf::by_energy> confs;
+		for (auto &conf : conformations) confs.insert(&conf);
+	
+		Grid<const Dock::DockedConf> cgrid(confs); // grid of docked conformations
+
+		while (!confs.empty()) {
+			// accept lowest energy conformation as representative
+			const Dock::DockedConf &lowest_point = **confs.begin();
+			reps.push_back(lowest_point);
+			confs.erase(confs.begin());
+			// delete all conformations within RMSD tolerance of this lowest energy yconformation
+			for (auto &pconf : cgrid.get_neighbors(lowest_point, __rmsd_tol)) {
+				if (pconf->compute_rmsd(lowest_point) < __rmsd_tol) {
+					confs.erase(pconf);
+				}
+			}
+		}
+		cout << "Clustering accepted conformations took " 
+			<< Benchmark::seconds_from_start() << " seconds" << endl;
+		return reps;
+	}
+
+	Molib::Molecules Dock::__convert_to_mols(const DockedConfVec &confs) {
+
+		Benchmark::reset();
+		
 		Molib::Molecules docked;
-		auto &gmap = __gpoints.get_gmap();
 
 		// go over all accepted conformations
-		for (auto &ac : accepted) {
-			Gpoint &cavpoint = *ac.first;
-			OneConformation &conf = *ac.second;
-			double energy_sum = 0;
-			// score this conformation
-			for (auto &pair : conf) {
-				Molib::Atom &atom = *pair.first;
-				Docker::Gpoint &gpoint0 = *pair.second;
-				Docker::IJK confijk = cavpoint.ijk() + gpoint0.ijk();
-				Docker::Gpoint &gpoint = *gmap.data[confijk.i][confijk.j][confijk.k];
-				energy_sum += gpoint.energy(atom.idatm_type());
+		for (auto &conf : confs) {
+			dbgmsg(" conformation size = " << conf.get_conf0().get_points().size() 
+				<< " energy = " << conf.get_energy());
+			// correct the seed's new coordinates and ...
+			for (int i = 0; i < conf.get_conf0().get_points().size(); ++i) {
+				Molib::Atom &atom = conf.get_conf0().get_atom(i);
+				Docker::Gpoints::Gpoint &gpoint0 = conf.get_conf0().get_point(i);
+				atom.set_crd(conf.get_cavpoint().crd() + gpoint0.crd());
 			}
-			
-			//~ if (energy_sum > 100000) {
-				//~ cout << " conf.size() = " << conf.size() << " energy_sum = " << energy_sum << endl;			
-				//~ // correct the seed's new coordinates and ...
-				//~ cout << "MODEL" << endl;
-				//~ for (auto &pair : conf) {
-					//~ Molib::Atom &atom = *(pair.first);
-					//~ Docker::Gpoint &gpoint0 = *pair.second;
-					//~ atom.set_crd(cavpoint.crd() + gpoint0.crd());
-					//~ cout << atom;
-				//~ }
-				//~ cout << "ENDMDL" << endl;
-				//~ // save the c-th conformation
-				//~ docked.add(new Molib::Molecule(__seed));
-			//~ }
+			// save the conformation
+			docked.add(new Molib::Molecule(__seed));
 		}
-
-		//~ Benchmark::reset();
-		//~ Geom3D::PointVec v;
-		//~ for (int i = 0; i < accepted.size(); ++i) {
-			//~ Gpoint &cavpoint = *accepted[i].first;
-			//~ OneConformation &conf = *accepted[i].second;
-			//~ for (int j = i + 1; j < accepted.size(); ++j) {
-				//~ Gpoint &cavpoint2 = *accepted[j].first;
-				//~ OneConformation &conf2 = *accepted[j].second;
-				//~ if (cavpoint.crd().distance(cavpoint2.crd()) < 0.5) {
-					//~ v.push_back(cavpoint.crd());
-				//~ }
-			//~ }
-		//~ }
-//~ 
-		//~ cout << "v.size() = " << v.size() << endl;
-		
-		cout << "Clustering accepted conformations took " << Benchmark::seconds_from_start() 
-			<< " seconds" << endl;
-
+		dbgmsg("Conversion of conformations to mols took " 
+			<< Benchmark::seconds_from_start() << " seconds");
 		return docked;
 	}
+
 };

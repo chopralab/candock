@@ -25,9 +25,11 @@ struct Array3d {
 		if (data) {
 			for (int i = 0; i < szi; ++i) {
 				for (int j = 0; j < szj; ++j) {
-					delete [] data[i][j];
+					if (data[i][j]) delete [] data[i][j];
+					data[i][j] = nullptr;
 				}
-				delete [] data[i];
+				if (data[i]) delete [] data[i];
+				data[i] = nullptr;
 			}
 			delete [] data;
 			data = nullptr;
