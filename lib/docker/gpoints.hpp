@@ -28,12 +28,9 @@ namespace Docker {
 		struct Gpoint {
 			Geom3D::Point __crd;
 			IJK __ijk;
-			//~ map<int, double> __energy; // ligand idatm type to energy
 			Array1d<double> __energy; // ligand idatm type to energy
 			Geom3D::Point& crd() { return __crd; }
-			//~ double energy(const int l) const { return __energy.at(l); }
 			double energy(const int l) const { return __energy.data[l]; }
-			//~ double energy(const int l) { return __energy[l]; }
 			const Geom3D::Point& crd() const { return __crd; }
 			IJK& ijk() { return __ijk; }
 		};

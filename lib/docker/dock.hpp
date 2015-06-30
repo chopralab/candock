@@ -36,7 +36,6 @@ namespace Docker {
 		};
 
 		typedef vector<DockedConf> DockedConfVec;
-		//~ typedef set<const DockedConf, DockedConf::by_energy> DockedConfSet;
 		
 		Gpoints &__gpoints;
 		Conformations &__conformations;

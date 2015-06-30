@@ -63,7 +63,6 @@ namespace Molib {
 		double non_bonded_energy(const Molecule&) const; // this was formerly called distances_and_scores_frag_lig
 		double non_bonded_energy(const AtomToCrd &) const;
 		cluster::MapD<Molib::Molecule> many_ligands_score(const Molib::Molecules &ligands) const;
-		//~ map<int, double> compute_energy(const Geom3D::Coordinate &crd, const set<int> &ligand_atom_types) const;
 		Array1d<double> compute_energy(const Geom3D::Coordinate &crd, const set<int> &ligand_atom_types) const;
 		const M1& get_energies() const { return __energies; }
 		const M1& get_derivatives() const { return __derivatives; }
