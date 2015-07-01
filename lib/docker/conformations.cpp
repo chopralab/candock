@@ -35,18 +35,14 @@ namespace Docker {
 	}
 
 	double Conformations::Conf::compute_rmsd(const Conformations::Conf &other) {
-
-		double min_sum_sq = HUGE_VAL;
-		for (auto &atom_match : __atom_matches) {
-			double sum_sq(0);
-			for (auto &atom_pair : atom_match) {
-				Geom3D::Point &crd1 = this->__points[atom_pair.first]->crd();
-				Geom3D::Point &crd2 = other.__points[atom_pair.second]->crd();
-				sum_sq += crd1.distance_sq(crd2);
-			}
-			if (sum_sq < min_sum_sq) min_sum_sq = sum_sq;
+		
+		double sum_sq(0);
+		for (int i = 0; i < this->__points.size(); ++i) {
+			Geom3D::Point &crd1 = this->__points[i]->crd();
+			Geom3D::Point &crd2 = other.__points[i]->crd();
+			sum_sq += crd1.distance_sq(crd2);
 		}
-		return sqrt(min_sum_sq / this->__points.size());
+		return sqrt(sum_sq / this->__points.size());
 	}
 
 	Conformations::Conformations(const Molib::Molecule &seed, Gpoints &gpoints, 
@@ -72,22 +68,6 @@ namespace Docker {
 		// create a mapping between atom pointers and their positions in vec
 		map<Molib::Atom*, int> atom_to_i;
 		for (int i = 0; i < __ordered_atoms.size(); ++i) atom_to_i[__ordered_atoms[i]] = i;
-
-		// for symmetric molecules, atoms can match in different ways
-		Molib::MolGraph seed_graph = create_graph(__ordered_atoms);
-		Molib::MolGraph::Matches matches = seed_graph.match(seed_graph);
-
-		for (auto &mv : matches) {
-			auto &vertices1 = mv.first;
-			auto &vertices2 = mv.second;
-			vector<pair<int, int>> atom_match;
-			for (int i = 0; i < vertices1.size(); ++i) {
-				Molib::Atom &a1 = seed_graph[vertices1[i]];
-				Molib::Atom &a2 = seed_graph[vertices2[i]];
-				atom_match.push_back(make_pair(atom_to_i[&a1], atom_to_i[&a2]));
-			}
-			__atom_matches.push_back(atom_match);
-		}
 
 		// center the grid points around the center point
 		Docker::Gpoints::Gpoint cp = gpoints.get_center_point();
@@ -162,7 +142,8 @@ namespace Docker {
 				__conf_map[ijk.i][ijk.j][ijk.k].push_back(c);
 				points[atom_to_i[patom]] = gpoint;
 			}
-			__conf_vec.push_back(Conformations::Conf(__atom_matches, __ordered_atoms, points));
+			//~ __conf_vec.push_back(Conformations::Conf(__atom_matches, __ordered_atoms, points));
+			__conf_vec.push_back(Conformations::Conf(__ordered_atoms, points));
 		}
 		
 		// pre-compute rmsd between ALL conformations

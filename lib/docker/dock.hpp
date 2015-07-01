@@ -25,7 +25,7 @@ namespace Docker {
 			void distance(const double) const {} // dummy
 			Gpoints::Gpoint &get_cavpoint() const { return __cavpoint; }
 			Conformations::Conf &get_conf0() const { return __conf0; }
-			double get_energy() { return __energy; }
+			double get_energy() const { return __energy; }
 			int get_i() const { return __i; }
 			struct by_energy {
 				bool operator() (const DockedConf *lhs, const DockedConf *rhs) const {

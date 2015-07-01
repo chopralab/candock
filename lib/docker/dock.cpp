@@ -16,18 +16,13 @@ namespace Docker {
 
 	double Dock::DockedConf::compute_rmsd(const Dock::DockedConf &other) const {
 		
-		double min_sum_sq(HUGE_VAL);
-		for (auto &atom_match : this->__conf0.get_atom_matches()) {
-			double sum_sq(0);
-			for (auto &atom_pair : atom_match) {
-				Geom3D::Point crda = this->__cavpoint.crd() + this->__conf0.get_point(atom_pair.first).crd();
-				Geom3D::Point crdb = other.__cavpoint.crd() + other.__conf0.get_point(atom_pair.second).crd();
-				sum_sq += crda.distance_sq(crdb);
-			}
-			if (sum_sq < min_sum_sq)
-				min_sum_sq = sum_sq;
+		double sum_sq(0);
+		for (int i = 0; i < this->__conf0.get_points().size(); ++i) {
+			Geom3D::Point crda = this->__cavpoint.crd() + this->__conf0.get_point(i).crd();
+			Geom3D::Point crdb = other.__cavpoint.crd() + other.__conf0.get_point(i).crd();
+			sum_sq += crda.distance_sq(crdb);
 		}
-		return sqrt(min_sum_sq / this->__conf0.get_points().size());
+		return sqrt(sum_sq / this->__conf0.get_points().size());
 	}
 
 	Molib::Molecules Dock::run() {
@@ -149,7 +144,7 @@ namespace Docker {
 		Benchmark::reset();
 		
 		Molib::Molecules docked;
-
+		docked.set_name(__seed.name()); // molecules name is seed_id
 		// go over all accepted conformations
 		for (auto &conf : confs) {
 			dbgmsg(" conformation size = " << conf.get_conf0().get_points().size() 
@@ -160,6 +155,7 @@ namespace Docker {
 				Docker::Gpoints::Gpoint &gpoint0 = conf.get_conf0().get_point(i);
 				atom.set_crd(conf.get_cavpoint().crd() + gpoint0.crd());
 			}
+			__seed.set_name(help::to_string(conf.get_energy())); // molecule name is energy
 			// save the conformation
 			docked.add(new Molib::Molecule(__seed));
 		}
