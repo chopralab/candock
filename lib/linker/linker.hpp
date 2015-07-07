@@ -9,6 +9,8 @@
 #include <tuple>
 #include <functional>
 #include "segment.hpp"
+#include "seed.hpp"
+#include "helper/array2d.hpp"
 
 namespace Geom3D {
 	class Quaternion;
@@ -23,10 +25,8 @@ namespace Molib {
 	class State;
 	class Score;
 	class Linker {
-		typedef Glib::Graph<Segment> SegGraph;
-		typedef Glib::Graph<Seed> SeedGraph;
 		typedef map<const Atom*, Segment*> AtomToSegment;
-		typedef map<ConstSegPair, SegGraph::Path> Paths;
+		typedef map<ConstSegPair, Segment::Graph::Path> Paths;
 		typedef map<const Segment*, State*> SegStateMap;
 		typedef Grid<Atom> MolGrid;
 		static const int MAX_ENERGY = 999999;
@@ -59,22 +59,19 @@ namespace Molib {
 			const LinkEnergy &conformation, const State &prev) const;
 		AtomToCrd __rotate(const Geom3D::Quaternion&, const Geom3D::Point&, const Geom3D::Point&, const AtomToCrd&);
 
-		void __create_states(const SegGraph &segment_graph, const NRset &top_seeds);
-		map<State*, StateSet> __find_compatible_state_pairs(const SeedGraph &seed_graph);
+		void __create_states(const Segment::Graph &segment_graph, const NRset &top_seeds);
+		Array2d<bool> __find_compatible_state_pairs(const StateVec &states);
 		vector<vector<StateVec>> __grow_possibles(const map<State*, StateSet> &pos);
-		vector<LinkEnergy> __find_possible_states(const SeedGraph &seed_graph);
-		Paths __find_paths(const SegGraph &segment_graph);
+		vector<LinkEnergy> __generate_rigid_conformations(const Seed::Graph &seed_graph);
+		Paths __find_paths(const Segment::Graph &segment_graph);
 		void __set_branching_rules(const Paths &paths);
 		Molecules __reconstruct(const Conformations &conformations);
 		void __init_max_linker_length(const Paths &paths);
-		void __compute_max_linker_length(SegGraph::Path &path);
-
-		SegGraph __create_segment_graph(const Molecule &molecule);
-		SeedGraph __create_seed_graph(const SegGraph &segment_graph, const Paths &paths);
+		void __compute_max_linker_length(Segment::Graph::Path &path);
 
 		Conformations __connect(const int segment_graph_size, const vector<LinkEnergy> &possibles);
 		bool __has_blacklisted(const StateVec &conformation, const set<ConstStatePair> &blacklist);
-		bool __link_adjacent(const SegGraph::Path &path);
+		bool __link_adjacent(const Segment::Graph::Path &path);
 		bool __check_distances_to_seeds(const State &curr_state, 
 			const Segment &adjacent, const SegStateMap &docked_seeds);
 		Conf __a_star(const int segment_graph_size, 
@@ -98,6 +95,7 @@ namespace Molib {
 		Molecules connect();
 		friend ostream& operator<<(ostream& os, const Conf &conf);
 		friend ostream& operator<<(ostream& os, const LinkEnergy &le);
+		friend ostream& operator<<(ostream& os, const vector<LinkEnergy> &vec_le);
 	};
 }
 #endif

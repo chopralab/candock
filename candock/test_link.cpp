@@ -140,13 +140,6 @@ int main(int argc, char* argv[]) {
 						 */
 						
 						Molib::Internal ic(ligand.get_atoms());
-
-						// compute max linker lengths for pre-computed linkers
-						// generate conneciton graph with fragments
-						// use maximum clique algorithm to find all cliques in connection graph
-						// score found solutions
-						// link them using suitable pre-computed linkers
-						
 						Molib::Linker linker(ligand, top_seeds, gridrec, score, ic, 
 							cmdl.dist_cutoff(), cmdl.spin_degrees(), cmdl.tol_dist(),
 							cmdl.tol_max_coeff(), cmdl.tol_min_coeff(), 

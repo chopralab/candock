@@ -12,13 +12,26 @@ struct Array2d {
 		for (int i = 0; i < szi; ++i) {
 			data[i] = new T[szj];
 			memset(data[i], 0, szj * sizeof(T));
-
 		}
 	}
+
 	Array2d(int SZI, int SZJ) : data(nullptr) {
 		init(SZI, SZJ);
 	}
+
 	Array2d() : data(nullptr), szi(0), szj(0) {}
+
+	Array2d(const Array2d &other) { // copy
+		szi = other.szi;
+		szj = other.szj;
+
+		data = new T*[szi];
+		for (int i = 0; i < szi; ++i) {
+			data[i] = new T[szj];
+			memcpy(data[i], other.data[i], szj * sizeof(T));
+		}
+	}
+
 	~Array2d() {
 		if (data) {
 			for (int i = 0; i < szi; ++i) {
