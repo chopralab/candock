@@ -86,7 +86,7 @@ int main(int argc, char* argv[]) {
 		 * 
 		 */
 		Molib::Molecules seeds;
-		set<string> added;
+		set<int> added;
 		set<int> ligand_idatm_types;
 
 		Molib::Molecules ligands;

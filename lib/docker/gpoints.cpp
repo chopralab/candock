@@ -34,7 +34,8 @@ namespace Docker {
 		return os;
 	}	
 	
-	Gpoints::Gpoints(const double &grid_spacing, const double &radial_check) {
+	Gpoints::Gpoints(const double &grid_spacing, const double &radial_check) 
+		: __score(nullptr), __ligand_idatm_types(nullptr) {
 		try {
 			__identify_gridpoints(grid_spacing, radial_check);
 		} catch(...) {
@@ -44,9 +45,22 @@ namespace Docker {
 	}
 	Gpoints::Gpoints(const Molib::Score &score, const set<int> &ligand_idatm_types, 
 		const Centro::Centroids &centroids, Molib::MolGrid &grid, const double &grid_spacing, 
-		const int &dist_cutoff, const double &excluded_radius, const double &max_interatomic_distance) {
+		const int &dist_cutoff, const double &excluded_radius, const double &max_interatomic_distance)
+		: __score(&score), __ligand_idatm_types(&ligand_idatm_types) {
 		try {
-			__identify_gridpoints(score, ligand_idatm_types, centroids, grid, grid_spacing, dist_cutoff, 
+			__identify_gridpoints(centroids, grid, grid_spacing, dist_cutoff, 
+				excluded_radius, max_interatomic_distance);
+		} catch(...) {
+			dbgmsg("FAILURE: constructor of Gpoints failed ... cleaning up resources...");
+			throw;
+		}
+	}
+
+	Gpoints::Gpoints(const Centro::Centroids &centroids, Molib::MolGrid &grid, const double &grid_spacing, 
+		const int &dist_cutoff, const double &excluded_radius, const double &max_interatomic_distance)
+		: __score(nullptr), __ligand_idatm_types(nullptr) {
+		try {
+			__identify_gridpoints(centroids, grid, grid_spacing, dist_cutoff, 
 				excluded_radius, max_interatomic_distance);
 		} catch(...) {
 			dbgmsg("FAILURE: constructor of Gpoints failed ... cleaning up resources...");
@@ -70,9 +84,9 @@ namespace Docker {
 		return *center_point;
 	}
 
-	void Gpoints::__identify_gridpoints(const Molib::Score &score, const set<int> &ligand_idatm_types, 
-		const Centro::Centroids &centroids, Molib::MolGrid &grid, const double &grid_spacing, const int &dist_cutoff, 
-		const double &excluded_radius, const double &max_interatomic_distance) {
+	void Gpoints::__identify_gridpoints(const Centro::Centroids &centroids, Molib::MolGrid &grid, 
+		const double &grid_spacing, const int &dist_cutoff, const double &excluded_radius, 
+		const double &max_interatomic_distance) {
 	
 		Benchmark::reset();
 	
@@ -176,7 +190,7 @@ namespace Docker {
 									Gpoint{
 										eval, 
 										IJK{column, row, layer}, 
-										score.compute_energy(eval, ligand_idatm_types)
+										__score ? __score->compute_energy(eval, *__ligand_idatm_types) : Array1d<double>()
 									});
 								//~ __gmap.data[column][row][layer] = true; 
 								model_number++;

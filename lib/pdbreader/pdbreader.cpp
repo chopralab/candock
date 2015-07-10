@@ -372,26 +372,39 @@ namespace Molib {
 										Residue::res_tuple2(tok2[0].at(0), tok2[1], stoi(tok2[2]), tok2[3].at(0))));
 				}
 			}
+			//~ else if (line.compare(0, 16, "REMARK   8 RIGID") == 0) {
+				//~ Model &model = mols.last().last().last();
+				//~ vector<string> vs = help::ssplit(line.substr(17), " ");
+				//~ AtomSet as;
+				//~ for (int i = 1; i < vs.size(); i++)	as.insert(atom_number_to_atom[&model][stoi(vs[i])]);
+				//~ model.get_rigid()[vs[0]].insert(as);
+				//~ dbgmsg(vs[0]);
+//~ #ifndef NDEBUG
+				//~ for (int i = 1; i < vs.size(); i++) dbgmsg(vs[i]);
+				//~ for (auto &a : as) dbgmsg(*a);
+				//~ dbgmsg(model.get_rigid());
+//~ #endif
+			//~ }
 			else if (line.compare(0, 16, "REMARK   8 RIGID") == 0) {
 				Model &model = mols.last().last().last();
 				vector<string> vs = help::ssplit(line.substr(17), " ");
-				AtomSet as;
-				for (int i = 1; i < vs.size(); i++)	as.insert(atom_number_to_atom[&model][stoi(vs[i])]);
-				model.get_rigid()[vs[0]].insert(as);
-				dbgmsg(vs[0]);
+				AtomSet core, join;
+				for (int i = 1; i < vs.size(); ++i)	{
+					const int atom_number = stoi(vs[i].substr(1));
+					if (vs[i][0] == 'c')
+						core.insert(atom_number_to_atom[&model][atom_number]);
+					else if (vs[i][0] == 'j')
+						join.insert(atom_number_to_atom[&model][atom_number]);
+				}
+				const int seed_id = stoi(vs[0]);
+				model.get_rigid().push_back(Fragmenter::Fragment(core, join, seed_id));
 #ifndef NDEBUG
+				dbgmsg("seed_id = " << seed_id);
 				for (int i = 1; i < vs.size(); i++) dbgmsg(vs[i]);
-				for (auto &a : as) dbgmsg(*a);
+				for (auto &a : core) dbgmsg("CORE ATOM : " << *a);
+				for (auto &a : join) dbgmsg("JOIN ATOM : " << *a);
 				dbgmsg(model.get_rigid());
 #endif
-			}
-			else if (line.compare(0, 15, "REMARK   8 SEED") == 0) {
-				Model &model = mols.last().last().last();
-				vector<string> vs = help::ssplit(line.substr(16), " ");
-				AtomSet as;
-				for (int i = 1; i < vs.size(); i++)	as.insert(atom_number_to_atom[&model][stoi(vs[i])]);
-				model.get_seeds()[vs[0]].insert(as);
-				dbgmsg(model.get_seeds());
 			}
 			else if (line.compare(0, 15, "REMARK   8 ROTA") == 0) {
 				Model &model = mols.last().last().last();

@@ -54,7 +54,7 @@ namespace Molib {
 		return true;
 	}
 
-	void Linker::__init_max_linker_length(const Paths &paths) {
+	void Linker::__init_max_linker_length(const Segment::Paths &paths) {
 		for (auto &kv : paths) {
 			auto &seg_pair = kv.first;
 			Segment::Graph::Path path(kv.second.begin(), kv.second.end());
@@ -99,15 +99,15 @@ namespace Molib {
 		 * segment atoms
 		 */
 		for (auto &seed_mols : top_seeds) {
-			const string nm = seed_mols.name();
-			dbgmsg("seed name = " << nm);
+			const int seed_id = stoi(seed_mols.name());
+			dbgmsg("seed id = " << seed_id);
 			// loop over segments with this name, seeds coordinates will not change
 			for (auto &segment : segment_graph) {
-				if (segment.get_name() == nm) {
+				if (segment.get_seed_id() == seed_id) {
 
-					dbgmsg("segment name = " << segment.get_name());
+					dbgmsg("segment seed id = " << segment.get_seed_id());
 					// create a graph out of the seed "nm" of "to be" ligand molecule
-					MolGraph gs = create_graph(seed_molecule.get_atoms());
+					MolGraph gs = create_graph(seed_mols.first().get_atoms());
 					dbgmsg("gs = " << endl << gs);
 					MolGraph gd = create_graph(segment.get_atoms());
 					dbgmsg("gd = " << endl << gd);
@@ -134,7 +134,7 @@ namespace Molib {
 								<< Geom3D::Coordinate(v2.crd()));
 						}
 						const double energy = stod(seed_molecule.name());
-						dbgmsg("adding docked state " << nm << " with energy of " << energy);
+						dbgmsg("adding docked state " << segment.get_seed_id() << " with energy of " << energy);
 						// ONLY COPY SEGMENT COORDS NOT SEED
 						segment.add_state(unique_ptr<State>(new State(segment, atom_crd, energy)));
 					}
@@ -191,10 +191,10 @@ namespace Molib {
 		return new_crd;
 	}
 	
-	StateVec Linker::__compute_neighbors(const State &curr_state, Segment &next,
+	State::Vec Linker::__compute_neighbors(const State &curr_state, Segment &next,
 		vector<unique_ptr<State>> &states) {
 		dbgmsg("in compute_neighbors for state = " << curr_state);
-		StateVec l;
+		State::Vec l;
 		const Segment &current = curr_state.get_segment();
 		dbgmsg("compute_neighbors : current segment is " << current);
 		dbgmsg("compute_neighbors : next segment is " << next);
@@ -281,7 +281,7 @@ namespace Molib {
 	pair<State*, Segment*> Linker::__find_good_neighbor(
 		const LinkEnergy &curr_conformation, const SegStateMap &docked_seeds) {
 
-		SegmentSet done_segments, free_seeds;
+		Segment::Set done_segments, free_seeds;
 		for (auto &pcurr_state : curr_conformation.first) {
 			done_segments.insert(const_cast<Segment*>(&pcurr_state->get_segment()));
 		}
@@ -325,11 +325,11 @@ namespace Molib {
 		SegStateMap docked_seeds;
 		for (auto &pstate : states) 
 			docked_seeds.insert({&pstate->get_segment(), &*pstate});
-		set<ConstStatePair>	failed_state_pairs;
+		set<State::ConstPair>	failed_state_pairs;
 		LinkEnergy min_conformation;
 		double min_energy = MAX_ENERGY;
 		PriorityQueue openset; // openset has conformations sorted from lowest to highest energy
-		openset.insert(LinkEnergy{StateVec{&*states[0]}, states[0]->get_energy()});
+		openset.insert(LinkEnergy{State::Vec{&*states[0]}, states[0]->get_energy()});
 		while(!openset.empty()) {
 			if (--iter < 0) break;
 			LinkEnergy curr_conformation = *openset.begin();
@@ -360,7 +360,7 @@ namespace Molib {
 				dbgmsg("check_distances_to_seeds = " << boolalpha 
 					<< (adj_is_seed || __check_distances_to_seeds(curr_state, adj, docked_seeds)));
 				if (adj_is_seed || __check_distances_to_seeds(curr_state, adj, docked_seeds)) {
-					auto ret2 = (adj_is_seed ? StateVec{adj_is_seed} : 
+					auto ret2 = (adj_is_seed ? State::Vec{adj_is_seed} : 
 						__compute_neighbors(curr_state, adj, states));
 					for (auto &pneighbor : ret2) { 
 						dbgmsg("CHECKING NEIGHBOR : " << *pneighbor);
@@ -404,7 +404,7 @@ namespace Molib {
 		return mc;
 	}
 	
-	Array2d<bool> Linker::__find_compatible_state_pairs(const StateVec &states) {
+	Array2d<bool> Linker::__find_compatible_state_pairs(const State::Vec &states) {
 		/* Find all pairs of compatible states at correct distances for 
 		 * the multi-seed molecules
 		 * 
@@ -415,7 +415,7 @@ namespace Molib {
 		for (int i = 0; i < states.size(); ++i) {
 			State &state1 = *states[i];
 			const Segment &segment1 = state1.get_segment();
-			for (int j = 0; j < states.size(); ++j) {
+			for (int j = i + 1; j < states.size(); ++j) {
 				State &state2 = *states[j];
 				const Segment &segment2 = state2.get_segment();
 				if (&segment1 != &segment2) {
@@ -426,17 +426,18 @@ namespace Molib {
 						? segment1.get_bond(segment2) : Bond());
 #ifndef NDEBUG
 					dbgmsg("segment1 = " << segment1 << endl << "segment2 = " << segment2);
+					dbgmsg("state1 = " << state1 << endl << "state2 = " << state2);
 					if (segment1.is_adjacent(segment2)) dbgmsg("excluded bond is " << excluded);
 #endif
 					const double dist = __distance(state1, state2);
 					if (dist < max_dist && dist > min_dist
 						&& !state1.clashes(state2, excluded)) {
 						dbgmsg("compatible states pair belongs to segments " 
-							<< segment1.get_name() << " and " 
-							<< segment2.get_name() << " mll is "
+							<< segment1.get_seed_id() << " and " 
+							<< segment2.get_seed_id() << " mll is "
 							<< max_linker_length
 							<< " dist is " << dist);
-						conn[i][j] = conn[j][i] = true;
+						conn.data[i][j] = conn.data[j][i] = true;
 					}
 				}
 			}
@@ -448,7 +449,7 @@ namespace Molib {
 		Benchmark::reset();
 		cout << "Generating rigid conformations of states..." << endl;
 
-		StateVec states;
+		State::Vec states;
 		for (auto &seed : seed_graph) 
 			for (auto &pstate : seed.get_segment().get_states())
 				states.push_back(&*pstate);
@@ -468,12 +469,12 @@ namespace Molib {
 		vector<LinkEnergy> possibles_w_energy;
 		for (auto &qmax : qmaxes) {
 			double energy = 0;
-			StateVec conf;
+			State::Vec conf;
 			for (auto &i : qmax) {
 				conf.push_back(states[i]);
 				energy += states[i]->get_energy();
 			}
-			possibles_w_energy.push_back({conformation, energy});
+			possibles_w_energy.push_back({conf, energy});
 		}
 		
 		// sort conformations according to their total energy
@@ -505,10 +506,11 @@ namespace Molib {
 		if (!segment_graph.find_cycles_connected_graph().empty()) {
 			throw Error("die : cyclic molecules are currently not supported");
 		}
+		dbgmsg("segment graph for ligand " << __ligand.name());
 		dbgmsg("segment graph for ligand " << __ligand.name() << " = " << segment_graph);
 		__create_states(segment_graph, __top_seeds);
 
-		const Paths paths = __find_paths(segment_graph);
+		const Segment::Paths paths = __find_paths(segment_graph);
 		__init_max_linker_length(paths);
 		__set_branching_rules(paths);
 		
@@ -516,7 +518,7 @@ namespace Molib {
 		dbgmsg("seed graph for ligand " << __ligand.name() << " = " << seed_graph);
 		
 		const vector<LinkEnergy> possible_states = __generate_rigid_conformations(seed_graph);
-		Conformations good_conformations = __connect(possible_states);
+		Conformations good_conformations = __connect(segment_graph.size(), possible_states);
 		
 		cout << "Connection of seeds for ligand " << __ligand.name() 
 			<< " resulted in " << good_conformations.size() 
@@ -525,8 +527,8 @@ namespace Molib {
 		return __reconstruct(good_conformations);
 	}
 
-	bool Linker::__has_blacklisted(const StateVec &conformation, 
-		const set<ConstStatePair> &blacklist) {
+	bool Linker::__has_blacklisted(const State::Vec &conformation, 
+		const set<State::ConstPair> &blacklist) {
 
 		for (int i = 0; i < conformation.size(); ++i) {
 			for (int j = i + 1; j < conformation.size(); ++j) {
@@ -542,7 +544,7 @@ namespace Molib {
 		const vector<LinkEnergy> &possibles) {
 		
 		Conformations good_conformations;
-		set<ConstStatePair> blacklist;
+		set<State::ConstPair> blacklist;
 		for (auto &le : possibles) {
 			auto &conformation = le.first;
 			auto &energy = le.second;
@@ -566,17 +568,17 @@ namespace Molib {
 		return good_conformations;
 	}
 	
-	//~ Linker::Paths Linker::__find_paths(const Segment::Graph &segment_graph) {
-		//~ Paths paths;
+	//~ Segment::Paths Linker::__find_paths(const Segment::Graph &segment_graph) {
+		//~ Segment::Paths paths;
 		//~ dbgmsg("find all paths in a graph");
-		//~ SegmentSet seeds, seeds_and_leafs;
+		//~ Segment::Set seeds, seeds_and_leafs;
 		//~ for (auto &seg : segment_graph) {
 			//~ if (seg.is_seed())
 				//~ seeds.insert(&seg);
 			//~ if (seg.is_seed() || seg.is_leaf())
 				//~ seeds_and_leafs.insert(&seg);
 		//~ }
-		//~ set<ConstSegPair> visited;
+		//~ set<Segment::ConstPair> visited;
 		//~ for (auto &pseg1 : seeds) {
 			//~ for (auto &pseg2 : seeds_and_leafs) {
 				//~ if (pseg1 != pseg2 && !visited.count({pseg1, pseg2})) {
@@ -596,21 +598,21 @@ namespace Molib {
 		//~ return paths;
 	//~ }
 	//~ 
-	Linker::Paths Linker::__find_paths(const Segment::Graph &segment_graph) {
+	Segment::Paths Linker::__find_paths(const Segment::Graph &segment_graph) {
 		/*
 		 * Find ALL paths between seed segments (even non-adjacent) 
 		 * and seeds and leafs
 		 */
-		Paths paths;
+		Segment::Paths paths;
 		dbgmsg("find all paths in a graph");
-		SegmentSet seeds, seeds_and_leafs;
+		Segment::Set seeds, seeds_and_leafs;
 		for (auto &seg : segment_graph) {
 			if (seg.is_seed())
 				seeds.insert(&seg);
 			if (seg.is_seed() || seg.is_leaf())
 				seeds_and_leafs.insert(&seg);
 		}
-		set<ConstSegPair> visited;
+		set<Segment::ConstPair> visited;
 		for (auto &pseg1 : seeds) {
 			for (auto &pseg2 : seeds_and_leafs) {
 				if (pseg1 != pseg2 && !visited.count({pseg1, pseg2})) {
@@ -628,7 +630,7 @@ namespace Molib {
 		return paths;
 	}
 	
-	void Linker::__set_branching_rules(const Paths &paths) {
+	void Linker::__set_branching_rules(const Segment::Paths &paths) {
 		for (auto &kv : paths) {
 			const Segment::Graph::Path &path = kv.second;
 #ifndef NDEBUG

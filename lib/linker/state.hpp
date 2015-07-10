@@ -9,16 +9,17 @@
 
 namespace Molib {
 	class Atom;
-	class State;
-	typedef map<const Atom*, Geom3D::Coordinate> AtomToCrd;
 	class Segment;
-	typedef vector<State*> StateVec;
-	typedef vector<State> NStateVec;
-	typedef set<State*> StateSet;
-	typedef map<const State*, State*> StateMap;
-	typedef vector<const State*> ConstStateVec;
-	typedef pair<const State*, const State*> ConstStatePair;
+	typedef map<const Atom*, Geom3D::Coordinate> AtomToCrd;
 	class State {
+	public:
+		typedef vector<State*> Vec;
+		typedef vector<State> NVec;
+		typedef set<State*> Set;
+		typedef map<const State*, State*> Map;
+		typedef vector<const State*> ConstVec;
+		typedef pair<const State*, const State*> ConstPair;
+	private:
 		const Segment &__segment;
 		const AtomToCrd __atom_crd;
 		double __energy;
@@ -34,7 +35,7 @@ namespace Molib {
 		bool clashes(const State &other, const Bond &excluded) const; // clashes between this and other state
 		string pdb() const;
 		friend ostream& operator<< (ostream& stream, const State& s);
+		friend ostream& operator<< (ostream& stream, const Vec& sv);
 	};
-	ostream& operator<< (ostream& stream, const StateVec& sv);
 };
 #endif

@@ -20,6 +20,10 @@
 #include "ligands/genclus.hpp"
 #include "ligands/genlig.hpp"
 #include "cluster/optics.hpp"
+#include "docker/gpoints.hpp"
+#include "docker/conformations.hpp"
+#include "docker/dock.hpp"
+#include "centro/centroids.hpp"
 using namespace std;
 
 CmdLnOpts cmdl;
@@ -40,7 +44,6 @@ int main(int argc, char* argv[]) {
 		 * or alternatively set binding sites from file
 		 * 
 		 */
-		common::Centroids centroids;
 		probis::compare_against_bslib(argc, argv, cmdl.receptor_file(), 
 			cmdl.receptor_chain_id(), cmdl.bslib_file(), cmdl.ncpu(),
 			cmdl.nosql_file(), cmdl.json_file());
@@ -53,7 +56,7 @@ int main(int argc, char* argv[]) {
 		inout::output_file(binding_sites.first, cmdl.lig_clus_file());
 		inout::output_file(binding_sites.second, cmdl.z_scores_file());
 		
-		centroids = common::set_centroids(binding_sites.first);	
+		Centro::Centroids centroids = Centro::set_centroids(binding_sites.first);
 
 		inout::output_file(centroids, cmdl.centroid_out_file()); // probis local structural alignments
 
@@ -78,20 +81,13 @@ int main(int argc, char* argv[]) {
 		 */
 		Molib::MolGrid gridrec(receptors[0].get_atoms());
 
-
-		/* Create gridpoints for each binding site represented by a centroid
+		/* Create gridpoints for ALL centroids representing one or more binding sites
 		 * 
 		 */
-		Geom3D::GridPoints gridpoints = common::identify_gridpoints(centroids, 
-			gridrec, cmdl.grid_spacing(), cmdl.dist_cutoff(), cmdl.excluded_radius(), 
+		Docker::Gpoints gpoints(centroids, gridrec, 
+			cmdl.grid_spacing(), cmdl.dist_cutoff(), cmdl.excluded_radius(), 
 			cmdl.max_interatomic_distance());
-		inout::output_file(gridpoints, cmdl.gridpdb_hcp_file());
-
-		//~ /* Identify amino acids that line each binding site
-		 //~ * 
-		 //~ */
-		//~ map<int, set<Molib::Residue*>> amino_acids = common::identify_amino_acids(centroids, gridrec);
-		//~ inout::output_file(amino_acids, cmdl.aa_file(), ios_base::app);
+		inout::output_file(gpoints, cmdl.gridpdb_hcp_file());
 
 		cmdl.display_time("finished");
 	} catch (exception& e) {

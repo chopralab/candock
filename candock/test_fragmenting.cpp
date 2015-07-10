@@ -44,7 +44,7 @@ int main(int argc, char* argv[]) {
 		mutex mtx;
 
 		Molib::Molecules seeds;
-		set<string> added;
+		set<int> added;
 
 		for(int i = 0; i < cmdl.ncpu(); ++i) {
 			threads.push_back(thread([&lpdb, &seeds, &added, &mtx] () {
@@ -62,11 +62,10 @@ int main(int argc, char* argv[]) {
 						.compute_ring_type()
 						.compute_gaff_type()
 						.compute_rotatable_bonds() // relies on hydrogens being assigned
-						.erase_hydrogen()
-						.compute_overlapping_rigid_segments();
+						.erase_hydrogen();
 					{
 						lock_guard<std::mutex> guard(mtx);
-						ligands.compute_seeds(cmdl.seeds_file());
+						ligands.compute_overlapping_rigid_segments(cmdl.seeds_file());
 					}
 					inout::output_file(ligands, cmdl.prep_file(), ios_base::app);
 					ligands.clear();

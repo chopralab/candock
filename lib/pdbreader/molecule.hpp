@@ -220,7 +220,7 @@ namespace Molib {
 	class Model : public template_map_container<Chain, Model, Assembly, char> {
 		int __number;
 		map<pair<int, Residue::res_tuple2>, map<Residue::res_tuple2, Residue::res_tuple2>> __remarks;
-		Fragments __seeds, __rigid;
+		Fragmenter::Fragment::Vec __rigid;
 	public:
 		Model(int number) : __number(number) {}
 		Model(const Model &rhs) : __number(rhs.__number), __remarks(rhs.__remarks) { 
@@ -229,12 +229,9 @@ namespace Molib {
 				add(new Chain(chain)); 
 			} 
 		}
-		Fragments& get_seeds() { return __seeds; }
-		Fragments& get_rigid() { return __rigid; }
-		const Fragments& get_seeds() const { return __seeds; }
-		const Fragments& get_rigid() const { return __rigid; }
-		void set_seeds(const Fragments &seeds) { __seeds = seeds; }
-		void set_rigid(const Fragments &rigid) { __rigid = rigid; }
+		Fragmenter::Fragment::Vec& get_rigid() { return __rigid; }
+		const Fragmenter::Fragment::Vec& get_rigid() const { return __rigid; }
+		void set_rigid(const Fragmenter::Fragment::Vec &rigid) { __rigid = rigid; }
 		void init_bio(const Model &model_asym, const Geom3D::Matrix &matrix, const set<char> &chains) {
 			for (const char &chain_id : chains) { 
 				if (model_asym.has_chain(chain_id)) {
@@ -352,7 +349,7 @@ namespace Molib {
 		Molecule& erase_hydrogen();
 		Molecule& regenerate_bonds(const Molecule&);
 		Molecule& compute_rotatable_bonds();
-		Molecule& compute_overlapping_rigid_segments();
+		Molecule& compute_overlapping_rigid_segments(Unique&);
 		Molecule& compute_seeds(Unique &u);
 		double compute_rmsd(const Molecule&) const;
 		void rotate(const Geom3D::Matrix &rota, const bool inverse=false) {
@@ -440,9 +437,7 @@ namespace Molib {
 			molecule.erase_hydrogen(); return *this; }
 		Molecules& compute_rotatable_bonds() { for (auto &molecule : *this) 
 			molecule.compute_rotatable_bonds(); return *this; }
-		Molecules& compute_overlapping_rigid_segments() { for (auto &molecule : *this) 
-			molecule.compute_overlapping_rigid_segments(); return *this; }
-		Molecules& compute_seeds(const string &seeds_file="");
+		Molecules& compute_overlapping_rigid_segments(const string &seeds_file="");
 		Molecules& erase_properties() { for (auto &molecule : *this) molecule.erase_properties(); return *this; }
 		friend ostream& operator<< (ostream& stream, const Molecules& m);
 	};

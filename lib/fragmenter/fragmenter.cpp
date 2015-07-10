@@ -30,21 +30,37 @@ namespace Molib {
 		return os;
 	}
 
-	ostream& operator<<(ostream& os, const Fragments& fragments)	{
-		for (auto &fragment : fragments) {
-			os << "fragment " << fragment.first << " : " << endl;
-			for (auto &atoms : fragment.second) {
-				for (auto &pa : atoms) {
-					os << "        " << *pa;
-				}
-				os << "-------------------";
-			}
+	ostream& operator<<(ostream& os, const Fragmenter::Fragment::Vec& fragments)	{
+		for (int i = 0; i < fragments.size(); ++i) {
+			auto &fragment = fragments[i];
+			os << "FRAGMENT " << i << " SEED_ID = " << fragment.get_seed_id() << " : " << endl;
+			for (auto &patom : fragment.get_core())
+				os << "CORE ATOM :        " << *patom;
+			for (auto &patom : fragment.get_join())
+				os << "JOIN ATOM :        " << *patom;
+			os << "-------------------" << endl;
 		}
 		return os;
 	}
 
-	Fragmenter::Fragmenter(const AtomVec &atoms) : __atoms(atoms), 
-		__min_rigid_atoms(5), __min_gaff_group_atoms(3) {}
+	Fragmenter::Fragment::Fragment(AtomSet core, AtomSet join, Unique &u) : __core(core), __join(join) {
+		/* Seeds are rigid segments with > 1 core atoms
+		 * THESE ARE NOT SEEDS:
+		 * 
+		 *         C
+		 *         |
+		 *         C          C    etc.
+		 *        / \        / \  
+		 *       C   C      C   C
+		 * 
+		 */
+		if (__core.size() > 1)
+			__seed_id = u.get_seed_id(this->get_all());
+		else
+			__seed_id = -1;
+	}
+
+	Fragmenter::Fragmenter(const AtomVec &atoms) : __atoms(atoms) {}
 
 	Rings Fragmenter::identify_fused_rings() {
 		return create_graph(__atoms).find_fused_rings();
@@ -54,53 +70,6 @@ namespace Molib {
 		return create_graph(__atoms).find_rings();
 	}
 
-	Fragments Fragmenter::identify_seeds(const Fragments &rigid, Unique &u) {
-		/* Seeds are essentially rigid segments with > 4 atoms (e.g., rings, 
-		 * non-ring rigid fragments, etc.) to which 
-		 * small groups with < 4 atoms were added (e.g., -NO2, -CH2-CH3, etc.).
-		 * Note that there can be a rotatable bond between rigid segment and 
-		 * a small group. This introduces a small error in the maximum clique
-		 * part which is rigid only.
-		 * 
-		 */
-		Fragments seeds;
-		for (auto &kv : rigid) {
-			string nm = kv.first;
-			const set<AtomSet> &rigids_with_same_name = kv.second;
-			if (rigids_with_same_name.empty() || rigids_with_same_name.size() > 1)
-				throw Error("die : there should be only one rigid segment per one name");
-			const AtomSet &rigid_segment = *rigids_with_same_name.begin();
-			if (rigid_segment.size() > __min_rigid_atoms) {
-				AtomSet a(rigid_segment.begin(), rigid_segment.end());
-				__merge_small_fragments_with_rings(a, __min_gaff_group_atoms);
-				seeds[help::to_string(u.get_seed_id(a))].insert(a);
-			}
-		}
-		dbgmsg("------------- SEEDS -------------------" << endl << seeds);
-		return seeds;
-	}
-
-	void Fragmenter::__merge_small_fragments_with_rings(AtomSet &ring, int frag_size) {
-		for (auto &pa : ring) {
-			// extend from each atom of a ring by max frag_size
-			queue<Atom*> q;
-			AtomSet visited;
-			q.push(pa);
-			while (!q.empty()) {
-				Atom &atom = *q.front(); q.pop();
-				visited.insert(&atom);
-				for (auto &adj_a : atom) {
-					if (!ring.count(&adj_a) && !visited.count(&adj_a)) {
-						q.push(&adj_a);
-					}
-				}
-				if (visited.size() > frag_size) goto skip_insert;
-			}
-			ring.insert(visited.begin(), visited.end());
-			skip_insert:
-			;
-		}
-	}
 	void Fragmenter::flip_conjugated_gaff_types(const AtomVec &atoms) {
 		AtomSet visited;
 		for (auto &patom : atoms) {
@@ -280,43 +249,45 @@ namespace Molib {
 		return amatch;
 	}
 
-	Fragments Fragmenter::identify_overlapping_rigid_segments(const AtomVec &atoms) {
-		Fragments f;
+	Fragmenter::Fragment::Vec Fragmenter::identify_overlapping_rigid_segments(const AtomVec &atoms, Unique &u) {
+		Fragment::Vec fragments;
 		AtomSet visited;
 		int i=0;
 		for (auto &pa : atoms) {
 			if (!visited.count(pa)) {
-				// insert all atoms that are connected to this atom
+				// insert core atoms that are connected to this atom
 				// by non-rotatable bond(s)
-				AtomSet seg;
+				AtomSet core, join;
 				queue<Atom*> q;
 				q.push(pa);
 				while (!q.empty()) {
 					Atom &current = *q.front(); q.pop();
-					seg.insert(&current);
+					core.insert(&current);
 					visited.insert(&current);
 					for (auto &pbond : current.get_bonds())
 						if (!visited.count(&pbond->second_atom(current)) 
 							&& !pbond->is_rotatable())
 							q.push(&pbond->second_atom(current));
 				}
-				// insert atoms that are connected to the segment 
+				// insert join atoms that are connected to the segment 
 				// by one rotatable bond
-				for (auto &pbond : get_bonds_in(seg, false)) {
+				for (auto &pbond : get_bonds_in(core, false)) {
 					Bond &bond = *pbond;
 					if (bond.is_rotatable()) {
-						seg.insert(&bond.atom1());
-						seg.insert(&bond.atom2());
+						if (!core.count(&bond.atom1())) join.insert(&bond.atom1());
+						if (!core.count(&bond.atom2())) join.insert(&bond.atom2());
 					}
 				}
+				
+				Fragment frag(core, join, u);
 				// ensure segments have >= 3 atoms
-				if (seg.size() >=3) {
-					f[help::to_string(i++)].insert(seg);
+				if (frag.size() >=3) {
+					fragments.push_back(frag);
 				}
 			}
 		}
-		dbgmsg("------------- RIGID SEGMENTS -------------------" << endl << f);
-		return f;
+		dbgmsg("------------- RIGID SEGMENTS -------------------" << endl << fragments);
+		return fragments;
 	}
 };
 

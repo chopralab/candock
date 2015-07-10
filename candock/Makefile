@@ -23,8 +23,8 @@ LIBS	= -L. -L$(LIBDIR)/linker -L $(LIBDIR)/pdbreader -L $(LIBDIR)/kabsch \
 -L $(LIBDIR)/helper -L $(LIBDIR)/score -L $(LIBDIR)/fragmenter -L $(LIBDIR)/graph \
 -L $(LIBDIR)/kbforce -L $(LIBDIR)/geom3d -L $(LIBDIR)/openmm -L $(LIBDIR)/probis \
 -L $(LIBDIR)/ligands -L $(LIBDIR)/docker -L $(LIBDIR)/centro \
--llinker -lpdb -lscore -lfragmenter -ldocker -lgraph -lkabsch -lcentro \
--lgeom3d -lomm -lhelper -lOpenMM_static -ldl -lc -lkbforce -lprobis -lligands -lpdb \
+-llinker -lpdb -ldocker -lscore -lfragmenter -lgraph -lkabsch -lcentro \
+-lomm -lhelper -lOpenMM_static -ldl -lc -lkbforce -lprobis -lligands -lpdb -lgeom3d \
 -lboost_regex -lboost_filesystem -lboost_system -lpthread -lboost_date_time \
 -lgsl -lgslcblas -lm
 INCL = -I $(LIBDIR)/tclap-1.2.1/include -I $(LIBDIR)/jsoncpp-src-0.6.0-rc2/include \

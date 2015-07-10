@@ -26,22 +26,21 @@ namespace Molib {
 	class Score;
 	class Linker {
 		typedef map<const Atom*, Segment*> AtomToSegment;
-		typedef map<ConstSegPair, Segment::Graph::Path> Paths;
 		typedef map<const Segment*, State*> SegStateMap;
 		typedef Grid<Atom> MolGrid;
 		static const int MAX_ENERGY = 999999;
-		typedef pair<StateVec, double> LinkEnergy;
-		typedef pair<NStateVec, double> Conf;
+		typedef pair<State::Vec, double> LinkEnergy;
+		typedef pair<State::NVec, double> Conf;
 		typedef vector<Conf> Conformations;
 		struct pq_comp { bool operator()(const LinkEnergy &i, const LinkEnergy &j) 
 			{ return i.second < j.second; } };
 		typedef multiset<LinkEnergy, pq_comp> PriorityQueue;
 
 		class ConnectionError : public Error {
-			const set<ConstStatePair> __fs; 
+			const set<State::ConstPair> __fs; 
 		public: 
-			ConnectionError(const string &msg, const set<ConstStatePair> fs) : Error(msg), __fs(fs) {}
-			const set<ConstStatePair>& get_failed_state_pairs() const { return __fs; }
+			ConnectionError(const string &msg, const set<State::ConstPair> fs) : Error(msg), __fs(fs) {}
+			const set<State::ConstPair>& get_failed_state_pairs() const { return __fs; }
 		};
 		Internal &__ic;
 		const Molecule &__ligand;
@@ -52,7 +51,7 @@ namespace Molib {
 			__tol_max_coeff, __tol_min_coeff;
 		const int __max_possible_conf, __link_iter;
 		double __distance(const State &start, const State &goal) const;
-		StateVec __compute_neighbors(const State &curr_state, Segment &next,
+		State::Vec __compute_neighbors(const State &curr_state, Segment &next,
 		vector<unique_ptr<State>> &states);
 		bool __clashes_receptor(const State&) const;
 		bool __clashes_ligand(const State &current, 
@@ -60,17 +59,17 @@ namespace Molib {
 		AtomToCrd __rotate(const Geom3D::Quaternion&, const Geom3D::Point&, const Geom3D::Point&, const AtomToCrd&);
 
 		void __create_states(const Segment::Graph &segment_graph, const NRset &top_seeds);
-		Array2d<bool> __find_compatible_state_pairs(const StateVec &states);
-		vector<vector<StateVec>> __grow_possibles(const map<State*, StateSet> &pos);
+		Array2d<bool> __find_compatible_state_pairs(const State::Vec &states);
+		vector<vector<State::Vec>> __grow_possibles(const map<State*, State::Set> &pos);
 		vector<LinkEnergy> __generate_rigid_conformations(const Seed::Graph &seed_graph);
-		Paths __find_paths(const Segment::Graph &segment_graph);
-		void __set_branching_rules(const Paths &paths);
+		Segment::Paths __find_paths(const Segment::Graph &segment_graph);
+		void __set_branching_rules(const Segment::Paths &paths);
 		Molecules __reconstruct(const Conformations &conformations);
-		void __init_max_linker_length(const Paths &paths);
+		void __init_max_linker_length(const Segment::Paths &paths);
 		void __compute_max_linker_length(Segment::Graph::Path &path);
 
 		Conformations __connect(const int segment_graph_size, const vector<LinkEnergy> &possibles);
-		bool __has_blacklisted(const StateVec &conformation, const set<ConstStatePair> &blacklist);
+		bool __has_blacklisted(const State::Vec &conformation, const set<State::ConstPair> &blacklist);
 		bool __link_adjacent(const Segment::Graph::Path &path);
 		bool __check_distances_to_seeds(const State &curr_state, 
 			const Segment &adjacent, const SegStateMap &docked_seeds);

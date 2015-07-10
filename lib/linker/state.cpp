@@ -42,12 +42,12 @@ namespace Molib {
 	}
 	
 	ostream& operator<< (ostream& stream, const State& s) {
-		stream << "State(address = " << &s <<", segment = " << s.__segment.get_name() << ") " 
+		stream << "State(address = " << &s <<", segment = " << s.__segment.get_seed_id() << ") " 
 			<< " energy = " << setprecision(4) << fixed << s.__energy << " atom_crd =  " ;
 		for (auto &kv : s.__atom_crd) stream << kv.first->atom_number() << " -> " << kv.second << " ";
 		return stream;
 	}
-	ostream& operator<< (ostream& stream, const StateVec& sv) {
+	ostream& operator<< (ostream& stream, const State::Vec& sv) {
 		for (auto &state : sv) stream << "MEMBER STATE : " << state << endl;
 		return stream;
 	}

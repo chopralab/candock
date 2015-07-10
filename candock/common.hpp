@@ -10,9 +10,9 @@
 
 namespace common {
 	Molib::NRset read_top_seeds_files(const Molib::Molecule &ligand, const string &top_seeds_file);
-	void create_mols_from_seeds(set<string> &added, Molib::Molecules &seeds, const Molib::Molecules &mols);
+	void create_mols_from_seeds(set<int> &added, Molib::Molecules &seeds, const Molib::Molecules &mols);
 //~ #ifndef NDEBUG	
-	void create_mols_from_fragments(set<string> &added, Molib::Molecules &seeds, const Molib::Molecules &mols);
+	void create_mols_from_fragments(set<int> &added, Molib::Molecules &seeds, const Molib::Molecules &mols);
 //~ #endif
 
 };

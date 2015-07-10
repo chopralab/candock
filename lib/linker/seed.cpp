@@ -6,10 +6,10 @@
 
 namespace Molib {
 	ostream& operator<< (ostream& stream, const Seed& s) {
-		return stream << "Seed = " << s.get_segment().get_name() << endl;
+		return stream << "Seed = " << s.get_segment().get_seed_id() << endl;
 	}
 
-	Seed::Graph Seed::create_graph(const Segment::Graph &segment_graph, const Paths &paths) {
+	Seed::Graph Seed::create_graph(const Segment::Graph &segment_graph, const Segment::Paths &paths) {
 		dbgmsg("Create seed graph ...");
 		vector<unique_ptr<Seed>> vertices;
 		for (auto &s : segment_graph) // add vertices to seed graph

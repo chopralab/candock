@@ -42,18 +42,24 @@ namespace Docker {
 
 		map<int, GpointVec> __gridpoints;
 		Array3d<Gpoint*> __gmap;
+		const Molib::Score *__score;
+		const set<int> *__ligand_idatm_types;
+		
 		
 		void __identify_gridpoints(const double &grid_spacing, const double &radial_check);
-		void __identify_gridpoints(const Molib::Score &score, const set<int> &ligand_idatm_types, 
-			const Centro::Centroids &centroids, Molib::MolGrid &grid, 
+		void __identify_gridpoints(const Centro::Centroids &centroids, Molib::MolGrid &grid, 
 			const double &grid_spacing, const int &dist_cutoff, const double &excluded_radius, 
 			const double &max_interatomic_distance);
 	
 	public:
 		Gpoints(const double &grid_spacing, const double &radial_check);
 		Gpoints(const Molib::Score &score, const set<int> &ligand_idatm_types, 
-			const Centro::Centroids &centroids, Molib::MolGrid &grid, const double &grid_spacing, 
-			const int &dist_cutoff, const double &excluded_radius, const double &max_interatomic_distance);
+			const Centro::Centroids &centroids, Molib::MolGrid &grid, 
+			const double &grid_spacing, const int &dist_cutoff, 
+			const double &excluded_radius, const double &max_interatomic_distance);
+		Gpoints(const Centro::Centroids &centroids, Molib::MolGrid &grid, 
+			const double &grid_spacing, const int &dist_cutoff, 
+			const double &excluded_radius, const double &max_interatomic_distance);
 		GpointVec& get_gridpoints0() { if (!__gridpoints.count(0)) throw Error("die : no gridpoints0 found ?"); return __gridpoints[0]; }
 		map<int, GpointVec>& get_gridpoints() { return __gridpoints; }
 		Gpoint& get_center_point();

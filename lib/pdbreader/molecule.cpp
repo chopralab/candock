@@ -317,13 +317,6 @@ namespace Molib {
 		return sqrt(md_sq);
 	}
 
-	Molecules& Molecules::compute_seeds(const string &seeds_file) { 
-		Unique u(seeds_file); 
-		for (auto &molecule : *this) 
-			molecule.compute_seeds(u); 
-		return *this; 
-	}
-
 	Molecule& Molecule::compute_rotatable_bonds() {
 		dbgmsg("starting compute_rotatable_bonds");
 		Fragmenter f(this->get_atoms());
@@ -340,23 +333,21 @@ namespace Molib {
 		return *this;
 	}
 
-	Molecule& Molecule::compute_overlapping_rigid_segments() {
+	Molecules& Molecules::compute_overlapping_rigid_segments(const string &seeds_file) { 
+		Unique u(seeds_file); 
+		for (auto &molecule : *this) 
+			molecule.compute_overlapping_rigid_segments(u); 
+		return *this; 
+	}
+
+	Molecule& Molecule::compute_overlapping_rigid_segments(Unique &u) {
 		for (auto &assembly : *this)
 		for (auto &model : assembly) {
 			Fragmenter f(model.get_atoms());
-			model.set_rigid(f.identify_overlapping_rigid_segments(model.get_atoms()));
+			model.set_rigid(f.identify_overlapping_rigid_segments(model.get_atoms(), u));
 		}
 		dbgmsg("MOLECULE AFTER COMPUTING OVERLAPPING RIGID SEGMENTS" 
 			<< endl << *this);
-		return *this;
-	}
-
-	Molecule& Molecule::compute_seeds(Unique &u) {
-		for (auto &assembly : *this)
-		for (auto &model : assembly) {
-			Fragmenter f(model.get_atoms());
-			model.set_seeds(f.identify_seeds(model.get_rigid(), u));
-		}
 		return *this;
 	}
 
@@ -738,23 +729,11 @@ namespace Molib {
 		for (auto &chain : m) {
 			stream << chain;
 		}
-		for (auto &kv : m.get_rigid()) {
-			const string &nm = kv.first;
-			const set<AtomSet> &same_name = kv.second;
-			for (auto &rigid : same_name) {
-				stream << "REMARK   8 RIGID " << nm;
-				for (auto &atom : rigid) stream << " " << atom->atom_number();
-				stream << endl;
-			}
-		}
-		for (auto &kv : m.get_seeds()) {
-			const string &nm = kv.first;
-			const set<AtomSet> &same_name = kv.second;
-			for (auto &seed : same_name) {
-				stream << "REMARK   8 SEED " << nm;
-				for (auto &atom : seed) stream << " " << atom->atom_number();
-				stream << endl;
-			}
+		for (auto &rigid : m.get_rigid()) {
+			stream << "REMARK   8 RIGID " << rigid.get_seed_id();
+			for (auto &atom : rigid.get_core()) stream << " " << 'c' << atom->atom_number();
+			for (auto &atom : rigid.get_join()) stream << " " << 'j' << atom->atom_number();
+			stream << endl;
 		}
 		for (auto &pbond : get_bonds_in(m.get_atoms())) {
 			Bond &bond = *pbond;
