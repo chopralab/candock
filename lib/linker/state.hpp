@@ -22,6 +22,7 @@ namespace Molib {
 	private:
 		const Segment &__segment;
 		const AtomToCrd __atom_crd;
+		//~ const AtomVec __atom_crd;
 		double __energy;
 	public:
 		State(const Segment &segment, const AtomToCrd atom_crd, const double energy=0) : 

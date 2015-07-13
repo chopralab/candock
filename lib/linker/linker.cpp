@@ -25,7 +25,8 @@ namespace Molib {
 		os << "start link ++++++++++++++++++++++++++++++" << endl;
 		os << "ENERGY = " << le.second << endl;
 		for (auto &pstate : le.first)
-			os << *pstate << endl;
+			//~ os << *pstate << endl;
+			os << pstate->pdb() << endl;
 		os << "end link --------------------------------" << endl;
 		return os;
 	}
@@ -123,15 +124,17 @@ namespace Molib {
 					auto &vertices2 = mv.second;
 					// for every docked rigid fragment
 					for (auto &seed_molecule : seed_mols) {
+						//~ AtomVec ordered_atoms;
 						AtomToCrd atom_crd;
 						for (int i = 0; i < vertices2.size(); ++i) {
 							Atom &v1 = gd[vertices1[i]];
-							Atom &v2 = gs[vertices2[i]];
-							atom_crd[&v1] = Geom3D::Coordinate(v2.crd());
+							Atom &v2 = *seed_molecule.get_atoms()[vertices2[i]];
+							atom_crd[&v1] = v2.crd();
+							
 							dbgmsg("adding matched vertex pair " << vertices1[i] 
 								<< "," << vertices2[i] << " new coordinates of atom " 
 								<< v1.atom_number() << " are " 
-								<< Geom3D::Coordinate(v2.crd()));
+								<< v2.crd());
 						}
 						const double energy = stod(seed_molecule.name());
 						dbgmsg("adding docked state " << segment.get_seed_id() << " with energy of " << energy);
@@ -420,8 +423,10 @@ namespace Molib {
 				const Segment &segment2 = state2.get_segment();
 				if (&segment1 != &segment2) {
 					const double max_linker_length = segment1.get_max_linker_length(segment2);
-					const double max_dist = __tol_max_coeff * max_linker_length;
-					const double min_dist = __tol_min_coeff * max_linker_length;
+					//~ const double max_dist = __tol_max_coeff * max_linker_length;
+					//~ const double min_dist = __tol_min_coeff * max_linker_length;
+					const double max_dist = max_linker_length + 1.5;
+					const double min_dist = max_linker_length - 1.5;
 					const Bond &excluded = (segment1.is_adjacent(segment2) 
 						? segment1.get_bond(segment2) : Bond());
 #ifndef NDEBUG
@@ -456,10 +461,17 @@ namespace Molib {
 
 		// init adjacency matrix (1 when states are compatible, 0 when not)
 		Array2d<bool> conn = __find_compatible_state_pairs(states);
+
+		cout << "find_compatible_state_pairs took " << Benchmark::seconds_from_start() 
+			<< " wallclock seconds" << endl;
 		
 		// find all maximum cliques, of size k; k...number of seed segments
 		Maxclique m(conn.data, conn.szi);
 		vector<vector<int>> qmaxes = m.mcq(seed_graph.size());
+		//~ vector<vector<int>> qmaxes = m.mcq(4);
+
+		cout << "max clique search took " << Benchmark::seconds_from_start() 
+			<< " wallclock seconds" << endl;
 
 		if (qmaxes.empty())
 			throw Error("die : couldn't find any possible conformations for ligand " 
@@ -482,6 +494,8 @@ namespace Molib {
 			[] (const LinkEnergy &i, const LinkEnergy &j) { 
 			return i.second < j.second;	});
 			
+		cout << possibles_w_energy << endl;
+
 		if (__max_possible_conf != -1 && possibles_w_energy.size() > __max_possible_conf) {
 			possibles_w_energy.resize(__max_possible_conf);
 			dbgmsg("number of possible conformations > max_possible_conf, "

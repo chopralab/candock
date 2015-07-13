@@ -8,7 +8,10 @@ namespace Molib {
 	string State::pdb() const { 
 		stringstream ss;
 		for (auto &kv : __atom_crd) {
-			Atom a(*kv.first);
+			//~ Atom a(*kv.first);
+			//~ a.set_crd(kv.second);
+			//~ ss << a;
+			Atom &a = *const_cast<Atom*>(kv.first);
 			a.set_crd(kv.second);
 			ss << a;
 		} 
