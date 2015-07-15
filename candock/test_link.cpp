@@ -140,6 +140,23 @@ int main(int argc, char* argv[]) {
 						 */
 						
 						Molib::Internal ic(ligand.get_atoms());
+						
+						// create grid of top seeds:
+						//    all atom grid
+						// join atoms are defined for seeds: 
+						//    a) by ligand topology 
+						//    b) (--synt option) by ALL possible C-join atoms of ALL seeds
+						// find all paths:
+						//    a) easy (like now)
+						//    b) limit path length to 3 or 4 segments
+						//
+						// for each possible docked conformation:
+						//
+						// select ALL pairs (triples, quadruples) of ADJACENT seeds for linking
+						// 
+						// APPENDIX:
+						//    fast clashes between seeds using grid
+						//    
 						Molib::Linker linker(ligand, top_seeds, gridrec, score, ic, 
 							cmdl.dist_cutoff(), cmdl.spin_degrees(), cmdl.tol_dist(),
 							cmdl.tol_max_coeff(), cmdl.tol_min_coeff(), 

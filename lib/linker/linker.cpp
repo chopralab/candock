@@ -25,8 +25,7 @@ namespace Molib {
 		os << "start link ++++++++++++++++++++++++++++++" << endl;
 		os << "ENERGY = " << le.second << endl;
 		for (auto &pstate : le.first)
-			//~ os << *pstate << endl;
-			os << pstate->pdb() << endl;
+			os << *pstate << endl;
 		os << "end link --------------------------------" << endl;
 		return os;
 	}
@@ -407,41 +406,88 @@ namespace Molib {
 		return mc;
 	}
 	
-	Array2d<bool> Linker::__find_compatible_state_pairs(const State::Vec &states) {
+	//~ Array2d<bool> Linker::__find_compatible_state_pairs(const State::Vec &states) {
+		//~ /* Find all pairs of compatible states at correct distances for 
+		 //~ * the multi-seed molecules
+		 //~ * 
+		 //~ */
+		//~ int sz = states.size();
+		//~ // reserve memory for sz * sz adjacency matrix; sz...sum of all docked states
+		//~ Array2d<bool> conn(sz, sz);
+//~ 
+		//~ for (int i = 0; i < states.size(); ++i) {
+			//~ State &state1 = *states[i];
+			//~ const Segment &segment1 = state1.get_segment();
+			//~ for (int j = i + 1; j < states.size(); ++j) {
+				//~ State &state2 = *states[j];
+				//~ const Segment &segment2 = state2.get_segment();
+				//~ if (&segment1 != &segment2) {
+					//~ const double max_linker_length = segment1.get_max_linker_length(segment2);
+					//~ // const double max_dist = __tol_max_coeff * max_linker_length;
+					//~ // const double min_dist = __tol_min_coeff * max_linker_length;
+					//~ const double max_dist = max_linker_length + 2.0;
+					//~ const double min_dist = max_linker_length - 2.0;
+					//~ const Bond &excluded = (segment1.is_adjacent(segment2) 
+						//~ ? segment1.get_bond(segment2) : Bond());
+//~ #ifndef NDEBUG
+					//~ dbgmsg("segment1 = " << segment1 << endl << "segment2 = " << segment2);
+					//~ dbgmsg("state1 = " << state1 << endl << "state2 = " << state2);
+					//~ if (segment1.is_adjacent(segment2)) dbgmsg("excluded bond is " << excluded);
+//~ #endif
+					//~ const double dist = __distance(state1, state2);
+					//~ if (dist < max_dist && dist > min_dist
+						//~ && !state1.clashes(state2, excluded)) {
+						//~ dbgmsg("compatible states pair belongs to segments " 
+							//~ << segment1.get_seed_id() << " and " 
+							//~ << segment2.get_seed_id() << " mll is "
+							//~ << max_linker_length
+							//~ << " dist is " << dist);
+						//~ conn.data[i][j] = conn.data[j][i] = true;
+					//~ }
+				//~ }
+			//~ }
+		//~ }
+		//~ return conn;
+	//~ }
+//~ 
+	//~ Array2d<bool> Linker::__find_compatible_state_pairs(const State::Vec &states) {
+		//~ /* Find all pairs of compatible states at correct distances for 
+		 //~ * the multi-seed molecules
+		 //~ */
+		//~ Array2d<bool> conn(states.size());
+		//~ Linker::Poses poses(states);
+		//~ for (auto &state : states) {
+			//~ State::Vec join_states = poses.get_join_states(state);
+			//~ State::Set clashed_states = poses.get_clashed_states(state);
+			//~ State::Vec compatible_states = join_states - clashed_states;
+			//~ const int i = state.get_id();
+			//~ for (auto &state2 : compatible_states) {
+				//~ const int j = state2.get_id();
+				//~ conn.data[i][j] = conn.data[j][i] = true;
+			//~ }
+		//~ }
+		//~ return conn;
+	//~ }
+//~ 
+	Array2d<bool> Linker::__find_compatible_state_pairs(const Seed::Graph &seed_graph) {
 		/* Find all pairs of compatible states at correct distances for 
 		 * the multi-seed molecules
-		 * 
 		 */
-		int sz = states.size();
-		// reserve memory for sz * sz adjacency matrix; sz...sum of all docked states
-		Array2d<bool> conn(sz, sz);
-		for (int i = 0; i < states.size(); ++i) {
-			State &state1 = *states[i];
-			const Segment &segment1 = state1.get_segment();
-			for (int j = i + 1; j < states.size(); ++j) {
-				State &state2 = *states[j];
-				const Segment &segment2 = state2.get_segment();
-				if (&segment1 != &segment2) {
-					const double max_linker_length = segment1.get_max_linker_length(segment2);
-					//~ const double max_dist = __tol_max_coeff * max_linker_length;
-					//~ const double min_dist = __tol_min_coeff * max_linker_length;
-					const double max_dist = max_linker_length + 1.5;
-					const double min_dist = max_linker_length - 1.5;
-					const Bond &excluded = (segment1.is_adjacent(segment2) 
-						? segment1.get_bond(segment2) : Bond());
-#ifndef NDEBUG
-					dbgmsg("segment1 = " << segment1 << endl << "segment2 = " << segment2);
-					dbgmsg("state1 = " << state1 << endl << "state2 = " << state2);
-					if (segment1.is_adjacent(segment2)) dbgmsg("excluded bond is " << excluded);
-#endif
-					const double dist = __distance(state1, state2);
-					if (dist < max_dist && dist > min_dist
-						&& !state1.clashes(state2, excluded)) {
-						dbgmsg("compatible states pair belongs to segments " 
-							<< segment1.get_seed_id() << " and " 
-							<< segment2.get_seed_id() << " mll is "
-							<< max_linker_length
-							<< " dist is " << dist);
+		Array2d<bool> conn(states.size());
+		Linker::Poses poses(states);
+		for (int u = 0; u < seed_graph.size(); ++u) {
+			Segment &segment1 = seed_graph[u].get_segment();
+			for (int v = u + 1; v < seed_graph.size(); ++v) {
+				Segment &segment2 = seed_graph[v].get_segment();
+				JoinAtoms join_atoms(segment1, segment2);
+				double max_linker_length = segment1.get_max_linker_length(segment2);
+				for (auto &state1 : segment1.get_states()) {
+					State::Vec join_states = poses.get_join_states(state, max_linker_length);
+					State::Set clashed_states = poses.get_clashed_states(state);
+					State::Vec compatible_states = join_states - clashed_states;
+					const int i = state.get_id();
+					for (auto &state2 : compatible_states) {
+						const int j = state2.get_id();
 						conn.data[i][j] = conn.data[j][i] = true;
 					}
 				}
@@ -468,7 +514,6 @@ namespace Molib {
 		// find all maximum cliques, of size k; k...number of seed segments
 		Maxclique m(conn.data, conn.szi);
 		vector<vector<int>> qmaxes = m.mcq(seed_graph.size());
-		//~ vector<vector<int>> qmaxes = m.mcq(4);
 
 		cout << "max clique search took " << Benchmark::seconds_from_start() 
 			<< " wallclock seconds" << endl;
@@ -494,13 +539,13 @@ namespace Molib {
 			[] (const LinkEnergy &i, const LinkEnergy &j) { 
 			return i.second < j.second;	});
 			
-		cout << possibles_w_energy << endl;
-
 		if (__max_possible_conf != -1 && possibles_w_energy.size() > __max_possible_conf) {
 			possibles_w_energy.resize(__max_possible_conf);
 			dbgmsg("number of possible conformations > max_possible_conf, "
 				<< "resizing to= " << __max_possible_conf << " conformations");
 		}
+
+		//~ cout << possibles_w_energy << endl;
 
 		dbgmsg("RIGID CONFORMATIONS FOR LIGAND " << __ligand.name() 
 			<< " : " << endl << possibles_w_energy);
@@ -520,7 +565,6 @@ namespace Molib {
 		if (!segment_graph.find_cycles_connected_graph().empty()) {
 			throw Error("die : cyclic molecules are currently not supported");
 		}
-		dbgmsg("segment graph for ligand " << __ligand.name());
 		dbgmsg("segment graph for ligand " << __ligand.name() << " = " << segment_graph);
 		__create_states(segment_graph, __top_seeds);
 
@@ -582,39 +626,9 @@ namespace Molib {
 		return good_conformations;
 	}
 	
-	//~ Segment::Paths Linker::__find_paths(const Segment::Graph &segment_graph) {
-		//~ Segment::Paths paths;
-		//~ dbgmsg("find all paths in a graph");
-		//~ Segment::Set seeds, seeds_and_leafs;
-		//~ for (auto &seg : segment_graph) {
-			//~ if (seg.is_seed())
-				//~ seeds.insert(&seg);
-			//~ if (seg.is_seed() || seg.is_leaf())
-				//~ seeds_and_leafs.insert(&seg);
-		//~ }
-		//~ set<Segment::ConstPair> visited;
-		//~ for (auto &pseg1 : seeds) {
-			//~ for (auto &pseg2 : seeds_and_leafs) {
-				//~ if (pseg1 != pseg2 && !visited.count({pseg1, pseg2})) {
-					//~ dbgmsg("finding path between " << *pseg1 << " and "
-						//~ << *pseg2);
-					//~ visited.insert({pseg1, pseg2});
-					//~ visited.insert({pseg2, pseg1});
-					//~ Segment::Graph::Path path = Glib::find_path(*pseg1, *pseg2);
-					//~ if (__link_adjacent(path)) {
-						//~ paths.insert({{pseg1, pseg2}, path });
-						//~ dbgmsg("path between first segment " << *pseg1
-							//~ << " and second segment " << *pseg2);
-					//~ }
-				//~ }
-			//~ }
-		//~ }
-		//~ return paths;
-	//~ }
-	//~ 
 	Segment::Paths Linker::__find_paths(const Segment::Graph &segment_graph) {
 		/*
-		 * Find ALL paths between seed segments (even non-adjacent) 
+		 * Find ALL paths between ALL seed segments (even non-adjacent) 
 		 * and seeds and leafs
 		 */
 		Segment::Paths paths;

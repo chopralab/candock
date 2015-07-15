@@ -109,6 +109,7 @@ namespace Molib {
 		void set_crd(const Geom3D::Coordinate &crd) { __crd = crd; }
 		string idatm_type_unmask() const { return help::idatm_unmask[__idatm_type]; }
 		int idatm_type() const { return __idatm_type; }
+		double radius() const { return help::vdw_radius[__idatm_type]; }
 		const string& gaff_type() const { return __gaff_type; }
 		const string& atom_name() const { return __atom_name; }
 		Element element() const { return __element; }

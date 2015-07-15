@@ -8,12 +8,12 @@ namespace Molib {
 	string State::pdb() const { 
 		stringstream ss;
 		for (auto &kv : __atom_crd) {
-			//~ Atom a(*kv.first);
-			//~ a.set_crd(kv.second);
-			//~ ss << a;
-			Atom &a = *const_cast<Atom*>(kv.first);
+			Atom a(*kv.first);
 			a.set_crd(kv.second);
 			ss << a;
+			//~ Atom &a = *const_cast<Atom*>(kv.first);
+			//~ a.set_crd(kv.second);
+			//~ ss << a;
 		} 
 		return ss.str();
 	}
@@ -27,7 +27,7 @@ namespace Molib {
 				continue;
 			}
 			const Geom3D::Coordinate &c1 = kv1.second;
-			const double vdw1 = help::vdw_radius[a1.idatm_type()];
+			const double vdw1 = a1.radius();
 			for (auto &kv2 : other.get_atoms()) {
 				const Atom &a2 = *kv2.first;
 				//~ if (&a2 == &excluded.first_atom() || &a2 == &excluded.second_atom()) { 
@@ -37,7 +37,7 @@ namespace Molib {
 					continue;
 				}
 				const Geom3D::Coordinate &c2 = kv2.second;
-				const double vdw2 = help::vdw_radius[a2.idatm_type()];
+				const double vdw2 = a2.radius();
 				if (c1.distance_sq(c2) < pow(0.75 * (vdw1 + vdw2), 2)) return true;
 			}
 		}
