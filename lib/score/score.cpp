@@ -15,8 +15,7 @@ namespace Molib {
 
 	Array1d<double> Score::compute_energy(const Geom3D::Coordinate &crd, const set<int> &ligand_atom_types) const {
 		Array1d<double> energy_sum(*ligand_atom_types.rbegin() + 1);
-		Atom at(crd);
-		for (auto &patom : __gridrec.get_neighbors(at, __dist_cutoff)) {
+		for (auto &patom : __gridrec.get_neighbors(crd, __dist_cutoff)) {
 			const double dist = patom->crd().distance(crd);
 			const auto &atom_1 = patom->idatm_type();
 			const int index = __get_index(dist);
@@ -281,7 +280,7 @@ namespace Molib {
 		for (auto &atom2 : residue2) {
 			const auto &atom_2 = atom2.idatm_type();
 			dbgmsg("ligand atom = " << atom2.atom_number() << " crd= " << atom2.crd().pdb());
-			for (auto &atom1 : __gridrec.get_neighbors(atom2, __dist_cutoff)) {
+			for (auto &atom1 : __gridrec.get_neighbors(atom2.crd(), __dist_cutoff)) {
 				const double dist = atom1->crd().distance(atom2.crd());
 				const auto &atom_1 = atom1->idatm_type();
 				const pair_of_ints atom_pair = minmax(atom_1, atom_2);
@@ -305,7 +304,7 @@ namespace Molib {
 			const Geom3D::Coordinate &atom2_crd = kv.second;
 			const auto &atom_2 = atom2.idatm_type();
 			dbgmsg("ligand atom = " << atom2.atom_number() << " crd= " << atom2_crd.pdb());
-			for (auto &atom1 : __gridrec.get_neighbors(Atom(atom2_crd), __dist_cutoff)) {
+			for (auto &atom1 : __gridrec.get_neighbors(atom2_crd, __dist_cutoff)) {
 				const double dist = atom1->crd().distance(atom2_crd);
 				const auto &atom_1 = atom1->idatm_type();
 				const pair_of_ints atom_pair = minmax(atom_1, atom_2);

@@ -166,10 +166,9 @@ namespace Docker {
 						}
 						END_LOOP:
 						if (bsite_id != -1) {
-							Molib::Atom at(eval);
-							for (Molib::Atom *a : grid.get_neighbors(at, dist_cutoff)) {
+							for (Molib::Atom *a : grid.get_neighbors(eval, dist_cutoff)) {
 								Molib::Atom &atom = *a;
-								const double vdW = help::vdw_radius[atom.idatm_type()];
+								const double vdW = atom.radius();
 								dbgmsg("vdW = " << vdW);
 								const double eval_dist = excluded_radius+0.9*vdW;
 								const double distance = atom.crd().distance(eval);

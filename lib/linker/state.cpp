@@ -5,6 +5,14 @@
 #include "helper/help.hpp"
 
 namespace Molib {
+	State::Vec operator-(const State::Set& left, const State::Set& right) const { 
+		State::Vec ret; 
+		for (auto &state : left) 
+			if (!right.count(state)) 
+				ret.push_back(state); 
+		return ret; 
+	}
+	
 	string State::pdb() const { 
 		stringstream ss;
 		for (auto &kv : __atom_crd) {
@@ -17,6 +25,7 @@ namespace Molib {
 		} 
 		return ss.str();
 	}
+	
 	bool State::clashes(const State &other, const Bond &excluded) const { // clashes between this and other state
 		for (auto &kv1 : __atom_crd) {
 			const Atom &a1 = *kv1.first;
@@ -50,6 +59,7 @@ namespace Molib {
 		for (auto &kv : s.__atom_crd) stream << kv.first->atom_number() << " -> " << kv.second << " ";
 		return stream;
 	}
+	
 	ostream& operator<< (ostream& stream, const State::Vec& sv) {
 		for (auto &state : sv) stream << "MEMBER STATE : " << state << endl;
 		return stream;

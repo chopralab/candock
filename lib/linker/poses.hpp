@@ -24,14 +24,14 @@ namespace Linker {
 			typedef vector<AtomPoint*> PVec;
 		};
 		
-		AtomPoint::UPVec __atompoints;
-		Grid<AtomPoint> __grid;
+		map<Segment::Id, AtomPoint::UPVec> __atompoints, __joinatompoints;
+		map<Segment::Id, Grid<AtomPoint>> __grid, __grid_join_atoms;
 		
-		Grid<AtomPoint> __initialize_grid(const State::Vec &states);
+		void __initialize_grid(const Segment::Vec &segments);
 	public:
-		Poses(const State::Vec &states);
-		State::Set get_clashed_states(const State &state) const;
-		State::Set get_join_states(const State &state) const;
+		Poses(const Segment::Vec &segments);
+		State::Set get_clashed_states(const State &state, const Segment &segment2) const;
+		State::Set get_join_states(const State &state, const Segment &segment2, const Segment::JoinAtoms &jatoms, const double max_linker_length) const;
 	};
 }
 #endif

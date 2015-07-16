@@ -15,11 +15,15 @@ struct Array2d {
 		}
 	}
 
+	Array2d() : data(nullptr), szi(0), szj(0) {}
+
+	Array2d(int SZ) : data(nullptr) {
+		init(SZ, SZ);
+	}
+
 	Array2d(int SZI, int SZJ) : data(nullptr) {
 		init(SZI, SZJ);
 	}
-
-	Array2d() : data(nullptr), szi(0), szj(0) {}
 
 	Array2d(const Array2d &other) { // copy
 		szi = other.szi;

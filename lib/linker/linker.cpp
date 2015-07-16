@@ -139,6 +139,7 @@ namespace Molib {
 						dbgmsg("adding docked state " << segment.get_seed_id() << " with energy of " << energy);
 						// ONLY COPY SEGMENT COORDS NOT SEED
 						segment.add_state(unique_ptr<State>(new State(segment, atom_crd, energy)));
+						__states.push_back(&segment.get_last_state());
 					}
 				}
 			}
@@ -406,88 +407,25 @@ namespace Molib {
 		return mc;
 	}
 	
-	//~ Array2d<bool> Linker::__find_compatible_state_pairs(const State::Vec &states) {
-		//~ /* Find all pairs of compatible states at correct distances for 
-		 //~ * the multi-seed molecules
-		 //~ * 
-		 //~ */
-		//~ int sz = states.size();
-		//~ // reserve memory for sz * sz adjacency matrix; sz...sum of all docked states
-		//~ Array2d<bool> conn(sz, sz);
-//~ 
-		//~ for (int i = 0; i < states.size(); ++i) {
-			//~ State &state1 = *states[i];
-			//~ const Segment &segment1 = state1.get_segment();
-			//~ for (int j = i + 1; j < states.size(); ++j) {
-				//~ State &state2 = *states[j];
-				//~ const Segment &segment2 = state2.get_segment();
-				//~ if (&segment1 != &segment2) {
-					//~ const double max_linker_length = segment1.get_max_linker_length(segment2);
-					//~ // const double max_dist = __tol_max_coeff * max_linker_length;
-					//~ // const double min_dist = __tol_min_coeff * max_linker_length;
-					//~ const double max_dist = max_linker_length + 2.0;
-					//~ const double min_dist = max_linker_length - 2.0;
-					//~ const Bond &excluded = (segment1.is_adjacent(segment2) 
-						//~ ? segment1.get_bond(segment2) : Bond());
-//~ #ifndef NDEBUG
-					//~ dbgmsg("segment1 = " << segment1 << endl << "segment2 = " << segment2);
-					//~ dbgmsg("state1 = " << state1 << endl << "state2 = " << state2);
-					//~ if (segment1.is_adjacent(segment2)) dbgmsg("excluded bond is " << excluded);
-//~ #endif
-					//~ const double dist = __distance(state1, state2);
-					//~ if (dist < max_dist && dist > min_dist
-						//~ && !state1.clashes(state2, excluded)) {
-						//~ dbgmsg("compatible states pair belongs to segments " 
-							//~ << segment1.get_seed_id() << " and " 
-							//~ << segment2.get_seed_id() << " mll is "
-							//~ << max_linker_length
-							//~ << " dist is " << dist);
-						//~ conn.data[i][j] = conn.data[j][i] = true;
-					//~ }
-				//~ }
-			//~ }
-		//~ }
-		//~ return conn;
-	//~ }
-//~ 
-	//~ Array2d<bool> Linker::__find_compatible_state_pairs(const State::Vec &states) {
-		//~ /* Find all pairs of compatible states at correct distances for 
-		 //~ * the multi-seed molecules
-		 //~ */
-		//~ Array2d<bool> conn(states.size());
-		//~ Linker::Poses poses(states);
-		//~ for (auto &state : states) {
-			//~ State::Vec join_states = poses.get_join_states(state);
-			//~ State::Set clashed_states = poses.get_clashed_states(state);
-			//~ State::Vec compatible_states = join_states - clashed_states;
-			//~ const int i = state.get_id();
-			//~ for (auto &state2 : compatible_states) {
-				//~ const int j = state2.get_id();
-				//~ conn.data[i][j] = conn.data[j][i] = true;
-			//~ }
-		//~ }
-		//~ return conn;
-	//~ }
-//~ 
 	Array2d<bool> Linker::__find_compatible_state_pairs(const Seed::Graph &seed_graph) {
 		/* Find all pairs of compatible states at correct distances for 
 		 * the multi-seed molecules
 		 */
-		Array2d<bool> conn(states.size());
-		Linker::Poses poses(states);
+		Array2d<bool> conn(__states.size());
+		Linker::Poses poses(__states);
 		for (int u = 0; u < seed_graph.size(); ++u) {
 			Segment &segment1 = seed_graph[u].get_segment();
 			for (int v = u + 1; v < seed_graph.size(); ++v) {
 				Segment &segment2 = seed_graph[v].get_segment();
-				JoinAtoms join_atoms(segment1, segment2);
-				double max_linker_length = segment1.get_max_linker_length(segment2);
+				const double max_linker_length = segment1.get_max_linker_length(segment2);
+				const Segment::JoinAtoms jatoms = segment1.get_join_atoms(segment2);
 				for (auto &state1 : segment1.get_states()) {
-					State::Vec join_states = poses.get_join_states(state, max_linker_length);
-					State::Set clashed_states = poses.get_clashed_states(state);
+					State::Set join_states = poses.get_join_states(state1, segment2, jatoms, max_linker_length);
+					State::Set clashed_states = poses.get_clashed_states(state1, segment2);
 					State::Vec compatible_states = join_states - clashed_states;
-					const int i = state.get_id();
+					const int i = static_cast<int> state1.get_id();
 					for (auto &state2 : compatible_states) {
-						const int j = state2.get_id();
+						const int j = static_cast<int> state2.get_id();
 						conn.data[i][j] = conn.data[j][i] = true;
 					}
 				}
@@ -500,13 +438,8 @@ namespace Molib {
 		Benchmark::reset();
 		cout << "Generating rigid conformations of states..." << endl;
 
-		State::Vec states;
-		for (auto &seed : seed_graph) 
-			for (auto &pstate : seed.get_segment().get_states())
-				states.push_back(&*pstate);
-
 		// init adjacency matrix (1 when states are compatible, 0 when not)
-		Array2d<bool> conn = __find_compatible_state_pairs(states);
+		Array2d<bool> conn = __find_compatible_state_pairs(seed_graph);
 
 		cout << "find_compatible_state_pairs took " << Benchmark::seconds_from_start() 
 			<< " wallclock seconds" << endl;
@@ -528,8 +461,8 @@ namespace Molib {
 			double energy = 0;
 			State::Vec conf;
 			for (auto &i : qmax) {
-				conf.push_back(states[i]);
-				energy += states[i]->get_energy();
+				conf.push_back(__states[i]);
+				energy += __states[i]->get_energy();
 			}
 			possibles_w_energy.push_back({conf, energy});
 		}

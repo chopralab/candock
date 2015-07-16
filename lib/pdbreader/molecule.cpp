@@ -126,7 +126,7 @@ namespace Molib {
 			if (atom1.atom_name() == "N" || atom1.atom_name() == "C") {
 				dbgmsg("neighbors of atom " << atom1.atom_name() << " " 
 					<< atom1.atom_number() << " " << atom1.crd() << " are : ");
-				for (auto &patom2 : grid.get_neighbors(atom1, 1.6)) {
+				for (auto &patom2 : grid.get_neighbors(atom1.crd(), 1.6)) {
 					auto &atom2 = *patom2;
 					dbgmsg("    neighbor : " << atom2.atom_name() << " " 
 						<< atom2.atom_number() << " " << atom2.crd());
@@ -134,9 +134,9 @@ namespace Molib {
 			}
 #endif
 			if (atom1.atom_name() == "SG") {
-				patom2 = get_closest_atom_of(atom1, grid.get_neighbors(atom1, 2.5), "SG");
+				patom2 = get_closest_atom_of(atom1, grid.get_neighbors(atom1.crd(), 2.5), "SG");
 			} else if (atom1.atom_name() == "N") {
-				patom2 = get_closest_atom_of(atom1, grid.get_neighbors(atom1, 1.4), "C");
+				patom2 = get_closest_atom_of(atom1, grid.get_neighbors(atom1.crd(), 1.4), "C");
 			}
 			if (patom2) {
 				auto &atom2 = *patom2;

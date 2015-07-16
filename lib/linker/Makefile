@@ -2,7 +2,7 @@ include ../../candock/Makefile.inc
 
 CFLAGS	= $(PRJCFLAGS) -I..
 OBJLIBS	= liblinker.a
-OBJS	= linker.o seed.o segment.o state.o
+OBJS	= linker.o seed.o segment.o state.o poses.o
 INCL= -I ../tclap-1.2.1/include/ -I ../all3/idatmtest \
 -I ../jsoncpp-src-0.6.0-rc2/include -I ../jsoncpp-src-0.6.0-rc2/src \
 -I ../../lib/openmm -I ..
@@ -19,6 +19,9 @@ segment.o: segment.cpp segment.hpp state.hpp
 	$(CC) $(PRJCFLAGS) $(INCL) -c $<
 
 state.o: state.cpp state.hpp segment.hpp
+	$(CC) $(PRJCFLAGS) $(INCL) -c $<
+
+poses.o: poses.cpp poses.hpp segment.hpp state.hpp
 	$(CC) $(PRJCFLAGS) $(INCL) -c $<
 
 liblinker.a : $(OBJS)

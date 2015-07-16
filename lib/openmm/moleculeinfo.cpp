@@ -153,7 +153,7 @@ namespace OMMIface {
 		set<Molib::AtomPair> visited;
 		Molib::MolGrid g(atoms);
 		for (auto &pa1 : atoms) {
-			for (auto &pa2 : g.get_neighbors(*pa1, dist_cutoff)) {
+			for (auto &pa2 : g.get_neighbors(pa1->crd(), dist_cutoff)) {
 				if (!visited.count({pa1, pa2})) {
 					visited.insert({pa2, pa1});
 					if (!bonded_exclusions.count({pa1, pa2})) {
@@ -171,7 +171,7 @@ namespace OMMIface {
 		// knowledge-based forces only between ligand and receptor atoms
 		Molib::MolGrid g(receptor.get_atoms());
 		for (auto &pa1 : ligand.get_atoms()) {
-			for (auto &pa2 : g.get_neighbors(*pa1, dist_cutoff)) {
+			for (auto &pa2 : g.get_neighbors(pa1->crd(), dist_cutoff)) {
 				this->kbforce.push_back({pa1, pa2});
 			}
 		}

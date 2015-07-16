@@ -88,7 +88,7 @@ namespace genbio {
 						const string lig_code = lresn + ":" + to_string(lresi) + ":" + chain.chain_id() + ":" + to_string(model.number()) 
 							+ ":" + to_string(assembly.number()) + ":" + molecule.name() + ":" + molecule.br().name();
 						for (auto &atom : residue) {
-							vector<Molib::Atom*> neighbors = grid.get_neighbors(atom, 4.0);
+							vector<Molib::Atom*> neighbors = grid.get_neighbors(atom.crd(), 4.0);
 							for (Molib::Atom *query_atom : neighbors) {
 								const Molib::Residue &qr = query_atom->br();
 								const Molib::Chain &qc = query_atom->br().br();

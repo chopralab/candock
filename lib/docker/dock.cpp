@@ -128,7 +128,7 @@ namespace Docker {
 			reps.push_back(lowest_point);
 			confs.erase(confs.begin());
 			// delete all conformations within RMSD tolerance of this lowest energy yconformation
-			for (auto &pconf : cgrid.get_neighbors(lowest_point, __rmsd_tol)) {
+			for (auto &pconf : cgrid.get_neighbors(lowest_point.crd(), __rmsd_tol)) {
 				if (pconf->compute_rmsd(lowest_point) < __rmsd_tol) {
 					confs.erase(pconf);
 				}

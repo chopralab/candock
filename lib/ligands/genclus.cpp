@@ -126,7 +126,7 @@ namespace genclus {
 		cluster::PairwiseDistances<Molib::Atom> pairwise_distances;
 		Molib::MolGrid grid(ligands);
 		for (auto &patom : ligands) {
-			for (auto &pneighbor : grid.get_neighbors(*patom, eps)) {
+			for (auto &pneighbor : grid.get_neighbors(patom->crd(), eps)) {
 				pairwise_distances[patom][pneighbor] = 
 					patom->crd().distance(pneighbor->crd());
 			}

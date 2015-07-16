@@ -42,7 +42,7 @@ namespace genlig {
 					for (auto &residue : chain) {
 						for (auto &atom : residue) {
 							dbgmsg("before get neighbors");
-							Molib::AtomVec neighbors = grid.get_neighbors(atom, 4.0);
+							Molib::AtomVec neighbors = grid.get_neighbors(atom.crd(), 4.0);
 							dbgmsg("number of neighbors = " << neighbors.size());
 							for (auto &pa : neighbors) {
 								dbgmsg("pa = " << *pa);

@@ -20,9 +20,10 @@ private:
 	Points ***storage;
 	int szi, szj, szk;
 	Geom3D::Coordinate __min_crd;
-	
-	Geom3D::Coordinate __correct(const T &point, const double &dist) const {
-		Geom3D::Coordinate crd = point.crd() - __min_crd + dist;
+
+	template<typename U>
+	Geom3D::Coordinate __correct(const U &point, const double &dist) const {
+		Geom3D::Coordinate crd = point - __min_crd + dist;
 		if (dist < 0) {
 			if (crd.x() < 0) crd.set_x(0);
 			if (crd.y() < 0) crd.set_y(0);
@@ -75,7 +76,9 @@ public:
 		}
 		return *this;
 	}
+	
 	Grid() : storage(nullptr), szi(0), szj(0), szk(0) {}
+	
 	template<typename P>
 	Grid(const P &points) : storage(nullptr), szi(0), szj(0), szk(0) {
 		dbgmsg("size of points in grid " << points.size());
@@ -105,11 +108,13 @@ public:
 		}
 		dbgmsg("points is empty2 " << boolalpha << points.empty());
 	}
+	
 	~Grid() {
 		this->__deallocate();
 	}
 
-	Points get_neighbors(const T &point, const double &dist) {
+	template<typename U>
+	Points get_neighbors(const U &point, const double &dist) {
 		Geom3D::Coordinate cmin = __correct(point, -dist);
 		Geom3D::Coordinate cmax = __correct(point, dist);
 		Points points;
@@ -118,19 +123,18 @@ public:
 			for (int j = cmin.j(); j <= cmax.j(); ++j)
 				for (int k = cmin.k(); k <= cmax.k(); ++k) {
 					for (auto neighbor : storage[i][j][k]) {
-						const double d_sq = point.crd().distance_sq(neighbor->crd());
-						if (d_sq < dist_sq) {
-							if (neighbor != &point) {
-								neighbor->distance(d_sq);
-								points.push_back(neighbor);
-							}
+						const double d_sq = point.distance_sq(neighbor->crd());
+						if (d_sq < dist_sq && d_sq > 0) {
+							neighbor->distance(d_sq);
+							points.push_back(neighbor);
 						}
 					}
 				}
 		return points;
 	}
 
-	Points get_neighbors_within_tolerance(const T &point, const double &dist, const double &tol) {
+	template<typename U>
+	Points get_neighbors_within_tolerance(const U &point, const double &dist, const double &tol) {
 		Geom3D::Coordinate cmin = __correct(point, -dist);
 		Geom3D::Coordinate cmax = __correct(point, dist);
 		Points points;
@@ -140,8 +144,8 @@ public:
 			for (int j = cmin.j(); j <= cmax.j(); ++j)
 				for (int k = cmin.k(); k <= cmax.k(); ++k) {
 					for (auto neighbor : storage[i][j][k]) {
-						const double d_sq = point.crd().distance_sq(neighbor->crd());
-						if (d_sq > dist_sq_min && d_sq < dist_sq_max) {
+						const double d_sq = point.distance_sq(neighbor->crd());
+						if (d_sq < dist_sq_max && d_sq > dist_sq_min) {
 							points.push_back(neighbor);
 						}
 					}
@@ -149,7 +153,8 @@ public:
 		return points;
 	}
 
-	bool has_neighbor_within(const T &point, const double &dist) {
+	template<typename U>
+	bool has_neighbor_within(const U &point, const double &dist) {
 		Geom3D::Coordinate cmin = __correct(point, -dist);
 		Geom3D::Coordinate cmax = __correct(point, dist);
 		const double dist_sq = pow(dist, 2);
@@ -157,43 +162,17 @@ public:
 			for (int j = cmin.j(); j <= cmax.j(); ++j)
 				for (int k = cmin.k(); k <= cmax.k(); ++k) {
 					for (auto neighbor : storage[i][j][k]) {
-						const double d_sq = point.crd().distance_sq(neighbor->crd());
-						if ( d_sq < dist_sq) {
-							if (neighbor != &point) {
-								return true;
-							}
+						const double d_sq = point.distance_sq(neighbor->crd());
+						if (d_sq < dist_sq && d_sq > 0) {
+							return true;
 						}
 					}
 				}
 		return false;
 	}
 
-	bool clashes(const T &point) {
-		const double dist = 3.0;
-		const double vdw1 = help::vdw_radius[point.idatm_type()];
-		Geom3D::Coordinate cmin = __correct(point, -dist);
-		Geom3D::Coordinate cmax = __correct(point, dist);
-		for (int i = cmin.i(); i <= cmax.i(); ++i)
-			for (int j = cmin.j(); j <= cmax.j(); ++j)
-				for (int k = cmin.k(); k <= cmax.k(); ++k) {
-					for (auto neighbor : storage[i][j][k]) {
-						const double d_sq = point.crd().distance_sq(neighbor->crd());
-						const double vdw2 = help::vdw_radius[neighbor->idatm_type()];
-						dbgmsg("vdw1 = " << vdw1 << " vdw2 = " << vdw2 
-								<< " pow = " << pow(0.75 * (vdw1 + vdw2), 2)
-								<< " dst_sq = " << d_sq << " dist = " 
-								<< sqrt(d_sq));
-						if (d_sq < pow(0.75 * (vdw1 + vdw2), 2)) {
-							if (neighbor != &point) {
-								return true;
-							}
-						}
-					}
-				}
-		return false;
-	}
-
-	Points get_sorted_neighbors(const T &point, const double &dist) {
+	template<typename U>
+	Points get_sorted_neighbors(const U &point, const double &dist) {
 		Points points = get_neighbors(point, dist);
 		sort(points.begin(), points.end(), [](T* i,T* j){ return (i->distance()<j->distance());}); // sort in ascending order
 		return points;

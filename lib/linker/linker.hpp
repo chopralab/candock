@@ -50,6 +50,9 @@ namespace Molib {
 		const double __dist_cutoff, __spin_degrees, __tol_dist,
 			__tol_max_coeff, __tol_min_coeff;
 		const int __max_possible_conf, __link_iter;
+		State::Vec __states;
+
+
 		double __distance(const State &start, const State &goal) const;
 		State::Vec __compute_neighbors(const State &curr_state, Segment &next,
 		vector<unique_ptr<State>> &states);
@@ -59,7 +62,7 @@ namespace Molib {
 		AtomToCrd __rotate(const Geom3D::Quaternion&, const Geom3D::Point&, const Geom3D::Point&, const AtomToCrd&);
 
 		void __create_states(const Segment::Graph &segment_graph, const NRset &top_seeds);
-		Array2d<bool> __find_compatible_state_pairs(const State::Vec &states);
+		Array2d<bool> __find_compatible_state_pairs(const Seed::Graph &seed_graph);
 		vector<vector<State::Vec>> __grow_possibles(const map<State*, State::Set> &pos);
 		vector<LinkEnergy> __generate_rigid_conformations(const Seed::Graph &seed_graph);
 		Segment::Paths __find_paths(const Segment::Graph &segment_graph);

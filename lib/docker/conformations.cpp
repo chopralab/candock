@@ -105,7 +105,7 @@ namespace Docker {
 		const double tol = grid_spacing / 3;
 
 		for (auto &patomB : atoms) {
-			for (auto &pointB : grid.get_neighbors_within_tolerance(pointA, atomA.crd().distance(patomB->crd()), tol)) {
+			for (auto &pointB : grid.get_neighbors_within_tolerance(pointA.crd(), atomA.crd().distance(patomB->crd()), tol)) {
 				vertices.push_back(make_pair(patomB, pointB));
 			}
 		}

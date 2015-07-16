@@ -17,10 +17,17 @@ struct Array3d {
 			}
 		}
 	}
+
+	Array3d() : data(nullptr), szi(0), szj(0), szk(0) {}
+
+	Array3d(int SZ) : data(nullptr) {
+		init(SZ, SZ, SZ);
+	}
+
 	Array3d(int SZI, int SZJ, int SZK) : data(nullptr) {
 		init(SZI, SZJ, SZK);
 	}
-	Array3d() : data(nullptr), szi(0), szj(0), szk(0) {}
+
 	~Array3d() {
 		if (data) {
 			for (int i = 0; i < szi; ++i) {

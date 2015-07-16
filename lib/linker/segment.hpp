@@ -22,7 +22,8 @@ namespace Molib {
 		typedef pair<const Segment*, const Segment*> ConstPair;
 		typedef Glib::Graph<Segment> Graph;
 		typedef map<ConstPair, Graph::Path> Paths;
-
+		typedef Segment* Id;
+		typedef pair<Atom*, Atom*> JoinAtoms;
 	private:
 		//~ const AtomSet &__atoms;
 		const AtomSet __atoms;
@@ -54,13 +55,14 @@ namespace Molib {
 		bool is_branch() const { return size() > 2; }
 		const vector<unique_ptr<State>>& get_states() const { return __state; }
 		State& get_first_state() const { return *__state[0]; }
+		State& get_last_state() const { return *__state.back(); }
 		bool is_adjacent(const Segment &other) const { for (auto &adj : *this) if (&adj == &other) return true; return false; }
 		double get_max_linker_length(const Segment &other) const { return __max_linker_length.at(&other); }
 		void set_max_linker_length(const Segment &other, const double d) {	__max_linker_length.insert({&other, d}); }
 		const Bond& get_bond(const Segment &other) const { return __bond.at(&other); }
 		void set_bond(const Segment &other, const Bond &b) { __bond.insert({&other, b}); }
-		//~ const Atom& adjacent_in_segment(const Atom &atom, const Atom &forbidden) const { for (auto &adj : atom) if (&adj != &forbidden && has_atom(adj)) return adj; }
 		const Atom& adjacent_in_segment(const Atom &atom, const Atom &forbidden) const;
+		Id get_id() const { return this; }
 		friend ostream& operator<< (ostream& stream, const Segment& s);
 		
 		static Graph create_graph(const Molecule &molecule);
