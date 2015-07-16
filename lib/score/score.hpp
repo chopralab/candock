@@ -2,7 +2,7 @@
 #define SCORE_H
 #include "helper/benchmark.hpp"
 #include "helper/error.hpp"
-#include "pdbreader/grid.hpp"
+#include "pdbreader/atom.hpp"
 #include "cluster/optics.hpp"
 #include "geom3d/geom3d.hpp"
 #include <iostream>
@@ -15,10 +15,9 @@
 using namespace std;
 
 namespace Molib {
-	class Atom;
+
 	class Molecule;
 	class Molecules;
-	typedef Grid<Atom> MolGrid;
 	typedef map<const Atom*, Geom3D::Coordinate> AtomToCrd;
 	class Score {
 		typedef pair<int, int> pair_of_ints;
@@ -33,7 +32,7 @@ namespace Molib {
 		const double __eps;
 		const string __ref_state, __comp, __distributions_file, __rad_or_raw;
 		const double __dist_cutoff, __step_non_bond;
-		MolGrid &__gridrec;
+		Atom::Grid &__gridrec;
 		void __define_composition(const set<int>&, const set<int>&);
 		void __process_distributions_file();
 		void __compile_scoring_function();
@@ -47,7 +46,7 @@ namespace Molib {
 		double __get_lower_bound(const int idx) const { return (double) idx * __step_non_bond; }
 	public:
 		Score(const set<int> &receptor_idatm_types, const set<int> &ligand_idatm_types, 
-				MolGrid &gridrec, const string &ref_state, 
+				Atom::Grid &gridrec, const string &ref_state, 
 				const string &comp, const string &rad_or_raw, const double &dist_cutoff, 
 				const string &distributions_file, const double &step_non_bond) 
 				: __gridrec(gridrec), __ref_state(ref_state), __comp(comp), 

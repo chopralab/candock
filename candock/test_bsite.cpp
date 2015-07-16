@@ -79,7 +79,7 @@ int main(int argc, char* argv[]) {
 		/* Create receptor grid
 		 * 
 		 */
-		Molib::MolGrid gridrec(receptors[0].get_atoms());
+		Molib::Atom::Grid gridrec(receptors[0].get_atoms());
 
 		/* Create gridpoints for ALL centroids representing one or more binding sites
 		 * 

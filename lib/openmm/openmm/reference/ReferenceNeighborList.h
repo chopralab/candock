@@ -10,8 +10,8 @@ namespace OpenMM {
 
 typedef std::vector<RealVec> AtomLocationList;
 typedef unsigned int AtomIndex;
-typedef std::pair<AtomIndex, AtomIndex> AtomPair;
-typedef std::vector<AtomPair>  NeighborList;
+typedef std::pair<AtomIndex, AtomIndex> Atom::Pair;
+typedef std::vector<Atom::Pair>  NeighborList;
 
 // Ridiculous O(n^2) version of neighbor list
 // for pedagogical purposes and simplicity

@@ -35,7 +35,7 @@ namespace Centro {
 	vector<Centroid> split_binding_site(const Molib::Molecules &binding_site_ligands) {
 
 		vector<Centroid> centroids;
-		Molib::AtomVec atoms = binding_site_ligands.get_atoms();
+		Molib::Atom::Vec atoms = binding_site_ligands.get_atoms();
 
 		gsl_matrix *data = gsl_matrix_alloc(3, atoms.size());
 		for (int i = 0; i < atoms.size(); ++i) {
@@ -66,7 +66,7 @@ namespace Centro {
 			<< min_value << " max_dist = " << max_dist);
 		const double interval = max_dist / (num_centroids + 1);
 
-		Molib::AtomSet visited;
+		Molib::Atom::Set visited;
 
 		for (int i = 1; i <= num_centroids; ++i) {
 			const double position = min_value + i * interval;

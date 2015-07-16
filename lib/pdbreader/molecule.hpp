@@ -16,13 +16,13 @@
 #include <boost/asio/ip/host_name.hpp>
 #include "geom3d/coordinate.hpp"
 #include "geom3d/matrix.hpp"
-#include "it.hpp"
-#include "element.hpp"
 #include "fragmenter/fragmenter.hpp"
 #include "helper/help.hpp"
-#include "grid.hpp"
-#include "bond.hpp"
 #include "graph/graph.hpp"
+#include "it.hpp"
+#include "element.hpp"
+#include "grid.hpp"
+#include "atom.hpp"
 
 using namespace std;
 
@@ -41,97 +41,8 @@ namespace Molib {
 	class Atom;
 	class Unique;
 	
-	typedef Grid<Atom> MolGrid;
-	typedef set<Atom*> AtomSet;
-	typedef vector<Atom*> AtomVec;
-	typedef pair<Atom*, Atom*> AtomPair;
-
-	class Atom : public template_vector_container<Atom*, Atom> {
-		int __atom_number;
-		string __atom_name;
-		Geom3D::Coordinate __crd;
-		int __idatm_type;
-		string __gaff_type;
-		Element __element;
-		string __smiles_label;
-		map<string, int> __smiles_prop;
-		map<int, int> __aps;
-		void *__br; // back reference
-		map<Atom*, shared_ptr<Bond>> __bonds;
-	public:
-		Atom(const Atom &rhs) : __atom_number(rhs.__atom_number), 
-			__atom_name(rhs.__atom_name), __crd(rhs.__crd), 
-			__idatm_type(rhs.__idatm_type), __gaff_type(rhs.__gaff_type),
-			__element(rhs.__element), __smiles_label(rhs.__smiles_label),
-			__smiles_prop(rhs.__smiles_prop), __aps(rhs.__aps) {
-			dbgmsg("Copy constructor : atom");
-		}
-		typedef tuple<int, string, unique_ptr<Geom3D::Coordinate>, double> atom_tuple;
-		Atom(const int atom_number, const string &smiles_label, 
-			const map<string, int> smiles_prop) : __atom_number(atom_number), 
-			__smiles_label(smiles_label), __smiles_prop(smiles_prop), __element(""),
-			__br(nullptr) {}
-		Atom(const Geom3D::Coordinate &crd) : __crd(crd), __element("") {}
-		Atom(const Geom3D::Coordinate &crd, const int &idatm_type) : __crd(crd), 
-			__idatm_type(idatm_type), __element("") {}
-		// if element is missing, try to guess it from atom name
-		Atom(int atom_number, const string &atom_name, const Geom3D::Coordinate &crd, 
-			const int idatm_type, const string &element="") : __atom_number(atom_number), 
-			__atom_name(atom_name), __crd(crd), __idatm_type(idatm_type), 
-			__gaff_type("???"), __element(element == "" ? atom_name : element) {}			
-		Bond& connect(Atom &a2);
-		void clear_bonds() { __bonds.clear(); }
-		BondVec get_bonds() const { BondVec bonds; for (auto &kv : __bonds) 
-			bonds.push_back(&*kv.second); return bonds; }
-		const shared_ptr<Bond>& get_shared_ptr_bond(Atom &other) const { return __bonds.at(&other); }
-		Bond& get_bond(Atom &other) const { return *get_shared_ptr_bond(other); }
-		shared_ptr<Bond>& insert_bond(Atom &other, const shared_ptr<Bond> &bond) { return __bonds.insert({&other, bond}).first->second; }
-		shared_ptr<Bond>& insert_bond(Atom &other, Bond *bond) { return __bonds.insert({&other, shared_ptr<Bond>(bond)}).first->second; }
-		void erase_bond(Atom &other) { __bonds.erase(&other); }
-		bool is_adjacent(Atom &other) const { return __bonds.count(&other); }
-		bool is_adjacent(const string &atom_name) const { for (auto &other : *this) if (other.atom_name() == atom_name) return true; return false; }
-		int get_num_hydrogens() const;
-		int atom_number() const { return __atom_number; }
-		void set_atom_name(const string &atom_name) { __atom_name = atom_name; }
-		void set_idatm_type(const string &idatm_type) { __idatm_type = help::idatm_mask.at(idatm_type); }
-		void set_gaff_type(const string &gaff_type) { __gaff_type = gaff_type; }
-		Atom& insert_property(const string &prop, const int count) { __smiles_prop.insert({prop, count}); return *this; }
-		Atom& add_property(const string &prop) { __smiles_prop[prop]++; return *this; }
-		Atom& erase_property(const string &prop) { __smiles_prop.erase(prop); return *this; }
-		Atom& erase_properties() { __smiles_prop.clear(); return *this; }
-		bool has_property(const string &prop) const { return __smiles_prop.count(prop); }
-		int get_num_property(const string &prop) const { 
-			dbgmsg("__smiles prop(" << prop << ") count = " << __smiles_prop.count(prop)); 
-			if (__smiles_prop.count(prop) == 0) return 0;
-			return __smiles_prop.at(prop); }
-		int get_num_bond_with_bond_gaff_type(const string &prop) const;
-		int compute_num_property(const string &prop) const;
-		void set_crd(const Geom3D::Coordinate &crd) { __crd = crd; }
-		string idatm_type_unmask() const { return help::idatm_unmask[__idatm_type]; }
-		int idatm_type() const { return __idatm_type; }
-		double radius() const { return help::vdw_radius[__idatm_type]; }
-		const string& gaff_type() const { return __gaff_type; }
-		const string& atom_name() const { return __atom_name; }
-		Element element() const { return __element; }
-		Geom3D::Coordinate& crd() { return __crd; }
-		const Geom3D::Coordinate& crd() const { return __crd; }
-		friend ostream& operator<< (ostream& stream, const Atom& a);
-		double distance() const { return 0.0; } // just dummy : needed by grid
-		void distance(double d) const {} // just dummy : needed by grid
-		const map<int, int>& get_aps() const { return __aps; }
-		void set_members(const string &str);
-		const Residue& br() const { return *static_cast<const Residue*>(__br); }
-		void set_br(void *br) { __br = br; }
-		// the following are required for MolGraph :-)
-		bool compatible(const Atom &atom) const;
-		string get_label() const { return (__smiles_label.empty() 
-			? help::idatm_unmask[__idatm_type] : __smiles_label); }
-		const int weight() const { return 0; } // dummy for graph ostream operator
-	};
-	
 	class Residue : public template_map_container<Atom, Residue, Chain, int> {
 	public:
-		//~ typedef enum {protein, nucleic, ion, water, hetero, notassigned} res_type;
 		typedef enum {notassigned=1, protein=2, nucleic=4, ion=8, water=16, hetero=32} res_type;
 		typedef tuple<char, string, int, char> res_tuple2;
 		typedef pair<int, char> res_pair;
@@ -170,7 +81,7 @@ namespace Molib {
 		int resi() const { return __resi; }
 		char ins_code() const { return __ins_code; }
 		Residue::res_type rest() const { return __rest; }
-		AtomVec get_atoms() const;
+		Atom::Vec get_atoms() const;
 		Residue& erase_properties() { for (auto &atom : *this) atom.erase_properties(); return *this; }
 		friend ostream& operator<< (ostream& stream, const Residue& r);
 	};
@@ -213,7 +124,7 @@ namespace Molib {
 				__crd = __crd / sz;} // calculate geom center
 		bool has_residue(Residue::res_pair p) { return this->has_element(p); }
 		char chain_id() const { return __chain_id; }
-		AtomVec get_atoms(const Residue::res_type &rest=Residue::res_type::notassigned) const;
+		Atom::Vec get_atoms(const Residue::res_type &rest=Residue::res_type::notassigned) const;
 		Chain& erase_properties() { for (auto &residue : *this) residue.erase_properties(); return *this; }
 		friend ostream& operator<< (ostream& stream, const Chain& c);
 	};
@@ -264,7 +175,7 @@ namespace Molib {
 			r = i->second;
 			return true;
 		}
-		AtomVec get_atoms(const string &chain_ids="", 
+		Atom::Vec get_atoms(const string &chain_ids="", 
 			const Residue::res_type &rest=Residue::res_type::notassigned) const;
 		Model& erase_properties() { for (auto &chain : *this) chain.erase_properties(); return *this; }
 		friend ostream& operator<< (ostream& stream, const Model& m);
@@ -299,7 +210,7 @@ namespace Molib {
 				model.rotate(rota, inverse);
 			}
 		}
-		AtomVec get_atoms(const string &chain_ids="", 
+		Atom::Vec get_atoms(const string &chain_ids="", 
 			const Residue::res_type &rest=Residue::res_type::notassigned,
 			const int model_number=-1) const;
 		Assembly& erase_properties() { for (auto &model : *this) model.erase_properties(); return *this; }
@@ -326,13 +237,13 @@ namespace Molib {
 		}
 		typedef enum {first_bio, all_bio} bio_how_many;
 		Assembly& asym() { return this->first(); }
-		AtomVec get_atoms(const string &chain_ids="", 
+		Atom::Vec get_atoms(const string &chain_ids="", 
 			const Residue::res_type &rest=Residue::res_type::notassigned,
 			const int model_number=-1) const;
 		double max_dist() const;
 		double max_dist(const Atom &atom) const;
 		Atom& get_center_atom() const;
-		void prepare_for_mm(const OMMIface::ForceField &ff, MolGrid &grid);
+		void prepare_for_mm(const OMMIface::ForceField &ff, Atom::Grid &grid);
 		void undo_mm_specific();
 		void add_modified(Residue::res_tuple2 t) { __modified.insert(t); }
 		bool is_modified(Residue::res_tuple2 t2) const { return (__modified.find(t2) != __modified.end()); }
@@ -400,7 +311,7 @@ namespace Molib {
 			Geom3D::Coordinate gc = compute_geometric_center();
 			double max_radius = -HUGE_VAL;
 			for (auto &molecule : *this) {
-				AtomVec atoms = molecule.get_atoms();
+				Atom::Vec atoms = molecule.get_atoms();
 				for (auto &patom : atoms)
 					max_radius = max(max_radius, patom->crd().distance(gc));
 			}
@@ -410,14 +321,14 @@ namespace Molib {
 			Geom3D::Coordinate gc;
 			int i = 0;
 			for (auto &molecule : *this) {
-				AtomVec atoms = molecule.get_atoms();
+				Atom::Vec atoms = molecule.get_atoms();
 				for (auto &patom : atoms)
 					gc = gc + patom->crd();
 				i += atoms.size();
 			}
 			return gc / (double) i;
 		}
-		AtomVec get_atoms(const string &chain_ids="", 
+		Atom::Vec get_atoms(const string &chain_ids="", 
 			const Residue::res_type &rest=Residue::res_type::notassigned,
 			const int model_number=-1) const;
 		Molecules& compute_ring_type() { for (auto &molecule : *this) 
@@ -447,25 +358,15 @@ namespace Molib {
 	public:
 		Molecules& add(Molecules *m) { return this->aadd(m, this); }
 		NRset& erase_properties() { for (auto &molecules : *this) molecules.erase_properties(); return *this; }
-		AtomVec get_atoms(const string &chain_ids="", 
+		Atom::Vec get_atoms(const string &chain_ids="", 
 			const Residue::res_type &rest=Residue::res_type::notassigned,
 			const int model_number=-1) const;
 		friend ostream& operator<< (ostream& stream, const NRset& m);
 	};
 	
-	typedef Glib::Graph<Atom> MolGraph;
-
 	
 	set<int> get_idatm_types(const Molecules&, set<int> previous=set<int>());
 
-	BondSet get_bonds_in(const AtomSet &atoms, bool in=true);
-	BondSet get_bonds_in(const AtomVec &atoms, bool in=true);
-
-	MolGraph create_graph(const AtomVec &atoms);
-	MolGraph create_graph(const AtomSet &atoms);
-
-	ostream& operator<< (ostream& stream, const AtomSet&atoms);
-	ostream& operator<< (ostream& stream, const AtomVec&atoms);
 
 } // Molib
 #endif

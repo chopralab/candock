@@ -88,7 +88,7 @@ namespace Docker {
 
 		// get maximum distance from atom A in seed to any atom B
 		Molib::Atom &atomA = seed.get_center_atom();
-		Molib::AtomVec atoms;
+		Molib::Atom::Vec atoms;
 		dbgmsg("atomA = " << atomA);
 		
 		// get seed atoms without atomA

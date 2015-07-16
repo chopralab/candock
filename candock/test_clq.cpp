@@ -71,7 +71,7 @@ int main(int argc, char* argv[]) {
 		/* Create receptor grid
 		 * 
 		 */
-		Molib::MolGrid gridrec(receptors[0].get_atoms());
+		Molib::Atom::Grid gridrec(receptors[0].get_atoms());
 
 		/* Prepare receptor for molecular mechanics: histidines, N-[C-]terminals,
 		 * bonds, disulfide bonds, main chain bonds

@@ -11,7 +11,7 @@
 #include <functional>
 #include "state.hpp"
 
-namespace Molib {
+namespace Linker {
 
 	class Segment : public template_vector_container<Segment*, Segment> {
 	public:
@@ -23,21 +23,19 @@ namespace Molib {
 		typedef Glib::Graph<Segment> Graph;
 		typedef map<ConstPair, Graph::Path> Paths;
 		typedef Segment* Id;
-		typedef pair<Atom*, Atom*> JoinAtoms;
+		
 	private:
-		//~ const AtomSet &__atoms;
-		const AtomSet __atoms;
+		const Molib::Atom::Set __atoms;
 		int __seed_id; // != -1 if segment is a seed
 		vector<unique_ptr<State>> __state; // only seed states here!
 		ConstSet __adjacent_seed_segments;
 		map<const Segment*, const double> __max_linker_length;
-		map<const Segment*, Bond> __bond;
+		map<const Segment*, Molib::Bond> __bond;
 		map<const Segment*, Segment*> __next;
+		
 	public:
 
-		//~ Segment(const AtomSet &atoms, const int &seed_id) : __atoms(atoms), __seed_id(seed_id) {}
-		Segment(const AtomSet atoms, const int &seed_id) : __atoms(atoms), __seed_id(seed_id) {}
-		//~ Segment(const AtomSet &atoms) : __atoms(atoms), __seed_id(-1) {}
+		Segment(const Molib::Atom::Set atoms, const int &seed_id) : __atoms(atoms), __seed_id(seed_id) {}
 		int get_seed_id() const { return __seed_id; }
 		bool has_next(const Segment &goal) const { return __next.count(&goal); }
 		Segment &get_next(const Segment &goal) const { return *__next.at(&goal); } // get next seg in the direction of goal
@@ -45,8 +43,8 @@ namespace Molib {
 		const ConstSet& get_adjacent_seed_segments() const { return __adjacent_seed_segments; };
 		void set_adjacent_seed_segments(Segment &seed_seg) { __adjacent_seed_segments.insert(&seed_seg); };
 		bool is_seed_adjacent(const Segment &other) const { return __adjacent_seed_segments.count(&other); }
-		const AtomSet& get_atoms() const { return __atoms; }
-		bool has_atom(Atom &atom) const { return __atoms.count(&atom); }
+		const Molib::Atom::Set& get_atoms() const { return __atoms; }
+		bool has_atom(Molib::Atom &atom) const { return __atoms.count(&atom); }
 		const string get_label() const { stringstream ss; ss << *this; return ss.str(); } // graph ostream operator
 		const int weight() const { return 0; } // dummy for graph ostream operator
 		void add_state(unique_ptr<State> s) { __state.push_back(std::move(s)); }
@@ -59,13 +57,13 @@ namespace Molib {
 		bool is_adjacent(const Segment &other) const { for (auto &adj : *this) if (&adj == &other) return true; return false; }
 		double get_max_linker_length(const Segment &other) const { return __max_linker_length.at(&other); }
 		void set_max_linker_length(const Segment &other, const double d) {	__max_linker_length.insert({&other, d}); }
-		const Bond& get_bond(const Segment &other) const { return __bond.at(&other); }
-		void set_bond(const Segment &other, const Bond &b) { __bond.insert({&other, b}); }
-		const Atom& adjacent_in_segment(const Atom &atom, const Atom &forbidden) const;
-		Id get_id() const { return this; }
+		const Molib::Bond& get_bond(const Segment &other) const { return __bond.at(&other); }
+		void set_bond(const Segment &other, const Molib::Bond &b) { __bond.insert({&other, b}); }
+		const Molib::Atom& adjacent_in_segment(const Molib::Atom &atom, const Molib::Atom &forbidden) const;
+		Id get_id() { return this; }
 		friend ostream& operator<< (ostream& stream, const Segment& s);
 		
-		static Graph create_graph(const Molecule &molecule);
+		static Graph create_graph(const Molib::Molecule &molecule);
 	};
 };
 #endif

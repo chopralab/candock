@@ -23,22 +23,21 @@ long_line_behaviour=1
 long_line_column=72
 
 [files]
-current_page=12
+current_page=3
 FILE_NAME_0=1108;Make;0;EUTF-8;1;1;0;%2Fhome%2Fkonc%2FDropbox%2Ftmp%2Fcandock%2Fcandock%2FMakefile;0;4
 FILE_NAME_1=457;Make;0;EUTF-8;1;1;0;%2Fhome%2Fkonc%2FDropbox%2Ftmp%2Fcandock%2Fcandock%2FMakefile.inc;0;4
-FILE_NAME_2=9759;C++;0;EUTF-8;1;1;0;%2Fhome%2Fkonc%2FDropbox%2Ftmp%2Fcandock%2Fcandock%2Fopts_candock.hpp;0;4
-FILE_NAME_3=4843;C++;0;EUTF-8;1;1;0;%2Fhome%2Fkonc%2FDropbox%2Ftmp%2Fcandock%2Fcandock%2Ftest_link.cpp;0;4
-FILE_NAME_4=25397;C++;0;EUTF-8;1;1;0;%2Fhome%2Fkonc%2FDropbox%2Ftmp%2Fcandock%2Flib%2Flinker%2Flinker.cpp;0;4
-FILE_NAME_5=2169;C++;0;EUTF-8;1;1;0;%2Fhome%2Fkonc%2FDropbox%2Ftmp%2Fcandock%2Flib%2Flinker%2Flinker.hpp;0;4
-FILE_NAME_6=508;C++;0;EUTF-8;1;1;0;%2Fhome%2Fkonc%2FDropbox%2Ftmp%2Fcandock%2Flib%2Flinker%2Fstate.cpp;0;4
-FILE_NAME_7=188;C++;0;EUTF-8;1;1;0;%2Fhome%2Fkonc%2FDropbox%2Ftmp%2Fcandock%2Flib%2Flinker%2Fstate.hpp;0;4
-FILE_NAME_8=722;C++;0;EUTF-8;1;1;0;%2Fhome%2Fkonc%2FDropbox%2Ftmp%2Fcandock%2Flib%2Flinker%2Fsegment.hpp;0;4
-FILE_NAME_9=2212;C++;0;EUTF-8;1;1;0;%2Fhome%2Fkonc%2FDropbox%2Ftmp%2Fcandock%2Flib%2Flinker%2Fsegment.cpp;0;4
-FILE_NAME_10=329;C++;0;EUTF-8;1;1;0;%2Fhome%2Fkonc%2FDropbox%2Ftmp%2Fcandock%2Flib%2Flinker%2Fseed.hpp;0;4
-FILE_NAME_11=152;C++;0;EUTF-8;1;1;0;%2Fhome%2Fkonc%2FDropbox%2Ftmp%2Fcandock%2Flib%2Flinker%2Fseed.cpp;0;4
-FILE_NAME_12=20;C++;0;EUTF-8;1;1;0;%2Fhome%2Fkonc%2FDropbox%2Ftmp%2Fcandock%2Flib%2Flinker%2Fposes.cpp;0;4
-FILE_NAME_13=1027;C++;0;EUTF-8;1;1;0;%2Fhome%2Fkonc%2FDropbox%2Ftmp%2Fcandock%2Flib%2Flinker%2Fposes.hpp;0;4
-FILE_NAME_14=0;Make;0;EUTF-8;1;1;0;%2Fhome%2Fkonc%2FDropbox%2Ftmp%2Fcandock%2Flib%2Flinker%2FMakefile;0;4
+FILE_NAME_2=10071;C++;0;EUTF-8;1;1;0;%2Fhome%2Fkonc%2FDropbox%2Ftmp%2Fcandock%2Fcandock%2Fopts_candock.hpp;0;4
+FILE_NAME_3=5556;C++;0;EUTF-8;1;1;0;%2Fhome%2Fkonc%2FDropbox%2Ftmp%2Fcandock%2Fcandock%2Ftest_link.cpp;0;4
+FILE_NAME_4=16842;C++;0;EUTF-8;1;1;0;%2Fhome%2Fkonc%2FDropbox%2Ftmp%2Fcandock%2Flib%2Flinker%2Flinker.cpp;0;4
+FILE_NAME_5=5079;C++;0;EUTF-8;1;1;0;%2Fhome%2Fkonc%2FDropbox%2Ftmp%2Fcandock%2Flib%2Flinker%2Flinker.hpp;0;4
+FILE_NAME_6=177;C++;0;EUTF-8;1;1;0;%2Fhome%2Fkonc%2FDropbox%2Ftmp%2Fcandock%2Flib%2Flinker%2Fstate.cpp;0;4
+FILE_NAME_7=607;C++;0;EUTF-8;1;1;0;%2Fhome%2Fkonc%2FDropbox%2Ftmp%2Fcandock%2Flib%2Flinker%2Fstate.hpp;0;4
+FILE_NAME_8=1656;C++;0;EUTF-8;1;1;0;%2Fhome%2Fkonc%2FDropbox%2Ftmp%2Fcandock%2Flib%2Flinker%2Fsegment.hpp;0;4
+FILE_NAME_9=194;C++;0;EUTF-8;1;1;0;%2Fhome%2Fkonc%2FDropbox%2Ftmp%2Fcandock%2Flib%2Flinker%2Fsegment.cpp;0;4
+FILE_NAME_10=807;C++;0;EUTF-8;1;1;0;%2Fhome%2Fkonc%2FDropbox%2Ftmp%2Fcandock%2Flib%2Flinker%2Fseed.hpp;0;4
+FILE_NAME_11=516;C++;0;EUTF-8;1;1;0;%2Fhome%2Fkonc%2FDropbox%2Ftmp%2Fcandock%2Flib%2Flinker%2Fseed.cpp;0;4
+FILE_NAME_12=1977;C++;0;EUTF-8;1;1;0;%2Fhome%2Fkonc%2FDropbox%2Ftmp%2Fcandock%2Flib%2Flinker%2Fposes.cpp;0;4
+FILE_NAME_13=1044;C++;0;EUTF-8;1;1;0;%2Fhome%2Fkonc%2FDropbox%2Ftmp%2Fcandock%2Flib%2Flinker%2Fposes.hpp;0;4
 
 [VTE]
 last_dir=/home/konc

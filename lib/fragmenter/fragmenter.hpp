@@ -4,41 +4,36 @@
 #include "graph/graph.hpp"
 #include "helper/help.hpp"
 #include "pdbreader/bond.hpp"
+#include "pdbreader/atom.hpp"
 #include <tuple>
 #include <vector>
 #include <map>
 #include <set>
 #include <functional>
 using namespace std;
+
 namespace Molib {
 	class Unique;
-	class Atom;
-	class Residue;
-	class Model;
-	class Molecule;
 
-	typedef vector<Atom*> AtomVec;
-	typedef set<Atom*> AtomSet;
 	typedef map<int, Atom*> AtomMatch;
 	typedef vector<AtomMatch> AtomMatchVec;
-	typedef set<Atom*> AtomSet;
-	typedef AtomSet Ring;
+	typedef Atom::Set Ring;
 	typedef set<Ring> Rings;
 
 	class Fragmenter {
 	public:
 	
 		class Fragment {
-			AtomSet __core, __join;
+			Atom::Set __core, __join;
 			int __seed_id;
 		public:
-			Fragment(AtomSet core, AtomSet join, Unique &u);
-			Fragment(AtomSet core, AtomSet join, int seed_id) : __core(core), __join(join), __seed_id(seed_id) {}
-			AtomSet& get_core() { return __core; }
-			AtomSet& get_join() { return __join; }
-			const AtomSet& get_core() const { return __core; }
-			const AtomSet& get_join() const { return __join; }
-			AtomSet get_all() const { AtomSet all(__core); all.insert(__join.begin(), __join.end()); return all; }
+			Fragment(Atom::Set core, Atom::Set join, Unique &u);
+			Fragment(Atom::Set core, Atom::Set join, int seed_id) : __core(core), __join(join), __seed_id(seed_id) {}
+			Atom::Set& get_core() { return __core; }
+			Atom::Set& get_join() { return __join; }
+			const Atom::Set& get_core() const { return __core; }
+			const Atom::Set& get_join() const { return __join; }
+			Atom::Set get_all() const { Atom::Set all(__core); all.insert(__join.begin(), __join.end()); return all; }
 			bool is_seed() const { return __seed_id != -1; }
 			int get_seed_id() const { return __seed_id; }
 			int size() const { return __core.size() + __join.size(); }
@@ -48,22 +43,22 @@ namespace Molib {
 		};
 	
 	private:
-		AtomVec __atoms;
+		Atom::Vec __atoms;
 		AtomMatch __convert_to_atom_match(const map<Bond*, Bond*> &bond_match, 
 			bool reverse=false);
 	public:
-		Fragmenter(const AtomVec &atoms);
+		Fragmenter(const Atom::Vec &atoms);
 		Rings identify_rings();
 		Rings identify_fused_rings();
 		AtomMatchVec grep(const help::smiles &smi);
 		void apply_rule(const AtomMatch &m, 
-			const vector<string> &rules, AtomSet &visited); // atom rule
+			const vector<string> &rules, Atom::Set &visited); // atom rule
 		void apply_rule(const AtomMatch &m, 
 			const vector<string> &rules, BondSet &visited); // bond rule
 		void substitute_bonds(const help::rename_rules &rrules);
 		void substitute_atoms(const help::rename_rules &rrules);
-		Fragment::Vec identify_overlapping_rigid_segments(const AtomVec &atoms, Unique &u);
-		void flip_conjugated_gaff_types(const AtomVec &atoms);
+		Fragment::Vec identify_overlapping_rigid_segments(const Atom::Vec &atoms, Unique &u);
+		void flip_conjugated_gaff_types(const Atom::Vec &atoms);
 	};
 	ostream& operator<<(ostream& os, const AtomMatchVec& atom_match_vec);
 	ostream& operator<<(ostream& os, const AtomMatch& atom_match);

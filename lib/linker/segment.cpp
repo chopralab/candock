@@ -1,17 +1,16 @@
 #include "segment.hpp"
-//~ #include "linker.hpp"
 #include "pdbreader/molecule.hpp"
 #include "helper/benchmark.hpp"
 #include "helper/help.hpp"
 
-namespace Molib {
+namespace Linker {
 	ostream& operator<< (ostream& stream, const Segment& s) {
 		stream << "Segment(" << s.__seed_id << ") : atom numbers = ";
 		for (auto &pa : s.__atoms) stream << pa->atom_number() << " ";
 		return stream;
 	}
-	const Atom& Segment::adjacent_in_segment(const Atom &atom, 
-		const Atom &forbidden) const { 
+	const Molib::Atom& Segment::adjacent_in_segment(const Molib::Atom &atom, 
+		const Molib::Atom &forbidden) const { 
 		for (auto &adj : atom) {
 			if (&adj != &forbidden && has_atom(adj)) 
 				return adj; 
@@ -19,9 +18,9 @@ namespace Molib {
 		throw Error("die : couldn't find adjacent in segment");
 	}
 	
-	Segment::Graph Segment::create_graph(const Molecule &molecule) {
+	Segment::Graph Segment::create_graph(const Molib::Molecule &molecule) {
 		dbgmsg("Create segment graph ...");
-		const Model &model = molecule.first().first();
+		const Molib::Model &model = molecule.first().first();
 		vector<unique_ptr<Segment>> vertices;
 		dbgmsg(model.get_rigid());
 		for (auto &fragment : model.get_rigid()) { // make vertices (segments) of a graph
@@ -48,13 +47,13 @@ namespace Molib {
 					if (num_bonds == 1) {
 						dbgmsg("atom " << atom1 << " belongs to segment " << s2);
 						dbgmsg("atom " << atom2 << " belongs to segment " << s1);
-						s1.set_bond(s2, Bond(&atom2, &atom1));
-						s2.set_bond(s1, Bond(&atom1, &atom2));
+						s1.set_bond(s2, Molib::Bond(&atom2, &atom1));
+						s2.set_bond(s1, Molib::Bond(&atom1, &atom2));
 					} else {
 						dbgmsg("atom " << atom1 << " belongs to segment " << s1);
 						dbgmsg("atom " << atom2 << " belongs to segment " << s2);
-						s1.set_bond(s2, Bond(&atom1, &atom2));
-						s2.set_bond(s1, Bond(&atom2, &atom1));
+						s1.set_bond(s2, Molib::Bond(&atom1, &atom2));
+						s2.set_bond(s1, Molib::Bond(&atom2, &atom1));
 					}
 				}
 			}

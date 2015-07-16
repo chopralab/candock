@@ -122,9 +122,9 @@ namespace genclus {
 		}
 	}
 	cluster::PairwiseDistances<Molib::Atom> create_pairwise_distances(
-		const Molib::AtomVec &ligands, const double eps) {
+		const Molib::Atom::Vec &ligands, const double eps) {
 		cluster::PairwiseDistances<Molib::Atom> pairwise_distances;
-		Molib::MolGrid grid(ligands);
+		Molib::Atom::Grid grid(ligands);
 		for (auto &patom : ligands) {
 			for (auto &pneighbor : grid.get_neighbors(patom->crd(), eps)) {
 				pairwise_distances[patom][pneighbor] = 
@@ -176,15 +176,15 @@ namespace genclus {
 			dbgmsg("molecules name = " << mols.name());
 		}
 #endif
-		//~ Molib::AtomVec protein_ligands = get_atoms(nrset, Molib::Residue::protein);
-		//~ Molib::AtomVec nucleic_ligands = get_atoms(nrset, Molib::Residue::nucleic);
-		//~ Molib::AtomVec hetero_ligands = get_atoms(nrset, Molib::Residue::hetero);
-		//~ Molib::AtomVec ion_ligands = get_atoms(nrset, Molib::Residue::ion);
-		Molib::AtomVec protein_ligands = nrset.get_atoms("", Molib::Residue::protein);
-		Molib::AtomVec nucleic_ligands = nrset.get_atoms("", Molib::Residue::nucleic);
-		Molib::AtomVec hetero_ligands = nrset.get_atoms("", Molib::Residue::hetero);
-		Molib::AtomVec ion_ligands = nrset.get_atoms("", Molib::Residue::ion);
-		//~ Molib::AtomVec water_ligands = get_atoms(nrset, Molib::Residue::water);
+		//~ Molib::Atom::Vec protein_ligands = get_atoms(nrset, Molib::Residue::protein);
+		//~ Molib::Atom::Vec nucleic_ligands = get_atoms(nrset, Molib::Residue::nucleic);
+		//~ Molib::Atom::Vec hetero_ligands = get_atoms(nrset, Molib::Residue::hetero);
+		//~ Molib::Atom::Vec ion_ligands = get_atoms(nrset, Molib::Residue::ion);
+		Molib::Atom::Vec protein_ligands = nrset.get_atoms("", Molib::Residue::protein);
+		Molib::Atom::Vec nucleic_ligands = nrset.get_atoms("", Molib::Residue::nucleic);
+		Molib::Atom::Vec hetero_ligands = nrset.get_atoms("", Molib::Residue::hetero);
+		Molib::Atom::Vec ion_ligands = nrset.get_atoms("", Molib::Residue::ion);
+		//~ Molib::Atom::Vec water_ligands = get_atoms(nrset, Molib::Residue::water);
 		//~ cluster::MapD<Molib::Atom> scores; // we don't use scores
 		//~ cluster::MapD<Molib::Atom> scores; // we don't use scores
 		cluster::PairwiseDistances<Molib::Atom> pd_protein = create_pairwise_distances(protein_ligands, 4.1);

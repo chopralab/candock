@@ -96,7 +96,7 @@ int main(int argc, char* argv[]) {
 		/* Create receptor grid
 		 * 
 		 */
-		Molib::MolGrid gridrec(receptors[0].get_atoms());
+		Molib::Atom::Grid gridrec(receptors[0].get_atoms());
 
 		/* Forcefield stuff : create forcefield for small molecules (and KB 
 		 * non-bonded with receptor) and read receptor's forcefield xml file(s) into 

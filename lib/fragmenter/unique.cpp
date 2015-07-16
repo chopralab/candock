@@ -53,7 +53,7 @@ namespace Molib {
 		return false;
 	}
 
-	size_t Unique::__hash(const AtomSet &atoms) {
+	size_t Unique::__hash(const Atom::Set &atoms) {
 		map<string, int> chemical_formula;
 		for (auto &a : atoms)
 			chemical_formula[a->get_label()]++;
@@ -64,7 +64,7 @@ namespace Molib {
 		return hash_fn(ss.str());
 	}
 
-	size_t Unique::__unique(const AtomSet &seed) {
+	size_t Unique::__unique(const Atom::Set &seed) {
 		help::smiles edges;
 		auto bonds = Molib::get_bonds_in(seed);
 		for (auto &pbond : bonds) {
@@ -80,7 +80,7 @@ namespace Molib {
 		size_t hsh = __hash(seed);
 		size_t si = 0;
 		// Glib::Graph<AtomTag> g(create_atom_tags(s), true, false);
-		// MolGraph g = create_graph(edges);
+		// Atom::Graph g = create_graph(edges);
 		dbgmsg("before creating bond graph");
 		BondGraph g = create_graph(edges);
 		dbgmsg(hsh);

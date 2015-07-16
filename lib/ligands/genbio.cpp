@@ -73,12 +73,12 @@ namespace genbio {
 			}
 		}
 	}
-	Molib::MolGrid set_grid_query(Molib::Molecule &query_molecule, const string query_chain_ids) {
+	Molib::Atom::Grid set_grid_query(Molib::Molecule &query_molecule, const string query_chain_ids) {
 		// set grid with query chain atoms
-		return Molib::MolGrid(query_molecule.get_atoms(query_chain_ids, 
+		return Molib::Atom::Grid(query_molecule.get_atoms(query_chain_ids, 
 			Molib::Residue::protein, 1));
 	}
-	void find_neighbor_residues(Molib::Molecule &molecule, Molib::MolGrid &grid, const map<Molib::Residue::res_tuple2, Molib::Residue::res_tuple2> *aligned_residues=nullptr) {
+	void find_neighbor_residues(Molib::Molecule &molecule, Molib::Atom::Grid &grid, const map<Molib::Residue::res_tuple2, Molib::Residue::res_tuple2> *aligned_residues=nullptr) {
 		for (auto &assembly : molecule) {
 			for (auto &model : assembly) {
 				for (auto &chain : model) {
@@ -109,7 +109,7 @@ namespace genbio {
 			}
 		}
 	}
-	void remove_not_ligands(Molib::Molecule &molecule, Molib::MolGrid &grid) {
+	void remove_not_ligands(Molib::Molecule &molecule, Molib::Atom::Grid &grid) {
 		// find atoms in aligned molecules that are neighbors of query chains
 		for (auto &assembly : molecule) {
 			for (auto &model : assembly) {
@@ -118,7 +118,7 @@ namespace genbio {
 					chain.remove_if([&grid](const Molib::Residue &r) {
 						if (r.rest() == Molib::Residue::hetero || r.rest() == Molib::Residue::ion || r.rest() == Molib::Residue::water) {
 							for (auto &atom : r) {
-								if (!grid.get_neighbors(atom, 4.0).empty()) {
+								if (!grid.get_neighbors(atom.crd(), 4.0).empty()) {
 									return false; // close enough, don't delete
 								}
 							}
@@ -129,7 +129,7 @@ namespace genbio {
 					for (auto &residue : chain) {
 						if (residue.rest() == Molib::Residue::protein || residue.rest() == Molib::Residue::nucleic) {
 							for (auto &atom : residue) {
-								if (!grid.get_neighbors(atom, 4.0).empty()) { // if atom is less than 4.0 A from some query atom, then this chain is a ligand of query, and is to keep
+								if (!grid.get_neighbors(atom.crd(), 4.0).empty()) { // if atom is less than 4.0 A from some query atom, then this chain is a ligand of query, and is to keep
 									goto KEEPCHAIN;
 								}
 							}
@@ -151,7 +151,7 @@ namespace genbio {
 
 		JsonReader jr;
 		//~ Molib::PDBreader pr((models == "all" ? Molib::PDBreader::all_models : Molib::PDBreader::first_model)|(hydrogens ? Molib::PDBreader::hydrogens : 0));
-		Molib::MolGrid query_grid;
+		Molib::Atom::Grid query_grid;
 		// the query file
 		Molib::Molecules mols;
 		if (!mols_name.empty())

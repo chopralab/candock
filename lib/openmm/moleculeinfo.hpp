@@ -23,7 +23,7 @@ namespace OMMIface {
 		typedef vector<pair<Molib::Atom*, Molib::Atom*>> Bonds;
 		typedef vector<tuple<Molib::Atom*, Molib::Atom*, Molib::Atom*>> Angles;
 		typedef vector<tuple<Molib::Atom*, Molib::Atom*, Molib::Atom*, Molib::Atom*>> Dihedrals;
-		Molib::AtomVec atom;
+		Molib::Atom::Vec atom;
 		Bonds bond;
 		Angles angle;
 		//~ Dihedrals dihedral;

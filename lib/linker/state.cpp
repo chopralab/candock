@@ -4,8 +4,11 @@
 #include "helper/benchmark.hpp"
 #include "helper/help.hpp"
 
-namespace Molib {
-	State::Vec operator-(const State::Set& left, const State::Set& right) const { 
+namespace Linker {
+	
+	State::Id State::idx = 0;
+
+	State::Vec operator-(const State::Set& left, const State::Set& right) { 
 		State::Vec ret; 
 		for (auto &state : left) 
 			if (!right.count(state)) 
@@ -16,7 +19,7 @@ namespace Molib {
 	string State::pdb() const { 
 		stringstream ss;
 		for (auto &kv : __atom_crd) {
-			Atom a(*kv.first);
+			Molib::Atom a(*kv.first);
 			a.set_crd(kv.second);
 			ss << a;
 			//~ Atom &a = *const_cast<Atom*>(kv.first);
@@ -26,9 +29,9 @@ namespace Molib {
 		return ss.str();
 	}
 	
-	bool State::clashes(const State &other, const Bond &excluded) const { // clashes between this and other state
+	bool State::clashes(const State &other, const Molib::Bond &excluded) const { // clashes between this and other state
 		for (auto &kv1 : __atom_crd) {
-			const Atom &a1 = *kv1.first;
+			const Molib::Atom &a1 = *kv1.first;
 			//~ if (&a1 == &excluded.first_atom() || &a1 == &excluded.second_atom()) { 
 			if (&a1 == &excluded.atom1() || &a1 == &excluded.atom2()) { 
 				dbgmsg("excluded state atom = " << a1.atom_number() 
@@ -38,7 +41,7 @@ namespace Molib {
 			const Geom3D::Coordinate &c1 = kv1.second;
 			const double vdw1 = a1.radius();
 			for (auto &kv2 : other.get_atoms()) {
-				const Atom &a2 = *kv2.first;
+				const Molib::Atom &a2 = *kv2.first;
 				//~ if (&a2 == &excluded.first_atom() || &a2 == &excluded.second_atom()) { 
 				if (&a2 == &excluded.atom1() || &a2 == &excluded.atom2()) { 
 					dbgmsg("excluded state atom = " << a2.atom_number() 

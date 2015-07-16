@@ -43,7 +43,7 @@ namespace Molib {
 		return os;
 	}
 
-	Fragmenter::Fragment::Fragment(AtomSet core, AtomSet join, Unique &u) : __core(core), __join(join) {
+	Fragmenter::Fragment::Fragment(Atom::Set core, Atom::Set join, Unique &u) : __core(core), __join(join) {
 		/* Seeds are rigid segments with > 1 core atoms
 		 * THESE ARE NOT SEEDS:
 		 * 
@@ -60,18 +60,18 @@ namespace Molib {
 			__seed_id = -1;
 	}
 
-	Fragmenter::Fragmenter(const AtomVec &atoms) : __atoms(atoms) {}
+	Fragmenter::Fragmenter(const Atom::Vec &atoms) : __atoms(atoms) {}
 
 	Rings Fragmenter::identify_fused_rings() {
-		return create_graph(__atoms).find_fused_rings();
+		return Atom::create_graph(__atoms).find_fused_rings();
 	}
 
 	Rings Fragmenter::identify_rings() {
-		return create_graph(__atoms).find_rings();
+		return Atom::create_graph(__atoms).find_rings();
 	}
 
-	void Fragmenter::flip_conjugated_gaff_types(const AtomVec &atoms) {
-		AtomSet visited;
+	void Fragmenter::flip_conjugated_gaff_types(const Atom::Vec &atoms) {
+		Atom::Set visited;
 		for (auto &patom : atoms) {
 			if (!visited.count(patom) && (help::gaff_group_1.count(patom->gaff_type()) 
 				|| help::gaff_group_2.count(patom->gaff_type()))) {
@@ -116,7 +116,7 @@ namespace Molib {
 	}
 
 	void Fragmenter::apply_rule(const AtomMatch &m, 
-		const vector<string> &rules, AtomSet &visited) { // atom rule
+		const vector<string> &rules, Atom::Set &visited) { // atom rule
 		for (auto &rule : rules) {
 			dbgmsg("atom_match = " << m << " rule = " << rule);
 			auto vec1 = help::ssplit(rule, ":", true);
@@ -165,7 +165,7 @@ namespace Molib {
 	}
 
 	void Fragmenter::substitute_atoms(const help::rename_rules &rrules) {
-		AtomSet visited;
+		Atom::Set visited;
 		Fragmenter &fragmenter = *this;
 		for (auto &p : rrules) {
 			AtomMatchVec atom_matches = fragmenter.grep(p.pattern);
@@ -249,15 +249,15 @@ namespace Molib {
 		return amatch;
 	}
 
-	Fragmenter::Fragment::Vec Fragmenter::identify_overlapping_rigid_segments(const AtomVec &atoms, Unique &u) {
+	Fragmenter::Fragment::Vec Fragmenter::identify_overlapping_rigid_segments(const Atom::Vec &atoms, Unique &u) {
 		Fragment::Vec fragments;
-		AtomSet visited;
+		Atom::Set visited;
 		int i=0;
 		for (auto &pa : atoms) {
 			if (!visited.count(pa)) {
 				// insert core atoms that are connected to this atom
 				// by non-rotatable bond(s)
-				AtomSet core, join;
+				Atom::Set core, join;
 				queue<Atom*> q;
 				q.push(pa);
 				while (!q.empty()) {

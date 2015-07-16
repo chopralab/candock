@@ -4,12 +4,12 @@
 #include "helper/benchmark.hpp"
 #include "helper/help.hpp"
 
-namespace Molib {
+namespace Linker {
 	ostream& operator<< (ostream& stream, const Seed& s) {
 		return stream << "Seed = " << s.get_segment().get_seed_id() << endl;
 	}
 
-	Seed::Graph Seed::create_graph(const Segment::Graph &segment_graph, const Segment::Paths &paths) {
+	Seed::Graph Seed::create_graph(const Segment::Graph &segment_graph) {
 		dbgmsg("Create seed graph ...");
 		vector<unique_ptr<Seed>> vertices;
 		for (auto &s : segment_graph) { // add vertices to seed graph
@@ -22,17 +22,9 @@ namespace Molib {
 				const Segment &seg_i = vertices[i]->get_segment();
 				const Segment &seg_j = vertices[j]->get_segment();
 				dbgmsg("i = " << i << " j = " << j << " "
-					<< seg_i << " " << seg_j << " path exists = "
-					<< boolalpha << (paths.count({&seg_i, &seg_j})
-					|| paths.count({&seg_j, &seg_i})));
-				if (paths.count({&seg_i, &seg_j}) || paths.count({&seg_j, &seg_i})) {
-#ifndef NDEBUG
-				   Segment::Graph::Path path = paths.count({&seg_i, &seg_j}) ? 
-					   paths.at({&seg_i, &seg_j}) : paths.at({&seg_j, &seg_i});
-					dbgmsg("path = ");
-					for (auto it = path.begin(); it != path.end(); ++it)
-					dbgmsg(**it);
-#endif
+					<< seg_i << " " << seg_j << " is_seed_adjacent = "
+					<< boolalpha << seg_i.is_seed_adjacent(seg_j));
+				if (seg_i.is_seed_adjacent(seg_j)) {
 					Seed &seed1 = *vertices[i];
 					Seed &seed2 = *vertices[j];
 					seed1.add(&seed2);

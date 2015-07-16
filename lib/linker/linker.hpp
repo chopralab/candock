@@ -14,20 +14,22 @@
 
 namespace Geom3D {
 	class Quaternion;
-}
+};
+
 namespace Molib {
 	class Atom;
-	class Residue;
-	class Model;
 	class Molecule;
 	class Molecules;
-	class Segment;
-	class State;
+	class NRset;
 	class Score;
+};
+
+namespace Linker {
+	class State;
+
 	class Linker {
-		typedef map<const Atom*, Segment*> AtomToSegment;
+		typedef map<const Molib::Atom*, Segment*> AtomToSegment;
 		typedef map<const Segment*, State*> SegStateMap;
-		typedef Grid<Atom> MolGrid;
 		static const int MAX_ENERGY = 999999;
 		typedef pair<State::Vec, double> LinkEnergy;
 		typedef pair<State::NVec, double> Conf;
@@ -42,13 +44,15 @@ namespace Molib {
 			ConnectionError(const string &msg, const set<State::ConstPair> fs) : Error(msg), __fs(fs) {}
 			const set<State::ConstPair>& get_failed_state_pairs() const { return __fs; }
 		};
-		Internal &__ic;
-		const Molecule &__ligand;
-		const NRset &__top_seeds;
-		MolGrid &__gridrec;
-		const Score &__score;
+		Molib::Internal &__ic;
+		const Molib::Molecule &__ligand;
+		const Molib::NRset &__top_seeds;
+		Molib::Atom::Grid &__gridrec;
+		const Molib::Score &__score;
+		//~ const double __dist_cutoff, __spin_degrees, __tol_dist,
+			//~ __tol_max_coeff, __tol_min_coeff;
 		const double __dist_cutoff, __spin_degrees, __tol_dist,
-			__tol_max_coeff, __tol_min_coeff;
+			__tol_seed_dist;
 		const int __max_possible_conf, __link_iter;
 		State::Vec __states;
 
@@ -61,13 +65,13 @@ namespace Molib {
 			const LinkEnergy &conformation, const State &prev) const;
 		AtomToCrd __rotate(const Geom3D::Quaternion&, const Geom3D::Point&, const Geom3D::Point&, const AtomToCrd&);
 
-		void __create_states(const Segment::Graph &segment_graph, const NRset &top_seeds);
+		void __create_states(const Segment::Graph &segment_graph, const Molib::NRset &top_seeds);
 		Array2d<bool> __find_compatible_state_pairs(const Seed::Graph &seed_graph);
 		vector<vector<State::Vec>> __grow_possibles(const map<State*, State::Set> &pos);
 		vector<LinkEnergy> __generate_rigid_conformations(const Seed::Graph &seed_graph);
 		Segment::Paths __find_paths(const Segment::Graph &segment_graph);
 		void __set_branching_rules(const Segment::Paths &paths);
-		Molecules __reconstruct(const Conformations &conformations);
+		Molib::Molecules __reconstruct(const Conformations &conformations);
 		void __init_max_linker_length(const Segment::Paths &paths);
 		void __compute_max_linker_length(Segment::Graph::Path &path);
 
@@ -83,18 +87,26 @@ namespace Molib {
 			const SegStateMap &docked_seeds);
 		State* __is_seed(const Segment &seg, const SegStateMap &docked_seeds);
 	public:
-		Linker(const Molecule &ligand, const NRset &top_seeds, MolGrid &gridrec, 
-			const Score &score, Internal &ic, const double dist_cutoff, 
-			const double spin_degrees, const double tol_dist, const double tol_max_coeff,
-			const double tol_min_coeff, const int max_possible_conf,
-			const int link_iter) : __ligand(ligand), 
+		//~ Linker(const Molib::Molecule &ligand, const Molib::NRset &top_seeds, Molib::Atom::Grid &gridrec, 
+			//~ const Molib::Score &score, Molib::Internal &ic, const double dist_cutoff, 
+			//~ const double spin_degrees, const double tol_dist, const double tol_max_coeff,
+			//~ const double tol_min_coeff, const int max_possible_conf,
+			//~ const int link_iter) : __ligand(ligand), 
+			//~ __top_seeds(top_seeds), __gridrec(gridrec), __score(score), __ic(ic), 
+			//~ __dist_cutoff(dist_cutoff), 
+			//~ __spin_degrees(Geom3D::radians(spin_degrees / 2)), 
+			//~ __tol_dist(tol_dist), __tol_max_coeff(tol_max_coeff), 
+			//~ __tol_min_coeff(tol_min_coeff), __max_possible_conf(max_possible_conf),
+			//~ __link_iter(link_iter) {}
+		Linker(const Molib::Molecule &ligand, const Molib::NRset &top_seeds, Molib::Atom::Grid &gridrec, 
+			const Molib::Score &score, Molib::Internal &ic, const double dist_cutoff, 
+			const double spin_degrees, const double tol_dist, const double tol_seed_dist, 
+			const int max_possible_conf, const int link_iter) : __ligand(ligand), 
 			__top_seeds(top_seeds), __gridrec(gridrec), __score(score), __ic(ic), 
-			__dist_cutoff(dist_cutoff), 
-			__spin_degrees(Geom3D::radians(spin_degrees / 2)), 
-			__tol_dist(tol_dist), __tol_max_coeff(tol_max_coeff), 
-			__tol_min_coeff(tol_min_coeff), __max_possible_conf(max_possible_conf),
+			__dist_cutoff(dist_cutoff), __spin_degrees(Geom3D::radians(spin_degrees / 2)), 
+			__tol_dist(tol_dist), __tol_seed_dist(tol_seed_dist), __max_possible_conf(max_possible_conf),
 			__link_iter(link_iter) {}
-		Molecules connect();
+		Molib::Molecules connect();
 		friend ostream& operator<<(ostream& os, const Conf &conf);
 		friend ostream& operator<<(ostream& os, const LinkEnergy &le);
 		friend ostream& operator<<(ostream& os, const vector<LinkEnergy> &vec_le);

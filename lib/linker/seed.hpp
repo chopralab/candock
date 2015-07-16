@@ -11,7 +11,7 @@
 #include <tuple>
 #include <functional>
 
-namespace Molib {
+namespace Linker {
 	class State;
 	class Segment;
 	
@@ -26,7 +26,7 @@ namespace Molib {
 		const string get_label() const { return __seg.get_label(); } // graph ostream operator
 		const int weight() const { return 0; } // dummy for graph ostream operator
 		friend ostream& operator<< (ostream& stream, const Seed& s);
-		static Graph create_graph(const Segment::Graph &segment_graph, const Segment::Paths &paths);
+		static Graph create_graph(const Segment::Graph &segment_graph);
 	
 	};
 };

@@ -1,4 +1,5 @@
 #include "linker.hpp"
+#include "poses.hpp"
 #include "geom3d/quaternion.hpp"
 #include "score/score.hpp"
 #include "pdbreader/molecule.hpp"
@@ -11,7 +12,7 @@
 
 using namespace std;
 
-namespace Molib {
+namespace Linker {
 	ostream& operator<<(ostream& os, const Linker::Conf &conf)	{
 		os << "start link ++++++++++++++++++++++++++++++" << endl;
 		os << "ENERGY = " << conf.second << endl;
@@ -68,8 +69,8 @@ namespace Molib {
 		double d = 0.0;
 		int i = 0;
 		for (; i < path.size() - 2; i += 2) {
-			const Bond &b1 = path[i]->get_bond(*path[i + 1]);
-			const Bond &b2 = path[i + 1]->get_bond(*path[i + 2]);
+			const Molib::Bond &b1 = path[i]->get_bond(*path[i + 1]);
+			const Molib::Bond &b2 = path[i + 1]->get_bond(*path[i + 2]);
 			path[0]->set_max_linker_length(*path[i + 1], d + b1.length());
 			path[i + 1]->set_max_linker_length(*path[0], d + b1.length());
 			//~ d += b1.first_atom().crd().distance(b2.second_atom().crd());
@@ -82,7 +83,7 @@ namespace Molib {
 				<< *path[i + 2] << " = " << path[0]->get_max_linker_length(*path[i + 2]));
 		}
 		if (i < path.size() - 1) {
-			const Bond &b = path[i]->get_bond(*path[i + 1]);
+			const Molib::Bond &b = path[i]->get_bond(*path[i + 1]);
 			d += b.length();
 			path[0]->set_max_linker_length(*path[i + 1], d);
 			path[i + 1]->set_max_linker_length(*path[0], d);
@@ -94,7 +95,7 @@ namespace Molib {
 			<< path[0]->get_max_linker_length(*path[path.size() - 1]));
 	}
 
-	void Linker::__create_states(const Segment::Graph &segment_graph, const NRset &top_seeds) {
+	void Linker::__create_states(const Segment::Graph &segment_graph, const Molib::NRset &top_seeds) {
 		/* each state is a mapping of docked seed atoms to ligands's 
 		 * segment atoms
 		 */
@@ -107,12 +108,12 @@ namespace Molib {
 
 					dbgmsg("segment seed id = " << segment.get_seed_id());
 					// create a graph out of the seed "nm" of "to be" ligand molecule
-					MolGraph gs = create_graph(seed_mols.first().get_atoms());
+					Molib::Atom::Graph gs = Molib::Atom::create_graph(seed_mols.first().get_atoms());
 					dbgmsg("gs = " << endl << gs);
-					MolGraph gd = create_graph(segment.get_atoms());
+					Molib::Atom::Graph gd = Molib::Atom::create_graph(segment.get_atoms());
 					dbgmsg("gd = " << endl << gd);
 					// map seed molecules atom numbers to ligand molecule
-					MolGraph::Matches m = gd.match(gs);
+					Molib::Atom::Graph::Matches m = gd.match(gs);
 					dbgmsg("__create_states : m.size() = " << m.size());
 					// consider ONLY THE FIRST mapping of seed to seed (the symmetry has 
 					// been taken care of in the rigid docking itself)...
@@ -123,11 +124,11 @@ namespace Molib {
 					auto &vertices2 = mv.second;
 					// for every docked rigid fragment
 					for (auto &seed_molecule : seed_mols) {
-						//~ AtomVec ordered_atoms;
+						//~ Atom::Vec ordered_atoms;
 						AtomToCrd atom_crd;
 						for (int i = 0; i < vertices2.size(); ++i) {
-							Atom &v1 = gd[vertices1[i]];
-							Atom &v2 = *seed_molecule.get_atoms()[vertices2[i]];
+							Molib::Atom &v1 = gd[vertices1[i]];
+							Molib::Atom &v2 = *seed_molecule.get_atoms()[vertices2[i]];
 							atom_crd[&v1] = v2.crd();
 							
 							dbgmsg("adding matched vertex pair " << vertices1[i] 
@@ -150,17 +151,19 @@ namespace Molib {
 
 	bool Linker::__clashes_receptor(const State &current) const {
 		for (auto &kv : current.get_atoms()) {
-			const Atom &a = *kv.first; 
+			const Molib::Atom &a = *kv.first; 
 			const Geom3D::Coordinate &c = kv.second; 
 			dbgmsg("in clashes_receptor test coordinate = " << c);
-			if (__gridrec.clashes(Atom(c, a.idatm_type()))) return true;
+			/* TEMPORARILY TURNED OF BECAUSE FUNCTION DOESN'T EXIST ANYMORE */
+			//~ if (__gridrec.clashes(Atom(c, a.idatm_type()))) return true;
+			/****************************************************************/
 		}
 		return false;
 	}
 	bool Linker::__clashes_ligand(const State &current, 
 		const LinkEnergy &conformation, const State &prev) const {
 
-		const Bond &excluded = current.get_segment().get_bond(prev.get_segment());
+		const Molib::Bond &excluded = current.get_segment().get_bond(prev.get_segment());
 		// clashes between current segment and previous segments
 		for (auto &pstate : conformation.first) {
 			dbgmsg("clashes_ligand test for state " << current 
@@ -174,11 +177,9 @@ namespace Molib {
 	double Linker::__distance(const State &start, const State &goal) const {
 		const Segment &start_segment = start.get_segment();
 		const Segment &goal_segment = goal.get_segment();
-		const Atom &first_atom = start_segment
-			//~ .get_bond(start_segment.get_next(goal_segment)).first_atom();
+		const Molib::Atom &first_atom = start_segment
 			.get_bond(start_segment.get_next(goal_segment)).atom1();
-		const Atom &last_atom = goal_segment
-			//~ .get_bond(goal_segment.get_next(start_segment)).first_atom();
+		const Molib::Atom &last_atom = goal_segment
 			.get_bond(goal_segment.get_next(start_segment)).atom1();
 		const Geom3D::Coordinate &first_crd = start.get_atom_crd(first_atom);
 		const Geom3D::Coordinate &last_crd = goal.get_atom_crd(last_atom);
@@ -201,13 +202,13 @@ namespace Molib {
 		const Segment &current = curr_state.get_segment();
 		dbgmsg("compute_neighbors : current segment is " << current);
 		dbgmsg("compute_neighbors : next segment is " << next);
-		const Bond &btorsion = current.get_bond(next);
+		const Molib::Bond &btorsion = current.get_bond(next);
 		//~ const Atom *a3 = &btorsion.second_atom(); 
-		const Atom *a3 = &btorsion.atom2(); 
+		const Molib::Atom *a3 = &btorsion.atom2(); 
 		//~ const Atom *a2 = &btorsion.first_atom();
-		const Atom *a2 = &btorsion.atom1();
-		const Atom *a1 = &current.adjacent_in_segment(*a2, *a3);	// segments overlap on 1 rotatable bond
-		const Atom *a4 = &next.adjacent_in_segment(*a3, *a2);
+		const Molib::Atom *a2 = &btorsion.atom1();
+		const Molib::Atom *a1 = &current.adjacent_in_segment(*a2, *a3);	// segments overlap on 1 rotatable bond
+		const Molib::Atom *a4 = &next.adjacent_in_segment(*a3, *a2);
 		dbgmsg("a4 = " << *a4 << " coordinates not set yet!");
 		Geom3D::Coordinate crd3(curr_state.get_atom_crd(*a3));
 		dbgmsg("a3 = " << *a3 << " crd3 = " << curr_state.get_atom_crd(*a3));
@@ -412,20 +413,22 @@ namespace Molib {
 		 * the multi-seed molecules
 		 */
 		Array2d<bool> conn(__states.size());
-		Linker::Poses poses(__states);
+		Poses poses(seed_graph, __tol_seed_dist);
 		for (int u = 0; u < seed_graph.size(); ++u) {
 			Segment &segment1 = seed_graph[u].get_segment();
 			for (int v = u + 1; v < seed_graph.size(); ++v) {
 				Segment &segment2 = seed_graph[v].get_segment();
 				const double max_linker_length = segment1.get_max_linker_length(segment2);
-				const Segment::JoinAtoms jatoms = segment1.get_join_atoms(segment2);
-				for (auto &state1 : segment1.get_states()) {
+				Molib::Atom::Pair jatoms{&segment1.get_bond(segment1.get_next(segment2)).atom1(), 
+					&segment2.get_bond(segment2.get_next(segment1)).atom1()};
+				for (auto &pstate1 : segment1.get_states()) {
+					State &state1 = *pstate1;
 					State::Set join_states = poses.get_join_states(state1, segment2, jatoms, max_linker_length);
 					State::Set clashed_states = poses.get_clashed_states(state1, segment2);
 					State::Vec compatible_states = join_states - clashed_states;
-					const int i = static_cast<int> state1.get_id();
-					for (auto &state2 : compatible_states) {
-						const int j = static_cast<int> state2.get_id();
+					const int i = static_cast<int>(state1.get_id());
+					for (auto &pstate2 : compatible_states) {
+						const int j = static_cast<int>(pstate2->get_id());
 						conn.data[i][j] = conn.data[j][i] = true;
 					}
 				}
@@ -490,7 +493,7 @@ namespace Molib {
 		return possibles_w_energy;
 	}
 	
-	Molecules Linker::connect() {
+	Molib::Molecules Linker::connect() {
 		Benchmark::reset();
 		cout << "Starting connection of seeds for ligand " << __ligand.name() << endl;
 		
@@ -505,7 +508,7 @@ namespace Molib {
 		__init_max_linker_length(paths);
 		__set_branching_rules(paths);
 		
-		const Seed::Graph seed_graph = Seed::create_graph(segment_graph, paths);
+		const Seed::Graph seed_graph = Seed::create_graph(segment_graph);
 		dbgmsg("seed graph for ligand " << __ligand.name() << " = " << seed_graph);
 		
 		const vector<LinkEnergy> possible_states = __generate_rigid_conformations(seed_graph);
@@ -624,29 +627,29 @@ namespace Molib {
 		}
 	}
 	
-	Molecules Linker::__reconstruct(const Conformations &conformations) {
+	Molib::Molecules Linker::__reconstruct(const Conformations &conformations) {
 		Benchmark::reset();
 		cout << "Reconstructing docked ligands..." << endl;
-		Molecules mols;
+		Molib::Molecules mols;
 		int conf_number = 0;
 		for (auto &conformation : conformations) { // write out reconstructed molecules
 			for (auto &state : conformation.first) { // convert ligand to new coordinates
 				const Segment &segment = state.get_segment();
-				AtomSet overlap;
+				Molib::Atom::Set overlap;
 				// deal with atoms that overlap between states
 				for (auto &adjacent : segment) {
-					const Bond &b = segment.get_bond(adjacent);
+					const Molib::Bond &b = segment.get_bond(adjacent);
 					overlap.insert(&b.atom2());
 				}
 				for (auto &kv : state.get_atoms()) {
-					Atom &atom = const_cast<Atom&>(*kv.first); // ugly, correct this
+					Molib::Atom &atom = const_cast<Molib::Atom&>(*kv.first); // ugly, correct this
 					if (!overlap.count(&atom)) {
 						const Geom3D::Coordinate &crd = kv.second;
 						atom.set_crd(crd);
 					}
 				}
 			}
-			Molecule &added = mols.add(new Molecule(__ligand));
+			Molib::Molecule &added = mols.add(new Molib::Molecule(__ligand));
 			added.set_name(added.name() + "_" + help::to_string(++conf_number));
 		}
 		cout << "Reconstruction of molecules took " << Benchmark::seconds_from_start() 

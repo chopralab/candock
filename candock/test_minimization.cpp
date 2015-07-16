@@ -58,7 +58,7 @@ int main(int argc, char* argv[]) {
 		/* Create receptor grid
 		 * 
 		 */
-		Molib::MolGrid gridrec(receptors[0].get_atoms());
+		Molib::Atom::Grid gridrec(receptors[0].get_atoms());
 		
 
 		Molib::Molecules ligands = lpdb.parse_molecule();

@@ -9,8 +9,11 @@
 
 namespace Molib {
 	class Atom;
+};
+
+namespace Linker {
 	class Segment;
-	typedef map<const Atom*, Geom3D::Coordinate> AtomToCrd;
+	typedef map<const Molib::Atom*, Geom3D::Coordinate> AtomToCrd;
 	class State {
 	public:
 		typedef vector<State*> Vec;
@@ -21,11 +24,11 @@ namespace Molib {
 		typedef pair<const State*, const State*> ConstPair;
 		typedef int Id;
 	private:
-		static Id idx = 0;
+		static Id idx;
 		const Segment &__segment;
 		const AtomToCrd __atom_crd;
 		double __energy;
-		Id __id;
+		const Id __id;
 		
 	public:
 		State(const Segment &segment, const AtomToCrd atom_crd, const double energy=0) : 
@@ -34,14 +37,15 @@ namespace Molib {
 		double get_energy() const { return __energy; }			
 		const Segment& get_segment() const { return __segment; }			
 		const AtomToCrd& get_atoms() const { return __atom_crd; }			
-		Geom3D::Coordinate get_atom_crd(const Atom &atom) const { return __atom_crd.at(&atom); }
-		bool has_atom(const Atom &atom) const { return __atom_crd.count(&atom); }
-		bool clashes(const State &other, const Bond &excluded) const; // clashes between this and other state
+		Geom3D::Coordinate get_atom_crd(const Molib::Atom &atom) const { return __atom_crd.at(&atom); }
+		bool has_atom(const Molib::Atom &atom) const { return __atom_crd.count(&atom); }
+		bool clashes(const State &other, const Molib::Bond &excluded) const; // clashes between this and other state
 		string pdb() const;
+		const Id get_id() const { return __id; }
 		friend ostream& operator<< (ostream& stream, const State& s);
 		friend ostream& operator<< (ostream& stream, const Vec& sv);
 	};
 	
-	State::Vec operator-(const State::Set& left, const State::Set& right) const;
+	State::Vec operator-(const State::Set& left, const State::Set& right);
 };
 #endif

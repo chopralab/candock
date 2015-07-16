@@ -11,10 +11,10 @@ namespace Docker {
 		typedef map<int, map<int, map<int, vector<int>>>> ConfMap;
 		
 		class Conf {
-			const Molib::AtomVec &__ordered_atoms;
+			const Molib::Atom::Vec &__ordered_atoms;
 			Gpoints::PGpointVec __points;
 		public:
-			Conf(const Molib::AtomVec &ordered_atoms, Gpoints::PGpointVec &points) : 
+			Conf(const Molib::Atom::Vec &ordered_atoms, Gpoints::PGpointVec &points) : 
 				__ordered_atoms(ordered_atoms), __points(points) {}
 			Gpoints::PGpointVec &get_points() { return __points; }
 			const Gpoints::PGpointVec &get_points() const { return __points; }
@@ -29,7 +29,7 @@ namespace Docker {
 	private:
 
 		vector<Conf> __conf_vec;
-		Molib::AtomVec __ordered_atoms;
+		Molib::Atom::Vec __ordered_atoms;
 		ConfMap __conf_map;
 		Array2d<double> __rmsd;
 		

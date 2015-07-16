@@ -1,7 +1,7 @@
 include ../../candock/Makefile.inc
 
 OBJLIBS	= libpdb.a
-OBJS	= molecule.o bond.o pdbreader.o element.o internal.o idatm.o \
+OBJS	= atom.o molecule.o bond.o pdbreader.o element.o internal.o idatm.o \
 atomtype.o bondtype.o
 INCL= -I ../tclap-1.2.1/include/ -I ../all3/idatmtest \
 -I ../jsoncpp-src-0.6.0-rc2/include -I ../jsoncpp-src-0.6.0-rc2/src \
@@ -11,6 +11,10 @@ all : $(OBJLIBS)
 
 pdbreader.o: pdbreader.cpp pdbreader.hpp \
 	  molecule.hpp
+	$(CC) $(PRJCFLAGS) $(INCL) -c $<
+
+atom.o: atom.cpp atom.hpp it.hpp \
+	  element.hpp
 	$(CC) $(PRJCFLAGS) $(INCL) -c $<
 
 molecule.o: molecule.cpp molecule.hpp it.hpp \

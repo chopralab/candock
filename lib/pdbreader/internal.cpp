@@ -13,7 +13,7 @@ using namespace std;
 namespace Molib {
 	const Torsion empty_torsion(nullptr, nullptr, nullptr, nullptr);
 
-	void Internal::build(const AtomVec &atoms) {
+	void Internal::build(const Atom::Vec &atoms) {
 		for (auto &pa1 : atoms) { // find all bonds lengths
 			const Atom &a1 = *pa1;
 			for (auto &a2 : a1) {
@@ -54,7 +54,7 @@ namespace Molib {
 
 	AtomToCrd Internal::cartesian(const Atom &ini1, const Atom &ini2, const Atom &ini3, 
 										const Geom3D::Coordinate &crd1, const Geom3D::Coordinate &crd2, 
-										const Geom3D::Coordinate &crd3, const AtomSet &atoms) const {
+										const Geom3D::Coordinate &crd3, const Atom::Set &atoms) const {
 		AtomToCrd new_crd {{&ini1, crd1}, {&ini2, crd2}, {&ini3, crd3}};
 		queue<tuple<const Atom*, const Atom*, const Atom*>> triples;
 		triples.push(make_tuple(&ini1, &ini2, &ini3));

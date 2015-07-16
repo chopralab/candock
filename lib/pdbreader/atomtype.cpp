@@ -30,7 +30,7 @@ namespace Molib {
 		return freeOxygens;
 	}
 	
-	bool aromatic(const AtomSet &ring) {
+	bool aromatic(const Atom::Set &ring) {
 		double sum = 0.0;
 		int bonds = 0;
 		dbgmsg("ring = " << endl << ring);

@@ -138,7 +138,7 @@ namespace Molib {
 
 	vector<unique_ptr<Bond>> create_bonds(const help::smiles &edges) {
 		map<int, int> added;
-		AtomVec atoms;
+		Atom::Vec atoms;
 		vector<unique_ptr<Bond>> bonds;
 		dbgmsg("creating bond graph from smiles");
 		for (auto &e : edges) {

@@ -34,7 +34,7 @@ ostream& operator<<(ostream& os, const genlig::BindingSiteScores& bscores)	{
 }	
 
 namespace genlig {
-	ResidueSet find_neighbor_residues(Molib::Molecule &ligand, Molib::MolGrid &grid) {
+	ResidueSet find_neighbor_residues(Molib::Molecule &ligand, Molib::Atom::Grid &grid) {
 		ResidueSet neighbor_residues;
 		for (auto &assembly : ligand) {
 			for (auto &model : assembly) {
@@ -42,7 +42,7 @@ namespace genlig {
 					for (auto &residue : chain) {
 						for (auto &atom : residue) {
 							dbgmsg("before get neighbors");
-							Molib::AtomVec neighbors = grid.get_neighbors(atom.crd(), 4.0);
+							Molib::Atom::Vec neighbors = grid.get_neighbors(atom.crd(), 4.0);
 							dbgmsg("number of neighbors = " << neighbors.size());
 							for (auto &pa : neighbors) {
 								dbgmsg("pa = " << *pa);
@@ -151,18 +151,18 @@ namespace genlig {
 		}
 		return bsite;
 	}
-	//~ Molib::MolGrid parse_receptor(const string &receptor_file, const string &receptor_chain_id) {
+	//~ Molib::Atom::Grid parse_receptor(const string &receptor_file, const string &receptor_chain_id) {
 		//~ // read query PDB protein
 		//~ Molib::PDBreader qpdb(receptor_file, 
 			//~ Molib::PDBreader::first_model|Molib::PDBreader::hydrogens);
 		//~ Molib::Molecules query_mols = qpdb.parse_molecule();
-		//~ return Molib::MolGrid(query_mols[0].get_atoms(receptor_chain_id, 
+		//~ return Molib::Atom::Grid(query_mols[0].get_atoms(receptor_chain_id, 
 			//~ Molib::Residue::protein));
 	//~ }
 	void generate_ligands(const string &receptor_file, const string &receptor_chain_id, 
 		const string &json_file, const string &bio_dir, const string &lig_code,
 		const string &lig_file, const string &bsite_file) {
-	//~ void generate_ligs(Molib::MolGrid &gridrec, const string &json_file, 
+	//~ void generate_ligs(Molib::Atom::Grid &gridrec, const string &json_file, 
 		//~ const string &bio_dir, const string &lig_code, const string &lig_file, 
 		//~ const string &bsite_file) {
 
@@ -170,7 +170,7 @@ namespace genlig {
 		Molib::PDBreader qpdb(receptor_file, 
 			Molib::PDBreader::first_model|Molib::PDBreader::hydrogens);
 		Molib::Molecules query_mols = qpdb.parse_molecule();
-		Molib::MolGrid gridrec(query_mols[0].get_atoms(receptor_chain_id, 
+		Molib::Atom::Grid gridrec(query_mols[0].get_atoms(receptor_chain_id, 
 			Molib::Residue::protein));
 
 		JsonReader jr;

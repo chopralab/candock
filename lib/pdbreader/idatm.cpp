@@ -135,8 +135,8 @@ namespace Idatm {
 				Molib::Bond *b = (*ai).first;
 				int order = (*ai).second;
 				//~ const Molib::Bond::Molib::Atoms &bondAtoms = b->atoms();
-				//~ const Molib::AtomVec &bondAtoms {&b->first_atom(), &b->second_atom()};
-				const Molib::AtomVec &bondAtoms {&b->atom1(), &b->atom2()};
+				//~ const Molib::Atom::Vec &bondAtoms {&b->first_atom(), &b->second_atom()};
+				const Molib::Atom::Vec &bondAtoms {&b->atom1(), &b->atom2()};
 				//~ for (Molib::Bond::Molib::Atoms::const_iterator bi =
 				//~ bondAtoms.begin(); bi != bondAtoms.end(); ++bi) {
 					//~ Molib::Atom *a = *bi;
@@ -378,8 +378,8 @@ namespace Idatm {
 					Molib::Bond *b = *bi;
 					//~ const Molib::Bond::Molib::Atoms &bondAtoms =
 							//~ b->atoms();
-					//~ const Molib::AtomVec &bondAtoms {&b->first_atom(), &b->second_atom()};
-					const Molib::AtomVec &bondAtoms {&b->atom1(), &b->atom2()};
+					//~ const Molib::Atom::Vec &bondAtoms {&b->first_atom(), &b->second_atom()};
+					const Molib::Atom::Vec &bondAtoms {&b->atom1(), &b->atom2()};
 					//~ for (Molib::Bond::Molib::Atoms::const_iterator
 					//~ bai = bondAtoms.begin();
 					//~ bai != bondAtoms.end(); ++bai) {
@@ -425,8 +425,8 @@ namespace Idatm {
 		bool assign1okay = true, assign2okay = true;
 		// see if this assignment completes the bonds of either connected
 		// atom and which assignments work
-		//~ const Molib::AtomSet bondAtoms {&assignTarget->first_atom(), &assignTarget->second_atom()};
-		const Molib::AtomSet bondAtoms {&assignTarget->atom1(), &assignTarget->atom2()};
+		//~ const Molib::Atom::Set bondAtoms {&assignTarget->first_atom(), &assignTarget->second_atom()};
+		const Molib::Atom::Set bondAtoms {&assignTarget->atom1(), &assignTarget->atom2()};
 		//~ const Molib::Bond::Molib::Atoms &bondAtoms = assignTarget->atoms(); 
 		//~ for (Molib::Bond::Molib::Atoms::const_iterator ai = bondAtoms.begin();
 		//~ ai != bondAtoms.end(); ++ai) {
@@ -558,7 +558,7 @@ namespace Idatm {
 		bonds.insert(assignTarget);
 	}
 
-	bool aromaticGeometry(const Molib::AtomSet &r) {
+	bool aromaticGeometry(const Molib::Atom::Set &r) {
 		// algorithm from:
 		//	Crystallographic Studies of Inter- and Intramolecular 
 		//	   Interactions Reflected in Aromatic Character of pi-Electron
@@ -1546,7 +1546,7 @@ namespace Idatm {
 					for (auto &cring : componentRings) {
 						for (auto &ring : cring) {
 							if (ring != r) {
-								Molib::AtomSet inter;
+								Molib::Atom::Set inter;
 								set_intersection(ring.begin(), ring.end(), r.begin(), r.end(), inserter(inter, inter.begin()));
 								if (inter.size() > 1) {
 									add_new_cring = false;
@@ -1602,7 +1602,7 @@ namespace Idatm {
 				for (auto &systemRings : componentRings) {
 					//~ std::set<Molib::Bond *> &bonds = fusedMolib::Bonds[i];
 					//~ std::set<Molib::Atom *> &atoms = fusedMolib::Atoms[i];
-					Molib::AtomSet atoms;
+					Molib::Atom::Set atoms;
 					for (auto &ring : systemRings)
 						for (auto &a : ring)
 							atoms.insert(a);
@@ -1777,7 +1777,7 @@ namespace Idatm {
 					//~ std::map<Molib::Atom *, Molib::Bond *> uncertain2bond;
 					map<Molib::Bond*, int> curAssign;
 					vector<map<Molib::Bond*, int> > assignments;
-					vector<Molib::AtomVec > assignedUncertains;
+					vector<Molib::Atom::Vec > assignedUncertains;
 					map<Molib::Atom*, Molib::Bond*> uncertain2bond;
 					//~ makeAssignments(bonds, connected, curAssign, &assignments);
 					//~ makeAssignments(bonds, connected, curAssign, &assignments,
@@ -1919,7 +1919,7 @@ namespace Idatm {
 						// if adjacent carbons were uncertain (i.e. had
 						// "redo" values) try changing their type
 						//~ std::vector<Molib::Atom *> uncertain;
-						Molib::AtomVec uncertain;
+						Molib::Atom::Vec uncertain;
 						//~ for (std::set<std::pair<Molib::Atom *, Molib::Bond *> >::iterator rni =
 						//~ ringNeighbors.begin(); rni != ringNeighbors.end(); ++rni) {
 						for (auto &kv : ringNeighbors) {
@@ -2362,7 +2362,7 @@ namespace Idatm {
 			
 			bool c2possible = false;
 			//~ primary = a->primaryNeighbors();
-			Molib::AtomVec nbValence1;
+			Molib::Atom::Vec nbValence1;
 			//~ for (std::vector<Molib::Atom *>::const_iterator bi = primary.begin();
 			  //~ bi != primary.end(); ++bi) {
 				//~ Molib::Atom *bondee = *bi;
@@ -2513,7 +2513,7 @@ namespace Idatm {
 						//~ if (bondee->rings(false,
 								//~ ringLimit, &considerMapped).size() > 0) {
 						Molib::Rings rs = Molib::Fragmenter(residue.get_atoms()).identify_rings();
-						Molib::AtomSet ring_atoms;
+						Molib::Atom::Set ring_atoms;
 						for (auto &ring : rs) 
 							for (auto &pa : ring)
 								ring_atoms.insert(pa);
@@ -2687,7 +2687,7 @@ namespace Idatm {
 		//  are not in turn bonded to sp2 atoms (implying Npl doubled bonded)
 		//  to N2, otherwise to Npl.  
 		//~ std::map<Molib::Atom *, std::vector<Molib::Atom *> > bondedSp2s;
-		map<Molib::Atom*, Molib::AtomVec> bondedSp2s;
+		map<Molib::Atom*, Molib::Atom::Vec> bondedSp2s;
 		for (auto &assembly : molecule)
 		for (auto &model : assembly)
 		for (auto &chain : model)
@@ -2798,7 +2798,7 @@ namespace Idatm {
 			//~ sp2i != bondedSp2s.end(); ++sp2i) {
 				//~ const std::vector<Molib::Atom *> &sp2s = (*sp2i).second;
 			for (auto &kv : bondedSp2s) {
-				const Molib::AtomVec &sp2s = kv.second;
+				const Molib::Atom::Vec &sp2s = kv.second;
 				if (sp2s.size() != i)
 					continue;
 				//~ Molib::Atom *a = (*sp2i).first;

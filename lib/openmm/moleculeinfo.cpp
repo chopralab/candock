@@ -67,7 +67,7 @@ namespace OMMIface {
 				}
 			}
 		}
-		set<Molib::AtomPair> visited_bonds;
+		set<Molib::Atom::Pair> visited_bonds;
 		set<tuple<Molib::Atom*, Molib::Atom*, Molib::Atom*>> visited_angles;
 		set<tuple<Molib::Atom*, Molib::Atom*, Molib::Atom*, Molib::Atom*>> visited_dihedrals, visited_impropers;
 		// set the bonds, angles, dihedrals
@@ -130,16 +130,16 @@ namespace OMMIface {
 					const Molib::Molecule &ligand, const int &dist_cutoff) {
 		dbgmsg("get_kb_force_info");
 		// 1-2 and 1-3 bonded exclusions for knowledge-based forcefield
-		Molib::AtomVec rec_atoms = receptor.get_atoms();
-		Molib::AtomVec lig_atoms = ligand.get_atoms();
-		Molib::AtomVec atoms;
+		Molib::Atom::Vec rec_atoms = receptor.get_atoms();
+		Molib::Atom::Vec lig_atoms = ligand.get_atoms();
+		Molib::Atom::Vec atoms;
 		atoms.reserve(rec_atoms.size() + lig_atoms.size());
 		dbgmsg("receptor atoms are : " << endl << rec_atoms);
 		dbgmsg("ligand atoms are : " << endl << lig_atoms);
 
 		atoms.insert(atoms.end(), rec_atoms.begin(), rec_atoms.end());
 		atoms.insert(atoms.end(), lig_atoms.begin(), lig_atoms.end());
-		set<Molib::AtomPair> bonded_exclusions;
+		set<Molib::Atom::Pair> bonded_exclusions;
 		for (auto &pa : atoms) {
 			Molib::Atom &atom1 = *pa;
 			for (auto &atom2 : atom1) {
@@ -150,8 +150,8 @@ namespace OMMIface {
 			}
 		}
 		// knowledge-based forces between atoms except between bonded exclusions
-		set<Molib::AtomPair> visited;
-		Molib::MolGrid g(atoms);
+		set<Molib::Atom::Pair> visited;
+		Molib::Atom::Grid g(atoms);
 		for (auto &pa1 : atoms) {
 			for (auto &pa2 : g.get_neighbors(pa1->crd(), dist_cutoff)) {
 				if (!visited.count({pa1, pa2})) {
@@ -169,7 +169,7 @@ namespace OMMIface {
 		const Molib::Molecule &ligand, const int &dist_cutoff) {
 
 		// knowledge-based forces only between ligand and receptor atoms
-		Molib::MolGrid g(receptor.get_atoms());
+		Molib::Atom::Grid g(receptor.get_atoms());
 		for (auto &pa1 : ligand.get_atoms()) {
 			for (auto &pa2 : g.get_neighbors(pa1->crd(), dist_cutoff)) {
 				this->kbforce.push_back({pa1, pa2});

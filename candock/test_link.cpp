@@ -64,7 +64,7 @@ int main(int argc, char* argv[]) {
 		/* Create receptor grid
 		 * 
 		 */
-		Molib::MolGrid gridrec(receptors[0].get_atoms());
+		Molib::Atom::Grid gridrec(receptors[0].get_atoms());
 
 		/* Read ligands from the ligands file - this file may contain millions
 		 * of ligands, and we read only a few at one time, to save memory
@@ -156,11 +156,11 @@ int main(int argc, char* argv[]) {
 						// 
 						// APPENDIX:
 						//    fast clashes between seeds using grid
-						//    
-						Molib::Linker linker(ligand, top_seeds, gridrec, score, ic, 
+						//
+						
+						Linker::Linker linker(ligand, top_seeds, gridrec, score, ic, 
 							cmdl.dist_cutoff(), cmdl.spin_degrees(), cmdl.tol_dist(),
-							cmdl.tol_max_coeff(), cmdl.tol_min_coeff(), 
-							cmdl.max_possible_conf(), cmdl.link_iter());
+							cmdl.tol_seed_dist(), cmdl.max_possible_conf(), cmdl.link_iter());
 
 						Molib::Molecules docked = linker.connect();
 

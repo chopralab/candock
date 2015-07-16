@@ -23,30 +23,6 @@
 using namespace std;
 
 namespace Molib {
-	MolGraph create_graph(const AtomVec &atoms) {
-		return MolGraph(atoms, true);
-	}
-	MolGraph create_graph(const AtomSet &atoms) {
-		return MolGraph(atoms, true);
-	}
-
-	BondSet get_bonds_in(const AtomSet &atoms, bool in) {
-		BondSet bonds;
-		for (auto &patom1 : atoms) {
-			for (auto &pbond : patom1->get_bonds()) {
-				Atom &atom2 = pbond->second_atom(*patom1);
-				if ((in || !atoms.count(&atom2)) 
-					&& (!in || atoms.count(&atom2))) {
-					bonds.insert(pbond);
-				}
-			}
-		}
-		return bonds;
-	}
-	BondSet get_bonds_in(const AtomVec &atoms, bool in) {
-		AtomSet a(atoms.begin(), atoms.end());
-		return get_bonds_in(a, in);
-	}
 	set<int> get_idatm_types(const Molecules &mols, set<int> previous) {
 		for (auto &molecule : mols)
 		for (auto &pa : molecule.get_atoms()) {
@@ -66,7 +42,7 @@ namespace Molib {
 		}
 	}
 
-	Atom* get_closest_atom_of(const Atom &atom1, const AtomVec &neighbors, const string &atom_name) {
+	Atom* get_closest_atom_of(const Atom &atom1, const Atom::Vec &neighbors, const string &atom_name) {
 		double min_dist = HUGE_VAL;
 		Atom *patom2 = nullptr;
 		for (auto &pa : neighbors) {
@@ -81,7 +57,7 @@ namespace Molib {
 		}
 		return patom2;
 	}
-	void Molecule::prepare_for_mm(const OMMIface::ForceField &ff, MolGrid &grid) {
+	void Molecule::prepare_for_mm(const OMMIface::ForceField &ff, Atom::Grid &grid) {
 		/* Rename some residues
 		 */
 		for (auto &assembly : *this)
@@ -169,36 +145,36 @@ namespace Molib {
 		}
 		dbgmsg("MOLECULE AFTER PREPARING FOR MOLECULAR MECHANICS" << endl << *this);
 	}
-	AtomVec NRset::get_atoms(const string &chain_ids, const Residue::res_type &rest,
+	Atom::Vec NRset::get_atoms(const string &chain_ids, const Residue::res_type &rest,
 		const int model_number) const {
-		AtomVec atoms;
+		Atom::Vec atoms;
 		for (auto &mols : *this) {
 			auto ret = mols.get_atoms(chain_ids, rest, model_number);
 			atoms.insert(atoms.end(), ret.begin(), ret.end());
 		}
 		return atoms;
 	}
-	AtomVec Molecules::get_atoms(const string &chain_ids, const Residue::res_type &rest,
+	Atom::Vec Molecules::get_atoms(const string &chain_ids, const Residue::res_type &rest,
 		const int model_number) const {
-		AtomVec atoms;
+		Atom::Vec atoms;
 		for (auto &molecule : *this) {
 			auto ret = molecule.get_atoms(chain_ids, rest, model_number);
 			atoms.insert(atoms.end(), ret.begin(), ret.end());
 		}
 		return atoms;
 	}
-	AtomVec Molecule::get_atoms(const string &chain_ids, const Residue::res_type &rest,
+	Atom::Vec Molecule::get_atoms(const string &chain_ids, const Residue::res_type &rest,
 		const int model_number) const {
-		AtomVec atoms;
+		Atom::Vec atoms;
 		for (auto &assembly : *this) {
 			auto ret = assembly.get_atoms(chain_ids, rest, model_number);
 			atoms.insert(atoms.end(), ret.begin(), ret.end());
 		}
 		return atoms;
 	}
-	AtomVec Assembly::get_atoms(const string &chain_ids, const Residue::res_type &rest,
+	Atom::Vec Assembly::get_atoms(const string &chain_ids, const Residue::res_type &rest,
 		const int model_number) const {
-		AtomVec atoms;
+		Atom::Vec atoms;
 		for (auto &model : *this) {
 			if (model_number == -1 || model.number() == model_number) {
 				auto ret = model.get_atoms(chain_ids, rest);
@@ -207,8 +183,8 @@ namespace Molib {
 		}
 		return atoms;
 	}
-	AtomVec Model::get_atoms(const string &chain_ids, const Residue::res_type &rest) const {
-		AtomVec atoms;
+	Atom::Vec Model::get_atoms(const string &chain_ids, const Residue::res_type &rest) const {
+		Atom::Vec atoms;
 		for (auto &chain : *this) {
 			if (chain_ids == "" || chain_ids.find(chain.chain_id()) != string::npos) {
 				auto ret = chain.get_atoms(rest);
@@ -217,8 +193,8 @@ namespace Molib {
 		}
 		return atoms;
 	}
-	AtomVec Chain::get_atoms(const Residue::res_type &rest) const {
-		AtomVec atoms;
+	Atom::Vec Chain::get_atoms(const Residue::res_type &rest) const {
+		Atom::Vec atoms;
 		for (auto &residue : *this) {
 			if (rest == Residue::res_type::notassigned || residue.rest() == rest) {
 				auto ret = residue.get_atoms();
@@ -227,8 +203,8 @@ namespace Molib {
 		}
 		return atoms;
 	}
-	AtomVec Residue::get_atoms() const {
-		AtomVec atoms;
+	Atom::Vec Residue::get_atoms() const {
+		Atom::Vec atoms;
 		for (auto &atom : *this) {
 			atoms.push_back(&atom);
 		}
@@ -239,16 +215,16 @@ namespace Molib {
 		dbgmsg("calculate rmsd between two conformations of the same \
 			molecule (can do symmetric molecules such as benzene, etc.)");
 
-		MolGraph g1 = create_graph(this->get_atoms());
+		Atom::Graph g1 = Atom::create_graph(this->get_atoms());
 		dbgmsg("g1 = " << endl << g1);
 
-		MolGraph g2 = create_graph(molecule.get_atoms());
+		Atom::Graph g2 = Atom::create_graph(molecule.get_atoms());
 		dbgmsg("g2 = " << endl << g2);
 
 		if (g1.size() != g2.size())
 			throw Error("die : RMSD can only be calculated for two conformations of the same molecule");
 
-		MolGraph::Matches m = g1.match(g2);
+		Atom::Graph::Matches m = g1.match(g2);
 		
 		// try calculating rmsd of each mapping of molecule to molecule ...
 		double min_sum_squared = HUGE_VAL;
@@ -274,7 +250,7 @@ namespace Molib {
 
 	Atom& Molecule::get_center_atom() const {
 		Atom *center_atom = nullptr;
-		AtomVec atoms = this->get_atoms();
+		Atom::Vec atoms = this->get_atoms();
 		double min_d = HUGE_VAL;
 		for (auto &patom1 : atoms) {
 			double d = 0.0;
@@ -294,22 +270,22 @@ namespace Molib {
 	}
 
 	double Molecule::max_dist() const {
-		dbgmsg("calculate max distance between atoms in an AtomSet ...");
+		dbgmsg("calculate max distance between atoms in an Atom::Set ...");
 		double md_sq = 0.0;
-		AtomVec atoms = this->get_atoms();
+		Atom::Vec atoms = this->get_atoms();
 		for (int i = 0; i < atoms.size(); ++i)
 			for (int j = i + 1; j < atoms.size(); ++j) {
 				const double dist_sq = atoms[i]->crd().distance_sq(atoms[j]->crd());
 				if (dist_sq > md_sq) md_sq = dist_sq;
 			}
-		dbgmsg("max_dist between atoms of atoms in AtomSet = " << sqrt(md_sq));
+		dbgmsg("max_dist between atoms of atoms in Atom::Set = " << sqrt(md_sq));
 		return sqrt(md_sq);
 	}
 	double Molecule::max_dist(const Atom &atom) const {
 		dbgmsg("calculate max distance between atom " << atom 
 			<< " and other atoms in molecule ...");
 		double md_sq = 0.0;
-		AtomVec atoms = this->get_atoms();
+		Atom::Vec atoms = this->get_atoms();
 		for (int i = 0; i < atoms.size(); ++i) {
 			const double dist_sq = atom.crd().distance_sq(atoms[i]->crd());
 			if (dist_sq > md_sq) md_sq = dist_sq;
@@ -436,110 +412,6 @@ namespace Molib {
 	Molecule& Molecule::compute_bond_order() {
 		BondOrder::compute_bond_order(*this);
 		return *this;
-	}
-	int Atom::get_num_hydrogens() const {
-		const Atom &atom = *this;
-		int num_h = 0;
-		for (auto &atom2 : atom)
-			if (atom2.element() == Element::H) 
-				num_h++;
-		return num_h;
-	}
-	Bond& Atom::connect(Atom &a2) {
-		Atom &a1 = *this;
-		if (!a1.is_adjacent(a2)) {
-			dbgmsg("connecting atoms " << a1.atom_number() << " and " << a2.atom_number());
-			a1.add(&a2);
-			a2.add(&a1);
-			a1.insert_bond(a2, new Bond(&a1, &a2)); // insert if not exists
-			return *a2.insert_bond(a1, a1.get_shared_ptr_bond(a2)); // insert if not exists
-		}
-		return a1.get_bond(a2); // if already connected return existing bond
-	}
-	void Atom::set_members(const string &str) {
-		// set atomic penalty scores
-		boost::smatch m;
-		dbgmsg("set members for atom " << this->atom_name() << " " << this->atom_number());
-		if (boost::regex_search(str, m, boost::regex("aps=(\\S+)"))) {
-			if (m[1].matched) {
-				string aps_str = m[1].str();
-				dbgmsg("aps_str = " << aps_str);
-				boost::match_results<string::const_iterator> matches;
-				string::const_iterator begin = aps_str.begin(), end = aps_str.end();
-				while (boost::regex_search(begin, end, matches, boost::regex("\\{(\\d+,\\d+)\\}"))) {
-					string s(matches[1].first, matches[1].second);
-					auto vec = help::ssplit(s, ",");
-					int val = stoi(vec[0]);
-					int aps = stoi(vec[1]);
-					__aps[val] = aps;
-					begin = matches[1].second;
-				}
-			}
-		}
-		// set properties
-		if (boost::regex_search(str, m, boost::regex("prop=(\\S+)"))) {
-			if (m[1].matched) {
-				string prop_str = m[1].str();
-				dbgmsg("prop = " << prop_str);
-				boost::match_results<string::const_iterator> matches;
-				string::const_iterator begin = prop_str.begin(), end = prop_str.end();
-				while (boost::regex_search(begin, end, matches, boost::regex("\\{(\\w+,\\d+)\\}"))) {
-					string s(matches[1].first, matches[1].second);
-					auto vec = help::ssplit(s, ",");
-					string val = vec[0];
-					int count = stoi(vec[1]);
-					__smiles_prop[val] = count;
-					begin = matches[1].second;
-				}
-			}
-		}
-		// set gaff type
-		if (boost::regex_search(str, m, boost::regex("gaff=([^,$]+)"))) {
-			if (m[1].matched) {
-				dbgmsg(m[1].str());
-				set_gaff_type(m[1].str());
-			}
-		}
-		// set idatm type
-		if (boost::regex_search(str, m, boost::regex("idatm=([^,$]+)"))) {
-			if (m[1].matched) {
-				dbgmsg(m[1].str());
-				set_idatm_type(m[1].str());
-			}
-		}
-	}
-
-	bool Atom::compatible(const Atom &other) const {
-		/* this is "smiles" atom and other is real atom */
-		if (!boost::regex_search(other.get_label(), boost::regex(this->get_label())))
-			return false;
-		for (auto &kv : this->__smiles_prop) {
-			auto &p = kv.first;
-			auto &cnt = kv.second;
-			int other_cnt = other.compute_num_property(p);
-			if (!((cnt == -1 && other_cnt > 0) || cnt == other_cnt))
-				return false;
-		}
-		return true;
-	}
-	int Atom::compute_num_property(const string &prop) const {
-		if (prop == "B") return this->size();
-		else if (prop == "H") return this->get_num_hydrogens();
-		else if (prop == "sb" || prop == "db" || prop == "tb" ||
-			//~ prop == "SB" || prop == "DB" || prop == "TB" || prop == "AB") 
-			prop == "SB" || prop == "DB" || prop == "DL") 
-			return this->get_num_bond_with_bond_gaff_type(prop);
-		else if (prop.substr(0,2) == "AR" || prop.substr(0,2) == "RG"
-			 || prop.substr(0,2) == "NG" || prop.substr(0,2) == "ag")
-			return this->get_num_property(prop);
-	}
-	int Atom::get_num_bond_with_bond_gaff_type(const string &prop) const {
-		const Atom &atom = *this;
-		int num_bwp = 0;
-		for (auto &pbond : atom.get_bonds())
-			if (pbond->get_bond_gaff_type() == prop) 
-				num_bwp++;
-		return num_bwp;
 	}
 
 	Molecule& Molecule::compute_hydrogen() {
@@ -800,15 +672,6 @@ namespace Molib {
 		for (auto &molecules : m) {
 			stream << molecules;
 		}
-		return stream;
-	}
-
-	ostream& operator<< (ostream& stream, const AtomSet&atoms) {
-		for (auto &patom : atoms) stream << *patom << endl;
-		return stream;
-	}
-	ostream& operator<< (ostream& stream, const AtomVec&atoms) {
-		for (auto &patom : atoms) stream << *patom << endl;
 		return stream;
 	}
 

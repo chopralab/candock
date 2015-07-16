@@ -64,8 +64,9 @@ class CmdLnOpts {
 
 	int __spin_degrees;
 	double __tol_dist;
-	double __tol_max_coeff;
-	double __tol_min_coeff;
+	//~ double __tol_max_coeff;
+	//~ double __tol_min_coeff;
+	double __tol_seed_dist;
 	int __max_possible_conf;
 	int __link_iter;
 
@@ -191,8 +192,10 @@ public:
 			TCLAP::ValueArg<int> spin_degreesArg("","spin","Spin degrees to rotate ligand (default 30)",false,30,&allowedValsSpinDegrees, cmd);
 			TCLAP::ValueArg<double> tol_distArg("","tol_dist","Allowed distance between last path- and goal- state in linker (default is 3.0)",false,3.0,"double", cmd);
 
-			TCLAP::ValueArg<double> tol_max_coeffArg("","tol_max_coeff","Multiply maximum linker length (upper bound) (default is 1.3)",false,1.3,"double", cmd);
-			TCLAP::ValueArg<double> tol_min_coeffArg("","tol_min_coeff","Multiply maximum linker length (lower bound) (default is 0.7)",false,0.7,"double", cmd);
+			//~ TCLAP::ValueArg<double> tol_max_coeffArg("","tol_max_coeff","Multiply maximum linker length (upper bound) (default is 1.3)",false,1.3,"double", cmd);
+			//~ TCLAP::ValueArg<double> tol_min_coeffArg("","tol_min_coeff","Multiply maximum linker length (lower bound) (default is 0.7)",false,0.7,"double", cmd);
+//~ 
+			TCLAP::ValueArg<double> tol_seed_distArg("","tol_seed_dist","Tolerance on seed distance for getting initial conformations of docked fragments (default is 2.0)",false,2.0,"double", cmd);
 
 			TCLAP::ValueArg<int> max_possible_confArg("","max_possible_conf","Maximum number of possible conformations to link (default is -1 [no limit])",false,-1,"int", cmd);
 			TCLAP::ValueArg<int> link_iterArg("","link_iter","Maximum iterations for linking procedure (default is 1000)",false,1000,"int", cmd);
@@ -278,8 +281,9 @@ public:
 			__gaff_xml_file = gaff_xml_fileArg.getValue();
 			__spin_degrees = spin_degreesArg.getValue();
 			__tol_dist = tol_distArg.getValue();
-			__tol_max_coeff = tol_max_coeffArg.getValue();
-			__tol_min_coeff = tol_min_coeffArg.getValue();
+			//~ __tol_max_coeff = tol_max_coeffArg.getValue();
+			//~ __tol_min_coeff = tol_min_coeffArg.getValue();
+			__tol_seed_dist = tol_seed_distArg.getValue();
 			__max_possible_conf = max_possible_confArg.getValue();
 			__link_iter = link_iterArg.getValue();
 			__docked_ligands_file = docked_ligands_fileArg.getValue();
@@ -360,8 +364,9 @@ public:
 	string gaff_xml_file() const { return __gaff_xml_file; }
 	int spin_degrees() const { return __spin_degrees; }
 	double tol_dist() const { return __tol_dist; }
-	double tol_max_coeff() const { return __tol_max_coeff; }
-	double tol_min_coeff() const { return __tol_min_coeff; }
+	//~ double tol_max_coeff() const { return __tol_max_coeff; }
+	//~ double tol_min_coeff() const { return __tol_min_coeff; }
+	double tol_seed_dist() const { return __tol_seed_dist; }
 	int max_possible_conf() const { return __max_possible_conf; }
 	int link_iter() const { return __link_iter; }
 	string docked_ligands_file() const { return __docked_ligands_file; }

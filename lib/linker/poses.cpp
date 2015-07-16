@@ -12,51 +12,57 @@
 using namespace std;
 
 namespace Linker {
-	Poses::Poses(const Segment::Vec &segments) {
+	Poses::Poses(const Seed::Graph &seed_graph, const double tol_seed_dist) : __tol_seed_dist(tol_seed_dist) {
 		try {
-			__initialize_grid(segments);
+			__initialize_grid(seed_graph);
 		} catch (...) {
 			dbgmsg("FAILURE: constructor of Poses failed...");
 			throw;
 		}
 	}
 	
-	void Poses::__initialize_grid(const Segment::Vec &segments) {
-		for (auto &segment : segments) {
-			for (auto &state : segment.get_states()) {
-				for (auto &atom : state.get_atoms()) {
-					__atompoints[segment.get_id].push_back(unique_ptr<AtomPoint>(new AtomPoint(atom, state)));
-				}
-				for (auto &atom : state.get_join_atoms()) {
-					__joinatompoints[segment.get_id()].push_back(unique_ptr<AtomPoint>(new AtomPoint(atom, state)));
+	void Poses::__initialize_grid(const Seed::Graph &seed_graph) {
+		for (auto &seed : seed_graph) {
+			auto &segment = seed.get_segment();
+			vector<AtomPoint*> ap;
+			for (auto &pstate : segment.get_states()) {
+				auto &state = *pstate;
+				for (auto &kv : state.get_atoms()) {
+					Molib::Atom &atom = const_cast<Molib::Atom&>(*kv.first);
+					__atompoints.push_back(unique_ptr<AtomPoint>(new AtomPoint(atom, state)));
+					ap.push_back(&*__atompoints.back());
 				}
 			}
-			__grid[segment.get_id()] = Grid<AtomPoint>(__atompoints[segment.get_id()]);
-			__grid_join_atoms[segment.get_id()] = Grid<AtomPoint>(__joinatompoints[segment.get_id()]);
+			__grid[segment.get_id()] = Grid<AtomPoint>(ap);
 		}
 	}
 	
-	State::Set Poses::get_clashed_states(const State &state, const Segment &segment2) const {
+	State::Set Poses::get_clashed_states(const State &state, Segment &segment2) {
 		State::Set clashed;
-		Grid<AtomPoint> &g = __grid[segment2.get_id()];
-		for (auto &atom : state.get_atoms()) {
+		Grid<AtomPoint> &g = __grid.at(segment2.get_id());
+		for (auto &kv : state.get_atoms()) {
+			Molib::Atom &atom = const_cast<Molib::Atom&>(*kv.first);
 			AtomPoint::PVec neighbors = g.get_neighbors(atom.crd(), atom.radius());
 			for (auto &patompoint : neighbors) {
 				clashed.insert(&patompoint->get_state());
+			}
 		}
 		return clashed;
 	}
 
-	State::Set get_join_states(const State &state, const Segment &segment2, const Segment::JoinAtoms &jatoms, const double max_linker_length) const {
+	State::Set Poses::get_join_states(const State &state, Segment &segment2, Molib::Atom::Pair &jatoms, const double max_linker_length) {
 		State::Set join;
-		Grid<AtomPoint> &g = __grid_join_atoms[segment2];
-		for (auto &atom : state.get_join_atoms()) {
-			AtomPoint::PVec neighbors = g.get_neighbors_within_tolerance(atom.crd(), 
-				max_linker_length, tolerance);
-					
-			for (auto &patompoint : neighbors) {
-				if (jatoms.first == atom && jatoms.second == patompoint->get_atom()) {
-					join.insert(&patompoint->get_state());
+		Grid<AtomPoint> &g = __grid.at(segment2.get_id());
+		for (auto &kv : state.get_atoms()) {
+			Molib::Atom &atom = const_cast<Molib::Atom&>(*kv.first);
+			if (&atom == jatoms.first) {
+				AtomPoint::PVec neighbors = g.get_neighbors_within_tolerance(atom.crd(), 
+					max_linker_length, __tol_seed_dist);
+						
+				for (auto &patompoint : neighbors) {
+					if (&patompoint->get_atom() == jatoms.second) {
+						join.insert(&patompoint->get_state());
+					}
 				}
 			}
 		}

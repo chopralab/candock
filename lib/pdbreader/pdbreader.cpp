@@ -375,7 +375,7 @@ namespace Molib {
 			//~ else if (line.compare(0, 16, "REMARK   8 RIGID") == 0) {
 				//~ Model &model = mols.last().last().last();
 				//~ vector<string> vs = help::ssplit(line.substr(17), " ");
-				//~ AtomSet as;
+				//~ Atom::Set as;
 				//~ for (int i = 1; i < vs.size(); i++)	as.insert(atom_number_to_atom[&model][stoi(vs[i])]);
 				//~ model.get_rigid()[vs[0]].insert(as);
 				//~ dbgmsg(vs[0]);
@@ -388,7 +388,7 @@ namespace Molib {
 			else if (line.compare(0, 16, "REMARK   8 RIGID") == 0) {
 				Model &model = mols.last().last().last();
 				vector<string> vs = help::ssplit(line.substr(17), " ");
-				AtomSet core, join;
+				Atom::Set core, join;
 				for (int i = 1; i < vs.size(); ++i)	{
 					const int atom_number = stoi(vs[i].substr(1));
 					if (vs[i][0] == 'c')
