@@ -15,31 +15,35 @@ namespace Linker {
 	
 	class Poses {
 		class AtomPoint {
-			Molib::Atom &__atom; 
+			const Geom3D::Point &__crd;
+			const Molib::Atom &__atom; 
 			State &__state;
 		public:
-			AtomPoint(Molib::Atom &atom, State &state) : __atom(atom), __state(state) {}
-			Geom3D::Point& crd() { return __atom.crd(); }
+			AtomPoint(const Geom3D::Point &crd, const Molib::Atom &atom, State &state) : __crd(crd), __atom(atom), __state(state) {}
+			const Geom3D::Point& crd() const { return __crd; }
 			State& get_state() { return __state; }
-			Molib::Atom& get_atom() { return __atom; }
+			const Molib::Atom& get_atom() const { return __atom; }
 			void distance(double d) const {} // just dummy : needed by grid
-
+			double radius() const { return __atom.radius(); }
+			
 			typedef vector<unique_ptr<AtomPoint>> UPVec;
 			typedef vector<AtomPoint*> PVec;
+			typedef ::Grid<AtomPoint> Grid;
 		};
 		
-		//~ AtomPoint::UPVec __atompoints, __joinatompoints;
-		//~ map<Segment::Id, Grid<AtomPoint>> __grid, __grid_join_atoms;
-		//~ 
-		AtomPoint::UPVec __atompoints;
-		map<Segment::Id, Grid<AtomPoint>> __grid;
-		const double __tol_seed_dist;
+		map<Segment::Id, AtomPoint::UPVec> __atompoints;
+		map<Segment::Id, AtomPoint::Grid> __grid;
+
+		AtomPoint::UPVec __atompoints_small;
+		AtomPoint::Grid __grid_small;	
 		
-		void __initialize_grid(const Seed::Graph &seed_graph);
 	public:
-		Poses(const Seed::Graph &seed_graph, const double tol_seed_dist);
+		Poses(const Seed::Graph &seed_graph);
+		Poses(const State::Set &states);
 		State::Set get_clashed_states(const State &state, Segment &segment2);
-		State::Set get_join_states(const State &state, Segment &segment2, Molib::Atom::Pair &jatoms, const double max_linker_length);
+		State::Set get_clashed_states(const State &state);
+		State::Set get_join_states(const State &state, Segment &segment2, Molib::Atom::Pair &jatoms, 
+			const double max_linker_length, const double tol_seed_dist);
 	};
 }
 #endif

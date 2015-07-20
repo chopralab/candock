@@ -520,49 +520,6 @@ namespace Molib {
 	}
 	
 
-	ostream& operator<< (ostream& stream, const Atom& a) {
-		if (!a.__br) {
-			stream << "ATOM " << a.get_label() << " " << a.atom_number() << endl;
-			return stream;
-		}
-		stream << setw(6) << left << (a.br().rest() == Molib::Residue::hetero 
-			|| a.br().rest() == Molib::Residue::ion 
-			|| a.br().rest() == Molib::Residue::water ? "HETATM" : "ATOM");
-		stream << setw(5) << right << a.atom_number();
-		stream << setw(1) << " ";
-		stream << setw(4) << left << (a.atom_name().size() < 4 ? " " + a.atom_name() : a.atom_name());
-		stream << setw(1) << " ";
-		stream << setw(3) << right << a.br().resn();
-		stream << setw(1) << " ";
-		stream << setw(1) << a.br().br().chain_id();
-		stream << setw(4) << right << a.br().resi();
-		stream << setw(1) << a.br().ins_code();
-		stream << setw(27) << a.crd().pdb();
-		stream << setw(6) << setprecision(2) << fixed << right << 1.0;
-		stream << setw(6) << setprecision(2) << fixed << right << 1.0;
-		stream << setw(12) << right << a.element();
-		stream << setw(2) << "  ";
-		stream << setw(5) << right << a.idatm_type_unmask();
-		stream << setw(5) << right << a.gaff_type();
-		stringstream ss;
-		ss << " aps={";
-		for (auto it = a.__aps.begin(); it != a.__aps.end(); ++it) {
-			auto it_plus_one = it;
-			ss << "{" << it->first << "," << it->second << "}" 
-				<< (++it_plus_one == a.__aps.end() ? "" : ",");
-		}
-		stream << ss.str() << "}"; 
-		ss.str("");
-		ss << " prop={";
-		for (auto it = a.__smiles_prop.begin(); it != a.__smiles_prop.end(); ++it) {
-			auto it_plus_one = it;
-			ss << "{" << it->first << "," << it->second << "}" 
-				<< (++it_plus_one == a.__smiles_prop.end() ? "" : ",");
-		}
-		stream << ss.str() << "}"; 
-		stream << endl;
-		return stream;
-	}
 	ostream& operator<< (ostream& stream, const Residue& r) {
 		for (auto &atom : r) { 
 			stream << atom;

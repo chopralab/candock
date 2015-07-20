@@ -297,11 +297,12 @@ namespace Molib {
 		}}}}}
 		return energy_sum;
 	}
-	double Score::non_bonded_energy(const AtomToCrd &atom_crd) const {
+
+	double Score::non_bonded_energy(const Atom::Vec &atoms, const Geom3D::Point::Vec &crds) const {
 		double energy_sum = 0.0;
-		for (auto &kv : atom_crd) {
-			const Atom &atom2 = *kv.first;
-			const Geom3D::Coordinate &atom2_crd = kv.second;
+		for (int i = 0; i < atoms.size(); ++i) {
+			const Atom &atom2 = *atoms[i];
+			const Geom3D::Coordinate &atom2_crd = crds[i];
 			const auto &atom_2 = atom2.idatm_type();
 			dbgmsg("ligand atom = " << atom2.atom_number() << " crd= " << atom2_crd.pdb());
 			for (auto &atom1 : __gridrec.get_neighbors(atom2_crd, __dist_cutoff)) {
@@ -321,6 +322,7 @@ namespace Molib {
 		}
 		return energy_sum;
 	}
+
 	cluster::MapD<Molib::Molecule> Score::many_ligands_score(const Molib::Molecules &ligands) const {
 		Benchmark::reset();
 		cluster::MapD<Molib::Molecule> scores;

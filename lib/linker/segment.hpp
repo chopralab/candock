@@ -25,7 +25,8 @@ namespace Linker {
 		typedef Segment* Id;
 		
 	private:
-		const Molib::Atom::Set __atoms;
+		map<const Molib::Atom*, int> __amap;
+		const Molib::Atom::Vec __atoms;
 		int __seed_id; // != -1 if segment is a seed
 		vector<unique_ptr<State>> __state; // only seed states here!
 		ConstSet __adjacent_seed_segments;
@@ -35,7 +36,9 @@ namespace Linker {
 		
 	public:
 
-		Segment(const Molib::Atom::Set atoms, const int &seed_id) : __atoms(atoms), __seed_id(seed_id) {}
+		//~ Segment(const Molib::Atom::Set atoms, const int &seed_id) : __atoms(atoms), __seed_id(seed_id) {}
+		//~ Segment(const Molib::Atom::Set xxxatoms, const int &seed_id) : __xxxatoms(xxxatoms), __seed_id(seed_id) { __atoms.assign(xxxatoms.begin(), xxxatoms.end()); }
+		Segment(const Molib::Atom::Vec atoms, const int &seed_id) : __atoms(atoms), __seed_id(seed_id) { for (int i = 0; i < atoms.size(); ++i) __amap[atoms[i]] = i; }
 		int get_seed_id() const { return __seed_id; }
 		bool has_next(const Segment &goal) const { return __next.count(&goal); }
 		Segment &get_next(const Segment &goal) const { return *__next.at(&goal); } // get next seg in the direction of goal
@@ -43,8 +46,15 @@ namespace Linker {
 		const ConstSet& get_adjacent_seed_segments() const { return __adjacent_seed_segments; };
 		void set_adjacent_seed_segments(Segment &seed_seg) { __adjacent_seed_segments.insert(&seed_seg); };
 		bool is_seed_adjacent(const Segment &other) const { return __adjacent_seed_segments.count(&other); }
-		const Molib::Atom::Set& get_atoms() const { return __atoms; }
-		bool has_atom(Molib::Atom &atom) const { return __atoms.count(&atom); }
+		//~ const Molib::Atom::Set& get_atoms() const { return __atoms; }
+		const Molib::Atom::Vec& get_atoms() const { return __atoms; }
+		const Molib::Atom& get_atom(const int i) const { return *__atoms.at(i); }
+		bool has_atom(const Molib::Atom &atom) const { return __amap.count(&atom); }
+		//~ bool has_atom(Molib::Atom &atom) const { return get_idx(atom) <__atoms.size(); }
+		//~ bool has_atom(const int i) const { return i < __atoms.size(); }
+		//~ int get_idx(const Molib::Atom &atom) const { for (int i = 0; i < __atoms.size(); ++i) if (&atom == __atoms[i]) return i; throw Error("die : atom not found in segment"); }
+		//~ const int get_idx(const Molib::Atom &atom) const { try { return __amap.at(&atom); } catch(const out_of_range&) { throw Error("die : atom not found in segment"); } }
+		const int get_idx(const Molib::Atom &atom) const { return __amap.at(&atom); }
 		const string get_label() const { stringstream ss; ss << *this; return ss.str(); } // graph ostream operator
 		const int weight() const { return 0; } // dummy for graph ostream operator
 		void add_state(unique_ptr<State> s) { __state.push_back(std::move(s)); }
@@ -58,8 +68,10 @@ namespace Linker {
 		double get_max_linker_length(const Segment &other) const { return __max_linker_length.at(&other); }
 		void set_max_linker_length(const Segment &other, const double d) {	__max_linker_length.insert({&other, d}); }
 		const Molib::Bond& get_bond(const Segment &other) const { return __bond.at(&other); }
-		void set_bond(const Segment &other, const Molib::Bond &b) { __bond.insert({&other, b}); }
-		const Molib::Atom& adjacent_in_segment(const Molib::Atom &atom, const Molib::Atom &forbidden) const;
+		//~ void set_bond(const Segment &other, const Molib::Bond &b) { __bond.insert({&other, b}); }
+		void set_bond(const Segment &other, Molib::Atom &a1, Molib::Atom &a2);
+		//~ const Molib::Atom& adjacent_in_segment(const Molib::Atom &atom, const Molib::Atom &forbidden) const;
+		const int adjacent_in_segment(const Molib::Atom &atom, const Molib::Atom &forbidden) const;
 		Id get_id() { return this; }
 		friend ostream& operator<< (ostream& stream, const Segment& s);
 		

@@ -2,8 +2,9 @@
 #define STATE_H
 #include "helper/debug.hpp"
 #include "helper/help.hpp"
-#include "geom3d/coordinate.hpp"
+#include "geom3d/geom3d.hpp"
 #include "pdbreader/bond.hpp"
+#include "pdbreader/atom.hpp"
 #include <tuple>
 #include <functional>
 
@@ -13,7 +14,6 @@ namespace Molib {
 
 namespace Linker {
 	class Segment;
-	typedef map<const Molib::Atom*, Geom3D::Coordinate> AtomToCrd;
 	class State {
 	public:
 		typedef vector<State*> Vec;
@@ -26,19 +26,23 @@ namespace Linker {
 	private:
 		static Id idx;
 		const Segment &__segment;
-		const AtomToCrd __atom_crd;
+		//~ const Molib::Atom::Vec __atoms;
+		const Geom3D::Point::Vec __crds;
 		double __energy;
 		const Id __id;
 		
 	public:
-		State(const Segment &segment, const AtomToCrd atom_crd, const double energy=0) : 
-			__segment(segment), __atom_crd(atom_crd), __energy(energy), __id(idx++) { }
+		State(const Segment &segment, const Geom3D::Point::Vec crds, const double energy=0) : 
+			__segment(segment), __crds(crds), __energy(energy), __id(idx++) { }
 		void set_energy(const double energy) { __energy = energy; }
 		double get_energy() const { return __energy; }			
 		const Segment& get_segment() const { return __segment; }			
-		const AtomToCrd& get_atoms() const { return __atom_crd; }			
-		Geom3D::Coordinate get_atom_crd(const Molib::Atom &atom) const { return __atom_crd.at(&atom); }
-		bool has_atom(const Molib::Atom &atom) const { return __atom_crd.count(&atom); }
+		//~ const Molib::Atom::Vec& get_atoms() const { return __atoms; }			
+		const Geom3D::Point::Vec& get_crds() const { return __crds; }			
+		//~ const Molib::Atom& get_atom(const int i) const { return *__atoms.at(i); }
+		const Geom3D::Point& get_crd(const int i) const { return __crds.at(i); }
+		//~ bool has_atom(const int i) const { return i < __atoms.size(); }
+		//~ bool has_atom(const int i) const { return i < __crds.size(); }
 		bool clashes(const State &other, const Molib::Bond &excluded) const; // clashes between this and other state
 		string pdb() const;
 		const Id get_id() const { return __id; }

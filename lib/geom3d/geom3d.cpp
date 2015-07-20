@@ -37,7 +37,7 @@ namespace Geom3D {
 	}
 };
 
-ostream& operator<<(ostream& os, const Geom3D::PointVec &points)	{
+ostream& operator<<(ostream& os, const Geom3D::Point::Vec &points)	{
 	for (auto &point : points) {
 		os << "ATOM      1   U  DIK     1    " << point.pdb() << endl;
 	}

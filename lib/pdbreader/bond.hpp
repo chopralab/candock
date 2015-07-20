@@ -21,6 +21,7 @@ namespace Molib {
 	
 	class Bond : public template_vector_container<Bond*, Bond> {
 		Atom *__atom1, *__atom2;
+		int __idx1, __idx2;
 		string __rotatable;
 		string __bond_gaff_type;
 		int __bo;
@@ -29,11 +30,14 @@ namespace Molib {
 		set<int> __angles;
 		int __drive_id;
 	public:
-		Bond() : __atom1(nullptr), __atom2(nullptr), __owns_atoms(false),
+		Bond() : __atom1(nullptr), __atom2(nullptr), __idx1(0), __idx2(0), __owns_atoms(false),
 			__ring(false), __bo(0), __drive_id(0), __angles(set<int>()), __rotatable(""),
 			__bond_gaff_type("") {}
 		Bond(Atom *atom1, Atom *atom2, bool owns_atoms=false) : __atom1(atom1), 
-			__atom2(atom2), __owns_atoms(owns_atoms), __ring(false), __bo(0), 
+			__atom2(atom2), __idx1(0), __idx2(0), __owns_atoms(owns_atoms), __ring(false), __bo(0), 
+			__angles(set<int>()), __drive_id(0), __rotatable(""), __bond_gaff_type("") {}
+		Bond(Atom *atom1, Atom *atom2, int idx1, int idx2, bool owns_atoms=false) : __atom1(atom1), 
+			__atom2(atom2), __idx1(idx1), __idx2(idx2), __owns_atoms(owns_atoms), __ring(false), __bo(0), 
 			__angles(set<int>()), __drive_id(0), __rotatable(""), __bond_gaff_type("") {}
 		~Bond();
 		void set_members(const string &str);
@@ -58,6 +62,8 @@ namespace Molib {
 		Atom& second_atom(Atom &origin) const { return (&origin == __atom1 ? *__atom2 : *__atom1); }
 		Atom& atom1() const { return *__atom1; }
 		Atom& atom2() const { return *__atom2; }
+		int idx1() const { return __idx1; }
+		int idx2() const { return __idx2; }
 		double length() const;
 		static void erase_stale_refs(const Bond &deleted_bond, const BondVec &bonds);
 		friend ostream& operator<< (ostream& stream, const Bond& b);

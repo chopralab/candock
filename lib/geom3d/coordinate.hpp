@@ -12,6 +12,7 @@
 #include <limits>
 #include <tuple>
 #include <memory>
+#include <vector>
 #include "helper/error.hpp"
 using namespace std;
 
@@ -20,6 +21,9 @@ namespace Geom3D {
 	class Coordinate {
 		double __x, __y, __z;
 	public:
+		
+		typedef vector<Coordinate> Vec;
+		
 		Coordinate() : __x(0), __y(0), __z(0) {}
 		Coordinate(double x, double y, double z) : __x(x), __y(y), __z(z) {}
 		Coordinate(const double *array) : __x(array[0]), __y(array[1]), __z(array[2]) {}

@@ -103,7 +103,8 @@ public:
 			this->__allocate(szi, szj, szk);
 			for (auto &point : points) { // set data points to grid cells
 				Geom3D::Coordinate crd = point->crd() - min_crd;
-				storage[crd.i()][crd.j()][crd.k()].push_back(point);
+				//~ storage[crd.i()][crd.j()][crd.k()].push_back(&*point);
+				storage[crd.i()][crd.j()][crd.k()].push_back(&*point);
 			}
 		}
 		dbgmsg("points is empty2 " << boolalpha << points.empty());
@@ -177,5 +178,28 @@ public:
 		sort(points.begin(), points.end(), [](T* i,T* j){ return (i->distance()<j->distance());}); // sort in ascending order
 		return points;
 	}
+	
+	template<typename V>
+	Points get_clashed(const V &atom) {
+		const double dist = 3.0;
+		const double clash_coeff = 0.9;
+		const double vdw1 = atom.radius();
+		Geom3D::Coordinate cmin = __correct(atom.crd(), -dist);
+		Geom3D::Coordinate cmax = __correct(atom.crd(), dist);
+		Points points;
+		for (int i = cmin.i(); i <= cmax.i(); ++i)
+			for (int j = cmin.j(); j <= cmax.j(); ++j)
+				for (int k = cmin.k(); k <= cmax.k(); ++k) {
+					for (auto neighbor : storage[i][j][k]) {
+						const double d_sq = atom.crd().distance_sq(neighbor->crd());
+						const double vdw2 = neighbor->radius();
+						if (d_sq < pow(clash_coeff * (vdw1 + vdw2), 2) && d_sq > 0) {
+							points.push_back(neighbor);
+						}
+					}
+				}
+		return points;
+	}
+	
 };
 #endif

@@ -124,23 +124,19 @@ namespace Linker {
 					auto &vertices2 = mv.second;
 					// for every docked rigid fragment
 					for (auto &seed_molecule : seed_mols) {
-						//~ Atom::Vec ordered_atoms;
-						AtomToCrd atom_crd;
+						Geom3D::Point::Vec crds(vertices2.size());
+						const Molib::Atom::Vec &seed_atoms = seed_molecule.get_atoms();
 						for (int i = 0; i < vertices2.size(); ++i) {
-							Molib::Atom &v1 = gd[vertices1[i]];
-							Molib::Atom &v2 = *seed_molecule.get_atoms()[vertices2[i]];
-							atom_crd[&v1] = v2.crd();
-							
+							crds[vertices1[i]] = seed_atoms.at(vertices2[i])->crd();
 							dbgmsg("adding matched vertex pair " << vertices1[i] 
 								<< "," << vertices2[i] << " new coordinates of atom " 
-								<< v1.atom_number() << " are " 
-								<< v2.crd());
+								<< segment.get_atom(vertices1[i]).atom_number() << " are " 
+								<< crds[vertices1[i]]);
 						}
 						const double energy = stod(seed_molecule.name());
 						dbgmsg("adding docked state " << segment.get_seed_id() << " with energy of " << energy);
 						// ONLY COPY SEGMENT COORDS NOT SEED
-						segment.add_state(unique_ptr<State>(new State(segment, atom_crd, energy)));
-						__states.push_back(&segment.get_last_state());
+						segment.add_state(unique_ptr<State>(new State(segment, crds, energy)));
 					}
 				}
 			}
@@ -150,11 +146,11 @@ namespace Linker {
 	static double torsion_energy(const State &first, const State &second) { return 0.0; }
 
 	bool Linker::__clashes_receptor(const State &current) const {
-		for (auto &kv : current.get_atoms()) {
-			const Molib::Atom &a = *kv.first; 
-			const Geom3D::Coordinate &c = kv.second; 
+		for (int i = 0; i < current.get_crds().size(); ++i) {
+			const Molib::Atom &a = current.get_segment().get_atom(i); 
+			const Geom3D::Coordinate &c = current.get_crd(i); 
 			dbgmsg("in clashes_receptor test coordinate = " << c);
-			/* TEMPORARILY TURNED OF BECAUSE FUNCTION DOESN'T EXIST ANYMORE */
+			/* TEMPORARILY TURNED OFF BECAUSE FUNCTION DOESN'T EXIST ANYMORE */
 			//~ if (__gridrec.clashes(Atom(c, a.idatm_type()))) return true;
 			/****************************************************************/
 		}
@@ -177,52 +173,75 @@ namespace Linker {
 	double Linker::__distance(const State &start, const State &goal) const {
 		const Segment &start_segment = start.get_segment();
 		const Segment &goal_segment = goal.get_segment();
-		const Molib::Atom &first_atom = start_segment
-			.get_bond(start_segment.get_next(goal_segment)).atom1();
-		const Molib::Atom &last_atom = goal_segment
-			.get_bond(goal_segment.get_next(start_segment)).atom1();
-		const Geom3D::Coordinate &first_crd = start.get_atom_crd(first_atom);
-		const Geom3D::Coordinate &last_crd = goal.get_atom_crd(last_atom);
+		//~ const Molib::Atom &first_atom = start_segment
+			//~ .get_bond(start_segment.get_next(goal_segment)).atom1();
+		//~ const Molib::Atom &last_atom = goal_segment
+			//~ .get_bond(goal_segment.get_next(start_segment)).atom1();
+		const int start_atom_idx = start_segment
+			.get_bond(start_segment.get_next(goal_segment)).idx1();
+		const int goal_atom_idx = goal_segment
+			.get_bond(goal_segment.get_next(start_segment)).idx1();
+		//~ const Geom3D::Coordinate &first_crd = start.get_atom_crd(first_atom);
+		//~ const Geom3D::Coordinate &last_crd = goal.get_atom_crd(last_atom);
+		const Geom3D::Coordinate &first_crd = start.get_crd(start_atom_idx);
+		const Geom3D::Coordinate &last_crd = goal.get_crd(goal_atom_idx);
 		return first_crd.distance(last_crd);
 	}
 	
-	AtomToCrd Linker::__rotate(const Geom3D::Quaternion &q, 
-		const Geom3D::Point &p1, const Geom3D::Point &p2, const AtomToCrd &atom_crd) {
-		AtomToCrd new_crd;
-		for (auto &kv : atom_crd) {	
-			new_crd.insert({kv.first, q.rotatedVector(kv.second - p1) + p1}); 
+	//~ AtomToCrd Linker::__rotate(const Geom3D::Quaternion &q, 
+		//~ const Geom3D::Point &p1, const Geom3D::Point &p2, const AtomToCrd &atom_crd) {
+		//~ AtomToCrd new_crd;
+		//~ for (auto &kv : atom_crd) {	
+			//~ new_crd.insert({kv.first, q.rotatedVector(kv.second - p1) + p1}); 
+		//~ }
+		//~ return new_crd;
+	//~ }
+	//~ 
+	Geom3D::Point::Vec Linker::__rotate(const Geom3D::Quaternion &q, 
+		const Geom3D::Point &p1, const Geom3D::Point &p2, const Geom3D::Point::Vec &crds) {
+
+		Geom3D::Point::Vec rotated;
+		for (auto &crd : crds) {	
+			rotated.push_back(q.rotatedVector(crd - p1) + p1); 
 		}
-		return new_crd;
+		return rotated;
 	}
 	
 	State::Vec Linker::__compute_neighbors(const State &curr_state, Segment &next,
 		vector<unique_ptr<State>> &states) {
+		const int ini_sz = states.size();
 		dbgmsg("in compute_neighbors for state = " << curr_state);
-		State::Vec l;
 		const Segment &current = curr_state.get_segment();
 		dbgmsg("compute_neighbors : current segment is " << current);
 		dbgmsg("compute_neighbors : next segment is " << next);
 		const Molib::Bond &btorsion = current.get_bond(next);
-		//~ const Atom *a3 = &btorsion.second_atom(); 
-		const Molib::Atom *a3 = &btorsion.atom2(); 
-		//~ const Atom *a2 = &btorsion.first_atom();
+		const int idx3 = btorsion.idx2();
+		const Molib::Atom *a3 = &btorsion.atom2();
+		const int idx2 = btorsion.idx1(); 
 		const Molib::Atom *a2 = &btorsion.atom1();
-		const Molib::Atom *a1 = &current.adjacent_in_segment(*a2, *a3);	// segments overlap on 1 rotatable bond
-		const Molib::Atom *a4 = &next.adjacent_in_segment(*a3, *a2);
+		//~ const Molib::Atom *a1 = &current.adjacent_in_segment(*a2, *a3);	// segments overlap on 1 rotatable bond
+		const int idx1 = current.adjacent_in_segment(*a2, *a3);	// segments overlap on 1 rotatable bond
+		const Molib::Atom *a1 = &current.get_atom(idx1);
+		
+		//~ const Molib::Atom *a4 = &next.adjacent_in_segment(*a3, *a2);
+		const int idx4 = next.adjacent_in_segment(*a3, *a2);
+		const Molib::Atom *a4 = &next.get_atom(idx4);
+		
 		dbgmsg("a4 = " << *a4 << " coordinates not set yet!");
-		Geom3D::Coordinate crd3(curr_state.get_atom_crd(*a3));
-		dbgmsg("a3 = " << *a3 << " crd3 = " << curr_state.get_atom_crd(*a3));
-		Geom3D::Coordinate crd2(curr_state.get_atom_crd(*a2));
-		dbgmsg("a2 = " << *a2 << " crd2 = " << curr_state.get_atom_crd(*a2));
-		Geom3D::Coordinate crd1(curr_state.get_atom_crd(*a1));
-		dbgmsg("a1 = " << *a1 << " crd1 = " << curr_state.get_atom_crd(*a1));
+		Geom3D::Coordinate crd3(curr_state.get_crd(idx3));
+		dbgmsg("a3 = " << *a3 << " crd3 = " << curr_state.get_crd(idx3));
+		Geom3D::Coordinate crd2(curr_state.get_crd(idx2));
+		dbgmsg("a2 = " << *a2 << " crd2 = " << curr_state.get_crd(idx2));
+		Geom3D::Coordinate crd1(curr_state.get_crd(idx1));
+		dbgmsg("a1 = " << *a1 << " crd1 = " << curr_state.get_crd(idx1));
 		states.push_back(unique_ptr<State>(new State(next, 
 			__ic.cartesian(*a1, *a2, *a3, crd1, crd2, crd3, next.get_atoms()))));
+#ifndef NDEBUG
 		State &initial = *states.back();
+#endif
 		dbgmsg("this is initial state = " << initial);
 		dbgmsg("a4 = " << *a4 << " newly determined crd4 = " 
-			<< Geom3D::Coordinate(initial.get_atom_crd(*a4)));
-		l.push_back(&initial);
+			<< initial.get_crd(idx4));
 		dbgmsg("rotate next segment on vector = "
 				<< crd2 << " - " << crd3
 				<< " by " << Geom3D::degrees(__spin_degrees) 
@@ -231,12 +250,13 @@ namespace Linker {
 		for (double angle = __spin_degrees; angle < M_PI; angle += __spin_degrees) {
 			State &previous_rotated = *states.back();
 			states.push_back(unique_ptr<State>(new State(next, 
-				__rotate(q, crd2, crd3, previous_rotated.get_atoms()))));
+				__rotate(q, crd2, crd3, previous_rotated.get_crds()))));
 			dbgmsg("rotated state at angle = " << Geom3D::degrees(angle)
 				<< " is " << *states.back());
-			l.push_back(&*states.back());
 		}
-		return l;
+		State::Vec ret;
+		for (int i = ini_sz; i < states.size(); ++i) ret.push_back(&*states[i]);
+		return ret;
 	}
 	
 	bool Linker::__check_distances_to_seeds(const State &curr_state, 
@@ -376,7 +396,8 @@ namespace Linker {
 							&& !__clashes_ligand(*pneighbor, curr_conformation, curr_state)) {
 							// IMPROVEMENT: clashes_receptor & clashes_ligand might
 							// be replaced by energy test ? (maybe not)
-							const double nb_ene = __score.non_bonded_energy(pneighbor->get_atoms());
+							//~ const double nb_ene = __score.non_bonded_energy(pneighbor->get_atoms());
+							const double nb_ene = __score.non_bonded_energy(pneighbor->get_segment().get_atoms(), pneighbor->get_crds());
 							const double torsion_ene = torsion_energy(curr_state, *pneighbor);
 							const double branch_ene = curr_conformation.second
 								+ nb_ene 
@@ -408,12 +429,47 @@ namespace Linker {
 		return mc;
 	}
 	
-	Array2d<bool> Linker::__find_compatible_state_pairs(const Seed::Graph &seed_graph) {
+	//~ Array2d<bool> Linker::__find_compatible_state_pairs(const Seed::Graph &seed_graph, const int sz) {
+		//~ /* Find all pairs of compatible states at correct distances for 
+		 //~ * the multi-seed molecules
+		 //~ */
+		//~ Array2d<bool> conn(sz);
+		//~ Poses poses(seed_graph);
+		//~ for (int u = 0; u < seed_graph.size(); ++u) {
+			//~ Segment &segment1 = seed_graph[u].get_segment();
+			//~ for (int v = u + 1; v < seed_graph.size(); ++v) {
+				//~ Segment &segment2 = seed_graph[v].get_segment();
+				//~ const double max_linker_length = segment1.get_max_linker_length(segment2);
+				//~ Molib::Atom::Pair jatoms{&segment1.get_bond(segment1.get_next(segment2)).atom1(), 
+					//~ &segment2.get_bond(segment2.get_next(segment1)).atom1()};
+				//~ dbgmsg("finding compatible state pairs for segments " << segment1 << " and " 
+					//~ << segment2 << " with maximum linker length " << max_linker_length << " and "
+					//~ << " join atom1 = " << jatoms.first->atom_number() << " join atom2 = "
+					//~ << jatoms.second->atom_number());
+				//~ for (auto &pstate1 : segment1.get_states()) {
+					//~ State &state1 = *pstate1;
+					//~ State::Set join_states = poses.get_join_states(state1, segment2, jatoms, 
+						//~ max_linker_length, __tol_seed_dist);
+					//~ State::Set clashed_states = poses.get_clashed_states(state1, segment2);
+					//~ State::Vec compatible_states = join_states - clashed_states;
+					//~ const int i = static_cast<int>(state1.get_id());
+					//~ for (auto &pstate2 : compatible_states) {
+						//~ const int j = static_cast<int>(pstate2->get_id());
+						//~ conn.data[i][j] = conn.data[j][i] = true;
+						//~ dbgmsg("compatible states " << i << " and " << j);
+					//~ }
+				//~ }
+			//~ }
+		//~ }
+		//~ return conn;
+	//~ }
+
+	Array2d<bool> Linker::__find_compatible_state_pairs(const Seed::Graph &seed_graph, const int sz) {
 		/* Find all pairs of compatible states at correct distances for 
 		 * the multi-seed molecules
 		 */
-		Array2d<bool> conn(__states.size());
-		Poses poses(seed_graph, __tol_seed_dist);
+		Array2d<bool> conn(sz);
+		Poses poses(seed_graph);
 		for (int u = 0; u < seed_graph.size(); ++u) {
 			Segment &segment1 = seed_graph[u].get_segment();
 			for (int v = u + 1; v < seed_graph.size(); ++v) {
@@ -421,15 +477,25 @@ namespace Linker {
 				const double max_linker_length = segment1.get_max_linker_length(segment2);
 				Molib::Atom::Pair jatoms{&segment1.get_bond(segment1.get_next(segment2)).atom1(), 
 					&segment2.get_bond(segment2.get_next(segment1)).atom1()};
+				const Molib::Bond &excluded = (segment1.is_adjacent(segment2) 
+							? segment1.get_bond(segment2) : Molib::Bond());
+				dbgmsg("finding compatible state pairs for segments " << segment1 << " and " 
+					<< segment2 << " with maximum linker length " << max_linker_length << " and "
+					<< " join atom1 = " << jatoms.first->atom_number() << " join atom2 = "
+					<< jatoms.second->atom_number());
 				for (auto &pstate1 : segment1.get_states()) {
 					State &state1 = *pstate1;
-					State::Set join_states = poses.get_join_states(state1, segment2, jatoms, max_linker_length);
-					State::Set clashed_states = poses.get_clashed_states(state1, segment2);
-					State::Vec compatible_states = join_states - clashed_states;
+					State::Set join_states = poses.get_join_states(state1, segment2, jatoms, 
+						max_linker_length, __tol_seed_dist);
+					//~ State::Set clashed_states = poses.get_clashed_states(state1, segment2);
+					//~ State::Vec compatible_states = join_states - clashed_states;
 					const int i = static_cast<int>(state1.get_id());
-					for (auto &pstate2 : compatible_states) {
-						const int j = static_cast<int>(pstate2->get_id());
-						conn.data[i][j] = conn.data[j][i] = true;
+					for (auto &pstate2 : join_states) {
+						if (!state1.clashes(*pstate2, excluded)) {
+							const int j = static_cast<int>(pstate2->get_id());
+							conn.data[i][j] = conn.data[j][i] = true;
+							dbgmsg("compatible states " << i << " and " << j);
+						}
 					}
 				}
 			}
@@ -441,8 +507,13 @@ namespace Linker {
 		Benchmark::reset();
 		cout << "Generating rigid conformations of states..." << endl;
 
+		State::Vec states;
+		for (auto &seed : seed_graph)
+			for (auto &pstate : seed.get_segment().get_states())
+				states.push_back(&*pstate);
+				
 		// init adjacency matrix (1 when states are compatible, 0 when not)
-		Array2d<bool> conn = __find_compatible_state_pairs(seed_graph);
+		Array2d<bool> conn = __find_compatible_state_pairs(seed_graph, states.size());
 
 		cout << "find_compatible_state_pairs took " << Benchmark::seconds_from_start() 
 			<< " wallclock seconds" << endl;
@@ -464,8 +535,8 @@ namespace Linker {
 			double energy = 0;
 			State::Vec conf;
 			for (auto &i : qmax) {
-				conf.push_back(__states[i]);
-				energy += __states[i]->get_energy();
+				conf.push_back(states[i]);
+				energy += states[i]->get_energy();
 			}
 			possibles_w_energy.push_back({conf, energy});
 		}
@@ -641,10 +712,10 @@ namespace Linker {
 					const Molib::Bond &b = segment.get_bond(adjacent);
 					overlap.insert(&b.atom2());
 				}
-				for (auto &kv : state.get_atoms()) {
-					Molib::Atom &atom = const_cast<Molib::Atom&>(*kv.first); // ugly, correct this
+				for (int i = 0; i < state.get_segment().get_atoms().size(); ++i) {
+					Molib::Atom &atom = const_cast<Molib::Atom&>(state.get_segment().get_atom(i)); // ugly, correct this
 					if (!overlap.count(&atom)) {
-						const Geom3D::Coordinate &crd = kv.second;
+						const Geom3D::Coordinate &crd = state.get_crd(i);
 						atom.set_crd(crd);
 					}
 				}
