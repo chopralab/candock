@@ -10,6 +10,13 @@ namespace Linker {
 		return stream;
 	}
 
+	Segment::Segment(const Molib::Atom::Vec atoms, const int &seed_id) : 
+		__atoms(atoms), __seed_id(seed_id), __join_atom(atoms.size(), false) { 
+
+		for (int i = 0; i < atoms.size(); ++i) 
+			__amap[atoms[i]] = i; 
+	}
+
 	//~ const Molib::Atom& Segment::adjacent_in_segment(const Molib::Atom &atom, 
 		//~ const Molib::Atom &forbidden) const { 
 		//~ for (auto &adj : atom) {
@@ -65,16 +72,157 @@ namespace Linker {
 						dbgmsg("atom " << atom2 << " belongs to segment " << s1);
 						s1.set_bond(s2, atom2, atom1);
 						s2.set_bond(s1, atom1, atom2);
+						
+						s1.set_join_atom(atom2);
+						s2.set_join_atom(atom1);
 					} else {
 						dbgmsg("atom " << atom1 << " belongs to segment " << s1);
 						dbgmsg("atom " << atom2 << " belongs to segment " << s2);
 						s1.set_bond(s2, atom1, atom2);
 						s2.set_bond(s1, atom2, atom1);
+
+						s1.set_join_atom(atom1);
+						s2.set_join_atom(atom2);
+
 					}
 				}
 			}
 		}
+
+		const Segment::Paths paths = __find_paths(vertices);
+		__init_max_linker_length(paths);
+		__set_branching_rules(paths);
+
 		return Segment::Graph(std::move(vertices), true, false);
 	}
+
+	Segment::Paths Segment::__find_paths(const vector<unique_ptr<Segment>> &segments) {
+		/*
+		 * Find ALL paths between ALL seed segments (even non-adjacent) 
+		 * and seeds and leafs
+		 */
+		Segment::Paths paths;
+		dbgmsg("find all paths in a graph");
+		Segment::Set seeds, seeds_and_leafs;
+		for (auto &pseg : segments) {
+			auto &seg = *pseg;
+			if (seg.is_seed())
+				seeds.insert(&seg);
+			if (seg.is_seed() || seg.is_leaf())
+				seeds_and_leafs.insert(&seg);
+		}
+		set<Segment::ConstPair> visited;
+		for (auto &pseg1 : seeds) {
+			for (auto &pseg2 : seeds_and_leafs) {
+				if (pseg1 != pseg2 && !visited.count({pseg1, pseg2})) {
+					dbgmsg("finding path between " << *pseg1 << " and "
+						<< *pseg2);
+					visited.insert({pseg1, pseg2});
+					visited.insert({pseg2, pseg1});
+					Segment::Graph::Path path = Glib::find_path(*pseg1, *pseg2);
+					paths.insert({{pseg1, pseg2}, path });
+					dbgmsg("path between first segment " << *pseg1
+						<< " and second segment " << *pseg2);
+				}
+			}
+		}
+		return paths;
+	}
+
+	bool Segment::__link_adjacent(const Segment::Graph::Path &path) {
+		/* Returns true if path has no seed segments along the way
+		 * 
+		 */
+#ifndef NDEBUG
+		for (auto it = path.begin(); it != path.end(); ++it) {
+			dbgmsg(**it << " is seed = " << boolalpha << (*it)->is_seed());
+		}
+#endif
+		for (auto it = path.begin() + 1; it != path.end() - 1; ++it) {
+			dbgmsg(**it);
+			if ((*it)->is_seed())
+				return false;
+		}
+		return true;
+	}
+
+	void Segment::__init_max_linker_length(const Segment::Paths &paths) {
+		for (auto &kv : paths) {
+			auto &seg_pair = kv.first;
+			Segment::Graph::Path path(kv.second.begin(), kv.second.end());
+			__compute_max_linker_length(path);
+			reverse(path.begin(), path.end());
+			__compute_max_linker_length(path);
+		}
+	}
+
+	void Segment::__compute_max_linker_length(Segment::Graph::Path &path) {
+		double d = 0.0;
+		int i = 0;
+		for (; i < path.size() - 2; i += 2) {
+			const Molib::Bond &b1 = path[i]->get_bond(*path[i + 1]);
+			const Molib::Bond &b2 = path[i + 1]->get_bond(*path[i + 2]);
+			path[0]->set_max_linker_length(*path[i + 1], d + b1.length());
+			path[i + 1]->set_max_linker_length(*path[0], d + b1.length());
+			//~ d += b1.first_atom().crd().distance(b2.second_atom().crd());
+			d += b1.atom1().crd().distance(b2.atom2().crd());
+			path[0]->set_max_linker_length(*path[i + 2], d);
+			path[i + 2]->set_max_linker_length(*path[0], d);
+			dbgmsg("max_linker_length between " << *path[0] << " and " 
+				<< *path[i + 1] << " = " << path[0]->get_max_linker_length(*path[i + 1]));
+			dbgmsg("max_linker_length between " << *path[0] << " and " 
+				<< *path[i + 2] << " = " << path[0]->get_max_linker_length(*path[i + 2]));
+		}
+		if (i < path.size() - 1) {
+			const Molib::Bond &b = path[i]->get_bond(*path[i + 1]);
+			d += b.length();
+			path[0]->set_max_linker_length(*path[i + 1], d);
+			path[i + 1]->set_max_linker_length(*path[0], d);
+			dbgmsg("last max_linker_length between " << *path[0] << " and " 
+				<< *path[i + 1] << " = " << path[0]->get_max_linker_length(*path[i + 1]));
+		}
+		dbgmsg("TOTAL max_linker_length between " << *path[0] << " and " 
+			<< *path[path.size() - 1] << " = " 
+			<< path[0]->get_max_linker_length(*path[path.size() - 1]));
+	}
+
+
+	
+	void Segment::__set_branching_rules(const Segment::Paths &paths) {
+		for (auto &kv : paths) {
+			const Segment::Graph::Path &path = kv.second;
+#ifndef NDEBUG
+			dbgmsg("valid_path = ");
+			for (auto &seg : path) dbgmsg(*seg);
+#endif
+			Segment &start = *path.back();
+			Segment &goal = *path.front();
+			Segment &start_next = **(path.end() - 2);
+			Segment &goal_next = **(path.begin() + 1);
+			const bool is_link_adjacent = __link_adjacent(path);
+			for (auto it = path.begin(); it != path.end(); ++it) {
+				Segment &current = **it;
+				if (&current != &goal && goal.is_seed()) {
+					Segment &next = **(it - 1);
+					current.set_next(goal, next);
+					goal.set_next(current, goal_next);
+					if (is_link_adjacent)
+						current.set_adjacent_seed_segments(goal);
+					dbgmsg("current = " << current << " goal.is_seed() = " 
+						<< boolalpha << goal.is_seed() << " next = " << next);
+				}
+				if (&current != &start && start.is_seed()) {
+					Segment &prev = **(it + 1);
+					current.set_next(start, prev);
+					start.set_next(current, start_next);
+					if (is_link_adjacent)
+						current.set_adjacent_seed_segments(start);
+					dbgmsg("current = " << current << " start.is_seed() = " 
+						<< boolalpha << start.is_seed() << " prev = " << prev);
+				}
+			}
+		}
+	}
+	
 
 };

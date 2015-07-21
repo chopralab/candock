@@ -160,7 +160,8 @@ int main(int argc, char* argv[]) {
 						
 						Linker::Linker linker(ligand, top_seeds, gridrec, score, ic, 
 							cmdl.dist_cutoff(), cmdl.spin_degrees(), cmdl.tol_dist(),
-							cmdl.tol_seed_dist(), cmdl.max_possible_conf(), cmdl.link_iter());
+							cmdl.tol_seed_dist(), cmdl.max_possible_conf(), cmdl.link_iter(),
+							cmdl.clash_coeff());
 
 						Molib::Molecules docked = linker.connect();
 

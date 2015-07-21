@@ -180,9 +180,8 @@ public:
 	}
 	
 	template<typename V>
-	Points get_clashed(const V &atom) {
+	Points get_clashed(const V &atom, const double clash_coeff) {
 		const double dist = 3.0;
-		const double clash_coeff = 0.9;
 		const double vdw1 = atom.radius();
 		Geom3D::Coordinate cmin = __correct(atom.crd(), -dist);
 		Geom3D::Coordinate cmax = __correct(atom.crd(), dist);
@@ -199,6 +198,26 @@ public:
 					}
 				}
 		return points;
+	}
+	
+	template<typename V>
+	bool clashes(const V &atom, const double clash_coeff) {
+		const double dist = 3.0;
+		const double vdw1 = atom.radius();
+		Geom3D::Coordinate cmin = __correct(atom.crd(), -dist);
+		Geom3D::Coordinate cmax = __correct(atom.crd(), dist);
+		for (int i = cmin.i(); i <= cmax.i(); ++i)
+			for (int j = cmin.j(); j <= cmax.j(); ++j)
+				for (int k = cmin.k(); k <= cmax.k(); ++k) {
+					for (auto neighbor : storage[i][j][k]) {
+						const double d_sq = atom.crd().distance_sq(neighbor->crd());
+						const double vdw2 = neighbor->radius();
+						if (d_sq < pow(clash_coeff * (vdw1 + vdw2), 2) && d_sq > 0) {
+							return true;
+						}
+					}
+				}
+		return false;
 	}
 	
 };

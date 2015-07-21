@@ -33,15 +33,9 @@ namespace Linker {
 		
 		map<Segment::Id, AtomPoint::UPVec> __atompoints;
 		map<Segment::Id, AtomPoint::Grid> __grid;
-
-		AtomPoint::UPVec __atompoints_small;
-		AtomPoint::Grid __grid_small;	
 		
 	public:
 		Poses(const Seed::Graph &seed_graph);
-		Poses(const State::Set &states);
-		State::Set get_clashed_states(const State &state, Segment &segment2);
-		State::Set get_clashed_states(const State &state);
 		State::Set get_join_states(const State &state, Segment &segment2, Molib::Atom::Pair &jatoms, 
 			const double max_linker_length, const double tol_seed_dist);
 	};

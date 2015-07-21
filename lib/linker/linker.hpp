@@ -50,7 +50,7 @@ namespace Linker {
 		Molib::Atom::Grid &__gridrec;
 		const Molib::Score &__score;
 		const double __dist_cutoff, __spin_degrees, __tol_dist,
-			__tol_seed_dist;
+			__tol_seed_dist, __clash_coeff;
 		const int __max_possible_conf, __link_iter;
 
 
@@ -67,15 +67,10 @@ namespace Linker {
 		Array2d<bool> __find_compatible_state_pairs(const Seed::Graph &seed_graph, const int sz);
 		vector<vector<State::Vec>> __grow_possibles(const map<State*, State::Set> &pos);
 		vector<LinkEnergy> __generate_rigid_conformations(const Seed::Graph &seed_graph);
-		Segment::Paths __find_paths(const Segment::Graph &segment_graph);
-		void __set_branching_rules(const Segment::Paths &paths);
 		Molib::Molecules __reconstruct(const Conformations &conformations);
-		void __init_max_linker_length(const Segment::Paths &paths);
-		void __compute_max_linker_length(Segment::Graph::Path &path);
 
 		Conformations __connect(const int segment_graph_size, const vector<LinkEnergy> &possibles);
 		bool __has_blacklisted(const State::Vec &conformation, const set<State::ConstPair> &blacklist);
-		bool __link_adjacent(const Segment::Graph::Path &path);
 		bool __check_distances_to_seeds(const State &curr_state, 
 			const Segment &adjacent, const SegStateMap &docked_seeds);
 		Conf __a_star(const int segment_graph_size, 
@@ -88,11 +83,11 @@ namespace Linker {
 		Linker(const Molib::Molecule &ligand, const Molib::NRset &top_seeds, Molib::Atom::Grid &gridrec, 
 			const Molib::Score &score, Molib::Internal &ic, const double dist_cutoff, 
 			const double spin_degrees, const double tol_dist, const double tol_seed_dist, 
-			const int max_possible_conf, const int link_iter) : __ligand(ligand), 
+			const int max_possible_conf, const int link_iter, const double clash_coeff) : __ligand(ligand), 
 			__top_seeds(top_seeds), __gridrec(gridrec), __score(score), __ic(ic), 
 			__dist_cutoff(dist_cutoff), __spin_degrees(Geom3D::radians(spin_degrees / 2)), 
 			__tol_dist(tol_dist), __tol_seed_dist(tol_seed_dist), __max_possible_conf(max_possible_conf),
-			__link_iter(link_iter) {}
+			__link_iter(link_iter), __clash_coeff(clash_coeff) {}
 		Molib::Molecules connect();
 		friend ostream& operator<<(ostream& os, const Conf &conf);
 		friend ostream& operator<<(ostream& os, const LinkEnergy &le);

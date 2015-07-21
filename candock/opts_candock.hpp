@@ -66,6 +66,7 @@ class CmdLnOpts {
 	double __tol_dist;
 	//~ double __tol_max_coeff;
 	//~ double __tol_min_coeff;
+	double __clash_coeff;
 	double __tol_seed_dist;
 	int __max_possible_conf;
 	int __link_iter;
@@ -194,7 +195,8 @@ public:
 
 			//~ TCLAP::ValueArg<double> tol_max_coeffArg("","tol_max_coeff","Multiply maximum linker length (upper bound) (default is 1.3)",false,1.3,"double", cmd);
 			//~ TCLAP::ValueArg<double> tol_min_coeffArg("","tol_min_coeff","Multiply maximum linker length (lower bound) (default is 0.7)",false,0.7,"double", cmd);
-//~ 
+
+			TCLAP::ValueArg<double> clash_coeffArg("","clash_coeff","Clash coefficient for determining whether two atoms clash by eq. dist12 s< C * (vdw1 + vdw2) (default is 0.75)",false,0.75,"double", cmd);
 			TCLAP::ValueArg<double> tol_seed_distArg("","tol_seed_dist","Tolerance on seed distance for getting initial conformations of docked fragments (default is 2.0)",false,2.0,"double", cmd);
 
 			TCLAP::ValueArg<int> max_possible_confArg("","max_possible_conf","Maximum number of possible conformations to link (default is -1 [no limit])",false,-1,"int", cmd);
@@ -283,6 +285,7 @@ public:
 			__tol_dist = tol_distArg.getValue();
 			//~ __tol_max_coeff = tol_max_coeffArg.getValue();
 			//~ __tol_min_coeff = tol_min_coeffArg.getValue();
+			__clash_coeff = clash_coeffArg.getValue();
 			__tol_seed_dist = tol_seed_distArg.getValue();
 			__max_possible_conf = max_possible_confArg.getValue();
 			__link_iter = link_iterArg.getValue();
@@ -366,6 +369,7 @@ public:
 	double tol_dist() const { return __tol_dist; }
 	//~ double tol_max_coeff() const { return __tol_max_coeff; }
 	//~ double tol_min_coeff() const { return __tol_min_coeff; }
+	double clash_coeff() const { return __clash_coeff; }
 	double tol_seed_dist() const { return __tol_seed_dist; }
 	int max_possible_conf() const { return __max_possible_conf; }
 	int link_iter() const { return __link_iter; }

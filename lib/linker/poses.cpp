@@ -19,7 +19,8 @@ namespace Linker {
 				for (auto &pstate : segment.get_states()) {
 					auto &state = *pstate;
 					for (int i = 0; i < state.get_crds().size(); ++i) {
-						__atompoints[segment.get_id()].push_back(unique_ptr<AtomPoint>(new AtomPoint(state.get_crd(i), state.get_segment().get_atom(i), state)));
+						if (state.get_segment().is_join_atom(i))
+							__atompoints[segment.get_id()].push_back(unique_ptr<AtomPoint>(new AtomPoint(state.get_crd(i), state.get_segment().get_atom(i), state)));
 					}
 				}
 				__grid[segment.get_id()] = AtomPoint::Grid(__atompoints[segment.get_id()]);
@@ -30,45 +31,6 @@ namespace Linker {
 		}
 	}
 	
-	Poses::Poses(const State::Set &states) {
-		try {
-			for (auto &pstate : states) {
-				auto &state = *pstate;
-				for (int i = 0; i < state.get_crds().size(); ++i) {
-					__atompoints_small.push_back(unique_ptr<AtomPoint>(new AtomPoint(state.get_crd(i), state.get_segment().get_atom(i), state)));
-				}
-			}
-			__grid_small = AtomPoint::Grid(__atompoints_small);
-		} catch (...) {
-			dbgmsg("FAILURE: constructor of Poses failed...");
-			throw;
-		}
-	}
-	
-	State::Set Poses::get_clashed_states(const State &state, Segment &segment2) {
-		State::Set clashed;
-		AtomPoint::Grid &g = __grid.at(segment2.get_id());
-		for (int i = 0; i < state.get_segment().get_atoms().size(); ++i) {
-			AtomPoint::PVec neighbors = g.get_clashed(Molib::Atom(state.get_crd(i), state.get_segment().get_atom(i).idatm_type()));
-			for (auto &patompoint : neighbors) {
-				clashed.insert(&patompoint->get_state());
-			}
-		}
-		return clashed;
-	}
-
-	State::Set Poses::get_clashed_states(const State &state) {
-		State::Set clashed;
-		AtomPoint::Grid &g = __grid_small;
-		for (int i = 0; i < state.get_segment().get_atoms().size(); ++i) {
-			AtomPoint::PVec neighbors = g.get_clashed(Molib::Atom(state.get_crd(i), state.get_segment().get_atom(i).idatm_type()));
-			for (auto &patompoint : neighbors) {
-				clashed.insert(&patompoint->get_state());
-			}
-		}
-		return clashed;
-	}
-
 	State::Set Poses::get_join_states(const State &state, Segment &segment2, Molib::Atom::Pair &jatoms, const double max_linker_length, const double tol_seed_dist) {
 		State::Set join;
 		AtomPoint::Grid &g = __grid.at(segment2.get_id());

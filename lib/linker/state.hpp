@@ -26,7 +26,6 @@ namespace Linker {
 	private:
 		static Id idx;
 		const Segment &__segment;
-		//~ const Molib::Atom::Vec __atoms;
 		const Geom3D::Point::Vec __crds;
 		double __energy;
 		const Id __id;
@@ -37,13 +36,9 @@ namespace Linker {
 		void set_energy(const double energy) { __energy = energy; }
 		double get_energy() const { return __energy; }			
 		const Segment& get_segment() const { return __segment; }			
-		//~ const Molib::Atom::Vec& get_atoms() const { return __atoms; }			
 		const Geom3D::Point::Vec& get_crds() const { return __crds; }			
-		//~ const Molib::Atom& get_atom(const int i) const { return *__atoms.at(i); }
-		const Geom3D::Point& get_crd(const int i) const { return __crds.at(i); }
-		//~ bool has_atom(const int i) const { return i < __atoms.size(); }
-		//~ bool has_atom(const int i) const { return i < __crds.size(); }
-		bool clashes(const State &other, const Molib::Bond &excluded) const; // clashes between this and other state
+		const Geom3D::Point& get_crd(const int i) const { return __crds[i]; }
+		bool clashes(const State &other, const Molib::Bond &excluded, const double clash_coeff) const; // clashes between this and other state
 		string pdb() const;
 		const Id get_id() const { return __id; }
 		friend ostream& operator<< (ostream& stream, const State& s);
