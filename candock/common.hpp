@@ -14,5 +14,13 @@ namespace common {
 //~ #ifndef NDEBUG	
 	void create_mols_from_fragments(set<int> &added, Molib::Molecules &seeds, const Molib::Molecules &mols);
 //~ #endif
+	void convert_clusters_to_mols(Molib::Molecules &rep_mols, const cluster::Clusters<Molib::Molecule> &representatives);
+	pair<cluster::Clusters<Molib::Molecule>, cluster::Clusters<Molib::Molecule>>
+		cluster_molecules(const Molib::Molecules &mols,	const Molib::Score &score, 
+		const double clus_rad, const int min_pts, const int max_num_clus, 
+		const int max_mols_to_cluster=999999);
+	cluster::PairwiseDistances<Molib::Molecule> all_all_rmsd(const vector<Molib::Molecule*> &mols, const double &clus_rad);
+
+	double compute_rmsd(const Molib::Atom::Graph&, const Molib::Atom::Graph&, const Molib::Atom::Graph::Matches&);
 
 };

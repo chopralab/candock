@@ -170,38 +170,38 @@ int main(int argc, char* argv[]) {
 							inout::output_file(docked, cmdl.docked_ligands_file(), 
 								ios_base::app); // output docked molecule conformations
 
-							//~ /* Cluster docked conformations and take only cluster
-							 //~ * representatives for further minimization
-							 //~ * 
-							 //~ */
-							//~ 
-							//~ auto clusters_reps_pair = common::cluster_molecules(docked, score,
-								//~ cmdl.docked_clus_rad(), cmdl.docked_min_pts(), cmdl.docked_max_num_clus());
-							//~ Molib::Molecules docked_representatives; 
-							//~ common::convert_clusters_to_mols(docked_representatives, clusters_reps_pair.second);
-//~ 
-							//~ /* Minimize each representative docked ligand conformation
-							//~ * with full flexibility of both ligand and receptor
-							 //~ * 
-							 //~ */
-							//~ Molib::Molecules mini;
-							//~ OMMIface::Energies energies;
-	//~ 
-							//~ for (auto &docked_ligand : docked_representatives) {
-								//~ OMMIface::OMM omm(receptors[0], docked_ligand, ffield_copy, 
-									//~ cmdl.fftype(), cmdl.dist_cutoff());
-								//~ omm.minimize(cmdl.tolerance(), cmdl.max_iterations()); // minimize
-								//~ auto ret = omm.get_state(receptors[0], docked_ligand);
-								//~ Molib::Molecule &minimized_receptor = mini.add(new Molib::Molecule(ret.first));
-								//~ Molib::Molecule &minimized_ligand = mini.add(new Molib::Molecule(ret.second));
-								//~ energies[&minimized_ligand] = omm.get_energy_components(
-									//~ minimized_receptor, minimized_ligand, cmdl.dist_cutoff());
-								//~ minimized_receptor.undo_mm_specific();
-							//~ }
-							//~ inout::output_file(mini, cmdl.mini_ligands_file(), 
-								//~ ios_base::app); // output docked & minimized ligands
-							//~ inout::output_file(energies, cmdl.energy_file(), 
-								//~ ios_base::app); // output energies of docked & minimized ligands
+							/* Cluster docked conformations and take only cluster
+							 * representatives for further minimization
+							 * 
+							 */
+							
+							auto clusters_reps_pair = common::cluster_molecules(docked, score,
+								cmdl.docked_clus_rad(), cmdl.docked_min_pts(), cmdl.docked_max_num_clus());
+							Molib::Molecules docked_representatives; 
+							common::convert_clusters_to_mols(docked_representatives, clusters_reps_pair.second);
+
+							/* Minimize each representative docked ligand conformation
+							* with full flexibility of both ligand and receptor
+							 * 
+							 */
+							Molib::Molecules mini;
+							OMMIface::Energies energies;
+	
+							for (auto &docked_ligand : docked_representatives) {
+								OMMIface::OMM omm(receptors[0], docked_ligand, ffield_copy, 
+									cmdl.fftype(), cmdl.dist_cutoff());
+								omm.minimize(cmdl.tolerance(), cmdl.max_iterations()); // minimize
+								auto ret = omm.get_state(receptors[0], docked_ligand);
+								Molib::Molecule &minimized_receptor = mini.add(new Molib::Molecule(ret.first));
+								Molib::Molecule &minimized_ligand = mini.add(new Molib::Molecule(ret.second));
+								energies[&minimized_ligand] = omm.get_energy_components(
+									minimized_receptor, minimized_ligand, cmdl.dist_cutoff());
+								minimized_receptor.undo_mm_specific();
+							}
+							inout::output_file(mini, cmdl.mini_ligands_file(), 
+								ios_base::app); // output docked & minimized ligands
+							inout::output_file(energies, cmdl.energy_file(), 
+								ios_base::app); // output energies of docked & minimized ligands
 						}
 					}
 					catch (Error& e) { 
