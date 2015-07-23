@@ -18,12 +18,12 @@ OBJS_TEST4	= test_clq.o common.o
 OBJS_TEST5	= test_link.o common.o
 OBJLIBS	=  libfragmenter.a libgeom3d.a libgraph.a libhelper.a libkabsch.a \
 libkbforce.a liblinker.a libomm.a libpdb.a libscore.a libprobis.a libligands.a \
-libdocker.a libcentro.a
+libdocker.a libcentro.a libcluster.a
 LIBS	= -L. -L$(LIBDIR)/linker -L $(LIBDIR)/pdbreader -L $(LIBDIR)/kabsch \
 -L $(LIBDIR)/helper -L $(LIBDIR)/score -L $(LIBDIR)/fragmenter -L $(LIBDIR)/graph \
 -L $(LIBDIR)/kbforce -L $(LIBDIR)/geom3d -L $(LIBDIR)/openmm -L $(LIBDIR)/probis \
--L $(LIBDIR)/ligands -L $(LIBDIR)/docker -L $(LIBDIR)/centro \
--llinker -lpdb -ldocker -lscore -lfragmenter -lgraph -lkabsch -lcentro \
+-L $(LIBDIR)/ligands -L $(LIBDIR)/docker -L $(LIBDIR)/centro -L $(LIBDIR)/cluster \
+-llinker -lcluster -lpdb -ldocker -lscore -lfragmenter -lgraph -lkabsch -lcentro \
 -lomm -lhelper -lOpenMM_static -ldl -lc -lkbforce -lprobis -lligands -lpdb -lgeom3d \
 -lboost_regex -lboost_filesystem -lboost_system -lpthread -lboost_date_time \
 -lgsl -lgslcblas -lm
@@ -87,6 +87,10 @@ candock.o: candock.cpp common.cpp common.hpp \
 
 common.o: common.cpp common.hpp
 	$(CC) $(PRJCFLAGS) $(INCL) -c $<
+
+libcluster.a : force_look
+	$(ECHO) looking into subdir : $(MAKE) $(MFLAGS)
+	cd $(LIBDIR)/cluster; $(MAKE) $(MFLAGS)
 
 libcentro.a : force_look
 	$(ECHO) looking into subdir : $(MAKE) $(MFLAGS)

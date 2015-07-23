@@ -72,6 +72,18 @@ namespace Molib {
 		return stream;
 	}
 
+	double Atom::compute_rmsd_sq(const Atom::Vec &atoms1, const Atom::Vec &atoms2) {
+		dbgmsg("calculate rmsd between two ordered sets of atoms");
+
+		// try calculating rmsd of each mapping of molecule to molecule ...
+		double sum_squared = 0;
+
+		for (int i = 0; i < atoms1.size(); ++i) {
+			sum_squared += atoms1[i]->crd().distance_sq(atoms2[i]->crd());
+		}
+		return sum_squared / atoms1.size();
+	}
+
 	BondSet get_bonds_in(const Atom::Set &atoms, bool in) {
 		BondSet bonds;
 		for (auto &patom1 : atoms) {

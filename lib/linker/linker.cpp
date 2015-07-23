@@ -204,23 +204,25 @@ namespace Linker {
 	
 	bool Linker::__check_distances_to_seeds(const State &curr_state, 
 		const Segment &adjacent, const SegStateMap &docked_seeds) {
-		const double mll_eps = 0.001; // add to max linker length to avoid
-		// checks to "back" seeds to be true, e.g., 2.44893690 > 2.44893690 
-		// should be false (but sometimes it returns true)
+
 		const Segment &current = curr_state.get_segment();
 		dbgmsg("curr_state= " << curr_state);
 		dbgmsg("adjacent= " << adjacent);
 		for (auto &adjacent_seed_segment : adjacent.get_adjacent_seed_segments()) {
 			auto it = docked_seeds.find(adjacent_seed_segment);
 			if (it != docked_seeds.end() && it->first != &current) {
-				dbgmsg("distance = " << __distance(curr_state, *it->second));
-				dbgmsg("mll = " << current.get_max_linker_length(*it->first));
-				dbgmsg("distance > mll = " << boolalpha << (__distance(curr_state, *it->second) 
-					> current.get_max_linker_length(*it->first) + mll_eps));
+
+				const double distance = __distance(curr_state, *it->second);
+				const double mll = current.get_max_linker_length(*it->first);
+
+				dbgmsg("distance = " << distance);
+				dbgmsg("mll = " << mll);
+				dbgmsg("is distance OK ? " << boolalpha << (distance < mll + __tol_seed_dist
+					&& distance > mll - __tol_seed_dist));
 				dbgmsg("curr_state= " << curr_state);
 				dbgmsg("adjacent seed state= " << *it->second);
-				if (__distance(curr_state, *it->second) > current
-					.get_max_linker_length(*it->first) + mll_eps) {
+
+				if (distance > mll + __tol_seed_dist || distance < mll - __tol_seed_dist) {
 					dbgmsg("returning false");
 					return false;
 				}

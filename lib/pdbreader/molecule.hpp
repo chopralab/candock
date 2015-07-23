@@ -218,6 +218,10 @@ namespace Molib {
 	};
 	
 	class Molecule : public template_map_container<Assembly, Molecule, Molecules> {
+	public:
+		typedef vector<Molecule*> Vec;
+		
+	private:
 		set<Residue::res_tuple2> __modified;
 		multimap<string, Residue::res_tuple2> __site;
 		string __name; // usually pdb file
@@ -263,7 +267,17 @@ namespace Molib {
 		Molecule& compute_rotatable_bonds();
 		Molecule& compute_overlapping_rigid_segments(Unique&);
 		Molecule& compute_seeds(Unique &u);
+
+		Geom3D::Coordinate compute_geometric_center() const { 
+			Geom3D::Coordinate center;
+			for (auto &patom : this->get_atoms()) {
+				center = center + patom->crd();
+			}
+			center = center / this->get_atoms().size();
+			return center;
+		}
 		double compute_rmsd(const Molecule&) const;
+		double compute_rmsd_ord(const Molecule&) const;
 		void rotate(const Geom3D::Matrix &rota, const bool inverse=false) {
 			for (auto &assembly : *this) {
 				assembly.rotate(rota, inverse);
@@ -318,15 +332,11 @@ namespace Molib {
 			return max_radius;
 		}
 		Geom3D::Coordinate compute_geometric_center() const { 
-			Geom3D::Coordinate gc;
-			int i = 0;
+			Geom3D::Coordinate center;
 			for (auto &molecule : *this) {
-				Atom::Vec atoms = molecule.get_atoms();
-				for (auto &patom : atoms)
-					gc = gc + patom->crd();
-				i += atoms.size();
+				center = center + molecule.compute_geometric_center();
 			}
-			return gc / (double) i;
+			return center / this->size();
 		}
 		Atom::Vec get_atoms(const string &chain_ids="", 
 			const Residue::res_type &rest=Residue::res_type::notassigned,

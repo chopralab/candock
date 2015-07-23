@@ -20,6 +20,7 @@
 #include "ligands/genclus.hpp"
 #include "ligands/genlig.hpp"
 #include "cluster/optics.hpp"
+#include "cluster/greedy.hpp"
 using namespace std;
 
 CmdLnOpts cmdl;
@@ -159,9 +160,8 @@ int main(int argc, char* argv[]) {
 						//
 						
 						Linker::Linker linker(ligand, top_seeds, gridrec, score, ic, 
-							cmdl.dist_cutoff(), cmdl.spin_degrees(), cmdl.tol_dist(),
-							cmdl.tol_seed_dist(), cmdl.max_possible_conf(), cmdl.link_iter(),
-							cmdl.clash_coeff());
+							cmdl.dist_cutoff(), cmdl.spin_degrees(), cmdl.tol_seed_dist(), 
+							cmdl.max_possible_conf(), cmdl.link_iter(), cmdl.clash_coeff());
 
 						Molib::Molecules docked = linker.connect();
 
@@ -175,13 +175,11 @@ int main(int argc, char* argv[]) {
 							 * 
 							 */
 							
-							auto clusters_reps_pair = common::cluster_molecules(docked, score,
-								cmdl.docked_clus_rad(), cmdl.docked_min_pts(), cmdl.docked_max_num_clus());
-							Molib::Molecules docked_representatives; 
-							common::convert_clusters_to_mols(docked_representatives, clusters_reps_pair.second);
+							Molib::Molecules docked_representatives = Molib::Cluster::greedy(
+								docked, score, cmdl.docked_clus_rad());
 
 							/* Minimize each representative docked ligand conformation
-							* with full flexibility of both ligand and receptor
+							 * with full flexibility of both ligand and receptor
 							 * 
 							 */
 							Molib::Molecules mini;

@@ -323,16 +323,4 @@ namespace Molib {
 		return energy_sum;
 	}
 
-	cluster::MapD<Molib::Molecule> Score::many_ligands_score(const Molib::Molecules &ligands) const {
-		Benchmark::reset();
-		cluster::MapD<Molib::Molecule> scores;
-		cout << "Beginning scoring ..." << endl;
-		for (auto &ligand : ligands) {
-			dbgmsg("non_bonded_energy = " << non_bonded_energy(ligand)) ;
-			scores[&ligand] = non_bonded_energy(ligand);
-		}
-		cout << "total time required for scoring " << ligands.size() 
-			<< " decoys was " << Benchmark::seconds_from_start() << " wallclock seconds\n";
-		return scores;
-	}
 };

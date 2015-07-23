@@ -122,6 +122,7 @@ namespace Molib {
 
 		static Graph create_graph(const Vec &atoms);
 		static Graph create_graph(const Set &atoms);
+		static double compute_rmsd_sq(const Atom::Vec &atoms1, const Atom::Vec &atoms2);
 
 	};
 

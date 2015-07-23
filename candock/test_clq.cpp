@@ -154,7 +154,7 @@ int main(int argc, char* argv[]) {
 							 * only best-scored cluster representatives
 							 *
 							 */
-							Docker::Dock dock(gpoints, conf, seeds[j], 2.0);
+							Docker::Dock dock(gpoints, conf, seeds[j], cmdl.clus_rad());
 							Molib::Molecules docked_seeds = dock.run();
 
 							inout::output_file(docked_seeds, "tmp/" + docked_seeds.name() + "/" 

@@ -248,6 +248,10 @@ namespace Molib {
 		return sqrt(min_sum_squared / g1.size());	
 	}
 
+	double Molecule::compute_rmsd_ord(const Molecule &other) const {
+		return sqrt(Atom::compute_rmsd_sq(this->get_atoms(), other.get_atoms()));
+	}
+
 	Atom& Molecule::get_center_atom() const {
 		Atom *center_atom = nullptr;
 		Atom::Vec atoms = this->get_atoms();
