@@ -46,7 +46,9 @@ namespace OMMIface {
 		const double __dist_cutoff;
 		const bool __use_constraints;
 		const double __step_size_in_fs; // integration step size (fs)
+		const Molib::Molecule &__receptor;
 		const Molib::Molecule &__ligand;
+		int __kbforce_idx;
 	public:
 		OMM(const Molib::Molecule &receptor, const Molib::Molecule &ligand,
 			const ForceField &ff, const string &fftype, const double dist_cutoff, 
@@ -58,7 +60,6 @@ namespace OMMIface {
 			delete __omm; // Clean up OpenMM data structures.
 		}
 		void minimize(double tolerance, int max_iterations, int update_freq);
-		//~ void minimize(double tolerance, int max_iterations, int update_freq);
 		void md(const double=100, const double=10, const bool=false) const;
 		pair<Molib::Molecule, Molib::Molecule> get_state(
 			const Molib::Molecule &receptor, const Molib::Molecule &ligand) const { 
