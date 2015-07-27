@@ -75,7 +75,8 @@ int main(int argc, char* argv[]) {
 			gridrec, cmdl.ref_state(), cmdl.comp(), cmdl.rad_or_raw(), 
 			cmdl.dist_cutoff(), cmdl.distributions_file(), cmdl.step_non_bond());
 
-		/* Forcefield stuff : create forcefield for small molecules (and KB 
+		/** 
+		 * Forcefield stuff : create forcefield for small molecules (and KB 
 		 * non-bonded with receptor) and read receptor's forcefield xml file(s) into 
 		 * forcefield object
 		 * 
@@ -95,7 +96,7 @@ int main(int argc, char* argv[]) {
 			try {
 				OMMIface::OMM omm(receptors[0], ligand, ffield, 
 					cmdl.fftype(), cmdl.dist_cutoff());
-				omm.minimize(cmdl.tolerance(), cmdl.max_iterations()); // minimize
+				omm.minimize(cmdl.tolerance(), cmdl.max_iterations(), cmdl.update_freq()); // minimize
 				dbgmsg(ligand);
 				auto ret = omm.get_state(receptors[0], ligand);
 				Molib::Molecules mini;

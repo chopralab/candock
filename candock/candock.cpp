@@ -24,6 +24,7 @@
 #include "docker/conformations.hpp"
 #include "docker/dock.hpp"
 #include "centro/centroids.hpp"
+#include "cluster/greedy.hpp"
 using namespace std;
 
 CmdLnOpts cmdl;
@@ -66,7 +67,7 @@ int main(int argc, char* argv[]) {
 			inout::output_file(binding_sites.first, cmdl.lig_clus_file());
 			inout::output_file(binding_sites.second, cmdl.z_scores_file());
 
-			centroids = Centro:set_centroids(binding_sites.first);	
+			centroids = Centro::set_centroids(binding_sites.first);	
 			inout::output_file(centroids, cmdl.centroid_out_file()); // probis local structural alignments
 
 		} else { // ... or else set binding sites from file
@@ -98,22 +99,6 @@ int main(int argc, char* argv[]) {
 		 */
 		Molib::Atom::Grid gridrec(receptors[0].get_atoms());
 
-		/* Forcefield stuff : create forcefield for small molecules (and KB 
-		 * non-bonded with receptor) and read receptor's forcefield xml file(s) into 
-		 * forcefield object
-		 * 
-		 */
-		OMMIface::ForceField ffield;
-		ffield.parse_gaff_dat_file(cmdl.gaff_dat_file())
-			.add_kb_forcefield(score, cmdl.step_non_bond(), cmdl.scale_non_bond())
-			.parse_forcefield_file(cmdl.amber_xml_file());
-
-		/* Prepare receptor for molecular mechanics: histidines, N-[C-]terminals,
-		 * bonds, disulfide bonds, main chain bonds
-		 * 
-		 */
-		receptors[0].prepare_for_mm(ffield, gridrec);
-
 		/* Read ligands from the ligands file - this file may contain millions
 		 * of ligands, and we read only a few at one time, to save memory
 		 * 
@@ -123,7 +108,7 @@ int main(int argc, char* argv[]) {
 		mutex mtx;
 
 		Molib::Molecules seeds;
-		set<string> added;
+		set<int> added;
 		set<int> ligand_idatm_types;
 
 		for(int i = 0; i < cmdl.ncpu(); ++i) {
@@ -142,11 +127,11 @@ int main(int argc, char* argv[]) {
 						.compute_ring_type()
 						.compute_gaff_type()
 						.compute_rotatable_bonds() // relies on hydrogens being assigned
-						.erase_hydrogen()
-						.compute_overlapping_rigid_segments();
+						.erase_hydrogen();
 					{
 						lock_guard<std::mutex> guard(mtx);
-						ligands.compute_seeds(cmdl.seeds_file());
+						ligands.compute_overlapping_rigid_segments(cmdl.seeds_file());
+
 						ligand_idatm_types = Molib::get_idatm_types(ligands, ligand_idatm_types);
 						common::create_mols_from_seeds(added, seeds, ligands);
 					}
@@ -171,6 +156,22 @@ int main(int argc, char* argv[]) {
 		Molib::Score score(Molib::get_idatm_types(receptors), ligand_idatm_types, 
 			gridrec, cmdl.ref_state(), cmdl.comp(), cmdl.rad_or_raw(), 
 			cmdl.dist_cutoff(), cmdl.distributions_file(), cmdl.step_non_bond());
+
+		/* Forcefield stuff : create forcefield for small molecules (and KB 
+		 * non-bonded with receptor) and read receptor's forcefield xml file(s) into 
+		 * forcefield object
+		 * 
+		 */
+		OMMIface::ForceField ffield;
+		ffield.parse_gaff_dat_file(cmdl.gaff_dat_file())
+			.add_kb_forcefield(score, cmdl.step_non_bond(), cmdl.scale_non_bond())
+			.parse_forcefield_file(cmdl.amber_xml_file());
+
+		/* Prepare receptor for molecular mechanics: histidines, N-[C-]terminals,
+		 * bonds, disulfide bonds, main chain bonds
+		 * 
+		 */
+		receptors[0].prepare_for_mm(ffield, gridrec);
 
 		/* Create gridpoints for ALL centroids representing one or more binding sites
 		 * 
@@ -220,7 +221,7 @@ int main(int argc, char* argv[]) {
 							 * only best-scored cluster representatives
 							 *
 							 */
-							Docker::Dock dock(gpoints, conf, seeds[j], 2.0);
+							Docker::Dock dock(gpoints, conf, seeds[j], cmdl.clus_rad());
 							Molib::Molecules docked_seeds = dock.run();
 
 							inout::output_file(docked_seeds, "tmp/" + seeds[j].name() + "/" 
@@ -273,10 +274,10 @@ int main(int argc, char* argv[]) {
 						 * 
 						 */
 						Molib::Internal ic(ligand.get_atoms());
-						Molib::Linker linker(ligand, top_seeds, gridrec, score, ic, 
-							cmdl.dist_cutoff(), cmdl.spin_degrees(), cmdl.tol_dist(),
-							cmdl.tol_max_coeff(), cmdl.tol_min_coeff(), 
-							cmdl.max_possible_conf(), cmdl.link_iter());
+
+						Linker::Linker linker(ligand, top_seeds, gridrec, score, ic, 
+							cmdl.dist_cutoff(), cmdl.spin_degrees(), cmdl.tol_seed_dist(), 
+							cmdl.max_possible_conf(), cmdl.link_iter(), cmdl.clash_coeff());
 
 						Molib::Molecules docked = linker.connect();
 
@@ -289,10 +290,8 @@ int main(int argc, char* argv[]) {
 							 * representatives for further minimization
 							 * 
 							 */
-							auto clusters_reps_pair = common::cluster_molecules(docked, score,
-								cmdl.docked_clus_rad(), cmdl.docked_min_pts(), cmdl.docked_max_num_clus());
-							Molib::Molecules docked_representatives; 
-							common::convert_clusters_to_mols(docked_representatives, clusters_reps_pair.second);
+							Molib::Molecules docked_representatives = Molib::Cluster::greedy(
+								docked, score, cmdl.docked_clus_rad());
 							
 							/* Minimize each representative docked ligand conformation
 							 * with full flexibility of both ligand and receptor

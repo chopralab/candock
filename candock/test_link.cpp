@@ -188,7 +188,7 @@ int main(int argc, char* argv[]) {
 							for (auto &docked_ligand : docked_representatives) {
 								OMMIface::OMM omm(receptors[0], docked_ligand, ffield_copy, 
 									cmdl.fftype(), cmdl.dist_cutoff());
-								omm.minimize(cmdl.tolerance(), cmdl.max_iterations()); // minimize
+								omm.minimize(cmdl.tolerance(), cmdl.max_iterations(), cmdl.update_freq()); // minimize
 								auto ret = omm.get_state(receptors[0], docked_ligand);
 								Molib::Molecule &minimized_receptor = mini.add(new Molib::Molecule(ret.first));
 								Molib::Molecule &minimized_ligand = mini.add(new Molib::Molecule(ret.second));

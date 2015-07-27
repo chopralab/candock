@@ -73,6 +73,7 @@ class CmdLnOpts {
 	string __fftype;
 	double __tolerance;
 	int __max_iterations;
+	int __update_freq;
 	
 	string __mini_ligands_file;
 	string __energy_file;
@@ -152,7 +153,7 @@ public:
 			TCLAP::ValueArg<double> step_non_bondArg("","step","Step for spline generation of non-bonded knowledge-based \
 				potential [0.0-1.0] (default is 0.1)",false,0.1,"double", cmd);
 			TCLAP::ValueArg<double> scale_non_bondArg("","scale","Scale non-bonded forces and energy for knowledge-based \
-				potential [0.0-1.0] (default is 0.01)",false,0.01,"double", cmd);
+				potential [0.0-1.0] (default is 0.0001)",false,0.0001,"double", cmd);
 
 			TCLAP::ValueArg<string> egrid_fileArg("","egrid", "Energy grid output file",false,"energy_grid.pdb","string", cmd);
 			TCLAP::ValueArg<string> docked_seeds_fileArg("","docked_seeds_file", "Docked seeds output file",false,
@@ -186,8 +187,9 @@ public:
 			vector<string> allowedFf{"kb","phy"};
 			TCLAP::ValuesConstraint<string> allowedValsFf( allowedFf );
 			TCLAP::ValueArg<string> fftypeArg("","fftype","Forcefield to use 'kb' (knowledge-based, default) or 'phy' (physics-based)",false,"kb",&allowedValsFf, cmd);
-			TCLAP::ValueArg<double> toleranceArg("","mini_tol","Minimization tolerance (default is 0.1)",false,0.1,"double", cmd);
+			TCLAP::ValueArg<double> toleranceArg("","mini_tol","Minimization tolerance (default is 0.0001)",false,0.0001,"double", cmd);
 			TCLAP::ValueArg<int> max_iterationsArg("","max_iter","Maximum iterations for minimization (default is 0 - meaning minimize until convergence is reached)",false,0,"int", cmd);
+			TCLAP::ValueArg<int> update_freqArg("","update_freq","Update non-bond frequency (default is 10)",false,10,"int", cmd);
 
 			TCLAP::ValueArg<string> mini_ligands_fileArg("","mini_ligands","Docked & minimized ligands output filename (default minimized.pdb)",false,"minimized.pdb","string", cmd);
 			TCLAP::ValueArg<string> energy_fileArg("","energy","Energies of minimized ligands output filename (default energies.txt)",false,"energies.txt","string", cmd);
@@ -260,6 +262,7 @@ public:
 			__fftype = fftypeArg.getValue();
 			__tolerance = toleranceArg.getValue();
 			__max_iterations = max_iterationsArg.getValue();
+			__update_freq = update_freqArg.getValue();
 			__mini_ligands_file = mini_ligands_fileArg.getValue();
 			__energy_file = energy_fileArg.getValue();
 			
@@ -336,6 +339,7 @@ public:
 	string fftype() const { return __fftype; }
 	double tolerance() const { return __tolerance; }
 	int max_iterations() const { return __max_iterations; }
+	int update_freq() const { return __update_freq; }
 	string mini_ligands_file() const { return __mini_ligands_file; }
 	string energy_file() const { return __energy_file; }
 	

@@ -113,7 +113,11 @@ namespace OMMIface {
 		OpenMM::PeriodicTorsionForce*   bondTorsion = (tor ? new OpenMM::PeriodicTorsionForce() : nullptr);
 		KBPlugin::KBForce*			    kbforce     = (kb ? new KBPlugin::KBForce() : nullptr);
  		if (nonbond) system.addForce(nonbond);
-		if (kbforce) system.addForce(kbforce);
+		if (kbforce) system.addForce(kbforce);  
+		//~ if (kbforce) {
+			//~ // remember the return value of addForce, which is the index of the force (kbforce_idx)
+			//~ __kbforce_idx = system.addForce(kbforce); 
+		//~ }
 		if (bondStretch) system.addForce(bondStretch);
 		if (bondBend) system.addForce(bondBend);
 		if (bondTorsion) system.addForce(bondTorsion);
@@ -347,6 +351,99 @@ namespace OMMIface {
 		
 		return energy_in_kcal;
 	}
+
+	void OMM::minimize(double tolerance, int max_iterations, int update_freq) {
+		Benchmark::reset();
+		cout << "Doing energy minimization of ligand " << __ligand.name() << endl;
+		OpenMM::LocalEnergyMinimizer::minimize(*__omm->context, 
+									tolerance, max_iterations);
+		cout << "time to minimize ligand " << __ligand.name() << " took " 
+			<< Benchmark::seconds_from_start() << " wallclock seconds" << endl;
+	}
+
+	//~ void OMM::minimize(double tolerance, int max_iterations, int update_freq) {
+		//~ Benchmark::reset();
+		//~ cout << "Doing energy minimization of ligand " << __ligand.name() << endl;
+//~ 
+		//~ int iter = 0;
+//~ 
+		//~ previous = get_positions();
+		//~ while (iter < max_iterations) {
+			//~ 
+			//~ // get initial positions
+			//~ const OpenMM::State initial_state = omm->context->getState(OpenMM::State::Positions);
+			//~ const vector<OpenMM::Vec3>& initial_positions = initial_state.getPositions();
+			//~ 
+			//~ /**
+			 //~ *  update nonbond list
+			 //~ */
+			 //~ 
+			 //~ // remove old knowledge-based force
+			//~ __omm->system->removeForce(__kbforce_idx);
+			//~ 
+			//~ // recalculate distances
+			//~ MoleculeInfo mol_info;
+			//~ mol_info.get_molecule_info(receptor, __ffield)
+				//~ .get_molecule_info(ligand, __ffield)
+				//~ .get_kb_force_info(receptor, ligand, dist_cutoff);				
+			//~ 
+//~ 
+			//~ // create new knowledge-based force
+			//~ KBPlugin::KBForce* kbforce = new KBPlugin::KBForce();
+//~ 
+			//~ kbforce->setStep(__ffield.step);
+			//~ kbforce->setScale(__ffield.scale);
+			//~ dbgmsg("kbforce scale = " << __ffield.scale 
+				//~ << " step = " << __ffield.step);
+			//~ for (auto &bond : mol_info.kbforce) {
+				//~ const Molib::Atom &atom1 = *bond.first;
+				//~ const Molib::Atom &atom2 = *bond.second;
+				//~ const int idx1 = atom_to_index.at(&atom1);
+				//~ const int idx2 = atom_to_index.at(&atom2);
+				//~ const int type1 = mol_info.atom_to_type.at(&atom1);
+				//~ const int type2 = mol_info.atom_to_type.at(&atom2);
+				//~ try {
+					//~ const ForceField::KBType& kbtype = 
+						//~ __ffield.get_kb_force_type(atom1, atom2, type1, type2);
+					//~ kbforce->addBond(idx1, idx2, 
+						//~ const_cast<vector<double>&>(kbtype.potential), 
+						//~ const_cast<vector<double>&>(kbtype.derivative));
+				//~ } catch (ParameterError& e) {
+					//~ cerr << e.what() << " (" << ++warn << ")" << endl;
+				//~ }
+			//~ }
+			//~ 
+			//~ // and add it to the system
+			//~ __kbforce_idx = __omm->system->addForce(kbforce);
+//~ 
+			//~ OpenMM::LocalEnergyMinimizer::minimize(*__omm->context, 
+										//~ tolerance, update_freq);
+//~ 
+			//~ // get positions after minimization
+			//~ const OpenMM::State state = omm->context->getState(OpenMM::State::Positions);
+			//~ const vector<OpenMM::Vec3>& minimized_positions = state.getPositions();
+//~ 
+			//~ // check if positions don't change too much
+			//~ double max_error = 0;
+			//~ for (int i = 0; __system.getNumParticles(); ++i) {
+				//~ OpenMM::Vec3 dif_pos = initial_positions[i] - minimized_positions[i];
+				 //~ const double error = dif_pos.dot(dif_pos);
+				 //~ if (error > max_error)
+					//~ max_error = error;
+				 //~ 
+			//~ }
+			//~ 
+			//~ // convergence reached
+			//~ if (sqrt(max_error) < pos_tol)
+				//~ break;
+				//~ 
+			//~ iter += update_freq;						
+//~ 
+		//~ }
+		//~ cout << "time to minimize ligand " << __ligand.name() << " took " 
+			//~ << Benchmark::seconds_from_start() << " wallclock seconds" << endl;
+	//~ }
+
 	void OMM::md(const double simulation_time_in_ps, 
 					const double report_interval_in_fs,
 					const bool want_energy) const {
