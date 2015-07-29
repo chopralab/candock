@@ -94,24 +94,58 @@ int main(int argc, char* argv[]) {
 		for (auto &ligand : ligands) {
 			ffield.insert_topology(ligand);
 			try {
-				OMMIface::OMM omm(receptors[0], ligand, ffield, 
-					cmdl.fftype(), cmdl.dist_cutoff());
-				omm.minimize(cmdl.tolerance(), cmdl.max_iterations(), cmdl.update_freq()); // minimize
-				dbgmsg(ligand);
-				auto ret = omm.get_state(receptors[0], ligand);
-				Molib::Molecules mini;
-				Molib::Molecule &minimized_receptor = 
-					mini.add(new Molib::Molecule(ret.first));
-				Molib::Molecule &minimized_ligand = 
-					mini.add(new Molib::Molecule(ret.second));
-		
-				minimized_receptor.undo_mm_specific();
-		
-				dbgmsg("MOLECULES AFTER MINIMIZATION : " << endl 
-					<< minimized_ligand << endl 
-					<< minimized_receptor);
-				//~ inout::output_file(minimized_ligand, cmdl.mini_ligands_file(), ios_base::app);
-				inout::output_file(mini, cmdl.mini_ligands_file(), ios_base::app);
+				/**
+				 * FOR MINIMIZATION : 
+				 * openmm.add_forcefield(ffield, cmdl.fftype());
+				 * openmm.set_distance_cutoff(cmdl.dist_cutoff);
+				 * 
+				 * openmm.add_topology(receptor.get_atoms());
+				 * openmm.add_topology(ligand.get_atoms());
+				 * 
+				 * openmm.add_coords(receptor, receptor.get_coords());
+				 * openmm.add_coords(ligand, ligand.get_coords());
+				 * 
+				 * openmm.minimize_state();
+				 * 
+				 * Molecule minimized_receptor = openmm.get_coords(receptor);
+				 * Molecule minimized_ligand = openmm.get_coords(ligand);
+				 * 
+				 */
+				 
+				OMMIface::Modeler modeler;
+				modeler.add_forcefield(ffield, cmdl.fftype());
+				modeler.set_distance_cutoff(cmdl.dist_cutoff());
+				modeler.add_topology(&receptors[0], receptors[0].get_atoms());
+				modeler.add_topology(&ligand, ligand.get_atoms());
+				
+				modeler.add_coords(&receptors[0], receptors[0].get_coords());
+				modeler.add_coords(&ligand, ligand.get_coords());
+				
+				modeler.minimize_state();
+				
+				Molib::Molecule mini_state = modeler.get_atoms();
+				mini_state.undo_mm_specific();
+				inout::output_file(mini_state, cmdl.mini_ligands_file(), ios_base::app);
+
+				
+				//~ OMMIface::OMM omm(receptors[0], ligand, ffield, 
+					//~ cmdl.fftype(), cmdl.dist_cutoff());
+				//~ omm.minimize(cmdl.tolerance(), cmdl.max_iterations(), cmdl.update_freq()); // minimize
+				//~ dbgmsg(ligand);
+				//~ auto ret = omm.get_state(receptors[0], ligand);
+				//~ Molib::Molecules mini;
+				//~ Molib::Molecule &minimized_receptor = 
+					//~ mini.add(new Molib::Molecule(ret.first));
+				//~ Molib::Molecule &minimized_ligand = 
+					//~ mini.add(new Molib::Molecule(ret.second));
+		//~ 
+				//~ minimized_receptor.undo_mm_specific();
+		//~ 
+				//~ dbgmsg("MOLECULES AFTER MINIMIZATION : " << endl 
+					//~ << minimized_ligand << endl 
+					//~ << minimized_receptor);
+				//~ inout::output_file(mini, cmdl.mini_ligands_file(), ios_base::app);
+
 				//~ OMMIface::Energies energies;
 				//~ energies[&minimized_ligand] = omm.get_energy_components(
 					//~ minimized_receptor, minimized_ligand, cmdl.dist_cutoff());

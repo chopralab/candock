@@ -26,7 +26,6 @@ namespace OMMIface {
 		Molib::Atom::Vec atom;
 		Bonds bond;
 		Angles angle;
-		//~ Dihedrals dihedral;
 		Dihedrals dihedral, improper;
 		Bonds kbforce;
 		map<const Molib::Atom*, const int> atom_to_type;
@@ -36,8 +35,6 @@ namespace OMMIface {
 		}
 		MoleculeInfo& get_molecule_info(const Molib::Molecule&, 
 				const ForceField&);
-		//~ MoleculeInfo& get_kb_force_info(const Molib::Molecule &, const Molib::Molecule&,
-										//~ const ForceField&, const int&);
 		MoleculeInfo& get_kb_force_info(const Molib::Molecule &, const Molib::Molecule&,
 										const int&);
 		MoleculeInfo& get_interaction_force_info(const Molib::Molecule &receptor, 

@@ -1,4 +1,4 @@
-#include "omm.hpp"
+#include "modeler.hpp"
 #include "forcefield.hpp"
 #include "moleculeinfo.hpp"
 #include "helper/inout.hpp"
@@ -13,45 +13,10 @@
 #include <boost/asio/ip/host_name.hpp>
 using namespace std;
 
-ostream& operator<<(ostream& os, const OMMIface::Energies& energies)	{
-	for (auto &kv : energies) {
-		const Molib::Molecule &molecule = *kv.first;
-		const OMMIface::Components &components = kv.second;
-		double total_energy, interaction_energy, ligand_internal_energy, 
-			ligand_torsional_energy, receptor_internal_energy, 
-			receptor_torsional_energy;
-		tie(total_energy, interaction_energy, ligand_internal_energy, 
-			ligand_torsional_energy, receptor_internal_energy, 
-			receptor_torsional_energy) = components;
-		os << setw(13) << molecule.name() 
-			<< setw(13) << setprecision(2) << fixed << total_energy
-			<< setw(13) << setprecision(2) << fixed << interaction_energy
-			<< setw(13) << setprecision(2) << fixed << ligand_internal_energy
-			<< setw(13) << setprecision(2) << fixed << ligand_torsional_energy
-			<< setw(13) << setprecision(2) << fixed << receptor_internal_energy
-			<< setw(13) << setprecision(2) << fixed << receptor_torsional_energy
-			<< endl;
-	}
-	return os;
-}	
-
 namespace OMMIface {
 	extern "C" OPENMM_EXPORT void registerKBReferenceKernelFactories();
 
-	const string print_energies_title() {
-		stringstream ss;
-		ss << setw(13) << "Ligand"
-			<< setw(13) << "Total"
-			<< setw(13) << "Interaction"
-			<< setw(13) << "LInternal"
-			<< setw(13) << "LTorsion"
-			<< setw(13) << "RInternal"
-			<< setw(13) << "RTorsion"
-			<< endl;
-		return ss.str();
-	}
-
-	void OMM::loadPlugins() {
+	void Modeler::loadPlugins() {
 		// Load all available OpenMM plugins from their default location.
 		
 		dbgmsg("before loading plugins");
@@ -62,92 +27,48 @@ namespace OMMIface {
 		
 	}
 
-	OMM::OMM(const Molib::Molecule &receptor, const Molib::Molecule &ligand,
-		const ForceField &ff, const string &fftype, const double dist_cutoff, 
-		const bool use_constraints, const double step_size_in_fs) : 
-		__receptor(receptor), __ligand(ligand), __ffield(ff), __fftype(fftype), 
-		__dist_cutoff(dist_cutoff), __use_constraints(use_constraints), 
-		__step_size_in_fs(step_size_in_fs), __omm(new MyOpenMMData()) {
-
-		try {
-			//~ cout << "calling constructor of OMM for molecule " << __ligand.name() << endl;
-			// Init Coords, Bonds, Angles, Torsions...			
-			MoleculeInfo mol_info;
-			mol_info.get_molecule_info(__receptor, __ffield)
-				.get_molecule_info(__ligand, __ffield)
-				.get_kb_force_info(__receptor, __ligand, dist_cutoff);				
-			
-			// Set up OpenMM data structures; returns OpenMM Platform name.
-			__initialize_openmm(__omm, mol_info, OMMIface::torsional|OMMIface::non_bond); 
-		} catch(...) {
-			dbgmsg("FAILURE: constructor of OMM failed for molecule " 
-				<< __ligand.name() << " ... cleaning up resources...");
-			delete __omm;
-			throw;
-		}
+	void Modeler::add_topology(void *id, Molib::Atom::Vec &atoms) {
+		__topologies[id].init_topology(atoms, __ffield); // should also calculated bonded exclusions
 	}
 
-	void OMM::__initialize_openmm(MyOpenMMData *omm, const MoleculeInfo &mol_info, 
-		unsigned int ene_opts) {
+	void Modeler::add_coords(void *id, Geom3D::Point::Vec &coords) {
+		__coords[id] = coords;
+	}
+
+	//~ void Modeler::SystemTopology::init_bonded(map<void*, Topology> &topologies) {
+	void Modeler::SystemTopology::init_bonded(Topology &topology) {
 			
 		int warn = 0;
 		
 		dbgmsg("initializing openmm");
 		
-		//~ // Load all available OpenMM plugins from their default location.
-		//~ OpenMM::Platform::loadPluginsFromDirectory
-			//~ (OpenMM::Platform::getDefaultPluginsDirectory());
-		//~ registerKBReferenceKernelFactories();
-		//~ dbgmsg("after loading plugins");
-		const bool nb = ((ene_opts & OMMIface::non_bond) && __fftype == "phy");
-		const bool kb = ((ene_opts & OMMIface::non_bond) && __fftype == "kb");
-		const bool tor = (ene_opts & OMMIface::torsional);
-		// Allocate space to hold OpenMM objects while we're using them.
-		// Create a System and Force objects within the System. Retain a reference
-		// to each force object so we can fill in the forces. Note: the System owns
-		// the force objects and will take care of deleting them; don't do it yourself!
-		OpenMM::System&                 system      = *(omm->system = new OpenMM::System());
-		OpenMM::NonbondedForce*         nonbond     = (nb ? new OpenMM::NonbondedForce() : nullptr);
-		OpenMM::HarmonicBondForce*      bondStretch = (tor ? new OpenMM::HarmonicBondForce() : nullptr);
-		OpenMM::HarmonicAngleForce*     bondBend    = (tor ? new OpenMM::HarmonicAngleForce() : nullptr);
-		OpenMM::PeriodicTorsionForce*   bondTorsion = (tor ? new OpenMM::PeriodicTorsionForce() : nullptr);
-		KBPlugin::KBForce*			    kbforce     = (kb ? new KBPlugin::KBForce() : nullptr);
- 		if (nonbond) system.addForce(nonbond);
-		//~ if (kbforce) system.addForce(kbforce);  
-		if (kbforce) {
-			// remember the return value of addForce, which is the index of the force (kbforce_idx)
-			__kbforce_idx = system.addForce(kbforce); 
-		}
-		if (bondStretch) system.addForce(bondStretch);
-		if (bondBend) system.addForce(bondBend);
-		if (bondTorsion) system.addForce(bondTorsion);
 		// Specify the atoms and their properties:
 		//  (1) System needs to know the masses.
 		//  (2) NonbondedForce needs charges,van der Waals properties (in MD units!).
 		//  (3) Collect default positions for initializing the simulation later.
-		vector<OpenMM::Vec3> initialPosInNm;
-		map<const Molib::Atom*, const int> atom_to_index;
 		int idx = 0;
-		for (auto &patom : mol_info.atom) {
+		for (auto &patom : topology.atoms) {
 			const Molib::Atom &atom = *patom;
-			atom_to_index.insert({&atom, idx++});
-			const int type = mol_info.atom_to_type.at(&atom);
-			try {
-				const ForceField::AtomType& atype = __ffield.get_atom_type(type);
-				system.addParticle(atype.mass);
-				
-				if (nonbond) nonbond->addParticle(atype.charge, atype.sigma, atype.epsilon);
-
-				dbgmsg("add particle type = " << type << " crd = " << atom.crd() << " mass = " 
-					<< atype.mass << " charge = " << atype.charge << " sigma = " << atype.sigma
-					<< " epsilon = " << atype.epsilon << " representing atom = "
-					<< atom << " at index = " << atom_to_index.at(&atom));
-				const OpenMM::Vec3 posInNm(atom.crd().x() * OpenMM::NmPerAngstrom,
-											atom.crd().y() * OpenMM::NmPerAngstrom,
-											atom.crd().z() * OpenMM::NmPerAngstrom);
-				initialPosInNm.push_back(posInNm);
-			} catch (ParameterError& e) {
-				cerr << e.what() << " (" << ++warn << ")" << endl;
+			if (!atom_to_index.count(&atom)) { // e.g., overlapping atoms from different segments
+				atom_to_index.insert({&atom, idx++});
+				const int type = topology.atom_to_type.at(&atom);
+				try {
+					const ForceField::AtomType& atype = __ffield.get_atom_type(type);
+					system.addParticle(atype.mass);
+					
+					if (nonbond) nonbond->addParticle(atype.charge, atype.sigma, atype.epsilon);
+	
+					dbgmsg("add particle type = " << type << " crd = " << atom.crd() << " mass = " 
+						<< atype.mass << " charge = " << atype.charge << " sigma = " << atype.sigma
+						<< " epsilon = " << atype.epsilon << " representing atom = "
+						<< atom << " at index = " << atom_to_index.at(&atom));
+					const OpenMM::Vec3 posInNm(atom.crd().x() * OpenMM::NmPerAngstrom,
+												atom.crd().y() * OpenMM::NmPerAngstrom,
+												atom.crd().z() * OpenMM::NmPerAngstrom);
+					initialPosInNm.push_back(posInNm);
+				} catch (ParameterError& e) {
+					cerr << e.what() << " (" << ++warn << ")" << endl;
+				}
 			}
 		}
 		// Process the bonds:
@@ -156,7 +77,7 @@ namespace OMMIface {
 		//      (tricky units!).
 		//  (2) Create a list of bonds for generating nonbond exclusions.
 		vector< pair<int,int> > bondPairs;
-		for (auto &bond : mol_info.bond) {
+		for (auto &bond : topology.bonds) {
 			dbgmsg("checkpoint0");
 			const Molib::Atom &atom1 = *bond.first;
 			dbgmsg(atom1);
@@ -166,9 +87,9 @@ namespace OMMIface {
 			dbgmsg(idx1);
 			const int idx2 = atom_to_index.at(&atom2);
 			dbgmsg(idx2);
-			const int type1 = mol_info.atom_to_type.at(&atom1);
+			const int type1 = topology.atom_to_type.at(&atom1);
 			dbgmsg(type1);
-			const int type2 = mol_info.atom_to_type.at(&atom2);
+			const int type2 = topology.atom_to_type.at(&atom2);
 			dbgmsg(type2);
 			try {				
 				const ForceField::BondType& btype = __ffield.get_bond_type(type1, type2);
@@ -190,7 +111,7 @@ namespace OMMIface {
 		if (nonbond)
 			nonbond->createExceptionsFromBonds(bondPairs, __ffield.coulomb14scale, __ffield.lj14scale);
 		// Create the 1-2-3 bond angle harmonic terms.
-		for (auto &angle : mol_info.angle) {
+		for (auto &angle : topology.angle) {
 			dbgmsg("checkpoint4");
 			const Molib::Atom &atom1 = *get<0>(angle);
 			const Molib::Atom &atom2 = *get<1>(angle);
@@ -199,9 +120,9 @@ namespace OMMIface {
 			const int idx2 = atom_to_index.at(&atom2);
 			dbgmsg("checkpoint5");
 			const int idx3 = atom_to_index.at(&atom3);
-			const int type1 = mol_info.atom_to_type.at(&atom1);
-			const int type2 = mol_info.atom_to_type.at(&atom2);
-			const int type3 = mol_info.atom_to_type.at(&atom3);
+			const int type1 = topology.atom_to_type.at(&atom1);
+			const int type2 = topology.atom_to_type.at(&atom2);
+			const int type3 = topology.atom_to_type.at(&atom3);
 			dbgmsg("checkpoint6");
 			try {
 				dbgmsg("determining angle type between atoms : " << endl
@@ -215,7 +136,7 @@ namespace OMMIface {
 			dbgmsg("checkpoint8");
 		}
 		// Create the 1-2-3-4 bond torsion (dihedral) terms.
-		for (auto &dihedral : mol_info.dihedral) {
+		for (auto &dihedral : topology.dihedral) {
 			dbgmsg("checkpoint9");
 			const Molib::Atom &atom1 = *get<0>(dihedral);
 			const Molib::Atom &atom2 = *get<1>(dihedral);
@@ -225,10 +146,10 @@ namespace OMMIface {
 			const int idx2 = atom_to_index.at(&atom2);
 			const int idx3 = atom_to_index.at(&atom3);
 			const int idx4 = atom_to_index.at(&atom4);
-			const int type1 = mol_info.atom_to_type.at(&atom1);
-			const int type2 = mol_info.atom_to_type.at(&atom2);
-			const int type3 = mol_info.atom_to_type.at(&atom3);
-			const int type4 = mol_info.atom_to_type.at(&atom4);
+			const int type1 = topology.atom_to_type.at(&atom1);
+			const int type2 = topology.atom_to_type.at(&atom2);
+			const int type3 = topology.atom_to_type.at(&atom3);
+			const int type4 = topology.atom_to_type.at(&atom4);
 			try {
 				const ForceField::TorsionTypeVec& v_ttype = 
 					__ffield.get_dihedral_type(type1, type2, type3, type4); // cannot make it const ??
@@ -244,7 +165,7 @@ namespace OMMIface {
 			}
 		}
 		// Create the 1-2-3-4 improper terms where 3 is the central atom
-		for (auto &dihedral : mol_info.improper) {
+		for (auto &dihedral : topology.improper) {
 			dbgmsg("checkpoint9");
 			const Molib::Atom &atom1 = *get<0>(dihedral);
 			const Molib::Atom &atom2 = *get<1>(dihedral);
@@ -254,10 +175,10 @@ namespace OMMIface {
 			const int idx2 = atom_to_index.at(&atom2);
 			const int idx3 = atom_to_index.at(&atom3);
 			const int idx4 = atom_to_index.at(&atom4);
-			const int type1 = mol_info.atom_to_type.at(&atom1);
-			const int type2 = mol_info.atom_to_type.at(&atom2);
-			const int type3 = mol_info.atom_to_type.at(&atom3);
-			const int type4 = mol_info.atom_to_type.at(&atom4);
+			const int type1 = topology.atom_to_type.at(&atom1);
+			const int type2 = topology.atom_to_type.at(&atom2);
+			const int type3 = topology.atom_to_type.at(&atom3);
+			const int type4 = topology.atom_to_type.at(&atom4);
 			try {
 				const ForceField::TorsionTypeVec& v_ttype = 
 					__ffield.get_improper_type(type1, type2, type3, type4); // cannot make it const ??
@@ -278,13 +199,13 @@ namespace OMMIface {
 			kbforce->setScale(__ffield.scale);
 			dbgmsg("kbforce scale = " << __ffield.scale 
 				<< " step = " << __ffield.step);
-			for (auto &bond : mol_info.kbforce) {
+			for (auto &bond : topology.kbforce) {
 				const Molib::Atom &atom1 = *bond.first;
 				const Molib::Atom &atom2 = *bond.second;
 				const int idx1 = atom_to_index.at(&atom1);
 				const int idx2 = atom_to_index.at(&atom2);
-				const int type1 = mol_info.atom_to_type.at(&atom1);
-				const int type2 = mol_info.atom_to_type.at(&atom2);
+				const int type1 = topology.atom_to_type.at(&atom1);
+				const int type2 = topology.atom_to_type.at(&atom2);
 				try {
 					const ForceField::KBType& kbtype = 
 						__ffield.get_kb_force_type(atom1, atom2, type1, type2);
@@ -388,15 +309,15 @@ namespace OMMIface {
 				Molib::Molecule minimized_receptor(ret.first);
 				Molib::Molecule minimized_ligand(ret.second);
 				
-				MoleculeInfo mol_info;
-				mol_info.get_molecule_info(minimized_receptor, __ffield)
-					.get_molecule_info(minimized_ligand, __ffield)
+				Topology topology;
+				topology.get_topology(minimized_receptor, __ffield)
+					.get_topology(minimized_ligand, __ffield)
 					.get_kb_force_info(minimized_receptor, minimized_ligand, __dist_cutoff);				
 	
 				// prepare atom_to_index
 				map<const Molib::Atom*, const int> atom_to_index;
 				int idx = 0;
-				for (auto &patom : mol_info.atom) {
+				for (auto &patom : topology.atom) {
 					const Molib::Atom &atom = *patom;
 					atom_to_index.insert({&atom, idx++});
 				}
@@ -409,13 +330,13 @@ namespace OMMIface {
 				dbgmsg("kbforce scale = " << __ffield.scale 
 					<< " step = " << __ffield.step);
 				
-				for (auto &bond : mol_info.kbforce) {
+				for (auto &bond : topology.kbforce) {
 					const Molib::Atom &atom1 = *bond.first;
 					const Molib::Atom &atom2 = *bond.second;
 					const int idx1 = atom_to_index.at(&atom1);
 					const int idx2 = atom_to_index.at(&atom2);
-					const int type1 = mol_info.atom_to_type.at(&atom1);
-					const int type2 = mol_info.atom_to_type.at(&atom2);
+					const int type1 = topology.atom_to_type.at(&atom1);
+					const int type2 = topology.atom_to_type.at(&atom2);
 					try {
 						const ForceField::KBType& kbtype = 
 							__ffield.get_kb_force_type(atom1, atom2, type1, type2);
@@ -494,19 +415,19 @@ namespace OMMIface {
 		 */
 		assert(cur_dist_cutoff <= __dist_cutoff);
 		
-		MoleculeInfo complex_info;
-		complex_info.get_molecule_info(receptor, __ffield)
-			.get_molecule_info(ligand, __ffield)
+		Topology complex_info;
+		complex_info.get_topology(receptor, __ffield)
+			.get_topology(ligand, __ffield)
 			.get_kb_force_info(receptor, ligand, cur_dist_cutoff);
-		MoleculeInfo interaction_info;
-		interaction_info.get_molecule_info(receptor, __ffield)
-			.get_molecule_info(ligand, __ffield)
+		Topology interaction_info;
+		interaction_info.get_topology(receptor, __ffield)
+			.get_topology(ligand, __ffield)
 			.get_interaction_force_info(receptor, ligand, cur_dist_cutoff);
-		MoleculeInfo ligand_info;					
-		ligand_info.get_molecule_info(ligand, __ffield)
+		Topology ligand_info;					
+		ligand_info.get_topology(ligand, __ffield)
 			.get_kb_force_info(Molib::Molecule("dummy"), ligand, cur_dist_cutoff);
-		MoleculeInfo receptor_info;					
-		receptor_info.get_molecule_info(receptor, __ffield)
+		Topology receptor_info;					
+		receptor_info.get_topology(receptor, __ffield)
 			.get_kb_force_info(receptor, Molib::Molecule("dummy"), cur_dist_cutoff);
 		
 		dbgmsg("after moleculeinfo");

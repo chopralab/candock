@@ -339,9 +339,24 @@ namespace Linker {
 							<< __clashes_ligand(*pneighbor, curr_conformation, curr_state));
 						if (!__clashes_receptor(*pneighbor) 
 							&& !__clashes_ligand(*pneighbor, curr_conformation, curr_state)) {
-							// IMPROVEMENT: clashes_receptor & clashes_ligand might
-							// be replaced by energy test ? (maybe not)
-							//~ const double nb_ene = __score.non_bonded_energy(pneighbor->get_atoms());
+
+							/**
+							 * FOR MINIMIZATION :
+							 * 
+							 * openmm.add_state(curr_conformation.get_state());
+							 * openmm.add_coords(pneighbor, pneighbor->get_crds());
+							 * openmm.minimize_state();
+							 * 
+							 * double nonbond_energy = score.non_bonded_energy(openmm.get_nonbonded_list(ligand, receptor));
+							 * 
+							 * 
+							 * next_conformation.set_states(curr_conformation.get_states());
+							 * next_conformation.add_coords(pneighbor, pneighbor->get_coords());
+							 * 
+							 * next_conformation.set_state(openmm.get_state());
+							 * next_conformation.set_energy(nonbond_energy());
+							 * 
+							 */
 							const double nb_ene = __score.non_bonded_energy(pneighbor->get_segment().get_atoms(), pneighbor->get_crds());
 							const double torsion_ene = torsion_energy(curr_state, *pneighbor);
 							const double branch_ene = curr_conformation.second
