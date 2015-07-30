@@ -113,8 +113,12 @@ int main(int argc, char* argv[]) {
 				 */
 				 
 				OMMIface::Modeler modeler;
-				modeler.add_forcefield(ffield, cmdl.fftype());
+				modeler.set_forcefield(ffield);
+				modeler.set_forcefield_type(cmdl.fftype());
 				modeler.set_distance_cutoff(cmdl.dist_cutoff());
+				modeler.set_use_constraints(false);
+				modeler.set_step_size_in_fs(2.0);
+				
 				modeler.add_topology(&receptors[0], receptors[0].get_atoms());
 				modeler.add_topology(&ligand, ligand.get_atoms());
 				

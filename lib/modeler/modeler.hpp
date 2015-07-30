@@ -31,20 +31,20 @@ namespace OMMIface {
 			typedef enum {torsional=1, non_bond=2} options;
 		private:
 			OpenMM::System *system;
-		    OpenMM::Integrator*     integrator;
-		    OpenMM::Context*  context;
+		    OpenMM::Integrator *integrator;
+		    OpenMM::Context *context;
 
-			OpenMM::NonbondedForce nonbond;
-			OpenMM::HarmonicBondForce bondStretch;
-			OpenMM::HarmonicAngleForce bondBend;
-			OpenMM::PeriodicTorsionForce bondTorsion;
+			OpenMM::NonbondedForce *nonbond;
+			OpenMM::HarmonicBondForce *bondStretch;
+			OpenMM::HarmonicAngleForce *bondBend;
+			OpenMM::PeriodicTorsionForce *bondTorsion;
 			KBPlugin::KBForce *kbforce;
 			
 			vector<OpenMM::Vec3> initialPosInNm;
 			map<const Molib::Atom*, const int> atom_to_index;
 
 		public:
-			void Modeler::SystemTopology::init_bonded(Topology &topology);
+			void init_bonded(Topology &topology);
 		};
 
 	public:
