@@ -17,18 +17,18 @@ OBJS_TEST3	= test_bsite.o common.o
 OBJS_TEST4	= test_clq.o common.o
 OBJS_TEST5	= test_link.o common.o
 OBJLIBS	=  libfragmenter.a libgeom3d.a libgraph.a libhelper.a libkabsch.a \
-libkbforce.a liblinker.a libomm.a libpdb.a libscore.a libprobis.a libligands.a \
+libkbforce.a liblinker.a libmodeler.a libpdb.a libscore.a libprobis.a libligands.a \
 libdocker.a libcentro.a libcluster.a
 LIBS	= -L. -L$(LIBDIR)/linker -L $(LIBDIR)/pdbreader -L $(LIBDIR)/kabsch \
 -L $(LIBDIR)/helper -L $(LIBDIR)/score -L $(LIBDIR)/fragmenter -L $(LIBDIR)/graph \
--L $(LIBDIR)/kbforce -L $(LIBDIR)/geom3d -L $(LIBDIR)/openmm -L $(LIBDIR)/probis \
+-L $(LIBDIR)/kbforce -L $(LIBDIR)/geom3d -L $(LIBDIR)/modeler -L $(LIBDIR)/probis \
 -L $(LIBDIR)/ligands -L $(LIBDIR)/docker -L $(LIBDIR)/centro -L $(LIBDIR)/cluster \
 -llinker -lcluster -lpdb -ldocker -lscore -lfragmenter -lgraph -lkabsch -lcentro \
--lomm -lhelper -lOpenMM_static -ldl -lc -lkbforce -lprobis -lligands -lpdb -lgeom3d \
+-lmodeler -lhelper -lOpenMM_static -ldl -lc -lkbforce -lprobis -lligands -lpdb -lgeom3d \
 -lboost_regex -lboost_filesystem -lboost_system -lpthread -lboost_date_time \
 -lgsl -lgslcblas -lm
 INCL = -I $(LIBDIR)/tclap-1.2.1/include -I $(LIBDIR)/jsoncpp-src-0.6.0-rc2/include \
--I $(LIBDIR)/jsoncpp-src-0.6.0-rc2/src -I $(LIBDIR) -I $(LIBDIR)/openmm
+-I $(LIBDIR)/jsoncpp-src-0.6.0-rc2/src -I $(LIBDIR) -I $(LIBDIR)/modeler
 
 all : $(EXE)
 test : $(TEST)
@@ -144,9 +144,9 @@ libgeom3d.a : force_look
 	$(ECHO) looking into subdir : $(MAKE) $(MFLAGS)
 	cd $(LIBDIR)/geom3d; $(MAKE) $(MFLAGS)
 
-libomm.a: force_look
+libmodeler.a: force_look
 	$(ECHO) looking into subdir : $(MAKE) $(MFLAGS)
-	cd $(LIBDIR)/openmm; $(MAKE) $(MFLAGS)
+	cd $(LIBDIR)/modeler; $(MAKE) $(MFLAGS)
 
 clean :
 	$(ECHO) cleaning up in .

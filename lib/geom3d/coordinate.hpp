@@ -29,6 +29,8 @@ namespace Geom3D {
 		Coordinate(const double *array) : __x(array[0]), __y(array[1]), __z(array[2]) {}
 		Coordinate(const Coordinate& other) : __x(other.__x), __y(other.__y), __z(other.__z) {} // copy constructor
 		Coordinate(const gsl_vector& other) : __x(gsl_vector_get(&other, 0)), __y(gsl_vector_get(&other, 1)), __z(gsl_vector_get(&other, 2)) {} // copy constructor
+		//~ Coordinate(const OpenMM::Vec3 &other) : __x(other[0]), __y(other[1]), __z(other[2]) {}
+
 		void set_x(const double &x) { this->__x = x; }
 		void set_y(const double &y) { this->__y = y; }
 		void set_z(const double &z) { this->__z = z; }

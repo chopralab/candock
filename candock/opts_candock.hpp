@@ -74,6 +74,7 @@ class CmdLnOpts {
 	double __tolerance;
 	int __max_iterations;
 	int __update_freq;
+	double __position_tolerance;
 	
 	string __mini_ligands_file;
 	string __energy_file;
@@ -190,6 +191,7 @@ public:
 			TCLAP::ValueArg<double> toleranceArg("","mini_tol","Minimization tolerance (default is 0.0001)",false,0.0001,"double", cmd);
 			TCLAP::ValueArg<int> max_iterationsArg("","max_iter","Maximum iterations for minimization (default is 0 - meaning minimize until convergence is reached)",false,0,"int", cmd);
 			TCLAP::ValueArg<int> update_freqArg("","update_freq","Update non-bond frequency (default is 10)",false,10,"int", cmd);
+			TCLAP::ValueArg<double> position_toleranceArg("","pos_tol","Minimization position tolerance in Angstroms - only for KB (default is 0.0001)",false,0.0001,"double", cmd);
 
 			TCLAP::ValueArg<string> mini_ligands_fileArg("","mini_ligands","Docked & minimized ligands output filename (default minimized.pdb)",false,"minimized.pdb","string", cmd);
 			TCLAP::ValueArg<string> energy_fileArg("","energy","Energies of minimized ligands output filename (default energies.txt)",false,"energies.txt","string", cmd);
@@ -263,6 +265,8 @@ public:
 			__tolerance = toleranceArg.getValue();
 			__max_iterations = max_iterationsArg.getValue();
 			__update_freq = update_freqArg.getValue();
+			__position_tolerance = position_toleranceArg.getValue();
+			
 			__mini_ligands_file = mini_ligands_fileArg.getValue();
 			__energy_file = energy_fileArg.getValue();
 			
@@ -340,6 +344,7 @@ public:
 	double tolerance() const { return __tolerance; }
 	int max_iterations() const { return __max_iterations; }
 	int update_freq() const { return __update_freq; }
+	double position_tolerance() const { return __position_tolerance; }
 	string mini_ligands_file() const { return __mini_ligands_file; }
 	string energy_file() const { return __energy_file; }
 	

@@ -1,4 +1,4 @@
-#include "moleculeinfo.hpp"
+#include "topology.hpp"
 #include "forcefield.hpp"
 #include "pdbreader/molecule.hpp"
 #include "helper/inout.hpp"
@@ -55,22 +55,19 @@ namespace OMMIface {
 		return stream;
 	}
 
-	Topology& Topology::get_topology(const Molib::Atom::Vec &atoms,	const ForceField &ff) {
+	Topology& Topology::add_topology(const Molib::Atom::Vec &atoms, const ForceField &ffield) {
 
-		// copy atoms
-		this->atoms = atoms;
-		
 		// residue topology
 		for (auto &patom : atoms) {
 			Molib::Atom &atom = *patom;
 			const Molib::Residue &residue = atom.br();
 
-			if (!ff.residue_topology.count(residue.resn())) 
+			if (!ffield.residue_topology.count(residue.resn())) 
 				throw Error("die : cannot find topology for residue " + residue.resn());
 
 			dbgmsg("residue topology for residue " << residue.resn());
 
-			const ForceField::ResidueTopology &rtop = ff.residue_topology.at(residue.resn());
+			const ForceField::ResidueTopology &rtop = ffield.residue_topology.at(residue.resn());
 
 			if (!rtop.atom.count(atom.atom_name()))
 				throw Error("die : cannot find atom " + atom.atom_name() 
@@ -78,6 +75,8 @@ namespace OMMIface {
 
 			dbgmsg("crd = " << atom.crd() << " type = " << rtop.atom.at(atom.atom_name()));
 			this->atom_to_type.insert({&atom, rtop.atom.at(atom.atom_name())});
+			int sz = this->atom_to_index.size();
+			this->atom_to_index.insert({&atom, sz});
 		}
 		BondedExclusions visited_bonds;
 		set<tuple<Molib::Atom*, Molib::Atom*, Molib::Atom*>> visited_angles;
@@ -151,55 +150,4 @@ namespace OMMIface {
 		dbgmsg("BONDED EXCLUSIONS ARE : " << endl << this->bonded_exclusions);
 	}
 
-	//~ Topology& Topology::get_kb_force_info(const Molib::Molecule &receptor, 
-					//~ const Molib::Molecule &ligand, const int &dist_cutoff) {
-		//~ dbgmsg("get_kb_force_info");
-		//~ // 1-2 and 1-3 bonded exclusions for knowledge-based forcefield
-		//~ Molib::Atom::Vec rec_atoms = receptor.get_atoms();
-		//~ Molib::Atom::Vec lig_atoms = ligand.get_atoms();
-		//~ Molib::Atom::Vec atoms;
-		//~ atoms.reserve(rec_atoms.size() + lig_atoms.size());
-		//~ dbgmsg("receptor atoms are : " << endl << rec_atoms);
-		//~ dbgmsg("ligand atoms are : " << endl << lig_atoms);
-//~ 
-		//~ atoms.insert(atoms.end(), rec_atoms.begin(), rec_atoms.end());
-		//~ atoms.insert(atoms.end(), lig_atoms.begin(), lig_atoms.end());
-		//~ BondedExclusions bonded_exclusions;
-		//~ for (auto &pa : atoms) {
-			//~ Molib::Atom &atom1 = *pa;
-			//~ for (auto &atom2 : atom1) {
-				//~ bonded_exclusions.insert({&atom1, &atom2});
-				//~ for (auto &atom3 : atom2) {
-					//~ bonded_exclusions.insert({&atom1, &atom3});
-				//~ }
-			//~ }
-		//~ }
-		//~ // knowledge-based forces between atoms except between bonded exclusions
-		//~ BondedExclusions visited;
-		//~ Molib::Atom::Grid g(atoms);
-		//~ for (auto &pa1 : atoms) {
-			//~ for (auto &pa2 : g.get_neighbors(pa1->crd(), dist_cutoff)) {
-				//~ if (!visited.count({pa1, pa2})) {
-					//~ visited.insert({pa2, pa1});
-					//~ if (!bonded_exclusions.count({pa1, pa2})) {
-						//~ this->kbforce.push_back({pa1, pa2});
-					//~ }
-				//~ }
-			//~ }
-		//~ }
-		//~ dbgmsg("KBFORCES ARE : " << endl << this->kbforce);
-		//~ return *this;
-	//~ }
-	//~ Topology& Topology::get_interaction_force_info(const Molib::Molecule &receptor, 
-		//~ const Molib::Molecule &ligand, const int &dist_cutoff) {
-//~ 
-		//~ // knowledge-based forces only between ligand and receptor atoms
-		//~ Molib::Atom::Grid g(receptor.get_atoms());
-		//~ for (auto &pa1 : ligand.get_atoms()) {
-			//~ for (auto &pa2 : g.get_neighbors(pa1->crd(), dist_cutoff)) {
-				//~ this->kbforce.push_back({pa1, pa2});
-			//~ }
-		//~ }
-		//~ return *this;
-	//~ }
 };

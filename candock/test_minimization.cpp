@@ -89,27 +89,13 @@ int main(int argc, char* argv[]) {
 	
 		receptors[0].prepare_for_mm(ffield, gridrec);
 
-		OMMIface::OMM::loadPlugins();
+		OMMIface::SystemTopology::loadPlugins();
 
 		for (auto &ligand : ligands) {
 			ffield.insert_topology(ligand);
 			try {
 				/**
-				 * FOR MINIMIZATION : 
-				 * openmm.add_forcefield(ffield, cmdl.fftype());
-				 * openmm.set_distance_cutoff(cmdl.dist_cutoff);
-				 * 
-				 * openmm.add_topology(receptor.get_atoms());
-				 * openmm.add_topology(ligand.get_atoms());
-				 * 
-				 * openmm.add_coords(receptor, receptor.get_coords());
-				 * openmm.add_coords(ligand, ligand.get_coords());
-				 * 
-				 * openmm.minimize_state();
-				 * 
-				 * Molecule minimized_receptor = openmm.get_coords(receptor);
-				 * Molecule minimized_ligand = openmm.get_coords(ligand);
-				 * 
+				 * Minimize system
 				 */
 				 
 				OMMIface::Modeler modeler;
@@ -118,16 +104,27 @@ int main(int argc, char* argv[]) {
 				modeler.set_distance_cutoff(cmdl.dist_cutoff());
 				modeler.set_use_constraints(false);
 				modeler.set_step_size_in_fs(2.0);
+				modeler.set_tolerance(cmdl.tolerance());
+				modeler.set_max_iterations(cmdl.max_iterations());
+				modeler.set_update_freq(cmdl.update_freq());
+				modeler.set_position_tolerance(cmdl.position_tolerance());
 				
-				modeler.add_topology(&receptors[0], receptors[0].get_atoms());
-				modeler.add_topology(&ligand, ligand.get_atoms());
+				modeler.add_topology(receptors[0].get_atoms());
+				modeler.add_topology(ligand.get_atoms());
 				
-				modeler.add_coords(&receptors[0], receptors[0].get_coords());
-				modeler.add_coords(&ligand, ligand.get_coords());
+				modeler.add_crds(receptors[0].get_atoms(), receptors[0].get_crds());
+				modeler.add_crds(ligand.get_atoms(), ligand.get_crds());
+				
+				modeler.init_openmm();
+				
+				modeler.unmask(receptors[0].get_atoms());
+				modeler.unmask(ligand.get_atoms());
 				
 				modeler.minimize_state();
 				
-				Molib::Molecule mini_state = modeler.get_atoms();
+				Molib::Molecule mini_receptor = modeler.get_state(receptors[0].get_atoms());
+				Molib::Molecule mini_ligand = modeler.get_state(ligand.get_atoms());
+				
 				mini_state.undo_mm_specific();
 				inout::output_file(mini_state, cmdl.mini_ligands_file(), ios_base::app);
 
