@@ -57,8 +57,10 @@ namespace OMMIface {
 
 	Topology& Topology::add_topology(const Molib::Atom::Vec &atoms, const ForceField &ffield) {
 
+		this->atoms = atoms;
+		
 		// residue topology
-		for (auto &patom : atoms) {
+		for (auto &patom : this->atoms) {
 			Molib::Atom &atom = *patom;
 			const Molib::Residue &residue = atom.br();
 
@@ -70,14 +72,15 @@ namespace OMMIface {
 			const ForceField::ResidueTopology &rtop = ffield.residue_topology.at(residue.resn());
 
 			if (!rtop.atom.count(atom.atom_name()))
-				throw Error("die : cannot find atom " + atom.atom_name() 
-						+ " in topology for residue " + residue.resn());
+				throw Error("die : cannot find topology for atom " 
+					+ atom.atom_name() + " in residue " + residue.resn());
 
 			dbgmsg("crd = " << atom.crd() << " type = " << rtop.atom.at(atom.atom_name()));
 			this->atom_to_type.insert({&atom, rtop.atom.at(atom.atom_name())});
 			int sz = this->atom_to_index.size();
 			this->atom_to_index.insert({&atom, sz});
 		}
+		
 		BondedExclusions visited_bonds;
 		set<tuple<Molib::Atom*, Molib::Atom*, Molib::Atom*>> visited_angles;
 		set<tuple<Molib::Atom*, Molib::Atom*, Molib::Atom*, Molib::Atom*>> visited_dihedrals, visited_impropers;
@@ -148,6 +151,8 @@ namespace OMMIface {
 		dbgmsg("DIHEDRALS ARE : " << endl << this->dihedrals);
 		dbgmsg("IMPROPERS ARE : " << endl << this->impropers);
 		dbgmsg("BONDED EXCLUSIONS ARE : " << endl << this->bonded_exclusions);
+		
+		return *this;
 	}
 
 };

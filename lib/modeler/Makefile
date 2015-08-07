@@ -3,7 +3,7 @@ include ../../candock/Makefile.inc
 
 CFLAGS	= $(PRJCFLAGS) -I..
 OBJLIBS	= libmodeler.a
-OBJS	= modeler.o forcefield.o systemtopology.o
+OBJS	= modeler.o forcefield.o systemtopology.o topology.o
 INCL= -I ../tclap-1.2.1/include/ -I ../all3/idatmtest \
 -I ../jsoncpp-src-0.6.0-rc2/include -I ../jsoncpp-src-0.6.0-rc2/src \
 -I ../../lib/modeler -I ..

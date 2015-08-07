@@ -172,6 +172,16 @@ namespace Molib {
 		}
 		return atoms;
 	}
+
+	Geom3D::Point::Vec Molecule::get_crds(const string &chain_ids, const Residue::res_type &rest,
+		const int model_number) const { 
+
+		Geom3D::Point::Vec crds;
+		for (auto &patom : this->get_atoms(chain_ids, rest, model_number)) 
+			crds.push_back(patom->crd());
+		return crds;
+	}
+
 	Atom::Vec Assembly::get_atoms(const string &chain_ids, const Residue::res_type &rest,
 		const int model_number) const {
 		Atom::Vec atoms;
@@ -183,6 +193,7 @@ namespace Molib {
 		}
 		return atoms;
 	}
+
 	Atom::Vec Model::get_atoms(const string &chain_ids, const Residue::res_type &rest) const {
 		Atom::Vec atoms;
 		for (auto &chain : *this) {

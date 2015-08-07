@@ -24,14 +24,14 @@ namespace OMMIface {
 	}
 
 
-	void Modeler::add_topology(Molib::Atom::Vec &atoms) {
-		__positions.(__positions.size() + atoms.size()); // increase size to accomodate more atoms
+	void Modeler::add_topology(const Molib::Atom::Vec &atoms) {
+		__positions.resize(__positions.size() + atoms.size()); // increase size to accomodate more atoms
 		__topology.add_topology(atoms, *__ffield);
 	}
 
-	void Modeler::add_crds(Molib::Atom::Vec &atoms, Geom3D::Point::Vec &crds) {
+	void Modeler::add_crds(const Molib::Atom::Vec &atoms, const Geom3D::Point::Vec &crds) {
 		for (int i = 0; i < atoms.size(); ++i) {
-			int idx = __topology.get_index(atoms[i]);
+			int idx = __topology.get_index(*atoms[i]);
 			__positions[idx] = crds[i];
 		}
 	}
@@ -39,14 +39,13 @@ namespace OMMIface {
 	/**
 	 * Changes coordinates of atoms
 	 */
-	Molib::Atom::Vec& Modeler::get_state(Molib::Atom::Vec &atoms) {
+	Molib::Atom::Vec Modeler::get_state(const Molib::Atom::Vec &atoms) {
 
-		int infoMask = OpenMM::State::Positions;
 		const vector<OpenMM::Vec3>& positions_in_nm = __system_topology.get_positions_in_nm();
 
 		for (int i = 0; i < atoms.size(); ++i) {
-			int idx = __topology.get_index(atoms[i]);
-			atoms[i].set_crd(Geom3D::Coordinate(
+			int idx = __topology.get_index(*atoms[i]);
+			atoms[i]->set_crd(Geom3D::Coordinate(
 				positions_in_nm[idx][0] * OpenMM::AngstromsPerNm,
 				positions_in_nm[idx][1] * OpenMM::AngstromsPerNm,
 				positions_in_nm[idx][2] * OpenMM::AngstromsPerNm
@@ -82,7 +81,7 @@ namespace OMMIface {
 		
 		int iter = 0;
 
-		const OpenMM::vector<Vec3>& initial_positions = __system_topology.get_positions_in_nm();
+		vector<OpenMM::Vec3> initial_positions = __system_topology.get_positions_in_nm();
 
 		__system_topology.update_knowledge_based_force(__topology, initial_positions, __dist_cutoff_in_nm);
 
@@ -92,7 +91,7 @@ namespace OMMIface {
 
 			__system_topology.minimize(__tolerance, __update_freq);
 
-			const OpenMM::vector<Vec3>& minimized_positions = __system_topology.get_positions_in_nm();
+			const vector<OpenMM::Vec3>& minimized_positions = __system_topology.get_positions_in_nm();
 
 			// check if positions have converged
 			double max_error = 0;
@@ -110,7 +109,7 @@ namespace OMMIface {
 			// update knowledge-based nonbond list
 			__system_topology.update_knowledge_based_force(__topology, minimized_positions, __dist_cutoff_in_nm);
 				
-			iter += update_freq;						
+			iter += __update_freq;						
 
 			initial_positions = minimized_positions;
 			dbgmsg("ending minimization step iter = " << iter);
@@ -121,9 +120,9 @@ namespace OMMIface {
 	}
 
 	void Modeler::init_openmm() {
-		__system_topology = SystemTopology::create_object(__ffield, 
-			__positions, __topology, __step_size_in_fs, __use_constraints);
-			
+		//~ __system_topology = SystemTopology::create_object(__ffield, 
+			//~ __positions, __topology, __step_size_in_fs, __use_constraints);
+		__system_topology.set_forcefield(*__ffield);
 		__system_topology.init_integrator(__step_size_in_fs);
 		__system_topology.init_positions(__positions);
 		__system_topology.init_particles(__topology);

@@ -14,7 +14,7 @@
 #include "openmm/forcefield.hpp"
 #include "openmm/moleculeinfo.hpp"
 #include "score/score.hpp"
-#include "openmm/omm.hpp"
+#include "modeler/modeler.hpp"
 #include "linker/linker.hpp"
 #include "probis/probis.hpp"
 #include "ligands/genclus.hpp"
@@ -122,35 +122,14 @@ int main(int argc, char* argv[]) {
 				
 				modeler.minimize_state();
 				
-				Molib::Molecule mini_receptor = modeler.get_state(receptors[0].get_atoms());
-				Molib::Molecule mini_ligand = modeler.get_state(ligand.get_atoms());
+				//~ Molib::Molecule mini_receptor = modeler.get_state(receptors[0].get_atoms());
+				//~ Molib::Molecule mini_ligand = modeler.get_state(ligand.get_atoms());
+				modeler.get_state(receptors[0].get_atoms());
+				modeler.get_state(ligand.get_atoms());
 				
-				mini_state.undo_mm_specific();
-				inout::output_file(mini_state, cmdl.mini_ligands_file(), ios_base::app);
+				//~ mini_state.undo_mm_specific();
+				//~ inout::output_file(mini_state, cmdl.mini_ligands_file(), ios_base::app);
 
-				
-				//~ OMMIface::OMM omm(receptors[0], ligand, ffield, 
-					//~ cmdl.fftype(), cmdl.dist_cutoff());
-				//~ omm.minimize(cmdl.tolerance(), cmdl.max_iterations(), cmdl.update_freq()); // minimize
-				//~ dbgmsg(ligand);
-				//~ auto ret = omm.get_state(receptors[0], ligand);
-				//~ Molib::Molecules mini;
-				//~ Molib::Molecule &minimized_receptor = 
-					//~ mini.add(new Molib::Molecule(ret.first));
-				//~ Molib::Molecule &minimized_ligand = 
-					//~ mini.add(new Molib::Molecule(ret.second));
-		//~ 
-				//~ minimized_receptor.undo_mm_specific();
-		//~ 
-				//~ dbgmsg("MOLECULES AFTER MINIMIZATION : " << endl 
-					//~ << minimized_ligand << endl 
-					//~ << minimized_receptor);
-				//~ inout::output_file(mini, cmdl.mini_ligands_file(), ios_base::app);
-
-				//~ OMMIface::Energies energies;
-				//~ energies[&minimized_ligand] = omm.get_energy_components(
-					//~ minimized_receptor, minimized_ligand, cmdl.dist_cutoff());
-				//~ minimized_receptor.undo_mm_specific();
 			} catch (exception& e) {
 				cerr << "MINIMIZATION FAILED FOR LIGAND " << ligand.name() 
 					<< " because of " << e.what() << endl;

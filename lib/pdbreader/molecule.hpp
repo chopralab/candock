@@ -14,7 +14,7 @@
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string.hpp>
 #include <boost/asio/ip/host_name.hpp>
-#include "geom3d/coordinate.hpp"
+#include "geom3d/geom3d.hpp"
 #include "geom3d/matrix.hpp"
 #include "fragmenter/fragmenter.hpp"
 #include "helper/help.hpp"
@@ -242,6 +242,9 @@ namespace Molib {
 		typedef enum {first_bio, all_bio} bio_how_many;
 		Assembly& asym() { return this->first(); }
 		Atom::Vec get_atoms(const string &chain_ids="", 
+			const Residue::res_type &rest=Residue::res_type::notassigned,
+			const int model_number=-1) const;
+		Geom3D::Point::Vec get_crds(const string &chain_ids="", 
 			const Residue::res_type &rest=Residue::res_type::notassigned,
 			const int model_number=-1) const;
 		double max_dist() const;

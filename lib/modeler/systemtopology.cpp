@@ -50,6 +50,11 @@ namespace OMMIface {
 	}
 	
 	void SystemTopology::init_integrator(const double step_size_in_fs) {
+		// Choose an Integrator for advancing time, and a Context connecting the
+		// System with the Integrator for simulation. Let the Context choose the
+		// best available Platform. Initialize the configuration from the default
+		// positions we collected above. Initial velocities will be zero.
+		system = new OpenMM::System();
 		integrator = new OpenMM::VerletIntegrator(step_size_in_fs * OpenMM::PsPerFs);
 		context = new OpenMM::Context(*system, *integrator);
 		dbgmsg("REMARK  Using OpenMM platform "	<< context->getPlatform().getName());
@@ -59,12 +64,6 @@ namespace OMMIface {
 
 		int warn = 0;
 
-		// Choose an Integrator for advancing time, and a Context connecting the
-		// System with the Integrator for simulation. Let the Context choose the
-		// best available Platform. Initialize the configuration from the default
-		// positions we collected above. Initial velocities will be zero.
-		system = new OpenMM::System();
-
 		// Specify the atoms and their properties:
 		//  (1) System needs to know the masses.
 		//  (2) NonbondedForce needs charges,van der Waals properties (in MD units!).
@@ -73,7 +72,7 @@ namespace OMMIface {
 			const Molib::Atom &atom = *patom;
 			const int type = topology.get_type(atom);
 			try {
-				const ForceField::AtomType& atype = __ffield.get_atom_type(type);
+				const ForceField::AtomType& atype = __ffield->get_atom_type(type);
 				system->addParticle(atype.mass);
 
 				masses.push_back(atype.mass);
@@ -88,8 +87,7 @@ namespace OMMIface {
 			}
 		}
 		if (warn > 0) {
-			throw Error("die : missing parameters detected for molecule "
-				+ __ligand.name());
+			throw Error("die : missing parameters detected");
 		}
 	}
 
@@ -104,10 +102,10 @@ namespace OMMIface {
 		}
 		
 		// generate grid
-		Molib::AtomPoint::Grid grid(atompoints);
+		AtomPoint::Grid grid(atompoints);
 		
 		// knowledge-based forces between atoms except between bonded exclusions
-		set<Molib::Atom> visited;
+		Molib::Atom::Set visited;
 		Topology::Bonds nonbondlist;
 
 		for (auto &pa1 : atompoints) {
@@ -130,9 +128,11 @@ namespace OMMIface {
 			system->removeForce(__kbforce_idx);
 
 		KBPlugin::KBForce* kbforce = new KBPlugin::KBForce();
-		kbforce->setStep(__ffield.step);
-		kbforce->setScale(__ffield.scale);
-		dbgmsg("kbforce scale = " << __ffield.scale << " step = " << __ffield.step);
+		kbforce->setStep(__ffield->step);
+		kbforce->setScale(__ffield->scale);
+		dbgmsg("kbforce scale = " << __ffield->scale << " step = " << __ffield->step);
+
+		int warn = 0;
 
 		// init OpenMM's kbforce object
 		for (auto &bond : nonbondlist) {
@@ -145,7 +145,7 @@ namespace OMMIface {
 			if (!masked[idx1] && !masked[idx2]) { // don't make the force if one or both atoms are masked
 				try {
 					const ForceField::KBType& kbtype = 
-						__ffield.get_kb_force_type(atom1, atom2, type1, type2);
+						__ffield->get_kb_force_type(atom1, atom2, type1, type2);
 					kbforce->addBond(idx1, idx2, 
 						const_cast<vector<double>&>(kbtype.potential), 
 						const_cast<vector<double>&>(kbtype.derivative));
@@ -156,18 +156,25 @@ namespace OMMIface {
 		}	
 		// and add it back to the system
 		__kbforce_idx = system->addForce(kbforce);
+
+		if (warn > 0) {
+			throw Error("die : missing parameters detected");
+		}
+
 	}
 	
 	void SystemTopology::init_physics_based_force(Topology &topology) {
 
+		int warn = 0;
+
 		OpenMM::NonbondedForce *nonbond = new OpenMM::NonbondedForce();
  		system->addForce(nonbond);
 
-		for (auto &patom : atoms) {
+		for (auto &patom : topology.atoms) {
 			const Molib::Atom &atom = *patom;
 			const int type = topology.get_type(atom);
 			try {
-				const ForceField::AtomType& atype = __ffield.get_atom_type(type);
+				const ForceField::AtomType& atype = __ffield->get_atom_type(type);
 
 				nonbond->addParticle(atype.charge, atype.sigma, atype.epsilon);
 
@@ -196,7 +203,11 @@ namespace OMMIface {
 		}
 		dbgmsg("checkpoint3");
 		// Exclude 1-2, 1-3 bonded atoms from nonbonded forces, and scale down 1-4 bonded atoms.
-		nonbond->createExceptionsFromBonds(bondPairs, __ffield.coulomb14scale, __ffield.lj14scale);
+		nonbond->createExceptionsFromBonds(bondPairs, __ffield->coulomb14scale, __ffield->lj14scale);
+
+		if (warn > 0) {
+			throw Error("die : missing parameters detected");
+		}
 		
 	}
 	
@@ -234,9 +245,9 @@ namespace OMMIface {
 			const int type2 = topology.get_type(atom2);
 			dbgmsg(type2);
 			try {				
-				const ForceField::BondType& btype = __ffield.get_bond_type(type1, type2);
+				const ForceField::BondType& btype = __ffield->get_bond_type(type1, type2);
 				if (use_constraints && btype.can_constrain) { // Should we constrain C-H bonds?
-					system.addConstraint(idx1, idx2, btype.length);
+					system->addConstraint(idx1, idx2, btype.length);
 				} else {
 					// Note factor of 2 for stiffness below because Amber specifies the constant
 					// as it is used in the harmonic energy term kx^2 with force 2kx; OpenMM wants 
@@ -250,7 +261,7 @@ namespace OMMIface {
 		dbgmsg("checkpoint3");
 
 		// Create the 1-2-3 bond angle harmonic terms.
-		for (auto &angle : topology.angle) {
+		for (auto &angle : topology.angles) {
 			dbgmsg("checkpoint4");
 			const Molib::Atom &atom1 = *get<0>(angle);
 			const Molib::Atom &atom2 = *get<1>(angle);
@@ -267,7 +278,7 @@ namespace OMMIface {
 				dbgmsg("determining angle type between atoms : " << endl
 					<< atom1 << endl << atom2 << endl << atom3);
 				const ForceField::AngleType& atype = 
-					__ffield.get_angle_type(type1, type2, type3);
+					__ffield->get_angle_type(type1, type2, type3);
 				bondBend->addAngle(idx1, idx2, idx3, atype.angle, atype.k);
 			} catch (ParameterError& e) {
 				cerr << e.what() << " (" << ++warn << ")" << endl;
@@ -276,7 +287,7 @@ namespace OMMIface {
 		}
 		
 		// Create the 1-2-3-4 bond torsion (dihedral) terms.
-		for (auto &dihedral : topology.dihedral) {
+		for (auto &dihedral : topology.dihedrals) {
 			dbgmsg("checkpoint9");
 			const Molib::Atom &atom1 = *get<0>(dihedral);
 			const Molib::Atom &atom2 = *get<1>(dihedral);
@@ -292,7 +303,7 @@ namespace OMMIface {
 			const int type4 = topology.get_type(atom4);
 			try {
 				const ForceField::TorsionTypeVec& v_ttype = 
-					__ffield.get_dihedral_type(type1, type2, type3, type4); // cannot make it const ??
+					__ffield->get_dihedral_type(type1, type2, type3, type4); // cannot make it const ??
 				for (auto &ttype : v_ttype) {
 					bondTorsion->addTorsion(idx1, idx2, idx3, idx4, ttype.periodicity, ttype.phase,	ttype.k);
 				}
@@ -302,7 +313,7 @@ namespace OMMIface {
 		}
 		
 		// Create the 1-2-3-4 improper terms where 3 is the central atom
-		for (auto &dihedral : topology.improper) {
+		for (auto &dihedral : topology.impropers) {
 			dbgmsg("checkpoint9");
 			const Molib::Atom &atom1 = *get<0>(dihedral);
 			const Molib::Atom &atom2 = *get<1>(dihedral);
@@ -318,7 +329,7 @@ namespace OMMIface {
 			const int type4 = topology.get_type(atom4);
 			try {
 				const ForceField::TorsionTypeVec& v_ttype = 
-					__ffield.get_improper_type(type1, type2, type3, type4); // cannot make it const ??
+					__ffield->get_improper_type(type1, type2, type3, type4); // cannot make it const ??
 				for (auto &ttype : v_ttype) {
 					bondTorsion->addTorsion(idx1, idx2, idx3, idx4, ttype.periodicity, ttype.phase, ttype.k);
 				}
@@ -327,23 +338,22 @@ namespace OMMIface {
 			}
 		}
 		if (warn > 0) {
-			throw Error("die : missing parameters detected for molecule "
-				+ __ligand.name());
+			throw Error("die : missing parameters detected");
 		}
 	}
 
-	void SystemTopology::init_positions(const Geom3D::Point:Vec &crds) { 
+	void SystemTopology::init_positions(const Geom3D::Point::Vec &crds) { 
 		vector<OpenMM::Vec3> positions_in_nm;
-		for (auto &crd: crds) {
-			const OpenMM::Vec3 posInNm(crd.x() * OpenMM::NmPerAngstrom, 
-				crd.y() * OpenMM::NmPerAngstrom, crd.z() * OpenMM::NmPerAngstrom);
-			positions_in_nm[idx] = posInNm;
+		//~ for (auto &crd: crds) {
+		for (int i = 0; i < crds.size(); ++i) {
+			positions_in_nm[i] = OpenMM::Vec3(crds[i].x() * OpenMM::NmPerAngstrom, 
+				crds[i].y() * OpenMM::NmPerAngstrom, crds[i].z() * OpenMM::NmPerAngstrom);
 		}
 		context->setPositions(positions_in_nm);
 	}
 
 	const vector<OpenMM::Vec3>& SystemTopology::get_positions_in_nm() {
-		return context->getState(infoMask).getPositions();		
+		return context->getState(OpenMM::State::Positions).getPositions();		
 	}
 
 	void SystemTopology::minimize(const double tolerance, const double max_iterations) {

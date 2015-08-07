@@ -124,10 +124,15 @@ namespace Molib {
 															__ic_dihedral.at(a1).at(a2).at(a3).at(a4))
 											});
 							dbgmsg("coords of atom " << a4->atom_number() << " are " << a4->crd()
-							<< " bond length between " << a3->atom_number() << " and " << a4->atom_number() << " is " << __ic_bond.at(a3).at(a4)
-							<< " angle between " << a2->atom_number() << " and " << a3->atom_number() << " and " << a4->atom_number() << " is " << __ic_angle.at(a2).at(a3).at(a4)
-							<< " dihedral between " << a1->atom_number() << " and " << a2->atom_number() << " and " << a3->atom_number() << " and " << a4->atom_number() << " is " << __ic_dihedral.at(a1).at(a2).at(a3).at(a4));
+							<< " bond length between " << a3->atom_number() << " and " << a4->atom_number() 
+							<< " is " << __ic_bond.at(a3).at(a4) << " angle between " << a2->atom_number() 
+							<< " and " << a3->atom_number() << " and " << a4->atom_number() << " is " 
+							<< __ic_angle.at(a2).at(a3).at(a4) << " dihedral between " << a1->atom_number() 
+							<< " and " << a2->atom_number() << " and " << a3->atom_number() << " and " 
+							<< a4->atom_number() << " is " << __ic_dihedral.at(a1).at(a2).at(a3).at(a4));
+
 							triples.push(make_tuple(a2, a3, a4));
+
 						}
 					}
 				}
