@@ -27,6 +27,7 @@ class CmdLnOpts {
 	bool __ralch;
 	bool __quiet;
 	bool __rnolig;
+	bool __rasym;
 	string __program_name;
 	string __version;
 public:
@@ -50,6 +51,7 @@ public:
 			TCLAP::SwitchArg hydrogensSwitch("","hydro","Read hydrogens", cmd, false);
 			TCLAP::SwitchArg neighbSwitch("","neighb","Find and output (in REMARK) neighbor residues of ligands", cmd, false);
 			TCLAP::SwitchArg rnoligSwitch("","rnolig","Remove all aligned chains that are not ligands (within 4.0 A) of the query protein", cmd, false);
+			TCLAP::SwitchArg rasymSwitch("","rasym","Remove asymmetric unit when biological assembly exists", cmd, false);
 			TCLAP::SwitchArg ralchSwitch("","ralch","Remove assemblies that don't have aligned chains", cmd, false);
 			TCLAP::SwitchArg noalchSwitch("","noalch","Remove aligned protein chains (query chain and aligned chains) from the first model of each assembly", cmd, false);
 			TCLAP::ValueArg<string> pdb_dirnameArg("","pdbdir","Directory containing PDB files (default is .)",false,".","string", cmd);
@@ -71,6 +73,7 @@ public:
 			__ralch = ralchSwitch.getValue();
 			__quiet = quietSwitch.getValue();
 			__rnolig = rnoligSwitch.getValue();
+			__rasym = rasymSwitch.getValue();
 		} 
 		catch (TCLAP::ArgException &e) { 
 			cerr << "error: " << e.error() << " for arg " << e.argId() << endl; 
@@ -97,6 +100,7 @@ public:
 	bool ralch() const { return __ralch; }
 	bool quiet() const { return __quiet; }
 	bool rnolig() const { return __rnolig; }
+	bool rasym() const { return __rasym; }
 	string version() const { return __version; }
 	string program_name() const { return __program_name; }
 };

@@ -73,6 +73,13 @@ namespace genbio {
 			}
 		}
 	}
+
+	void remove_asymmetric_unit(Molib::Molecule &molecule) { // remove asymmetric unit if there are biological assembiles
+		if (molecule.size() > 1) {
+			molecule.erase(0);
+		}
+	}
+
 	Molib::Atom::Grid set_grid_query(Molib::Molecule &query_molecule, const string query_chain_ids) {
 		// set grid with query chain atoms
 		return Molib::Atom::Grid(query_molecule.get_atoms(query_chain_ids, 
@@ -147,7 +154,7 @@ namespace genbio {
 		const string &pdb_dirname, const string &qpdb_file, const string &qcid,
 		const bool neighb, const bool rnolig, const string &bio, const bool ralch,
 		const string &json_file, const string &bio_file, const bool noalch,
-		const string &geo_file, const string &mols_name) {
+		const string &geo_file, const string &mols_name, const bool rasym) {
 
 		JsonReader jr;
 		//~ Molib::PDBreader pr((models == "all" ? Molib::PDBreader::all_models : Molib::PDBreader::first_model)|(hydrogens ? Molib::PDBreader::hydrogens : 0));
@@ -204,7 +211,12 @@ namespace genbio {
 		if (!bio_file.empty()) inout::output_file(mols, bio_file); // output rotated bio assemblies (or asymmetric units if NO bioassembly)
 		// now it's safe to remove query chains (they are used in query_grid)
 		if (noalch) genbio::remove_chains(mols, aligned_chains); // remove query chains
-
+		// remove asymmetric units when there are bio assemblies available
+		if (rasym) {
+			for (auto &molecule : mols) {
+				genbio::remove_asymmetric_unit(molecule);
+			}
+		}
 		if (!geo_file.empty()) {
 			for (auto &molecule : mols) {
 				genbio::make_geo(molecule); // calculate geometric centers of residues and chains
