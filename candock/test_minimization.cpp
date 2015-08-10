@@ -121,14 +121,14 @@ int main(int argc, char* argv[]) {
 				modeler.unmask(ligand.get_atoms());
 				
 				modeler.minimize_state();
+				// init with minimized coordinates
+				Molib::Molecule minimized_receptor(receptors[0], modeler.get_state(receptors[0].get_atoms()));
+				Molib::Molecule minimized_ligand(ligand, modeler.get_state(ligand.get_atoms()));
+
+				minimized_receptor.undo_mm_specific();
 				
-				//~ Molib::Molecule mini_receptor = modeler.get_state(receptors[0].get_atoms());
-				//~ Molib::Molecule mini_ligand = modeler.get_state(ligand.get_atoms());
-				modeler.get_state(receptors[0].get_atoms());
-				modeler.get_state(ligand.get_atoms());
-				
-				//~ mini_state.undo_mm_specific();
-				//~ inout::output_file(mini_state, cmdl.mini_ligands_file(), ios_base::app);
+				inout::output_file(Molib::Molecule::print_complex(minimized_ligand, minimized_receptor), 
+					cmdl.mini_ligands_file(), ios_base::app);
 
 			} catch (exception& e) {
 				cerr << "MINIMIZATION FAILED FOR LIGAND " << ligand.name() 

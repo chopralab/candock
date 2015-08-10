@@ -57,6 +57,7 @@ namespace Molib {
 		}
 		return patom2;
 	}
+
 	void Molecule::prepare_for_mm(const OMMIface::ForceField &ff, Atom::Grid &grid) {
 		/* Rename some residues
 		 */
@@ -646,5 +647,36 @@ namespace Molib {
 		}
 		return stream;
 	}
+
+	/**
+	 * Copy molecule with new coordinates
+	 */
+	Molecule::Molecule(const Molib::Molecule &rhs, const Geom3D::Point::Vec &crds) : Molecule(rhs) {
+
+		auto atoms = get_atoms();
+		for (int i = 0; i < atoms.size(); ++i) {
+			atoms[i]->set_crd(crds[i]);
+		}
+	}
+
+	string Molecule::print_complex(Molecule &ligand, Molecule &receptor) {
+		stringstream ss;
+		ss << "REMARK   1 MINIMIZED COMPLEX OF " << ligand.name() << " AND " << receptor.name() << endl;
+		ss << "MODEL" << endl;
+		int reenum = 0;
+		for (auto &patom : receptor.get_atoms()) {
+			ss << setw(66) << left << *patom;
+			reenum = patom->atom_number();
+		}
+		ss << "TER" << endl;
+		for (auto &patom : ligand.get_atoms()) {
+			patom->set_atom_number(++reenum);
+			ss << setw(66) << left << *patom;
+		}
+		//~ ss << get_bonds_in(ligand.get_atoms());
+		ss << "ENDMDL" << endl;
+		return ss.str();
+	}
+
 
 };

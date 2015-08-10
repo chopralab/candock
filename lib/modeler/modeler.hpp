@@ -40,7 +40,7 @@ namespace OMMIface {
 		void add_topology(const Molib::Atom::Vec &atoms);
 		void add_crds(const Molib::Atom::Vec &atoms, const Geom3D::Point::Vec &crds);
 
-		Molib::Atom::Vec get_state(const Molib::Atom::Vec &atoms);
+		Geom3D::Point::Vec get_state(const Molib::Atom::Vec &atoms);
 
 		void minimize_state();
 		void minimize_physical();

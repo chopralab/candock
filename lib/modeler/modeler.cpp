@@ -39,21 +39,23 @@ namespace OMMIface {
 	/**
 	 * Changes coordinates of atoms
 	 */
-	Molib::Atom::Vec Modeler::get_state(const Molib::Atom::Vec &atoms) {
+
+	Geom3D::Point::Vec Modeler::get_state(const Molib::Atom::Vec &atoms) {
 
 		const vector<OpenMM::Vec3>& positions_in_nm = __system_topology.get_positions_in_nm();
-
+		Geom3D::Point::Vec crds;
 		for (int i = 0; i < atoms.size(); ++i) {
 			int idx = __topology.get_index(*atoms[i]);
-			atoms[i]->set_crd(Geom3D::Coordinate(
+			crds.push_back(Geom3D::Point(
 				positions_in_nm[idx][0] * OpenMM::AngstromsPerNm,
 				positions_in_nm[idx][1] * OpenMM::AngstromsPerNm,
 				positions_in_nm[idx][2] * OpenMM::AngstromsPerNm
-				));
+			));
 		}
 		
-		return atoms;
+		return crds;
 	}
+
 
 	void Modeler::minimize_state() {
 		if (__fftype == "kb")

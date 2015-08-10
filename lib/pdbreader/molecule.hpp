@@ -239,6 +239,7 @@ namespace Molib {
 			}
 			regenerate_bonds(rhs); 
 		}
+		Molecule(const Molib::Molecule &rhs, const Geom3D::Point::Vec &crds);
 		typedef enum {first_bio, all_bio} bio_how_many;
 		Assembly& asym() { return this->first(); }
 		Atom::Vec get_atoms(const string &chain_ids="", 
@@ -306,6 +307,7 @@ namespace Molib {
 		}
 		Molecule& erase_properties() { for (auto &assembly : *this) assembly.erase_properties(); return *this; }
 		friend ostream& operator<< (ostream& stream, const Molecule& m);
+		static string print_complex(Molecule &ligand, Molecule &receptor);
 	};
 	
 	class Molecules : public template_map_container<Molecule, Molecules, NRset> {

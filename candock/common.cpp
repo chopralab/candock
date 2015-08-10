@@ -60,7 +60,6 @@ namespace common {
 			}
 		}
 	}
-
 //~ #ifndef NDEBUG
 	void create_mols_from_fragments(set<int> &added, Molib::Molecules &seeds, const Molib::Molecules &mols) {
 		for (auto &molecule : mols)

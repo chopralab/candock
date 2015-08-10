@@ -55,7 +55,7 @@ namespace Molib {
 			__atom_name(rhs.__atom_name), __crd(rhs.__crd), 
 			__idatm_type(rhs.__idatm_type), __gaff_type(rhs.__gaff_type),
 			__element(rhs.__element), __smiles_label(rhs.__smiles_label),
-			__smiles_prop(rhs.__smiles_prop), __aps(rhs.__aps) {
+			__smiles_prop(rhs.__smiles_prop), __aps(rhs.__aps), __br(nullptr) {
 			dbgmsg("Copy constructor : atom");
 		}
 
@@ -85,6 +85,7 @@ namespace Molib {
 		int get_num_hydrogens() const;
 		int atom_number() const { return __atom_number; }
 		void set_atom_name(const string &atom_name) { __atom_name = atom_name; }
+		void set_atom_number(int atom_number) { __atom_number = atom_number; }
 		void set_idatm_type(const string &idatm_type) { __idatm_type = help::idatm_mask.at(idatm_type); }
 		void set_gaff_type(const string &gaff_type) { __gaff_type = gaff_type; }
 		Atom& insert_property(const string &prop, const int count) { __smiles_prop.insert({prop, count}); return *this; }
