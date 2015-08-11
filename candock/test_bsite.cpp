@@ -44,21 +44,27 @@ int main(int argc, char* argv[]) {
 		 * or alternatively set binding sites from file
 		 * 
 		 */
-		probis::compare_against_bslib(argc, argv, cmdl.receptor_file(), 
-			cmdl.receptor_chain_id(), cmdl.bslib_file(), cmdl.ncpu(),
-			cmdl.nosql_file(), cmdl.json_file());
-		genclus::generate_clusters_of_ligands(cmdl.json_file(), cmdl.json_with_ligs_file(),
-			cmdl.geo_dir(), cmdl.names_dir(), cmdl.neighb(), cmdl.probis_clus_rad(),
-			cmdl.probis_min_pts(), cmdl.probis_min_z_score());
-		auto binding_sites = 
-			genlig::generate_binding_site_prediction(cmdl.json_with_ligs_file(), 
-			cmdl.bio_dir(), cmdl.num_bsites());
-		inout::output_file(binding_sites.first, cmdl.lig_clus_file());
-		inout::output_file(binding_sites.second, cmdl.z_scores_file());
-		
-		Centro::Centroids centroids = Centro::set_centroids(binding_sites.first);
+		Centro::Centroids centroids;
+		if (cmdl.centroid_in_file().empty()) {
+			probis::compare_against_bslib(argc, argv, cmdl.receptor_file(), 
+				cmdl.receptor_chain_id(), cmdl.bslib_file(), cmdl.ncpu(),
+				cmdl.nosql_file(), cmdl.json_file());
+			genclus::generate_clusters_of_ligands(cmdl.json_file(), cmdl.json_with_ligs_file(),
+				cmdl.geo_dir(), cmdl.names_dir(), cmdl.neighb(), cmdl.probis_clus_rad(),
+				cmdl.probis_min_pts(), cmdl.probis_min_z_score());
+			auto binding_sites = 
+				genlig::generate_binding_site_prediction(cmdl.json_with_ligs_file(), 
+				cmdl.bio_dir(), cmdl.num_bsites());
 
-		inout::output_file(centroids, cmdl.centroid_out_file()); // probis local structural alignments
+			inout::output_file(binding_sites.first, cmdl.lig_clus_file());
+			inout::output_file(binding_sites.second, cmdl.z_scores_file());
+
+			centroids = Centro::set_centroids(binding_sites.first);	
+			inout::output_file(centroids, cmdl.centroid_out_file()); // probis local structural alignments
+
+		} else { // ... or else set binding sites from file
+			centroids = Centro::set_centroids(cmdl.centroid_in_file());
+		}
 
 		/* Initialize parsers for receptor (and ligands) and read
 		 * the receptor molecule(s)
