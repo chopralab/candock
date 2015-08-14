@@ -76,7 +76,8 @@ namespace genbio {
 
 	void remove_asymmetric_unit(Molib::Molecule &molecule) { // remove asymmetric unit if there are biological assembiles
 		if (molecule.size() > 1) {
-			molecule.erase(0);
+			if (molecule.has_element(0))
+				molecule.erase(0);
 		}
 	}
 
@@ -157,7 +158,6 @@ namespace genbio {
 		const string &geo_file, const string &mols_name, const bool rasym) {
 
 		JsonReader jr;
-		//~ Molib::PDBreader pr((models == "all" ? Molib::PDBreader::all_models : Molib::PDBreader::first_model)|(hydrogens ? Molib::PDBreader::hydrogens : 0));
 		Molib::Atom::Grid query_grid;
 		// the query file
 		Molib::Molecules mols;
@@ -169,9 +169,7 @@ namespace genbio {
 				(models == "all" ? Molib::PDBreader::all_models : Molib::PDBreader::first_model)
 				|(hydrogens ? Molib::PDBreader::hydrogens : 0));
 			pr.parse_molecule(mols);
-			//~ mols.set_name(boost::filesystem::path(qpdb_file).stem().string() + " " + qcid);
-			mols.set_name(boost::filesystem::path(qpdb_file).stem().string());
-			//~ mols.last().set_name(boost::filesystem::path(qpdb_file).stem().string() + " " + qcid);
+			mols.set_name(boost::filesystem::path(qpdb_file).stem().string()); // for probis-server, qpdb_file needs to have pdb_id and chain_id
 			mols.last().set_name(boost::filesystem::path(qpdb_file).stem().string());
 			query_grid = genbio::set_grid_query(mols.last(), qcid);
 			if (bio != "none") mols.last().init_bio(bio == "all" ? Molib::Molecule::all_bio : Molib::Molecule::first_bio);
@@ -193,8 +191,12 @@ namespace genbio {
 						(models == "all" ? Molib::PDBreader::all_models : Molib::PDBreader::first_model)
 						|(hydrogens ? Molib::PDBreader::hydrogens : 0));
 					pr.parse_molecule(mols);
-					//~ mols.last().set_name(pdb_id + " " + chain_ids); // set only if not set by pdbreader using "REMARK   5"
-					mols.last().set_name(pdb_id); // set only if not set by pdbreader using "REMARK   5"
+					// distinguish between two use-cases
+					if (pdb_id.size() == 4)
+						mols.last().set_name(pdb_id + chain_ids);  // e.g., for probis-server
+					else
+						mols.last().set_name(pdb_id);  // e.g., for bslib where the pdb_id represents ligand binding site
+						
 					if (bio != "none") mols.last().init_bio(bio == "all" ? Molib::Molecule::all_bio : Molib::Molecule::first_bio);  // make biounits coordinates (optional)
 					mols.last().rotate(Geom3D::Matrix(d["alignment"][0]["rotation_matrix"], d["alignment"][0]["translation_vector"]), true); // inverse rotation
 					if (ralch) genbio::remove_assemblies(mols.last(), chain_ids); // remove assemblies that don't contain aligned chains
