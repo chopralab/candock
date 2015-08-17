@@ -54,7 +54,6 @@ namespace OMMIface {
 		// System with the Integrator for simulation. Let the Context choose the
 		// best available Platform. Initialize the configuration from the default
 		// positions we collected above. Initial velocities will be zero.
-		system = new OpenMM::System();
 		integrator = new OpenMM::VerletIntegrator(step_size_in_fs * OpenMM::PsPerFs);
 		context = new OpenMM::Context(*system, *integrator);
 		dbgmsg("REMARK  Using OpenMM platform "	<< context->getPlatform().getName());
@@ -64,6 +63,10 @@ namespace OMMIface {
 
 		int warn = 0;
 
+		system = new OpenMM::System();
+
+		dbgmsg("topology.atoms.size() = " << topology.atoms.size());
+		
 		// Specify the atoms and their properties:
 		//  (1) System needs to know the masses.
 		//  (2) NonbondedForce needs charges,van der Waals properties (in MD units!).
@@ -98,8 +101,10 @@ namespace OMMIface {
 		for (int i = 0; i < positions.size(); ++i) {
 			atompoints.push_back(unique_ptr<AtomPoint>(new AtomPoint(
 				Geom3D::Point(positions[i][0], positions[i][1], positions[i][2]),
-				* topology.atoms[i])));
+				*topology.atoms[i])));
 		}
+
+		dbgmsg("atompoints.size() = " << atompoints.size());
 		
 		// generate grid
 		AtomPoint::Grid grid(atompoints);
@@ -343,16 +348,19 @@ namespace OMMIface {
 	}
 
 	void SystemTopology::init_positions(const Geom3D::Point::Vec &crds) { 
+		dbgmsg("entering init_positions crds.size() = " << crds.size());
 		vector<OpenMM::Vec3> positions_in_nm;
-		//~ for (auto &crd: crds) {
-		for (int i = 0; i < crds.size(); ++i) {
-			positions_in_nm[i] = OpenMM::Vec3(crds[i].x() * OpenMM::NmPerAngstrom, 
-				crds[i].y() * OpenMM::NmPerAngstrom, crds[i].z() * OpenMM::NmPerAngstrom);
+		for (auto &crd: crds) {
+			positions_in_nm.push_back(OpenMM::Vec3(crd.x() * OpenMM::NmPerAngstrom, 
+				crd.y() * OpenMM::NmPerAngstrom, crd.z() * OpenMM::NmPerAngstrom));
 		}
+		
 		context->setPositions(positions_in_nm);
+		
+		dbgmsg("exiting init_positions");
 	}
 
-	const vector<OpenMM::Vec3>& SystemTopology::get_positions_in_nm() {
+	vector<OpenMM::Vec3> SystemTopology::get_positions_in_nm() {
 		return context->getState(OpenMM::State::Positions).getPositions();		
 	}
 

@@ -42,10 +42,16 @@ namespace OMMIface {
 
 		Geom3D::Point::Vec get_state(const Molib::Atom::Vec &atoms);
 
-		void minimize_state();
-		void minimize_physical();
+#ifndef NDEBUG
+		void minimize_state(Molib::Molecule &ligand, Molib::Molecule &receptor);
+		void minimize_knowledge_based(Molib::Molecule &ligand, Molib::Molecule &receptor);
+#else
+		void minimize_state() {
 		void minimize_knowledge_based();
+#endif
+		void minimize_physical();
 
+		void init_openmm_positions();
 		void init_openmm();
 
 		void set_forcefield(ForceField &ffield) { __ffield = &ffield; }

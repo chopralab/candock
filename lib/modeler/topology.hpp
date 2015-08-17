@@ -40,12 +40,13 @@ namespace OMMIface {
 		int get_index(const Molib::Atom &atom) const { return atom_to_index.at(&atom); }
 		int get_type(const Molib::Atom &atom) const { return atom_to_type.at(&atom); }
 		
-		friend ostream& operator<< (ostream& stream, const BondedExclusions &bonds);
-		friend ostream& operator<< (ostream& stream, const Bonds &bonds);
-		friend ostream& operator<< (ostream& stream, const Angles &angles);
-		friend ostream& operator<< (ostream& stream, const Dihedrals &dihedrals);
-
 	};
+
+	ostream& operator<< (ostream& stream, const Topology::BondedExclusions &bonds);
+	ostream& operator<< (ostream& stream, const Topology::Bonds &bonds);
+	ostream& operator<< (ostream& stream, const Topology::Angles &angles);
+	ostream& operator<< (ostream& stream, const Topology::Dihedrals &dihedrals);
+
 
 };
 #endif

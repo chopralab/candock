@@ -57,10 +57,11 @@ namespace OMMIface {
 
 	Topology& Topology::add_topology(const Molib::Atom::Vec &atoms, const ForceField &ffield) {
 
-		this->atoms = atoms;
+		int sz = this->atoms.size();
+		this->atoms.insert(this->atoms.end(), atoms.begin(), atoms.end());
 		
 		// residue topology
-		for (auto &patom : this->atoms) {
+		for (auto &patom : atoms) {
 			Molib::Atom &atom = *patom;
 			const Molib::Residue &residue = atom.br();
 
@@ -77,8 +78,7 @@ namespace OMMIface {
 
 			dbgmsg("crd = " << atom.crd() << " type = " << rtop.atom.at(atom.atom_name()));
 			this->atom_to_type.insert({&atom, rtop.atom.at(atom.atom_name())});
-			int sz = this->atom_to_index.size();
-			this->atom_to_index.insert({&atom, sz});
+			this->atom_to_index.insert({&atom, sz++});
 		}
 		
 		BondedExclusions visited_bonds;

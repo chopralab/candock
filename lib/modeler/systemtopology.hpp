@@ -60,7 +60,8 @@ namespace OMMIface {
 		void init_physics_based_force(Topology &topology);
 		void init_bonded(Topology &topology, const bool use_constraints);
 		void init_positions(const Geom3D::Point::Vec &crds);
-		const vector<OpenMM::Vec3>& get_positions_in_nm();
+		//~ const vector<OpenMM::Vec3>& get_positions_in_nm();
+		vector<OpenMM::Vec3> get_positions_in_nm();
 		void minimize(const double tolerance, const double max_iterations);
 		void set_forcefield(ForceField &ffield) { __ffield = &ffield; }
 	};

@@ -15,6 +15,14 @@
 using namespace std;
 
 namespace OMMIface {
+	ostream& operator<<(ostream& os, const vector<OpenMM::Vec3>& positions)	{
+		os << "SIZE OF POSITIONS = " << positions.size() << endl;
+		os << "ELEMENTS :" << endl;
+		for (auto &v : positions) 
+			os << setprecision(8) << fixed << v[0] << " " << v[1] << " " << v[2] << endl;
+		return os;
+	}	
+
 	void Modeler::mask(const Molib::Atom::Vec &atoms) {
 		__system_topology.mask(__topology, atoms);
 	}
@@ -25,11 +33,11 @@ namespace OMMIface {
 
 
 	void Modeler::add_topology(const Molib::Atom::Vec &atoms) {
-		__positions.resize(__positions.size() + atoms.size()); // increase size to accomodate more atoms
 		__topology.add_topology(atoms, *__ffield);
 	}
 
 	void Modeler::add_crds(const Molib::Atom::Vec &atoms, const Geom3D::Point::Vec &crds) {
+		__positions.resize(__topology.atoms.size()); // as many positions as there are atoms
 		for (int i = 0; i < atoms.size(); ++i) {
 			int idx = __topology.get_index(*atoms[i]);
 			__positions[idx] = crds[i];
@@ -57,9 +65,13 @@ namespace OMMIface {
 	}
 
 
+#ifndef NDEBUG
+	void Modeler::minimize_state(Molib::Molecule &ligand, Molib::Molecule &receptor) {
+#else
 	void Modeler::minimize_state() {
+#endif
 		if (__fftype == "kb")
-			minimize_knowledge_based();
+			minimize_knowledge_based(ligand, receptor);
 		else if (__fftype == "phy")
 			minimize_physical();
 	}
@@ -73,8 +85,12 @@ namespace OMMIface {
 		cout << "time to minimize took " << Benchmark::seconds_from_start() 
 			<< " wallclock seconds" << endl;
 	}
-	
+
+#ifndef NDEBUG
+	void Modeler::minimize_knowledge_based(Molib::Molecule &ligand, Molib::Molecule &receptor) {
+#else
 	void Modeler::minimize_knowledge_based() {
+#endif
 		Benchmark::reset();
 		cout << "Doing energy minimization using knowledge-based forcefield" << endl;
 
@@ -85,15 +101,33 @@ namespace OMMIface {
 
 		vector<OpenMM::Vec3> initial_positions = __system_topology.get_positions_in_nm();
 
+		
 		__system_topology.update_knowledge_based_force(__topology, initial_positions, __dist_cutoff_in_nm);
 
 		while (iter < __max_iterations) {
 			
 			dbgmsg("starting minimization step = " << iter);
 
+			dbgmsg("initial_positions = " << initial_positions);
+
 			__system_topology.minimize(__tolerance, __update_freq);
 
+#ifndef NDEBUG
+			// output frames during minimization
+			Molib::Molecule minimized_receptor(receptor, get_state(receptor.get_atoms()));
+			Molib::Molecule minimized_ligand(ligand, get_state(ligand.get_atoms()));
+
+			minimized_receptor.undo_mm_specific();
+			
+			inout::output_file(Molib::Molecule::print_complex(minimized_ligand, minimized_receptor), 
+				"frame" + help::to_string(iter) + ".pdb");
+#endif
+
+
 			const vector<OpenMM::Vec3>& minimized_positions = __system_topology.get_positions_in_nm();
+
+
+			dbgmsg("minimized_positions = " << minimized_positions);
 
 			// check if positions have converged
 			double max_error = 0;
@@ -121,15 +155,16 @@ namespace OMMIface {
 			<< " wallclock seconds" << endl;
 	}
 
-	void Modeler::init_openmm() {
-		//~ __system_topology = SystemTopology::create_object(__ffield, 
-			//~ __positions, __topology, __step_size_in_fs, __use_constraints);
-		__system_topology.set_forcefield(*__ffield);
-		__system_topology.init_integrator(__step_size_in_fs);
+	void Modeler::init_openmm_positions() {
 		__system_topology.init_positions(__positions);
+	}
+
+	void Modeler::init_openmm() {
+		__system_topology.set_forcefield(*__ffield);
 		__system_topology.init_particles(__topology);
 		__system_topology.init_bonded(__topology, __use_constraints);
-		
+		__system_topology.init_integrator(__step_size_in_fs);
+
 		if (__fftype == "kb") {
 
 			// do nothing since force will be initialized when minimization starts

@@ -116,11 +116,16 @@ int main(int argc, char* argv[]) {
 				modeler.add_crds(ligand.get_atoms(), ligand.get_crds());
 				
 				modeler.init_openmm();
+				modeler.init_openmm_positions();
 				
 				modeler.unmask(receptors[0].get_atoms());
 				modeler.unmask(ligand.get_atoms());
-				
+
+#ifndef NDEBUG
+				modeler.minimize_state(ligand, receptors[0]);
+#else
 				modeler.minimize_state();
+#endif
 				// init with minimized coordinates
 				Molib::Molecule minimized_receptor(receptors[0], modeler.get_state(receptors[0].get_atoms()));
 				Molib::Molecule minimized_ligand(ligand, modeler.get_state(ligand.get_atoms()));
@@ -129,6 +134,35 @@ int main(int argc, char* argv[]) {
 				
 				inout::output_file(Molib::Molecule::print_complex(minimized_ligand, minimized_receptor), 
 					cmdl.mini_ligands_file(), ios_base::app);
+				
+				//~ /**
+				 //~ * This section is a test to see if you can change positions 
+				 //~ * of some atoms without reinitializing the whole openmm
+				 //~ */
+				 //~ 
+				//~ // change coordinate of ligand atoms
+				//~ for (auto &patom : ligand.get_atoms()) {
+					//~ patom->set_crd(patom->crd() + 1.0);
+				//~ }
+				//~ // initialize only new ligand coordinates
+				//~ modeler.add_crds(ligand.get_atoms(), ligand.get_crds());
+				//~ modeler.init_openmm_positions();
+				//~ 
+//~ #ifndef NDEBUG				
+				//~ modeler.minimize_state(ligand, receptors[0]);
+//~ #else
+				//~ modeler.minimize_state();
+//~ #endif
+				//~ // init with minimized coordinates
+				//~ Molib::Molecule mod_minimized_receptor(receptors[0], modeler.get_state(receptors[0].get_atoms()));
+				//~ Molib::Molecule mod_minimized_ligand(ligand, modeler.get_state(ligand.get_atoms()));
+//~ 
+				//~ mod_minimized_receptor.undo_mm_specific();
+				//~ 
+				//~ inout::output_file(Molib::Molecule::print_complex(mod_minimized_ligand, mod_minimized_receptor), 
+					//~ "mod_" + cmdl.mini_ligands_file(), ios_base::app);
+					//~ 
+				//~ /*****************************/
 
 			} catch (exception& e) {
 				cerr << "MINIMIZATION FAILED FOR LIGAND " << ligand.name() 
