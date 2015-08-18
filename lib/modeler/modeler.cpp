@@ -120,7 +120,7 @@ namespace OMMIface {
 			minimized_receptor.undo_mm_specific();
 			
 			inout::output_file(Molib::Molecule::print_complex(minimized_ligand, minimized_receptor), 
-				"frame" + help::to_string(iter) + ".pdb");
+				ligand.name() + "_frame_" + help::to_string(iter) + ".pdb");
 #endif
 
 

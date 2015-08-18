@@ -154,6 +154,7 @@ namespace OMMIface {
 					kbforce->addBond(idx1, idx2, 
 						const_cast<vector<double>&>(kbtype.potential), 
 						const_cast<vector<double>&>(kbtype.derivative));
+					dbgmsg("adding kbforce between idx1 = " << idx1 << " and idx2 = " << idx2);
 				} catch (ParameterError& e) {
 					cerr << e.what() << " (" << ++warn << ")" << endl;
 				}
@@ -161,7 +162,8 @@ namespace OMMIface {
 		}	
 		// and add it back to the system
 		__kbforce_idx = system->addForce(kbforce);
-
+		context->reinitialize();
+		context->setPositions(positions);
 		if (warn > 0) {
 			throw Error("die : missing parameters detected");
 		}

@@ -131,6 +131,8 @@ double ReferenceCalcKBForceKernel::execute(ContextImpl& context, bool includeFor
     vector<RealVec>& force = extractForces(context);
     int numBonds = particle1.size();
     double energy = 0;
+
+	dbgmsg("numBonds = " << numBonds);
     // Compute the interactions.
     
     for (int i = 0; i < numBonds; i++) {
