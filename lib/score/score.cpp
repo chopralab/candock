@@ -13,26 +13,26 @@ namespace Molib {
 		return stream;
 	}
 
-	Array1d<double> Score::compute_energy(const Geom3D::Coordinate &crd, const set<int> &ligand_atom_types) const {
+	Array1d<double> Score::compute_energy(Atom::Grid &gridrec, const Geom3D::Coordinate &crd, const set<int> &ligand_atom_types) const {
 		Array1d<double> energy_sum(*ligand_atom_types.rbegin() + 1);
-		for (auto &patom : __gridrec.get_neighbors(crd, __dist_cutoff)) {
+		for (auto &patom : gridrec.get_neighbors(crd, __dist_cutoff)) {
 			const double dist = patom->crd().distance(crd);
 			const auto &atom_1 = patom->idatm_type();
 			const int index = __get_index(dist);
 			for (auto &l : ligand_atom_types) {
 				auto atom_pair = minmax(atom_1, l);
 #ifndef NDEBUG
-				if (!__energies.count(atom_pair))
-					throw Error("undefined atom_pair in __energies");
-				if (index >= __energies.at(atom_pair).size())
-					throw Error("undefined index in __energies");
+				if (!__energies_scoring.count(atom_pair))
+					throw Error("undefined atom_pair in __energies_scoring");
+				if (index >= __energies_scoring.at(atom_pair).size())
+					throw Error("undefined index in __energies_scoring");
 				dbgmsg("atom pairs = " << help::idatm_unmask[atom_pair.first] << " " 
 					<< help::idatm_unmask[atom_pair.second] << " index = " << index
-					<< " dist = " << dist << " __energies.at(atom_pair).size() = " 
-					<< __energies.at(atom_pair).size() << " partial energy = "
-					<< __energies.at(atom_pair).at(index));
+					<< " dist = " << dist << " __energies_scoring.at(atom_pair).size() = " 
+					<< __energies_scoring.at(atom_pair).size() << " partial energy = "
+					<< __energies_scoring.at(atom_pair).at(index));
 #endif
-				energy_sum.data[l] += __energies.at(atom_pair).at(index);
+				energy_sum.data[l] += __energies_scoring.at(atom_pair).at(index);
 			}
 		}
 		dbgmsg("out of compute energy");
@@ -150,9 +150,8 @@ namespace Molib {
 		return inter;
 	}
 
-	void Score::__compile_scoring_function() {
-		cout << "compiling scoring function ...\n";
-		dbgmsg("her i am");
+	void Score::__compile_objective_function() {
+		cout << "Compiling objective function for minimization...\n";
 		auto energy_function = __ref_state == "mean" ? 
 			mem_fn(&Score::__energy_mean) : mem_fn(&Score::__energy_cumulative);
 		for (auto &el1 : __gij_of_r_numerator) {
@@ -197,23 +196,6 @@ namespace Molib {
 				}
 				if (energy[i] == HUGE_VAL) energy[i] = -HUGE_VAL;
 			}
-			//~ if (max_index == -1 || __get_lower_bound(max_index) > 4.5 || __get_lower_bound(max_index) < 2.0) { // there are no data for this atom type
-				//~ for (int i = 0; i < gij_of_r_vals.size(); ++i)
-					//~ energy[i] = 0;
-			//~ } else {
-			//~ if (max_index == -1) { // there are no data for this atom type
-				//~ for (int i = 0; i < gij_of_r_vals.size(); ++i)
-					//~ energy[i] = 0;
-			//~ } else {
-				//~ for (int i = 0; i <= max_index; ++i) // unset everything below this value
-					//~ energy[i] = -HUGE_VAL;
-				//~ energy.front() = 280000; // set the lower bound energy to arbitrary high value
-				//~ if (energy.back() == -HUGE_VAL) energy.back() = 0; // take care about the non-assigned values
-			//~ }
-			//~ if (max_index == -1) { // there are no data for this atom type
-				//~ for (int i = 0; i < gij_of_r_vals.size(); ++i)
-					//~ energy[i] = 0;
-			//~ } else {
 			for (int i = 0; i <= repulsion_idx; ++i) // unset everything below this value
 				energy[i] = -HUGE_VAL;
 			energy.front() = 280000; // set the lower bound energy to arbitrary high value
@@ -241,6 +223,61 @@ namespace Molib {
 		}
 		dbgmsg("out of loop");
 	}
+	
+	void Score::__compile_scoring_function() {
+		cout << "Compiling scoring function...\n";
+		auto energy_function = __ref_state == "mean" ? 
+			mem_fn(&Score::__energy_mean) : mem_fn(&Score::__energy_cumulative);
+		for (auto &el1 : __gij_of_r_numerator) {
+			const pair_of_ints &atom_pair = el1.first;
+			const M0 &gij_of_r_vals = el1.second;
+			const double w1 = help::vdw_radius[atom_pair.first];
+			const double w2 = help::vdw_radius[atom_pair.second];
+			const double vdW_sum = ((w1 > 0 && w2 > 0) ? w1 + w2 : 4.500);
+			const int repulsion_idx = __get_index(vdW_sum - 0.6);
+			const string idatm_type1 = help::idatm_unmask[atom_pair.first];
+			const string idatm_type2 = help::idatm_unmask[atom_pair.second];
+			dbgmsg("atom1 = " << idatm_type1
+				<< " atom2 = " << idatm_type2
+				<< " vdW_sum = " << vdW_sum
+				<< " repulsion index (below is forbidden area) = " << repulsion_idx);
+			M0 energy(gij_of_r_vals.size(), -HUGE_VAL);
+			for (int i = 0; i < gij_of_r_vals.size(); ++i) {
+				const double lower_bound = __get_lower_bound(i);
+				const double &gij_of_r_numerator = gij_of_r_vals[i];
+				dbgmsg("lower bound for atom_pair " << idatm_type1
+					<< " " << idatm_type2 
+					<< " " << lower_bound << " gij_of_r_numerator = "
+					<< gij_of_r_numerator << " __sum_gij_of_r_numerator[atom_pair] = "
+					<< __sum_gij_of_r_numerator[atom_pair]);
+
+
+				if (__sum_gij_of_r_numerator[atom_pair] < __eps) {
+					energy[i] = 0;
+				}
+				else if (gij_of_r_numerator < __eps && (i + 1 < repulsion_idx)) {
+					energy[i] = 5.0;
+				}
+				else if (gij_of_r_numerator < __eps && (i + 1 >= repulsion_idx)) {
+					energy[i] = 0;
+				}
+				else {
+					energy[i] = energy_function(*this, atom_pair, lower_bound);
+				}
+			}
+
+			dbgmsg("raw energies for scoring : " << endl << energy);
+
+
+			if (idatm_type1 == "H" || idatm_type1 == "HC"
+				|| idatm_type2 == "H" || idatm_type2 == "HC") {
+				energy.assign(energy.size(), 0);
+			}
+			__energies_scoring[atom_pair] = energy;
+		}
+		dbgmsg("out of loop");
+	}
+	
 	double Score::__energy_mean(const pair_of_ints &atom_pair, const double &lower_bound) {
 		const int idx = __get_index(lower_bound);
 #ifndef NDEBUG
@@ -271,46 +308,24 @@ namespace Molib {
 		double ratio = numerator / denominator;
 		return -log(ratio);
 	}
-	double Score::non_bonded_energy(const Molecule &ligand) const {
-		double energy_sum = 0.0;
-		for (auto &assembly2 : ligand) {
-		for (auto &model2 : assembly2) {
-		for (auto &chain2 : model2) {
-		for (auto &residue2 : chain2) {
-		for (auto &atom2 : residue2) {
-			const auto &atom_2 = atom2.idatm_type();
-			dbgmsg("ligand atom = " << atom2.atom_number() << " crd= " << atom2.crd().pdb());
-			for (auto &atom1 : __gridrec.get_neighbors(atom2.crd(), __dist_cutoff)) {
-				const double dist = atom1->crd().distance(atom2.crd());
-				const auto &atom_1 = atom1->idatm_type();
-				const pair_of_ints atom_pair = minmax(atom_1, atom_2);
-				const int idx = __get_index(dist);
-				energy_sum += __energies.at(atom_pair).at(idx);
-#ifndef NDEBUG				
-				dbgmsg("ligand atom = " << atom2.atom_number() 
-					<< " crd= " << atom2.crd().pdb() << "protein atom = " << atom1->atom_number() 
-					<< " crd= " << atom1->crd().pdb() << " dist= " << dist 
-					<< " atom_pair={" << atom_pair.first << "," << atom_pair.second << "}" 
-					<< " lower_bound= " << __get_lower_bound(idx) << " energy_sum=" << energy_sum);
-#endif
-			}
-		}}}}}
-		return energy_sum;
+	
+	double Score::non_bonded_energy(Atom::Grid &gridrec, const Molecule &ligand) const {
+		return this->non_bonded_energy(gridrec, ligand.get_atoms(), ligand.get_crds());
 	}
 
-	double Score::non_bonded_energy(const Atom::Vec &atoms, const Geom3D::Point::Vec &crds) const {
+	double Score::non_bonded_energy(Atom::Grid &gridrec, const Atom::Vec &atoms, const Geom3D::Point::Vec &crds) const {
 		double energy_sum = 0.0;
 		for (int i = 0; i < atoms.size(); ++i) {
 			const Atom &atom2 = *atoms[i];
 			const Geom3D::Coordinate &atom2_crd = crds[i];
 			const auto &atom_2 = atom2.idatm_type();
 			dbgmsg("ligand atom = " << atom2.atom_number() << " crd= " << atom2_crd.pdb());
-			for (auto &atom1 : __gridrec.get_neighbors(atom2_crd, __dist_cutoff)) {
+			for (auto &atom1 : gridrec.get_neighbors(atom2_crd, __dist_cutoff)) {
 				const double dist = atom1->crd().distance(atom2_crd);
 				const auto &atom_1 = atom1->idatm_type();
 				const pair_of_ints atom_pair = minmax(atom_1, atom_2);
 				const int idx = __get_index(dist);
-				energy_sum += __energies.at(atom_pair).at(idx);
+				energy_sum += __energies_scoring.at(atom_pair).at(idx);
 #ifndef NDEBUG				
 				dbgmsg("ligand atom = " << atom2.atom_number() 
 					<< " crd= " << atom2_crd.pdb() << "protein atom = " << atom1->atom_number() 

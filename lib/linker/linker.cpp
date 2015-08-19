@@ -357,7 +357,7 @@ namespace Linker {
 							 * next_conformation.set_energy(nonbond_energy());
 							 * 
 							 */
-							const double nb_ene = __score.non_bonded_energy(pneighbor->get_segment().get_atoms(), pneighbor->get_crds());
+							const double nb_ene = __score.non_bonded_energy(__gridrec, pneighbor->get_segment().get_atoms(), pneighbor->get_crds());
 							const double torsion_ene = torsion_energy(curr_state, *pneighbor);
 							const double branch_ene = curr_conformation.second
 								+ nb_ene 

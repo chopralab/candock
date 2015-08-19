@@ -133,8 +133,11 @@ int main(int argc, char* argv[]) {
 				Molib::Molecule minimized_ligand(ligand, modeler.get_state(ligand.get_atoms()));
 
 				minimized_receptor.undo_mm_specific();
+
+				Molib::Atom::Grid gridrec(minimized_receptor.get_atoms());
+				const double energy = score.non_bonded_energy(gridrec, minimized_ligand);
 				
-				inout::output_file(Molib::Molecule::print_complex(minimized_ligand, minimized_receptor), 
+				inout::output_file(Molib::Molecule::print_complex(minimized_ligand, minimized_receptor, energy), 
 					"org_" + cmdl.mini_ligands_file(), ios_base::app);
 				
 				/**
@@ -161,7 +164,7 @@ int main(int argc, char* argv[]) {
 				Molib::Molecule mod_minimized_ligand(ligand, modeler.get_state(ligand.get_atoms()));
 
 				mod_minimized_receptor.undo_mm_specific();
-				
+
 				inout::output_file(Molib::Molecule::print_complex(mod_minimized_ligand, mod_minimized_receptor), 
 					"mod_" + cmdl.mini_ligands_file(), ios_base::app);
 					

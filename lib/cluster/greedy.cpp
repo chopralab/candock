@@ -10,18 +10,18 @@
 
 namespace Molib {
 
-	Molib::Molecules Cluster::greedy(const Molib::Molecules &initial, const Molib::Score &score, const double clus_rad) {
+	Molib::Molecules Cluster::greedy(const Molib::Molecules &initial, const Molib::Score &score, Molib::Atom::Grid &gridrec, const double clus_rad) {
 
 		Benchmark::reset();
 
 		LinkedConf::UPVec conformations;
 		for (auto &molecule : initial)
-			conformations.push_back(unique_ptr<LinkedConf>(new LinkedConf(molecule, molecule.compute_geometric_center(), score.non_bonded_energy(molecule))));
+			conformations.push_back(unique_ptr<LinkedConf>(new LinkedConf(molecule, molecule.compute_geometric_center(), score.non_bonded_energy(gridrec, molecule))));
 
 		set<const LinkedConf*, LinkedConf::by_energy> confs;
 		for (auto &conf : conformations) confs.insert(&*conf);
 
-		dbgmsg(confs)
+		dbgmsg(confs);
 	
 		Grid<const LinkedConf> grid(confs); // grid of docked conformations
 

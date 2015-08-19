@@ -659,9 +659,9 @@ namespace Molib {
 		}
 	}
 
-	string Molecule::print_complex(Molecule &ligand, Molecule &receptor) {
+	string Molecule::print_complex(Molecule &ligand, Molecule &receptor, const double energy) {
 		stringstream ss;
-		ss << "REMARK   1 MINIMIZED COMPLEX OF " << ligand.name() << " AND " << receptor.name() << endl;
+		ss << "REMARK   1 MINIMIZED COMPLEX OF " << ligand.name() << " AND " << receptor.name() << " WITH SCORE OF " << energy << endl;
 		ss << "MODEL" << endl;
 		int reenum = 0;
 		for (auto &patom : receptor.get_atoms()) {

@@ -189,7 +189,7 @@ namespace Docker {
 									Gpoint{
 										eval, 
 										IJK{column, row, layer}, 
-										__score ? __score->compute_energy(eval, *__ligand_idatm_types) : Array1d<double>()
+										__score ? __score->compute_energy(grid, eval, *__ligand_idatm_types) : Array1d<double>()
 									});
 								//~ __gmap.data[column][row][layer] = true; 
 								model_number++;

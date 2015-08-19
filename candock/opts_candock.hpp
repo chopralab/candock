@@ -77,7 +77,7 @@ class CmdLnOpts {
 	double __position_tolerance;
 	
 	string __mini_ligands_file;
-	string __energy_file;
+	//~ string __energy_file;
 
 	int __num_bsites;
 	double __grid_spacing;
@@ -194,7 +194,7 @@ public:
 			TCLAP::ValueArg<double> position_toleranceArg("","pos_tol","Minimization position tolerance in Angstroms - only for KB (default is 0.0001)",false,0.0001,"double", cmd);
 
 			TCLAP::ValueArg<string> mini_ligands_fileArg("","mini_ligands","Docked & minimized ligands output filename (default minimized.pdb)",false,"minimized.pdb","string", cmd);
-			TCLAP::ValueArg<string> energy_fileArg("","energy","Energies of minimized ligands output filename (default energies.txt)",false,"energies.txt","string", cmd);
+			//~ TCLAP::ValueArg<string> energy_fileArg("","energy","Energies of minimized ligands output filename (default energies.txt)",false,"energies.txt","string", cmd);
 			
 			TCLAP::ValueArg<int> num_bsitesArg("","num_bsites","Maximum number of predicted (or given) binding sites to consider for docking (default is 3)",false,3,"int", cmd);
 			
@@ -268,7 +268,7 @@ public:
 			__position_tolerance = position_toleranceArg.getValue();
 			
 			__mini_ligands_file = mini_ligands_fileArg.getValue();
-			__energy_file = energy_fileArg.getValue();
+			//~ __energy_file = energy_fileArg.getValue();
 			
 			__num_bsites = num_bsitesArg.getValue();
 			__grid_spacing = grid_spacingArg.getValue();
@@ -346,7 +346,7 @@ public:
 	int update_freq() const { return __update_freq; }
 	double position_tolerance() const { return __position_tolerance; }
 	string mini_ligands_file() const { return __mini_ligands_file; }
-	string energy_file() const { return __energy_file; }
+	//~ string energy_file() const { return __energy_file; }
 	
 	int num_bsites() const { return __num_bsites; }
 	double grid_spacing() const { return __grid_spacing; }

@@ -34,7 +34,7 @@ namespace Molib {
 		friend ostream& operator<<(ostream& os, const set<const LinkedConf*, LinkedConf::by_energy> &confs);
 	public:
 		static Molib::Molecules greedy(const Molib::Molecules &initial, const Molib::Score &score,
-			const double clus_rad);
+			Molib::Atom::Grid &gridrec, const double clus_rad);
 	};
 		
 };
