@@ -72,7 +72,7 @@ int main(int argc, char* argv[]) {
 
 
 		Molib::Score score(Molib::get_idatm_types(receptors), ligand_idatm_types, 
-			gridrec, cmdl.ref_state(), cmdl.comp(), cmdl.rad_or_raw(), 
+			cmdl.ref_state(), cmdl.comp(), cmdl.rad_or_raw(), 
 			cmdl.dist_cutoff(), cmdl.distributions_file(), cmdl.step_non_bond());
 
 		/** 
@@ -99,18 +99,11 @@ int main(int argc, char* argv[]) {
 				 */
 				
 				ligand.set_name("org");
-				
-				OMMIface::Modeler modeler;
-				modeler.set_forcefield(ffield);
-				modeler.set_forcefield_type(cmdl.fftype());
-				modeler.set_distance_cutoff(cmdl.dist_cutoff());
-				modeler.set_use_constraints(false);
-				modeler.set_step_size_in_fs(2.0);
-				modeler.set_tolerance(cmdl.tolerance());
-				modeler.set_max_iterations(cmdl.max_iterations());
-				modeler.set_update_freq(cmdl.update_freq());
-				modeler.set_position_tolerance(cmdl.position_tolerance());
-				
+
+				OMMIface::Modeler modeler(ffield, cmdl.fftype(), cmdl.dist_cutoff(),
+					cmdl.tolerance(), cmdl.max_iterations(), cmdl.update_freq(), cmdl.position_tolerance(),
+					false, 2.0);
+						
 				modeler.add_topology(receptors[0].get_atoms());
 				modeler.add_topology(ligand.get_atoms());
 				
@@ -124,7 +117,7 @@ int main(int argc, char* argv[]) {
 				modeler.unmask(ligand.get_atoms());
 
 #ifndef NDEBUG
-				modeler.minimize_state(ligand, receptors[0]);
+				modeler.minimize_state(ligand, receptors[0], score);
 #else
 				modeler.minimize_state();
 #endif
@@ -155,7 +148,7 @@ int main(int argc, char* argv[]) {
 				modeler.init_openmm_positions();
 				
 #ifndef NDEBUG				
-				modeler.minimize_state(ligand, receptors[0]);
+				modeler.minimize_state(ligand, receptors[0], score);
 #else
 				modeler.minimize_state();
 #endif
@@ -165,7 +158,10 @@ int main(int argc, char* argv[]) {
 
 				mod_minimized_receptor.undo_mm_specific();
 
-				inout::output_file(Molib::Molecule::print_complex(mod_minimized_ligand, mod_minimized_receptor), 
+				Molib::Atom::Grid mod_gridrec(mod_minimized_receptor.get_atoms());
+				const double mod_energy = score.non_bonded_energy(mod_gridrec, mod_minimized_ligand);
+
+				inout::output_file(Molib::Molecule::print_complex(mod_minimized_ligand, mod_minimized_receptor, mod_energy), 
 					"mod_" + cmdl.mini_ligands_file(), ios_base::app);
 					
 				/*****************************/

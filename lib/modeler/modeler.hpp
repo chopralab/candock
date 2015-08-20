@@ -15,24 +15,38 @@
 
 using namespace std;
 
+namespace Molib {
+	class Score;
+};
+
 namespace OMMIface {
 	
 	class Modeler {
 		ForceField *__ffield;
 		string __fftype;
 		double __dist_cutoff_in_nm;
-		bool __use_constraints;
-		double __step_size_in_fs;
 		double __tolerance;
-		double __position_tolerance_in_nm;
 		int __max_iterations;
 		int __update_freq;
+		double __position_tolerance_in_nm;
+		bool __use_constraints;
+		double __step_size_in_ps;
 
 		Geom3D::Point::Vec __positions;
 		Topology __topology;
 		SystemTopology __system_topology;
 
 	public:
+
+		Modeler(ForceField &ffield, const string &fftype, double dist_cutoff,
+			double tolerance, int max_iterations, int update_freq, double position_tolerance,
+			bool use_constraints, double step_size_in_fs) 
+			: 
+			__ffield(&ffield), __fftype(fftype), __dist_cutoff_in_nm(dist_cutoff * OpenMM::NmPerAngstrom),
+			__tolerance(tolerance), __max_iterations(max_iterations), __update_freq(update_freq), 
+			__position_tolerance_in_nm(position_tolerance * OpenMM::NmPerAngstrom), 
+			__use_constraints(use_constraints), __step_size_in_ps(step_size_in_fs * OpenMM::PsPerFs)
+			{}
 
 		void mask(const Molib::Atom::Vec &atoms);
 		void unmask(const Molib::Atom::Vec &atoms);
@@ -43,8 +57,8 @@ namespace OMMIface {
 		Geom3D::Point::Vec get_state(const Molib::Atom::Vec &atoms);
 
 #ifndef NDEBUG
-		void minimize_state(Molib::Molecule &ligand, Molib::Molecule &receptor);
-		void minimize_knowledge_based(Molib::Molecule &ligand, Molib::Molecule &receptor);
+		void minimize_state(Molib::Molecule &ligand, Molib::Molecule &receptor, Molib::Score &score);
+		void minimize_knowledge_based(Molib::Molecule &ligand, Molib::Molecule &receptor, Molib::Score &score);
 #else
 		void minimize_state() {
 		void minimize_knowledge_based();
@@ -54,15 +68,6 @@ namespace OMMIface {
 		void init_openmm_positions();
 		void init_openmm();
 
-		void set_forcefield(ForceField &ffield) { __ffield = &ffield; }
-		void set_forcefield_type(const string &fftype) { __fftype = fftype; }
-		void set_distance_cutoff(const double dist_cutoff) { __dist_cutoff_in_nm = dist_cutoff * OpenMM::NmPerAngstrom; }
-		void set_use_constraints(const bool use_constraints) { __use_constraints = use_constraints; }
-		void set_step_size_in_fs(const double step_size_in_fs) { __step_size_in_fs = step_size_in_fs; }
-		void set_tolerance(const double tolerance) { __tolerance = tolerance; }
-		void set_max_iterations(const int max_iterations) { __max_iterations = max_iterations; }
-		void set_update_freq(const int update_freq) { __update_freq = update_freq; }
-		void set_position_tolerance(const double position_tolerance) { __position_tolerance_in_nm = position_tolerance * OpenMM::NmPerAngstrom; }
 	};
 	
 }

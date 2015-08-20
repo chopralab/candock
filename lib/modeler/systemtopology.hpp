@@ -54,7 +54,7 @@ namespace OMMIface {
 		static void loadPlugins();
 		void mask(Topology &topology, const Molib::Atom::Vec &atoms);
 		void unmask(Topology &topology, const Molib::Atom::Vec &atoms);
-		void init_integrator(const double step_size_in_fs);
+		void init_integrator(const double step_size_in_ps);
 		void init_particles(Topology &topology);
 		void update_knowledge_based_force(Topology &topology, const vector<OpenMM::Vec3> &positions, const double dist_cutoff);
 		void init_physics_based_force(Topology &topology);

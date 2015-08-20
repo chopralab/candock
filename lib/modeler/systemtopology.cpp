@@ -49,12 +49,12 @@ namespace OMMIface {
 		}
 	}
 	
-	void SystemTopology::init_integrator(const double step_size_in_fs) {
+	void SystemTopology::init_integrator(const double step_size_in_ps) {
 		// Choose an Integrator for advancing time, and a Context connecting the
 		// System with the Integrator for simulation. Let the Context choose the
 		// best available Platform. Initialize the configuration from the default
 		// positions we collected above. Initial velocities will be zero.
-		integrator = new OpenMM::VerletIntegrator(step_size_in_fs * OpenMM::PsPerFs);
+		integrator = new OpenMM::VerletIntegrator(step_size_in_ps);
 		context = new OpenMM::Context(*system, *integrator);
 		dbgmsg("REMARK  Using OpenMM platform "	<< context->getPlatform().getName());
 	}

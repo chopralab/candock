@@ -5,6 +5,7 @@
 #include "helper/inout.hpp"
 #include "helper/debug.hpp"
 #include "helper/error.hpp"
+#include "score/score.hpp"
 #include <boost/regex.hpp>
 #include <boost/algorithm/string.hpp>
 #include <boost/filesystem.hpp>
@@ -66,12 +67,12 @@ namespace OMMIface {
 
 
 #ifndef NDEBUG
-	void Modeler::minimize_state(Molib::Molecule &ligand, Molib::Molecule &receptor) {
+	void Modeler::minimize_state(Molib::Molecule &ligand, Molib::Molecule &receptor, Molib::Score &score) {
 #else
 	void Modeler::minimize_state() {
 #endif
 		if (__fftype == "kb")
-			minimize_knowledge_based(ligand, receptor);
+			minimize_knowledge_based(ligand, receptor, score);
 		else if (__fftype == "phy")
 			minimize_physical();
 	}
@@ -87,7 +88,7 @@ namespace OMMIface {
 	}
 
 #ifndef NDEBUG
-	void Modeler::minimize_knowledge_based(Molib::Molecule &ligand, Molib::Molecule &receptor) {
+	void Modeler::minimize_knowledge_based(Molib::Molecule &ligand, Molib::Molecule &receptor, Molib::Score &score) {
 #else
 	void Modeler::minimize_knowledge_based() {
 #endif
@@ -110,7 +111,7 @@ namespace OMMIface {
 
 			dbgmsg("initial_positions = " << initial_positions);
 
-			__system_topology.minimize(__tolerance, __update_freq);
+
 
 #ifndef NDEBUG
 			// output frames during minimization
@@ -119,9 +120,15 @@ namespace OMMIface {
 
 			minimized_receptor.undo_mm_specific();
 
-			inout::output_file(Molib::Molecule::print_complex(minimized_ligand, minimized_receptor, 0.0), 
+			Molib::Atom::Grid gridrec(minimized_receptor.get_atoms());
+			const double energy = score.non_bonded_energy(gridrec, minimized_ligand);
+
+
+			inout::output_file(Molib::Molecule::print_complex(minimized_ligand, minimized_receptor, energy), 
 				ligand.name() + "_frame_" + help::to_string(iter) + ".pdb");
 #endif
+
+			__system_topology.minimize(__tolerance, __update_freq);
 
 
 			const vector<OpenMM::Vec3>& minimized_positions = __system_topology.get_positions_in_nm();
@@ -163,7 +170,7 @@ namespace OMMIface {
 		__system_topology.set_forcefield(*__ffield);
 		__system_topology.init_particles(__topology);
 		__system_topology.init_bonded(__topology, __use_constraints);
-		__system_topology.init_integrator(__step_size_in_fs);
+		__system_topology.init_integrator(__step_size_in_ps);
 
 		if (__fftype == "kb") {
 

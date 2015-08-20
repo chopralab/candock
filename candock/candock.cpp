@@ -291,6 +291,14 @@ int main(int argc, char* argv[]) {
 							 */
 							Molib::Molecules docked_representatives = Molib::Cluster::greedy(
 								docked, score, gridrec, cmdl.docked_clus_rad());
+
+							OMMIface::Modeler modeler(ffield_copy, cmdl.fftype(), cmdl.dist_cutoff(),
+								cmdl.tolerance(), cmdl.max_iterations(), cmdl.update_freq(), cmdl.position_tolerance(),
+								false, 2.0);
+							
+							modeler.add_topology(receptors[0].get_atoms());
+							modeler.add_topology(ligand.get_atoms());
+
 							
 							/* Minimize each representative docked ligand conformation
 							 * with full flexibility of both ligand and receptor
@@ -298,37 +306,23 @@ int main(int argc, char* argv[]) {
 							 */
 							for (auto &docked_ligand : docked_representatives) {
 
-								OMMIface::Modeler modeler;
-								modeler.set_forcefield(ffield_copy);
-								modeler.set_forcefield_type(cmdl.fftype());
-								modeler.set_distance_cutoff(cmdl.dist_cutoff());
-								modeler.set_use_constraints(false);
-								modeler.set_step_size_in_fs(2.0);
-								modeler.set_tolerance(cmdl.tolerance());
-								modeler.set_max_iterations(cmdl.max_iterations());
-								modeler.set_update_freq(cmdl.update_freq());
-								modeler.set_position_tolerance(cmdl.position_tolerance());
-								
-								modeler.add_topology(receptors[0].get_atoms());
-								modeler.add_topology(docked_ligand.get_atoms());
-								
 								modeler.add_crds(receptors[0].get_atoms(), receptors[0].get_crds());
-								modeler.add_crds(docked_ligand.get_atoms(), docked_ligand.get_crds());
+								modeler.add_crds(ligand.get_atoms(), docked_ligand.get_crds());
 								
 								modeler.init_openmm();
 								modeler.init_openmm_positions();
 								
 								modeler.unmask(receptors[0].get_atoms());
-								modeler.unmask(docked_ligand.get_atoms());
+								modeler.unmask(ligand.get_atoms());
 				
 #ifndef NDEBUG
-								modeler.minimize_state(docked_ligand, receptors[0]);
+								modeler.minimize_state(ligand, receptors[0], score);
 #else
 								modeler.minimize_state();
 #endif
 								// init with minimized coordinates
 								Molib::Molecule minimized_receptor(receptors[0], modeler.get_state(receptors[0].get_atoms()));
-								Molib::Molecule minimized_ligand(docked_ligand, modeler.get_state(docked_ligand.get_atoms()));
+								Molib::Molecule minimized_ligand(ligand, modeler.get_state(ligand.get_atoms()));
 				
 								minimized_receptor.undo_mm_specific();
 
