@@ -340,31 +340,47 @@ namespace Linker {
 						if (!__clashes_receptor(*pneighbor) 
 							&& !__clashes_ligand(*pneighbor, curr_conformation, curr_state)) {
 
-							/**
-							 * FOR MINIMIZATION :
-							 * 
-							 * openmm.add_state(curr_conformation.get_state());
-							 * openmm.add_coords(pneighbor, pneighbor->get_crds());
-							 * openmm.minimize_state();
-							 * 
-							 * double nonbond_energy = score.non_bonded_energy(openmm.get_nonbonded_list(ligand, receptor));
-							 * 
-							 * 
-							 * next_conformation.set_states(curr_conformation.get_states());
-							 * next_conformation.add_coords(pneighbor, pneighbor->get_coords());
-							 * 
-							 * next_conformation.set_state(openmm.get_state());
-							 * next_conformation.set_energy(nonbond_energy());
-							 * 
-							 */
-							const double nb_ene = __score.non_bonded_energy(__gridrec, pneighbor->get_segment().get_atoms(), pneighbor->get_crds());
-							const double torsion_ene = torsion_energy(curr_state, *pneighbor);
-							const double branch_ene = curr_conformation.second
-								+ nb_ene 
-								+ torsion_ene;
+							//~ const double nb_ene = __score.non_bonded_energy(__gridrec, pneighbor->get_segment().get_atoms(), pneighbor->get_crds());
+							//~ const double torsion_ene = torsion_energy(curr_state, *pneighbor);
+							//~ const double branch_ene = curr_conformation.second
+								//~ + nb_ene 
+								//~ + torsion_ene;
 							LinkEnergy next_conformation = curr_conformation;
 							next_conformation.first.push_back(pneighbor);
-							next_conformation.second = branch_ene;
+							//~ next_conformation.second = branch_ene;
+
+							/**
+							 * Minimization !!!!
+							 * 
+							 */
+
+							// initialize only new ligand coordinates
+							modeler.mask("whole ligand");
+							modeler.add_crds(next_conformation.get_receptor_atoms(), next_conformation.get_receptor_crds());
+							modeler.add_crds(next_conformation.get_atoms(), next_conformation.get_crds());
+							modeler.unmask(next_conformation.get_atoms());
+							
+							modeler.init_openmm_positions();
+							
+#ifndef NDEBUG				
+							modeler.minimize_state(ligand, receptors[0], __score);
+#else
+							modeler.minimize_state();
+#endif
+							// init with minimized coordinates
+							Molib::Molecule minimized_receptor(receptors[0], modeler.get_state(receptors[0].get_atoms()));
+							next_conformation.set_receptor_crds(minimized_receptor.get_crds());
+							next_conformation.set_crds(modeler.get_state(next_conformation.get_atoms()));
+
+							// compute energy after minimization
+							Molib::Atom::Grid gridrec(minimized_receptor.get_atoms());
+							const double energy = __score.non_bonded_energy(gridrec, next_conformation.get_atoms());
+
+							next_conformation.set_energy(energy);
+
+
+
+
 							dbgmsg("accepting state " << *pneighbor);
 							dbgmsg("before insert openset.size() = " << openset.size());
 							openset.insert(next_conformation);
