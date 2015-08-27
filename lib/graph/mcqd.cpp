@@ -1,9 +1,8 @@
 #include "mcqd.hpp"
 
-Maxclique::Maxclique (const bool* const* conn, const int sz, const float tt) : pk(0), level(1), Tlimit(tt), V(sz), Q(sz), QMAX(sz) {
+Maxclique::Maxclique (AdjMatrix &conn, const int sz, const float tt) : e(conn), pk(0), level(1), Tlimit(tt), V(sz), Q(sz), QMAX(sz) {
   if (conn==0 || sz==0) throw exc_empty;
   for (int i=0; i < sz; i++) V.push(i);
-  e = conn;
   C = new ColorClass[sz + 1];
   for (int i=0; i < sz + 1; i++) C[i].init(sz + 1);
   S = new StepCount[sz + 1];
@@ -105,16 +104,16 @@ void Maxclique::expand(Vertices R) {
       Q.push(R.end().get_i());
       Vertices Rp(R.size());
       cut2(R, Rp);
+      //~ std::cout << "QMs = " << QMAX.size() << std::endl;
+      //~ std::cout << "Qs = " << Q.size() << std::endl;
       if (Rp.size()) {
         color_sort(Rp);
 		pk++;
         expand(Rp);
       }
       else if (Q.size() > QMAX.size()) { 
-		//~ std::cout << "step = " << pk << " current max. clique size = " << Q.size() << std::endl; 
-		QMAX = Q;
-		QMAXES.push_back(QMAX);
-		QMAX.pop();
+		//~ std::cout << "step = " << pk << " Q.size() = " << Q.size() << std::endl; 
+		QMAXES.push_back(Q); //akj
       }    
       Rp.dispose();
       Q.pop();
@@ -146,9 +145,7 @@ void Maxclique::expand_dyn(Vertices R) {
       }
       else if (Q.size() > QMAX.size()) { 
 		//~ std::cout << "step = " << pk << " current max. clique size = " << Q.size() << std::endl; 
-		QMAX = Q;
-		QMAXES.push_back(QMAX);
-		QMAX.pop();
+		QMAXES.push_back(Q);
       }    
       Rp.dispose();
       Q.pop();

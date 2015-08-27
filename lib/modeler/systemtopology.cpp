@@ -34,20 +34,118 @@ namespace OMMIface {
 	}
 
 	void SystemTopology::mask(Topology &topology, const Molib::Atom::Vec &atoms) {
+		set<int> substruct;
+		
 		for (auto &patom : atoms) {
 			int idx = topology.get_index(*patom);
+			dbgmsg("masking particle idx = " << idx);
+			substruct.insert(idx);
+		}
+		
+		for (auto &idx : substruct) {
 			system->setParticleMass(idx, 0);
 			masked[idx] = true;
+			
+			mask_forces(idx, substruct);
+			
+		}
+		bondStretch->updateParametersInContext(*context);
+		bondBend->updateParametersInContext(*context);
+		bondTorsion->updateParametersInContext(*context);
+	}
+
+	void SystemTopology::unmask(Topology &topology, const Molib::Atom::Vec &atoms) {
+		set<int> substruct;
+		
+		for (auto &patom : atoms) {
+			int idx = topology.get_index(*patom);
+			substruct.insert(idx);
+		}
+		
+		for (auto &idx : substruct) {
+			dbgmsg("unmasking particle idx = " << idx << " mass = " << masses[idx]);
+			system->setParticleMass(idx, masses[idx]);
+			masked[idx] = false;
+
+			unmask_forces(idx, substruct);
+
+		}
+		bondStretch->updateParametersInContext(*context);
+		bondBend->updateParametersInContext(*context);
+		bondTorsion->updateParametersInContext(*context);
+	}
+
+	void SystemTopology::mask_forces(const int atom_idx, const set<int> &substruct) {
+		for (auto &data : bondStretchData[atom_idx]) { // get all forces involving this atom's idx
+			if (substruct.count(data.idx1) && substruct.count(data.idx2))
+				bondStretch->setBondParameters(data.force_idx, data.idx1, data.idx2, data.length, 0.0);
+		}
+		for (auto &data : bondBendData[atom_idx]) { // get all forces involving this atom's idx
+			if (substruct.count(data.idx1) && substruct.count(data.idx2) && substruct.count(data.idx3))
+				bondBend->setAngleParameters(data.force_idx, data.idx1, data.idx2, data.idx3, data.angle, 0.0);
+		}
+		for (auto &data : bondTorsionData[atom_idx]) { // get all forces involving this atom's idx
+			if (substruct.count(data.idx1) && substruct.count(data.idx2) && substruct.count(data.idx3) && substruct.count(data.idx4)) {
+
+				int idx1, idx2, idx3, idx4;
+				int periodicity;
+				double phase, k;
+
+				bondTorsion->getTorsionParameters(data.force_idx, idx1, idx2, idx3, idx4, periodicity, phase, k);
+				dbgmsg("particles of force " << data.force_idx);
+				dbgmsg(idx1 << " " << data.idx1);
+				dbgmsg(idx2 << " " << data.idx2);
+				dbgmsg(idx3 << " " << data.idx3);
+				dbgmsg(idx4 << " " << data.idx4);
+				dbgmsg(periodicity << " " << data.periodicity);
+
+				if (idx1 != data.idx1) throw Error("die : particles changed");
+				if (idx2 != data.idx2) throw Error("die : particles changed");
+				if (idx3 != data.idx3) throw Error("die : particles changed");
+				if (idx4 != data.idx4) throw Error("die : particles changed");
+				
+				bondTorsion->setTorsionParameters(data.force_idx, data.idx1, data.idx2, data.idx3, data.idx4, data.periodicity, data.phase, 0.0);
+			}
 		}
 	}
 	
-	void SystemTopology::unmask(Topology &topology, const Molib::Atom::Vec &atoms) {
-		for (auto &patom : atoms) {
-			int idx = topology.get_index(*patom);
-			system->setParticleMass(idx, masses[idx]);
-			masked[idx] = false;
+	void SystemTopology::unmask_forces(const int atom_idx, const set<int> &substruct) {
+		for (auto &data : bondStretchData[atom_idx]) { // get all forces involving this atom's idx
+			if (substruct.count(data.idx1) && substruct.count(data.idx2))
+				bondStretch->setBondParameters(data.force_idx, data.idx1, data.idx2, data.length, data.k);
+		}
+		for (auto &data : bondBendData[atom_idx]) { // get all forces involving this atom's idx
+			if (substruct.count(data.idx1) && substruct.count(data.idx2) && substruct.count(data.idx3))
+				bondBend->setAngleParameters(data.force_idx, data.idx1, data.idx2, data.idx3, data.angle, data.k);
+		}
+		for (auto &data : bondTorsionData[atom_idx]) { // get all forces involving this atom's idx
+			if (substruct.count(data.idx1) && substruct.count(data.idx2) && substruct.count(data.idx3) && substruct.count(data.idx4)) {
+
+
+				int idx1, idx2, idx3, idx4;
+				int periodicity;
+				double phase, k;
+
+				bondTorsion->getTorsionParameters(data.force_idx, idx1, idx2, idx3, idx4, periodicity, phase, k);
+				dbgmsg("particles of force " << data.force_idx);
+				dbgmsg(idx1 << " " << data.idx1);
+				dbgmsg(idx2 << " " << data.idx2);
+				dbgmsg(idx3 << " " << data.idx3);
+				dbgmsg(idx4 << " " << data.idx4);
+				dbgmsg(periodicity << " " << data.periodicity);
+
+				if (idx1 != data.idx1) throw Error("die : particles changed");
+				if (idx2 != data.idx2) throw Error("die : particles changed");
+				if (idx3 != data.idx3) throw Error("die : particles changed");
+				if (idx4 != data.idx4) throw Error("die : particles changed");
+
+
+
+				bondTorsion->setTorsionParameters(data.force_idx, data.idx1, data.idx2, data.idx3, data.idx4, data.periodicity, data.phase, data.k);
+			}
 		}
 	}
+	
 	
 	void SystemTopology::init_integrator(const double step_size_in_ps) {
 		// Choose an Integrator for advancing time, and a Context connecting the
@@ -71,16 +169,17 @@ namespace OMMIface {
 		//  (1) System needs to know the masses.
 		//  (2) NonbondedForce needs charges,van der Waals properties (in MD units!).
 		//  (3) Collect default positions for initializing the simulation later.
+
 		for (auto &patom : topology.atoms) {
 			const Molib::Atom &atom = *patom;
 			const int type = topology.get_type(atom);
 			try {
+
 				const ForceField::AtomType& atype = __ffield->get_atom_type(type);
 				system->addParticle(atype.mass);
 
 				masses.push_back(atype.mass);
-				masked.push_back(true); // at the start mask everything
-				
+				masked.push_back(false); // at the start unmask everything
 				dbgmsg("add particle type = " << type << " crd = " << atom.crd() << " mass = " 
 					<< atype.mass << " charge = " << atype.charge << " sigma = " << atype.sigma
 					<< " epsilon = " << atype.epsilon << " representing atom = "
@@ -222,9 +321,17 @@ namespace OMMIface {
 			
 		int warn = 0;
 
-		OpenMM::HarmonicBondForce *bondStretch = new OpenMM::HarmonicBondForce();
-		OpenMM::HarmonicAngleForce *bondBend = new OpenMM::HarmonicAngleForce();
-		OpenMM::PeriodicTorsionForce *bondTorsion = new OpenMM::PeriodicTorsionForce();
+		bondStretchData.resize(topology.atoms.size());
+		bondBendData.resize(topology.atoms.size());
+		bondTorsionData.resize(topology.atoms.size());
+		
+		//~ OpenMM::HarmonicBondForce *bondStretch = new OpenMM::HarmonicBondForce();
+		//~ OpenMM::HarmonicAngleForce *bondBend = new OpenMM::HarmonicAngleForce();
+		//~ OpenMM::PeriodicTorsionForce *bondTorsion = new OpenMM::PeriodicTorsionForce();
+//~ 
+		bondStretch = new OpenMM::HarmonicBondForce();
+		bondBend = new OpenMM::HarmonicAngleForce();
+		bondTorsion = new OpenMM::PeriodicTorsionForce();
 
 		system->addForce(bondStretch);
 		system->addForce(bondBend);
@@ -237,6 +344,9 @@ namespace OMMIface {
 		//      otherwise, tell HarmonicBondForce the bond stretch parameters 
 		//      (tricky units!).
 		//  (2) Create a list of bonds for generating nonbond exclusions.
+		
+		int force_idx = 0;
+		
 		for (auto &bond : topology.bonds) {
 			dbgmsg("checkpoint0");
 			const Molib::Atom &atom1 = *bond.first;
@@ -260,6 +370,10 @@ namespace OMMIface {
 					// as it is used in the harmonic energy term kx^2 with force 2kx; OpenMM wants 
 					// it as used in the force term kx, with energy kx^2/2.
 					bondStretch->addBond(idx1, idx2, btype.length, btype.k);
+					//~ bondStretch->addBond(idx1, idx2, btype.length, 0);
+					bondStretchData[idx1].push_back(ForceData{force_idx, idx1, idx2, 0, 0, btype.length, 0, 0, 0, btype.k});
+					bondStretchData[idx2].push_back(ForceData{force_idx, idx1, idx2, 0, 0, btype.length, 0, 0, 0, btype.k});
+					++force_idx;
 				}
 			} catch (ParameterError& e) {
 				cerr << e.what() << " (" << ++warn << ")" << endl;
@@ -267,6 +381,7 @@ namespace OMMIface {
 		}
 		dbgmsg("checkpoint3");
 
+		force_idx = 0;
 		// Create the 1-2-3 bond angle harmonic terms.
 		for (auto &angle : topology.angles) {
 			dbgmsg("checkpoint4");
@@ -287,12 +402,20 @@ namespace OMMIface {
 				const ForceField::AngleType& atype = 
 					__ffield->get_angle_type(type1, type2, type3);
 				bondBend->addAngle(idx1, idx2, idx3, atype.angle, atype.k);
+				//~ bondBend->addAngle(idx1, idx2, idx3, atype.angle, 0);
+				bondBendData[idx1].push_back(ForceData{force_idx, idx1, idx2, idx3, 0, 0, atype.angle, 0, 0, atype.k});
+				bondBendData[idx2].push_back(ForceData{force_idx, idx1, idx2, idx3, 0, 0, atype.angle, 0, 0, atype.k});
+				bondBendData[idx3].push_back(ForceData{force_idx, idx1, idx2, idx3, 0, 0, atype.angle, 0, 0, atype.k});
+				
+				++force_idx;
+
 			} catch (ParameterError& e) {
 				cerr << e.what() << " (" << ++warn << ")" << endl;
 			}
 			dbgmsg("checkpoint8");
 		}
 		
+		force_idx = 0;
 		// Create the 1-2-3-4 bond torsion (dihedral) terms.
 		for (auto &dihedral : topology.dihedrals) {
 			dbgmsg("checkpoint9");
@@ -312,13 +435,24 @@ namespace OMMIface {
 				const ForceField::TorsionTypeVec& v_ttype = 
 					__ffield->get_dihedral_type(type1, type2, type3, type4); // cannot make it const ??
 				for (auto &ttype : v_ttype) {
+					dbgmsg("force_idx = " << force_idx << " idx1 = " << idx1 << " idx2 = " << idx2
+						 << " idx3 = " << idx3 << " idx4 = " << idx4);
 					bondTorsion->addTorsion(idx1, idx2, idx3, idx4, ttype.periodicity, ttype.phase,	ttype.k);
+					//~ bondTorsion->addTorsion(idx1, idx2, idx3, idx4, ttype.periodicity, ttype.phase,	0);
+					bondTorsionData[idx1].push_back(ForceData{force_idx, idx1, idx2, idx3, idx4, 0, 0, ttype.periodicity, ttype.phase, ttype.k});
+					bondTorsionData[idx2].push_back(ForceData{force_idx, idx1, idx2, idx3, idx4, 0, 0, ttype.periodicity, ttype.phase, ttype.k});
+					bondTorsionData[idx3].push_back(ForceData{force_idx, idx1, idx2, idx3, idx4, 0, 0, ttype.periodicity, ttype.phase, ttype.k});
+					bondTorsionData[idx4].push_back(ForceData{force_idx, idx1, idx2, idx3, idx4, 0, 0, ttype.periodicity, ttype.phase, ttype.k});
+					
+					++force_idx;
+
 				}
 			} catch (ParameterError& e) {
 				cerr << e.what() << " (" << ++warn << ")" << endl;
 			}
 		}
 		
+		//~ force_idx = 0;
 		// Create the 1-2-3-4 improper terms where 3 is the central atom
 		for (auto &dihedral : topology.impropers) {
 			dbgmsg("checkpoint9");
@@ -338,7 +472,17 @@ namespace OMMIface {
 				const ForceField::TorsionTypeVec& v_ttype = 
 					__ffield->get_improper_type(type1, type2, type3, type4); // cannot make it const ??
 				for (auto &ttype : v_ttype) {
+					dbgmsg("force_idx = " << force_idx << " idx1 = " << idx1 << " idx2 = " << idx2
+						 << " idx3 = " << idx3 << " idx4 = " << idx4);
 					bondTorsion->addTorsion(idx1, idx2, idx3, idx4, ttype.periodicity, ttype.phase, ttype.k);
+					//~ bondTorsion->addTorsion(idx1, idx2, idx3, idx4, ttype.periodicity, ttype.phase, 0);
+					bondTorsionData[idx1].push_back(ForceData{force_idx, idx1, idx2, idx3, idx4, 0, 0, ttype.periodicity, ttype.phase, ttype.k});
+					bondTorsionData[idx2].push_back(ForceData{force_idx, idx1, idx2, idx3, idx4, 0, 0, ttype.periodicity, ttype.phase, ttype.k});
+					bondTorsionData[idx3].push_back(ForceData{force_idx, idx1, idx2, idx3, idx4, 0, 0, ttype.periodicity, ttype.phase, ttype.k});
+					bondTorsionData[idx4].push_back(ForceData{force_idx, idx1, idx2, idx3, idx4, 0, 0, ttype.periodicity, ttype.phase, ttype.k});
+					
+					++force_idx;
+
 				}
 			} catch (ParameterError& e) {
 				dbgmsg(e.what() << " (WARNINGS ARE NOT INCREASED)");

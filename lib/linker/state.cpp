@@ -6,8 +6,6 @@
 
 namespace Linker {
 	
-	State::Id State::idx = 0;
-
 	State::Vec operator-(const State::Set& left, const State::Set& right) { 
 		State::Vec ret; 
 		for (auto &state : left) 
@@ -31,7 +29,7 @@ namespace Linker {
 		for (int i = 0; i < __crds.size(); ++i) {
 			const Geom3D::Point &crd1 = get_crd(i);
 			const Molib::Atom &a1 = __segment.get_atom(i);;
-			if (&a1 == &excluded.atom1() || &a1 == &excluded.atom2()) { 
+			if (excluded.is_set() && (&a1 == &excluded.atom1() || &a1 == &excluded.atom2())) { 
 				dbgmsg("excluded state atom = " << a1.atom_number() 
 					<< " is not checked for clashes");
 				continue;
@@ -40,7 +38,7 @@ namespace Linker {
 			for (int j = 0; j < other_size; ++j) {
 				const Geom3D::Point &crd2 = other.get_crd(j);
 				const Molib::Atom &a2 = other.get_segment().get_atom(j);
-				if (&a2 == &excluded.atom1() || &a2 == &excluded.atom2()) { 
+				if (excluded.is_set() && (&a2 == &excluded.atom1() || &a2 == &excluded.atom2())) { 
 					dbgmsg("excluded state atom = " << a2.atom_number() 
 						<< " is not checked for clashes");
 					continue;
@@ -53,7 +51,8 @@ namespace Linker {
 	}
 	
 	ostream& operator<< (ostream& stream, const State& s) {
-		stream << "State(address = " << &s <<", segment = " << s.__segment.get_seed_id() << ") " 
+		//~ stream << "State(address = " << &s <<", segment = " << s.__segment.get_seed_id() << ") " 
+		stream << "State(id = " << s.get_id() <<", segment = " << s.__segment.get_seed_id() << ") " 
 			<< " energy = " << setprecision(4) << fixed << s.__energy << " atom_crd =  " ;
 		for (int i = 0; i < s.get_crds().size(); ++i) {
 			const Geom3D::Point &crd = s.get_crd(i);
@@ -64,7 +63,7 @@ namespace Linker {
 	}
 	
 	ostream& operator<< (ostream& stream, const State::Vec& sv) {
-		for (auto &state : sv) stream << "MEMBER STATE : " << state << endl;
+		for (auto &state : sv) stream << "MEMBER STATE : " << *state << endl;
 		return stream;
 	}
 };

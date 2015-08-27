@@ -10,8 +10,8 @@ namespace Linker {
 		return stream;
 	}
 
-	Segment::Segment(const Molib::Atom::Vec atoms, const int &seed_id) : 
-		__atoms(atoms), __seed_id(seed_id), __join_atom(atoms.size(), false) { 
+	Segment::Segment(const Molib::Atom::Vec atoms, const int &seed_id, const Segment::Id idx) 
+		: __atoms(atoms), __seed_id(seed_id), __id(idx), __join_atom(atoms.size(), false) { 
 
 		for (int i = 0; i < atoms.size(); ++i) 
 			__amap[atoms[i]] = i; 
@@ -44,11 +44,13 @@ namespace Linker {
 		const Molib::Model &model = molecule.first().first();
 		vector<unique_ptr<Segment>> vertices;
 		dbgmsg(model.get_rigid());
+		int idx = 0;
 		for (auto &fragment : model.get_rigid()) { // make vertices (segments) of a graph
 			dbgmsg(fragment.get_all());
 			auto all = fragment.get_all();
 			Molib::Atom::Vec fragatoms(all.begin(), all.end());
-			vertices.push_back(unique_ptr<Segment>(new Segment(fragatoms, fragment.get_seed_id())));
+			//~ vertices.push_back(unique_ptr<Segment>(new Segment(fragatoms, fragment.get_seed_id())));
+			vertices.push_back(unique_ptr<Segment>(new Segment(fragatoms, fragment.get_seed_id(), idx++)));
 		}
 		// connect segments
 		for (int i = 0; i < vertices.size(); ++i) {
@@ -151,42 +153,49 @@ namespace Linker {
 			auto &seg_pair = kv.first;
 			Segment::Graph::Path path(kv.second.begin(), kv.second.end());
 			__compute_max_linker_length(path);
-			reverse(path.begin(), path.end());
-			__compute_max_linker_length(path);
 		}
 	}
 
 	void Segment::__compute_max_linker_length(Segment::Graph::Path &path) {
-		double d = 0.0;
-		int i = 0;
-		for (; i < path.size() - 2; i += 2) {
+
+		for (int i = 0; i < path.size() - 1; ++i) {
+
+			double d = 0.0;
+			
 			const Molib::Bond &b1 = path[i]->get_bond(*path[i + 1]);
-			const Molib::Bond &b2 = path[i + 1]->get_bond(*path[i + 2]);
-			path[0]->set_max_linker_length(*path[i + 1], d + b1.length());
-			path[i + 1]->set_max_linker_length(*path[0], d + b1.length());
-			//~ d += b1.first_atom().crd().distance(b2.second_atom().crd());
-			d += b1.atom1().crd().distance(b2.atom2().crd());
-			path[0]->set_max_linker_length(*path[i + 2], d);
-			path[i + 2]->set_max_linker_length(*path[0], d);
-			dbgmsg("max_linker_length between " << *path[0] << " and " 
-				<< *path[i + 1] << " = " << path[0]->get_max_linker_length(*path[i + 1]));
-			dbgmsg("max_linker_length between " << *path[0] << " and " 
-				<< *path[i + 2] << " = " << path[0]->get_max_linker_length(*path[i + 2]));
+			Molib::Atom *front_atom = (path[i]->has_atom(b1.atom1()) ? &b1.atom1() : &b1.atom2());
+
+			path[i]->set_max_linker_length(*path[i + 1], b1.length());
+			path[i + 1]->set_max_linker_length(*path[i], b1.length());
+
+			dbgmsg("max_linker_length between " << *path[i] << " and " 
+				<< *path[i + 1] << " = " << path[i]->get_max_linker_length(*path[i + 1]));
+			dbgmsg("MAX_linker_length between " << *path[i] << " and " 
+				<< *path[i + 1] << " = " << b1.length());
+
+			for (int j = i + 1; j < path.size() - 1; ++j) {
+
+				const Molib::Bond &b2 = path[j]->get_bond(*path[j + 1]);
+
+				Molib::Atom &b2_atom1 = (path[j]->has_atom(b2.atom1()) ? b2.atom1() : b2.atom2());
+				Molib::Atom &b2_atom2 = b2.second_atom(b2_atom1);
+		
+				double rigid_width = (*front_atom).crd().distance(b2_atom2.crd());
+				front_atom = &b2_atom2;
+
+				d += rigid_width;
+
+				path[i]->set_max_linker_length(*path[j + 1], d);
+				path[j + 1]->set_max_linker_length(*path[i], d);
+				
+				dbgmsg("max_linker_length between " << *path[i] << " and " 
+					<< *path[j + 1] << " = " << path[i]->get_max_linker_length(*path[j + 1]));
+				dbgmsg("MAX_linker_length between " << *path[i] << " and " 
+					<< *path[j + 1] << " = " << d);
+								
+			}
 		}
-		if (i < path.size() - 1) {
-			const Molib::Bond &b = path[i]->get_bond(*path[i + 1]);
-			d += b.length();
-			path[0]->set_max_linker_length(*path[i + 1], d);
-			path[i + 1]->set_max_linker_length(*path[0], d);
-			dbgmsg("last max_linker_length between " << *path[0] << " and " 
-				<< *path[i + 1] << " = " << path[0]->get_max_linker_length(*path[i + 1]));
-		}
-		dbgmsg("TOTAL max_linker_length between " << *path[0] << " and " 
-			<< *path[path.size() - 1] << " = " 
-			<< path[0]->get_max_linker_length(*path[path.size() - 1]));
 	}
-
-
 	
 	void Segment::__set_branching_rules(const Segment::Paths &paths) {
 		for (auto &kv : paths) {

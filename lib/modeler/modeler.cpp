@@ -35,10 +35,10 @@ namespace OMMIface {
 
 	void Modeler::add_topology(const Molib::Atom::Vec &atoms) {
 		__topology.add_topology(atoms, *__ffield);
+		__positions.resize(__topology.atoms.size()); // as many positions as there are atoms
 	}
 
 	void Modeler::add_crds(const Molib::Atom::Vec &atoms, const Geom3D::Point::Vec &crds) {
-		__positions.resize(__topology.atoms.size()); // as many positions as there are atoms
 		for (int i = 0; i < atoms.size(); ++i) {
 			int idx = __topology.get_index(*atoms[i]);
 			__positions[idx] = crds[i];
@@ -66,11 +66,7 @@ namespace OMMIface {
 	}
 
 
-#ifndef NDEBUG
-	void Modeler::minimize_state(Molib::Molecule &ligand, Molib::Molecule &receptor, Molib::Score &score) {
-#else
-	void Modeler::minimize_state() {
-#endif
+	void Modeler::minimize_state(const Molib::Molecule &ligand, const Molib::Molecule &receptor, const Molib::Score &score) {
 		if (__fftype == "kb")
 			minimize_knowledge_based(ligand, receptor, score);
 		else if (__fftype == "phy")
@@ -87,11 +83,7 @@ namespace OMMIface {
 			<< " wallclock seconds" << endl;
 	}
 
-#ifndef NDEBUG
-	void Modeler::minimize_knowledge_based(Molib::Molecule &ligand, Molib::Molecule &receptor, Molib::Score &score) {
-#else
-	void Modeler::minimize_knowledge_based() {
-#endif
+	void Modeler::minimize_knowledge_based(const Molib::Molecule &ligand, const Molib::Molecule &receptor, const Molib::Score &score) {
 		Benchmark::reset();
 		cout << "Doing energy minimization using knowledge-based forcefield" << endl;
 
@@ -163,6 +155,10 @@ namespace OMMIface {
 	}
 
 	void Modeler::init_openmm_positions() {
+#ifndef NDEBUG
+		dbgmsg("init_openmm_positions");
+		for (auto &point : __positions) dbgmsg(point);
+#endif
 		__system_topology.init_positions(__positions);
 	}
 

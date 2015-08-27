@@ -56,7 +56,15 @@ private:
 		delete [] storage;
 	}
 public:
+
+	
+	//~ template<typename U>
+	//~ Grid(Grid<U>&& other) noexcept {
+		//~ std::cout << "Grid move constructor" << std::endl;
+	//~ }
+//~ 
 	Grid& operator=(const Grid &rhs) {
+		dbgmsg("Grid assignment operator");
 		if (this != &rhs) {
 			// Deallocate, allocate new space, copy values...
 			this->__deallocate();
@@ -111,6 +119,7 @@ public:
 	}
 	
 	~Grid() {
+		dbgmsg("Grid destructor");
 		this->__deallocate();
 	}
 

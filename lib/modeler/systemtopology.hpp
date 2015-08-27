@@ -27,6 +27,10 @@ namespace OMMIface {
 	    OpenMM::Integrator *integrator;
 	    OpenMM::Context *context;
 
+		OpenMM::HarmonicBondForce *bondStretch;
+		OpenMM::HarmonicAngleForce *bondBend;
+		OpenMM::PeriodicTorsionForce *bondTorsion;
+
 		ForceField *__ffield;
 		
 		int __kbforce_idx;
@@ -47,6 +51,14 @@ namespace OMMIface {
 			typedef vector<AtomPoint*> PVec;
 			typedef ::Grid<AtomPoint> Grid;
 		};
+		
+		struct ForceData {
+			int force_idx, idx1, idx2, idx3, idx4;
+			double length, angle;
+			int periodicity;
+			double phase, k;
+		};
+		vector<vector<ForceData>> bondStretchData, bondBendData, bondTorsionData;
 
 	public:
 		SystemTopology() : system(nullptr), integrator(nullptr), context(nullptr), __kbforce_idx(-1) {}
@@ -54,6 +66,10 @@ namespace OMMIface {
 		static void loadPlugins();
 		void mask(Topology &topology, const Molib::Atom::Vec &atoms);
 		void unmask(Topology &topology, const Molib::Atom::Vec &atoms);
+
+		void mask_forces(const int atom_idx, const set<int> &substruct);
+		void unmask_forces(const int atom_idx, const set<int> &substruct);
+
 		void init_integrator(const double step_size_in_ps);
 		void init_particles(Topology &topology);
 		void update_knowledge_based_force(Topology &topology, const vector<OpenMM::Vec3> &positions, const double dist_cutoff);

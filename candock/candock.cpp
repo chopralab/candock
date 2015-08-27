@@ -183,7 +183,7 @@ int main(int argc, char* argv[]) {
 		 * radius) for getting all conformations of each seed
 		 * 
 		 */
-		Docker::Gpoints gpoints0(cmdl.grid_spacing(), 10.0);
+		Docker::Gpoints gpoints0(cmdl.grid_spacing(), cmdl.max_frag_radius());
 
 		/* Create template grids using ProBiS-ligands algorithm
 		 * WORK IN PROGESS WORK IN PROGESS WORK IN PROGESS WORK IN PROGESS 
@@ -266,15 +266,28 @@ int main(int argc, char* argv[]) {
 						ligand.erase_properties(); // required for graph matching
 						top_seeds.erase_properties(); // required for graph matching
 
-						/* Connect seeds with rotatable linkers, symmetry, optimize 
-						 * seeds with appendices. A graph of segments is constructed in 
-						 * which each rigid segment is a vertex & segments that are 
-						 * part of seeds are identified.
-						 * 
+						/* Init minization options and constants, including ligand and receptor topology
+						 *
 						 */
-						Molib::Internal ic(ligand.get_atoms());
+						 
+						OMMIface::Modeler modeler(ffield_copy, cmdl.fftype(), cmdl.dist_cutoff(),
+							cmdl.tolerance(), cmdl.max_iterations(), cmdl.update_freq(), 
+							cmdl.position_tolerance(), false, 2.0);
+						
+						modeler.add_topology(receptors[0].get_atoms());
+						modeler.add_topology(ligand.get_atoms());
 
-						Linker::Linker linker(ligand, top_seeds, gridrec, score, ic, 
+						modeler.init_openmm();
+
+						/* Connect seeds with rotatable linkers, symmetry, optimize 
+						 * seeds with appendices, minimize partial conformations between linking. 
+						 * A graph of segments is constructed in which each rigid segment is 
+						 * a vertex & segments that are part of seeds are identified.
+						 * 
+						 */					
+
+						Molib::Internal ic(ligand.get_atoms());
+						Linker::Linker linker(modeler, receptors[0], ligand, top_seeds, gridrec, score, ic, 
 							cmdl.dist_cutoff(), cmdl.spin_degrees(), cmdl.tol_seed_dist(), 
 							cmdl.max_possible_conf(), cmdl.link_iter(), cmdl.clash_coeff());
 
@@ -292,15 +305,7 @@ int main(int argc, char* argv[]) {
 							Molib::Molecules docked_representatives = Molib::Cluster::greedy(
 								docked, score, gridrec, cmdl.docked_clus_rad());
 
-							OMMIface::Modeler modeler(ffield_copy, cmdl.fftype(), cmdl.dist_cutoff(),
-								cmdl.tolerance(), cmdl.max_iterations(), cmdl.update_freq(), cmdl.position_tolerance(),
-								false, 2.0);
-							
-							modeler.add_topology(receptors[0].get_atoms());
-							modeler.add_topology(ligand.get_atoms());
-
-							
-							/* Minimize each representative docked ligand conformation
+							/* Finally, minimize each representative docked ligand conformation
 							 * with full flexibility of both ligand and receptor
 							 * 
 							 */
@@ -309,17 +314,13 @@ int main(int argc, char* argv[]) {
 								modeler.add_crds(receptors[0].get_atoms(), receptors[0].get_crds());
 								modeler.add_crds(ligand.get_atoms(), docked_ligand.get_crds());
 								
-								modeler.init_openmm();
 								modeler.init_openmm_positions();
 								
 								modeler.unmask(receptors[0].get_atoms());
 								modeler.unmask(ligand.get_atoms());
 				
-#ifndef NDEBUG
 								modeler.minimize_state(ligand, receptors[0], score);
-#else
-								modeler.minimize_state();
-#endif
+
 								// init with minimized coordinates
 								Molib::Molecule minimized_receptor(receptors[0], modeler.get_state(receptors[0].get_atoms()));
 								Molib::Molecule minimized_ligand(ligand, modeler.get_state(ligand.get_atoms()));

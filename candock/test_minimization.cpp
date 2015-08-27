@@ -106,21 +106,32 @@ int main(int argc, char* argv[]) {
 						
 				modeler.add_topology(receptors[0].get_atoms());
 				modeler.add_topology(ligand.get_atoms());
-				
+
+				modeler.init_openmm();
+
+				// change coordinate of some ligand atoms
+				Molib::Atom::Vec substruct;
+				for (auto &patom : ligand.get_atoms()) {
+					if (patom->atom_number() == 2 || patom->atom_number() == 1 
+						|| patom->atom_number() == 4 || patom->atom_number() == 57) {
+						substruct.push_back(patom);
+					}
+				}
+				for (auto &patom : substruct) {
+					patom->set_crd(patom->crd() + 5.0);
+				}
+
 				modeler.add_crds(receptors[0].get_atoms(), receptors[0].get_crds());
 				modeler.add_crds(ligand.get_atoms(), ligand.get_crds());
 				
-				modeler.init_openmm();
 				modeler.init_openmm_positions();
 				
-				modeler.unmask(receptors[0].get_atoms());
-				modeler.unmask(ligand.get_atoms());
+				//~ modeler.unmask(receptors[0].get_atoms());
+				modeler.mask(ligand.get_atoms());
+				modeler.unmask(substruct);
 
-#ifndef NDEBUG
 				modeler.minimize_state(ligand, receptors[0], score);
-#else
-				modeler.minimize_state();
-#endif
+
 				// init with minimized coordinates
 				Molib::Molecule minimized_receptor(receptors[0], modeler.get_state(receptors[0].get_atoms()));
 				Molib::Molecule minimized_ligand(ligand, modeler.get_state(ligand.get_atoms()));
@@ -133,38 +144,35 @@ int main(int argc, char* argv[]) {
 				inout::output_file(Molib::Molecule::print_complex(minimized_ligand, minimized_receptor, energy), 
 					"org_" + cmdl.mini_ligands_file(), ios_base::app);
 				
-				/**
-				 * This section is a test to see if you can change positions 
-				 * of some atoms without reinitializing the whole openmm
-				 */
-				 
-				// change coordinate of ligand atoms
-				ligand.set_name("mod");
-				for (auto &patom : ligand.get_atoms()) {
-					patom->set_crd(patom->crd() + 2.0);
-				}
-				// initialize only new ligand coordinates
-				modeler.add_crds(ligand.get_atoms(), ligand.get_crds());
-				modeler.init_openmm_positions();
-				
-#ifndef NDEBUG				
-				modeler.minimize_state(ligand, receptors[0], score);
-#else
-				modeler.minimize_state();
-#endif
-				// init with minimized coordinates
-				Molib::Molecule mod_minimized_receptor(receptors[0], modeler.get_state(receptors[0].get_atoms()));
-				Molib::Molecule mod_minimized_ligand(ligand, modeler.get_state(ligand.get_atoms()));
-
-				mod_minimized_receptor.undo_mm_specific();
-
-				Molib::Atom::Grid mod_gridrec(mod_minimized_receptor.get_atoms());
-				const double mod_energy = score.non_bonded_energy(mod_gridrec, mod_minimized_ligand);
-
-				inout::output_file(Molib::Molecule::print_complex(mod_minimized_ligand, mod_minimized_receptor, mod_energy), 
-					"mod_" + cmdl.mini_ligands_file(), ios_base::app);
-					
-				/*****************************/
+				//~ /**
+				 //~ * This section is a test to see if you can change positions 
+				 //~ * of some atoms without reinitializing the whole openmm
+				 //~ */
+				 //~ 
+				//~ // change coordinate of ligand atoms
+				//~ ligand.set_name("mod");
+				//~ for (auto &patom : ligand.get_atoms()) {
+					//~ patom->set_crd(patom->crd() + 2.0);
+				//~ }
+				//~ // initialize only new ligand coordinates
+				//~ modeler.add_crds(ligand.get_atoms(), ligand.get_crds());
+				//~ modeler.init_openmm_positions();
+				//~ 
+				//~ modeler.minimize_state(ligand, receptors[0], score);
+//~ 
+				//~ // init with minimized coordinates
+				//~ Molib::Molecule mod_minimized_receptor(receptors[0], modeler.get_state(receptors[0].get_atoms()));
+				//~ Molib::Molecule mod_minimized_ligand(ligand, modeler.get_state(ligand.get_atoms()));
+//~ 
+				//~ mod_minimized_receptor.undo_mm_specific();
+//~ 
+				//~ Molib::Atom::Grid mod_gridrec(mod_minimized_receptor.get_atoms());
+				//~ const double mod_energy = score.non_bonded_energy(mod_gridrec, mod_minimized_ligand);
+//~ 
+				//~ inout::output_file(Molib::Molecule::print_complex(mod_minimized_ligand, mod_minimized_receptor, mod_energy), 
+					//~ "mod_" + cmdl.mini_ligands_file(), ios_base::app);
+					//~ 
+				//~ /*****************************/
 
 			} catch (exception& e) {
 				cerr << "MINIMIZATION FAILED FOR LIGAND " << ligand.name() 

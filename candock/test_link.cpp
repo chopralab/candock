@@ -21,6 +21,7 @@
 #include "ligands/genlig.hpp"
 #include "cluster/optics.hpp"
 #include "cluster/greedy.hpp"
+#include "modeler/modeler.hpp"
 using namespace std;
 
 CmdLnOpts cmdl;
@@ -39,8 +40,6 @@ int main(int argc, char* argv[]) {
 		inout::output_file("", cmdl.docked_seeds_file()); // output docked & filtered fragment poses
 		inout::output_file("", cmdl.docked_ligands_file()); // output docked molecule conformations
 		inout::output_file("", cmdl.mini_ligands_file()); // output docked & minimized ligands conformations
-		inout::output_file(OMMIface::print_energies_title(), 
-			cmdl.energy_file()); // output energy components of docked & minimized ligands conformations
 		inout::output_file("", cmdl.nosql_file()); // probis local structural alignments
 		
 		/* Initialize parsers for receptor (and ligands) and read
@@ -82,7 +81,7 @@ int main(int argc, char* argv[]) {
 		 * 
 		 */
 		Molib::Score score(Molib::get_idatm_types(receptors), ligand_idatm_types, 
-			gridrec, cmdl.ref_state(), cmdl.comp(), cmdl.rad_or_raw(), 
+			cmdl.ref_state(), cmdl.comp(), cmdl.rad_or_raw(), 
 			cmdl.dist_cutoff(), cmdl.distributions_file(), cmdl.step_non_bond());
 
 		/* Forcefield stuff : create forcefield for small molecules (and KB 
@@ -110,7 +109,7 @@ int main(int argc, char* argv[]) {
 
 		Molib::PDBreader lpdb2(cmdl.ligand_file(), Molib::PDBreader::all_models, 1);
 
-		OMMIface::OMM::loadPlugins();
+		OMMIface::SystemTopology::loadPlugins();
 		
 		for(int i = 0; i < cmdl.ncpu(); ++i) {
 			threads.push_back(thread([&lpdb2, &receptors, &gridrec, &score, &ffield] () {
@@ -132,6 +131,22 @@ int main(int argc, char* argv[]) {
 						ligand.erase_properties(); // required for graph matching
 						top_seeds.erase_properties(); // required for graph matching
 						
+						/* Init minization options and constants, including ligand and receptor topology
+						 *
+						 */
+						 						 
+						OMMIface::Modeler modeler(ffield_copy, cmdl.fftype(), cmdl.dist_cutoff(),
+							cmdl.tolerance(), cmdl.max_iterations(), cmdl.update_freq(), 
+							cmdl.position_tolerance(), false, 2.0);
+						
+						modeler.add_topology(receptors[0].get_atoms());
+						modeler.add_topology(ligand.get_atoms());
+						
+						modeler.init_openmm();
+
+						modeler.add_crds(ligand.get_atoms(), ligand.get_crds());
+
+						//~ modeler.unmask(receptors[0].get_atoms());
 
 						/* Connect seeds with rotatable linkers, symmetry, optimize 
 						 * seeds with appendices. A graph of segments is constructed in 
@@ -159,7 +174,7 @@ int main(int argc, char* argv[]) {
 						//    fast clashes between seeds using grid
 						//
 						
-						Linker::Linker linker(ligand, top_seeds, gridrec, score, ic, 
+						Linker::Linker linker(modeler, receptors[0], ligand, top_seeds, gridrec, score, ic, 
 							cmdl.dist_cutoff(), cmdl.spin_degrees(), cmdl.tol_seed_dist(), 
 							cmdl.max_possible_conf(), cmdl.link_iter(), cmdl.clash_coeff());
 
@@ -176,30 +191,36 @@ int main(int argc, char* argv[]) {
 							 */
 							
 							Molib::Molecules docked_representatives = Molib::Cluster::greedy(
-								docked, score, cmdl.docked_clus_rad());
+								docked, score, gridrec, cmdl.docked_clus_rad());
 
-							/* Minimize each representative docked ligand conformation
+							/* Finally, minimize each representative docked ligand conformation
 							 * with full flexibility of both ligand and receptor
 							 * 
 							 */
-							Molib::Molecules mini;
-							OMMIface::Energies energies;
-	
 							for (auto &docked_ligand : docked_representatives) {
-								OMMIface::OMM omm(receptors[0], docked_ligand, ffield_copy, 
-									cmdl.fftype(), cmdl.dist_cutoff());
-								omm.minimize(cmdl.tolerance(), cmdl.max_iterations(), cmdl.update_freq()); // minimize
-								auto ret = omm.get_state(receptors[0], docked_ligand);
-								Molib::Molecule &minimized_receptor = mini.add(new Molib::Molecule(ret.first));
-								Molib::Molecule &minimized_ligand = mini.add(new Molib::Molecule(ret.second));
-								energies[&minimized_ligand] = omm.get_energy_components(
-									minimized_receptor, minimized_ligand, cmdl.dist_cutoff());
+
+								modeler.add_crds(receptors[0].get_atoms(), receptors[0].get_crds());
+								modeler.add_crds(ligand.get_atoms(), docked_ligand.get_crds());
+								
+								modeler.init_openmm_positions();
+								
+								modeler.unmask(receptors[0].get_atoms());
+								modeler.unmask(ligand.get_atoms());
+				
+								modeler.minimize_state(ligand, receptors[0], score);
+
+								// init with minimized coordinates
+								Molib::Molecule minimized_receptor(receptors[0], modeler.get_state(receptors[0].get_atoms()));
+								Molib::Molecule minimized_ligand(ligand, modeler.get_state(ligand.get_atoms()));
+				
 								minimized_receptor.undo_mm_specific();
+
+								Molib::Atom::Grid gridrec(minimized_receptor.get_atoms());
+								const double energy = score.non_bonded_energy(gridrec, minimized_ligand);
+
+								inout::output_file(Molib::Molecule::print_complex(minimized_ligand, minimized_receptor, energy), 
+									cmdl.mini_ligands_file(), ios_base::app);
 							}
-							inout::output_file(mini, cmdl.mini_ligands_file(), 
-								ios_base::app); // output docked & minimized ligands
-							inout::output_file(energies, cmdl.energy_file(), 
-								ios_base::app); // output energies of docked & minimized ligands
 						}
 					}
 					catch (Error& e) { 

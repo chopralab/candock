@@ -39,6 +39,7 @@ class CmdLnOpts {
 	string __centroid_out_file;
 
 	string __gridpdb_hcp_file;
+	double __max_frag_radius;
 
 	string __ref_state;
 	string __comp;
@@ -132,6 +133,8 @@ public:
 			TCLAP::ValueArg<string> centroid_out_fileArg("","centro_out","Filename for outputting calculated centroids",false,"","string", cmd);
 
 			TCLAP::ValueArg<string> gridpdb_hcp_fileArg("","gridpdb_hcp","Grid pdb hcp file for output",false,"gridpdb_hcp.pdb","string", cmd);
+			
+			TCLAP::ValueArg<double> max_frag_radiusArg("","max_frag_radius","Maximum fragment radius for creating the initial rotamers (default is 10.0)",false,10.0,"double", cmd);
 
 			vector<string> allowedRef{"mean","cumulative"};
 			TCLAP::ValuesConstraint<string> allowedValsRef( allowedRef );
@@ -154,7 +157,7 @@ public:
 			TCLAP::ValueArg<double> step_non_bondArg("","step","Step for spline generation of non-bonded knowledge-based \
 				potential [0.0-1.0] (default is 0.1)",false,0.1,"double", cmd);
 			TCLAP::ValueArg<double> scale_non_bondArg("","scale","Scale non-bonded forces and energy for knowledge-based \
-				potential [0.0-1.0] (default is 0.0001)",false,0.0001,"double", cmd);
+				potential [0.0-1.0] (default is 0.002)",false,0.002,"double", cmd);
 
 			TCLAP::ValueArg<string> egrid_fileArg("","egrid", "Energy grid output file",false,"energy_grid.pdb","string", cmd);
 			TCLAP::ValueArg<string> docked_seeds_fileArg("","docked_seeds_file", "Docked seeds output file",false,
@@ -234,6 +237,7 @@ public:
 			__centroid_in_file = centroid_in_fileArg.getValue();
 			__centroid_out_file = centroid_out_fileArg.getValue();
 			__gridpdb_hcp_file = gridpdb_hcp_fileArg.getValue();
+			__max_frag_radius = max_frag_radiusArg.getValue();
 			
 			__ref_state = ref_stateArg.getValue();
 			__comp = compArg.getValue();
@@ -313,6 +317,7 @@ public:
 	string centroid_in_file() const { return __centroid_in_file; }
 	string centroid_out_file() const { return __centroid_out_file; }
 	string gridpdb_hcp_file() const { return __gridpdb_hcp_file; }
+	double max_frag_radius() const { return __max_frag_radius; }
 	
 	string ref_state() const { return __ref_state; }
 	string comp() const { return __comp; }

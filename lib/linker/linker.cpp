@@ -8,6 +8,8 @@
 #include "helper/help.hpp"
 #include "helper/array2d.hpp"
 #include "graph/mcqd.hpp"
+#include "modeler/modeler.hpp"
+#include "geom3d/geom3d.hpp"
 #include <queue>
 
 using namespace std;
@@ -22,27 +24,11 @@ namespace Linker {
 		return os;
 	}
 
-	ostream& operator<<(ostream& os, const Linker::LinkEnergy &le)	{
-		os << "start link ++++++++++++++++++++++++++++++" << endl;
-		os << "ENERGY = " << le.second << endl;
-		for (auto &pstate : le.first)
-			//~ os << *pstate << endl;
-			os << pstate->pdb() << endl;
-		os << "end link --------------------------------" << endl;
-		return os;
-	}
-
-	ostream& operator<<(ostream& os, const vector<Linker::LinkEnergy> &vec_le)	{
-		for (auto &le : vec_le) {
-			os << le << endl;
-		}			
-		return os;
-	}
-
 	void Linker::__create_states(const Segment::Graph &segment_graph, const Molib::NRset &top_seeds) {
 		/* each state is a mapping of docked seed atoms to ligands's 
 		 * segment atoms
 		 */
+		//~ int idx = 0;
 		for (auto &seed_mols : top_seeds) {
 			const int seed_id = stoi(seed_mols.name());
 			dbgmsg("seed id = " << seed_id);
@@ -81,6 +67,7 @@ namespace Linker {
 						dbgmsg("adding docked state " << segment.get_seed_id() << " with energy of " << energy);
 						// ONLY COPY SEGMENT COORDS NOT SEED
 						segment.add_state(unique_ptr<State>(new State(segment, crds, energy)));
+						//~ segment.add_state(unique_ptr<State>(new State(segment, crds, idx++, energy)));
 					}
 				}
 			}
@@ -100,11 +87,11 @@ namespace Linker {
 	}
 	
 	bool Linker::__clashes_ligand(const State &current, 
-		const LinkEnergy &conformation, const State &prev) const {
+		const Partial &conformation, const State &prev) const {
 
 		const Molib::Bond &excluded = current.get_segment().get_bond(prev.get_segment());
 		// clashes between current segment and previous segments
-		for (auto &pstate : conformation.first) {
+		for (auto &pstate : conformation.get_states()) {
 			dbgmsg("clashes_ligand test for state " << current 
 				<< " and state " << *pstate);
 			if (current.clashes(*pstate, excluded, __clash_coeff)) 
@@ -237,21 +224,21 @@ namespace Linker {
 		return (it == docked_seeds.end() ? nullptr : it->second);
 	}
 
-	string Linker::to_pdb(const LinkEnergy &conformation) {
+	string Linker::to_pdb(const Partial &conformation) {
 		stringstream os;
 		os << "MODEL" << endl;
-		os << "REMARK   8 ENERGY " << conformation.second << endl;
-		for (auto &pstate : conformation.first)
+		os << "REMARK   8 ENERGY " << conformation.get_energy() << endl;
+		for (auto &pstate : conformation.get_states())
 			os << pstate->pdb();
 		os << "ENDMDL" << endl;
 		return os.str();
 	}
 
 	pair<State*, Segment*> Linker::__find_good_neighbor(
-		const LinkEnergy &curr_conformation, const SegStateMap &docked_seeds) {
+		const Partial &curr_conformation, const SegStateMap &docked_seeds) {
 
 		Segment::Set done_segments, free_seeds;
-		for (auto &pcurr_state : curr_conformation.first) {
+		for (auto &pcurr_state : curr_conformation.get_states()) {
 			done_segments.insert(const_cast<Segment*>(&pcurr_state->get_segment()));
 		}
 		for (auto &kv : docked_seeds) {
@@ -261,7 +248,7 @@ namespace Linker {
 			}
 		}
 		pair<State*, Segment*> good;
-		for (auto &pcurr_state : curr_conformation.first) {
+		for (auto &pcurr_state : curr_conformation.get_states()) {
 			State &curr_state = *pcurr_state;
 			const Segment &curr_segment = curr_state.get_segment();
 			for (auto &pgoal : free_seeds) {
@@ -273,7 +260,7 @@ namespace Linker {
 				}
 			}
 		}
-		for (auto &pcurr_state : curr_conformation.first) {
+		for (auto &pcurr_state : curr_conformation.get_states()) {
 			State &curr_state = *pcurr_state;
 			for (auto &adj : curr_state.get_segment()) { 
 				if (!done_segments.count(&adj)) { // don't go back
@@ -284,36 +271,35 @@ namespace Linker {
 	}
 
 	Linker::Conf Linker::__a_star(const int segment_graph_size, 
-		const LinkEnergy &start_conformation, int iter) {
+		const Partial &start_conformation, int iter) {
 
 		vector<unique_ptr<State>> states;
-		for (auto &pstate : start_conformation.first)
+		for (auto &pstate : start_conformation.get_states())
 			states.push_back(unique_ptr<State>(new State(*pstate)));
-		if (start_conformation.first.empty())
+		if (start_conformation.empty())
 			throw Error ("die : at least one docked anchor state is required for linking");
 		SegStateMap docked_seeds;
 		for (auto &pstate : states) 
 			docked_seeds.insert({&pstate->get_segment(), &*pstate});
 		set<State::ConstPair>	failed_state_pairs;
-		LinkEnergy min_conformation;
-		double min_energy = MAX_ENERGY;
+		Partial min_conformation(MAX_ENERGY);
 		PriorityQueue openset; // openset has conformations sorted from lowest to highest energy
-		openset.insert(LinkEnergy{State::Vec{&*states[0]}, states[0]->get_energy()});
+		openset.insert(Partial(State::Vec{&*states[0]}, states[0]->get_energy(),
+			__receptor.get_crds()));
+			
 		while(!openset.empty()) {
 			if (--iter < 0) break;
-			LinkEnergy curr_conformation = *openset.begin();
+			Partial curr_conformation = *openset.begin();
 			openset.erase(openset.begin());
 			dbgmsg("openset.size() = " << openset.size());
 			dbgmsg("curr_conformation at step = " 
 				<< iter << " = " << endl << curr_conformation
 				<< endl << to_pdb(curr_conformation));
-			if (curr_conformation.first.size() == segment_graph_size) {
+			if (curr_conformation.size() == segment_graph_size) {
 				dbgmsg("CANDIDATE for minimum energy conformation at step = " 
 					<< iter << " = " << endl << curr_conformation);
-				const double curr_energy = curr_conformation.second;
-				if (curr_energy < min_energy) {
+				if (curr_conformation.get_energy() < min_conformation.get_energy()) {
 					min_conformation = curr_conformation;
-					min_energy = curr_energy;
 					dbgmsg("ACCEPTED");
 				}
 			} else {
@@ -340,46 +326,48 @@ namespace Linker {
 						if (!__clashes_receptor(*pneighbor) 
 							&& !__clashes_ligand(*pneighbor, curr_conformation, curr_state)) {
 
-							//~ const double nb_ene = __score.non_bonded_energy(__gridrec, pneighbor->get_segment().get_atoms(), pneighbor->get_crds());
-							//~ const double torsion_ene = torsion_energy(curr_state, *pneighbor);
-							//~ const double branch_ene = curr_conformation.second
-								//~ + nb_ene 
-								//~ + torsion_ene;
-							LinkEnergy next_conformation = curr_conformation;
-							next_conformation.first.push_back(pneighbor);
-							//~ next_conformation.second = branch_ene;
+							dbgmsg("Preparing for minimization");
+							Partial next_conformation(curr_conformation);
 
-							/**
-							 * Minimization !!!!
-							 * 
-							 */
+							dbgmsg("Adding state");
+							next_conformation.add_state(*pneighbor);
 
-							// initialize only new ligand coordinates
-							modeler.mask("whole ligand");
-							modeler.add_crds(next_conformation.get_receptor_atoms(), next_conformation.get_receptor_crds());
-							modeler.add_crds(next_conformation.get_atoms(), next_conformation.get_crds());
-							modeler.unmask(next_conformation.get_atoms());
+							// prepare for minimization receptor and ligand coordinates
+							dbgmsg("Adding coordinates");
+							__modeler.add_crds(__receptor.get_atoms(), next_conformation.get_receptor_crds());
+							__modeler.add_crds(next_conformation.get_ligand_atoms(), next_conformation.get_ligand_crds());
+							//~ __modeler.add_crds(__ligand.get_atoms(), __ligand.get_crds());
+
+							dbgmsg("Initializing openmm positions");
+							__modeler.init_openmm_positions();
 							
-							modeler.init_openmm_positions();
+							dbgmsg("Masking atoms " << __ligand.get_atoms());
+							__modeler.mask(__ligand.get_atoms());
 							
-#ifndef NDEBUG				
-							modeler.minimize_state(ligand, receptors[0], __score);
-#else
-							modeler.minimize_state();
-#endif
+							dbgmsg("Unmasking atoms " << next_conformation.get_ligand_atoms());
+							dbgmsg("with coordinates");
+							for (auto &point : next_conformation.get_ligand_crds())
+								dbgmsg(point);
+							__modeler.unmask(next_conformation.get_ligand_atoms());
+							
+							// minimize ...
+							dbgmsg("Minimizing");
+							__modeler.minimize_state(__ligand, __receptor, __score);
+
 							// init with minimized coordinates
-							Molib::Molecule minimized_receptor(receptors[0], modeler.get_state(receptors[0].get_atoms()));
+							Molib::Molecule minimized_receptor(__receptor, __modeler.get_state(__receptor.get_atoms()));
 							next_conformation.set_receptor_crds(minimized_receptor.get_crds());
-							next_conformation.set_crds(modeler.get_state(next_conformation.get_atoms()));
+							next_conformation.set_ligand_crds(__modeler.get_state(next_conformation.get_ligand_atoms()));
+
+							dbgmsg("minimized coordinates");
+							for (auto &point : __modeler.get_state(next_conformation.get_ligand_atoms())) dbgmsg(point);
+
 
 							// compute energy after minimization
 							Molib::Atom::Grid gridrec(minimized_receptor.get_atoms());
-							const double energy = __score.non_bonded_energy(gridrec, next_conformation.get_atoms());
+							const double energy = __score.non_bonded_energy(gridrec, next_conformation.get_ligand_atoms(), next_conformation.get_ligand_crds());
 
 							next_conformation.set_energy(energy);
-
-
-
 
 							dbgmsg("accepting state " << *pneighbor);
 							dbgmsg("before insert openset.size() = " << openset.size());
@@ -391,7 +379,7 @@ namespace Linker {
 			}
 		}
 		dbgmsg("ASTAR FINISHED");
-		if (min_energy != MAX_ENERGY) {
+		if (min_conformation.get_energy() != MAX_ENERGY) {
 			dbgmsg("SUCCESS minimum energy conformation at step = " 
 				<< iter << " = " << endl << min_conformation);
 		} else {
@@ -400,8 +388,8 @@ namespace Linker {
 				failed_state_pairs);
 		}
 		Conf mc;
-		for (auto &pstate : min_conformation.first) mc.first.push_back(*pstate);
-		mc.second = min_conformation.second;
+		for (auto &pstate : min_conformation.get_states()) mc.first.push_back(*pstate);
+		mc.second = min_conformation.get_energy();
 		return mc;
 	}
 	
@@ -409,6 +397,9 @@ namespace Linker {
 		/* Find all pairs of compatible states at correct distances for 
 		 * the multi-seed molecules
 		 */
+		 
+		int idx = 0;
+		
 		Array2d<bool> conn(sz);
 		Poses poses(seed_graph);
 		for (int u = 0; u < seed_graph.size(); ++u) {
@@ -419,57 +410,70 @@ namespace Linker {
 				Molib::Atom::Pair jatoms{&segment1.get_bond(segment1.get_next(segment2)).atom1(), 
 					&segment2.get_bond(segment2.get_next(segment1)).atom1()};
 				const Molib::Bond &excluded = (segment1.is_adjacent(segment2) 
-							? segment1.get_bond(segment2) : Molib::Bond());
+					? segment1.get_bond(segment2) : Molib::Bond());
 				dbgmsg("finding compatible state pairs for segments " << segment1 << " and " 
 					<< segment2 << " with maximum linker length " << max_linker_length << " and "
 					<< " join atom1 = " << jatoms.first->atom_number() << " join atom2 = "
-					<< jatoms.second->atom_number());
+					<< jatoms.second->atom_number() << " excluded = " << excluded);
 				for (auto &pstate1 : segment1.get_states()) {
 					State &state1 = *pstate1;
 					State::Set join_states = poses.get_join_states(state1, segment2, jatoms, 
 						max_linker_length, __tol_seed_dist);
-					const int i = static_cast<int>(state1.get_id());
+					//~ cout << "join_states.size() = " << join_states.size() << endl;
+
+					const int i = state1.get_id();
+					//~ // dbgmsg("state1(" << i << ") = " << state1);
 					for (auto &pstate2 : join_states) {
+						//~ // dbgmsg("state2(" << pstate2->get_id() << ") = " << *pstate2);
 						if (!state1.clashes(*pstate2, excluded, __clash_coeff)) {
-							const int j = static_cast<int>(pstate2->get_id());
-							conn.data[i][j] = conn.data[j][i] = true;
-							dbgmsg("compatible states " << i << " and " << j);
+							const int j = pstate2->get_id();
+							//~ assert(i >= 0 && i < conn.szi);
+							//~ assert(j >= 0 && j < conn.szj);
+							conn.data[i][j] = true;
+							conn.data[j][i] = true;
+							//~ dbgmsg("compatible states " << i << " and " << j);
 						}
 					}
 				}
 			}
 		}
+
 		return conn;
 	}
 
-	vector<Linker::LinkEnergy> Linker::__generate_rigid_conformations(const Seed::Graph &seed_graph) {
+	Partial::Vec Linker::__generate_rigid_conformations(const Seed::Graph &seed_graph) {
 		Benchmark::reset();
 		cout << "Generating rigid conformations of states..." << endl;
 
 		State::Vec states;
+		State::Id id = 0;
 		for (auto &seed : seed_graph)
-			for (auto &pstate : seed.get_segment().get_states())
+			for (auto &pstate : seed.get_segment().get_states()) {
 				states.push_back(&*pstate);
+				pstate->set_id(id++);
+				dbgmsg(*pstate);
+			}
 				
+	
 		// init adjacency matrix (1 when states are compatible, 0 when not)
 		Array2d<bool> conn = __find_compatible_state_pairs(seed_graph, states.size());
 
 		cout << "find_compatible_state_pairs took " << Benchmark::seconds_from_start() 
 			<< " wallclock seconds" << endl;
-		
+				
 		// find all maximum cliques, of size k; k...number of seed segments
 		Maxclique m(conn.data, conn.szi);
 		vector<vector<int>> qmaxes = m.mcq(seed_graph.size());
 
-		cout << "max clique search took " << Benchmark::seconds_from_start() 
-			<< " wallclock seconds" << endl;
+		cout << "found " << qmaxes.size() << " maximum cliques, which took " 
+			<< Benchmark::seconds_from_start() << " wallclock seconds" << endl;
 
 		if (qmaxes.empty())
 			throw Error("die : couldn't find any possible conformations for ligand " 
 				+ __ligand.name());
 
 		// score conformations by summing up individual fragment energies
-		vector<LinkEnergy> possibles_w_energy;
+		Partial::Vec possibles_w_energy;
 		for (auto &qmax : qmaxes) {
 			double energy = 0;
 			State::Vec conf;
@@ -477,13 +481,12 @@ namespace Linker {
 				conf.push_back(states[i]);
 				energy += states[i]->get_energy();
 			}
-			possibles_w_energy.push_back({conf, energy});
+			//~ possibles_w_energy.push_back({conf, energy});
+			possibles_w_energy.push_back(Partial(conf, energy));
 		}
 		
 		// sort conformations according to their total energy
-		sort(possibles_w_energy.begin(), possibles_w_energy.end(), 
-			[] (const LinkEnergy &i, const LinkEnergy &j) { 
-			return i.second < j.second;	});
+		sort(possibles_w_energy.begin(), possibles_w_energy.end(), Partial::comp());
 			
 		if (__max_possible_conf != -1 && possibles_w_energy.size() > __max_possible_conf) {
 			possibles_w_energy.resize(__max_possible_conf);
@@ -517,7 +520,7 @@ namespace Linker {
 		const Seed::Graph seed_graph = Seed::create_graph(segment_graph);
 		dbgmsg("seed graph for ligand " << __ligand.name() << " = " << seed_graph);
 		
-		const vector<LinkEnergy> possible_states = __generate_rigid_conformations(seed_graph);
+		const Partial::Vec possible_states = __generate_rigid_conformations(seed_graph);
 		Conformations good_conformations = __connect(segment_graph.size(), possible_states);
 		
 		cout << "Connection of seeds for ligand " << __ligand.name() 
@@ -541,15 +544,15 @@ namespace Linker {
 	}
 
 	Linker::Conformations Linker::__connect(const int segment_graph_size, 
-		const vector<LinkEnergy> &possibles) {
+		const Partial::Vec &possibles) {
 		
 		Conformations good_conformations;
 		set<State::ConstPair> blacklist;
 		for (auto &le : possibles) {
-			auto &conformation = le.first;
-			auto &energy = le.second;
+			auto &conformation = le.get_states();
+			double energy = le.get_energy();
 			if (!__has_blacklisted(conformation, blacklist)) {
-				LinkEnergy grow_link_energy(conformation, energy);
+				Partial grow_link_energy(conformation, energy);
 				dbgmsg("connecting ligand " << __ligand.name() 
 					<< endl << "possible starting conformation is " << endl
 					<< grow_link_energy);

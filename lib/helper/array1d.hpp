@@ -21,7 +21,9 @@ struct Array1d {
 	
 	Array1d() : data(nullptr), sz(0) {}
 	
-	Array1d(const Array1d &other) { // copy
+	template<typename U>
+	Array1d(const Array1d<U> &other) { // copy
+		dbgmsg("Array1d copy constructor");
 		sz = other.sz;
 		data = new T[sz];
 		memcpy(data, other.data, sz * sizeof(T));

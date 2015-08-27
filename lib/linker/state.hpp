@@ -8,6 +8,8 @@
 #include <tuple>
 #include <functional>
 
+using namespace std;
+
 namespace Molib {
 	class Atom;
 };
@@ -24,22 +26,23 @@ namespace Linker {
 		typedef pair<const State*, const State*> ConstPair;
 		typedef int Id;
 	private:
-		static Id idx;
 		const Segment &__segment;
-		const Geom3D::Point::Vec __crds;
+		Geom3D::Point::Vec __crds;
 		double __energy;
-		const Id __id;
+		Id __id;
 		
 	public:
 		State(const Segment &segment, const Geom3D::Point::Vec crds, const double energy=0) : 
-			__segment(segment), __crds(crds), __energy(energy), __id(idx++) { }
+			__segment(segment), __crds(crds), __energy(energy) {}
 		void set_energy(const double energy) { __energy = energy; }
 		double get_energy() const { return __energy; }			
 		const Segment& get_segment() const { return __segment; }			
 		const Geom3D::Point::Vec& get_crds() const { return __crds; }			
+		Geom3D::Point::Vec& get_crds() { return __crds; }			
 		const Geom3D::Point& get_crd(const int i) const { return __crds[i]; }
 		bool clashes(const State &other, const Molib::Bond &excluded, const double clash_coeff) const; // clashes between this and other state
 		string pdb() const;
+		void set_id(Id id) { __id = id; }
 		const Id get_id() const { return __id; }
 		friend ostream& operator<< (ostream& stream, const State& s);
 		friend ostream& operator<< (ostream& stream, const Vec& sv);

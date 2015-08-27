@@ -19,8 +19,10 @@ namespace Linker {
 				for (auto &pstate : segment.get_states()) {
 					auto &state = *pstate;
 					for (int i = 0; i < state.get_crds().size(); ++i) {
-						if (state.get_segment().is_join_atom(i))
-							__atompoints[segment.get_id()].push_back(unique_ptr<AtomPoint>(new AtomPoint(state.get_crd(i), state.get_segment().get_atom(i), state)));
+						//~ if (state.get_segment().is_join_atom(i))
+						if (segment.is_join_atom(i))
+							//~ __atompoints[segment.get_id()].push_back(unique_ptr<AtomPoint>(new AtomPoint(state.get_crd(i), state.get_segment().get_atom(i), state)));
+							__atompoints[segment.get_id()].push_back(unique_ptr<AtomPoint>(new AtomPoint(state.get_crd(i), segment.get_atom(i), state)));
 					}
 				}
 				__grid[segment.get_id()] = AtomPoint::Grid(__atompoints[segment.get_id()]);

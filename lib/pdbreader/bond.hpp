@@ -40,6 +40,7 @@ namespace Molib {
 			__atom2(atom2), __idx1(idx1), __idx2(idx2), __owns_atoms(owns_atoms), __ring(false), __bo(0), 
 			__angles(set<int>()), __drive_id(0), __rotatable(""), __bond_gaff_type("") {}
 		~Bond();
+		bool is_set() const { return __atom1 != nullptr; }
 		void set_members(const string &str);
 		bool is_adjacent(const Bond &other);
 		void set_angle(int angle) { __angles.insert(angle); }

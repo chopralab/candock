@@ -56,13 +56,8 @@ namespace OMMIface {
 
 		Geom3D::Point::Vec get_state(const Molib::Atom::Vec &atoms);
 
-#ifndef NDEBUG
-		void minimize_state(Molib::Molecule &ligand, Molib::Molecule &receptor, Molib::Score &score);
-		void minimize_knowledge_based(Molib::Molecule &ligand, Molib::Molecule &receptor, Molib::Score &score);
-#else
-		void minimize_state() {
-		void minimize_knowledge_based();
-#endif
+		void minimize_state(const Molib::Molecule &ligand, const Molib::Molecule &receptor, const Molib::Score &score);
+		void minimize_knowledge_based(const Molib::Molecule &ligand, const Molib::Molecule &receptor, const Molib::Score &score);
 		void minimize_physical();
 
 		void init_openmm_positions();

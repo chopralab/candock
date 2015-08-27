@@ -22,20 +22,22 @@ namespace Linker {
 		typedef pair<const Segment*, const Segment*> ConstPair;
 		typedef Glib::Graph<Segment> Graph;
 		typedef map<ConstPair, Graph::Path> Paths;
-		typedef Segment* Id;
+		//~ typedef Segment* Id;
+		typedef int Id;
 		
 	private:
 		map<const Molib::Atom*, int> __amap;
 		const Molib::Atom::Vec __atoms;
 		int __seed_id; // != -1 if segment is a seed
+		Id __id;
 		vector<unique_ptr<State>> __state; // only seed states here!
 		ConstSet __adjacent_seed_segments;
-		map<const Segment*, const double> __max_linker_length;
+		map<const Segment*, double> __max_linker_length;
 		map<const Segment*, Molib::Bond> __bond;
 		map<const Segment*, Segment*> __next;
 		vector<bool> __join_atom;
 
-		Segment(const Molib::Atom::Vec atoms, const int &seed_id);
+		Segment(const Molib::Atom::Vec atoms, const int &seed_id, const Segment::Id idx);
 		static Paths __find_paths(const vector<unique_ptr<Segment>> &segments);
 		static void __set_branching_rules(const Paths &paths);
 		static bool __link_adjacent(const Graph::Path &path);
@@ -65,11 +67,12 @@ namespace Linker {
 		State& get_last_state() const { return *__state.back(); }
 		bool is_adjacent(const Segment &other) const { for (auto &adj : *this) if (&adj == &other) return true; return false; }
 		double get_max_linker_length(const Segment &other) const { return __max_linker_length.at(&other); }
-		void set_max_linker_length(const Segment &other, const double d) {	__max_linker_length.insert({&other, d}); }
+		void set_max_linker_length(const Segment &other, const double d) {	if (d > __max_linker_length[&other]) __max_linker_length[&other] = d; }
 		const Molib::Bond& get_bond(const Segment &other) const { return __bond.at(&other); }
 		void set_bond(const Segment &other, Molib::Atom &a1, Molib::Atom &a2);
 		const int adjacent_in_segment(const Molib::Atom &atom, const Molib::Atom &forbidden) const;
-		Id get_id() { return this; }
+		//~ Id get_id() { return this; }
+		Id get_id() { return __id; }
 		void set_join_atom(const Molib::Atom &atom) { __join_atom[get_idx(atom)] = true; }
 		bool is_join_atom(const int i) const { return __join_atom[i]; }
 		friend ostream& operator<< (ostream& stream, const Segment& s);

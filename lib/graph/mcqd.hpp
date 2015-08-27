@@ -35,7 +35,10 @@ using namespace std;
 #endif
 
 class Maxclique {
-  const bool* const* e;
+  typedef bool** AdjMatrix;
+  
+  //~ const bool* const* e;
+  AdjMatrix &e;
   int pk, level;
   const float Tlimit;
   class Vertices {
@@ -72,7 +75,7 @@ class Maxclique {
     ~ColorClass() { if (i) delete [] i;
     }
     ColorClass(const ColorClass& dh) { // copy
-		init(dh.sz);
+      init(dh.sz);
       for (int j = 0; j < dh.sz; j++) i[j] = dh.i[j];
       sz = dh.sz;
     }
@@ -102,7 +105,8 @@ class Maxclique {
     void inc_i1()  { i1++; }
   };
   StepCount *S;
-  bool connection(const int i, const int j) const { return e[i][j]; }
+  //~ bool connection(const int i, const int j) const { return e[i][j]; }
+  bool connection(const int i, const int j) { return e[i][j]; }
   bool cut1(const int, const ColorClass&);
   void cut2(const Vertices&, Vertices&);
   void color_sort(Vertices&);
@@ -114,7 +118,8 @@ public:
   class myexception : public std::exception {
     const char* what() const throw() { return "WARNING: Graph is empty."; }
   } exc_empty;
-  Maxclique(const bool* const*, const int, const float=0.025);
+  //~ Maxclique(const bool* const*, const int, const float=0.025);
+  Maxclique(AdjMatrix&, const int, const float=0.025);
   int steps() const { return pk; }
   std::vector<std::vector<int>> mcq(const int minsz) { return _mcq(minsz, false); }
   std::vector<std::vector<int>> mcqdyn(const int minsz) { return _mcq(minsz, true); }
