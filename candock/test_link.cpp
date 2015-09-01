@@ -176,7 +176,8 @@ int main(int argc, char* argv[]) {
 						
 						Linker::Linker linker(modeler, receptors[0], ligand, top_seeds, gridrec, score, ic, 
 							cmdl.dist_cutoff(), cmdl.spin_degrees(), cmdl.tol_seed_dist(), 
-							cmdl.max_possible_conf(), cmdl.link_iter(), cmdl.clash_coeff());
+							cmdl.max_possible_conf(), cmdl.link_iter(), cmdl.clash_coeff(),
+							cmdl.docked_clus_rad());
 
 						Molib::Molecules docked = linker.connect();
 
@@ -207,6 +208,8 @@ int main(int argc, char* argv[]) {
 								modeler.unmask(receptors[0].get_atoms());
 								modeler.unmask(ligand.get_atoms());
 				
+								modeler.set_max_iterations(1000); // until converged
+								
 								modeler.minimize_state(ligand, receptors[0], score);
 
 								// init with minimized coordinates

@@ -261,7 +261,7 @@ namespace Molib {
 	}
 
 	double Molecule::compute_rmsd_ord(const Molecule &other) const {
-		return sqrt(Atom::compute_rmsd_sq(this->get_atoms(), other.get_atoms()));
+		return sqrt(Geom3D::compute_rmsd_sq(this->get_crds(), other.get_crds()));
 	}
 
 	Atom& Molecule::get_center_atom() const {

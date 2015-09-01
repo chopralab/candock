@@ -13,6 +13,8 @@ namespace Geom3D {
 	double angle(const Point &, const Point &, const Point &);
 	double dihedral(const Point &, const Point &, const Point &, const Point &);
 	Point line_evaluate(const Point &, const Vector3 &, const double);
+	double compute_rmsd_sq(const Point::Vec &crds1, const Point::Vec &crds2);
+	Point compute_geometric_center(const Geom3D::Point::Vec &crds);
 }
 ostream& operator<<(ostream& os, const Geom3D::Point::Vec &points);
 #endif

@@ -40,7 +40,7 @@ namespace Linker {
 		Geom3D::Point::Vec& get_receptor_crds() { return __crds; }
 
 		void set_ligand_crds(const Geom3D::Point::Vec &crds); 
-		Geom3D::Point::Vec get_ligand_crds();
+		Geom3D::Point::Vec get_ligand_crds() const;
 
 		Molib::Atom::Vec get_ligand_atoms();
 
@@ -49,9 +49,16 @@ namespace Linker {
 
 		int size() const { return __states.size(); }
 		bool empty() const { return __states.empty(); }
+
+		double compute_rmsd_ord(const Partial&) const;
+
+		Geom3D::Point compute_geometric_center() const;
+		
+		static void sort(Partial::Vec &v);
 		
 		friend ostream& operator<<(ostream& os, const Partial &le);
 		friend ostream& operator<<(ostream& os, const Vec &vec_le);
+		
 
 	};
 }

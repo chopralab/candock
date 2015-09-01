@@ -271,15 +271,7 @@ namespace Molib {
 		Molecule& compute_rotatable_bonds();
 		Molecule& compute_overlapping_rigid_segments(Unique&);
 		Molecule& compute_seeds(Unique &u);
-
-		Geom3D::Coordinate compute_geometric_center() const { 
-			Geom3D::Coordinate center;
-			for (auto &patom : this->get_atoms()) {
-				center = center + patom->crd();
-			}
-			center = center / this->get_atoms().size();
-			return center;
-		}
+		Geom3D::Coordinate compute_geometric_center() const { return Geom3D::compute_geometric_center(this->get_crds()); }
 		double compute_rmsd(const Molecule&) const;
 		double compute_rmsd_ord(const Molecule&) const;
 		void rotate(const Geom3D::Matrix &rota, const bool inverse=false) {

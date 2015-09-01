@@ -1,4 +1,6 @@
 #include "geom3d.hpp"
+#include "helper/debug.hpp"
+#include <assert.h>
 
 namespace Geom3D {
 	double degrees(double radians) { return radians * 57.29577951308232286465; }
@@ -35,6 +37,29 @@ namespace Geom3D {
 	Point line_evaluate(const Point &origin, const Vector3 &unit_vector, const double position) {
 		return origin + unit_vector * position;
 	}
+	
+	double compute_rmsd_sq(const Point::Vec &crds1, const Point::Vec &crds2) {
+		dbgmsg("calculate rmsd between two ordered sets of points");
+		assert(crds1.size() == crds2.size());
+		
+		double sum_squared = 0;
+
+		for (int i = 0; i < crds1.size(); ++i) {
+			sum_squared += crds1[i].distance_sq(crds2[i]);
+		}
+		return sum_squared / crds1.size();
+	}
+
+	Point compute_geometric_center(const Geom3D::Point::Vec &crds) { 
+		Geom3D::Point center;
+		for (auto &crd : crds) {
+			center = center + crd;
+		}
+		center = center / crds.size();
+		return center;
+	}
+
+
 };
 
 ostream& operator<<(ostream& os, const Geom3D::Point::Vec &points)	{

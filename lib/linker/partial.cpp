@@ -8,6 +8,7 @@
 #include "helper/array2d.hpp"
 #include "graph/mcqd.hpp"
 #include <queue>
+#include <algorithm>
 
 using namespace std;
 
@@ -30,8 +31,55 @@ namespace Linker {
 		return os;
 	}
 
+	//~ double Partial::compute_rmsd_ord(const Partial &other) const {
+		//~ Geom3D::Point::Vec crds1, crds2;
+		//~ for (auto &pstate1 : this->get_states()) {
+			//~ for (auto &pstate2 : other.get_states()) {
+				//~ if (pstate1->get_segment().get_id() == pstate2->get_segment().get_id()) {
+					//~ for (auto &crd : pstate1->get_crds()) {
+						//~ crds1.push_back(crd);
+					//~ }
+					//~ for (auto &crd : pstate2->get_crds()) {
+						//~ crds2.push_back(crd);
+					//~ }
+				//~ }
+			//~ }
+		//~ }
+		//~ return sqrt(Geom3D::compute_rmsd_sq(crds1, crds2));
+	//~ }
+//~ 
+	double Partial::compute_rmsd_ord(const Partial &other) const {
+		double sum_squared = 0;
+		int sz = 0;
+		for (auto &pstate1 : this->get_states()) {
+			for (auto &pstate2 : other.get_states()) {
+				if (pstate1->get_segment().get_id() == pstate2->get_segment().get_id()) {
+					if (pstate1->get_id() == pstate2->get_id()) {
+						sz += pstate1->get_crds().size();
+						//~ cout << "cheap" << endl;
+					} else  {
+						auto &crds1 = pstate1->get_crds();
+						auto &crds2 = pstate2->get_crds();
+						for (int i = 0; i < crds1.size(); ++i) {
+							sum_squared += crds1[i].distance_sq(crds2[i]);
+						}
+						sz += crds1.size();
+					}
+				}
+			}
+		}
+		return sqrt(sum_squared / sz);
+	}
 
-	Geom3D::Point::Vec Partial::get_ligand_crds() { 
+	Geom3D::Point Partial::compute_geometric_center() const { 
+		return Geom3D::compute_geometric_center(this->get_ligand_crds()); 
+	}
+
+	void Partial::sort(Partial::Vec &v) {
+		::sort(v.begin(), v.end(), Partial::comp());
+	}
+
+	Geom3D::Point::Vec Partial::get_ligand_crds() const { 
 		Geom3D::Point::Vec crds;
 		for (auto &pstate: __states) {
 			for (auto &crd : pstate->get_crds()) {

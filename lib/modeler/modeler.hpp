@@ -62,6 +62,8 @@ namespace OMMIface {
 
 		void init_openmm_positions();
 		void init_openmm();
+		
+		void set_max_iterations(const int max_iterations) { __max_iterations = max_iterations; }
 
 	};
 	

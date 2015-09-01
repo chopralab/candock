@@ -10,6 +10,7 @@
 #include "graph/mcqd.hpp"
 #include "modeler/modeler.hpp"
 #include "geom3d/geom3d.hpp"
+#include "cluster/greedy.hpp"
 #include <queue>
 
 using namespace std;
@@ -486,24 +487,28 @@ namespace Linker {
 		}
 		
 		// sort conformations according to their total energy
-		sort(possibles_w_energy.begin(), possibles_w_energy.end(), Partial::comp());
-			
-		if (__max_possible_conf != -1 && possibles_w_energy.size() > __max_possible_conf) {
-			possibles_w_energy.resize(__max_possible_conf);
+		Partial::sort(possibles_w_energy);
+		
+		dbgmsg("number of possibles_w_energy = " << possibles_w_energy.size());
+		// cluster rigid conformations and take only cluster representatives for further linking
+		Partial::Vec clustered_possibles_w_energy = Molib::Cluster::greedy(
+			possibles_w_energy, __gridrec, __docked_clus_rad);
+		dbgmsg("number of clustered_possibles_w_energy = " << clustered_possibles_w_energy.size());
+		
+		if (__max_possible_conf != -1 && clustered_possibles_w_energy.size() > __max_possible_conf) {
+			clustered_possibles_w_energy.resize(__max_possible_conf);
 			dbgmsg("number of possible conformations > max_possible_conf, "
 				<< "resizing to= " << __max_possible_conf << " conformations");
 		}
 
-		//~ cout << possibles_w_energy << endl;
-
 		dbgmsg("RIGID CONFORMATIONS FOR LIGAND " << __ligand.name() 
-			<< " : " << endl << possibles_w_energy);
+			<< " : " << endl << clustered_possibles_w_energy);
 
-		cout << "Generated " << possibles_w_energy.size() 
+		cout << "Generated " << clustered_possibles_w_energy.size() 
 			<< " possible conformations for ligand " << __ligand.name()
 			<< ", which took " << Benchmark::seconds_from_start() 
 			<< " wallclock seconds" << endl;
-		return possibles_w_energy;
+		return clustered_possibles_w_energy;
 	}
 	
 	Molib::Molecules Linker::connect() {

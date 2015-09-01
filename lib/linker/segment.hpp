@@ -22,7 +22,6 @@ namespace Linker {
 		typedef pair<const Segment*, const Segment*> ConstPair;
 		typedef Glib::Graph<Segment> Graph;
 		typedef map<ConstPair, Graph::Path> Paths;
-		//~ typedef Segment* Id;
 		typedef int Id;
 		
 	private:
@@ -71,8 +70,7 @@ namespace Linker {
 		const Molib::Bond& get_bond(const Segment &other) const { return __bond.at(&other); }
 		void set_bond(const Segment &other, Molib::Atom &a1, Molib::Atom &a2);
 		const int adjacent_in_segment(const Molib::Atom &atom, const Molib::Atom &forbidden) const;
-		//~ Id get_id() { return this; }
-		Id get_id() { return __id; }
+		const Id get_id() const { return __id; }
 		void set_join_atom(const Molib::Atom &atom) { __join_atom[get_idx(atom)] = true; }
 		bool is_join_atom(const int i) const { return __join_atom[i]; }
 		friend ostream& operator<< (ostream& stream, const Segment& s);
