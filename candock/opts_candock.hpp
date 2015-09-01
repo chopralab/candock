@@ -69,6 +69,7 @@ class CmdLnOpts {
 	string __docked_ligands_file;
 	
 	double __docked_clus_rad;
+	double __max_allow_energy;
 	
 	string __amber_xml_file;
 	string __fftype;
@@ -173,9 +174,9 @@ public:
 			TCLAP::ValueArg<string> gaff_dat_fileArg("","gaff_dat","Gaff DAT forcefield input file",false,"data/gaff.dat","string", cmd);
 			TCLAP::ValueArg<string> gaff_xml_fileArg("","gaff_xml","Gaff XML forcefield and ligand topology output file",false,"gaff.xml","string", cmd);
 
-			vector<int> allowedSpinDegrees{5,10,15,20,30,60};
+			vector<int> allowedSpinDegrees{5,10,15,20,30,60,90};
 			TCLAP::ValuesConstraint<int> allowedValsSpinDegrees( allowedSpinDegrees );
-			TCLAP::ValueArg<int> spin_degreesArg("","spin","Spin degrees to rotate ligand (default 30)",false,30,&allowedValsSpinDegrees, cmd);
+			TCLAP::ValueArg<int> spin_degreesArg("","spin","Spin degrees to rotate ligand (default 60)",false,60,&allowedValsSpinDegrees, cmd);
 
 			TCLAP::ValueArg<double> clash_coeffArg("","clash_coeff","Clash coefficient for determining whether two atoms clash by eq. dist12 s< C * (vdw1 + vdw2) (default is 0.75)",false,0.75,"double", cmd);
 			TCLAP::ValueArg<double> tol_seed_distArg("","tol_seed_dist","Tolerance on seed distance for getting initial conformations of docked fragments (default is 2.0)",false,2.0,"double", cmd);
@@ -186,6 +187,7 @@ public:
 			TCLAP::ValueArg<string> docked_ligands_fileArg("","docked_ligands","Docked ligands output filename",false,"docked_ligands.pdb","string", cmd);
 			
 			TCLAP::ValueArg<double> docked_clus_radArg("","docked_clus_rad","Cluster radius between docked ligand conformations (default is 2.0)",false,2.0,"double", cmd);
+			TCLAP::ValueArg<double> max_allow_energyArg("","max_allow_energy","Maximum allowed energy for seed conformations (default is 0.0)",false,0.0,"double", cmd);
 
 			TCLAP::ValueArg<string> amber_xml_fileArg("","amber_xml","Receptor XML parameters (and topology) input file",false,"data/amber10.xml","string", cmd);
 			vector<string> allowedFf{"kb","phy"};
@@ -263,6 +265,7 @@ public:
 			__docked_ligands_file = docked_ligands_fileArg.getValue();
 			
 			__docked_clus_rad = docked_clus_radArg.getValue();
+			__max_allow_energy = max_allow_energyArg.getValue();
 			
 			__amber_xml_file = amber_xml_fileArg.getValue();
 			__fftype = fftypeArg.getValue();
@@ -343,6 +346,7 @@ public:
 	string docked_ligands_file() const { return __docked_ligands_file; }
 	
 	double docked_clus_rad() const { return __docked_clus_rad; }
+	double max_allow_energy() const { return __max_allow_energy; }
 	
 	string amber_xml_file() const { return __amber_xml_file; }
 	string fftype() const { return __fftype; }

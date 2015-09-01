@@ -66,6 +66,8 @@ namespace Molib {
 		const M1& get_energies() const { return __energies; }
 		const M1& get_derivatives() const { return __derivatives; }
 		friend ostream& operator<< (ostream& stream, const Score::M0 &energy);
+		friend ostream& operator<< (ostream& stream, const Score::M1 &energies);
+		friend ostream& operator<< (ostream& stream, const Score &score);
 	};
 };
 #endif

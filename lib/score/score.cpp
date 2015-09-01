@@ -8,12 +8,36 @@
 namespace Molib {
 	ostream& operator<< (ostream& stream, const Score::M0 &energy) {
 		for (int i = 0; i < energy.size(); ++i) {
-			stream << "i = " << i << " value = " << energy[i] << endl;
+			stream << i << " " << energy[i];
 		}
 		return stream;
 	}
 
+	ostream& operator<< (ostream& stream, const Score::M1 &energies) {
+		for (auto &kv : energies) {
+			auto &atom_pair = kv.first;
+			auto &energy = kv.second;
+			for (int i = 0; i < energy.size(); ++i) {
+				stream << help::idatm_unmask[atom_pair.first] << " " << help::idatm_unmask[atom_pair.second] 
+					<< " " << i << " " << energy[i] << endl;
+			}
+		}
+		return stream;
+	}
+
+
+	ostream& operator<< (ostream& stream, const Score &score) {
+		stream << "SCORE OBJECT" << endl;
+		stream << "OBJECTIVE ENERGY FUNCTION ENERGIES" << endl << score.__energies << endl;
+		stream << "OBJECTIVE ENERGY FUNCTION DERIVATIVES" << endl << score.__derivatives << endl;
+		stream << "SCORING ENERGY FUNCTION" << endl << score.__energies_scoring << endl;
+		return stream;
+	}
+
+
+
 	Array1d<double> Score::compute_energy(Atom::Grid &gridrec, const Geom3D::Coordinate &crd, const set<int> &ligand_atom_types) const {
+		dbgmsg("computing energy");
 		Array1d<double> energy_sum(*ligand_atom_types.rbegin() + 1);
 		for (auto &patom : gridrec.get_neighbors(crd, __dist_cutoff)) {
 			const double dist = patom->crd().distance(crd);
@@ -32,10 +56,12 @@ namespace Molib {
 					<< __energies_scoring.at(atom_pair).size() << " partial energy = "
 					<< __energies_scoring.at(atom_pair).at(index));
 #endif
+				//~ assert(index < __energies_scoring.at(atom_pair).size());
+				//~ assert(l < energy_sum.sz);
 				energy_sum.data[l] += __energies_scoring.at(atom_pair).at(index);
 			}
 		}
-		dbgmsg("out of compute energy");
+		dbgmsg("out of compute energy energy_sum = " << energy_sum);
 		return energy_sum;
 	}
 

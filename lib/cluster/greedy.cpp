@@ -51,8 +51,7 @@ namespace Molib {
 
 		LinkedConf<Linker::Partial>::UPVec conformations;
 		for (auto &molecule : initial) {
-			if (molecule.get_energy() < 0)
-				conformations.push_back(unique_ptr<LinkedConf<Linker::Partial>>(new LinkedConf<Linker::Partial>(const_cast<Linker::Partial&>(molecule), molecule.compute_geometric_center(), molecule.get_energy())));
+			conformations.push_back(unique_ptr<LinkedConf<Linker::Partial>>(new LinkedConf<Linker::Partial>(const_cast<Linker::Partial&>(molecule), molecule.compute_geometric_center(), molecule.get_energy())));
 		}
 
 		set<const LinkedConf<Linker::Partial>*, LinkedConf<Linker::Partial>::by_energy> confs;

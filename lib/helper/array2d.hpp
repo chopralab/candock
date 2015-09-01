@@ -34,8 +34,19 @@ struct Array2d {
 		init(SZI, SZJ);
 	}
 
-	template<typename U>
-	Array2d(const Array2d<U> &other) { // copy
+	//~ template<typename U>
+	//~ Array2d(const Array2d<U> &other) { // copy
+		//~ dbgmsg("Array2d copy constructor");
+		//~ szi = other.szi;
+		//~ szj = other.szj;
+		//~ data = new T*[szi];
+		//~ for (int i = 0; i < szi; ++i) {
+			//~ data[i] = new T[szj];
+			//~ memcpy(data[i], other.data[i], szj * sizeof(T));
+		//~ }
+	//~ }
+	//~ 
+	Array2d(const Array2d &other) { // copy
 		dbgmsg("Array2d copy constructor");
 		szi = other.szi;
 		szj = other.szj;

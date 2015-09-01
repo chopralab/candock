@@ -28,6 +28,21 @@ struct Array3d {
 		init(SZI, SZJ, SZK);
 	}
 
+	Array3d(const Array3d &other) { // copy
+		dbgmsg("Array3d copy constructor");
+		szi = other.szi;
+		szj = other.szj;
+		szk = other.szk;
+		data = new T*[szi];
+		for (int i = 0; i < szi; ++i) {
+			data[i] = new T*[szj];
+			for (int j = 0; j < szj; ++j) {
+				data[i][j] = new T[szk];
+				memcpy(data[i][j], other.data[i], szk * sizeof(T));
+			}
+		}
+	}
+
 	~Array3d() {
 		if (data) {
 			for (int i = 0; i < szi; ++i) {

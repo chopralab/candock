@@ -109,6 +109,8 @@ int main(int argc, char* argv[]) {
 			cmdl.ref_state(), cmdl.comp(), cmdl.rad_or_raw(), 
 			cmdl.dist_cutoff(), cmdl.distributions_file(), cmdl.step_non_bond());
 
+		dbgmsg(score);
+		
 		/* Create gridpoints for ALL centroids representing one or more binding sites
 		 * 
 		 */
@@ -121,7 +123,7 @@ int main(int argc, char* argv[]) {
 		 * radius) for getting all conformations of each seed
 		 * 
 		 */
-		Docker::Gpoints gpoints0(cmdl.grid_spacing(), 10.0);
+		Docker::Gpoints gpoints0(cmdl.grid_spacing(), cmdl.max_frag_radius());
 		//~ inout::output_file(gpoints0, cmdl.gridpdb_hcp_file());
 
 		/* Create template grids using ProBiS-ligands algorithm

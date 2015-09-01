@@ -56,7 +56,8 @@ namespace Linker {
 		Molib::Atom::Grid &__gridrec;
 		const Molib::Score &__score;
 		const double __dist_cutoff, __spin_degrees,
-			__tol_seed_dist, __clash_coeff, __docked_clus_rad;
+			__tol_seed_dist, __clash_coeff, __docked_clus_rad,
+			__max_allow_energy;
 		const int __max_possible_conf, __link_iter;
 
 
@@ -90,12 +91,14 @@ namespace Linker {
 			const Molib::NRset &top_seeds, Molib::Atom::Grid &gridrec, 
 			const Molib::Score &score, Molib::Internal &ic, const double dist_cutoff, 
 			const double spin_degrees, const double tol_seed_dist, 
-			const int max_possible_conf, const int link_iter, const double clash_coeff, const double docked_clus_rad) : 
+			const int max_possible_conf, const int link_iter, const double clash_coeff, const double docked_clus_rad,
+			const double max_allow_energy) : 
 			__modeler(modeler), __receptor(receptor), __ligand(ligand), 
 			__top_seeds(top_seeds), __gridrec(gridrec), __score(score), __ic(ic), 
 			__dist_cutoff(dist_cutoff), __spin_degrees(Geom3D::radians(spin_degrees / 2)), 
 			__tol_seed_dist(tol_seed_dist), __max_possible_conf(max_possible_conf),
-			__link_iter(link_iter), __clash_coeff(clash_coeff), __docked_clus_rad(docked_clus_rad) {}
+			__link_iter(link_iter), __clash_coeff(clash_coeff), __docked_clus_rad(docked_clus_rad),
+			__max_allow_energy(max_allow_energy) {}
 		Molib::Molecules connect();
 		friend ostream& operator<<(ostream& os, const Conf &conf);
 	};

@@ -21,8 +21,15 @@ struct Array1d {
 	
 	Array1d() : data(nullptr), sz(0) {}
 	
-	template<typename U>
-	Array1d(const Array1d<U> &other) { // copy
+	//~ template<typename U>
+	//~ Array1d(const Array1d<U> &other) { // copy
+		//~ dbgmsg("Array1d copy constructor");
+		//~ sz = other.sz;
+		//~ data = new T[sz];
+		//~ memcpy(data, other.data, sz * sizeof(T));
+	//~ }
+	//~ 
+	Array1d(const Array1d &other) { // copy
 		dbgmsg("Array1d copy constructor");
 		sz = other.sz;
 		data = new T[sz];
@@ -40,5 +47,13 @@ struct Array1d {
 		memset(data, 0, sz * sizeof(T));
 	}
 };
+
+template<typename T>
+ostream& operator<< (ostream& stream, const Array1d<T> s) {
+	for (int i = 0; i < s.sz; ++i) {
+		stream << s.data[i] << endl;
+	}
+	return stream;
+}
 
 #endif

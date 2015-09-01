@@ -483,7 +483,9 @@ namespace Linker {
 				energy += states[i]->get_energy();
 			}
 			//~ possibles_w_energy.push_back({conf, energy});
-			possibles_w_energy.push_back(Partial(conf, energy));
+			if (energy < __max_allow_energy) {
+				possibles_w_energy.push_back(Partial(conf, energy));
+			}
 		}
 		
 		// sort conformations according to their total energy

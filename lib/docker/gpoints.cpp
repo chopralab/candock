@@ -149,6 +149,9 @@ namespace Docker {
 						
 						// mark that this point is not accessible
 						//~ __gmap.data[column][row][layer] = false;
+						//~ assert(column < __gmap.szi);
+						//~ assert(row < __gmap.szj);
+						//~ assert(layer < __gmap.szk);
 						__gmap.data[column][row][layer] = nullptr;
 						
 						int okay_min=1;
@@ -168,6 +171,7 @@ namespace Docker {
 						if (bsite_id != -1) {
 							for (Molib::Atom *a : grid.get_neighbors(eval, dist_cutoff)) {
 								Molib::Atom &atom = *a;
+								dbgmsg("before getting atom radius");
 								const double vdW = atom.radius();
 								dbgmsg("vdW = " << vdW);
 								const double eval_dist = excluded_radius+0.9*vdW;
@@ -185,12 +189,14 @@ namespace Docker {
 							OUTER:
 							if (closest>max_interatomic_distance) okay_max = 0;
 							if (okay_min*okay_max > 0) {
+								dbgmsg("before adding to __gridpoints");
 								__gridpoints[bsite_id].push_back(
 									Gpoint{
 										eval, 
 										IJK{column, row, layer}, 
 										__score ? __score->compute_energy(grid, eval, *__ligand_idatm_types) : Array1d<double>()
 									});
+								dbgmsg("really out");
 								//~ __gmap.data[column][row][layer] = true; 
 								model_number++;
 								points_kept++;
@@ -212,6 +218,7 @@ namespace Docker {
 		}
 		
 		// initialize gmap data here, because push_back can invalidate pointers...
+		dbgmsg("initializing gmap");
 		for (auto &kv : __gridpoints) {
 			for (auto &gpoint : kv.second) {
 				__gmap.data[gpoint.ijk().i][gpoint.ijk().j][gpoint.ijk().k] = &gpoint; 
