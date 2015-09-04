@@ -38,6 +38,7 @@ namespace Linker {
 
 		void set_receptor_crds(const Geom3D::Point::Vec &crds) { __crds = crds; }
 		Geom3D::Point::Vec& get_receptor_crds() { return __crds; }
+		const Geom3D::Point::Vec& get_receptor_crds() const { return __crds; }
 
 		void set_ligand_crds(const Geom3D::Point::Vec &crds); 
 		Geom3D::Point::Vec get_ligand_crds() const;

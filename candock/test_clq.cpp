@@ -148,7 +148,7 @@ int main(int argc, char* argv[]) {
 							 */
 							Docker::Conformations conf(seeds[j], gpoints0, cmdl.grid_spacing());
 
-							inout::output_file(conf, "conformations.pdb"); 
+							inout::output_file(conf, "conformations_" + help::to_string(j) + ".pdb"); 
 							
 							/* Dock this seed's conformations to the entire grid by moving them 
 							 * over all gridpoints and probe where they clash with the receptor: 

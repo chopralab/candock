@@ -66,20 +66,21 @@ class CmdLnOpts {
 	int __max_possible_conf;
 	int __link_iter;
 
-	string __docked_ligands_file;
+	string __docked_file;
 	
 	double __docked_clus_rad;
 	double __max_allow_energy;
+	bool __iterative;
 	
 	string __amber_xml_file;
 	string __fftype;
 	double __tolerance;
 	int __max_iterations;
+	int __max_iterations_final;
 	int __update_freq;
 	double __position_tolerance;
 	
-	string __mini_ligands_file;
-	//~ string __energy_file;
+	string __mini_file;
 
 	int __num_bsites;
 	double __grid_spacing;
@@ -184,10 +185,11 @@ public:
 			TCLAP::ValueArg<int> max_possible_confArg("","max_possible_conf","Maximum number of possible conformations to link (default is -1 [no limit])",false,-1,"int", cmd);
 			TCLAP::ValueArg<int> link_iterArg("","link_iter","Maximum iterations for linking procedure (default is 1000)",false,1000,"int", cmd);
 
-			TCLAP::ValueArg<string> docked_ligands_fileArg("","docked_ligands","Docked ligands output filename",false,"docked_ligands.pdb","string", cmd);
+			TCLAP::ValueArg<string> docked_fileArg("","docked_file","Docked ligands output filename",false,"docked_ligands.pdb","string", cmd);
 			
 			TCLAP::ValueArg<double> docked_clus_radArg("","docked_clus_rad","Cluster radius between docked ligand conformations (default is 2.0)",false,2.0,"double", cmd);
 			TCLAP::ValueArg<double> max_allow_energyArg("","max_allow_energy","Maximum allowed energy for seed conformations (default is 0.0)",false,0.0,"double", cmd);
+			TCLAP::SwitchArg iterativeSwitch("","iterative","Enable iterative minimization during linking (not enabled by default)", cmd, false);
 
 			TCLAP::ValueArg<string> amber_xml_fileArg("","amber_xml","Receptor XML parameters (and topology) input file",false,"data/amber10.xml","string", cmd);
 			vector<string> allowedFf{"kb","phy"};
@@ -195,11 +197,11 @@ public:
 			TCLAP::ValueArg<string> fftypeArg("","fftype","Forcefield to use 'kb' (knowledge-based, default) or 'phy' (physics-based)",false,"kb",&allowedValsFf, cmd);
 			TCLAP::ValueArg<double> toleranceArg("","mini_tol","Minimization tolerance (default is 0.0001)",false,0.0001,"double", cmd);
 			TCLAP::ValueArg<int> max_iterationsArg("","max_iter","Maximum iterations for minimization (default is 100)",false,100,"int", cmd);
+			TCLAP::ValueArg<int> max_iterations_finalArg("","max_iter_final","Maximum iterations for minimization (default is 10000)",false,10000,"int", cmd);
 			TCLAP::ValueArg<int> update_freqArg("","update_freq","Update non-bond frequency (default is 10)",false,10,"int", cmd);
 			TCLAP::ValueArg<double> position_toleranceArg("","pos_tol","Minimization position tolerance in Angstroms - only for KB (default is 0.0001)",false,0.0001,"double", cmd);
 
-			TCLAP::ValueArg<string> mini_ligands_fileArg("","mini_ligands","Docked & minimized ligands output filename (default minimized.pdb)",false,"minimized.pdb","string", cmd);
-			//~ TCLAP::ValueArg<string> energy_fileArg("","energy","Energies of minimized ligands output filename (default energies.txt)",false,"energies.txt","string", cmd);
+			TCLAP::ValueArg<string> mini_fileArg("","mini_file","Docked & minimized ligands output filename (default minimized.pdb)",false,"minimized.pdb","string", cmd);
 			
 			TCLAP::ValueArg<int> num_bsitesArg("","num_bsites","Maximum number of predicted (or given) binding sites to consider for docking (default is 3)",false,3,"int", cmd);
 			
@@ -262,20 +264,21 @@ public:
 			__tol_seed_dist = tol_seed_distArg.getValue();
 			__max_possible_conf = max_possible_confArg.getValue();
 			__link_iter = link_iterArg.getValue();
-			__docked_ligands_file = docked_ligands_fileArg.getValue();
+			__docked_file = docked_fileArg.getValue();
 			
 			__docked_clus_rad = docked_clus_radArg.getValue();
 			__max_allow_energy = max_allow_energyArg.getValue();
+			__iterative = iterativeSwitch.getValue();
 			
 			__amber_xml_file = amber_xml_fileArg.getValue();
 			__fftype = fftypeArg.getValue();
 			__tolerance = toleranceArg.getValue();
 			__max_iterations = max_iterationsArg.getValue();
+			__max_iterations_final = max_iterations_finalArg.getValue();
 			__update_freq = update_freqArg.getValue();
 			__position_tolerance = position_toleranceArg.getValue();
 			
-			__mini_ligands_file = mini_ligands_fileArg.getValue();
-			//~ __energy_file = energy_fileArg.getValue();
+			__mini_file = mini_fileArg.getValue();
 			
 			__num_bsites = num_bsitesArg.getValue();
 			__grid_spacing = grid_spacingArg.getValue();
@@ -343,19 +346,20 @@ public:
 	double tol_seed_dist() const { return __tol_seed_dist; }
 	int max_possible_conf() const { return __max_possible_conf; }
 	int link_iter() const { return __link_iter; }
-	string docked_ligands_file() const { return __docked_ligands_file; }
+	string docked_file() const { return __docked_file; }
 	
 	double docked_clus_rad() const { return __docked_clus_rad; }
 	double max_allow_energy() const { return __max_allow_energy; }
+	bool iterative() const { return __iterative; }
 	
 	string amber_xml_file() const { return __amber_xml_file; }
 	string fftype() const { return __fftype; }
 	double tolerance() const { return __tolerance; }
 	int max_iterations() const { return __max_iterations; }
+	int max_iterations_final() const { return __max_iterations_final; }
 	int update_freq() const { return __update_freq; }
 	double position_tolerance() const { return __position_tolerance; }
-	string mini_ligands_file() const { return __mini_ligands_file; }
-	//~ string energy_file() const { return __energy_file; }
+	string mini_file() const { return __mini_file; }
 	
 	int num_bsites() const { return __num_bsites; }
 	double grid_spacing() const { return __grid_spacing; }

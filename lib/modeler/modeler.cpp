@@ -25,10 +25,12 @@ namespace OMMIface {
 	}	
 
 	void Modeler::mask(const Molib::Atom::Vec &atoms) {
+		dbgmsg("Masking atoms " << atoms);
 		__system_topology.mask(__topology, atoms);
 	}
 
 	void Modeler::unmask(const Molib::Atom::Vec &atoms) {
+		dbgmsg("Unmasking atoms " << atoms);
 		__system_topology.unmask(__topology, atoms);
 	}
 

@@ -57,8 +57,7 @@ namespace Molib {
 		set<const LinkedConf<Linker::Partial>*, LinkedConf<Linker::Partial>::by_energy> confs;
 		for (auto &conf : conformations) confs.insert(&*conf);
 
-		//~ dbgmsg("number of conformations to cluster = " << confs.size() << endl << confs);
-		cout << "number of conformations to cluster = " << confs.size() << endl << confs << endl;
+		dbgmsg("number of conformations to cluster = " << confs.size() << endl << confs);
 	
 		Grid<const LinkedConf<Linker::Partial>> grid(confs); // grid of docked conformations
 

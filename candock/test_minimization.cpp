@@ -32,7 +32,7 @@ int main(int argc, char* argv[]) {
 		cmdl.display_time("started");
 		cout << cmdl << endl;
 		
-		inout::output_file("", cmdl.mini_ligands_file()); // output docked & minimized ligands conformations
+		inout::output_file("", cmdl.mini_file()); // output docked & minimized ligands conformations
 
 		Molib::PDBreader rpdb(cmdl.receptor_file(), 
 			Molib::PDBreader::first_model|Molib::PDBreader::skip_hetatm|Molib::PDBreader::hydrogens);
@@ -142,7 +142,7 @@ int main(int argc, char* argv[]) {
 				const double energy = score.non_bonded_energy(gridrec, minimized_ligand);
 				
 				inout::output_file(Molib::Molecule::print_complex(minimized_ligand, minimized_receptor, energy), 
-					"org_" + cmdl.mini_ligands_file(), ios_base::app);
+					"org_" + cmdl.mini_file(), ios_base::app);
 				
 				//~ /**
 				 //~ * This section is a test to see if you can change positions 
@@ -170,7 +170,7 @@ int main(int argc, char* argv[]) {
 				//~ const double mod_energy = score.non_bonded_energy(mod_gridrec, mod_minimized_ligand);
 //~ 
 				//~ inout::output_file(Molib::Molecule::print_complex(mod_minimized_ligand, mod_minimized_receptor, mod_energy), 
-					//~ "mod_" + cmdl.mini_ligands_file(), ios_base::app);
+					//~ "mod_" + cmdl.mini_file(), ios_base::app);
 					//~ 
 				//~ /*****************************/
 
