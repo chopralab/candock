@@ -102,8 +102,10 @@ namespace OMMIface {
 		while (iter < __max_iterations) {
 			
 			dbgmsg("starting minimization step = " << iter);
+			//~ cout << "starting minimization step = " << iter << endl;
 
 			dbgmsg("initial_positions = " << initial_positions);
+			//~ cout << "initial_positions = " << initial_positions << endl;
 
 
 
@@ -127,8 +129,12 @@ namespace OMMIface {
 
 			const vector<OpenMM::Vec3>& minimized_positions = __system_topology.get_positions_in_nm();
 
+			// check if minimization failed
+			if (std::isnan(minimized_positions[0][0]))
+				throw MinimizationError("die : minimization failed");
 
 			dbgmsg("minimized_positions = " << minimized_positions);
+			//~ cout << "minimized_positions = " << minimized_positions << endl;
 
 			// check if positions have converged
 			double max_error = 0;

@@ -566,12 +566,11 @@ namespace Linker {
 		}
 		dbgmsg("segment graph for ligand " << __ligand.name() << " = " << segment_graph);
 		__create_states(segment_graph, __top_seeds);
-
+		
 		const Seed::Graph seed_graph = Seed::create_graph(segment_graph);
 		dbgmsg("seed graph for ligand " << __ligand.name() << " = " << seed_graph);
 		
 		const Partial::Vec possible_states = __generate_rigid_conformations(seed_graph);
-		
 		DockedConformation::Vec docked_confs = __connect(segment_graph.size(), possible_states);
 		
 		cout << "Connection of seeds for ligand " << __ligand.name() 
@@ -579,6 +578,48 @@ namespace Linker {
 			<< " conformations and took " 
 			<< Benchmark::seconds_from_start() << " wallclock seconds" << endl;
 		return docked_confs;
+	}
+
+	Partial::Vec Linker::init_conformations() {
+		Benchmark::reset();
+		cout << "Starting connection of seeds for ligand " << __ligand.name() << endl;
+		
+		__segment_graph = Segment::create_graph(__ligand);
+		if (!__segment_graph.find_cycles_connected_graph().empty()) {
+			throw Error("die : cyclic molecules are currently not supported");
+		}
+		dbgmsg("segment graph for ligand " << __ligand.name() << " = " << __segment_graph);
+		__create_states(__segment_graph, __top_seeds);
+		
+		__seed_graph = Seed::create_graph(__segment_graph);
+		dbgmsg("seed graph for ligand " << __ligand.name() << " = " << __seed_graph);
+		
+		return __generate_rigid_conformations(__seed_graph);
+	}
+	
+	DockedConformation Linker::compute_conformation(const Partial &partial) {
+
+		auto &conformation = partial.get_states();
+			
+		if (!__has_blacklisted(conformation, __blacklist)) {
+			try {
+				Partial grow_link_energy(conformation, partial.get_energy());
+				dbgmsg("connecting ligand " << __ligand.name() 
+					<< endl << "possible starting conformation is " << endl
+					<< grow_link_energy);
+				vector<unique_ptr<State>> states;
+				if (__iterative) {
+					return __a_star_iterative(__segment_graph.size(), grow_link_energy, states, __link_iter);
+				} else {
+					return __a_star_static(__segment_graph.size(), grow_link_energy, states, __link_iter);
+				}
+			} catch (ConnectionError& e) {
+				dbgmsg("exception : " << e.what());
+				for (auto &failed_pair : e.get_failed_state_pairs())
+					__blacklist.insert(failed_pair);
+				throw e;
+			}
+		}
 	}
 
 	bool Linker::__has_blacklisted(const State::Vec &conformation, 
@@ -605,11 +646,11 @@ namespace Linker {
 			double energy = le.get_energy();
 			
 			if (!__has_blacklisted(conformation, blacklist)) {
-				Partial grow_link_energy(conformation, energy);
-				dbgmsg("connecting ligand " << __ligand.name() 
-					<< endl << "possible starting conformation is " << endl
-					<< grow_link_energy);
 				try {
+					Partial grow_link_energy(conformation, energy);
+					dbgmsg("connecting ligand " << __ligand.name() 
+						<< endl << "possible starting conformation is " << endl
+						<< grow_link_energy);
 					vector<unique_ptr<State>> states;
 					if (__iterative) {
 						good_conformations.push_back(__a_star_iterative(
@@ -620,6 +661,10 @@ namespace Linker {
 					}
 					dbgmsg("complete linked molecule" << endl 
 						<< good_conformations.back());
+					cout << "good_conformations.size() = " << good_conformations.size() << endl;
+					cout << "good_conformations.capacity() = " << good_conformations.capacity() << endl;
+					cout << "states.size() = " << states.size() << endl;
+					cout << "blacklist.size() = " << blacklist.size() << endl;
 				} catch (ConnectionError& e) {
 					dbgmsg("exception : " << e.what());
 					for (auto &failed_pair : e.get_failed_state_pairs())

@@ -185,7 +185,7 @@ public:
 			TCLAP::ValueArg<int> max_possible_confArg("","max_possible_conf","Maximum number of possible conformations to link (default is -1 [no limit])",false,-1,"int", cmd);
 			TCLAP::ValueArg<int> link_iterArg("","link_iter","Maximum iterations for linking procedure (default is 1000)",false,1000,"int", cmd);
 
-			TCLAP::ValueArg<string> docked_fileArg("","docked_file","Docked ligands output filename",false,"docked_ligands.pdb","string", cmd);
+			TCLAP::ValueArg<string> docked_fileArg("","docked_file","Docked ligands output filename",false,"docked.pdb","string", cmd);
 			
 			TCLAP::ValueArg<double> docked_clus_radArg("","docked_clus_rad","Cluster radius between docked ligand conformations (default is 2.0)",false,2.0,"double", cmd);
 			TCLAP::ValueArg<double> max_allow_energyArg("","max_allow_energy","Maximum allowed energy for seed conformations (default is 0.0)",false,0.0,"double", cmd);

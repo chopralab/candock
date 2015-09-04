@@ -36,16 +36,18 @@ namespace Linker {
 	public:
 		typedef vector<DockedConformation> Vec;
 	private:
-		Molib::Molecule __ligand;
-		Molib::Molecule __receptor;
+		unique_ptr<Molib::Molecule> __ligand;
+		unique_ptr<Molib::Molecule> __receptor;
 		double __energy;
 	public:
+		DockedConformation() : __ligand(nullptr), __receptor(nullptr), __energy(0) {}
 		DockedConformation(Molib::Molecule ligand, Molib::Molecule receptor, double energy) 
-			: __ligand(ligand), __receptor(receptor), __energy(energy) {}
-		Molib::Molecule& get_ligand() { return __ligand; }
-		const Molib::Molecule& get_ligand() const { return __ligand; }
-		Molib::Molecule& get_receptor() { return __receptor; }
-		const Molib::Molecule& get_receptor() const { return __receptor; }
+			: __ligand(unique_ptr<Molib::Molecule>(new Molib::Molecule(ligand))), 
+			__receptor(unique_ptr<Molib::Molecule>(new Molib::Molecule(receptor))), __energy(energy) {}
+		Molib::Molecule& get_ligand() { return *__ligand; }
+		const Molib::Molecule& get_ligand() const { return *__ligand; }
+		Molib::Molecule& get_receptor() { return *__receptor; }
+		const Molib::Molecule& get_receptor() const { return *__receptor; }
 		double get_energy() { return __energy; }
 		const double get_energy() const { return __energy; }
 		friend ostream& operator<<(ostream& os, const DockedConformation &conf);
@@ -57,12 +59,14 @@ namespace Linker {
 		static const int MAX_ENERGY = 999999;
 		typedef multiset<Partial, Partial::comp> PriorityQueue;
 
+	public:
 		class ConnectionError : public Error {
 			const set<State::ConstPair> __fs; 
 		public: 
 			ConnectionError(const string &msg, const set<State::ConstPair> fs) : Error(msg), __fs(fs) {}
 			const set<State::ConstPair>& get_failed_state_pairs() const { return __fs; }
 		};
+	private:
 		Molib::Internal &__ic;
 		OMMIface::Modeler &__modeler;
 		const Molib::Molecule &__receptor, &__ligand;
@@ -74,6 +78,11 @@ namespace Linker {
 			__max_allow_energy;
 		const int __max_possible_conf, __link_iter;
 		const bool __iterative;
+		
+		Segment::Graph __segment_graph;
+		Seed::Graph __seed_graph;
+		set<State::ConstPair> __blacklist;
+		
 
 		double __distance(const State &start, const State &goal) const;
 		State::Vec __compute_neighbors(const State &curr_state, Segment &next,
@@ -116,6 +125,8 @@ namespace Linker {
 			__link_iter(link_iter), __clash_coeff(clash_coeff), __docked_clus_rad(docked_clus_rad),
 			__max_allow_energy(max_allow_energy), __iterative(iterative) {}
 		DockedConformation::Vec connect();
+		Partial::Vec init_conformations();
+		DockedConformation compute_conformation(const Partial &partial);
 	};
 }
 #endif

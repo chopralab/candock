@@ -22,6 +22,12 @@ namespace Molib {
 namespace OMMIface {
 	
 	class Modeler {
+	public:
+		class MinimizationError : public Error {
+		public: 
+			MinimizationError(const string &msg) : Error(msg) {}
+		};
+	private:
 		ForceField *__ffield;
 		string __fftype;
 		double __dist_cutoff_in_nm;
