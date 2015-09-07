@@ -29,16 +29,17 @@
 #include <assert.h>
 #include <exception>
 #include <vector>
-
+#include "helper/array2d.hpp"
 #ifdef DBG
 using namespace std;
 #endif
 
 class Maxclique {
-  typedef bool** AdjMatrix;
+  //~ typedef bool** AdjMatrix;
   
   //~ const bool* const* e;
-  AdjMatrix &e;
+  //~ AdjMatrix &e;
+  Array2d<bool> &e;
   int pk, level;
   const float Tlimit;
   class Vertices {
@@ -75,7 +76,9 @@ class Maxclique {
     ~ColorClass() { if (i) delete [] i;
     }
     ColorClass(const ColorClass& dh) { // copy
+      //~ std::cerr << "copy constructor of color_class" << std::endl;
       init(dh.sz);
+      //~ std::cerr << "dh.sz = " << dh.sz << std::endl;		
       for (int j = 0; j < dh.sz; j++) i[j] = dh.i[j];
       sz = dh.sz;
     }
@@ -85,15 +88,16 @@ class Maxclique {
     void rewind() { sz = 0; };
     int size() const { return sz; }
     int& at(const int ii) const { return i[ii]; }
-    ColorClass& operator=(const ColorClass& dh) {
-      for (int j = 0; j < dh.sz; j++) i[j] = dh.i[j];
-      sz = dh.sz;
-      return *this;
-    }
+    //~ ColorClass& operator=(const ColorClass& dh) {
+      //~ for (int j = 0; j < dh.sz; j++) i[j] = dh.i[j];
+      //~ sz = dh.sz;
+      //~ return *this;
+    //~ }
   };
   Vertices V;
   ColorClass *C, QMAX, Q;
-  std::vector<ColorClass> QMAXES;
+  //~ std::vector<ColorClass> QMAXES;
+  std::vector<std::vector<short int>> QMAXES;
   class StepCount {
     int i1, i2;
   public:
@@ -106,23 +110,25 @@ class Maxclique {
   };
   StepCount *S;
   //~ bool connection(const int i, const int j) const { return e[i][j]; }
-  bool connection(const int i, const int j) { return e[i][j]; }
+  //~ bool connection(const int i, const int j) { return e[i][j]; }
+  const bool connection(const int i, const int j) const { return e.get(i, j); }
   bool cut1(const int, const ColorClass&);
   void cut2(const Vertices&, Vertices&);
   void color_sort(Vertices&);
   void expand(Vertices);
   void expand_dyn(Vertices);
-  std::vector<std::vector<int>> _mcq(const int, bool);
+  std::vector<std::vector<short int>>& _mcq(const int, bool);
   void degree_sort(Vertices &R) { R.set_degrees(*this); R.sort(); }
 public:
   class myexception : public std::exception {
     const char* what() const throw() { return "WARNING: Graph is empty."; }
   } exc_empty;
   //~ Maxclique(const bool* const*, const int, const float=0.025);
-  Maxclique(AdjMatrix&, const int, const float=0.025);
+  //~ Maxclique(AdjMatrix&, const int, const float=0.025);
+  Maxclique(Array2d<bool>&, const float=0.025);
   int steps() const { return pk; }
-  std::vector<std::vector<int>> mcq(const int minsz) { return _mcq(minsz, false); }
-  std::vector<std::vector<int>> mcqdyn(const int minsz) { return _mcq(minsz, true); }
+  std::vector<std::vector<short int>>& mcq(const int minsz) { return _mcq(minsz, false); }
+  std::vector<std::vector<short int>>& mcqdyn(const int minsz) { return _mcq(minsz, true); }
   ~Maxclique() {
     if (C) delete [] C;
     if (S) delete [] S;

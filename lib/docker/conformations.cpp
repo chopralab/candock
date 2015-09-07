@@ -119,13 +119,15 @@ namespace Docker {
 				auto &v2 = vertices[j];
 				if (v1.first != v2.first && v1.second != v2.second 
 					&& fabs(v1.first->crd().distance(v2.first->crd()) - v1.second->crd().distance(v2.second->crd())) < tol) {
-					conn.data[i][j] = conn.data[j][i] = true;
+					//~ conn.data[i][j] = conn.data[j][i] = true;
+					conn.set(i, j);
+					conn.set(j, i);
 				}
 			}
 		}
 		
 		// find all max cliques of size equal num. seed atoms
-		Maxclique m(conn.data, vertices.size());
+		Maxclique m(conn);
 		vector<vector<int>> qmaxes = m.mcq(__ordered_atoms.size());
 
 		// save conformations

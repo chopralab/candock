@@ -471,10 +471,8 @@ namespace Linker {
 						//~ // dbgmsg("state2(" << pstate2->get_id() << ") = " << *pstate2);
 						if (!state1.clashes(*pstate2, excluded, __clash_coeff)) {
 							const int j = pstate2->get_id();
-							//~ assert(i >= 0 && i < conn.szi);
-							//~ assert(j >= 0 && j < conn.szj);
-							conn.data[i][j] = true;
-							conn.data[j][i] = true;
+							conn.set(i, j);
+							conn.set(j, i);
 							//~ dbgmsg("compatible states " << i << " and " << j);
 						}
 					}
@@ -498,46 +496,65 @@ namespace Linker {
 				dbgmsg(*pstate);
 			}
 				
+		help::memusage("before find compatible state pairs");
 	
 		// init adjacency matrix (1 when states are compatible, 0 when not)
 		Array2d<bool> conn = __find_compatible_state_pairs(seed_graph, states.size());
 
+		cout << "dimensions of conn = " << conn.get_szi() << " " << conn.get_szj() << endl;
+
+		help::memusage("before max.clique.search");
+		
 		cout << "find_compatible_state_pairs took " << Benchmark::seconds_from_start() 
 			<< " wallclock seconds" << endl;
-				
-		// find all maximum cliques, of size k; k...number of seed segments
-		Maxclique m(conn.data, conn.szi);
-		vector<vector<int>> qmaxes = m.mcq(seed_graph.size());
-
-		cout << "found " << qmaxes.size() << " maximum cliques, which took " 
-			<< Benchmark::seconds_from_start() << " wallclock seconds" << endl;
-
-		if (qmaxes.empty())
-			throw Error("die : couldn't find any possible conformations for ligand " 
-				+ __ligand.name());
-
-		// score conformations by summing up individual fragment energies
+		
 		Partial::Vec possibles_w_energy;
-		for (auto &qmax : qmaxes) {
-			double energy = 0;
-			State::Vec conf;
-			for (auto &i : qmax) {
-				conf.push_back(states[i]);
-				energy += states[i]->get_energy();
+		{
+			// find all maximum cliques, of size k; k...number of seed segments
+			Maxclique m(conn);
+			const vector<vector<short int>> &qmaxes = m.mcq(seed_graph.size());
+	
+			help::memusage("after max.clique.search");
+	
+			cout << "found " << qmaxes.size() << " maximum cliques, which took " 
+				<< Benchmark::seconds_from_start() << " wallclock seconds" << endl;
+	
+			if (qmaxes.empty())
+				throw Error("die : couldn't find any possible conformations for ligand " 
+					+ __ligand.name());
+	
+			// score conformations by summing up individual fragment energies
+			for (auto &qmax : qmaxes) {
+				double energy = 0;
+				State::Vec conf;
+				for (auto &i : qmax) {
+					conf.push_back(states[i]);
+					energy += states[i]->get_energy();
+				}
+				if (energy < __max_allow_energy) {
+					possibles_w_energy.push_back(Partial(conf, energy));
+				}
 			}
-			//~ possibles_w_energy.push_back({conf, energy});
-			if (energy < __max_allow_energy) {
-				possibles_w_energy.push_back(Partial(conf, energy));
-			}
+	
+			help::memusage("after possibles_w_energy");
 		}
+		help::memusage("after forced destructor of qmaxes");
 		
 		// sort conformations according to their total energy
 		Partial::sort(possibles_w_energy);
+
+		if (possibles_w_energy.size() > 200000)
+			possibles_w_energy.resize(200000);
+
+		help::memusage("after sort of possibles_w_energy");
 		
 		dbgmsg("number of possibles_w_energy = " << possibles_w_energy.size());
 		// cluster rigid conformations and take only cluster representatives for further linking
 		Partial::Vec clustered_possibles_w_energy = Molib::Cluster::greedy(
 			possibles_w_energy, __gridrec, __docked_clus_rad);
+			
+		help::memusage("after greedy");
+			
 		dbgmsg("number of clustered_possibles_w_energy = " << clustered_possibles_w_energy.size());
 		
 		if (__max_possible_conf != -1 && clustered_possibles_w_energy.size() > __max_possible_conf) {
@@ -571,7 +588,12 @@ namespace Linker {
 		dbgmsg("seed graph for ligand " << __ligand.name() << " = " << seed_graph);
 		
 		const Partial::Vec possible_states = __generate_rigid_conformations(seed_graph);
+
+		help::memusage("before connect");
+
 		DockedConformation::Vec docked_confs = __connect(segment_graph.size(), possible_states);
+
+		help::memusage("after connect");
 		
 		cout << "Connection of seeds for ligand " << __ligand.name() 
 			<< " resulted in " << docked_confs.size() 

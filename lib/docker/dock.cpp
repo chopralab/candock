@@ -155,9 +155,11 @@ namespace Docker {
 				Docker::Gpoints::Gpoint &gpoint0 = conf.get_conf0().get_point(i);
 				atom.set_crd(conf.get_cavpoint().crd() + gpoint0.crd());
 			}
-			__seed.set_name(help::to_string(conf.get_energy())); // molecule name is energy
+			//~ __seed.set_name(help::to_string(conf.get_energy())); // molecule name is energy
 			// save the conformation
-			docked.add(new Molib::Molecule(__seed));
+			//~ docked.add(new Molib::Molecule(__seed));
+			docked.add(new Molib::Molecule(__seed)).set_name(help::to_string(conf.get_energy())); // molecule name is energy
+
 		}
 		dbgmsg("Conversion of conformations to mols took " 
 			<< Benchmark::seconds_from_start() << " seconds");

@@ -2,7 +2,7 @@ include ../../candock/Makefile.inc
 
 CFLAGS	= $(PRJCFLAGS) -I..
 OBJLIBS	= libhelper.a
-OBJS	= help.o inout.o benchmark.o
+OBJS	= help.o inout.o benchmark.o array2d.o
 INCL= -I ../tclap-1.2.1/include/ -I ../all3/idatmtest \
 -I ../jsoncpp-src-0.6.0-rc2/include -I ../jsoncpp-src-0.6.0-rc2/src \
 -I ../../lib/openmm -I ..
@@ -16,6 +16,9 @@ inout.o: inout.cpp inout.hpp error.hpp
 	$(CC) $(PRJCFLAGS) $(INCL) -c $<
 
 benchmark.o: benchmark.cpp benchmark.hpp
+	$(CC) $(PRJCFLAGS) $(INCL) -c $<
+
+array2d.o: array2d.cpp array2d.hpp
 	$(CC) $(PRJCFLAGS) $(INCL) -c $<
 
 libhelper.a : $(OBJS)

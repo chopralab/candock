@@ -18,13 +18,16 @@ namespace Linker {
 	class Segment;
 	class State {
 	public:
+		struct comp { bool operator()(State* const i, State* const j) const
+			{ return i->get_id() < j->get_id(); } };
+
 		typedef vector<State*> Vec;
 		typedef vector<State> NVec;
-		typedef set<State*> Set;
-		typedef map<const State*, State*> Map;
+		typedef set<State*, State::comp> Set;
 		typedef vector<const State*> ConstVec;
 		typedef pair<const State*, const State*> ConstPair;
 		typedef int Id;
+		
 	private:
 		const Segment &__segment;
 		Geom3D::Point::Vec __crds;

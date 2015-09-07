@@ -1,14 +1,15 @@
 #include "mcqd.hpp"
+#include "helper/help.hpp"
 
-Maxclique::Maxclique (AdjMatrix &conn, const int sz, const float tt) : e(conn), pk(0), level(1), Tlimit(tt), V(sz), Q(sz), QMAX(sz) {
-  if (conn==0 || sz==0) throw exc_empty;
-  for (int i=0; i < sz; i++) V.push(i);
-  C = new ColorClass[sz + 1];
-  for (int i=0; i < sz + 1; i++) C[i].init(sz + 1);
-  S = new StepCount[sz + 1];
+Maxclique::Maxclique (Array2d<bool> &conn, const float tt) : e(conn), pk(0), level(1), Tlimit(tt), V(conn.get_szi()), Q(conn.get_szi()), QMAX(conn.get_szi()) {
+  if (conn.get_szi()==0) throw exc_empty;
+  for (int i=0; i < conn.get_szi(); i++) V.push(i);
+  C = new ColorClass[conn.get_szi() + 1];
+  for (int i=0; i < conn.get_szi() + 1; i++) C[i].init(conn.get_szi() + 1);
+  S = new StepCount[conn.get_szi() + 1];
 }
 
-std::vector<std::vector<int>> Maxclique::_mcq(const int minsz, bool dyn) { 
+std::vector<std::vector<short int>>& Maxclique::_mcq(const int minsz, bool dyn){ 
 
   // search only for cliques of size >= minsz
   for (int i = 0; i < minsz - 1; ++i) QMAX.push(0);
@@ -26,15 +27,13 @@ std::vector<std::vector<int>> Maxclique::_mcq(const int minsz, bool dyn) {
   else
     expand(V);
 
-  std::vector<std::vector<int>> maxcliques;
+  help::memusage("after expand");
 
-  for (int i=0; i<QMAXES.size(); i++) {
-	  maxcliques.push_back(std::vector<int>());
-	for (int j=0; j<QMAXES[i].size(); j++) { 
-		maxcliques.back().push_back(QMAXES[i].at(j));
-	}
-  }
-  return maxcliques;
+  QMAXES.shrink_to_fit();
+  
+  help::memusage("after shrink to fit");
+
+  return QMAXES;
 }
 
 void Maxclique::Vertices::init_colors() { 
@@ -112,8 +111,13 @@ void Maxclique::expand(Vertices R) {
         expand(Rp);
       }
       else if (Q.size() > QMAX.size()) { 
-		//~ std::cout << "step = " << pk << " Q.size() = " << Q.size() << std::endl; 
-		QMAXES.push_back(Q); //akj
+        //~ std::cout << "step = " << pk << " Q.size() = " << Q.size() << std::endl; 
+		//~ QMAXES.push_back(Q); //akj
+		std::vector<short int> lastQ;
+        for (int i=0; i < Q.size(); ++i) { 
+			lastQ.push_back(static_cast<short int>(Q.at(i))); 
+		}
+        QMAXES.push_back(lastQ); //akj
       }    
       Rp.dispose();
       Q.pop();
@@ -145,7 +149,12 @@ void Maxclique::expand_dyn(Vertices R) {
       }
       else if (Q.size() > QMAX.size()) { 
 		//~ std::cout << "step = " << pk << " current max. clique size = " << Q.size() << std::endl; 
-		QMAXES.push_back(Q);
+		//~ QMAXES.push_back(Q);
+		std::vector<short int> lastQ;
+        for (int i=0; i < Q.size(); ++i) { 
+			lastQ.push_back(static_cast<short int>(Q.at(i))); 
+		}
+        QMAXES.push_back(lastQ); //akj
       }    
       Rp.dispose();
       Q.pop();

@@ -28,7 +28,10 @@ namespace common {
 				dbgmsg("reading top_seeds_file for seed id = " << fragment.get_seed_id());
 				Molib::PDBreader pdb("tmp/" + help::to_string(fragment.get_seed_id()) + "/" + top_seeds_file, 
 					Molib::PDBreader::all_models);
-				top_seeds.add(new Molib::Molecules(pdb.parse_molecule()));
+				Molib::Molecules &last = top_seeds.add(new Molib::Molecules(pdb.parse_molecule()));
+				if (last.empty()) {
+					throw Error("die : there are no docked conformations for seed " + help::to_string(fragment.get_seed_id()));
+				}
 			}
 		}
 		return top_seeds;
