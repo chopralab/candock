@@ -1,7 +1,9 @@
 #include "mcqd.hpp"
 #include "helper/help.hpp"
+#include <utility>
 
-Maxclique::Maxclique (Array2d<bool> &conn, const float tt) : e(conn), pk(0), level(1), Tlimit(tt), V(conn.get_szi()), Q(conn.get_szi()), QMAX(conn.get_szi()) {
+//~ Maxclique::Maxclique (const Array2d<bool> &conn, const vector<double> &scores, const float tt) : __conn(conn), __scores(scores), pk(0), level(1), Tlimit(tt), V(conn.get_szi()), Q(conn.get_szi()), QMAX(conn.get_szi()) {
+Maxclique::Maxclique (const Array2d<bool> &conn, const float tt) : __conn(conn), pk(0), level(1), Tlimit(tt), V(conn.get_szi()), Q(conn.get_szi()), QMAX(conn.get_szi()) {
   if (conn.get_szi()==0) throw exc_empty;
   for (int i=0; i < conn.get_szi(); i++) V.push(i);
   C = new ColorClass[conn.get_szi() + 1];
@@ -9,7 +11,7 @@ Maxclique::Maxclique (Array2d<bool> &conn, const float tt) : e(conn), pk(0), lev
   S = new StepCount[conn.get_szi() + 1];
 }
 
-std::vector<std::vector<short int>>& Maxclique::_mcq(const int minsz, bool dyn){ 
+vector<vector<unsigned short int>>& Maxclique::mcq(const int minsz){ 
 
   // search only for cliques of size >= minsz
   for (int i = 0; i < minsz - 1; ++i) QMAX.push(0);
@@ -17,24 +19,46 @@ std::vector<std::vector<short int>>& Maxclique::_mcq(const int minsz, bool dyn){
   V.set_degrees(*this);
   V.sort();
   V.init_colors();
-  if (dyn) {
-    for (int i=0; i < V.size() + 1; i++) {
-      S[i].set_i1(0);
-      S[i].set_i2(0);
-    }
-    expand_dyn(V);
-  }
-  else
-    expand(V);
+  expand(V);
 
-  help::memusage("after expand");
-
-  QMAXES.shrink_to_fit();
-  
-  help::memusage("after shrink to fit");
+  //help::memusage("after expand");
 
   return QMAXES;
 }
+
+vector<vector<unsigned short int>>& Maxclique::mcqdyn(const int minsz){ 
+
+  // search only for cliques of size >= minsz
+  for (int i = 0; i < minsz - 1; ++i) QMAX.push(0);
+
+  V.set_degrees(*this);
+  V.sort();
+  V.init_colors();
+  for (int i=0; i < V.size() + 1; i++) {
+    S[i].set_i1(0);
+    S[i].set_i2(0);
+  }
+  expand_dyn(V);
+
+  //help::memusage("after expand");
+
+  return QMAXES;
+}
+
+//~ set<pair<vector<unsigned short int>, double>, Maxclique::comp>&  Maxclique::mcqw(const int minsz) { 
+//~ 
+  //~ // search only for cliques of size >= minsz
+  //~ for (int i = 0; i < minsz - 1; ++i) QMAX.push(0);
+//~ 
+  //~ V.set_degrees(*this);
+  //~ V.sort();
+  //~ V.init_colors();
+  //~ expand_weight(V);
+//~ 
+  //~ //help::memusage("after expand");
+//~ 
+  //~ return QMAXES_WEIGHT;
+//~ }
 
 void Maxclique::Vertices::init_colors() { 
   const int max_degree = v[0].get_degree();
@@ -98,24 +122,26 @@ void Maxclique::color_sort(Vertices &R) {
 }
 
 void Maxclique::expand(Vertices R) {
+  if (QMAXES.size() > 1000000) return;
   while (R.size()) {
     if (Q.size() + R.end().get_degree() > QMAX.size()) {
       Q.push(R.end().get_i());
       Vertices Rp(R.size());
       cut2(R, Rp);
-      //~ std::cout << "QMs = " << QMAX.size() << std::endl;
-      //~ std::cout << "Qs = " << Q.size() << std::endl;
+      //~ cout << "QMs = " << QMAX.size() << endl;
+      //~ cout << "Qs = " << Q.size() << endl;
       if (Rp.size()) {
         color_sort(Rp);
 		pk++;
         expand(Rp);
       }
       else if (Q.size() > QMAX.size()) { 
-        //~ std::cout << "step = " << pk << " Q.size() = " << Q.size() << std::endl; 
+        //~ cout << "step = " << pk << " Q.size() = " << Q.size() << endl; 
 		//~ QMAXES.push_back(Q); //akj
-		std::vector<short int> lastQ;
+
+		vector<unsigned short int> lastQ;
         for (int i=0; i < Q.size(); ++i) { 
-			lastQ.push_back(static_cast<short int>(Q.at(i))); 
+			lastQ.push_back(static_cast<unsigned short int>(Q.at(i))); 
 		}
         QMAXES.push_back(lastQ); //akj
       }    
@@ -128,6 +154,39 @@ void Maxclique::expand(Vertices R) {
     R.pop();
   }
 }
+
+//~ void Maxclique::expand_weight(Vertices R) {
+  //~ if (QMAXES_WEIGHT.size() > 100000) return;
+  //~ while (R.size()) {
+    //~ if (Q.size() + R.end().get_degree() > QMAX.size()) {
+      //~ Q.push(R.end().get_i());
+      //~ Vertices Rp(R.size());
+      //~ cut2(R, Rp);
+      //~ if (Rp.size()) {
+        //~ color_sort(Rp);
+		//~ pk++;
+        //~ expand(Rp);
+      //~ }
+      //~ else if (Q.size() > QMAX.size()) { 
+		//~ vector<unsigned short int> lastQ;
+		//~ double energy = 0.0;
+        //~ for (int i=0; i < Q.size(); ++i) { 
+			//~ lastQ.push_back(static_cast<unsigned short int>(Q.at(i)));
+			//~ energy += __scores[Q.at(i)];
+		//~ }
+		//~ QMAXES_WEIGHT.insert(make_pair(lastQ, energy));
+		//~ if (QMAXES_WEIGHT.size() > 100)
+			//~ QMAXES_WEIGHT.erase(--QMAXES_WEIGHT.end());
+      //~ }    
+      //~ Rp.dispose();
+      //~ Q.pop();
+    //~ }
+    //~ else {
+      //~ return;
+    //~ }
+    //~ R.pop();
+  //~ }
+//~ }
 
 void Maxclique::expand_dyn(Vertices R) {
   S[level].set_i1(S[level].get_i1() + S[level - 1].get_i1() - S[level].get_i2());
@@ -148,11 +207,11 @@ void Maxclique::expand_dyn(Vertices R) {
 		level--;
       }
       else if (Q.size() > QMAX.size()) { 
-		//~ std::cout << "step = " << pk << " current max. clique size = " << Q.size() << std::endl; 
+		//~ cout << "step = " << pk << " current max. clique size = " << Q.size() << endl; 
 		//~ QMAXES.push_back(Q);
-		std::vector<short int> lastQ;
+		vector<unsigned short int> lastQ;
         for (int i=0; i < Q.size(); ++i) { 
-			lastQ.push_back(static_cast<short int>(Q.at(i))); 
+			lastQ.push_back(static_cast<unsigned short int>(Q.at(i))); 
 		}
         QMAXES.push_back(lastQ); //akj
       }    

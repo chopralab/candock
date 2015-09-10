@@ -46,9 +46,9 @@ namespace Docker {
 	}
 
 	Conformations::Conformations(const Molib::Molecule &seed, Gpoints &gpoints, 
-			const double &grid_spacing) {
+		const double &grid_spacing, const int min_num_conf) {
 		try {
-			__init_conformations(seed, gpoints, grid_spacing);
+			__init_conformations(seed, gpoints, grid_spacing, min_num_conf);
 		} catch(...) {
 			dbgmsg("FAILURE: constructor of Conformations failed ... cleaning resources...");
 			throw;
@@ -56,7 +56,7 @@ namespace Docker {
 	}
 	
 	void Conformations::__init_conformations(const Molib::Molecule &seed, Gpoints &gpoints, 
-		const double &grid_spacing) {
+		const double &grid_spacing, const int min_num_conf) {
 	
 		Benchmark::reset();
 
@@ -98,38 +98,49 @@ namespace Docker {
 		
 		// get point that is at the center of the gpoints (0,0,0)
 		Docker::Gpoints::Gpoint &pointA = gpoints.get_center_point();
-
-		// generate product graph vertices
 		vector<pair<Molib::Atom*, Docker::Gpoints::Gpoint*>> vertices;
-		vertices.push_back(make_pair(&atomA, &pointA));
-		const double tol = grid_spacing / 3;
 
-		for (auto &patomB : atoms) {
-			for (auto &pointB : grid.get_neighbors_within_tolerance(pointA.crd(), atomA.crd().distance(patomB->crd()), tol)) {
-				vertices.push_back(make_pair(patomB, pointB));
-			}
-		}
-		dbgmsg("number of vertices = " << vertices.size());
+		double coeff = 3.0;
+		vector<vector<unsigned short int>> qmaxes;
 
-		// set the adjacency matrix (generate product graph edges)
-		Array2d<bool> conn(vertices.size(), vertices.size());
-		for (int i = 0; i < vertices.size(); ++i) {
-			auto &v1 = vertices[i];
-			for (int j = i + 1; j < vertices.size(); ++j) {
-				auto &v2 = vertices[j];
-				if (v1.first != v2.first && v1.second != v2.second 
-					&& fabs(v1.first->crd().distance(v2.first->crd()) - v1.second->crd().distance(v2.second->crd())) < tol) {
-					//~ conn.data[i][j] = conn.data[j][i] = true;
-					conn.set(i, j);
-					conn.set(j, i);
+		// iterate until you get a decent number of conformations
+		do { 
+			// generate product graph vertices
+			vertices.clear();
+			vertices.push_back(make_pair(&atomA, &pointA));
+			const double tol = grid_spacing / coeff;
+	
+			for (auto &patomB : atoms) {
+				for (auto &pointB : grid.get_neighbors_within_tolerance(pointA.crd(), atomA.crd().distance(patomB->crd()), tol)) {
+					vertices.push_back(make_pair(patomB, pointB));
 				}
 			}
-		}
-		
-		// find all max cliques of size equal num. seed atoms
-		Maxclique m(conn);
-		vector<vector<int>> qmaxes = m.mcq(__ordered_atoms.size());
+			dbgmsg("number of vertices = " << vertices.size());
+	
+			// set the adjacency matrix (generate product graph edges)
+			Array2d<bool> conn(vertices.size(), vertices.size());
+			for (int i = 0; i < vertices.size(); ++i) {
+				auto &v1 = vertices[i];
+				for (int j = i + 1; j < vertices.size(); ++j) {
+					auto &v2 = vertices[j];
+					if (v1.first != v2.first && v1.second != v2.second 
+						&& fabs(v1.first->crd().distance(v2.first->crd()) - v1.second->crd().distance(v2.second->crd())) < tol) {
+						conn.set(i, j);
+						conn.set(j, i);
+					}
+				}
+			}
+			
+			// find all max cliques of size equal num. seed atoms
+			Maxclique m(conn);
+			qmaxes = m.mcq(__ordered_atoms.size());
 
+			cout << "iterative coeff = " << coeff << " qmaxes.size() = " << qmaxes.size() << endl;
+
+			coeff -= 0.1;
+
+		} while (qmaxes.size() < min_num_conf);
+		
 		// save conformations
 		for (int c = 0; c < qmaxes.size(); ++c) {
 			auto &qmax = qmaxes[c];
@@ -144,7 +155,6 @@ namespace Docker {
 				__conf_map[ijk.i][ijk.j][ijk.k].push_back(c);
 				points[atom_to_i[patom]] = gpoint;
 			}
-			//~ __conf_vec.push_back(Conformations::Conf(__atom_matches, __ordered_atoms, points));
 			__conf_vec.push_back(Conformations::Conf(__ordered_atoms, points));
 		}
 		

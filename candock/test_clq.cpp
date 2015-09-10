@@ -146,7 +146,8 @@ int main(int argc, char* argv[]) {
 							 * atom fixed on coordinate origin using maximum clique algorithm
 							 * 
 							 */
-							Docker::Conformations conf(seeds[j], gpoints0, cmdl.grid_spacing());
+							Docker::Conformations conf(seeds[j], gpoints0, cmdl.grid_spacing(),
+								cmdl.min_num_conf());
 
 							inout::output_file(conf, "conformations_" + help::to_string(j) + ".pdb"); 
 							

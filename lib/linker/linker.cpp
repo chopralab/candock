@@ -489,21 +489,23 @@ namespace Linker {
 
 		State::Vec states;
 		State::Id id = 0;
+		//~ vector<double> scores;
 		for (auto &seed : seed_graph)
 			for (auto &pstate : seed.get_segment().get_states()) {
 				states.push_back(&*pstate);
+				//~ scores.push_back(pstate->get_energy());
 				pstate->set_id(id++);
 				dbgmsg(*pstate);
 			}
 				
-		help::memusage("before find compatible state pairs");
+		//help::memusage("before find compatible state pairs");
 	
 		// init adjacency matrix (1 when states are compatible, 0 when not)
 		Array2d<bool> conn = __find_compatible_state_pairs(seed_graph, states.size());
 
-		cout << "dimensions of conn = " << conn.get_szi() << " " << conn.get_szj() << endl;
+		dbgmsg("dimensions of conn = " << conn.get_szi() << " " << conn.get_szj());
 
-		help::memusage("before max.clique.search");
+		//help::memusage("before max.clique.search");
 		
 		cout << "find_compatible_state_pairs took " << Benchmark::seconds_from_start() 
 			<< " wallclock seconds" << endl;
@@ -512,9 +514,9 @@ namespace Linker {
 		{
 			// find all maximum cliques, of size k; k...number of seed segments
 			Maxclique m(conn);
-			const vector<vector<short int>> &qmaxes = m.mcq(seed_graph.size());
+			const vector<vector<unsigned short int>> &qmaxes = m.mcq(seed_graph.size());
 	
-			help::memusage("after max.clique.search");
+			//help::memusage("after max.clique.search");
 	
 			cout << "found " << qmaxes.size() << " maximum cliques, which took " 
 				<< Benchmark::seconds_from_start() << " wallclock seconds" << endl;
@@ -536,24 +538,24 @@ namespace Linker {
 				}
 			}
 	
-			help::memusage("after possibles_w_energy");
+			//help::memusage("after possibles_w_energy");
 		}
-		help::memusage("after forced destructor of qmaxes");
+		//help::memusage("after forced destructor of qmaxes");
 		
 		// sort conformations according to their total energy
 		Partial::sort(possibles_w_energy);
 
-		if (possibles_w_energy.size() > 200000)
-			possibles_w_energy.resize(200000);
+		if (possibles_w_energy.size() > __max_num_possibles)
+			possibles_w_energy.resize(__max_num_possibles);
 
-		help::memusage("after sort of possibles_w_energy");
+		//help::memusage("after sort of possibles_w_energy");
 		
 		dbgmsg("number of possibles_w_energy = " << possibles_w_energy.size());
 		// cluster rigid conformations and take only cluster representatives for further linking
 		Partial::Vec clustered_possibles_w_energy = Molib::Cluster::greedy(
 			possibles_w_energy, __gridrec, __docked_clus_rad);
 			
-		help::memusage("after greedy");
+		//help::memusage("after greedy");
 			
 		dbgmsg("number of clustered_possibles_w_energy = " << clustered_possibles_w_energy.size());
 		
@@ -589,11 +591,11 @@ namespace Linker {
 		
 		const Partial::Vec possible_states = __generate_rigid_conformations(seed_graph);
 
-		help::memusage("before connect");
+		//help::memusage("before connect");
 
 		DockedConformation::Vec docked_confs = __connect(segment_graph.size(), possible_states);
 
-		help::memusage("after connect");
+		//help::memusage("after connect");
 		
 		cout << "Connection of seeds for ligand " << __ligand.name() 
 			<< " resulted in " << docked_confs.size() 
@@ -683,10 +685,10 @@ namespace Linker {
 					}
 					dbgmsg("complete linked molecule" << endl 
 						<< good_conformations.back());
-					cout << "good_conformations.size() = " << good_conformations.size() << endl;
-					cout << "good_conformations.capacity() = " << good_conformations.capacity() << endl;
-					cout << "states.size() = " << states.size() << endl;
-					cout << "blacklist.size() = " << blacklist.size() << endl;
+					dbgmsg("good_conformations.size() = " << good_conformations.size());
+					dbgmsg("good_conformations.capacity() = " << good_conformations.capacity());
+					dbgmsg("states.size() = " << states.size());
+					dbgmsg("blacklist.size() = " << blacklist.size());
 				} catch (ConnectionError& e) {
 					dbgmsg("exception : " << e.what());
 					for (auto &failed_pair : e.get_failed_state_pairs())

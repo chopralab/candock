@@ -71,6 +71,7 @@ class CmdLnOpts {
 	double __docked_clus_rad;
 	double __max_allow_energy;
 	bool __iterative;
+	int __max_num_possibles;
 	
 	string __amber_xml_file;
 	string __fftype;
@@ -84,6 +85,7 @@ class CmdLnOpts {
 
 	int __num_bsites;
 	double __grid_spacing;
+	int __min_num_conf;
 	double __excluded_radius;
 	double __max_interatomic_distance;
 
@@ -136,7 +138,7 @@ public:
 
 			TCLAP::ValueArg<string> gridpdb_hcp_fileArg("","gridpdb_hcp","Grid pdb hcp file for output",false,"gridpdb_hcp.pdb","string", cmd);
 			
-			TCLAP::ValueArg<double> max_frag_radiusArg("","max_frag_radius","Maximum fragment radius for creating the initial rotamers (default is 10.0)",false,10.0,"double", cmd);
+			TCLAP::ValueArg<double> max_frag_radiusArg("","max_frag_radius","Maximum fragment radius for creating the initial rotamers (default is 16.0)",false,16.0,"double", cmd);
 
 			vector<string> allowedRef{"mean","cumulative"};
 			TCLAP::ValuesConstraint<string> allowedValsRef( allowedRef );
@@ -190,14 +192,15 @@ public:
 			TCLAP::ValueArg<double> docked_clus_radArg("","docked_clus_rad","Cluster radius between docked ligand conformations (default is 2.0)",false,2.0,"double", cmd);
 			TCLAP::ValueArg<double> max_allow_energyArg("","max_allow_energy","Maximum allowed energy for seed conformations (default is 0.0)",false,0.0,"double", cmd);
 			TCLAP::SwitchArg iterativeSwitch("","iterative","Enable iterative minimization during linking (not enabled by default)", cmd, false);
+			TCLAP::ValueArg<int> max_num_possiblesArg("","max_num_possibles","Maximum number of possibles conformations considered for clustering (default is 200000)",false,200000,"int", cmd);
 
 			TCLAP::ValueArg<string> amber_xml_fileArg("","amber_xml","Receptor XML parameters (and topology) input file",false,"data/amber10.xml","string", cmd);
 			vector<string> allowedFf{"kb","phy"};
 			TCLAP::ValuesConstraint<string> allowedValsFf( allowedFf );
 			TCLAP::ValueArg<string> fftypeArg("","fftype","Forcefield to use 'kb' (knowledge-based, default) or 'phy' (physics-based)",false,"kb",&allowedValsFf, cmd);
 			TCLAP::ValueArg<double> toleranceArg("","mini_tol","Minimization tolerance (default is 0.0001)",false,0.0001,"double", cmd);
-			TCLAP::ValueArg<int> max_iterationsArg("","max_iter","Maximum iterations for minimization (default is 100)",false,100,"int", cmd);
-			TCLAP::ValueArg<int> max_iterations_finalArg("","max_iter_final","Maximum iterations for minimization (default is 10000)",false,10000,"int", cmd);
+			TCLAP::ValueArg<int> max_iterationsArg("","max_iter","Maximum iterations for minimization during linking (default is 100)",false,100,"int", cmd);
+			TCLAP::ValueArg<int> max_iterations_finalArg("","max_iter_final","Maximum iterations for final minimization (default is 10000)",false,10000,"int", cmd);
 			TCLAP::ValueArg<int> update_freqArg("","update_freq","Update non-bond frequency (default is 10)",false,10,"int", cmd);
 			TCLAP::ValueArg<double> position_toleranceArg("","pos_tol","Minimization position tolerance in Angstroms - only for KB (default is 0.0001)",false,0.0001,"double", cmd);
 
@@ -206,6 +209,8 @@ public:
 			TCLAP::ValueArg<int> num_bsitesArg("","num_bsites","Maximum number of predicted (or given) binding sites to consider for docking (default is 3)",false,3,"int", cmd);
 			
 			TCLAP::ValueArg<double> grid_spacingArg("","grid","Grid spacing (default is 0.5)",false,0.5,"double", cmd);
+			TCLAP::ValueArg<int> min_num_confArg("","min_num_conf","Minimum number of conformations for each fragment (default is 3000)",false,3000,"int", cmd);
+
 			TCLAP::ValueArg<double> excluded_radiusArg("","excluded","Excluded radius (default is 0.8)",false,0.8,"double", cmd);
 			TCLAP::ValueArg<double> max_interatomic_distanceArg("","interatomic","Maximum interatomic distance (default is 8.0)",false,8.0,"double", cmd);
 
@@ -269,6 +274,7 @@ public:
 			__docked_clus_rad = docked_clus_radArg.getValue();
 			__max_allow_energy = max_allow_energyArg.getValue();
 			__iterative = iterativeSwitch.getValue();
+			__max_num_possibles = max_num_possiblesArg.getValue();
 			
 			__amber_xml_file = amber_xml_fileArg.getValue();
 			__fftype = fftypeArg.getValue();
@@ -282,6 +288,7 @@ public:
 			
 			__num_bsites = num_bsitesArg.getValue();
 			__grid_spacing = grid_spacingArg.getValue();
+			__min_num_conf = min_num_confArg.getValue();
 			__excluded_radius = excluded_radiusArg.getValue();
 			__max_interatomic_distance = max_interatomic_distanceArg.getValue();
 			__top_percent = top_percentArg.getValue();
@@ -351,6 +358,7 @@ public:
 	double docked_clus_rad() const { return __docked_clus_rad; }
 	double max_allow_energy() const { return __max_allow_energy; }
 	bool iterative() const { return __iterative; }
+	int max_num_possibles() const { return __max_num_possibles; }
 	
 	string amber_xml_file() const { return __amber_xml_file; }
 	string fftype() const { return __fftype; }
@@ -363,6 +371,7 @@ public:
 	
 	int num_bsites() const { return __num_bsites; }
 	double grid_spacing() const { return __grid_spacing; }
+	int min_num_conf() const { return __min_num_conf; }
 	double excluded_radius() const { return __excluded_radius; }
 	double max_interatomic_distance() const { return __max_interatomic_distance; }
 	double top_percent() const { return __top_percent; }

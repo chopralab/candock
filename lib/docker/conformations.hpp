@@ -34,10 +34,10 @@ namespace Docker {
 		Array2d<double> __rmsd;
 		
 		void __init_conformations(const Molib::Molecule &seed, Gpoints &gpoints, 
-			const double &grid_spacing);
+			const double &grid_spacing, const int min_num_conf);
 
 	public:
-		Conformations(const Molib::Molecule &seed, Gpoints &gpoints, const double &grid_spacing);
+		Conformations(const Molib::Molecule &seed, Gpoints &gpoints, const double &grid_spacing, const int min_num_conf);
 		vector<Conf> &get_conformations() { return __conf_vec; }
 		ConfMap &get_confmap() { return __conf_map; }
 		vector<int> &get_confs_at(const Gpoints::IJK &ijk) { return __conf_map[ijk.i][ijk.j][ijk.k]; }

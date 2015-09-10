@@ -29,19 +29,28 @@
 #include <assert.h>
 #include <exception>
 #include <vector>
+#include <set>
 #include "helper/array2d.hpp"
-#ifdef DBG
+
 using namespace std;
-#endif
 
 class Maxclique {
-  //~ typedef bool** AdjMatrix;
-  
-  //~ const bool* const* e;
-  //~ AdjMatrix &e;
-  Array2d<bool> &e;
+public:
+
+  class myexception : public exception {
+    const char* what() const throw() { return "WARNING: Graph is empty."; }
+  } exc_empty;
+
+  //~ struct comp { bool operator()(const pair<vector<unsigned short int>, double> &i, const pair<vector<unsigned short int>, double> &j) 
+    //~ { return i.second < j.second; } };
+    
+private:
+
+  const Array2d<bool> &__conn;
+  //~ const vector<double> &__scores;
   int pk, level;
   const float Tlimit;
+ 
   class Vertices {
     class Vertex {
       int i, d;
@@ -67,6 +76,7 @@ class Maxclique {
     Vertex& at(const int ii) const { return v[ii]; };
     Vertex& end() const { return v[sz - 1]; };
   };
+ 
   class ColorClass {
     int *i;
     int sz;
@@ -76,9 +86,7 @@ class Maxclique {
     ~ColorClass() { if (i) delete [] i;
     }
     ColorClass(const ColorClass& dh) { // copy
-      //~ std::cerr << "copy constructor of color_class" << std::endl;
       init(dh.sz);
-      //~ std::cerr << "dh.sz = " << dh.sz << std::endl;		
       for (int j = 0; j < dh.sz; j++) i[j] = dh.i[j];
       sz = dh.sz;
     }
@@ -88,16 +96,13 @@ class Maxclique {
     void rewind() { sz = 0; };
     int size() const { return sz; }
     int& at(const int ii) const { return i[ii]; }
-    //~ ColorClass& operator=(const ColorClass& dh) {
-      //~ for (int j = 0; j < dh.sz; j++) i[j] = dh.i[j];
-      //~ sz = dh.sz;
-      //~ return *this;
-    //~ }
   };
+ 
   Vertices V;
   ColorClass *C, QMAX, Q;
-  //~ std::vector<ColorClass> QMAXES;
-  std::vector<std::vector<short int>> QMAXES;
+  vector<vector<unsigned short int>> QMAXES;
+  //~ set<pair<vector<unsigned short int>, double>, Maxclique::comp> QMAXES_WEIGHT;
+ 
   class StepCount {
     int i1, i2;
   public:
@@ -108,31 +113,32 @@ class Maxclique {
     int get_i2() const { return i2; }
     void inc_i1()  { i1++; }
   };
+  
   StepCount *S;
-  //~ bool connection(const int i, const int j) const { return e[i][j]; }
-  //~ bool connection(const int i, const int j) { return e[i][j]; }
-  const bool connection(const int i, const int j) const { return e.get(i, j); }
+ 
+  const bool connection(const int i, const int j) const { return __conn.get(i, j); }
   bool cut1(const int, const ColorClass&);
   void cut2(const Vertices&, Vertices&);
   void color_sort(Vertices&);
   void expand(Vertices);
+  //~ void expand_weight(Vertices R);
   void expand_dyn(Vertices);
-  std::vector<std::vector<short int>>& _mcq(const int, bool);
   void degree_sort(Vertices &R) { R.set_degrees(*this); R.sort(); }
+  
 public:
-  class myexception : public std::exception {
-    const char* what() const throw() { return "WARNING: Graph is empty."; }
-  } exc_empty;
-  //~ Maxclique(const bool* const*, const int, const float=0.025);
-  //~ Maxclique(AdjMatrix&, const int, const float=0.025);
-  Maxclique(Array2d<bool>&, const float=0.025);
-  int steps() const { return pk; }
-  std::vector<std::vector<short int>>& mcq(const int minsz) { return _mcq(minsz, false); }
-  std::vector<std::vector<short int>>& mcqdyn(const int minsz) { return _mcq(minsz, true); }
+  
+  //~ Maxclique(const Array2d<bool>&, const vector<double> &scores=vector<double>(), const float=0.025);
+  Maxclique(const Array2d<bool>&, const float=0.025);
   ~Maxclique() {
     if (C) delete [] C;
     if (S) delete [] S;
     V.dispose();
   };
+  
+  int steps() const { return pk; }
+  vector<vector<unsigned short int>>& mcq(const int minsz);
+  vector<vector<unsigned short int>>& mcqdyn(const int minsz);
+  //~ set<pair<vector<unsigned short int>, double>, Maxclique::comp>& mcqw(const int minsz);
+
 };
 #endif
