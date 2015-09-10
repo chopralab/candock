@@ -238,9 +238,8 @@ namespace OMMIface {
 	}
 
 	ForceField& ForceField::add_kb_forcefield(const Molib::Score &score, 
-		const double step, const double scale) {
+		const double step) {
 		this->step = step * OpenMM::NmPerAngstrom;
-		this->scale = scale;
 		for (auto &kv : score.get_energies()) {
 			auto &atom_pair = kv.first;
 			auto &energy = kv.second;

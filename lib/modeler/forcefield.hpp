@@ -24,7 +24,7 @@ namespace OMMIface {
 
 		double coulomb14scale;
 		double lj14scale;
-		double step, scale; // for knowledge-based potential
+		double step; // for knowledge-based potential
 		
 		//~ static const double Temperature         = 300;     // Kelvins
 		//~ static const double FrictionInPerPs     = 91.;     // collisions per picosecond
@@ -67,7 +67,7 @@ namespace OMMIface {
 		ForceField& parse_gaff_dat_file(const string&);
 		ForceField& insert_topology(const Molib::Molecule&);
 		ForceField& erase_topology(const Molib::Molecule&);
-		ForceField& add_kb_forcefield(const Molib::Score&, const double step, const double scale);
+		ForceField& add_kb_forcefield(const Molib::Score&, const double step);
 
 	};
 	ostream& operator<< (ostream& stream, const ForceField::ResidueTopology& r);

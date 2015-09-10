@@ -11,8 +11,6 @@
 #include "pdbreader/grid.hpp"
 #include "pdbreader/molecule.hpp"
 #include "pdbreader/pdbreader.hpp"
-#include "openmm/forcefield.hpp"
-#include "openmm/moleculeinfo.hpp"
 #include "probis/probis.hpp"
 #include "ligands/genclus.hpp"
 #include "ligands/genlig.hpp"

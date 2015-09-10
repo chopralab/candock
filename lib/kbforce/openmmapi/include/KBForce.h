@@ -59,12 +59,10 @@ public:
      * Set global parameters
      */
      void setStep(double step) { this->step = step; }
-     void setScale(double scale) { this->scale = scale; }
     /**
      * Get global parameters
      */
      double getStep() const { return this->step; }
-     double getScale() const { return this->scale; }
     /**
      * Get the number of bond stretch terms in the potential function
      */
@@ -118,7 +116,7 @@ protected:
 private:
     class BondInfo;
     std::vector<BondInfo> bonds;
-    double step, scale;
+    double step;
 };
 
 /**

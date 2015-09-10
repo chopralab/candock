@@ -233,8 +233,7 @@ namespace OMMIface {
 
 		KBPlugin::KBForce* kbforce = new KBPlugin::KBForce();
 		kbforce->setStep(__ffield->step);
-		kbforce->setScale(__ffield->scale);
-		dbgmsg("kbforce scale = " << __ffield->scale << " step = " << __ffield->step);
+		dbgmsg("kbforce step = " << __ffield->step);
 
 		int warn = 0;
 

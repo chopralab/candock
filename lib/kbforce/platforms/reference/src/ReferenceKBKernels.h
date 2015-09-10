@@ -73,8 +73,7 @@ private:
     std::vector<int> particle1, particle2;
     //~ std::vector<double> length, k;
     std::vector<std::vector<double>*> potential, derivative;
-    double step, scale;
-    //~ double step;
+    double step;
 };
 
 } // namespace KBPlugin

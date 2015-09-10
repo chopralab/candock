@@ -4,7 +4,7 @@ CFLAGS	= $(PRJCFLAGS) -I..
 OBJLIBS	= libkbforce.a
 OBJS	= KBForce.o KBForceImpl.o ReferenceKBKernelFactory.o ReferenceKBKernels.o
 INCL= -I ../tclap-1.2.1/include/ -I ../all3/idatmtest -I ../jsoncpp-src-0.6.0-rc2/include \
--I ../jsoncpp-src-0.6.0-rc2/src -I .. -I ../openmm -I openmmapi/include -I platforms/reference/src \
+-I ../jsoncpp-src-0.6.0-rc2/src -I .. -I ../modeler -I openmmapi/include -I platforms/reference/src \
 -I platforms/reference/include -I ..
 
 all : $(OBJLIBS)

@@ -11,8 +11,7 @@
 #include "pdbreader/grid.hpp"
 #include "pdbreader/molecule.hpp"
 #include "pdbreader/pdbreader.hpp"
-#include "openmm/forcefield.hpp"
-#include "openmm/moleculeinfo.hpp"
+#include "modeler/forcefield.hpp"
 #include "score/score.hpp"
 #include "modeler/modeler.hpp"
 #include "linker/linker.hpp"
@@ -73,7 +72,8 @@ int main(int argc, char* argv[]) {
 
 		Molib::Score score(Molib::get_idatm_types(receptors), ligand_idatm_types, 
 			cmdl.ref_state(), cmdl.comp(), cmdl.rad_or_raw(), 
-			cmdl.dist_cutoff(), cmdl.distributions_file(), cmdl.step_non_bond());
+			cmdl.dist_cutoff(), cmdl.distributions_file(), cmdl.step_non_bond(),
+			cmdl.scale_non_bond());
 
 		/** 
 		 * Forcefield stuff : create forcefield for small molecules (and KB 
@@ -83,7 +83,7 @@ int main(int argc, char* argv[]) {
 		 */
 		OMMIface::ForceField ffield;
 		ffield.parse_gaff_dat_file(cmdl.gaff_dat_file())
-			.add_kb_forcefield(score, cmdl.step_non_bond(), cmdl.scale_non_bond())
+			.add_kb_forcefield(score, cmdl.step_non_bond())
 			.parse_forcefield_file(cmdl.amber_xml_file());
 
 	

@@ -224,6 +224,11 @@ namespace Molib {
 			}
 			for (int i = 0; i <= repulsion_idx; ++i) // unset everything below this value
 				energy[i] = -HUGE_VAL;
+			// scale energy here not in kbforce (derivatives will scale themselves)
+			for (int i = 0; i < energy.size(); ++i) {
+				if (energy[i] != -HUGE_VAL)
+					energy[i] *= __scale_non_bond;
+			}
 			energy.front() = 280000; // set the lower bound energy to arbitrary high value
 			if (energy.back() == -HUGE_VAL) energy.back() = 0; // take care about the non-assigned values
 			if (idatm_type1 == "H" || idatm_type1 == "HC"

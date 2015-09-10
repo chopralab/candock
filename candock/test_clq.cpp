@@ -11,10 +11,8 @@
 #include "pdbreader/grid.hpp"
 #include "pdbreader/molecule.hpp"
 #include "pdbreader/pdbreader.hpp"
-#include "openmm/forcefield.hpp"
-#include "openmm/moleculeinfo.hpp"
+#include "modeler/forcefield.hpp"
 #include "score/score.hpp"
-#include "openmm/omm.hpp"
 #include "linker/linker.hpp"
 #include "probis/probis.hpp"
 #include "ligands/genclus.hpp"
@@ -107,7 +105,8 @@ int main(int argc, char* argv[]) {
 		 */
 		Molib::Score score(Molib::get_idatm_types(receptors), ligand_idatm_types, 
 			cmdl.ref_state(), cmdl.comp(), cmdl.rad_or_raw(), 
-			cmdl.dist_cutoff(), cmdl.distributions_file(), cmdl.step_non_bond());
+			cmdl.dist_cutoff(), cmdl.distributions_file(), cmdl.step_non_bond(),
+			cmdl.scale_non_bond());
 
 		dbgmsg(score);
 		

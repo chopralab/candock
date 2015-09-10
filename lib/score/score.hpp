@@ -32,7 +32,7 @@ namespace Molib {
 		set<pair_of_ints> __prot_lig_pairs;
 		const double __eps;
 		const string __ref_state, __comp, __distributions_file, __rad_or_raw;
-		const double __dist_cutoff, __step_non_bond;
+		const double __dist_cutoff, __step_non_bond, __scale_non_bond;
 		void __define_composition(const set<int>&, const set<int>&);
 		void __process_distributions_file();
 		void __compile_objective_function();
@@ -48,11 +48,11 @@ namespace Molib {
 	public:
 		Score(const set<int> &receptor_idatm_types, const set<int> &ligand_idatm_types, const string &ref_state, 
 				const string &comp, const string &rad_or_raw, const double &dist_cutoff, 
-				const string &distributions_file, const double &step_non_bond) 
+				const string &distributions_file, const double &step_non_bond, const double &scale_non_bond) 
 				: __ref_state(ref_state), __comp(comp), 
 				__rad_or_raw(rad_or_raw), __dist_cutoff(dist_cutoff), 
 				__distributions_file(distributions_file), __step_non_bond(step_non_bond),
-				__total_quantity(0), __eps(0.0000001) {
+				__scale_non_bond(scale_non_bond), __total_quantity(0), __eps(0.0000001) {
 					
 			function<double (Score&, const pair_of_ints&, const double&)> fptr = &Score::__energy_mean;
 			__define_composition(receptor_idatm_types, ligand_idatm_types);
