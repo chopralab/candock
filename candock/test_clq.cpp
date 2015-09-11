@@ -148,7 +148,7 @@ int main(int argc, char* argv[]) {
 							Docker::Conformations conf(seeds[j], gpoints0, cmdl.grid_spacing(),
 								cmdl.min_num_conf());
 
-							inout::output_file(conf, "conformations_" + help::to_string(j) + ".pdb"); 
+							inout::output_file(conf, "conf_" + seeds[j].name() + ".pdb"); 
 							
 							/* Dock this seed's conformations to the entire grid by moving them 
 							 * over all gridpoints and probe where they clash with the receptor: 
@@ -157,9 +157,10 @@ int main(int argc, char* argv[]) {
 							 *
 							 */
 							Docker::Dock dock(gpoints, conf, seeds[j], cmdl.clus_rad());
-							Molib::Molecules docked_seeds = dock.run();
 
-							inout::output_file(docked_seeds, "tmp/" + docked_seeds.name() + "/" 
+							dock.run();
+
+							inout::output_file(dock.get_docked(), "tmp/" + dock.get_docked().name() + "/" 
 								+ cmdl.top_seeds_file()); // output docked & clustered seeds
 	
 						}

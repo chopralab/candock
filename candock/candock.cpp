@@ -221,9 +221,10 @@ int main(int argc, char* argv[]) {
 							 *
 							 */
 							Docker::Dock dock(gpoints, conf, seeds[j], cmdl.clus_rad());
-							Molib::Molecules docked_seeds = dock.run();
 
-							inout::output_file(docked_seeds, "tmp/" + docked_seeds.name() + "/" 
+							dock.run();
+
+							inout::output_file(dock.get_docked(), "tmp/" + dock.get_docked().name() + "/" 
 								+ cmdl.top_seeds_file()); // output docked & clustered seeds
 	
 						}

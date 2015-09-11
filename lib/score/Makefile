@@ -5,7 +5,7 @@ OBJLIBS	= libscore.a
 OBJS	= score.o
 INCL= -I ../tclap-1.2.1/include/ -I ../all3/idatmtest \
 -I ../jsoncpp-src-0.6.0-rc2/include -I ../jsoncpp-src-0.6.0-rc2/src \
--I ../../lib/openmm -I ..
+-I ../../lib/modeler -I ..
 
 all : $(OBJLIBS)
 

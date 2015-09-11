@@ -3,7 +3,7 @@ include Makefile.inc
 LIBDIR = ../lib
 DIRS	= $(LIBDIR)/pdbreader $(LIBDIR)/kabsch $(LIBDIR)/helper $(LIBDIR)/linker \
 $(LIBDIR)/score $(LIBDIR)/fragmenter $(LIBDIR)/graph $(LIBDIR)/kbforce $(LIBDIR)/geom3d \
-$(LIBDIR)/openmm $(LIBDIR)/probis $(LIBDIR)/ligands $(LIBDIR)/docker $(LIBDIR)/centro \
+$(LIBDIR)/probis $(LIBDIR)/ligands $(LIBDIR)/docker $(LIBDIR)/centro \
 $(LIBDIR)/modeler $(LIBDIR)/cluster
 EXE	= candock
 TEST = test_minimization

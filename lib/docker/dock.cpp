@@ -25,16 +25,17 @@ namespace Docker {
 		return sqrt(sum_sq / this->__conf0.get_points().size());
 	}
 
-	Molib::Molecules Dock::run() {
-		DockedConfVec docked = __dock();
-		DockedConfVec clustered = __cluster(docked);
-		return __convert_to_mols(clustered);
+	void Dock::run() {
+		DockedConf::Vec docked = __dock();
+		DockedConf::Vec clustered = __cluster(docked);
+		docked.clear(); // clear memory
+		__set_docked(clustered);
 	}
 
-	Dock::DockedConfVec Dock::__dock() {
+	Dock::DockedConf::Vec Dock::__dock() {
 		Benchmark::reset();
 
-		DockedConfVec accepted;
+		DockedConf::Vec accepted;
 		
 		auto &gmap = __gpoints.get_gmap();
 		auto &conformations = __conformations.get_conformations();
@@ -44,7 +45,7 @@ namespace Docker {
 		// go over all cavity points
 		for (auto &kv : __gpoints.get_gridpoints()) {
 			for (auto &cavpoint : kv.second) {
-				DockedConfVec accepted_tmp;
+				DockedConf::Vec accepted_tmp;
 				// reset map of rejected conformations to zero
 				rejected.reset();
 				for (int c = 0; c < conformations.size(); ++c) {
@@ -93,7 +94,7 @@ namespace Docker {
 		return accepted;
 	}
 
-	void Dock::__cluster_fast(const DockedConfVec &conformations, DockedConfVec &reps) {
+	void Dock::__cluster_fast(const DockedConf::Vec &conformations, DockedConf::Vec &reps) {
 
 		set<const Dock::DockedConf*, Dock::DockedConf::by_energy> confs;
 		for (auto &conf : conformations) confs.insert(&conf);
@@ -112,10 +113,10 @@ namespace Docker {
 		}
 	}
 
-	Dock::DockedConfVec Dock::__cluster(const DockedConfVec &conformations) {
+	Dock::DockedConf::Vec Dock::__cluster(const DockedConf::Vec &conformations) {
 
 		Benchmark::reset();
-		DockedConfVec reps;
+		DockedConf::Vec reps;
 
 		set<const Dock::DockedConf*, Dock::DockedConf::by_energy> confs;
 		for (auto &conf : conformations) confs.insert(&conf);
@@ -139,12 +140,11 @@ namespace Docker {
 		return reps;
 	}
 
-	Molib::Molecules Dock::__convert_to_mols(const DockedConfVec &confs) {
+	void Dock::__set_docked(const DockedConf::Vec &confs) {
 
 		Benchmark::reset();
 		
-		Molib::Molecules docked;
-		docked.set_name(__seed.name()); // molecules name is seed_id
+		__docked.set_name(__seed.name()); // molecules name is seed_id
 		// go over all accepted conformations
 		for (auto &conf : confs) {
 			dbgmsg(" conformation size = " << conf.get_conf0().get_points().size() 
@@ -155,15 +155,12 @@ namespace Docker {
 				Docker::Gpoints::Gpoint &gpoint0 = conf.get_conf0().get_point(i);
 				atom.set_crd(conf.get_cavpoint().crd() + gpoint0.crd());
 			}
-			//~ __seed.set_name(help::to_string(conf.get_energy())); // molecule name is energy
 			// save the conformation
-			//~ docked.add(new Molib::Molecule(__seed));
-			docked.add(new Molib::Molecule(__seed)).set_name(help::to_string(conf.get_energy())); // molecule name is energy
+			__docked.add(new Molib::Molecule(__seed)).set_name(help::to_string(conf.get_energy())); // molecule name is energy
 
 		}
 		dbgmsg("Conversion of conformations to mols took " 
 			<< Benchmark::seconds_from_start() << " seconds");
-		return docked;
 	}
 
 };

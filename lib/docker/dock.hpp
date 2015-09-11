@@ -13,6 +13,10 @@ namespace Docker {
 	class Dock {
 
 		class DockedConf {
+		public:
+			typedef vector<DockedConf> Vec;
+
+		private:
 			Gpoints::Gpoint &__cavpoint;
 			Conformations::Conf &__conf0;
 			double __energy;
@@ -35,23 +39,24 @@ namespace Docker {
 			double compute_rmsd(const DockedConf &other) const;
 		};
 
-		typedef vector<DockedConf> DockedConfVec;
-		
 		Gpoints &__gpoints;
 		Conformations &__conformations;
 		Molib::Molecule &__seed;
 		double __rmsd_tol;
 
-		DockedConfVec __dock();
-		DockedConfVec __cluster(const DockedConfVec &confs);
-		void __cluster_fast(const DockedConfVec &conformations, DockedConfVec &reps);
-		Molib::Molecules __convert_to_mols(const DockedConfVec &confs);
+		Molib::Molecules __docked;
+
+		DockedConf::Vec __dock();
+		DockedConf::Vec __cluster(const DockedConf::Vec &confs);
+		void __cluster_fast(const DockedConf::Vec &conformations, DockedConf::Vec &reps);
+		void __set_docked(const DockedConf::Vec &confs);
 		
 	public:
 		Dock(Gpoints &gpoints, Conformations &conformations,
 			Molib::Molecule &seed, const double rmsd_tol=2.0) : __gpoints(gpoints),
 			__conformations(conformations), __seed(seed), __rmsd_tol(rmsd_tol) {}
-		Molib::Molecules run();
+		void run();
+		Molib::Molecules& get_docked() { return __docked; };
 	};
 };
 

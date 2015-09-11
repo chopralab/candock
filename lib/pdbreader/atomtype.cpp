@@ -16,7 +16,7 @@
 #include "geom3d/geom3d.hpp"
 #include "fragmenter/fragmenter.hpp"
 #include "fragmenter/unique.hpp"
-#include "openmm/forcefield.hpp"
+#include "modeler/forcefield.hpp"
 #include "atomtype.hpp"
 using namespace std;
 

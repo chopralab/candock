@@ -19,7 +19,7 @@
 #include "geom3d/geom3d.hpp"
 #include "fragmenter/fragmenter.hpp"
 #include "fragmenter/unique.hpp"
-#include "openmm/forcefield.hpp"
+#include "modeler/forcefield.hpp"
 using namespace std;
 
 namespace Molib {
