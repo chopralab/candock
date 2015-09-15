@@ -78,6 +78,7 @@ namespace OMMIface {
 		void init_positions(const Geom3D::Point::Vec &crds);
 		//~ const vector<OpenMM::Vec3>& get_positions_in_nm();
 		vector<OpenMM::Vec3> get_positions_in_nm();
+		vector<OpenMM::Vec3> get_forces();
 		void minimize(const double tolerance, const double max_iterations);
 		void set_forcefield(ForceField &ffield) { __ffield = &ffield; }
 	};

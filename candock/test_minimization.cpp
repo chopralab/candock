@@ -74,6 +74,8 @@ int main(int argc, char* argv[]) {
 			cmdl.ref_state(), cmdl.comp(), cmdl.rad_or_raw(), 
 			cmdl.dist_cutoff(), cmdl.distributions_file(), cmdl.step_non_bond(),
 			cmdl.scale_non_bond());
+			
+		dbgmsg(score);
 
 		/** 
 		 * Forcefield stuff : create forcefield for small molecules (and KB 
@@ -108,18 +110,18 @@ int main(int argc, char* argv[]) {
 				modeler.add_topology(ligand.get_atoms());
 
 				modeler.init_openmm();
-
-				// change coordinate of some ligand atoms
-				Molib::Atom::Vec substruct;
-				for (auto &patom : ligand.get_atoms()) {
-					if (patom->atom_number() == 2 || patom->atom_number() == 1 
-						|| patom->atom_number() == 4 || patom->atom_number() == 57) {
-						substruct.push_back(patom);
-					}
-				}
-				for (auto &patom : substruct) {
-					patom->set_crd(patom->crd() + 5.0);
-				}
+//~ 
+				//~ // change coordinate of some ligand atoms
+				//~ Molib::Atom::Vec substruct;
+				//~ for (auto &patom : ligand.get_atoms()) {
+					//~ if (patom->atom_number() == 2 || patom->atom_number() == 1 
+						//~ || patom->atom_number() == 4 || patom->atom_number() == 57) {
+						//~ substruct.push_back(patom);
+					//~ }
+				//~ }
+				//~ for (auto &patom : substruct) {
+					//~ patom->set_crd(patom->crd() + 5.0);
+				//~ }
 
 				modeler.add_crds(receptors[0].get_atoms(), receptors[0].get_crds());
 				modeler.add_crds(ligand.get_atoms(), ligand.get_crds());
@@ -127,8 +129,8 @@ int main(int argc, char* argv[]) {
 				modeler.init_openmm_positions();
 				
 				//~ modeler.unmask(receptors[0].get_atoms());
-				modeler.mask(ligand.get_atoms());
-				modeler.unmask(substruct);
+				//~ modeler.mask(ligand.get_atoms());
+				//~ modeler.unmask(substruct);
 
 				modeler.minimize_state(ligand, receptors[0], score);
 

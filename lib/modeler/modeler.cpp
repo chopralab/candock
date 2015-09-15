@@ -102,10 +102,8 @@ namespace OMMIface {
 		while (iter < __max_iterations) {
 			
 			dbgmsg("starting minimization step = " << iter);
-			//~ cout << "starting minimization step = " << iter << endl;
 
 			dbgmsg("initial_positions = " << initial_positions);
-			//~ cout << "initial_positions = " << initial_positions << endl;
 
 
 
@@ -134,8 +132,10 @@ namespace OMMIface {
 				throw MinimizationError("die : minimization failed");
 
 			dbgmsg("minimized_positions = " << minimized_positions);
-			//~ cout << "minimized_positions = " << minimized_positions << endl;
-
+#ifndef NDEBUG
+			const vector<OpenMM::Vec3>& forces = __system_topology.get_forces();
+			dbgmsg("forces after minimization = " << forces);
+#endif			
 			// check if positions have converged
 			double max_error = 0;
 			for (int i = 0; i < initial_positions.size(); ++i) {
@@ -146,8 +146,10 @@ namespace OMMIface {
 			}
 
 			// stop if convergence reached
-			if (sqrt(max_error) < __position_tolerance_in_nm)
+			if (sqrt(max_error) < __position_tolerance_in_nm) {
+				dbgmsg("Convergence reached (position_tolerance) - minimization finished");
 				break;
+			}
 
 			// update knowledge-based nonbond list
 			__system_topology.update_knowledge_based_force(__topology, minimized_positions, __dist_cutoff_in_nm);

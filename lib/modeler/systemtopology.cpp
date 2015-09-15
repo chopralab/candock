@@ -218,14 +218,14 @@ namespace OMMIface {
 			for (auto &pa2 : grid.get_neighbors(pa1->crd(), dist_cutoff)) {
 				Molib::Atom &atom2 = pa2->get_atom();
 				if (!visited.count(&atom2)) {
-					if (!topology.bonded_exclusions.count({&atom1, &atom2})) {
+					if (!topology.bonded_exclusions.count({&atom1, &atom2}) && !topology.bonded_exclusions.count({&atom2, &atom1})) {
 						nonbondlist.push_back({&atom1, &atom2});
 					}
 				}
 			}
 		}
 		
-		dbgmsg("NONBOND LIST (KBFORCES) : " << endl << nonbondlist);
+		dbgmsg("NONBOND LIST (KBFORCES) (SIZE = " << nonbondlist.size() << ") : " << endl << nonbondlist);
 
 		// remove force if it exists
 		if (__kbforce_idx != -1)
@@ -262,6 +262,7 @@ namespace OMMIface {
 		__kbforce_idx = system->addForce(kbforce);
 		context->reinitialize();
 		context->setPositions(positions);
+
 		if (warn > 0) {
 			throw Error("die : missing parameters detected");
 		}
@@ -369,6 +370,8 @@ namespace OMMIface {
 					// as it is used in the harmonic energy term kx^2 with force 2kx; OpenMM wants 
 					// it as used in the force term kx, with energy kx^2/2.
 					bondStretch->addBond(idx1, idx2, btype.length, btype.k);
+					dbgmsg("force_idx = " << force_idx << " idx1 = " << idx1 << " idx2 = " << idx2
+						 << " bond length = " << btype.length << " k = " << btype.k);
 					//~ bondStretch->addBond(idx1, idx2, btype.length, 0);
 					bondStretchData[idx1].push_back(ForceData{force_idx, idx1, idx2, 0, 0, btype.length, 0, 0, 0, btype.k});
 					bondStretchData[idx2].push_back(ForceData{force_idx, idx1, idx2, 0, 0, btype.length, 0, 0, 0, btype.k});
@@ -435,7 +438,8 @@ namespace OMMIface {
 					__ffield->get_dihedral_type(type1, type2, type3, type4); // cannot make it const ??
 				for (auto &ttype : v_ttype) {
 					dbgmsg("force_idx = " << force_idx << " idx1 = " << idx1 << " idx2 = " << idx2
-						 << " idx3 = " << idx3 << " idx4 = " << idx4);
+						 << " idx3 = " << idx3 << " idx4 = " << idx4 << " periodicity = " << ttype.periodicity
+						 << " phase = " << ttype.phase << " k = " << ttype.k);
 					bondTorsion->addTorsion(idx1, idx2, idx3, idx4, ttype.periodicity, ttype.phase,	ttype.k);
 					//~ bondTorsion->addTorsion(idx1, idx2, idx3, idx4, ttype.periodicity, ttype.phase,	0);
 					bondTorsionData[idx1].push_back(ForceData{force_idx, idx1, idx2, idx3, idx4, 0, 0, ttype.periodicity, ttype.phase, ttype.k});
@@ -507,6 +511,11 @@ namespace OMMIface {
 
 	vector<OpenMM::Vec3> SystemTopology::get_positions_in_nm() {
 		return context->getState(OpenMM::State::Positions).getPositions();		
+	}
+
+	vector<OpenMM::Vec3> SystemTopology::get_forces() {
+		//~ return context->getState(OpenMM::State::Forces | OpenMM::State::Energy).getForces();		
+		return context->getState(OpenMM::State::Forces).getForces();		
 	}
 
 	void SystemTopology::minimize(const double tolerance, const double max_iterations) {

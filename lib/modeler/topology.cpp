@@ -141,7 +141,14 @@ namespace OMMIface {
 			for (auto &atom2 : atom1) {
 				this->bonded_exclusions.insert({&atom1, &atom2});
 				for (auto &atom3 : atom2) {
-					this->bonded_exclusions.insert({&atom1, &atom3});
+					if (&atom3 != &atom1) {
+						this->bonded_exclusions.insert({&atom1, &atom3});
+						for (auto &atom4 : atom3) {
+							if (&atom4 != &atom1 && &atom4 != &atom2) {
+								this->bonded_exclusions.insert({&atom1, &atom4});
+							}
+						}
+					}
 				}
 			}
 		}

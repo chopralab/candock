@@ -197,16 +197,20 @@ double ReferenceCalcKBForceKernel::execute(ContextImpl& context, bool includeFor
 		int dist = (int) floor(r / step);
 		if (dist >= (*potential[i]).size()) continue; // effectively add zero to energy and force
 		energy += (*potential[i])[dist];
-		dbgmsg("kb particle1 = " << p1 << " particle2 = " << p2 
-			<< " distance = " << r << " index for potential = " << dist 
-			<< " potential = " << (*potential[i])[dist] 
-			<< " derivative = " << (*derivative[i])[dist] 
-			<< " size of potential = " << (*potential[i]).size());
 
         RealOpenMM dEdR = (*derivative[i])[dist];
         dEdR = (r > 0) ? (dEdR/r) : 0;
         force[p1] -= delta*dEdR;
         force[p2] += delta*dEdR;
+
+		dbgmsg("kb particle1 = " << p1 << " particle2 = " << p2 
+			<< " distance = " << r << " index for potential = " << dist 
+			<< " potential = " << (*potential[i])[dist] 
+			<< " derivative = " << (*derivative[i])[dist] 
+			<< " size of potential = " << (*potential[i]).size()
+			<< " force[" << p1 << "] = " << force[p1]
+			<< " force[" << p2 << "] = " << force[p2]);
+
     }
     dbgmsg("knowledge-based energy is calculated as : energy = " << setprecision(20) << energy);
     return energy;
