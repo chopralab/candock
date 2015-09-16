@@ -159,9 +159,9 @@ public:
 			TCLAP::ValueArg<string> distributions_fileArg("","dist","Select one of the interatomic distance distribution \
 				file(s) provided with this script",false,"data/csd_complete_distance_distributions.txt","string", cmd);
 			TCLAP::ValueArg<double> step_non_bondArg("","step","Step for spline generation of non-bonded knowledge-based \
-				potential [0.0-1.0] (default is 0.1)",false,0.1,"double", cmd);
+				potential [0.0-1.0] (default is 0.01)",false,0.01,"double", cmd);
 			TCLAP::ValueArg<double> scale_non_bondArg("","scale","Scale non-bonded forces and energy for knowledge-based \
-				potential [0.0-1.0] (default is 0.002)",false,0.002,"double", cmd);
+				potential [0.0-1.0] (default is 1.0)",false,1.0,"double", cmd);
 
 			TCLAP::ValueArg<string> egrid_fileArg("","egrid", "Energy grid output file",false,"energy_grid.pdb","string", cmd);
 			TCLAP::ValueArg<string> docked_seeds_fileArg("","docked_seeds_file", "Docked seeds output file",false,
@@ -182,9 +182,9 @@ public:
 			TCLAP::ValueArg<int> spin_degreesArg("","spin","Spin degrees to rotate ligand (default 60)",false,60,&allowedValsSpinDegrees, cmd);
 
 			TCLAP::ValueArg<double> clash_coeffArg("","clash_coeff","Clash coefficient for determining whether two atoms clash by eq. dist12 s< C * (vdw1 + vdw2) (default is 0.75)",false,0.75,"double", cmd);
-			TCLAP::ValueArg<double> tol_seed_distArg("","tol_seed_dist","Tolerance on seed distance for getting initial conformations of docked fragments (default is 2.0)",false,2.0,"double", cmd);
+			TCLAP::ValueArg<double> tol_seed_distArg("","tol_seed_dist","Tolerance on seed distance for getting initial conformations of docked fragments (default is 1.0)",false,1.0,"double", cmd);
 
-			TCLAP::ValueArg<int> max_possible_confArg("","max_possible_conf","Maximum number of possible conformations to link (default is -1 [no limit])",false,-1,"int", cmd);
+			TCLAP::ValueArg<int> max_possible_confArg("","max_possible_conf","Maximum number of possible conformations to link (default is 20, -1 means unlimited)",false,20,"int", cmd);
 			TCLAP::ValueArg<int> link_iterArg("","link_iter","Maximum iterations for linking procedure (default is 1000)",false,1000,"int", cmd);
 
 			TCLAP::ValueArg<string> docked_fileArg("","docked_file","Docked ligands output filename",false,"docked.pdb","string", cmd);
@@ -202,14 +202,14 @@ public:
 			TCLAP::ValueArg<int> max_iterationsArg("","max_iter","Maximum iterations for minimization during linking (default is 100)",false,100,"int", cmd);
 			TCLAP::ValueArg<int> max_iterations_finalArg("","max_iter_final","Maximum iterations for final minimization (default is 10000)",false,10000,"int", cmd);
 			TCLAP::ValueArg<int> update_freqArg("","update_freq","Update non-bond frequency (default is 10)",false,10,"int", cmd);
-			TCLAP::ValueArg<double> position_toleranceArg("","pos_tol","Minimization position tolerance in Angstroms - only for KB (default is 0.0001)",false,0.0001,"double", cmd);
+			TCLAP::ValueArg<double> position_toleranceArg("","pos_tol","Minimization position tolerance in Angstroms - only for KB (default is 0.00000000001)",false, 0.00000000001,"double", cmd);
 
 			TCLAP::ValueArg<string> mini_fileArg("","mini_file","Docked & minimized ligands output filename (default minimized.pdb)",false,"minimized.pdb","string", cmd);
 			
 			TCLAP::ValueArg<int> num_bsitesArg("","num_bsites","Maximum number of predicted (or given) binding sites to consider for docking (default is 3)",false,3,"int", cmd);
 			
 			TCLAP::ValueArg<double> grid_spacingArg("","grid","Grid spacing (default is 0.5)",false,0.5,"double", cmd);
-			TCLAP::ValueArg<int> min_num_confArg("","min_num_conf","Minimum number of conformations for each fragment (default is 3000)",false,3000,"int", cmd);
+			TCLAP::ValueArg<int> min_num_confArg("","min_num_conf","Minimum number of conformations for each fragment (default is 1000)",false,1000,"int", cmd);
 
 			TCLAP::ValueArg<double> excluded_radiusArg("","excluded","Excluded radius (default is 0.8)",false,0.8,"double", cmd);
 			TCLAP::ValueArg<double> max_interatomic_distanceArg("","interatomic","Maximum interatomic distance (default is 8.0)",false,8.0,"double", cmd);

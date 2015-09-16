@@ -325,10 +325,6 @@ namespace OMMIface {
 		bondBendData.resize(topology.atoms.size());
 		bondTorsionData.resize(topology.atoms.size());
 		
-		//~ OpenMM::HarmonicBondForce *bondStretch = new OpenMM::HarmonicBondForce();
-		//~ OpenMM::HarmonicAngleForce *bondBend = new OpenMM::HarmonicAngleForce();
-		//~ OpenMM::PeriodicTorsionForce *bondTorsion = new OpenMM::PeriodicTorsionForce();
-//~ 
 		bondStretch = new OpenMM::HarmonicBondForce();
 		bondBend = new OpenMM::HarmonicAngleForce();
 		bondTorsion = new OpenMM::PeriodicTorsionForce();
@@ -372,7 +368,6 @@ namespace OMMIface {
 					bondStretch->addBond(idx1, idx2, btype.length, btype.k);
 					dbgmsg("force_idx = " << force_idx << " idx1 = " << idx1 << " idx2 = " << idx2
 						 << " bond length = " << btype.length << " k = " << btype.k);
-					//~ bondStretch->addBond(idx1, idx2, btype.length, 0);
 					bondStretchData[idx1].push_back(ForceData{force_idx, idx1, idx2, 0, 0, btype.length, 0, 0, 0, btype.k});
 					bondStretchData[idx2].push_back(ForceData{force_idx, idx1, idx2, 0, 0, btype.length, 0, 0, 0, btype.k});
 					++force_idx;
@@ -404,7 +399,6 @@ namespace OMMIface {
 				const ForceField::AngleType& atype = 
 					__ffield->get_angle_type(type1, type2, type3);
 				bondBend->addAngle(idx1, idx2, idx3, atype.angle, atype.k);
-				//~ bondBend->addAngle(idx1, idx2, idx3, atype.angle, 0);
 				bondBendData[idx1].push_back(ForceData{force_idx, idx1, idx2, idx3, 0, 0, atype.angle, 0, 0, atype.k});
 				bondBendData[idx2].push_back(ForceData{force_idx, idx1, idx2, idx3, 0, 0, atype.angle, 0, 0, atype.k});
 				bondBendData[idx3].push_back(ForceData{force_idx, idx1, idx2, idx3, 0, 0, atype.angle, 0, 0, atype.k});
@@ -441,7 +435,6 @@ namespace OMMIface {
 						 << " idx3 = " << idx3 << " idx4 = " << idx4 << " periodicity = " << ttype.periodicity
 						 << " phase = " << ttype.phase << " k = " << ttype.k);
 					bondTorsion->addTorsion(idx1, idx2, idx3, idx4, ttype.periodicity, ttype.phase,	ttype.k);
-					//~ bondTorsion->addTorsion(idx1, idx2, idx3, idx4, ttype.periodicity, ttype.phase,	0);
 					bondTorsionData[idx1].push_back(ForceData{force_idx, idx1, idx2, idx3, idx4, 0, 0, ttype.periodicity, ttype.phase, ttype.k});
 					bondTorsionData[idx2].push_back(ForceData{force_idx, idx1, idx2, idx3, idx4, 0, 0, ttype.periodicity, ttype.phase, ttype.k});
 					bondTorsionData[idx3].push_back(ForceData{force_idx, idx1, idx2, idx3, idx4, 0, 0, ttype.periodicity, ttype.phase, ttype.k});
@@ -455,7 +448,6 @@ namespace OMMIface {
 			}
 		}
 		
-		//~ force_idx = 0;
 		// Create the 1-2-3-4 improper terms where 3 is the central atom
 		for (auto &dihedral : topology.impropers) {
 			dbgmsg("checkpoint9");
@@ -478,7 +470,6 @@ namespace OMMIface {
 					dbgmsg("force_idx = " << force_idx << " idx1 = " << idx1 << " idx2 = " << idx2
 						 << " idx3 = " << idx3 << " idx4 = " << idx4);
 					bondTorsion->addTorsion(idx1, idx2, idx3, idx4, ttype.periodicity, ttype.phase, ttype.k);
-					//~ bondTorsion->addTorsion(idx1, idx2, idx3, idx4, ttype.periodicity, ttype.phase, 0);
 					bondTorsionData[idx1].push_back(ForceData{force_idx, idx1, idx2, idx3, idx4, 0, 0, ttype.periodicity, ttype.phase, ttype.k});
 					bondTorsionData[idx2].push_back(ForceData{force_idx, idx1, idx2, idx3, idx4, 0, 0, ttype.periodicity, ttype.phase, ttype.k});
 					bondTorsionData[idx3].push_back(ForceData{force_idx, idx1, idx2, idx3, idx4, 0, 0, ttype.periodicity, ttype.phase, ttype.k});
@@ -514,7 +505,6 @@ namespace OMMIface {
 	}
 
 	vector<OpenMM::Vec3> SystemTopology::get_forces() {
-		//~ return context->getState(OpenMM::State::Forces | OpenMM::State::Energy).getForces();		
 		return context->getState(OpenMM::State::Forces).getForces();		
 	}
 

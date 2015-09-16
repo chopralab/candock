@@ -94,7 +94,11 @@ namespace OMMIface {
 		
 		int iter = 0;
 
+		// do a brief relaxation of bonded forces initially (without non-bonded forces)
+		__system_topology.minimize(__tolerance, 20);
+
 		vector<OpenMM::Vec3> initial_positions = __system_topology.get_positions_in_nm();
+
 
 		
 		__system_topology.update_knowledge_based_force(__topology, initial_positions, __dist_cutoff_in_nm);
