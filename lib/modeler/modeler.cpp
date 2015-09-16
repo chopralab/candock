@@ -87,7 +87,7 @@ namespace OMMIface {
 
 	void Modeler::minimize_knowledge_based(const Molib::Molecule &ligand, const Molib::Molecule &receptor, const Molib::Score &score) {
 		Benchmark::reset();
-		cout << "Doing energy minimization using knowledge-based forcefield" << endl;
+		cout << "Doing energy minimization of ligand " << ligand.name() << " using knowledge-based forcefield" << endl;
 
 		// for knowledge-based forcefield we implement a custom update nonbond
 		// function
@@ -98,6 +98,10 @@ namespace OMMIface {
 		__system_topology.minimize(__tolerance, 20);
 
 		vector<OpenMM::Vec3> initial_positions = __system_topology.get_positions_in_nm();
+
+		// check if minimization failed
+		if (std::isnan(initial_positions[0][0]))
+			throw MinimizationError("die : minimization failed (initial bonded relaxation)");
 
 
 		
@@ -133,7 +137,7 @@ namespace OMMIface {
 
 			// check if minimization failed
 			if (std::isnan(minimized_positions[0][0]))
-				throw MinimizationError("die : minimization failed");
+				throw MinimizationError("die : minimization failed (in loop)");
 
 			dbgmsg("minimized_positions = " << minimized_positions);
 #ifndef NDEBUG

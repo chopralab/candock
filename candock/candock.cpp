@@ -212,8 +212,9 @@ int main(int argc, char* argv[]) {
 							Docker::Conformations conf(seeds[j], gpoints0, cmdl.grid_spacing(),
 								cmdl.min_num_conf());
 
+#ifndef NDEBUG
 							inout::output_file(conf, "conf_" + seeds[j].name() + ".pdb"); 
-							
+#endif			
 							/* Dock this seed's conformations to the entire grid by moving them 
 							 * over all gridpoints and probe where they clash with the receptor: 
 							 * cluster docked conformations based on rmsd and energy and output 

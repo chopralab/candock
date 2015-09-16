@@ -200,15 +200,15 @@ int main(int argc, char* argv[]) {
 									cmdl.mini_file(), ios_base::app); // output minimized docked conformations
 
 							} catch(Linker::Linker::ConnectionError &e) {
-								cerr << "skipping ligand " << ligand.name() << " due to : " << e.what() << endl;
+								cerr << "ConnectionError: skipping ligand " << ligand.name() << " due to : " << e.what() << endl;
 							}
 							catch(OMMIface::Modeler::MinimizationError &e) {
-								cerr << "skipping ligand " << ligand.name() << " due to : " << e.what() << endl;								
+								cerr << "MinimizationError: skipping ligand " << ligand.name() << " due to : " << e.what() << endl;								
 							}
 						}
 					}
 					catch (Error& e) { 
-						cerr << "skipping ligand " << ligand.name() << " due to : " << e.what() << endl; 
+						cerr << "Error: skipping ligand " << ligand.name() << " due to : " << e.what() << endl; 
 					} 
 					catch (out_of_range& e) { 
 						cerr << "skipping ligand due to : " << e.what() << endl; 

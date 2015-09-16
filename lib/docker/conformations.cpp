@@ -135,7 +135,7 @@ namespace Docker {
 			Maxclique m(conn);
 			qmaxes = m.mcq(__ordered_atoms.size());
 
-			cout << "iterative coeff = " << coeff << " qmaxes.size() = " << qmaxes.size() << endl;
+			dbgmsg("iterative coeff = " << coeff << " qmaxes.size() = " << qmaxes.size());
 
 			coeff -= 0.1;
 
@@ -166,7 +166,7 @@ namespace Docker {
 			}
 		}
 		cout << "time to find " << __conf_vec.size() << " conformations of seed " 
-			<< seed.name() << " took " << Benchmark::seconds_from_start() 
+			<< seed.name() << " with coeff = " << coeff << " took " << Benchmark::seconds_from_start() 
 			<< " wallclock seconds" << endl;
 	}
 	

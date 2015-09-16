@@ -155,7 +155,7 @@ public:
 			vector<int> allowedDistCutoff{4,5,6,7,8,9,10,11,12,13,14,15};
 			TCLAP::ValuesConstraint<int> allowedValsDistCutoff( allowedDistCutoff );
 			
-			TCLAP::ValueArg<int> dist_cutoffArg("","cutoff","Cutoff length (default is 8)",false,8,&allowedValsDistCutoff, cmd);
+			TCLAP::ValueArg<int> dist_cutoffArg("","cutoff","Cutoff length (default is 6)",false,6,&allowedValsDistCutoff, cmd);
 			TCLAP::ValueArg<string> distributions_fileArg("","dist","Select one of the interatomic distance distribution \
 				file(s) provided with this script",false,"data/csd_complete_distance_distributions.txt","string", cmd);
 			TCLAP::ValueArg<double> step_non_bondArg("","step","Step for spline generation of non-bonded knowledge-based \
@@ -182,7 +182,7 @@ public:
 			TCLAP::ValueArg<int> spin_degreesArg("","spin","Spin degrees to rotate ligand (default 60)",false,60,&allowedValsSpinDegrees, cmd);
 
 			TCLAP::ValueArg<double> clash_coeffArg("","clash_coeff","Clash coefficient for determining whether two atoms clash by eq. dist12 s< C * (vdw1 + vdw2) (default is 0.75)",false,0.75,"double", cmd);
-			TCLAP::ValueArg<double> tol_seed_distArg("","tol_seed_dist","Tolerance on seed distance for getting initial conformations of docked fragments (default is 1.0)",false,1.0,"double", cmd);
+			TCLAP::ValueArg<double> tol_seed_distArg("","tol_seed_dist","Tolerance on seed distance for getting initial conformations of docked fragments (default is 2.0)",false,2.0,"double", cmd);
 
 			TCLAP::ValueArg<int> max_possible_confArg("","max_possible_conf","Maximum number of possible conformations to link (default is 20, -1 means unlimited)",false,20,"int", cmd);
 			TCLAP::ValueArg<int> link_iterArg("","link_iter","Maximum iterations for linking procedure (default is 1000)",false,1000,"int", cmd);
@@ -200,7 +200,7 @@ public:
 			TCLAP::ValueArg<string> fftypeArg("","fftype","Forcefield to use 'kb' (knowledge-based, default) or 'phy' (physics-based)",false,"kb",&allowedValsFf, cmd);
 			TCLAP::ValueArg<double> toleranceArg("","mini_tol","Minimization tolerance (default is 0.0001)",false,0.0001,"double", cmd);
 			TCLAP::ValueArg<int> max_iterationsArg("","max_iter","Maximum iterations for minimization during linking (default is 100)",false,100,"int", cmd);
-			TCLAP::ValueArg<int> max_iterations_finalArg("","max_iter_final","Maximum iterations for final minimization (default is 10000)",false,10000,"int", cmd);
+			TCLAP::ValueArg<int> max_iterations_finalArg("","max_iter_final","Maximum iterations for final minimization (default is 100)",false,100,"int", cmd);
 			TCLAP::ValueArg<int> update_freqArg("","update_freq","Update non-bond frequency (default is 10)",false,10,"int", cmd);
 			TCLAP::ValueArg<double> position_toleranceArg("","pos_tol","Minimization position tolerance in Angstroms - only for KB (default is 0.00000000001)",false, 0.00000000001,"double", cmd);
 

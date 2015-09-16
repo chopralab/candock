@@ -299,13 +299,14 @@ namespace Linker {
 						__compute_neighbors(curr_state, adj, states));
 					for (auto &pneighbor : ret2) { 
 						dbgmsg("CHECKING NEIGHBOR : " << *pneighbor);
-						dbgmsg("clashes_receptor = " << boolalpha 
-							<< __clashes_receptor(*pneighbor));
+						//~ dbgmsg("clashes_receptor = " << boolalpha 
+							//~ << __clashes_receptor(*pneighbor));
 						dbgmsg("clashes_ligand = " << boolalpha 
 							<< __clashes_ligand(*pneighbor, curr_conformation, curr_state));
-						if (!__clashes_receptor(*pneighbor) 
-							&& !__clashes_ligand(*pneighbor, curr_conformation, curr_state)) {
-
+						//~ if (!__clashes_receptor(*pneighbor) 
+							//~ && !__clashes_ligand(*pneighbor, curr_conformation, curr_state)) {
+						if (!__clashes_ligand(*pneighbor, curr_conformation, curr_state)) { // don't check for clashes with receptor
+							
 							Partial next_conformation(curr_conformation);
 							next_conformation.add_state(*pneighbor);
 
