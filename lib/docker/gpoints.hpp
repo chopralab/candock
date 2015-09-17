@@ -60,9 +60,11 @@ namespace Docker {
 		Gpoints(const Centro::Centroids &centroids, Molib::Atom::Grid &grid, 
 			const double &grid_spacing, const int &dist_cutoff, 
 			const double &excluded_radius, const double &max_interatomic_distance);
-		GpointVec& get_gridpoints0() { if (!__gridpoints.count(0)) throw Error("die : no gridpoints0 found ?"); return __gridpoints[0]; }
+		GpointVec& get_gridpoints0() { try { return __gridpoints.at(0); } catch (const std::out_of_range& oor) { throw Error("die : no gridpoints0 ?"); } }
+		const GpointVec& get_gridpoints0() const { try { return __gridpoints.at(0); } catch (const std::out_of_range& oor) { throw Error("die : no gridpoints0 ?"); } }
+		//~ const GpointVec& get_gridpoints0() const { return const_cast<const GpointVec&>(get_gridpoints0()); }
 		map<int, GpointVec>& get_gridpoints() { return __gridpoints; }
-		Gpoint& get_center_point();
+		const Gpoint& get_center_point() const;
 		Array3d<Gpoint*>& get_gmap() { return __gmap; }
 		
 		friend ostream& operator<<(ostream& os, const Gpoints &gpoints);

@@ -68,10 +68,10 @@ namespace Docker {
 		}
 	}
 
-	Gpoints::Gpoint& Gpoints::get_center_point() {
+	const Gpoints::Gpoint& Gpoints::get_center_point() const {
 		Geom3D::Point center(0,0,0);
 		double min_d = HUGE_VAL;
-		Gpoints::Gpoint *center_point = nullptr;
+		const Gpoints::Gpoint *center_point = nullptr;
 		for (auto &p : get_gridpoints0()) {
 			const double d = p.crd().distance(center);
 			if (d < min_d) {
@@ -171,9 +171,9 @@ namespace Docker {
 						if (bsite_id != -1) {
 							for (Molib::Atom *a : grid.get_neighbors(eval, dist_cutoff)) {
 								Molib::Atom &atom = *a;
-								dbgmsg("before getting atom radius");
+								//~ dbgmsg("before getting atom radius");
 								const double vdW = atom.radius();
-								dbgmsg("vdW = " << vdW);
+								//~ dbgmsg("vdW = " << vdW);
 								const double eval_dist = excluded_radius+0.9*vdW;
 								const double distance = atom.crd().distance(eval);
 								if (distance <= eval_dist) {
@@ -294,6 +294,16 @@ namespace Docker {
 				dbgmsg("column = " << column);
 			}
 		}
+
+		// center the ijk coordinates of grid points around the center point (0,0,0)
+		Gpoint cp = this->get_center_point(); // here we copy by value intentionally
+		dbgmsg("center point = " << cp.ijk());
+		for (auto &point : this->get_gridpoints0()) {
+			dbgmsg("point = " << point.ijk() << " address = " << &point);
+			point.ijk() = point.ijk() - cp.ijk();
+			dbgmsg("centered point = " << point.ijk());
+		}
+
 		// the last ones that did not get to the next mod==0
 		cout << points_kept << " points kept out of " << gridpoint_counter 
 			<< " total gridpoints\n";

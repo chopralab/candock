@@ -45,7 +45,7 @@ namespace Docker {
 		return sqrt(sum_sq / this->__points.size());
 	}
 
-	Conformations::Conformations(const Molib::Molecule &seed, Gpoints &gpoints, 
+	Conformations::Conformations(const Molib::Molecule &seed, const Gpoints &gpoints, 
 		const double &grid_spacing, const int min_num_conf) {
 		try {
 			__init_conformations(seed, gpoints, grid_spacing, min_num_conf);
@@ -55,7 +55,7 @@ namespace Docker {
 		}
 	}
 	
-	void Conformations::__init_conformations(const Molib::Molecule &seed, Gpoints &gpoints, 
+	void Conformations::__init_conformations(const Molib::Molecule &seed, const Gpoints &gpoints, 
 		const double &grid_spacing, const int min_num_conf) {
 	
 		Benchmark::reset();
@@ -69,21 +69,12 @@ namespace Docker {
 		map<Molib::Atom*, int> atom_to_i;
 		for (int i = 0; i < __ordered_atoms.size(); ++i) atom_to_i[__ordered_atoms[i]] = i;
 
-		// center the grid points around the center point
-		Docker::Gpoints::Gpoint cp = gpoints.get_center_point();
-		dbgmsg("center point = " << cp.ijk());
-		for (auto &point : gpoints.get_gridpoints0()) {
-			dbgmsg("point = " << point.ijk());
-			point.ijk() = point.ijk() - cp.ijk();
-			dbgmsg("centered point = " << point.ijk());
-		}
-		
 		// create grid
-		Docker::Gpoints::PGpointVec pgvec;
+		Gpoints::PGpointVec pgvec;
 		for (auto &point : gpoints.get_gridpoints0()) {
-			pgvec.push_back(&point);
+			pgvec.push_back(const_cast<Gpoints::Gpoint*>(&point));
 		 }
-		Grid<Docker::Gpoints::Gpoint> grid(pgvec);
+		Grid<Gpoints::Gpoint> grid(pgvec);
 		dbgmsg("after creating grid");
 
 		// get maximum distance from atom A in seed to any atom B
@@ -97,8 +88,8 @@ namespace Docker {
 		}
 		
 		// get point that is at the center of the gpoints (0,0,0)
-		Docker::Gpoints::Gpoint &pointA = gpoints.get_center_point();
-		vector<pair<Molib::Atom*, Docker::Gpoints::Gpoint*>> vertices;
+		Gpoints::Gpoint &pointA = const_cast<Gpoints::Gpoint&>(gpoints.get_center_point());
+		vector<pair<Molib::Atom*, Gpoints::Gpoint*>> vertices;
 
 		double coeff = 3.0;
 		vector<vector<unsigned short int>> qmaxes;
@@ -147,11 +138,11 @@ namespace Docker {
 			// if max clique contains all seed atoms...
 			dbgmsg("qmax[" << c << "].size = " << qmax.size());
 			// go over vertices of each max clique
-			Docker::Gpoints::PGpointVec points(qmax.size()); // init size of vec!
+			Gpoints::PGpointVec points(qmax.size()); // init size of vec!
 			for (auto &i : qmax) {
 				Molib::Atom *patom = vertices[i].first;
-				Docker::Gpoints::Gpoint *gpoint = vertices[i].second;
-				Docker::Gpoints::IJK ijk = gpoint->ijk();
+				Gpoints::Gpoint *gpoint = vertices[i].second;
+				Gpoints::IJK ijk = gpoint->ijk();
 				__conf_map[ijk.i][ijk.j][ijk.k].push_back(c);
 				points[atom_to_i[patom]] = gpoint;
 			}
