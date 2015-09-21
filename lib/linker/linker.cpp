@@ -271,6 +271,14 @@ namespace Linker {
 			if (--iter < 0) break;
 			Partial curr_conformation = *openset.begin();
 			openset.erase(openset.begin());
+#define MOVIE
+#ifdef MOVIE
+			DockedConformation docked = __reconstruct(curr_conformation);
+			docked.get_receptor().undo_mm_specific();
+			inout::output_file(Molib::Molecule::print_complex(docked.get_ligand(), docked.get_receptor(), docked.get_energy()), 
+			"movie.pdb", ios_base::app); // output docked molecule conformations
+#endif
+
 			dbgmsg("openset.size() = " << openset.size());
 			dbgmsg("curr_conformation at step = " 
 				<< iter << " = " << endl << curr_conformation
