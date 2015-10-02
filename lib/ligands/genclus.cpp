@@ -23,19 +23,18 @@ namespace genclus {
 		str.erase(std::remove_if(str.begin(), str.end(), [](const char &c ) { return c==':'||c=='"'||c=='\\';}), str.end());
 		return str;
 	}
-	void add_to_json(JsonReader &jr, cluster::Clusters<Molib::Atom> ligand_clusters, 
+	void add_to_json(JsonReader &jr, cluster::Clusters<Molib::Molecule> ligand_clusters, 
 		string cluster_name, const string &names_dir, const bool for_gclus) {
 
 		map<string, unique_ptr<Json::Value>> ligands;
 		for (auto &kv : ligand_clusters) {
 			int cluster_id = (kv.first == -1 ? 0 : kv.first); // unclustered is cluster #0
-			Molib::Atom &atom = *kv.second;
-			const Molib::Molecules &mols = atom.br().br().br().br().br().br(); // mols.name() is the nr-pdb name
-			const Molib::Molecule &molecule = atom.br().br().br().br().br(); // molecule.name() is the source pdb name
-			const Molib::Assembly &assembly = atom.br().br().br().br();
-			const Molib::Model &model = atom.br().br().br();
-			const Molib::Chain &chain = atom.br().br();
-			const Molib::Residue &residue = atom.br();
+			const Molib::Molecule &molecule = *kv.second;
+			const Molib::Molecules &mols = molecule.br(); // mols.name() is the nr-pdb name
+			const Molib::Assembly &assembly = molecule.first();
+			const Molib::Model &model = assembly.first();
+			const Molib::Chain &chain = model.first();
+			const Molib::Residue &residue = chain.first();
 			dbgmsg(mols.name());
 			if (ligands.find(mols.name()) == ligands.end()) {
 				ligands.insert(make_pair(mols.name(), unique_ptr<Json::Value>(new Json::Value(Json::arrayValue))));
@@ -63,12 +62,9 @@ namespace genclus {
 			dbgmsg(residue.resn() << ":" << to_string(cluster_id) << " molecule_name = " << molecule.name() << " mols_name = " << mols.name());
 		}
 		for (auto &i : ligands) {
-			//~ const string &pdb_id = i.first;
 			const string &mols_name = i.first;
-			//~ dbgmsg("pdb_id = " << pdb_id);
 			dbgmsg("mols_name = " << mols_name);
 			Json::Value &vec = *(i.second);
-			//~ JsonReader::iterator it = jr.find({make_pair("pdb_id", pdb_id)});
 			JsonReader::iterator it = jr.end();
 			if(for_gclus) {
 				auto vs = help::ssplit(mols_name, " ");
@@ -121,25 +117,81 @@ namespace genclus {
 			}
 		}
 	}
-	cluster::PairwiseDistances<Molib::Atom> create_pairwise_distances(
-		const Molib::Atom::Vec &ligands, const double eps) {
-		cluster::PairwiseDistances<Molib::Atom> pairwise_distances;
-		Molib::Atom::Grid grid(ligands);
-		for (auto &patom : ligands) {
+
+	/**
+	 * Calculate shortest distance between any two molecules.
+	 * 
+	 */
+	cluster::PairwiseDistances<Molib::Molecule> create_pairwise_distances(const Molib::Molecule::Vec &ligands, const double eps) {
+
+		cluster::PairwiseDistances<Molib::Molecule> pairwise_distances;
+		Molib::Atom::Vec atoms;
+
+		for (auto &pmolecule : ligands)
+			for (auto &patom : pmolecule->get_atoms())
+				atoms.push_back(patom);
+
+		Molib::Atom::Grid grid(atoms);
+		
+		for (auto &patom : atoms) {
+			Molib::Molecule &molecule1 = const_cast<Molib::Molecule&>(patom->br().br().br().br().br());
 			for (auto &pneighbor : grid.get_neighbors(patom->crd(), eps)) {
-				pairwise_distances[patom][pneighbor] = 
-					patom->crd().distance(pneighbor->crd());
+				Molib::Molecule &molecule2 = const_cast<Molib::Molecule&>(pneighbor->br().br().br().br().br());
+				const double distance = patom->crd().distance(pneighbor->crd());
+				if (pairwise_distances[&molecule1][&molecule2] < 0.0000000001
+					|| distance < pairwise_distances[&molecule1][&molecule2]) {
+						
+					pairwise_distances[&molecule1][&molecule2] = distance;
+					
+				}
 			}
 		}
 		return pairwise_distances;
 	}
+	
+	/**
+	 * Split read molecules into smaller pieces (i.e., protein chain A and its ligands
+	 * also chain A are outputted as separate molecules)
+	 */
+	Molib::NRset split_into_molecules(Molib::NRset &nrset) {
+		Molib::NRset cnrset;
+		for (auto &mols : nrset) {
+			Molib::Molecules &cmols = cnrset.add(new Molib::Molecules(mols.name()));
+			for (auto &molecule : mols) {
+				for (auto &assembly : molecule) {
+					for (auto &model : assembly) {
+						for (auto &chain : model) {
+							Molib::Residue::res_type prev_rest(Molib::Residue::notassigned);
+							for (auto &residue : chain) {
+								if (prev_rest != residue.rest() || residue.rest() == Molib::Residue::water 
+									|| residue.rest() == Molib::Residue::ion || residue.rest() == Molib::Residue::hetero) {
+
+									Molib::Molecule &cmolecule = cmols.add(new Molib::Molecule(molecule.name()));
+									Molib::Assembly &cassembly = cmolecule.add(new Molib::Assembly(assembly.number()));
+									Molib::Model &cmodel = cassembly.add(new Molib::Model(model.number()));
+									Molib::Chain &cchain = cmodel.add(new Molib::Chain(chain.chain_id()));
+
+								}
+
+								cmols.last().first().first().first().add(new Molib::Residue(residue));
+								prev_rest = residue.rest();
+
+							}
+							chain.clear();
+						}
+					}
+				}
+			}
+		}
+		return cnrset;
+	}
+
 	void generate_clusters_of_ligands(const string &json_file, const string &json_with_ligs_file, 
-		const string &geo_dir, const string &names_dir, const bool neighb, const double hetero_clus_rad, 
+		const string &bio_dir, const string &names_dir, const bool neighb, const double hetero_clus_rad, 
 		const int hetero_min_pts, const double min_z_score, const bool for_gclus) {
 		JsonReader jr;
 		Molib::NRset nrset;
-		//~ Molib::PDBreader pr(Molib::PDBreader::all_models);
-		cluster::MapD<Molib::Atom> scores;
+		map<string, double> scr;
 		// the aligned files from json
 		jr.parse_JSON(json_file);
 		for (auto &d : jr.root()) {
@@ -151,15 +203,18 @@ namespace genclus {
 				const string chain_ids = d["chain_id"].asString();
 				const double z_score = d["alignment"][0]["scores"]["z_score"].asDouble();
 				if (z_score < min_z_score) continue;
-				const string pdb_file = geo_dir + "/" 
+				const string pdb_file = bio_dir + "/" 
 					+ (for_gclus ? (pdb_id + chain_ids) : pdb_id) + ".pdb";
+
 				dbgmsg(pdb_id + " " + chain_ids);
-				//~ pr.rewind();
-				Molib::PDBreader pr(pdb_file, Molib::PDBreader::all_models);
+
+				Molib::PDBreader pr(pdb_file, Molib::PDBreader::all_models|Molib::PDBreader::sparse_macromol);
 				Molib::Molecules &mols = nrset.add(new Molib::Molecules(pr.parse_molecule()));
-				for (auto &molecule : mols)
-					for (auto &patom : molecule.get_atoms())
-						scores[patom] = z_score;
+
+				for (auto &molecule : mols) {
+					scr[molecule.name()] = z_score;
+				}
+				
 				dbgmsg("from genclus : " << mols.name());
 				if (neighb) remove_ligands_not_in_aligned_region(mols, 
 					d["alignment"][0]["aligned_residues"]); // remove ligands that are not near aligned residues
@@ -176,45 +231,41 @@ namespace genclus {
 			dbgmsg("molecules name = " << mols.name());
 		}
 #endif
-		//~ Molib::Atom::Vec protein_ligands = get_atoms(nrset, Molib::Residue::protein);
-		//~ Molib::Atom::Vec nucleic_ligands = get_atoms(nrset, Molib::Residue::nucleic);
-		//~ Molib::Atom::Vec hetero_ligands = get_atoms(nrset, Molib::Residue::hetero);
-		//~ Molib::Atom::Vec ion_ligands = get_atoms(nrset, Molib::Residue::ion);
-		Molib::Atom::Vec protein_ligands = nrset.get_atoms("", Molib::Residue::protein);
-		Molib::Atom::Vec nucleic_ligands = nrset.get_atoms("", Molib::Residue::nucleic);
-		Molib::Atom::Vec hetero_ligands = nrset.get_atoms("", Molib::Residue::hetero);
-		Molib::Atom::Vec ion_ligands = nrset.get_atoms("", Molib::Residue::ion);
-		//~ Molib::Atom::Vec water_ligands = get_atoms(nrset, Molib::Residue::water);
-		//~ cluster::MapD<Molib::Atom> scores; // we don't use scores
-		//~ cluster::MapD<Molib::Atom> scores; // we don't use scores
-		cluster::PairwiseDistances<Molib::Atom> pd_protein = create_pairwise_distances(protein_ligands, 4.1);
-		cluster::Optics<Molib::Atom> op(pd_protein, scores, 4.1, 3);
-		cluster::PairwiseDistances<Molib::Atom> pd_nucleic = create_pairwise_distances(nucleic_ligands, 4.1);
-		cluster::Optics<Molib::Atom> on(pd_nucleic, scores, 4.1, 3);
-		//~ cluster::MapD<Molib::Atom> hetero_scores; for (auto &pa : hetero_ligands) hetero_scores[pa] = stod(pa->atom_name());
-		cluster::PairwiseDistances<Molib::Atom> pd_hetero = create_pairwise_distances(hetero_ligands, 3.1);
-		//~ cluster::Optics<Molib::Atom> oh(pd_hetero, scores, 3.1, 50);
-		//~ cluster::Optics<Molib::Atom> oh(pd_hetero, scores, hetero_clus_rad + 0.1, (int) ceil(hetero_ligands.size() / hetero_min_pts_factor) + 1);
-		cluster::Optics<Molib::Atom> oh(pd_hetero, scores, hetero_clus_rad + 0.1, hetero_min_pts);
-		cluster::PairwiseDistances<Molib::Atom> pd_ion = create_pairwise_distances(ion_ligands, 3.1);
-		cluster::Optics<Molib::Atom> oi(pd_ion, scores, 3.1, 4);
-		//~ cluster::PairwiseDistances<Molib::Atom> pd_water = create_pairwise_distances(water_ligands, 3.0)
-		//~ cluster::Optics<Molib::Atom> op(pd_water, scores, 3.0, 4);
+		Molib::NRset splitted = split_into_molecules(nrset);
+		
+		cluster::MapD<Molib::Molecule> scores;
+		for (auto &mols : splitted) 
+			for (auto &molecule : mols)
+				scores[&molecule] = scr.at(molecule.name());
+		
+		Molib::Molecule::Vec protein_ligands = splitted.get_molecules(Molib::Residue::protein);
+		Molib::Molecule::Vec nucleic_ligands = splitted.get_molecules(Molib::Residue::nucleic);
+		Molib::Molecule::Vec hetero_ligands = splitted.get_molecules(Molib::Residue::hetero);
+		Molib::Molecule::Vec ion_ligands = splitted.get_molecules(Molib::Residue::ion);
+		
+		cluster::PairwiseDistances<Molib::Molecule> pd_protein = create_pairwise_distances(protein_ligands, 4.1);
+		cluster::Optics<Molib::Molecule> op(pd_protein, scores, 4.1, 3);
+
+		cluster::PairwiseDistances<Molib::Molecule> pd_nucleic = create_pairwise_distances(nucleic_ligands, 4.1);
+		cluster::Optics<Molib::Molecule> on(pd_nucleic, scores, 4.1, 3);
+
+		//~ cluster::PairwiseDistances<Molib::Molecule> pd_hetero = create_pairwise_distances(hetero_ligands, 3.1);
+		cluster::PairwiseDistances<Molib::Molecule> pd_hetero = create_pairwise_distances(hetero_ligands, hetero_clus_rad + 0.1);
+		cluster::Optics<Molib::Molecule> oh(pd_hetero, scores, hetero_clus_rad + 0.1, hetero_min_pts);
+
+		cluster::PairwiseDistances<Molib::Molecule> pd_ion = create_pairwise_distances(ion_ligands, 3.1);
+		cluster::Optics<Molib::Molecule> oi(pd_ion, scores, 3.1, 4);
 
 		auto protein_clusters = op.extract_dbscan(4.0);
 		auto nucleic_clusters = on.extract_dbscan(4.0);
-		//~ auto hetero_clusters = oh.extract_dbscan(0.5);
-		//~ auto hetero_clusters = oh.extract_dbscan(2.0, 100, true);
 		auto hetero_clusters = oh.extract_dbscan(hetero_clus_rad, 100, true);
 		auto ion_clusters = oi.extract_dbscan(3.0);
-		//~ vector<pair<Molib::Atom*, int>> water_clusters = ow.extract_dbscan(2.0);
+
 		add_to_json(jr, protein_clusters.first, "protein", names_dir, for_gclus);
 		add_to_json(jr, nucleic_clusters.first, "nucleic", names_dir, for_gclus);
 		add_to_json(jr, hetero_clusters.first, "hetero", names_dir, for_gclus);
 		add_to_json(jr, ion_clusters.first, "ion", names_dir, for_gclus);
-		//~ add_to_json(jr, water_clusters.first, "water");
 		inout::Inout::file_open_put_stream(json_with_ligs_file, stringstream(jr.output_json()));
-		//~ cout << jr.root() << endl;
 	}
 }
 

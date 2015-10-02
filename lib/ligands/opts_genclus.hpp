@@ -14,7 +14,7 @@ using namespace std;
 class CmdLnOpts {
 	string __json_file;
 	string __json_with_ligs_file;
-	string __geo_dir;
+	string __bio_dir;
 	string __names_dir;
 	bool __neighb;
 	double __probis_clus_rad;
@@ -33,7 +33,7 @@ public:
 			TCLAP::SwitchArg quietSwitch("q","quiet","Quiet mode (default is verbose)", cmd, false);
 			TCLAP::ValueArg<string> json_fileArg("","json","Json-formatted ProBiS alignments input file (default is probis.json)",true,"probis.json","string", cmd);
 			TCLAP::ValueArg<string> json_with_ligs_fileArg("","jsonwl","Json-formatted ProBiS alignments with transposed ligands output file (default is probis_with_ligands.json",false,"probis_with_ligands.json","string", cmd);
-			TCLAP::ValueArg<string> geo_dirArg("","geo","Directory with ProBiS-ligands geo database (default is data/probis_ligands/geo)",false,"data/probis_ligands/geo","string", cmd);
+			TCLAP::ValueArg<string> bio_dirArg("","bio","Directory with ProBiS-ligands bio database (default is data/probis_ligands/bio)",false,"data/probis_ligands/bio","string", cmd);
 			TCLAP::ValueArg<string> names_dirArg("","names","Directory with ligand names (default is data/probis_ligands/names)",false,"data/probis_ligands/names","string", cmd);
 			TCLAP::SwitchArg neighbSwitch("","neighb","Allow only ligands that are in the similar regions according to REMARKs (not enabled by default)", cmd, false);
 			TCLAP::ValueArg<double> probis_clus_radArg("","probis_clus_rad","Cluster radius for predicted ligands by probis (default is 2.0)",false,2.0,"double", cmd);
@@ -43,7 +43,7 @@ public:
 			cmd.parse(argc, argv);
 			__json_file = json_fileArg.getValue();
 			__json_with_ligs_file = json_with_ligs_fileArg.getValue();
-			__geo_dir = geo_dirArg.getValue();
+			__bio_dir = bio_dirArg.getValue();
 			__names_dir = names_dirArg.getValue();
 			__neighb = neighbSwitch.getValue();
 			__probis_clus_rad = probis_clus_radArg.getValue();
@@ -62,7 +62,7 @@ public:
 	// interface
 	string json_file() const { return __json_file; }
 	string json_with_ligs_file() const { return __json_with_ligs_file; }
-	string geo_dir() const { return __geo_dir; }
+	string bio_dir() const { return __bio_dir; }
 	string names_dir() const { return __names_dir; }
 	bool neighb() const { return __neighb; }
 	double probis_clus_rad() const { return __probis_clus_rad; }

@@ -444,6 +444,14 @@ void state7(Args *args) {
     NoSql nosql(&mol1, NOSQL_FILE);
     nosql.read();
 
+/******
+ * 
+ * Later found out that there is no need to comment things out below, it is enough
+ * to set -nofp flag, but anyway I'll leave it for now... (Janez)
+ * 
+ * 
+ */
+ 
 /* NOT FOR CANDOCK
     // dolocis kolikokrat je vsak query residue ohranjen (upostevas le dobro prilegane sekvence)
     if (! (_pairwise || _nofp)) { // ce je pairwise ali nofp (no fingerprint), ne filtriramo po fingerprint residue-jih

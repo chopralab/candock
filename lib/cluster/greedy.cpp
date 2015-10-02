@@ -10,6 +10,39 @@
 
 namespace Molib {
 
+	/**
+	 * Cluter points
+	 */
+	Geom3D::Point::Vec Cluster::greedy(const Geom3D::Point::Vec &initial, const double clus_rad) {
+
+		Benchmark::reset();
+
+		Geom3D::Point::ConstSet confs;
+		for (auto &point : initial)
+			confs.insert(&point);
+
+		dbgmsg(confs);
+	
+		Grid<const Geom3D::Point> grid(confs); // grid of points
+
+		Geom3D::Point::Vec reps;
+
+		while (!confs.empty()) {
+			// accept lowest energy conformation as representative
+			const Geom3D::Point &lowest_point = **confs.begin();
+			reps.push_back(lowest_point);
+			confs.erase(confs.begin());
+			// delete all conformations within RMSD tolerance of this lowest energy yconformation
+			for (auto &pconf : grid.get_neighbors(lowest_point.crd(), clus_rad)) {
+				confs.erase(pconf);
+			}
+		}
+		cout << "Clustering " << initial.size() << " accepted conformations resulted in "
+			<< reps.size() << " clusters took " << Benchmark::seconds_from_start() 
+			<< " seconds" << endl;
+		return reps;
+	}
+
 	Molib::Molecules Cluster::greedy(const Molib::Molecules &initial, const Molib::Score &score, Molib::Atom::Grid &gridrec, const double clus_rad) {
 
 		Benchmark::reset();

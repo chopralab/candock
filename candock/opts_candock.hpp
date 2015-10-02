@@ -23,7 +23,7 @@ class CmdLnOpts {
 	string __nosql_file;
 	string __json_file;
 	string __json_with_ligs_file;
-	string __geo_dir;
+	//~ string __geo_dir;
 	string __names_dir;
 	bool __neighb;
 	double __probis_clus_rad;
@@ -34,6 +34,7 @@ class CmdLnOpts {
 	string __bio_dir;
 	string __lig_clus_file;
 	string __z_scores_file;
+	double __centro_clus_rad;
 	
 	string __centroid_in_file;
 	string __centroid_out_file;
@@ -89,7 +90,7 @@ class CmdLnOpts {
 	double __excluded_radius;
 	double __max_interatomic_distance;
 
-	double __top_percent;
+	//~ double __top_percent;
 
 	double __clus_rad;
 	int __num_iter;
@@ -121,17 +122,19 @@ public:
 			TCLAP::ValueArg<string> nosql_fileArg("","nosql","NoSql-formatted ProBiS alignments output file (default is probis.nosql)",false,"probis.nosql","string", cmd);
 			TCLAP::ValueArg<string> json_fileArg("","json","Json-formatted ProBiS alignments output file (default is probis.json",false,"probis.json","string", cmd);
 			TCLAP::ValueArg<string> json_with_ligs_fileArg("","jsonwl","Json-formatted ProBiS alignments with transposed ligands output file (default is probis_with_ligands.json",false,"probis_with_ligands.json","string", cmd);
-			TCLAP::ValueArg<string> geo_dirArg("","geo","Directory with ProBiS-ligands geo database (default is bslibdb/geo)",false,"bslibdb/geo","string", cmd);
+			//~ TCLAP::ValueArg<string> geo_dirArg("","geo","Directory with ProBiS-ligands geo database (default is bslibdb/geo)",false,"bslibdb/geo","string", cmd);
 			TCLAP::ValueArg<string> names_dirArg("","names","Directory with ligand names (default is bslibdb/names)",false,"bslibdb/names","string", cmd);
 			TCLAP::SwitchArg neighbSwitch("","neighb","Allow only ligands that are in the similar regions according to REMARKs (not enabled by default)", cmd, false);
 
-			TCLAP::ValueArg<double> probis_clus_radArg("","probis_clus_rad","Cluster radius for predicted ligands by probis (default is 2.0)",false,2.0,"double", cmd);
+			TCLAP::ValueArg<double> probis_clus_radArg("","probis_clus_rad","Cluster radius for predicted ligands by probis (default is 3.0)",false,3.0,"double", cmd);
 			TCLAP::ValueArg<int> probis_min_ptsArg("","probis_min_pts","The minimum number of points (for predicted ligands) required to form a cluster (default is 10)",false,10,"int", cmd);
 			TCLAP::ValueArg<double> probis_min_z_scoreArg("","probis_min_z_score","Minimium z-score of ligands to be considered in clustering (default is 2.5)",false,2.5,"double", cmd);
 
 			TCLAP::ValueArg<string> bio_dirArg("","bio","Directory with ProBiS-ligands bio database (default is bslibdb/bio)",false,"bslibdb/bio","string", cmd);
 			TCLAP::ValueArg<string> lig_clus_fileArg("","lig_clus_file","Ligand clusters found by ProBiS are outputted to this file",false,"ligand_clusters.pdb","string", cmd);
 			TCLAP::ValueArg<string> z_scores_fileArg("","z_scores_file","Binding site z-scores are outputted to this file",false,"z_scores.pdb","string", cmd);
+
+			TCLAP::ValueArg<double> centro_clus_radArg("","centro_clus_rad","Cluster radius for centroid centers (default is 3.0)",false,3.0,"double", cmd);
 
 			TCLAP::ValueArg<string> centroid_in_fileArg("","centro_in","Filename for reading centroids",false,"","string", cmd);
 			TCLAP::ValueArg<string> centroid_out_fileArg("","centro_out","Filename for outputting calculated centroids",false,"","string", cmd);
@@ -214,7 +217,7 @@ public:
 			TCLAP::ValueArg<double> excluded_radiusArg("","excluded","Excluded radius (default is 0.8)",false,0.8,"double", cmd);
 			TCLAP::ValueArg<double> max_interatomic_distanceArg("","interatomic","Maximum interatomic distance (default is 8.0)",false,8.0,"double", cmd);
 
-			TCLAP::ValueArg<double> top_percentArg("","top_percent","Percent of top scores to keep (default is 0.80)",false,0.80,"double", cmd);
+			//~ TCLAP::ValueArg<double> top_percentArg("","top_percent","Percent of top scores to keep (default is 0.80)",false,0.80,"double", cmd);
 
 			TCLAP::ValueArg<double> clus_radArg("","clus_rad","Cluster radius for docked seeds (default is 2.0)",false,2.0,"double", cmd);
 
@@ -234,7 +237,7 @@ public:
 			__nosql_file = nosql_fileArg.getValue();
 			__json_file = json_fileArg.getValue();
 			__json_with_ligs_file = json_with_ligs_fileArg.getValue();
-			__geo_dir = geo_dirArg.getValue();
+			//~ __geo_dir = geo_dirArg.getValue();
 			__names_dir = names_dirArg.getValue();
 			__neighb = neighbSwitch.getValue();
 			__probis_clus_rad = probis_clus_radArg.getValue();
@@ -243,6 +246,9 @@ public:
 			__bio_dir = bio_dirArg.getValue();
 			__lig_clus_file = lig_clus_fileArg.getValue();
 			__z_scores_file = z_scores_fileArg.getValue();
+
+			__centro_clus_rad = centro_clus_radArg.getValue();
+
 			__centroid_in_file = centroid_in_fileArg.getValue();
 			__centroid_out_file = centroid_out_fileArg.getValue();
 			__gridpdb_hcp_file = gridpdb_hcp_fileArg.getValue();
@@ -291,7 +297,7 @@ public:
 			__min_num_conf = min_num_confArg.getValue();
 			__excluded_radius = excluded_radiusArg.getValue();
 			__max_interatomic_distance = max_interatomic_distanceArg.getValue();
-			__top_percent = top_percentArg.getValue();
+			//~ __top_percent = top_percentArg.getValue();
 			__clus_rad = clus_radArg.getValue();
 			
 			__num_iter = num_iterArg.getValue();
@@ -318,7 +324,7 @@ public:
 	string nosql_file() const { return __nosql_file; }
 	string json_file() const { return __json_file; }
 	string json_with_ligs_file() const { return __json_with_ligs_file; }
-	string geo_dir() const { return __geo_dir; }
+	//~ string geo_dir() const { return __geo_dir; }
 	string names_dir() const { return __names_dir; }
 	bool neighb() const { return __neighb; }
 	double probis_clus_rad() const { return __probis_clus_rad; }
@@ -327,6 +333,7 @@ public:
 	string bio_dir() const { return __bio_dir; }
 	string lig_clus_file() const { return __lig_clus_file; }
 	string z_scores_file() const { return __z_scores_file; }
+	double centro_clus_rad() const { return __centro_clus_rad; }
 	string centroid_in_file() const { return __centroid_in_file; }
 	string centroid_out_file() const { return __centroid_out_file; }
 	string gridpdb_hcp_file() const { return __gridpdb_hcp_file; }
@@ -374,7 +381,7 @@ public:
 	int min_num_conf() const { return __min_num_conf; }
 	double excluded_radius() const { return __excluded_radius; }
 	double max_interatomic_distance() const { return __max_interatomic_distance; }
-	double top_percent() const { return __top_percent; }
+	//~ double top_percent() const { return __top_percent; }
 	double clus_rad() const { return __clus_rad; }
 	
 	int num_iter() const { return __num_iter; }

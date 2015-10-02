@@ -13,6 +13,7 @@
 #include <tuple>
 #include <memory>
 #include <vector>
+#include <set>
 #include "helper/error.hpp"
 using namespace std;
 
@@ -23,6 +24,8 @@ namespace Geom3D {
 	public:
 		
 		typedef vector<Coordinate> Vec;
+		typedef set<Coordinate*> Set;
+		typedef set<const Coordinate*> ConstSet;
 		
 		Coordinate() : __x(0), __y(0), __z(0) {}
 		Coordinate(double x, double y, double z) : __x(x), __y(y), __z(z) {}
@@ -56,6 +59,9 @@ namespace Geom3D {
 		Coordinate operator-() const { return Coordinate(-x(), -y(), -z()); }
 		double distance(const Coordinate &c) const { return sqrt(pow(__x-c.x(), 2) + pow(__y-c.y(), 2) + pow(__z-c.z(), 2)); }
 		double distance_sq(const Coordinate &c) const { return pow(__x-c.x(), 2) + pow(__y-c.y(), 2) + pow(__z-c.z(), 2); }
+		
+		void distance(double d) const {} // just dummy : needed by grid
+		
 		void normalize() { const double length = this->distance(Coordinate(0.0, 0.0, 0.0)); if (length == 0) throw Error("Coordinate::operator/  division by zero\n"); this->__x /= length; this->__y /= length; this->__z /= length; }
 		Coordinate norm() { Coordinate c = *this; c.normalize(); return c; }
 		string pdb() const { stringstream outs; outs<<fixed<<right<<setprecision(3)<<setw(8)<<__x<<fixed<<right<<setprecision(3)<<setw(8)<<__y<<fixed<<right<<setprecision(3)<<setw(8)<<__z; return outs.str(); }								

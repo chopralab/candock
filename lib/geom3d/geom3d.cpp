@@ -68,3 +68,9 @@ ostream& operator<<(ostream& os, const Geom3D::Point::Vec &points)	{
 	}
 	return os;
 }	
+ostream& operator<<(ostream& os, const Geom3D::Point::ConstSet &points)	{
+	for (auto &point : points) {
+		os << "ATOM      1   U  DIK     1    " << point->pdb() << endl;
+	}
+	return os;
+}	

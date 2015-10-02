@@ -335,6 +335,13 @@ namespace Molib {
 			}
 			return center / this->size();
 		}
+		
+		Molecule::Vec get_molecules(const Residue::res_type &rest) const;
+
+		Geom3D::Point::Vec get_crds(const string &chain_ids="", 
+			const Residue::res_type &rest=Residue::res_type::notassigned,
+			const int model_number=-1) const;
+
 		Atom::Vec get_atoms(const string &chain_ids="", 
 			const Residue::res_type &rest=Residue::res_type::notassigned,
 			const int model_number=-1) const;
@@ -365,6 +372,7 @@ namespace Molib {
 	public:
 		Molecules& add(Molecules *m) { return this->aadd(m, this); }
 		NRset& erase_properties() { for (auto &molecules : *this) molecules.erase_properties(); return *this; }
+		Molecule::Vec get_molecules(const Residue::res_type &rest) const;
 		Atom::Vec get_atoms(const string &chain_ids="", 
 			const Residue::res_type &rest=Residue::res_type::notassigned,
 			const int model_number=-1) const;

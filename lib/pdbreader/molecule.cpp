@@ -146,6 +146,28 @@ namespace Molib {
 		}
 		dbgmsg("MOLECULE AFTER PREPARING FOR MOLECULAR MECHANICS" << endl << *this);
 	}
+	
+	
+	Molecule::Vec Molecules::get_molecules(const Residue::res_type &rest) const {
+		Molecule::Vec molecules;
+		for (auto &molecule : *this) {
+			Residue &first = molecule.first().first().first().first();
+			if (first.rest() == rest)
+				molecules.push_back(&molecule);
+		}
+		return molecules;
+	}
+
+	Molecule::Vec NRset::get_molecules(const Residue::res_type &rest) const {
+		Molecule::Vec molecules;
+		for (auto &mols : *this) {
+			Residue &first = mols.first().first().first().first().first();
+			auto ret = mols.get_molecules(rest);
+			molecules.insert(molecules.end(), ret.begin(), ret.end());
+		}
+		return molecules;
+	}
+
 	Atom::Vec NRset::get_atoms(const string &chain_ids, const Residue::res_type &rest,
 		const int model_number) const {
 		Atom::Vec atoms;
@@ -175,6 +197,15 @@ namespace Molib {
 	}
 
 	Geom3D::Point::Vec Molecule::get_crds(const string &chain_ids, const Residue::res_type &rest,
+		const int model_number) const { 
+
+		Geom3D::Point::Vec crds;
+		for (auto &patom : this->get_atoms(chain_ids, rest, model_number)) 
+			crds.push_back(patom->crd());
+		return crds;
+	}
+
+	Geom3D::Point::Vec Molecules::get_crds(const string &chain_ids, const Residue::res_type &rest,
 		const int model_number) const { 
 
 		Geom3D::Point::Vec crds;

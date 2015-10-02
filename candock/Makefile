@@ -24,7 +24,7 @@ LIBS	= -L. -L$(LIBDIR)/linker -L $(LIBDIR)/pdbreader -L $(LIBDIR)/kabsch \
 -L $(LIBDIR)/helper -L $(LIBDIR)/score -L $(LIBDIR)/fragmenter -L $(LIBDIR)/graph \
 -L $(LIBDIR)/kbforce -L $(LIBDIR)/geom3d -L $(LIBDIR)/modeler -L $(LIBDIR)/probis \
 -L $(LIBDIR)/ligands -L $(LIBDIR)/docker -L $(LIBDIR)/centro -L $(LIBDIR)/cluster \
--llinker -lcluster -lpdb -ldocker -lscore -lfragmenter -lgraph -lkabsch -lcentro \
+-lpdb -ldocker -lscore -lfragmenter -lgraph -lkabsch -lcentro -lcluster -llinker \
 -lmodeler -lhelper -lOpenMM_static -ldl -lc -lkbforce -lprobis -lligands -lpdb -lgeom3d \
 -lboost_regex -lboost_filesystem -lboost_system -lpthread -lboost_date_time \
 -lgsl -lgslcblas -lm

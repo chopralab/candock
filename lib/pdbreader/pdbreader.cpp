@@ -205,6 +205,11 @@ namespace Molib {
 							else if (help::ions.find(resn) != help::ions.end()) rest = Residue::ion;
 							else if (resn == "HOH") rest = Residue::water;
 							else rest = Residue::hetero;  // if nothing known then hetero...
+							
+											
+							if ((__hm & PDBreader::sparse_macromol) && (rest == Residue::protein && atom_name != "CA"
+								|| rest == Residue::nucleic && atom_name != "P")) continue;
+
 							if (!__giant_molecule || rest != Residue::protein || atom_name == "CA") {
 								Model &model = mols.last().last().last();
 								if (!model.has_chain(chain_id))

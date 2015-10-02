@@ -23,7 +23,7 @@ int main(int argc, char *argv[]) {
 	try {
 		cmdl.init(argc, argv);
 		genclus::generate_clusters_of_ligands(cmdl.json_file(), cmdl.json_with_ligs_file(),
-			cmdl.geo_dir(), cmdl.names_dir(), cmdl.neighb(), cmdl.probis_clus_rad(),
+			cmdl.bio_dir(), cmdl.names_dir(), cmdl.neighb(), cmdl.probis_clus_rad(),
 			cmdl.probis_min_pts(), cmdl.probis_min_z_score(), true);
 		cout << "end" << endl;
 	}

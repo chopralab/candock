@@ -36,6 +36,7 @@ namespace Molib {
 		friend ostream& operator<<(ostream& os, const set<const LinkedConf<Molecule>*, LinkedConf<Molecule>::by_energy> &confs);
 		friend ostream& operator<<(ostream& os, const set<const LinkedConf<Linker::Partial>*, LinkedConf<Linker::Partial>::by_energy> &confs);
 	public:
+		static Geom3D::Point::Vec greedy(const Geom3D::Point::Vec &initial, const double clus_rad);
 		static Molib::Molecules greedy(const Molib::Molecules &initial, const Molib::Score &score,
 			Molib::Atom::Grid &gridrec, const double clus_rad);
 		static Linker::Partial::Vec greedy(const Linker::Partial::Vec &initial, Molib::Atom::Grid &gridrec, const double clus_rad);

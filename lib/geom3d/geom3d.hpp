@@ -17,4 +17,5 @@ namespace Geom3D {
 	Point compute_geometric_center(const Geom3D::Point::Vec &crds);
 }
 ostream& operator<<(ostream& os, const Geom3D::Point::Vec &points);
+ostream& operator<<(ostream& os, const Geom3D::Point::ConstSet &points);
 #endif
