@@ -50,7 +50,6 @@ class CmdLnOpts {
 	double __step_non_bond;
 	double __scale_non_bond;
 
-	string __egrid_file;
 	string __docked_seeds_file;
 	
 	string __cluster_file;
@@ -166,7 +165,6 @@ public:
 			TCLAP::ValueArg<double> scale_non_bondArg("","scale","Scale non-bonded forces and energy for knowledge-based \
 				potential [0.0-1.0] (default is 1.0)",false,1.0,"double", cmd);
 
-			TCLAP::ValueArg<string> egrid_fileArg("","egrid", "Energy grid output file",false,"energy_grid.pdb","string", cmd);
 			TCLAP::ValueArg<string> docked_seeds_fileArg("","docked_seeds_file", "Docked seeds output file",false,
 				"docked_seeds.pdb","string", cmd);
 				
@@ -261,7 +259,6 @@ public:
 			__distributions_file = distributions_fileArg.getValue();
 			__step_non_bond = step_non_bondArg.getValue();
 			__scale_non_bond = scale_non_bondArg.getValue();
-			__egrid_file = egrid_fileArg.getValue();
 			__docked_seeds_file = docked_seeds_fileArg.getValue();
 			
 			__cluster_file = cluster_fileArg.getValue();
@@ -346,7 +343,6 @@ public:
 	string distributions_file() const { return __distributions_file; }
 	double step_non_bond() const { return __step_non_bond; }
 	double scale_non_bond() const { return __scale_non_bond; }
-	string egrid_file() const { return __egrid_file; }
 	string docked_seeds_file() const { return __docked_seeds_file; }
 	
 	string cluster_file() const { return __cluster_file; }

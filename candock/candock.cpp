@@ -39,7 +39,6 @@ int main(int argc, char* argv[]) {
 		 */
 		inout::output_file("", cmdl.gridpdb_hcp_file()); // gridpoints for all binding sites
 		inout::output_file("", cmdl.prep_file()); // output prepared ligands
-		inout::output_file("", cmdl.egrid_file()); // output energy grid
 		inout::output_file("", cmdl.docked_seeds_file()); // output docked & filtered fragment poses
 		inout::output_file("", cmdl.docked_file()); // output docked molecule conformations
 		inout::output_file("", cmdl.mini_file()); // output docked & minimized ligands conformations
