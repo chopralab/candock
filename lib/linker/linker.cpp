@@ -271,7 +271,7 @@ namespace Linker {
 			if (--iter < 0) break;
 			Partial curr_conformation = *openset.begin();
 			openset.erase(openset.begin());
-#define MOVIE
+//~ #define MOVIE
 #ifdef MOVIE
 			DockedConformation docked = __reconstruct(curr_conformation);
 			docked.get_receptor().undo_mm_specific();

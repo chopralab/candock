@@ -44,7 +44,7 @@ int main(int argc, char* argv[]) {
 		if (cmdl.centroid_in_file().empty()) {
 			throw Error("For testing use --centroid option to provide a centroid file");
 		} else { // ... or else set binding sites from file
-			centroids = Centro::set_centroids(cmdl.centroid_in_file());
+			centroids = Centro::set_centroids(cmdl.centroid_in_file(), cmdl.num_bsites());
 		}
 
 		/* Initialize parsers for receptor (and ligands) and read
@@ -160,7 +160,7 @@ int main(int argc, char* argv[]) {
 
 							dock.run();
 
-							inout::output_file(dock.get_docked(), "tmp/" + dock.get_docked().name() + "/" 
+							inout::output_file(dock.get_docked(), cmdl.top_seeds_dir() + "/" + dock.get_docked().name() + "/" 
 								+ cmdl.top_seeds_file()); // output docked & clustered seeds
 	
 						}

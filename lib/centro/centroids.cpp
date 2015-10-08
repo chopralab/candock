@@ -64,7 +64,7 @@ namespace Centro {
 			<< endl << centroids);
 		return centroids;
 	}
-	Centroids set_centroids(const string &centroid_file) {
+	Centroids set_centroids(const string &centroid_file, const int num_bsites) {
 		Centroids centroids;
 		vector<string> data;
 		inout::Inout::read_file(centroid_file, data);
@@ -73,7 +73,9 @@ namespace Centro {
 			int bsite_id;
 			double x, y, z, rc;
 			ss >> bsite_id >> x >> y >> z >> rc;
-			centroids[bsite_id].push_back(Centroid(Geom3D::Coordinate(x, y, z), rc));
+			if (bsite_id <= num_bsites) {
+				centroids[bsite_id].push_back(Centroid(Geom3D::Coordinate(x, y, z), rc));
+			}
 		}
 		if (centroids.empty()) 
 			throw Error("die: could not find centroid in centroid file " 

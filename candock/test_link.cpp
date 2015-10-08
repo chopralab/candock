@@ -120,7 +120,7 @@ int main(int argc, char* argv[]) {
 
 						// read top seeds for this ligand
 						Molib::NRset top_seeds = common::read_top_seeds_files(ligand,
-							cmdl.top_seeds_file());
+							cmdl.top_seeds_dir(), cmdl.top_seeds_file());
 						
 						ligand.erase_properties(); // required for graph matching
 						top_seeds.erase_properties(); // required for graph matching

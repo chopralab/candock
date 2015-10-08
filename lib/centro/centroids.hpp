@@ -21,7 +21,7 @@ namespace Centro {
 	typedef map<int, vector<Centroid>> Centroids;
 
 	Centroids set_centroids(const genlig::BindingSiteClusters &binding_site_clusters, const double centro_clus_rad);
-	Centroids set_centroids(const string &centroid_file);
+	Centroids set_centroids(const string &centroid_file, const int num_bsites);
 
 };
 

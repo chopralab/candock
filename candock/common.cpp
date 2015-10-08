@@ -20,13 +20,13 @@ namespace common {
 	/* Part7a stuff
 	 * 
 	 */
-	Molib::NRset read_top_seeds_files(const Molib::Molecule &ligand, const string &top_seeds_file) {
+	Molib::NRset read_top_seeds_files(const Molib::Molecule &ligand, const string &top_seeds_dir, const string &top_seeds_file) {
 		Molib::NRset top_seeds;
 		const Molib::Model &model = ligand.first().first();
 		for (auto &fragment : model.get_rigid()) { // iterate over seeds
 			if (fragment.is_seed()) {
 				dbgmsg("reading top_seeds_file for seed id = " << fragment.get_seed_id());
-				Molib::PDBreader pdb("tmp/" + help::to_string(fragment.get_seed_id()) + "/" + top_seeds_file, 
+				Molib::PDBreader pdb(top_seeds_dir + "/" + help::to_string(fragment.get_seed_id()) + "/" + top_seeds_file, 
 					Molib::PDBreader::all_models);
 				Molib::Molecules &last = top_seeds.add(new Molib::Molecules(pdb.parse_molecule()));
 				if (last.empty()) {

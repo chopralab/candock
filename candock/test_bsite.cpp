@@ -58,7 +58,7 @@ int main(int argc, char* argv[]) {
 			inout::output_file(centroids, cmdl.centroid_out_file()); // probis local structural alignments
 
 		} else { // ... or else set binding sites from file
-			centroids = Centro::set_centroids(cmdl.centroid_in_file());
+			centroids = Centro::set_centroids(cmdl.centroid_in_file(), cmdl.num_bsites());
 		}
 
 		/* Initialize parsers for receptor (and ligands) and read

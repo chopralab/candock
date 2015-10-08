@@ -67,7 +67,7 @@ int main(int argc, char* argv[]) {
 			inout::output_file(centroids, cmdl.centroid_out_file()); // probis local structural alignments
 
 		} else { // ... or else set binding sites from file
-			centroids = Centro::set_centroids(cmdl.centroid_in_file());
+			centroids = Centro::set_centroids(cmdl.centroid_in_file(), cmdl.num_bsites());
 		}
 
 		/* Initialize parsers for receptor (and ligands) and read
@@ -173,6 +173,7 @@ int main(int argc, char* argv[]) {
 		/* Create gridpoints for ALL centroids representing one or more binding sites
 		 * 
 		 */
+
 		Docker::Gpoints gpoints(score, ligand_idatm_types, centroids, gridrec, 
 			cmdl.grid_spacing(), cmdl.dist_cutoff(), cmdl.excluded_radius(), 
 			cmdl.max_interatomic_distance());
@@ -224,7 +225,7 @@ int main(int argc, char* argv[]) {
 
 							dock.run();
 
-							inout::output_file(dock.get_docked(), "tmp/" + dock.get_docked().name() + "/" 
+							inout::output_file(dock.get_docked(), cmdl.top_seeds_dir() + "/" + dock.get_docked().name() + "/" 
 								+ cmdl.top_seeds_file()); // output docked & clustered seeds
 	
 						}
@@ -263,7 +264,7 @@ int main(int argc, char* argv[]) {
 
 						// read top seeds for this ligand
 						Molib::NRset top_seeds = common::read_top_seeds_files(ligand,
-							cmdl.top_seeds_file());
+							cmdl.top_seeds_dir(), cmdl.top_seeds_file());
 
 						ligand.erase_properties(); // required for graph matching
 						top_seeds.erase_properties(); // required for graph matching

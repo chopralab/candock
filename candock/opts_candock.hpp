@@ -23,7 +23,9 @@ class CmdLnOpts {
 	string __nosql_file;
 	string __json_file;
 	string __json_with_ligs_file;
-	//~ string __geo_dir;
+
+	string __top_seeds_dir;
+
 	string __names_dir;
 	bool __neighb;
 	double __probis_clus_rad;
@@ -121,7 +123,9 @@ public:
 			TCLAP::ValueArg<string> nosql_fileArg("","nosql","NoSql-formatted ProBiS alignments output file (default is probis.nosql)",false,"probis.nosql","string", cmd);
 			TCLAP::ValueArg<string> json_fileArg("","json","Json-formatted ProBiS alignments output file (default is probis.json",false,"probis.json","string", cmd);
 			TCLAP::ValueArg<string> json_with_ligs_fileArg("","jsonwl","Json-formatted ProBiS alignments with transposed ligands output file (default is probis_with_ligands.json",false,"probis_with_ligands.json","string", cmd);
-			//~ TCLAP::ValueArg<string> geo_dirArg("","geo","Directory with ProBiS-ligands geo database (default is bslibdb/geo)",false,"bslibdb/geo","string", cmd);
+
+			TCLAP::ValueArg<string> top_seeds_dirArg("","top_seeds_dir","Directory for saving top docked seeds (default is top_seeds)",false,"top_seeds","string", cmd);
+
 			TCLAP::ValueArg<string> names_dirArg("","names","Directory with ligand names (default is bslibdb/names)",false,"bslibdb/names","string", cmd);
 			TCLAP::SwitchArg neighbSwitch("","neighb","Allow only ligands that are in the similar regions according to REMARKs (not enabled by default)", cmd, false);
 
@@ -235,7 +239,7 @@ public:
 			__nosql_file = nosql_fileArg.getValue();
 			__json_file = json_fileArg.getValue();
 			__json_with_ligs_file = json_with_ligs_fileArg.getValue();
-			//~ __geo_dir = geo_dirArg.getValue();
+			__top_seeds_dir = top_seeds_dirArg.getValue();
 			__names_dir = names_dirArg.getValue();
 			__neighb = neighbSwitch.getValue();
 			__probis_clus_rad = probis_clus_radArg.getValue();
@@ -321,7 +325,7 @@ public:
 	string nosql_file() const { return __nosql_file; }
 	string json_file() const { return __json_file; }
 	string json_with_ligs_file() const { return __json_with_ligs_file; }
-	//~ string geo_dir() const { return __geo_dir; }
+	string top_seeds_dir() const { return __top_seeds_dir; }
 	string names_dir() const { return __names_dir; }
 	bool neighb() const { return __neighb; }
 	double probis_clus_rad() const { return __probis_clus_rad; }
