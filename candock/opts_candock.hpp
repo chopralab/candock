@@ -52,8 +52,6 @@ class CmdLnOpts {
 	double __step_non_bond;
 	double __scale_non_bond;
 
-	string __docked_seeds_file;
-	
 	string __cluster_file;
 	string __top_seeds_file;
 
@@ -170,9 +168,6 @@ public:
 			TCLAP::ValueArg<double> scale_non_bondArg("","scale","Scale non-bonded forces and energy for knowledge-based \
 				potential [0.0-1.0] (default is 1.0)",false,1.0,"double", cmd);
 
-			TCLAP::ValueArg<string> docked_seeds_fileArg("","docked_seeds_file", "Docked seeds output file",false,
-				"docked_seeds.pdb","string", cmd);
-				
 			TCLAP::ValueArg<string> cluster_fileArg("","clusterfile","Clustered representative docked-seed conformations \
 				output file",false,"clustered_seeds.txt","string", cmd);
 			TCLAP::ValueArg<string> top_seeds_fileArg("","topseedsfile","Top seeds \
@@ -228,6 +223,7 @@ public:
 			TCLAP::ValueArg<int> num_iterArg("","num_iter","Number of iterations for maximum weight clique algorithm (default is 1000)",false,1000,"int", cmd);
 
 			TCLAP::ValueArg<int> ncpuArg("","ncpu","Number of CPUs to use concurrently (default is 1)",false,1,"int", cmd);
+			TCLAP::SwitchArg pluginSwitch("","plugin","Plugin option", cmd, false); // da spusti skozi
 
 			cmd.parse( argc, argv );
 			__quiet = quietSwitch.getValue();
@@ -265,8 +261,7 @@ public:
 			__distributions_file = distributions_fileArg.getValue();
 			__step_non_bond = step_non_bondArg.getValue();
 			__scale_non_bond = scale_non_bondArg.getValue();
-			__docked_seeds_file = docked_seeds_fileArg.getValue();
-			
+
 			__cluster_file = cluster_fileArg.getValue();
 			__top_seeds_file = top_seeds_fileArg.getValue();
 			__max_num_ligands = max_num_ligandsArg.getValue();
@@ -350,8 +345,7 @@ public:
 	string distributions_file() const { return __distributions_file; }
 	double step_non_bond() const { return __step_non_bond; }
 	double scale_non_bond() const { return __scale_non_bond; }
-	string docked_seeds_file() const { return __docked_seeds_file; }
-	
+
 	string cluster_file() const { return __cluster_file; }
 	string top_seeds_file() const { return __top_seeds_file; }
 	int max_num_ligands() const { return __max_num_ligands; }
