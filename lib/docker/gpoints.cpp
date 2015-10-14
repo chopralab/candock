@@ -12,6 +12,14 @@ using namespace std;
 
 namespace Docker {
 
+	ostream& operator<<(ostream& os, const Docker::Gpoints::PGpointVec &points)	{
+		for (auto &ppoint : points) {
+			// to add : output of energies
+			os << "ATOM      1   U  DIK     1    " << ppoint->crd().pdb() << endl; 
+		}
+		return os;
+	}	
+
 	ostream& operator<<(ostream& os, const Docker::Gpoints::GpointVec &points)	{
 		for (auto &point : points) {
 			// to add : output of energies

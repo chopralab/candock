@@ -33,6 +33,7 @@ namespace Docker {
 			double energy(const int l) const { return __energy.data[l]; }
 			const Geom3D::Point& crd() const { return __crd; }
 			IJK& ijk() { return __ijk; }
+			void distance(double d) const {} // just dummy : needed by grid
 		};
 
 		typedef vector<Gpoint> GpointVec;
@@ -71,6 +72,7 @@ namespace Docker {
 	};
 
 	ostream& operator<<(ostream& os, const Docker::Gpoints::GpointVec &points);
+	ostream& operator<<(ostream& os, const Docker::Gpoints::PGpointVec &points);
 };
 
 

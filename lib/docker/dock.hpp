@@ -18,17 +18,17 @@ namespace Docker {
 
 		private:
 			Gpoints::Gpoint &__cavpoint;
-			Conformations::Conf &__conf0;
+			Gpoints::PGpointVec &__conf0;
 			double __energy;
 			int __i;
 		public:
-			DockedConf(Gpoints::Gpoint &cavpoint, Conformations::Conf &conf0, double energy, int i) 
+			DockedConf(Gpoints::Gpoint &cavpoint, Gpoints::PGpointVec &conf0, double energy, int i) 
 				: __cavpoint(cavpoint), __conf0(conf0), __energy(energy), __i(i) {}
 			Geom3D::Point& crd() { return __cavpoint.crd(); }
 			const Geom3D::Point& crd() const { return __cavpoint.crd(); }
 			void distance(const double) const {} // dummy
 			Gpoints::Gpoint &get_cavpoint() const { return __cavpoint; }
-			Conformations::Conf &get_conf0() const { return __conf0; }
+			Gpoints::PGpointVec &get_conf0() const { return __conf0; }
 			double get_energy() const { return __energy; }
 			int get_i() const { return __i; }
 			struct by_energy {

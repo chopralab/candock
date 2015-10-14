@@ -92,7 +92,7 @@ namespace Linker {
 		bool __clashes_ligand(const State &current, 
 			const Partial &conformation, const State &prev) const;
 		Geom3D::Point::Vec __rotate(const Geom3D::Quaternion &q, const Geom3D::Point &p1, 
-			const Geom3D::Point &p2, const Geom3D::Point::Vec &crds);
+			const Geom3D::Point::Vec &crds);
 
 		void __create_states(const Segment::Graph &segment_graph, const Molib::NRset &top_seeds);
 		Array2d<bool> __find_compatible_state_pairs(const Seed::Graph &seed_graph, const int sz);
@@ -121,7 +121,7 @@ namespace Linker {
 			const double max_allow_energy, bool iterative, const int max_num_possibles) : 
 			__modeler(modeler), __receptor(receptor), __ligand(ligand), 
 			__top_seeds(top_seeds), __gridrec(gridrec), __score(score), __ic(ic), 
-			__dist_cutoff(dist_cutoff), __spin_degrees(Geom3D::radians(spin_degrees / 2)), 
+			__dist_cutoff(dist_cutoff), __spin_degrees(Geom3D::radians(spin_degrees / 2)), // it needs to be divided by two due to quaternion rotation (it seems to double the angles)..
 			__tol_seed_dist(tol_seed_dist), __max_possible_conf(max_possible_conf),
 			__link_iter(link_iter), __clash_coeff(clash_coeff), __docked_clus_rad(docked_clus_rad),
 			__max_allow_energy(max_allow_energy), __iterative(iterative), __max_num_possibles(max_num_possibles) {}

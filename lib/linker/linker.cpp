@@ -111,7 +111,7 @@ namespace Linker {
 	}
 	
 	Geom3D::Point::Vec Linker::__rotate(const Geom3D::Quaternion &q, 
-		const Geom3D::Point &p1, const Geom3D::Point &p2, const Geom3D::Point::Vec &crds) {
+		const Geom3D::Point &p1, const Geom3D::Point::Vec &crds) {
 
 		Geom3D::Point::Vec rotated;
 		for (auto &crd : crds) {	
@@ -160,7 +160,7 @@ namespace Linker {
 		for (double angle = __spin_degrees; angle < M_PI; angle += __spin_degrees) {
 			State &previous_rotated = *states.back();
 			states.push_back(unique_ptr<State>(new State(next, 
-				__rotate(q, crd2, crd3, previous_rotated.get_crds()))));
+				__rotate(q, crd2, previous_rotated.get_crds()))));
 			dbgmsg("rotated state at angle = " << Geom3D::degrees(angle)
 				<< " is " << *states.back());
 		}

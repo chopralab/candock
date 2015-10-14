@@ -1,6 +1,7 @@
 #include "geom3d.hpp"
 #include "helper/debug.hpp"
 #include <assert.h>
+#include <algorithm>
 
 namespace Geom3D {
 	double degrees(double radians) { return radians * 57.29577951308232286465; }
@@ -50,6 +51,10 @@ namespace Geom3D {
 		return sum_squared / crds1.size();
 	}
 
+	double compute_rmsd(const Point::Vec &crds1, const Point::Vec &crds2) { 
+		return sqrt(Geom3D::compute_rmsd_sq(crds1, crds2)); 
+	}
+
 	Point compute_geometric_center(const Geom3D::Point::Vec &crds) { 
 		Geom3D::Point center;
 		for (auto &crd : crds) {
@@ -59,18 +64,47 @@ namespace Geom3D {
 		return center;
 	}
 
+	/**
+	 * Distribute n points on a sphere evenly.
+	 */
+	Point::Vec uniform_sphere(const int n) { 
+
+		struct c_unique {
+			double first, last, d;
+			int i;
+			c_unique(double f, double l, int n) { first = f; last = l; i = 0; d = (last - first) / n; }
+			double operator()() {return first + d * (++i);}
+		} UniqueNumber(1 - 1.0 / n, 1.0 / n - 1, n);
+		
+		vector<double> z(n);
+		generate(z.begin(), z.end(), UniqueNumber);
+		
+		double golden_angle = M_PI * (3 - sqrt(5));
+
+		vector<double> theta;
+		for (int i = 0; i < n; ++i) theta.push_back(golden_angle * i);
+
+		Point::Vec points;
+		for (int i = 0; i < n; ++i) {
+			double radius = sqrt(1 - z[i] * z[i]);
+			points.push_back(Point(radius * cos(theta[i]), radius * sin(theta[i]), z[i]));
+		}
+		return points;
+	}
+
+
+
+	ostream& operator<<(ostream& os, const Geom3D::Point::Vec &points)	{
+		for (auto &point : points) {
+			os << "ATOM      1   U  DIK     1    " << point.pdb() << endl;
+		}
+		return os;
+	}	
+	ostream& operator<<(ostream& os, const Geom3D::Point::ConstSet &points)	{
+		for (auto &point : points) {
+			os << "ATOM      1   U  DIK     1    " << point->pdb() << endl;
+		}
+		return os;
+	}	
 
 };
-
-ostream& operator<<(ostream& os, const Geom3D::Point::Vec &points)	{
-	for (auto &point : points) {
-		os << "ATOM      1   U  DIK     1    " << point.pdb() << endl;
-	}
-	return os;
-}	
-ostream& operator<<(ostream& os, const Geom3D::Point::ConstSet &points)	{
-	for (auto &point : points) {
-		os << "ATOM      1   U  DIK     1    " << point->pdb() << endl;
-	}
-	return os;
-}	

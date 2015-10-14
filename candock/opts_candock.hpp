@@ -87,7 +87,8 @@ class CmdLnOpts {
 
 	int __num_bsites;
 	double __grid_spacing;
-	int __min_num_conf;
+	int __num_univec;
+	double __conf_spin;
 	double __excluded_radius;
 	double __max_interatomic_distance;
 
@@ -214,7 +215,8 @@ public:
 			TCLAP::ValueArg<int> num_bsitesArg("","num_bsites","Maximum number of predicted (or given) binding sites to consider for docking (default is 3)",false,3,"int", cmd);
 			
 			TCLAP::ValueArg<double> grid_spacingArg("","grid","Grid spacing (default is 0.5)",false,0.5,"double", cmd);
-			TCLAP::ValueArg<int> min_num_confArg("","min_num_conf","Minimum number of conformations for each fragment (default is 1000)",false,1000,"int", cmd);
+			TCLAP::ValueArg<int> num_univecArg("","num_univec","Number of unit vectors evenly distributed on a sphere for conformation generation (default is 256)",false,256,"int", cmd);
+			TCLAP::ValueArg<double> conf_spinArg("","conf_spin","Spin degrees for conformation generation (default is 10)",false,10,"double", cmd);
 
 			TCLAP::ValueArg<double> excluded_radiusArg("","excluded","Excluded radius (default is 0.8)",false,0.8,"double", cmd);
 			TCLAP::ValueArg<double> max_interatomic_distanceArg("","interatomic","Maximum interatomic distance (default is 8.0)",false,8.0,"double", cmd);
@@ -295,7 +297,8 @@ public:
 			
 			__num_bsites = num_bsitesArg.getValue();
 			__grid_spacing = grid_spacingArg.getValue();
-			__min_num_conf = min_num_confArg.getValue();
+			__num_univec = num_univecArg.getValue();
+			__conf_spin = conf_spinArg.getValue();
 			__excluded_radius = excluded_radiusArg.getValue();
 			__max_interatomic_distance = max_interatomic_distanceArg.getValue();
 			//~ __top_percent = top_percentArg.getValue();
@@ -378,7 +381,8 @@ public:
 	
 	int num_bsites() const { return __num_bsites; }
 	double grid_spacing() const { return __grid_spacing; }
-	int min_num_conf() const { return __min_num_conf; }
+	int num_univec() const { return __num_univec; }
+	double conf_spin() const { return __conf_spin; }
 	double excluded_radius() const { return __excluded_radius; }
 	double max_interatomic_distance() const { return __max_interatomic_distance; }
 	//~ double top_percent() const { return __top_percent; }

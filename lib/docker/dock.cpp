@@ -16,13 +16,12 @@ namespace Docker {
 
 	double Dock::DockedConf::compute_rmsd(const Dock::DockedConf &other) const {
 		
-		double sum_sq(0);
-		for (int i = 0; i < this->__conf0.get_points().size(); ++i) {
-			Geom3D::Point crda = this->__cavpoint.crd() + this->__conf0.get_point(i).crd();
-			Geom3D::Point crdb = other.__cavpoint.crd() + other.__conf0.get_point(i).crd();
-			sum_sq += crda.distance_sq(crdb);
-		}
-		return sqrt(sum_sq / this->__conf0.get_points().size());
+		Gpoints::PGpointVec &points1 = this->get_conf0();
+		Gpoints::PGpointVec &points2 = other.get_conf0();
+		Geom3D::Point::Vec crds1, crds2;
+		for (auto &pp : points1) crds1.push_back(pp->crd());
+		for (auto &pp : points2) crds2.push_back(pp->crd());
+		return Geom3D::compute_rmsd(crds1, crds2);
 	}
 
 	void Dock::run() {
@@ -42,6 +41,8 @@ namespace Docker {
 		auto &confmap = __conformations.get_confmap();
 		Array1d<bool> rejected(conformations.size());
 
+		Molib::Atom::Vec seed_atoms = __seed.get_atoms();
+
 		// go over all cavity points
 		for (auto &kv : __gpoints.get_gridpoints()) {
 			for (auto &cavpoint : kv.second) {
@@ -49,14 +50,14 @@ namespace Docker {
 				// reset map of rejected conformations to zero
 				rejected.reset();
 				for (int c = 0; c < conformations.size(); ++c) {
-					Conformations::Conf &conf = conformations[c];
+					Gpoints::PGpointVec &conf = conformations[c];
 					// test if c-th conformation clashes with receptor: if yes, reject it
 					if (!rejected.data[c]) {
 						double energy_sum(0);
 						// go over coordinates of the c-th conformation
 						dbgmsg("testing conformation " << c);
-						for (int i = 0; i < conf.get_points().size(); ++i) {
-							Docker::Gpoints::Gpoint &gpoint0 = conf.get_point(i);
+						for (int i = 0; i < conf.size(); ++i) {
+							Docker::Gpoints::Gpoint &gpoint0 = *conf[i];
 							Docker::Gpoints::IJK confijk = cavpoint.ijk() + gpoint0.ijk();
 
 							dbgmsg("cavpoint.ijk() = " << cavpoint.ijk());
@@ -75,7 +76,7 @@ namespace Docker {
 								goto ESCAPE;
 							}
 							Docker::Gpoints::Gpoint *pgpoint = gmap.data[confijk.i][confijk.j][confijk.k];
-							Molib::Atom &atom = conf.get_atom(i);
+							Molib::Atom &atom = *seed_atoms[i];
 							energy_sum += pgpoint->energy(atom.idatm_type());
 						}
 						// if no clashes were found ...
@@ -144,15 +145,19 @@ namespace Docker {
 
 		Benchmark::reset();
 		
-		__docked.set_name(__seed.name()); // molecules name is seed_id
+		__docked.set_name(__seed.name()); // molecules(!) name is seed_id
+		
+		Molib::Atom::Vec seed_atoms = __seed.get_atoms();
+		
 		// go over all accepted conformations
 		for (auto &conf : confs) {
-			dbgmsg(" conformation size = " << conf.get_conf0().get_points().size() 
+			dbgmsg(" conformation size = " << conf.get_conf0().size() 
 				<< " energy = " << conf.get_energy());
 			// correct the seed's new coordinates and ...
-			for (int i = 0; i < conf.get_conf0().get_points().size(); ++i) {
-				Molib::Atom &atom = conf.get_conf0().get_atom(i);
-				Docker::Gpoints::Gpoint &gpoint0 = conf.get_conf0().get_point(i);
+			Gpoints::PGpointVec &points = conf.get_conf0();
+			for (int i = 0; i < points.size(); ++i) {
+				Molib::Atom &atom = *seed_atoms[i];
+				Docker::Gpoints::Gpoint &gpoint0 = *points[i];
 				atom.set_crd(conf.get_cavpoint().crd() + gpoint0.crd());
 			}
 			// save the conformation

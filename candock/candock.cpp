@@ -209,8 +209,10 @@ int main(int argc, char* argv[]) {
 							 * atom fixed on coordinate origin using maximum clique algorithm
 							 * 
 							 */
-							Docker::Conformations conf(seeds[j], gpoints0, cmdl.grid_spacing(),
-								cmdl.min_num_conf());
+							Docker::Conformations conf(seeds[j], gpoints0, 
+								cmdl.conf_spin(), // angstroms
+								cmdl.num_univec() // number of unit vectors
+								);
 
 #ifndef NDEBUG
 							inout::output_file(conf, "conf_" + seeds[j].name() + ".pdb"); 
