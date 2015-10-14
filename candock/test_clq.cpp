@@ -31,6 +31,7 @@ int main(int argc, char* argv[]) {
 		cmdl.init(argc, argv);
 		cmdl.display_time("started");
 		cout << cmdl << endl;
+		
 		/* Create empty output files
 		 * 
 		 */
@@ -146,7 +147,7 @@ int main(int argc, char* argv[]) {
 							 * 
 							 */
 							Docker::Conformations conf(seeds[j], gpoints0, 
-								cmdl.conf_spin(), // angstroms
+								cmdl.conf_spin(), // degrees
 								cmdl.num_univec() // number of unit vectors
 								);
 

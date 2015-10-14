@@ -210,7 +210,7 @@ int main(int argc, char* argv[]) {
 							 * 
 							 */
 							Docker::Conformations conf(seeds[j], gpoints0, 
-								cmdl.conf_spin(), // angstroms
+								cmdl.conf_spin(), // degrees
 								cmdl.num_univec() // number of unit vectors
 								);
 

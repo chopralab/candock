@@ -110,7 +110,7 @@ namespace Docker {
 			__rmsd.init(confs.size(), confs.size());
 			for (int i = 0; i < confs.size(); ++i) {
 				for (int j = i + 1; j < confs.size(); ++j) {
-					__rmsd.data[i][j] = __rmsd.data[j][i] = Geom3D::compute_rmsd(confs[i], confs[j]);
+					__rmsd.data[i][j] = __rmsd.data[j][i] = (float) Geom3D::compute_rmsd(confs[i], confs[j]);
 				}
 			}
 			dbgmsg("after rmsd calculation");

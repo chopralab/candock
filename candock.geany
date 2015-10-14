@@ -23,24 +23,25 @@ long_line_behaviour=1
 long_line_column=72
 
 [files]
-current_page=15
+current_page=4
 FILE_NAME_0=1182;Make;0;EUTF-8;1;1;0;%2Fhome%2Fkonc%2FDropbox%2Ftmp%2Fcandock%2Fcandock%2FMakefile;0;4
 FILE_NAME_1=351;Make;0;EUTF-8;1;1;0;%2Fhome%2Fkonc%2FDropbox%2Ftmp%2Fcandock%2Fcandock%2FMakefile.inc;0;4
 FILE_NAME_2=12432;C++;0;EUTF-8;1;1;0;%2Fhome%2Fkonc%2FDropbox%2Ftmp%2Fcandock%2Fcandock%2Fopts_candock.hpp;0;4
-FILE_NAME_3=7500;C++;0;EUTF-8;1;1;0;%2Fhome%2Fkonc%2FDropbox%2Ftmp%2Fcandock%2Fcandock%2Fcandock.cpp;0;4
-FILE_NAME_4=4618;C++;0;EUTF-8;1;1;0;%2Fhome%2Fkonc%2FDropbox%2Ftmp%2Fcandock%2Fcandock%2Ftest_clq.cpp;0;4
-FILE_NAME_5=2897;C++;0;EUTF-8;1;1;0;%2Fhome%2Fkonc%2FDropbox%2Ftmp%2Fcandock%2Flib%2Fdocker%2Fconformations.cpp;0;4
-FILE_NAME_6=832;C++;0;EUTF-8;1;1;0;%2Fhome%2Fkonc%2FDropbox%2Ftmp%2Fcandock%2Flib%2Fdocker%2Fconformations.hpp;0;4
-FILE_NAME_7=5531;C++;0;EUTF-8;1;1;0;%2Fhome%2Fkonc%2FDropbox%2Ftmp%2Fcandock%2Flib%2Fdocker%2Fdock.cpp;0;4
+FILE_NAME_3=7434;C++;0;EUTF-8;1;1;0;%2Fhome%2Fkonc%2FDropbox%2Ftmp%2Fcandock%2Fcandock%2Fcandock.cpp;0;4
+FILE_NAME_4=5429;C++;0;EUTF-8;1;1;0;%2Fhome%2Fkonc%2FDropbox%2Ftmp%2Fcandock%2Fcandock%2Ftest_clq.cpp;0;4
+FILE_NAME_5=3759;C++;0;EUTF-8;1;1;0;%2Fhome%2Fkonc%2FDropbox%2Ftmp%2Fcandock%2Flib%2Fdocker%2Fconformations.cpp;0;4
+FILE_NAME_6=834;C++;0;EUTF-8;1;1;0;%2Fhome%2Fkonc%2FDropbox%2Ftmp%2Fcandock%2Flib%2Fdocker%2Fconformations.hpp;0;4
+FILE_NAME_7=773;C++;0;EUTF-8;1;1;0;%2Fhome%2Fkonc%2FDropbox%2Ftmp%2Fcandock%2Flib%2Fdocker%2Fdock.cpp;0;4
 FILE_NAME_8=761;C++;0;EUTF-8;1;1;0;%2Fhome%2Fkonc%2FDropbox%2Ftmp%2Fcandock%2Flib%2Fdocker%2Fdock.hpp;0;4
-FILE_NAME_9=482;C++;0;EUTF-8;1;1;0;%2Fhome%2Fkonc%2FDropbox%2Ftmp%2Fcandock%2Flib%2Fdocker%2Fgpoints.cpp;0;4
-FILE_NAME_10=949;C++;0;EUTF-8;1;1;0;%2Fhome%2Fkonc%2FDropbox%2Ftmp%2Fcandock%2Flib%2Fdocker%2Fgpoints.hpp;0;4
+FILE_NAME_9=8385;C++;0;EUTF-8;1;1;0;%2Fhome%2Fkonc%2FDropbox%2Ftmp%2Fcandock%2Flib%2Fdocker%2Fgpoints.cpp;0;4
+FILE_NAME_10=2670;C++;0;EUTF-8;1;1;0;%2Fhome%2Fkonc%2FDropbox%2Ftmp%2Fcandock%2Flib%2Fdocker%2Fgpoints.hpp;0;4
 FILE_NAME_11=2015;C++;0;EUTF-8;1;1;0;%2Fhome%2Fkonc%2FDropbox%2Ftmp%2Fcandock%2Flib%2Fgeom3d%2Fgeom3d.cpp;0;4
 FILE_NAME_12=777;C++;0;EUTF-8;1;1;0;%2Fhome%2Fkonc%2FDropbox%2Ftmp%2Fcandock%2Flib%2Fgeom3d%2Fgeom3d.hpp;0;4
 FILE_NAME_13=3748;C++;0;EUTF-8;1;1;0;%2Fhome%2Fkonc%2FDropbox%2Ftmp%2Fcandock%2Flib%2Fgeom3d%2Fcoordinate.hpp;0;4
 FILE_NAME_14=6738;C++;0;EUTF-8;1;1;0;%2Fhome%2Fkonc%2FDropbox%2Ftmp%2Fcandock%2Flib%2Flinker%2Flinker.cpp;0;4
 FILE_NAME_15=2920;C++;0;EUTF-8;1;1;0;%2Fhome%2Fkonc%2FDropbox%2Ftmp%2Fcandock%2Flib%2Flinker%2Flinker.hpp;0;4
 FILE_NAME_16=6540;C++;0;EUTF-8;1;1;0;%2Fhome%2Fkonc%2FDropbox%2Ftmp%2Fcandock%2Flib%2Fgeom3d%2Fquaternion.hpp;0;4
+FILE_NAME_17=0;C++;0;EUTF-8;1;1;0;%2Fhome%2Fkonc%2FDropbox%2Ftmp%2Fcandock%2Flib%2Fhelper%2Farray3d.hpp;0;4
 
 [VTE]
 last_dir=/home/konc
