@@ -17,34 +17,6 @@
 using namespace std;
 
 namespace genbio {
-	void make_geo(Molib::Molecule &molecule) {
-		for (auto &assembly : molecule) {
-			for (auto &model : assembly) {
-				for (auto &chain : model) {
-					chain.set_crd(); // set geom. centers of the chain and its residues recursively
-					unsigned int csz = chain.size();
-					Molib::Residue::res_type crest = Molib::Residue::notassigned;
-					chain.remove_if([](const Molib::Residue &r){ return r.rest() == Molib::Residue::protein; });
-					if (csz != chain.size()) {
-						crest = Molib::Residue::protein;
-					} else {
-						chain.remove_if([](const Molib::Residue &r){ return r.rest() == Molib::Residue::nucleic; });
-						if (csz != chain.size()) crest = Molib::Residue::nucleic;
-					}
-					if (crest != Molib::Residue::notassigned) { // the chain was either a protein or nucleic so add one atom with geometric center of this chain
-						Molib::Residue &residue = chain.add(new Molib::Residue((crest == Molib::Residue::protein ? "PPP" : "NNN"), -999, ' ', crest));
-						residue.add(new Molib::Atom(1, "GEO", chain.crd(), 1));
-					}
-					for (auto &residue : chain) { // deal with hetero, ions, and waters
-						if (residue.rest() == Molib::Residue::water || residue.rest() == Molib::Residue::ion || residue.rest() == Molib::Residue::hetero) {
-							residue.clear(); // delete all atoms
-							residue.add(new Molib::Atom(1, "GEO", residue.crd(), 1)); // replace by a single atom
-						}
-					}
-				}
-			}
-		}
-	}
 	void remove_chains(Molib::Molecules &mols, const vector<string> &aligned_chains) {
 		int i = 0;
 		for (auto &molecule : mols) {
@@ -155,7 +127,7 @@ namespace genbio {
 		const string &pdb_dirname, const string &qpdb_file, const string &qcid,
 		const bool neighb, const bool rnolig, const string &bio, const bool ralch,
 		const string &json_file, const string &bio_file, const bool noalch,
-		const string &geo_file, const string &mols_name, const bool rasym) {
+		const string &mols_name, const bool rasym) {
 
 		JsonReader jr;
 		Molib::Atom::Grid query_grid;
@@ -218,12 +190,6 @@ namespace genbio {
 			for (auto &molecule : mols) {
 				genbio::remove_asymmetric_unit(molecule);
 			}
-		}
-		if (!geo_file.empty()) {
-			for (auto &molecule : mols) {
-				genbio::make_geo(molecule); // calculate geometric centers of residues and chains
-			}
-			inout::output_file(mols, geo_file); // output rotated bio assemblies (or asymmetric units if NO bioassembly)
 		}
 	}
 };

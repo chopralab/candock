@@ -14,7 +14,6 @@ using namespace std;
 class CmdLnOpts {
 	string __infile;
 	string __biofile;
-	string __geofile;
 	string __mols_name;
 	string __qpdb_file;
 	string __qcid;
@@ -38,7 +37,6 @@ public:
 			TCLAP::CmdLine cmd("Command description message", ' ', __version);
 			TCLAP::SwitchArg quietSwitch("q","quiet","Quiet mode (default is verbose)", cmd, false);
 			TCLAP::ValueArg<string> biofileArg("","biofile","Output biological units to this pdb file",false,"","string", cmd);
-			TCLAP::ValueArg<string> geofileArg("","geofile","Reduce the proteins to geometric centers of protein or nucleic acid chains, and water, ions, or hetero and output geometric centers to this pdb file",false,"","string", cmd);
 			TCLAP::ValueArg<string> mols_nameArg("","mols_name","Stem name of representative",false,"","string", cmd);
 			vector<string> allowedModels{"all","first"};
 			TCLAP::ValuesConstraint<string> allowedValsModels( allowedModels );
@@ -59,7 +57,6 @@ public:
 			//~ Parse the argv array.
 			cmd.parse(argc, argv);
 			__biofile = biofileArg.getValue();
-			__geofile = geofileArg.getValue();
 			__mols_name = mols_nameArg.getValue();
 			__infile = infileArg.getValue();
 			__bio = bioArg.getValue();
@@ -86,7 +83,6 @@ public:
 	}
 	// interface
 	string biofile() const {return __biofile; }
-	string geofile() const {return __geofile; }
 	string mols_name() const {return __mols_name; }
 	string infile() const {return __infile; }
 	string qpdb_file() const { return __qpdb_file; }

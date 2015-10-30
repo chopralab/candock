@@ -25,7 +25,7 @@ int main(int argc, char *argv[]) {
 		genbio::generate_biological_assemblies(cmdl.models(), cmdl.hydrogens(),
 			cmdl.pdb_dirname(), cmdl.qpdb_file(), cmdl.qcid(), cmdl.neighb(),
 			cmdl.rnolig(), cmdl.bio(), cmdl.ralch(), cmdl.infile(), cmdl.biofile(),
-			cmdl.noalch(), cmdl.geofile(), cmdl.mols_name(), cmdl.rasym());
+			cmdl.noalch(), cmdl.mols_name(), cmdl.rasym());
 	}
 	catch (exception& e) {
 		cerr << e.what() << endl;

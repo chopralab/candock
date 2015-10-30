@@ -27,6 +27,7 @@ CmdLnOpts cmdl;
 
 int main(int argc, char* argv[]) {
 	try {
+
 		cmdl.init(argc, argv);
 		cmdl.display_time("started");
 		cout << cmdl << endl;

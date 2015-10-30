@@ -93,7 +93,7 @@ class CmdLnOpts {
 	//~ double __top_percent;
 
 	double __clus_rad;
-	int __num_iter;
+	//~ int __num_iter;
 
 	int __ncpu;
 	
@@ -220,10 +220,9 @@ public:
 
 			TCLAP::ValueArg<double> clus_radArg("","clus_rad","Cluster radius for docked seeds (default is 2.0)",false,2.0,"double", cmd);
 
-			TCLAP::ValueArg<int> num_iterArg("","num_iter","Number of iterations for maximum weight clique algorithm (default is 1000)",false,1000,"int", cmd);
+			//~ TCLAP::ValueArg<int> num_iterArg("","num_iter","Number of iterations for maximum weight clique algorithm (default is 1000)",false,1000,"int", cmd);
 
 			TCLAP::ValueArg<int> ncpuArg("","ncpu","Number of CPUs to use concurrently (default is 1)",false,1,"int", cmd);
-			TCLAP::SwitchArg pluginSwitch("","plugin","Plugin option", cmd, false); // da spusti skozi
 
 			cmd.parse( argc, argv );
 			__quiet = quietSwitch.getValue();
@@ -298,8 +297,8 @@ public:
 			__max_interatomic_distance = max_interatomic_distanceArg.getValue();
 			//~ __top_percent = top_percentArg.getValue();
 			__clus_rad = clus_radArg.getValue();
-			
-			__num_iter = num_iterArg.getValue();
+
+			//~ __num_iter = num_iterArg.getValue();
 			__ncpu = ncpuArg.getValue();
 		} 
 		catch (TCLAP::ArgException &e) { 
@@ -381,8 +380,8 @@ public:
 	double max_interatomic_distance() const { return __max_interatomic_distance; }
 	//~ double top_percent() const { return __top_percent; }
 	double clus_rad() const { return __clus_rad; }
-	
-	int num_iter() const { return __num_iter; }
+
+	//~ int num_iter() const { return __num_iter; }
 	int ncpu() const { return __ncpu; }
 	
 	friend ostream& operator<< (ostream& stream, const CmdLnOpts &cmdl) {
