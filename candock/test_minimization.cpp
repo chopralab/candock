@@ -100,7 +100,7 @@ int main(int argc, char* argv[]) {
 				 * Minimize system
 				 */
 				
-				ligand.set_name("org");
+				//~ ligand.set_name("org");
 
 				OMMIface::Modeler modeler(ffield, cmdl.fftype(), cmdl.dist_cutoff(),
 					cmdl.tolerance(), cmdl.max_iterations(), cmdl.update_freq(), cmdl.position_tolerance(),
@@ -144,7 +144,7 @@ int main(int argc, char* argv[]) {
 				const double energy = score.non_bonded_energy(gridrec, minimized_ligand);
 				
 				inout::output_file(Molib::Molecule::print_complex(minimized_ligand, minimized_receptor, energy), 
-					"org_" + cmdl.mini_file(), ios_base::app);
+					cmdl.mini_file(), ios_base::app);
 				
 				//~ /**
 				 //~ * This section is a test to see if you can change positions 

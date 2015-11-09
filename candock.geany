@@ -23,12 +23,16 @@ long_line_behaviour=1
 long_line_column=72
 
 [files]
-current_page=4
-FILE_NAME_0=20;Make;0;EUTF-8;1;1;0;%2Fhome%2Fkonc%2FDropbox%2Ftmp%2Fcandock%2Fcandock%2FMakefile;0;4
+current_page=8
+FILE_NAME_0=1718;Make;0;EUTF-8;1;1;0;%2Fhome%2Fkonc%2FDropbox%2Ftmp%2Fcandock%2Fcandock%2FMakefile;0;4
 FILE_NAME_1=351;Make;0;EUTF-8;1;1;0;%2Fhome%2Fkonc%2FDropbox%2Ftmp%2Fcandock%2Fcandock%2FMakefile.inc;0;4
-FILE_NAME_2=22;C++;0;EUTF-8;1;1;0;%2Fhome%2Fkonc%2FDropbox%2Ftmp%2Fcandock%2Fcandock%2Fopts_candock.hpp;0;4
-FILE_NAME_3=802;C++;0;EUTF-8;1;1;0;%2Fhome%2Fkonc%2FDropbox%2Ftmp%2Fcandock%2Fcandock%2Fcandock.cpp;0;4
-FILE_NAME_4=0;C++;0;EUTF-8;1;1;0;%2Fhome%2Fkonc%2FDropbox%2Ftmp%2Fcandock%2Fcandock%2Ftest_bsite.cpp;0;4
+FILE_NAME_2=9283;C++;0;EUTF-8;1;1;0;%2Fhome%2Fkonc%2FDropbox%2Ftmp%2Fcandock%2Fcandock%2Fopts_candock.hpp;0;4
+FILE_NAME_3=467;C++;0;EUTF-8;1;1;0;%2Fhome%2Fkonc%2FDropbox%2Ftmp%2Fcandock%2Fcandock%2Ftest_bsite.cpp;0;4
+FILE_NAME_4=10831;C++;0;EUTF-8;1;1;0;%2Fhome%2Fkonc%2FDropbox%2Ftmp%2Fcandock%2Fcandock%2Fcandock.cpp;0;4
+FILE_NAME_5=540;C++;0;EUTF-8;1;1;0;%2Fhome%2Fkonc%2FDropbox%2Ftmp%2Fcandock%2Fcandock%2Ftest_singlepoint.cpp;0;4
+FILE_NAME_6=2949;C++;0;EUTF-8;1;1;0;%2Fhome%2Fkonc%2FDropbox%2Ftmp%2Fcandock%2Fcandock%2Ftest_minimization.cpp;0;4
+FILE_NAME_7=22950;C++;0;EUTF-8;1;1;0;%2Fhome%2Fkonc%2FDropbox%2Ftmp%2Fcandock%2Flib%2Flinker%2Flinker.cpp;0;4
+FILE_NAME_8=0;C++;0;EUTF-8;1;1;0;%2Fhome%2Fkonc%2FDropbox%2Ftmp%2Fcandock%2Flib%2Flinker%2Flinker.hpp;0;4
 
 [VTE]
 last_dir=/home/konc
