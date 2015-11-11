@@ -35,7 +35,6 @@ int main(int argc, char* argv[]) {
 		/* Create empty output files
 		 * 
 		 */
-		inout::output_file("", cmdl.docked_seeds_file()); // output docked & filtered fragment poses
 
 		/* Identify potential binding sites using ProBiS algorithm
 		 * or alternatively set binding sites from file
@@ -137,7 +136,11 @@ int main(int argc, char* argv[]) {
 		threads.clear();
 		for(int i = 0; i < cmdl.ncpu(); ++i) {
 			threads.push_back(
+#ifndef NDEBUG
 				thread([&seeds, &gridrec, &score, &gpoints0, &gpoints, i] () {
+#else
+				thread([&seeds, &gpoints0, &gpoints, i] () {
+#endif
 					// iterate over seeds and dock unique seeds
 					for (int j = i; j < seeds.size(); j+= cmdl.ncpu()) {
 						try {
@@ -159,8 +162,11 @@ int main(int argc, char* argv[]) {
 							 * only best-scored cluster representatives
 							 *
 							 */
+#ifndef NDEBUG
+							Docker::Dock dock(gpoints, conf, seeds[j], score, gridrec, cmdl.clus_rad());
+#else
 							Docker::Dock dock(gpoints, conf, seeds[j], cmdl.clus_rad());
-
+#endif
 							dock.run();
 
 							inout::output_file(dock.get_docked(), cmdl.top_seeds_dir() + "/" + dock.get_docked().name() + "/" 

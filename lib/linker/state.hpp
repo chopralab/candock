@@ -43,7 +43,7 @@ namespace Linker {
 		const Geom3D::Point::Vec& get_crds() const { return __crds; }			
 		Geom3D::Point::Vec& get_crds() { return __crds; }			
 		const Geom3D::Point& get_crd(const int i) const { return __crds[i]; }
-		bool clashes(const State &other, const Molib::Bond &excluded, const double clash_coeff) const; // clashes between this and other state
+		bool clashes(const State &other, const double clash_coeff) const; // clashes between this and other state
 		string pdb() const;
 		void set_id(Id id) { __id = id; }
 		const Id get_id() const { return __id; }

@@ -46,15 +46,24 @@ namespace Docker {
 
 		Molib::Molecules __docked;
 
+#ifndef NDEBUG
+		Molib::Score &__score;
+		Molib::Atom::Grid &__gridrec;
+#endif
 		DockedConf::Vec __dock();
 		DockedConf::Vec __cluster(const DockedConf::Vec &confs);
 		void __cluster_fast(const DockedConf::Vec &conformations, DockedConf::Vec &reps);
 		void __set_docked(const DockedConf::Vec &confs);
 		
 	public:
-		Dock(Gpoints &gpoints, Conformations &conformations,
-			Molib::Molecule &seed, const double rmsd_tol=2.0) : __gpoints(gpoints),
-			__conformations(conformations), __seed(seed), __rmsd_tol(rmsd_tol) {}
+#ifndef NDEBUG
+		Dock(Gpoints &gpoints, Conformations &conformations, Molib::Molecule &seed, Molib::Score &score, 
+			Molib::Atom::Grid &gridrec, const double rmsd_tol=2.0) : __gpoints(gpoints), __conformations(conformations), 
+			__seed(seed), __score(score), __gridrec(gridrec), __rmsd_tol(rmsd_tol) {}
+#else
+		Dock(Gpoints &gpoints, Conformations &conformations, Molib::Molecule &seed, const double rmsd_tol=2.0) 
+			: __gpoints(gpoints), __conformations(conformations), __seed(seed), __rmsd_tol(rmsd_tol) {}
+#endif
 		void run();
 		Molib::Molecules& get_docked() { return __docked; };
 	};

@@ -201,7 +201,7 @@ int main(int argc, char* argv[]) {
 
 							} catch(Linker::Linker::ConnectionError &e) {
 								cerr << "ConnectionError: skipping ligand " << ligand.name() << " due to : " << e.what() << endl;
-							}
+							} 
 							catch(OMMIface::Modeler::MinimizationError &e) {
 								cerr << "MinimizationError: skipping ligand " << ligand.name() << " due to : " << e.what() << endl;								
 							}

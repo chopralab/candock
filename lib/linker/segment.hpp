@@ -34,7 +34,7 @@ namespace Linker {
 		map<const Segment*, double> __max_linker_length;
 		map<const Segment*, Molib::Bond> __bond;
 		map<const Segment*, Segment*> __next;
-		vector<bool> __join_atom;
+		vector<bool> __join_atom, __common_atom;
 
 		Segment(const Molib::Atom::Vec atoms, const int &seed_id, const Segment::Id idx);
 		static Paths __find_paths(const vector<unique_ptr<Segment>> &segments);
@@ -73,6 +73,8 @@ namespace Linker {
 		const Id get_id() const { return __id; }
 		void set_join_atom(const Molib::Atom &atom) { __join_atom[get_idx(atom)] = true; }
 		bool is_join_atom(const int i) const { return __join_atom[i]; }
+		void set_common_atom(const Molib::Atom &atom) { __common_atom[get_idx(atom)] = true; }
+		bool is_common_atom(const int i) const { return __common_atom[i]; }
 		friend ostream& operator<< (ostream& stream, const Segment& s);
 		
 		static Graph create_graph(const Molib::Molecule &molecule);

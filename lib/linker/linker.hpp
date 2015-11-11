@@ -100,7 +100,6 @@ namespace Linker {
 		Partial::Vec __generate_rigid_conformations(const Seed::Graph &seed_graph);
 		DockedConformation __reconstruct(const Partial &conformation);
 
-		DockedConformation::Vec __connect(const int segment_graph_size, const Partial::Vec &possibles);
 		bool __has_blacklisted(const State::Vec &conformation, const set<State::ConstPair> &blacklist);
 		bool __check_distances_to_seeds(const State &curr_state, 
 			const Segment &adjacent, const SegStateMap &docked_seeds);
@@ -125,7 +124,6 @@ namespace Linker {
 			__tol_seed_dist(tol_seed_dist), __max_possible_conf(max_possible_conf),
 			__link_iter(link_iter), __clash_coeff(clash_coeff), __docked_clus_rad(docked_clus_rad),
 			__max_allow_energy(max_allow_energy), __iterative(iterative), __max_num_possibles(max_num_possibles) {}
-		DockedConformation::Vec connect();
 		Partial::Vec init_conformations();
 		DockedConformation compute_conformation(const Partial &partial);
 	};

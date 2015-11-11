@@ -32,6 +32,8 @@ namespace Molib {
 		Molecules mols; 
 		p->parse_molecule(mols); 
 		dbgmsg("PARSED MOLECULES : " << endl << mols);
+		if (mols.empty())
+			throw Error("die : could not read molecules from file");
 		return mols; 
 	}
 	

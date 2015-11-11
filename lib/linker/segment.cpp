@@ -11,7 +11,8 @@ namespace Linker {
 	}
 
 	Segment::Segment(const Molib::Atom::Vec atoms, const int &seed_id, const Segment::Id idx) 
-		: __atoms(atoms), __seed_id(seed_id), __id(idx), __join_atom(atoms.size(), false) { 
+		: __atoms(atoms), __seed_id(seed_id), __id(idx), __join_atom(atoms.size(), false), 
+		__common_atom(atoms.size(), false) { 
 
 		for (int i = 0; i < atoms.size(); ++i) 
 			__amap[atoms[i]] = i; 
@@ -59,11 +60,23 @@ namespace Linker {
 				Segment &s2 = *vertices[j];
 				auto inter = Glib::intersection(s1.get_atoms(), s2.get_atoms());
 				dbgmsg(s1.get_atoms().size() << " " << s2.get_atoms().size() << " " << inter.size());
-				if (inter.size() == 2) {
+				if (inter.size() == 1) {
+
+					auto &atom = **inter.begin();
+					s1.set_common_atom(atom);
+					s2.set_common_atom(atom);
+
+				} else if (inter.size() == 2) {
 					s1.add(&s2);
 					s2.add(&s1);
 					auto &atom1 = **inter.begin();
 					auto &atom2 = **inter.rbegin();
+
+					s1.set_common_atom(atom1);
+					s2.set_common_atom(atom1);
+					s1.set_common_atom(atom2);
+					s2.set_common_atom(atom2);
+
 					int num_bonds = 0; 
 					for (auto &adj : atom1) {
 						if (s1.has_atom(adj))

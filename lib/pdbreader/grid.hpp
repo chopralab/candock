@@ -145,8 +145,8 @@ public:
 
 	template<typename U>
 	Points get_neighbors_within_tolerance(const U &point, const double &dist, const double &tol) {
-		Geom3D::Coordinate cmin = __correct(point, -dist);
-		Geom3D::Coordinate cmax = __correct(point, dist);
+		Geom3D::Coordinate cmin = __correct(point, -(dist + tol));
+		Geom3D::Coordinate cmax = __correct(point, dist + tol);
 		Points points;
 		const double dist_sq_max = pow(dist + tol, 2);
 		const double dist_sq_min = pow(dist - tol, 2);

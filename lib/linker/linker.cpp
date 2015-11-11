@@ -87,12 +87,11 @@ namespace Linker {
 	bool Linker::__clashes_ligand(const State &current, 
 		const Partial &conformation, const State &prev) const {
 
-		const Molib::Bond &excluded = current.get_segment().get_bond(prev.get_segment());
 		// clashes between current segment and previous segments
 		for (auto &pstate : conformation.get_states()) {
 			dbgmsg("clashes_ligand test for state " << current 
 				<< " and state " << *pstate);
-			if (current.clashes(*pstate, excluded, __clash_coeff)) 
+			if (current.clashes(*pstate, __clash_coeff)) 
 				return true;
 		}
 		return false;
@@ -318,10 +317,25 @@ namespace Linker {
 							Partial next_conformation(curr_conformation);
 							next_conformation.add_state(*pneighbor);
 
-							// compute energy with original (static) receptor structure
-							const double energy = __score.non_bonded_energy(__gridrec, next_conformation.get_ligand_atoms(), next_conformation.get_ligand_crds());
+							// compute energy with original (static) receptor structure, use expensive non_bonded_energy calculation only for linkers
+							const double energy = curr_conformation.get_energy() +
+								(pneighbor->get_energy() == 0 ? __score.non_bonded_energy(__gridrec, pneighbor->get_segment().get_atoms(), pneighbor->get_crds()) 
+								: pneighbor->get_energy());
 
 							next_conformation.set_energy(energy);
+#ifndef NDEBUG
+							// TEST if energy determined in a different way is the same
+							double ene = 0.0, ene2 = 0.0;
+							for (auto &pstate : next_conformation.get_states()) {
+								if (pstate->get_energy() == 0) {
+									ene += __score.non_bonded_energy(__gridrec, pstate->get_segment().get_atoms(), pstate->get_crds());
+								} else {
+									ene += pstate->get_energy();
+									ene2 += pstate->get_energy();
+								}
+							}
+							dbgmsg("ene = " << ene << " ene2 = " << ene2 << " energy = " << energy);
+#endif
 
 							dbgmsg("accepting state " << *pneighbor);
 							openset.insert(next_conformation);
@@ -339,6 +353,19 @@ namespace Linker {
 			throw ConnectionError("die : could not connect this conformation",
 				failed_state_pairs);
 		}
+
+#ifndef NDEBUG
+		DockedConformation mini = __reconstruct(min_conformation);
+		dbgmsg("ENERGY OF MINIMIZED LIGAND (reconstructed) = " << __score.non_bonded_energy(__gridrec, mini.get_ligand()));
+		dbgmsg("ENERGY OF MINIMIZED LIGAND (calculated) = " << 
+			__score.non_bonded_energy(__gridrec, min_conformation.get_ligand_atoms(), min_conformation.get_ligand_crds()));
+		dbgmsg("ENERGY OF MINIMIZED LIGAND (DockedConformation) = " << min_conformation.get_energy());
+		for (auto &pstate : min_conformation.get_states()) {
+			dbgmsg("seed " << pstate->get_segment().get_seed_id() << " original E = " << pstate->get_energy() 
+				<< " calculated E = " << __score.non_bonded_energy(__gridrec, pstate->get_segment().get_atoms(), pstate->get_crds()));
+		}
+
+#endif
 		return __reconstruct(min_conformation);
 	}
 	
@@ -463,26 +490,28 @@ namespace Linker {
 				const double max_linker_length = segment1.get_max_linker_length(segment2);
 				Molib::Atom::Pair jatoms{&segment1.get_bond(segment1.get_next(segment2)).atom1(), 
 					&segment2.get_bond(segment2.get_next(segment1)).atom1()};
+#ifndef NDEBUG
 				const Molib::Bond &excluded = (segment1.is_adjacent(segment2) 
 					? segment1.get_bond(segment2) : Molib::Bond());
 				dbgmsg("finding compatible state pairs for segments " << segment1 << " and " 
 					<< segment2 << " with maximum linker length " << max_linker_length << " and "
 					<< " join atom1 = " << jatoms.first->atom_number() << " join atom2 = "
 					<< jatoms.second->atom_number() << " excluded = " << excluded);
+#endif
 				for (auto &pstate1 : segment1.get_states()) {
 					State &state1 = *pstate1;
 					State::Set join_states = poses.get_join_states(state1, segment2, jatoms, 
 						max_linker_length, __tol_seed_dist);
 
 					const int i = state1.get_id();
-					//~ // dbgmsg("state1(" << i << ") = " << state1);
+					dbgmsg("comparing state1(" << i << ") = " << state1);
 					for (auto &pstate2 : join_states) {
-						//~ // dbgmsg("state2(" << pstate2->get_id() << ") = " << *pstate2);
-						if (!state1.clashes(*pstate2, excluded, __clash_coeff)) {
+						dbgmsg("with state2(" << pstate2->get_id() << ") = " << *pstate2);
+						if (!state1.clashes(*pstate2, __clash_coeff)) {
 							const int j = pstate2->get_id();
 							conn.set(i, j);
 							conn.set(j, i);
-							//~ dbgmsg("compatible states " << i << " and " << j);
+							dbgmsg("compatible states " << i << " and " << j);
 						}
 					}
 				}
@@ -584,35 +613,6 @@ namespace Linker {
 		return clustered_possibles_w_energy;
 	}
 	
-	DockedConformation::Vec Linker::connect() {
-		Benchmark::reset();
-		cout << "Starting connection of seeds for ligand " << __ligand.name() << endl;
-		
-		Segment::Graph segment_graph = Segment::create_graph(__ligand);
-		if (!segment_graph.find_cycles_connected_graph().empty()) {
-			throw Error("die : cyclic molecules are currently not supported");
-		}
-		dbgmsg("segment graph for ligand " << __ligand.name() << " = " << segment_graph);
-		__create_states(segment_graph, __top_seeds);
-		
-		const Seed::Graph seed_graph = Seed::create_graph(segment_graph);
-		dbgmsg("seed graph for ligand " << __ligand.name() << " = " << seed_graph);
-		
-		const Partial::Vec possible_states = __generate_rigid_conformations(seed_graph);
-
-		//help::memusage("before connect");
-
-		DockedConformation::Vec docked_confs = __connect(segment_graph.size(), possible_states);
-
-		//help::memusage("after connect");
-		
-		cout << "Connection of seeds for ligand " << __ligand.name() 
-			<< " resulted in " << docked_confs.size() 
-			<< " conformations and took " 
-			<< Benchmark::seconds_from_start() << " wallclock seconds" << endl;
-		return docked_confs;
-	}
-
 	Partial::Vec Linker::init_conformations() {
 		Benchmark::reset();
 		cout << "Starting connection of seeds for ligand " << __ligand.name() << endl;
@@ -668,46 +668,6 @@ namespace Linker {
 		return false;
 	}
 
-	DockedConformation::Vec Linker::__connect(const int segment_graph_size, 
-		const Partial::Vec &possibles) {
-		
-		DockedConformation::Vec good_conformations;
-		set<State::ConstPair> blacklist;
-		
-		for (auto &le : possibles) {
-			auto &conformation = le.get_states();
-			double energy = le.get_energy();
-			
-			if (!__has_blacklisted(conformation, blacklist)) {
-				try {
-					Partial grow_link_energy(conformation, energy);
-					dbgmsg("connecting ligand " << __ligand.name() 
-						<< endl << "possible starting conformation is " << endl
-						<< grow_link_energy);
-					vector<unique_ptr<State>> states;
-					if (__iterative) {
-						good_conformations.push_back(__a_star_iterative(
-							segment_graph_size, grow_link_energy, states, __link_iter));
-					} else {
-						good_conformations.push_back(__a_star_static(
-							segment_graph_size, grow_link_energy, states, __link_iter));
-					}
-					dbgmsg("complete linked molecule" << endl 
-						<< good_conformations.back());
-					dbgmsg("good_conformations.size() = " << good_conformations.size());
-					dbgmsg("good_conformations.capacity() = " << good_conformations.capacity());
-					dbgmsg("states.size() = " << states.size());
-					dbgmsg("blacklist.size() = " << blacklist.size());
-				} catch (ConnectionError& e) {
-					dbgmsg("exception : " << e.what());
-					for (auto &failed_pair : e.get_failed_state_pairs())
-						blacklist.insert(failed_pair);
-				}
-			}
-		}
-		return good_conformations;
-	}
-	
 	DockedConformation Linker::__reconstruct(const Partial &conformation) {
 		Benchmark::reset();
 		cout << "Reconstructing docked ligands..." << endl;

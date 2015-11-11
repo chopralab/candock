@@ -24,13 +24,13 @@ namespace Linker {
 		return ss.str();
 	}
 	
-	bool State::clashes(const State &other, const Molib::Bond &excluded, const double clash_coeff) const { // clashes between this and other state
+	bool State::clashes(const State &other, const double clash_coeff) const { // clashes between this and other state
 		const int other_size = other.get_crds().size();
 		for (int i = 0; i < __crds.size(); ++i) {
 			const Geom3D::Point &crd1 = get_crd(i);
 			const Molib::Atom &a1 = __segment.get_atom(i);;
-			if (excluded.is_set() && (&a1 == &excluded.atom1() || &a1 == &excluded.atom2())) { 
-				dbgmsg("excluded state atom = " << a1.atom_number() 
+			if (__segment.is_common_atom(i)) {
+				dbgmsg("common state atom = " << a1.atom_number() 
 					<< " is not checked for clashes");
 				continue;
 			}
@@ -38,8 +38,8 @@ namespace Linker {
 			for (int j = 0; j < other_size; ++j) {
 				const Geom3D::Point &crd2 = other.get_crd(j);
 				const Molib::Atom &a2 = other.get_segment().get_atom(j);
-				if (excluded.is_set() && (&a2 == &excluded.atom1() || &a2 == &excluded.atom2())) { 
-					dbgmsg("excluded state atom = " << a2.atom_number() 
+				if (other.get_segment().is_common_atom(j)) { 
+					dbgmsg("common state atom = " << a2.atom_number() 
 						<< " is not checked for clashes");
 					continue;
 				}
