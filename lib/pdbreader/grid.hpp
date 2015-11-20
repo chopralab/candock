@@ -164,6 +164,26 @@ public:
 	}
 
 	template<typename U>
+	Points get_neighbors_within_tolerance_asymmetric(const U &point, const double &dist, const double &tol_down, const double &tol_up) {
+		Geom3D::Coordinate cmin = __correct(point, -(dist + tol_up));
+		Geom3D::Coordinate cmax = __correct(point, dist + tol_up);
+		Points points;
+		const double dist_sq_max = pow(dist + tol_up, 2);
+		const double dist_sq_min = pow(dist - tol_down, 2);
+		for (int i = cmin.i(); i <= cmax.i(); ++i)
+			for (int j = cmin.j(); j <= cmax.j(); ++j)
+				for (int k = cmin.k(); k <= cmax.k(); ++k) {
+					for (auto neighbor : storage[i][j][k]) {
+						const double d_sq = point.distance_sq(neighbor->crd());
+						if (d_sq < dist_sq_max && d_sq > dist_sq_min) {
+							points.push_back(neighbor);
+						}
+					}
+				}
+		return points;
+	}
+
+	template<typename U>
 	bool has_neighbor_within(const U &point, const double &dist) {
 		Geom3D::Coordinate cmin = __correct(point, -dist);
 		Geom3D::Coordinate cmax = __correct(point, dist);

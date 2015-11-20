@@ -77,6 +77,7 @@ namespace Linker {
 					s1.set_common_atom(atom2);
 					s2.set_common_atom(atom2);
 
+					// determine which atom of bond is in s1 and which in s2
 					int num_bonds = 0; 
 					for (auto &adj : atom1) {
 						if (s1.has_atom(adj))
@@ -170,45 +171,47 @@ namespace Linker {
 	}
 
 	void Segment::__compute_max_linker_length(Segment::Graph::Path &path) {
-
-		for (int i = 0; i < path.size() - 1; ++i) {
+		for (int j = 0; j < path.size() - 1; j++) {
 
 			double d = 0.0;
+			int i = j;
 			
-			const Molib::Bond &b1 = path[i]->get_bond(*path[i + 1]);
-			Molib::Atom *front_atom = (path[i]->has_atom(b1.atom1()) ? &b1.atom1() : &b1.atom2());
-
-			path[i]->set_max_linker_length(*path[i + 1], b1.length());
-			path[i + 1]->set_max_linker_length(*path[i], b1.length());
-
-			dbgmsg("max_linker_length between " << *path[i] << " and " 
-				<< *path[i + 1] << " = " << path[i]->get_max_linker_length(*path[i + 1]));
-			dbgmsg("MAX_linker_length between " << *path[i] << " and " 
-				<< *path[i + 1] << " = " << b1.length());
-
-			for (int j = i + 1; j < path.size() - 1; ++j) {
-
-				const Molib::Bond &b2 = path[j]->get_bond(*path[j + 1]);
-
-				Molib::Atom &b2_atom1 = (path[j]->has_atom(b2.atom1()) ? b2.atom1() : b2.atom2());
-				Molib::Atom &b2_atom2 = b2.second_atom(b2_atom1);
-		
-				double rigid_width = (*front_atom).crd().distance(b2_atom2.crd());
-				front_atom = &b2_atom2;
-
-				d += rigid_width;
-
-				path[i]->set_max_linker_length(*path[j + 1], d);
-				path[j + 1]->set_max_linker_length(*path[i], d);
+			Molib::Atom *front_atom = &path[i]->get_bond(*path[i + 1]).atom1();
+			
+			for (; i < path.size() - 2; i += 2) {
+				const Molib::Bond &b1 = path[i]->get_bond(*path[i + 1]);
+				const Molib::Bond &b2 = path[i + 1]->get_bond(*path[i + 2]);
+				path[j]->set_max_linker_length(*path[i + 1], d + b1.length());
+				path[i + 1]->set_max_linker_length(*path[j], d + b1.length());
 				
-				dbgmsg("max_linker_length between " << *path[i] << " and " 
-					<< *path[j + 1] << " = " << path[i]->get_max_linker_length(*path[j + 1]));
-				dbgmsg("MAX_linker_length between " << *path[i] << " and " 
-					<< *path[j + 1] << " = " << d);
-								
+				d += front_atom->crd().distance(b2.atom2().crd());
+
+				front_atom = &b2.atom2();
+				
+				path[j]->set_max_linker_length(*path[i + 2], d);
+				path[i + 2]->set_max_linker_length(*path[j], d);
+
+				dbgmsg("max_linker_length between " << *path[j] << " and " 
+					<< *path[i + 1] << " = " << path[j]->get_max_linker_length(*path[i + 1]));
+				dbgmsg("max_linker_length between " << *path[j] << " and " 
+					<< *path[i + 2] << " = " << path[j]->get_max_linker_length(*path[i + 2]));
 			}
+			if (i < path.size() - 1) {
+				const Molib::Bond &b = path[i]->get_bond(*path[i + 1]);
+
+				d += front_atom->crd().distance(b.atom2().crd());
+				
+				path[j]->set_max_linker_length(*path[i + 1], d);
+				path[i + 1]->set_max_linker_length(*path[j], d);
+				dbgmsg("last max_linker_length between " << *path[j] << " and " 
+					<< *path[i + 1] << " = " << path[j]->get_max_linker_length(*path[i + 1]));
+			}
+			dbgmsg("TOTAL max_linker_length between " << *path[j] << " and " 
+				<< *path[path.size() - 1] << " = " 
+				<< path[j]->get_max_linker_length(*path[path.size() - 1]));
 		}
 	}
+
 	
 	void Segment::__set_branching_rules(const Segment::Paths &paths) {
 		for (auto &kv : paths) {

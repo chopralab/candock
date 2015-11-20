@@ -199,7 +199,11 @@ int main(int argc, char* argv[]) {
 		threads.clear();
 		for(int i = 0; i < cmdl.ncpu(); ++i) {
 			threads.push_back(
+#ifndef NDEBUG
 				thread([&seeds, &gridrec, &score, &gpoints0, &gpoints, i] () {
+#else
+				thread([&seeds, &gpoints0, &gpoints, i] () {
+#endif
 					// iterate over docked seeds and dock unique seeds
 					for (int j = i; j < seeds.size(); j+= cmdl.ncpu()) {
 						try {
@@ -222,7 +226,11 @@ int main(int argc, char* argv[]) {
 							 * only best-scored cluster representatives
 							 *
 							 */
+#ifndef NDEBUG
+							Docker::Dock dock(gpoints, conf, seeds[j], score, gridrec, cmdl.clus_rad());
+#else
 							Docker::Dock dock(gpoints, conf, seeds[j], cmdl.clus_rad());
+#endif
 
 							dock.run();
 

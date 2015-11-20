@@ -14,7 +14,7 @@ indent_mode=2
 
 [project]
 name=candock
-base_path=/home/konc/Dropbox/tmp/candock
+base_path=/u/konc/Downloads/git/candock
 description=
 file_patterns=
 
@@ -23,23 +23,36 @@ long_line_behaviour=1
 long_line_column=72
 
 [files]
-current_page=1
-FILE_NAME_0=16;Make;0;EUTF-8;1;1;0;%2Fhome%2Fkonc%2FDropbox%2Ftmp%2Fcandock%2Fcandock%2FMakefile;0;4
-FILE_NAME_1=351;Make;0;EUTF-8;1;1;0;%2Fhome%2Fkonc%2FDropbox%2Ftmp%2Fcandock%2Fcandock%2FMakefile.inc;0;4
-FILE_NAME_2=12160;C++;0;EUTF-8;1;1;0;%2Fhome%2Fkonc%2FDropbox%2Ftmp%2Fcandock%2Fcandock%2Fopts_candock.hpp;0;4
-FILE_NAME_3=5925;C++;0;EUTF-8;1;1;0;%2Fhome%2Fkonc%2FDropbox%2Ftmp%2Fcandock%2Fcandock%2Ftest_link.cpp;0;4
-FILE_NAME_4=4293;C++;0;EUTF-8;1;1;0;%2Fhome%2Fkonc%2FDropbox%2Ftmp%2Fcandock%2Fcandock%2Ftest_clq.cpp;0;4
-FILE_NAME_5=14975;C++;0;EUTF-8;1;1;0;%2Fhome%2Fkonc%2FDropbox%2Ftmp%2Fcandock%2Flib%2Flinker%2Flinker.cpp;0;4
-FILE_NAME_6=1756;C++;0;EUTF-8;1;1;0;%2Fhome%2Fkonc%2FDropbox%2Ftmp%2Fcandock%2Flib%2Flinker%2Flinker.hpp;0;4
-FILE_NAME_7=16167;C++;0;EUTF-8;1;1;0;%2Fhome%2Fkonc%2FDropbox%2Ftmp%2Fcandock%2Flib%2Fscore%2Fscore.cpp;0;4
-FILE_NAME_8=701;C++;0;EUTF-8;1;1;0;%2Fhome%2Fkonc%2FDropbox%2Ftmp%2Fcandock%2Flib%2Flinker%2Fstate.hpp;0;4
-FILE_NAME_9=0;C++;0;EUTF-8;1;1;0;%2Fhome%2Fkonc%2FDropbox%2Ftmp%2Fcandock%2Flib%2Flinker%2Fsegment.hpp;0;4
-FILE_NAME_10=7028;C++;0;EUTF-8;1;1;0;%2Fhome%2Fkonc%2FDropbox%2Ftmp%2Fcandock%2Flib%2Fdocker%2Fdock.cpp;0;4
-FILE_NAME_11=414;C++;0;EUTF-8;1;1;0;%2Fhome%2Fkonc%2FDropbox%2Ftmp%2Fcandock%2Flib%2Fdocker%2Fdock.hpp;0;4
-FILE_NAME_12=7247;C++;0;EUTF-8;1;1;0;%2Fhome%2Fkonc%2FDropbox%2Ftmp%2Fcandock%2Flib%2Fdocker%2Fgpoints.cpp;0;4
-FILE_NAME_13=278;C++;0;EUTF-8;1;1;0;%2Fhome%2Fkonc%2FDropbox%2Ftmp%2Fcandock%2Flib%2Fdocker%2Fgpoints.hpp;0;4
-FILE_NAME_14=1182;C++;0;EUTF-8;1;1;0;%2Fhome%2Fkonc%2FDropbox%2Ftmp%2Fcandock%2Flib%2Flinker%2Fpartial.hpp;0;4
-FILE_NAME_15=22;C++;0;EUTF-8;1;1;0;%2Fhome%2Fkonc%2FDropbox%2Ftmp%2Fcandock%2Flib%2Flinker%2Fpartial.cpp;0;4
+current_page=5
+FILE_NAME_0=0;Make;0;EUTF-8;1;1;0;%2Fu%2Fkonc%2FDownloads%2Fgit%2Fcandock%2Fcandock%2FMakefile;0;4
+FILE_NAME_1=351;Make;0;EUTF-8;1;1;0;%2Fu%2Fkonc%2FDownloads%2Fgit%2Fcandock%2Fcandock%2FMakefile.inc;0;4
+FILE_NAME_2=9096;C++;0;EUTF-8;1;1;0;%2Fu%2Fkonc%2FDownloads%2Fgit%2Fcandock%2Fcandock%2Fopts_candock.hpp;0;4
+FILE_NAME_3=5606;C++;0;EUTF-8;1;1;0;%2Fu%2Fkonc%2FDownloads%2Fgit%2Fcandock%2Fcandock%2Ftest_clq.cpp;0;4
+FILE_NAME_4=298;Sh;0;EUTF-8;1;1;0;%2Fu%2Fkonc%2FDownloads%2Fcandock%2Ftest%2Flnkace%2Frun.sh;0;4
+FILE_NAME_5=4104;C++;0;EUTF-8;1;1;0;%2Fu%2Fkonc%2FDownloads%2Fgit%2Fcandock%2Fcandock%2Ftest_link.cpp;0;4
+FILE_NAME_6=21137;C++;0;EUTF-8;1;1;0;%2Fu%2Fkonc%2FDownloads%2Fgit%2Fcandock%2Flib%2Flinker%2Flinker.cpp;0;4
+FILE_NAME_7=1511;C++;0;EUTF-8;1;1;0;%2Fu%2Fkonc%2FDownloads%2Fgit%2Fcandock%2Flib%2Flinker%2Fposes.cpp;0;4
+FILE_NAME_8=0;C++;0;EUTF-8;1;1;0;%2Fu%2Fkonc%2FDownloads%2Fgit%2Fcandock%2Flib%2Flinker%2Flinker.hpp;0;4
+FILE_NAME_9=0;C++;0;EUTF-8;1;1;0;%2Fu%2Fkonc%2FDownloads%2Fgit%2Fcandock%2Flib%2Flinker%2Fpartial.cpp;0;4
+FILE_NAME_10=0;C++;0;EUTF-8;1;1;0;%2Fu%2Fkonc%2FDownloads%2Fgit%2Fcandock%2Flib%2Flinker%2Fpartial.hpp;0;4
+FILE_NAME_11=9483;C++;0;EUTF-8;1;1;0;%2Fu%2Fkonc%2FDownloads%2Fgit%2Fcandock%2Flib%2Fpdbreader%2Fmolecule.cpp;0;4
+FILE_NAME_12=10628;C++;0;EUTF-8;1;1;0;%2Fu%2Fkonc%2FDownloads%2Fgit%2Fcandock%2Flib%2Fpdbreader%2Fmolecule.hpp;0;4
+FILE_NAME_13=0;C++;0;EUTF-8;1;1;0;%2Fu%2Fkonc%2FDownloads%2Fgit%2Fcandock%2Flib%2Ffragmenter%2Funique.cpp;0;4
+FILE_NAME_14=3389;C++;0;EUTF-8;1;1;0;%2Fu%2Fkonc%2FDownloads%2Fgit%2Fcandock%2Flib%2Flinker%2Fsegment.hpp;0;4
+FILE_NAME_15=5558;C++;0;EUTF-8;1;1;0;%2Fu%2Fkonc%2FDownloads%2Fgit%2Fcandock%2Flib%2Flinker%2Fsegment.cpp;0;4
+FILE_NAME_16=0;C++;0;EUTF-8;1;1;0;%2Fu%2Fkonc%2FDownloads%2Fgit%2Fcandock%2Flib%2Fpdbreader%2Fbond.hpp;0;4
+FILE_NAME_17=5345;C++;0;EUTF-8;1;1;0;%2Fu%2Fkonc%2FDownloads%2Fgit%2Fcandock%2Flib%2Fpdbreader%2Fgrid.hpp;0;4
 
 [VTE]
-last_dir=/home/konc
+last_dir=/home
+
+[build-menu]
+NF_00_LB=_Make
+NF_00_CM=make
+NF_00_WD=
+NF_03_LB=Make Clean
+NF_03_CM=make clean
+NF_03_WD=
+NF_01_LB=Make Custom Object
+NF_01_CM=make 
+NF_01_WD=

@@ -605,6 +605,8 @@ namespace Linker {
 
 		dbgmsg("RIGID CONFORMATIONS FOR LIGAND " << __ligand.name() 
 			<< " : " << endl << clustered_possibles_w_energy);
+		cout << "RIGID CONFORMATIONS FOR LIGAND " << __ligand.name() 
+			<< " : " << endl << clustered_possibles_w_energy << endl;
 
 		cout << "Generated " << clustered_possibles_w_energy.size() 
 			<< " possible conformations for ligand " << __ligand.name()

@@ -54,7 +54,7 @@ namespace Molib {
 		 *       C   C      C   C
 		 * 
 		 */
-		if (__core.size() > 1)
+		if (__core.size() > 1 || __core.size() + __join.size() > 3)
 			__seed_id = u.get_seed_id(this->get_all());
 		else
 			__seed_id = -1;

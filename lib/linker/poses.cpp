@@ -36,9 +36,10 @@ namespace Linker {
 		AtomPoint::Grid &g = __grid.at(segment2.get_id());
 		for (int i = 0; i < state.get_segment().get_atoms().size(); ++i) {
 			if (&state.get_segment().get_atom(i) == jatoms.first) {
-				AtomPoint::PVec neighbors = g.get_neighbors_within_tolerance(state.get_crd(i), 
-					max_linker_length, tol_seed_dist);
-						
+				//~ AtomPoint::PVec neighbors = g.get_neighbors_within_tolerance(state.get_crd(i), 
+				AtomPoint::PVec neighbors = g.get_neighbors_within_tolerance_asymmetric(state.get_crd(i), 
+					max_linker_length, tol_seed_dist, 2.0);
+				dbgmsg("found neighbors = " << neighbors.size());
 				for (auto &patompoint : neighbors) {
 					if (&patompoint->get_atom() == jatoms.second) {
 						join.insert(&patompoint->get_state());

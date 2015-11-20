@@ -145,6 +145,11 @@ int main(int argc, char* argv[]) {
 					for (int j = i; j < seeds.size(); j+= cmdl.ncpu()) {
 						try {
 							dbgmsg(seeds[j]);
+
+#ifndef NDEBUG
+							Molib::Molecule orig_seed = seeds[j];
+#endif
+							
 							/* Compute all conformations of this seed with the center
 							 * atom fixed on coordinate origin using maximum clique algorithm
 							 * 
@@ -171,7 +176,15 @@ int main(int argc, char* argv[]) {
 
 							inout::output_file(dock.get_docked(), cmdl.top_seeds_dir() + "/" + dock.get_docked().name() + "/" 
 								+ cmdl.top_seeds_file()); // output docked & clustered seeds
-	
+
+#ifndef NDEBUG
+							int nn = 0;
+							for (auto &d : dock.get_docked()) {
+								cout << "SEED" << endl << orig_seed << endl << "DOCKED" << endl << d << endl;
+								cout << "seed=" << dock.get_docked().name() << " conf=" << ++nn << " rmsd=" << d.compute_rmsd_ord(orig_seed) << " energy=" << d.name() << endl;
+							}
+#endif
+							
 						}
 						catch (Error& e) {
 							cerr << "skipping seed due to : " << e.what() << endl;
