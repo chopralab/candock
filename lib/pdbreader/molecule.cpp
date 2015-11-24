@@ -5,6 +5,7 @@
 #include <string>
 #include <vector>
 #include <cstdlib>
+#include <time.h>
 #include <boost/regex.hpp>
 #include <boost/algorithm/string.hpp>
 #include <boost/filesystem.hpp>
@@ -156,6 +157,18 @@ namespace Molib {
 				molecules.push_back(&molecule);
 		}
 		return molecules;
+	}
+
+	void NRset::jiggle() {
+		srand((unsigned)time(NULL));
+		for (auto &patom : this->get_atoms()) {
+			dbgmsg("before jiggle crd = " << patom->crd());
+			Geom3D::Coordinate dcrd(((double)rand() / (double)RAND_MAX) / 1000, 
+				((double)rand() / (double)RAND_MAX) / 1000,
+				((double)rand() / (double)RAND_MAX) / 1000);
+			patom->set_crd(patom->crd() + dcrd);
+			dbgmsg("after jiggle crd = " << patom->crd());
+		}
 	}
 
 	Molecule::Vec NRset::get_molecules(const Residue::res_type &rest) const {

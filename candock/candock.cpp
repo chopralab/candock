@@ -278,6 +278,10 @@ int main(int argc, char* argv[]) {
 						ligand.erase_properties(); // required for graph matching
 						top_seeds.erase_properties(); // required for graph matching
 
+						// jiggle the coordinates by one-thousands of Angstrom to avoid minimization failures
+						// with initial bonded relaxation failed errors
+						top_seeds.jiggle();
+
 						/* Init minization options and constants, including ligand and receptor topology
 						 *
 						 */
@@ -302,8 +306,8 @@ int main(int argc, char* argv[]) {
 						Molib::Internal ic(ligand.get_atoms());
 						
 						Linker::Linker linker(modeler, receptors[0], ligand, top_seeds, gridrec, score, ic, 
-							cmdl.dist_cutoff(), cmdl.spin_degrees(), cmdl.tol_seed_dist(), 
-							cmdl.max_possible_conf(), cmdl.link_iter(), cmdl.clash_coeff(),
+							cmdl.dist_cutoff(), cmdl.spin_degrees(), cmdl.tol_seed_dist(), cmdl.lower_tol_seed_dist(), 
+							cmdl.upper_tol_seed_dist(), cmdl.max_possible_conf(), cmdl.link_iter(), cmdl.clash_coeff(),
 							cmdl.docked_clus_rad(), cmdl.max_allow_energy(), cmdl.iterative(),
 							cmdl.max_num_possibles());
 

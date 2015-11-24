@@ -65,9 +65,12 @@ namespace Linker {
 								<< crds[vertices1[i]]);
 						}
 						const double energy = stod(seed_molecule.name());
-						dbgmsg("adding docked state " << segment.get_seed_id() << " with energy of " << energy);
-						// ONLY COPY SEGMENT COORDS NOT SEED
-						segment.add_state(unique_ptr<State>(new State(segment, crds, energy)));
+						
+						if (energy < __max_allow_energy) {
+							dbgmsg("adding docked state " << segment.get_seed_id() << " with energy of " << energy);
+							// ONLY COPY SEGMENT COORDS NOT SEED
+							segment.add_state(unique_ptr<State>(new State(segment, crds, energy)));
+						}
 					}
 				}
 			}
@@ -501,7 +504,7 @@ namespace Linker {
 				for (auto &pstate1 : segment1.get_states()) {
 					State &state1 = *pstate1;
 					State::Set join_states = poses.get_join_states(state1, segment2, jatoms, 
-						max_linker_length, __tol_seed_dist);
+						max_linker_length, __lower_tol_seed_dist, __upper_tol_seed_dist);
 
 					const int i = state1.get_id();
 					dbgmsg("comparing state1(" << i << ") = " << state1);
@@ -571,9 +574,7 @@ namespace Linker {
 					conf.push_back(states[i]);
 					energy += states[i]->get_energy();
 				}
-				if (energy < __max_allow_energy) {
-					possibles_w_energy.push_back(Partial(conf, energy));
-				}
+				possibles_w_energy.push_back(Partial(conf, energy));
 			}
 	
 			//help::memusage("after possibles_w_energy");
@@ -605,8 +606,6 @@ namespace Linker {
 
 		dbgmsg("RIGID CONFORMATIONS FOR LIGAND " << __ligand.name() 
 			<< " : " << endl << clustered_possibles_w_energy);
-		cout << "RIGID CONFORMATIONS FOR LIGAND " << __ligand.name() 
-			<< " : " << endl << clustered_possibles_w_energy << endl;
 
 		cout << "Generated " << clustered_possibles_w_energy.size() 
 			<< " possible conformations for ligand " << __ligand.name()

@@ -122,7 +122,7 @@ void Maxclique::color_sort(Vertices &R) {
 }
 
 void Maxclique::expand(Vertices R) {
-  if (QMAXES.size() > 1000000) return;
+  if (QMAXES.size() > 10000000) return;
   while (R.size()) {
     if (Q.size() + R.end().get_degree() > QMAX.size()) {
       Q.push(R.end().get_i());

@@ -74,7 +74,8 @@ namespace Linker {
 		Molib::Atom::Grid &__gridrec;
 		const Molib::Score &__score;
 		const double __dist_cutoff, __spin_degrees,
-			__tol_seed_dist, __clash_coeff, __docked_clus_rad,
+			__tol_seed_dist, __lower_tol_seed_dist, __upper_tol_seed_dist, 
+			__clash_coeff, __docked_clus_rad,
 			__max_allow_energy;
 		const int __max_possible_conf, __link_iter;
 		const bool __iterative;
@@ -115,13 +116,13 @@ namespace Linker {
 		Linker(OMMIface::Modeler &modeler, const Molib::Molecule &receptor, const Molib::Molecule &ligand, 
 			const Molib::NRset &top_seeds, Molib::Atom::Grid &gridrec, 
 			const Molib::Score &score, Molib::Internal &ic, const double dist_cutoff, 
-			const double spin_degrees, const double tol_seed_dist, 
+			const double spin_degrees, const double tol_seed_dist, const double lower_tol_seed_dist, const double upper_tol_seed_dist, 
 			const int max_possible_conf, const int link_iter, const double clash_coeff, const double docked_clus_rad,
 			const double max_allow_energy, bool iterative, const int max_num_possibles) : 
 			__modeler(modeler), __receptor(receptor), __ligand(ligand), 
 			__top_seeds(top_seeds), __gridrec(gridrec), __score(score), __ic(ic), 
 			__dist_cutoff(dist_cutoff), __spin_degrees(Geom3D::radians(spin_degrees / 2)), // it needs to be divided by two due to quaternion rotation (it seems to double the angles)..
-			__tol_seed_dist(tol_seed_dist), __max_possible_conf(max_possible_conf),
+			__tol_seed_dist(tol_seed_dist), __lower_tol_seed_dist(lower_tol_seed_dist), __upper_tol_seed_dist(upper_tol_seed_dist), __max_possible_conf(max_possible_conf),
 			__link_iter(link_iter), __clash_coeff(clash_coeff), __docked_clus_rad(docked_clus_rad),
 			__max_allow_energy(max_allow_energy), __iterative(iterative), __max_num_possibles(max_num_possibles) {}
 		Partial::Vec init_conformations();

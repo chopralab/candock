@@ -65,6 +65,7 @@ namespace Linker {
 					auto &atom = **inter.begin();
 					s1.set_common_atom(atom);
 					s2.set_common_atom(atom);
+					dbgmsg("intersection size is one for segments " << s1 << " and " << s2);
 
 				} else if (inter.size() == 2) {
 					s1.add(&s2);

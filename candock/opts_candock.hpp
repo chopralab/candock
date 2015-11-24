@@ -63,6 +63,8 @@ class CmdLnOpts {
 	int __spin_degrees;
 	double __clash_coeff;
 	double __tol_seed_dist;
+	double __lower_tol_seed_dist;
+	double __upper_tol_seed_dist;
 	int __max_possible_conf;
 	int __link_iter;
 
@@ -183,7 +185,9 @@ public:
 			TCLAP::ValueArg<int> spin_degreesArg("","spin","Spin degrees to rotate ligand (default 60)",false,60,&allowedValsSpinDegrees, cmd);
 
 			TCLAP::ValueArg<double> clash_coeffArg("","clash_coeff","Clash coefficient for determining whether two atoms clash by eq. dist12 s< C * (vdw1 + vdw2) (default is 0.75)",false,0.75,"double", cmd);
-			TCLAP::ValueArg<double> tol_seed_distArg("","tol_seed_dist","Tolerance on seed distance for getting initial conformations of docked fragments (default is 2.0)",false,2.0,"double", cmd);
+			TCLAP::ValueArg<double> tol_seed_distArg("","tol_seed_dist","Tolerance on seed distance in-between linking (default is 2.0)",false,2.0,"double", cmd);
+			TCLAP::ValueArg<double> lower_tol_seed_distArg("","lower_tol_seed_dist","Lower tolerance on seed distance for getting initial conformations of docked fragments (default is 2.0)",false,2.0,"double", cmd);
+			TCLAP::ValueArg<double> upper_tol_seed_distArg("","upper_tol_seed_dist","Upper tolerance on seed distance for getting initial conformations of docked fragments (default is 2.0)",false,2.0,"double", cmd);
 
 			TCLAP::ValueArg<int> max_possible_confArg("","max_possible_conf","Maximum number of possible conformations to link (default is 20, -1 means unlimited)",false,20,"int", cmd);
 			TCLAP::ValueArg<int> link_iterArg("","link_iter","Maximum iterations for linking procedure (default is 1000)",false,1000,"int", cmd);
@@ -270,6 +274,8 @@ public:
 			
 			__clash_coeff = clash_coeffArg.getValue();
 			__tol_seed_dist = tol_seed_distArg.getValue();
+			__lower_tol_seed_dist = lower_tol_seed_distArg.getValue();
+			__upper_tol_seed_dist = upper_tol_seed_distArg.getValue();
 			__max_possible_conf = max_possible_confArg.getValue();
 			__link_iter = link_iterArg.getValue();
 			__docked_file = docked_fileArg.getValue();
@@ -354,6 +360,8 @@ public:
 	
 	double clash_coeff() const { return __clash_coeff; }
 	double tol_seed_dist() const { return __tol_seed_dist; }
+	double lower_tol_seed_dist() const { return __lower_tol_seed_dist; }
+	double upper_tol_seed_dist() const { return __upper_tol_seed_dist; }
 	int max_possible_conf() const { return __max_possible_conf; }
 	int link_iter() const { return __link_iter; }
 	string docked_file() const { return __docked_file; }

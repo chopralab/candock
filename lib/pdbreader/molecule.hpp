@@ -376,6 +376,7 @@ namespace Molib {
 		Atom::Vec get_atoms(const string &chain_ids="", 
 			const Residue::res_type &rest=Residue::res_type::notassigned,
 			const int model_number=-1) const;
+		void jiggle();
 		friend ostream& operator<< (ostream& stream, const NRset& m);
 	};
 	

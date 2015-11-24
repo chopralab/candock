@@ -124,6 +124,10 @@ int main(int argc, char* argv[]) {
 						
 						ligand.erase_properties(); // required for graph matching
 						top_seeds.erase_properties(); // required for graph matching
+
+						// jiggle the coordinates by one-thousands of Angstrom to avoid minimization failures
+						// with initial bonded relaxation failed errors
+						top_seeds.jiggle();
 						
 						/**
 						 * Init minization options and constants, including ligand 
@@ -152,8 +156,8 @@ int main(int argc, char* argv[]) {
 						Molib::Internal ic(ligand.get_atoms());
 						
 						Linker::Linker linker(modeler, receptors[0], ligand, top_seeds, gridrec, score, ic, 
-							cmdl.dist_cutoff(), cmdl.spin_degrees(), cmdl.tol_seed_dist(), 
-							cmdl.max_possible_conf(), cmdl.link_iter(), cmdl.clash_coeff(),
+							cmdl.dist_cutoff(), cmdl.spin_degrees(), cmdl.tol_seed_dist(), cmdl.lower_tol_seed_dist(), 
+							cmdl.upper_tol_seed_dist(), cmdl.max_possible_conf(), cmdl.link_iter(), cmdl.clash_coeff(),
 							cmdl.docked_clus_rad(), cmdl.max_allow_energy(), cmdl.iterative(),
 							cmdl.max_num_possibles());
 
@@ -172,32 +176,32 @@ int main(int argc, char* argv[]) {
 
 								docked.get_receptor().undo_mm_specific();
 								
-								//~ modeler.add_crds(receptors[0].get_atoms(), docked.get_receptor().get_crds());
-								//~ modeler.add_crds(ligand.get_atoms(), docked.get_ligand().get_crds());
-								//~ 
-								//~ modeler.init_openmm_positions();
-								//~ 
-								//~ modeler.unmask(receptors[0].get_atoms());
-								//~ modeler.unmask(ligand.get_atoms());
-				//~ 
-								//~ modeler.set_max_iterations(cmdl.max_iterations_final()); // until converged
-								//~ modeler.minimize_state(ligand, receptors[0], score);
-	//~ 
-								//~ // init with minimized coordinates
-								//~ Molib::Molecule minimized_receptor(receptors[0], modeler.get_state(receptors[0].get_atoms()));
-								//~ Molib::Molecule minimized_ligand(ligand, modeler.get_state(ligand.get_atoms()));
-				//~ 
-								//~ minimized_receptor.undo_mm_specific();
-								//~ 
-								//~ Molib::Atom::Grid gridrec(minimized_receptor.get_atoms());
-//~ 
-								//~ const double energy = score.non_bonded_energy(gridrec, minimized_ligand);
-//~ 
+								modeler.add_crds(receptors[0].get_atoms(), docked.get_receptor().get_crds());
+								modeler.add_crds(ligand.get_atoms(), docked.get_ligand().get_crds());
+								
+								modeler.init_openmm_positions();
+								
+								modeler.unmask(receptors[0].get_atoms());
+								modeler.unmask(ligand.get_atoms());
+				
+								modeler.set_max_iterations(cmdl.max_iterations_final()); // until converged
+								modeler.minimize_state(ligand, receptors[0], score);
+	
+								// init with minimized coordinates
+								Molib::Molecule minimized_receptor(receptors[0], modeler.get_state(receptors[0].get_atoms()));
+								Molib::Molecule minimized_ligand(ligand, modeler.get_state(ligand.get_atoms()));
+				
+								minimized_receptor.undo_mm_specific();
+								
+								Molib::Atom::Grid gridrec(minimized_receptor.get_atoms());
+
+								const double energy = score.non_bonded_energy(gridrec, minimized_ligand);
+
 								inout::output_file(Molib::Molecule::print_complex(docked.get_ligand(), docked.get_receptor(), docked.get_energy()), 
 									cmdl.docked_file(), ios_base::app); // output docked molecule conformations
 	
-								//~ inout::output_file(Molib::Molecule::print_complex(minimized_ligand, minimized_receptor, energy), 
-									//~ cmdl.mini_file(), ios_base::app); // output minimized docked conformations
+								inout::output_file(Molib::Molecule::print_complex(minimized_ligand, minimized_receptor, energy), 
+									cmdl.mini_file(), ios_base::app); // output minimized docked conformations
 
 							} catch(Linker::Linker::ConnectionError &e) {
 								cerr << "ConnectionError: skipping ligand " << ligand.name() << " due to : " << e.what() << endl;

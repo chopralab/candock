@@ -37,7 +37,7 @@ namespace Linker {
 	public:
 		Poses(const Seed::Graph &seed_graph);
 		State::Set get_join_states(const State &state, Segment &segment2, Molib::Atom::Pair &jatoms, 
-			const double max_linker_length, const double tol_seed_dist);
+			const double max_linker_length, const double lower_tol_seed_dist, const double upper_tol_seed_dist);
 	};
 }
 #endif
