@@ -97,6 +97,9 @@ namespace Molib {
 					double x, y, z, charge;
 					ss >> atom_id >> atom_name >> x >> y >> z >> atom_type 
 						>> subst_id >> subst_name >> charge;
+						
+					subst_name = subst_name.substr(0, 3); // truncate longer than 3-lett (pde5a bug)
+					
 					dbgmsg("atom_id = " << atom_id << " atom_name = " << atom_name
 						<< " x = " << x << " y = " << y << " z = " << z
 						<< " atom_type = " << atom_type << " subst_id = " << subst_id
@@ -163,8 +166,8 @@ namespace Molib {
 	}
 	void PDBreader::PdbParser::parse_molecule(Molecules &mols) {
 		vector<string> pdb_raw;
+		dbgmsg("num_occur = " << __num_occur);
 		inout::Inout::read_file(__molecule_file, pdb_raw, __pos,
-			//~ inout::Inout::panic, __num_occur, "REMARK   5 END");
 			inout::Inout::panic, __num_occur, "REMARK   5 MOLECULE");
 		boost::smatch m;
 		set<char> bio_chain;
@@ -182,6 +185,7 @@ namespace Molib {
 				__generate_model(mols, found_model, 1);
 				string record_name = boost::algorithm::trim_copy(line.substr(0,6));
 				int atom_number = stoi(line.substr(6, 5));
+				dbgmsg("atom_number = " << atom_number);
 				string atom_name = boost::algorithm::trim_copy(line.substr(12,4));
 				char alt_loc = line.at(16);
 				string resn = boost::algorithm::trim_copy(line.substr(17,3));

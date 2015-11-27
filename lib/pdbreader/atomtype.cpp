@@ -345,6 +345,7 @@ namespace Molib {
 		// lengths are used in this pass.  
 		for (auto &pa : molecule.get_atoms()) {
 			Atom &a = *pa;
+			dbgmsg("pass 3 : atom = " << a.atom_number());
 			if (a.size() != 1)
 				continue;
 			
@@ -419,7 +420,7 @@ namespace Molib {
 						a.set_idatm_type("S3");
 				}
 			}
-			dbgmsg("pass 3  : " << a.idatm_type_unmask());
+			dbgmsg("pass 3  : " << a.idatm_type_unmask() << " " << a.atom_number());
 		}
 	
 		// "pass 4": re-examine all atoms with non-zero 'redo' values and
