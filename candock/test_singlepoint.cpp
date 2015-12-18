@@ -43,7 +43,7 @@ int main(int argc, char* argv[]) {
 
 		/* Compute atom types for receptor (gaff types not needed since 
 		 * they are read from the forcefield xml file)
-		 * 
+		* 
 		 */
 		receptors.compute_idatm_type();
 

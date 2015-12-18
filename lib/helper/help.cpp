@@ -21,6 +21,32 @@ namespace help {
 		return os;
 	}
 
+	vector<string> gnuplot(const string &x1, const string &x2, const string &datapoints) {
+
+		// fit 1/x^12 repulsion term onto datapoints formatted x y (one-per-line)
+		const string cmd = "gnuplot << EOF 2>&1\n"
+			"f(x) = a/x**12 + b\n"
+			"a=1000000\n"
+			"b=1\n"
+			"fit [" + x1 + ":" + x2 + "] f(x) \"-\" u 1:2 via a,b\n"
+			+ datapoints + "\n"
+			"e\n"
+			"print 'a = ', a, ' b = ', b\n"
+			"EOF\n";
+			
+	    FILE* pipe = popen(cmd.c_str(), "r");
+	    if (!pipe) throw Error("die : install gnuplot!");
+	    char buffer[128];
+	    vector<string> result;
+	    while(!feof(pipe)) {
+	    	if(fgets(buffer, 128, pipe) != NULL)
+	    		result.push_back(buffer);
+	    }
+	    pclose(pipe);
+	    return result;
+		
+	}
+
 	string memusage(const string &msg) {
 		const string cmd = "ps ax -o rss,command | sort -nr | head -n 10|grep test_link|cut -f1 -d' '";
 	    FILE* pipe = popen(cmd.c_str(), "r");

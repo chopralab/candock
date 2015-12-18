@@ -52,6 +52,8 @@ class CmdLnOpts {
 	double __step_non_bond;
 	double __scale_non_bond;
 
+	string __potential_file;
+
 	string __cluster_file;
 	string __top_seeds_file;
 
@@ -166,9 +168,11 @@ public:
 			TCLAP::ValueArg<string> distributions_fileArg("","dist","Select one of the interatomic distance distribution \
 				file(s) provided with this script",false,"data/csd_complete_distance_distributions.txt","string", cmd);
 			TCLAP::ValueArg<double> step_non_bondArg("","step","Step for spline generation of non-bonded knowledge-based \
-				potential [0.0-1.0] (default is 0.01)",false,0.01,"double", cmd);
+				potential [0.0-1.0] (default is 0.1)",false,0.1,"double", cmd);
 			TCLAP::ValueArg<double> scale_non_bondArg("","scale","Scale non-bonded forces and energy for knowledge-based \
 				potential [0.0-1.0] (default is 1.0)",false,1.0,"double", cmd);
+
+			TCLAP::ValueArg<string> potential_fileArg("","potential_file","Output file for potentials and derivatives",false,"potentials.txt","string", cmd);
 
 			TCLAP::ValueArg<string> cluster_fileArg("","clusterfile","Clustered representative docked-seed conformations \
 				output file",false,"clustered_seeds.txt","string", cmd);
@@ -265,6 +269,8 @@ public:
 			__step_non_bond = step_non_bondArg.getValue();
 			__scale_non_bond = scale_non_bondArg.getValue();
 
+			__potential_file = potential_fileArg.getValue();
+
 			__cluster_file = cluster_fileArg.getValue();
 			__top_seeds_file = top_seeds_fileArg.getValue();
 			__max_num_ligands = max_num_ligandsArg.getValue();
@@ -350,6 +356,7 @@ public:
 	string distributions_file() const { return __distributions_file; }
 	double step_non_bond() const { return __step_non_bond; }
 	double scale_non_bond() const { return __scale_non_bond; }
+	string potential_file() const { return __potential_file; }
 
 	string cluster_file() const { return __cluster_file; }
 	string top_seeds_file() const { return __top_seeds_file; }

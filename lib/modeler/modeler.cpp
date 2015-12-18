@@ -168,8 +168,8 @@ namespace OMMIface {
 			dbgmsg("ending minimization step iter = " << iter);
 
 		}
-		cout << "time to minimize took " << Benchmark::seconds_from_start() 
-			<< " wallclock seconds" << endl;
+		cout << "Minimized in " << iter << " iterations, which took " 
+			<< Benchmark::seconds_from_start() << " wallclock seconds" << endl;
 	}
 
 	void Modeler::init_openmm_positions() {

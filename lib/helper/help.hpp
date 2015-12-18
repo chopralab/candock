@@ -13,6 +13,8 @@ using namespace std;
 
 namespace help {
 	string memusage(const string&);
+	vector<string> gnuplot(const string &x1, const string &x2, const string &datapoints);
+	
 	struct edge { 
 		string atom_property1;
 		string atom_property2;
@@ -878,6 +880,24 @@ namespace help {
 		"Zr",
 		"???"
 	};
+
+	const map<pair<string, string>, double> repulsion_idx {
+		{{"Npl", "Npl"}, 2.5}, 
+		{{"Npl", "S3"}, 2.8},
+		{{"O2", "O2-"}, 2.2},
+		{{"O2-", "S3"}, 2.9},
+		{{"Cac", "S3"}, 3.4},
+		{{"Cl", "O2-"}, 2.8},
+		{{"N2", "O2-"}, 2.8},
+		{{"N2", "S3"}, 3.0},
+		{{"N3+", "N3+"}, 2.5},
+		{{"N3+", "Ng+"}, 2.9},
+		{{"N3+", "O2-"}, 2.5},
+		{{"N3+", "O3"}, 2.5},
+		{{"N3+", "S3"}, 3.0},
+		{{"Ng+", "Ng+"}, 2.7}
+	};
+
 	const map<const string, const int> idatm_mask {	
 		{"Ac",  0},
 		{"Ag",  1},
@@ -1030,6 +1050,8 @@ namespace help {
 		{"Zr",  148},
 		{"???",  149},
 	};
+	
+	
 	const double vdw_radius[] = {	
 		2, // Ac
 		1.72, // Ag
@@ -1818,5 +1840,6 @@ namespace help {
 		{{{"^S#1#1","^N#2#3",""},{"#2","^O|^S#3#6",""}}, {{"1:aps={{1,0},{2,1}}"}}}, // APSS1- : for S in pyridine 1-oxide etc
 		{{{"^S#1#1",".*#2",""}}, {{"1:aps={{1,2},{2,0},{3,64}}"}}}, // S(X1)
 	};
+
 };
 #endif

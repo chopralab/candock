@@ -2,12 +2,15 @@ include ../../candock/Makefile.inc
 
 CFLAGS	= $(PRJCFLAGS) -I..
 OBJLIBS	= libscore.a
-OBJS	= score.o
+OBJS	= interpolation.o score.o
 INCL= -I ../tclap-1.2.1/include/ -I ../all3/idatmtest \
 -I ../jsoncpp-src-0.6.0-rc2/include -I ../jsoncpp-src-0.6.0-rc2/src \
 -I ../../lib/modeler -I ..
 
 all : $(OBJLIBS)
+
+interpolation.o: interpolation.cpp interpolation.hpp
+	$(CC) $(PRJCFLAGS) $(INCL) -c $<
 
 score.o: score.cpp score.hpp
 	$(CC) $(PRJCFLAGS) $(INCL) -c $<

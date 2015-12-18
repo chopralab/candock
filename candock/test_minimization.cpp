@@ -75,7 +75,7 @@ int main(int argc, char* argv[]) {
 			cmdl.dist_cutoff(), cmdl.distributions_file(), cmdl.step_non_bond(),
 			cmdl.scale_non_bond());
 			
-		dbgmsg(score);
+		dbgmsg("START SCORE" << endl << score << "END SCORE");
 
 		/** 
 		 * Forcefield stuff : create forcefield for small molecules (and KB 
@@ -132,6 +132,9 @@ int main(int argc, char* argv[]) {
 				//~ modeler.mask(ligand.get_atoms());
 				//~ modeler.unmask(substruct);
 
+				cout << "Initial energy = " << score.non_bonded_energy(gridrec, ligand) << endl;
+
+
 				modeler.minimize_state(ligand, receptors[0], score);
 
 				// init with minimized coordinates
@@ -143,12 +146,14 @@ int main(int argc, char* argv[]) {
 				Molib::Atom::Grid gridrec(minimized_receptor.get_atoms());
 				const double energy = score.non_bonded_energy(gridrec, minimized_ligand);
 				
+				cout << "Minimized energy = " << energy << endl;
+
 				inout::output_file(Molib::Molecule::print_complex(minimized_ligand, minimized_receptor, energy), 
 					cmdl.mini_file(), ios_base::app);
 				
 				//~ /**
 				 //~ * This section is a test to see if you can change positions 
-				 //~ * of some atoms without reinitializing the whole openmm
+				//~ * of some atoms without reinitializing the whole openmm
 				 //~ */
 				 //~ 
 				//~ // change coordinate of ligand atoms

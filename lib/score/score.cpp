@@ -1,19 +1,21 @@
 #include "score.hpp"
+#include "interpolation.hpp"
 #include "pdbreader/molecule.hpp"
 #include "helper/inout.hpp"
 #include <functional>
 #include <gsl/gsl_errno.h>
 #include <gsl/gsl_spline.h>
+#include <math.h>
 
 namespace Molib {
-	ostream& operator<< (ostream& stream, const Score::M0 &energy) {
+	ostream& operator<< (ostream& stream, const vector<double> &energy) {
 		for (int i = 0; i < energy.size(); ++i) {
 			stream << i << "=" << energy[i] << " ";
 		}
 		return stream;
 	}
 
-	ostream& operator<< (ostream& stream, const Score::M1 &energies) {
+	ostream& operator<< (ostream& stream, const Score::AtomPairValues &energies) {
 		for (auto &kv : energies) {
 			auto &atom_pair = kv.first;
 			auto &energy = kv.second;
@@ -25,16 +27,30 @@ namespace Molib {
 		return stream;
 	}
 
-
 	ostream& operator<< (ostream& stream, const Score &score) {
-		stream << "SCORE OBJECT" << endl;
-		stream << "OBJECTIVE ENERGY FUNCTION ENERGIES" << endl << score.__energies << endl;
-		stream << "OBJECTIVE ENERGY FUNCTION DERIVATIVES" << endl << score.__derivatives << endl;
-		stream << "SCORING ENERGY FUNCTION" << endl << score.__energies_scoring << endl;
+		for (auto &kv : score.__energies_scoring) {
+			auto &atom_pair = kv.first;
+			auto &sene = score.__energies_scoring.at(atom_pair);
+			auto &ene = score.__energies.at(atom_pair);
+			auto &der = score.__derivatives.at(atom_pair);
+			stream << "#objective function" << endl;
+			for (int i = 0; i < ene.size(); ++i) {
+				stream << help::idatm_unmask[atom_pair.first] << "\t"
+					<< help::idatm_unmask[atom_pair.second] << "\t" 
+					<< fixed << setprecision(3) << i * score.__step_non_bond << "\t" 
+					<< fixed << setprecision(3) << ene[i] << "\t" 
+					<< fixed << setprecision(3) << der[i] << endl;
+			}
+			stream << "#scoring function" << endl;
+			for (int i = 0; i < sene.size(); ++i) {
+				stream << help::idatm_unmask[atom_pair.first] << "\t"
+					<< help::idatm_unmask[atom_pair.second] << "\t" 
+					<< fixed << setprecision(3) << score.__get_lower_bound(i) << "\t" 
+					<< fixed << setprecision(3) << sene[i] << endl;
+			}
+		}
 		return stream;
 	}
-
-
 
 	Array1d<double> Score::compute_energy(Atom::Grid &gridrec, const Geom3D::Coordinate &crd, const set<int> &ligand_atom_types) const {
 		dbgmsg("computing energy");
@@ -70,6 +86,8 @@ namespace Molib {
 		set<int> idatm_types;
 		for (auto &key : receptor_idatm_types) idatm_types.insert(key);
 		for (auto &key : ligand_idatm_types) idatm_types.insert(key);
+		
+		dbgmsg("idatm_types.size() = " << idatm_types.size());
 		if (__comp == "reduced") {
 			for (auto &prot_key : idatm_types) {
 				for (auto &lig_key : idatm_types) {
@@ -79,11 +97,12 @@ namespace Molib {
 		} else if (__comp == "complete") {
 			int sz = sizeof(help::idatm_unmask) / sizeof(help::idatm_unmask[0]);
 			for (int i = 0; i < sz; ++i) {
-				for (int j = i + 1; j < sz; ++j) {
+				for (int j = i; j < sz; ++j) {
 					__prot_lig_pairs.insert({i, j});
 				}
 			}
 		}
+		dbgmsg("__prot_lig_pairs.size() = " << __prot_lig_pairs.size());
 #ifndef NDEBUG
 		for (auto &i : __prot_lig_pairs) {
 			dbgmsg("pairs: " << help::idatm_unmask[i.first] << " " 
@@ -91,24 +110,27 @@ namespace Molib {
 		}
 #endif
 	}
+	
 	void Score::__process_distributions_file() {
 		Benchmark::reset();
 		cout << "processing combined histogram ...\n";
 		vector<string> distributions_file_raw;
 		inout::Inout::read_file(__distributions_file, distributions_file_raw);
 		const bool rad_or_raw(__rad_or_raw == "normalized_frequency");
-		dbgmsg(__step_in_file);
-		__bin_range_sum.resize(__get_index(__dist_cutoff) + 1, 0);
+
 		for (string &line : distributions_file_raw) {
 			stringstream ss(line); // dist_file is simply too big to use boost
 			string atom_1,atom_2;
 			double lower_bound, upper_bound, quantity;
 			ss>>atom_1>>atom_2>>lower_bound>>upper_bound>>quantity;
-			//~ dbgmsg(upper_bound -lower_bound);
-			if (fabs(__step_in_file - (upper_bound - lower_bound)) > __eps) {
-				throw Error("die: invalid step size in csd file");
+			
+			// set step size
+			if (__step_in_file < 0) {
+				__step_in_file = upper_bound - lower_bound;
+				__bin_range_sum.resize(__get_index(__dist_cutoff) + 1, 0);
 			}
 				
+			
 			if (upper_bound <= __dist_cutoff) {
 				pair_of_ints atom_pair = minmax(help::idatm_mask.at(atom_1), help::idatm_mask.at(atom_2));
 				if (__prot_lig_pairs.count(atom_pair)) {
@@ -117,24 +139,21 @@ namespace Molib {
 					__sum_gij_of_r_numerator[atom_pair] += quantity / shell_volume;
 					// JANEZ : next two are for cumulative scoring function (compile_cumulative_scoring_function)
 					__bin_range_sum[__get_index(lower_bound)] += quantity / shell_volume;
-					//~ __bin_range_sum[__get_index(lower_bound, step_in_file)] += quantity / shell_volume;
 					__total_quantity += quantity / shell_volume;
-					dbgmsg(" " <<  atom_1 << " " <<  atom_2 << " " << lower_bound 
-						<< " " <<  upper_bound << " " <<  quantity);
+					//~ dbgmsg(" " <<  atom_1 << " " <<  atom_2 << " " << lower_bound 
+						//~ << " " <<  upper_bound << " " <<  quantity);
 				}
 			}	
 		}
 		// JANEZ : next part only needed for compile_mean_scoring_function
 		__gij_of_r_bin_range_sum.resize(__get_index(__dist_cutoff) + 1, 0);
-		//~ __gij_of_r_bin_range_sum.resize(__get_index(__dist_cutoff, step_in_file) + 1, 0);
 		for (auto &el1 : __gij_of_r_numerator) {
 			const pair_of_ints &atom_pair = el1.first;
 			if (__sum_gij_of_r_numerator[atom_pair] > 0) {
-				const M0 &gij_of_r_vals = el1.second;
+				const vector<double> &gij_of_r_vals = el1.second;
 				for (int i = 0; i < gij_of_r_vals.size(); ++i) {
 					const double &gij_of_r_value = gij_of_r_vals[i];
 					__gij_of_r_bin_range_sum[i] += gij_of_r_value / __sum_gij_of_r_numerator[atom_pair];
-					//~ dbgmsg("__gij_of_r_bin_range_sum[" <<  __get_lower_bound(i, step_in_file) 
 					dbgmsg("__gij_of_r_bin_range_sum[" <<  __get_lower_bound(i) 
 						<< "]= " <<  __gij_of_r_bin_range_sum[i]);
 				}
@@ -143,56 +162,6 @@ namespace Molib {
 		cout << "time to process distributions file " << Benchmark::seconds_from_start() 
 			<< " wallclock seconds" << endl;
 	}
-	Score::Inter Score::__interpolate(const M0 &energy) {
-		M0 x, y;
-		Inter inter;
-		dbgmsg(fmod(__step_in_file, __step_non_bond));
-		if (fmod(__step_in_file, __step_non_bond) > __eps) throw Error("die: step in csd must be divisible by step set by user");
-		const int sz = (energy.size() - 1) * (int) (__step_in_file / __step_non_bond) + 1;
-		dbgmsg("sz = " << sz << " energy.size() = " << energy.size());
-		for (int i = 0; i < energy.size(); ++i) {
-			if (energy[i] != -HUGE_VAL) {
-				x.push_back(__get_lower_bound(i));
-				y.push_back(energy[i]);
-			}
-#ifndef NDEBUG
-			else {
-				dbgmsg("NOT FOR INTERPOLATION i = " << i 
-					<< " energy = " << energy[i]);
-			}
-#endif
-		}
-		if (x.size() < 10) { // ?#! this is crappy, not enough points for interpolation
-			dbgmsg("not enough points for interpolation, just zeroing everything!");
-			for (int i = 0; i < sz; ++i) {
-				inter.potential.push_back(0.0);
-				inter.derivative.push_back(0.0);
-			}
-		} else {
-			gsl_interp_accel *acc = gsl_interp_accel_alloc();
-			gsl_spline *spline = gsl_spline_alloc(gsl_interp_cspline, x.size());
-			gsl_spline_init(spline, &x[0], &y[0], x.size());
-			dbgmsg("min_bound = " << x.front() << " max_bound = " << x.back());
-			for (int i = 0; i < sz; ++i) {
-				dbgmsg("evaluating at x = " << __get_lower_bound(i, __step_non_bond));
-				dbgmsg("evaluated y = " << gsl_spline_eval(spline, __get_lower_bound(i, __step_non_bond), acc));
-				inter.potential.push_back(gsl_spline_eval(spline, __get_lower_bound(i, __step_non_bond), acc));
-			}
-			// calculate derivatives
-			const double ds = __step_non_bond / 100;
-			inter.derivative.push_back((inter.potential[1] - inter.potential[0]) / __step_non_bond); // first
-			for (int i = 1; i < inter.potential.size() - 1; ++i) {
-				// gsl_spline_eval_deriv gave WRONG derivatives ???
-				const double e1 = gsl_spline_eval(spline, __get_lower_bound(i, __step_non_bond) - ds, acc);
-				const double e2 = gsl_spline_eval(spline, __get_lower_bound(i, __step_non_bond) + ds, acc);
-				inter.derivative.push_back((e2 - e1) / (2 * ds)); // symmetric difference quotient
-			}
-			inter.derivative.push_back(0); // last
-			gsl_spline_free(spline);
-			gsl_interp_accel_free(acc);
-		}
-		return inter;
-	}
 
 	void Score::__compile_objective_function() {
 		cout << "Compiling objective function for minimization...\n";
@@ -200,18 +169,20 @@ namespace Molib {
 			mem_fn(&Score::__energy_mean) : mem_fn(&Score::__energy_cumulative);
 		for (auto &el1 : __gij_of_r_numerator) {
 			const pair_of_ints &atom_pair = el1.first;
-			const M0 &gij_of_r_vals = el1.second;
+			const vector<double> &gij_of_r_vals = el1.second;
 			const double w1 = help::vdw_radius[atom_pair.first];
 			const double w2 = help::vdw_radius[atom_pair.second];
 			const double vdW_sum = ((w1 > 0 && w2 > 0) ? w1 + w2 : 4.500);
-			const int repulsion_idx = __get_index(vdW_sum - 0.6);
+
 			const string idatm_type1 = help::idatm_unmask[atom_pair.first];
 			const string idatm_type2 = help::idatm_unmask[atom_pair.second];
-			dbgmsg("atom1 = " << idatm_type1
-				<< " atom2 = " << idatm_type2
-				<< " vdW_sum = " << vdW_sum
-				<< " repulsion index (below is forbidden area) = " << repulsion_idx);
-			M0 energy(gij_of_r_vals.size(), -HUGE_VAL);
+
+			vector<double> energy(gij_of_r_vals.size(), -HUGE_VAL);
+
+			const int start_idx = __get_index(vdW_sum - 0.6);
+			const int end_idx = __get_index(vdW_sum + 1.0);
+
+
 			for (int i = 0; i < gij_of_r_vals.size(); ++i) {
 				const double lower_bound = __get_lower_bound(i);
 				const double &gij_of_r_numerator = gij_of_r_vals[i];
@@ -220,17 +191,28 @@ namespace Molib {
 					<< " " << lower_bound << " gij_of_r_numerator = "
 					<< gij_of_r_numerator << " __sum_gij_of_r_numerator[atom_pair] = "
 					<< __sum_gij_of_r_numerator[atom_pair]);
-				if (gij_of_r_numerator >= __eps)
+
+				if (__sum_gij_of_r_numerator[atom_pair] < __eps) {
+					energy[i] = 0;
+				}
+				else if (gij_of_r_numerator < __eps && (i + 1 < start_idx)) {
+					energy[i] = 5.0;
+				}
+				else if (gij_of_r_numerator < __eps && (i + 1 >= start_idx)) {
+					energy[i] = 0;
+				}
+				else {
 					energy[i] = energy_function(*this, atom_pair, lower_bound);
+				}
 			}
-			//~ dbgmsg("maximum is at " << __get_lower_bound(max_index) 
-				//~ << " and is " << max_energy);
+
 			dbgmsg("raw energies before interpolations : " << endl << energy);
-			// correct for outliers
-			for (int i = 0; i < energy.size() - 2; ++i) {
-				if (energy[i] != -HUGE_VAL) {
+
+			// correct for outliers only in the TRUE potential region of the potential
+			for (int i = start_idx; i < energy.size() - 2; ++i) {
+				if (energy[i] != 0 && energy[i] != 5) {
 					int j = i + 1;
-					while (j < energy.size() && energy[j] == -HUGE_VAL) { ++j; }
+					while (j < i + 3 && j < energy.size() && (energy[j] == 0 || energy[j] == 5)) { ++j; }
 					if (j > i + 1 && j < energy.size()) {
 						const double k0 = (energy[j] - energy[i]) / (j - i);
 						for (int k = 1; k < j - i; ++k) {
@@ -238,38 +220,179 @@ namespace Molib {
 						}
 					}
 				}
-				if (energy[i] == HUGE_VAL) energy[i] = -HUGE_VAL;
-			}
-			for (int i = 0; i <= repulsion_idx; ++i) // unset everything below this value
-				energy[i] = -HUGE_VAL;
-			energy.front() = 280000; // set the lower bound energy to arbitrary high value
-			if (energy.back() == -HUGE_VAL) energy.back() = 0; // take care about the non-assigned values
-			if (idatm_type1 == "H" || idatm_type1 == "HC"
-				|| idatm_type2 == "H" || idatm_type2 == "HC") {
-				energy.assign(energy.size(), 0);
-			}
-			dbgmsg("energies before interpolations : " << endl << energy);
-			auto inter = __interpolate(energy); // interpolate data points to get a smooth function
-			__energies[atom_pair].assign(inter.potential.begin(), inter.potential.end());
-			__derivatives[atom_pair].assign(inter.derivative.begin(), inter.derivative.end());
-
-			// scale derivatives ONLY not energies and don't do it in kbforce cause here is more efficient
-			for (int i = 0; i < __derivatives[atom_pair].size(); ++i) {
-				__derivatives[atom_pair][i] *= __scale_non_bond;
 			}
 
+			// locate global minimum and repulsion index in interval [vdW_sum - 0.6, vdW_sum + 1.0]
+			double global_min = HUGE_VAL;
+			int global_min_idx = start_idx;
+			int repulsion_idx = global_min_idx;
+
+			try { 
+				repulsion_idx = __get_index(help::repulsion_idx.at(make_pair(idatm_type1, idatm_type2)));
+			} catch (out_of_range&) {
+				try {
+					repulsion_idx = __get_index(help::repulsion_idx.at(make_pair(idatm_type2, idatm_type1))); 
+				} catch (out_of_range&) {
+
+					dbgmsg("de-novo calculation of repulsion idx");
+					
+					for (int i = start_idx; i < end_idx && i < energy.size(); ++i) {
+						if (energy[i] != -HUGE_VAL) {
+							if (energy[i] < global_min) {
+								global_min = energy[i];
+								global_min_idx = i;
+								
+								// minimum has to have steep downward slope on the left side
+								// leave the slope intact and unset everything left of the slope start point
+								repulsion_idx = i;
+								while (repulsion_idx > 0 && energy[repulsion_idx] != -HUGE_VAL 
+									&& ((energy[repulsion_idx] - energy[repulsion_idx - 1]) / __step_in_file) < 0.75) --repulsion_idx;
+		
+							}
+						}
+					}
+
+				}
+			}
+
+			dbgmsg("repulsion idx (before correction) = " << repulsion_idx
+				<< " repulsion distance (below is forbidden area) = " << __get_lower_bound(repulsion_idx));
+			
+			// calculate slope points & minor correction to repulsion index
+			vector<double> deriva;
+			for (int i = repulsion_idx; i < repulsion_idx + 5 && i < energy.size() - 1; ++i) {
+				double d = (energy[i + 1] - energy[i]) / __step_in_file;
+				deriva.push_back(d);
+			}
+			
+			// find up to 3 most negative derivatives -> slope
+			set<int> slope;
+			for (int i = 0; i < 3 && i < deriva.size(); ++i) {
+				auto it = min_element(deriva.begin(), deriva.end(), [](double i, double j) { return i < j; });
+				if (*it < 0) { // derivative < 0
+					int i0 = repulsion_idx + (it - deriva.begin());
+					deriva.erase(it);
+					slope.insert(i0);
+					slope.insert(i0 + 1);
+				}
+			}
+			
+			
+			if (slope.size() <= 1) {
+				const int n = (int) floor(__dist_cutoff / __step_non_bond) + 1;
+				dbgmsg("n = " << n);
+				__energies[atom_pair].assign(n, 0.0);
+				__derivatives[atom_pair].assign(n, 0.0);
+			}
+			else if (slope.size() > 1) {
+
+				repulsion_idx = *slope.begin(); // correct repulsion_idx
+			
+				dbgmsg("atom1 = " << idatm_type1
+					<< " atom2 = " << idatm_type2
+					<< " vdW_sum = " << vdW_sum
+					<< " repulsion idx = " << repulsion_idx
+					<< " step_non_bond = " << __step_non_bond
+					<< " repulsion distance (below is forbidden area) = " << __get_lower_bound(repulsion_idx)
+					<< " minimum distance = " << __get_lower_bound(global_min_idx)
+					<< " begin slope idx = " << *slope.begin()
+					<< " end slope idx = " << *slope.rbegin()
+				);
+
+				dbgmsg("energies before interpolations : " << endl << energy);
+
+				vector<double> dataX, dataY;
+				for (int i = repulsion_idx; i < energy.size(); ++i) { // unset everything below this value
+					dataX.push_back(__get_lower_bound(i));
+					dataY.push_back(energy[i]);
+				}
+			
+				vector<double> potential = Interpolation::interpolate_bspline(dataX, dataY, __step_non_bond);
+
+				// add repulsion term by fitting 1/x**12 function to slope points
+				const double x1 = __get_lower_bound(*slope.begin());
+				const double x2 = __get_lower_bound(*slope.rbegin());
+				string datapoints("");
+				int i = 0;
+				for (double xi = dataX.front(); xi <= dataX.back(); xi += __step_non_bond) {
+					if (xi >= x1 && xi <=x2) {
+						datapoints += help::to_string(xi) + " " + help::to_string(potential[i]) + "\n";
+					}
+					++i;
+				}
+				
+				dbgmsg("x1 = " << x1);
+				dbgmsg("x2 = " << x2);
+				dbgmsg("datapoints = " << datapoints);
+
+				// fit function to slope
+				vector<string> output = help::gnuplot(help::to_string(x1), help::to_string(x2), datapoints);
+
+				dbgmsg("output.size() = " << output.size());
+
+				// convert output to potential
+				double coeffA = 0, coeffB = 0;
+				for (auto &line : output) {
+					stringstream ss(line);
+					string str1, str2, str3, str4, str5, str6;
+					ss >> str1 >> str2 >> str3 >> str4 >> str5 >> str6;
+					dbgmsg("line = " << line);
+					dbgmsg("str1 = " << str1 << " str2 = " << str2 << " str3 = " << str3);
+					dbgmsg("str4 = " << str4 << " str5 = " << str5 << " str6 = " << str6);
+					if (str1 == "a" && str2 == "=" && str4 == "b" && str5 == "=") {
+						coeffA = stod(str3);
+						coeffB = stod(str6);
+					}
+				}
+				if (coeffA == 0) throw Error ("die : could not fit repulsion term");
+				
+				vector<double> repulsion;
+				for (double xi = 0; xi < dataX.front(); xi += __step_non_bond) {
+					const double yi = coeffA / pow(xi, 12) + coeffB;
+					repulsion.push_back(std::isinf(yi) ? 10 * coeffA / pow(xi + __step_non_bond , 12) + coeffB: yi);
+				}
+				dbgmsg("repulsion.size() = " << repulsion.size());
 #ifndef NDEBUG
-			for (int i = 0; i < inter.potential.size(); ++i) {
-				dbgmsg("inter.potential " << help::idatm_unmask[atom_pair.first] 
-					<< " " << help::idatm_unmask[atom_pair.second]
-					<< " " << __get_lower_bound(i, __step_non_bond) << " " << inter.potential[i]); 
-			}
-			for (int i = 0; i < inter.derivative.size(); ++i) {
-				dbgmsg("inter.derivative " << help::idatm_unmask[atom_pair.first] 
-					<< " " << help::idatm_unmask[atom_pair.second]
-					<< " " << __get_lower_bound(i, __step_non_bond) << " " << inter.derivative[i]); 
-			}
+				for (int i = 0; i < repulsion.size(); ++i)
+					dbgmsg("i = " << i << " repulsion = " << repulsion[i]);
 #endif
+				// if the repulsion term comes under the potential do a linear interpolation to get smooth joint
+				int w = 0;
+				while (!repulsion.empty() && repulsion.back() < potential.front()) {
+					repulsion.pop_back();
+					++w;
+				}
+
+				dbgmsg("repulsion.size() = " << repulsion.size());
+
+				const double rep_good = repulsion.back();
+				const double k0 = (potential.front() - rep_good) / w;
+				for (int k = 1; k < w; ++k) {
+					repulsion.push_back(rep_good + k0 * k);
+				}
+
+				// add repulsion term before bsplined potential
+				potential.insert(potential.begin(), repulsion.begin(), repulsion.end());
+				
+				vector<double> derivative = Interpolation::derivative(potential, __step_non_bond);
+				
+				__energies[atom_pair].assign(potential.begin(), potential.end());
+				__derivatives[atom_pair].assign(derivative.begin(), derivative.end());
+	
+				// scale derivatives ONLY not energies and don't do it in kbforce cause here is more efficient
+				for (int i = 0; i < __derivatives[atom_pair].size(); ++i) {
+					__derivatives[atom_pair][i] *= __scale_non_bond;
+				}
+#ifndef NDEBUG
+				for (int i = 0; i < potential.size(); ++i) {
+					dbgmsg("interpolated " << help::idatm_unmask[atom_pair.first] 
+						<< " " << help::idatm_unmask[atom_pair.second]
+						<< " " << i * __step_non_bond
+						<< " pot = " << potential[i]
+						<< " der = " << derivative[i]); 
+				}
+#endif
+			}
 		}
 		dbgmsg("out of loop");
 	}
@@ -280,7 +403,7 @@ namespace Molib {
 			mem_fn(&Score::__energy_mean) : mem_fn(&Score::__energy_cumulative);
 		for (auto &el1 : __gij_of_r_numerator) {
 			const pair_of_ints &atom_pair = el1.first;
-			const M0 &gij_of_r_vals = el1.second;
+			const vector<double> &gij_of_r_vals = el1.second;
 			const double w1 = help::vdw_radius[atom_pair.first];
 			const double w2 = help::vdw_radius[atom_pair.second];
 			const double vdW_sum = ((w1 > 0 && w2 > 0) ? w1 + w2 : 4.500);
@@ -291,7 +414,7 @@ namespace Molib {
 				<< " atom2 = " << idatm_type2
 				<< " vdW_sum = " << vdW_sum
 				<< " repulsion index (below is forbidden area) = " << repulsion_idx);
-			M0 energy(gij_of_r_vals.size(), -HUGE_VAL);
+			vector<double> energy(gij_of_r_vals.size(), -HUGE_VAL);
 			for (int i = 0; i < gij_of_r_vals.size(); ++i) {
 				const double lower_bound = __get_lower_bound(i);
 				const double &gij_of_r_numerator = gij_of_r_vals[i];
@@ -300,7 +423,6 @@ namespace Molib {
 					<< " " << lower_bound << " gij_of_r_numerator = "
 					<< gij_of_r_numerator << " __sum_gij_of_r_numerator[atom_pair] = "
 					<< __sum_gij_of_r_numerator[atom_pair]);
-
 
 				if (__sum_gij_of_r_numerator[atom_pair] < __eps) {
 					energy[i] = 0;
@@ -339,10 +461,13 @@ namespace Molib {
 			throw Error("die : undefined __gij_of_r_bin_range_sum");
 #endif
 		double gij_of_r = __gij_of_r_numerator[atom_pair][idx] / __sum_gij_of_r_numerator[atom_pair];
+		dbgmsg("gij_of_r = " << gij_of_r);
 		double denominator = __gij_of_r_bin_range_sum[idx] / __prot_lig_pairs.size();
+		dbgmsg("denominator = " << denominator);
 		double ratio = gij_of_r / denominator;
 		return -log(ratio);
 	}
+	
 	double Score::__energy_cumulative(const pair_of_ints &atom_pair, const double &lower_bound) {
 		const int idx = __get_index(lower_bound);
 #ifndef NDEBUG
@@ -372,6 +497,7 @@ namespace Molib {
 			dbgmsg("ligand atom = " << atom2.atom_number() << " crd= " << atom2_crd.pdb());
 			for (auto &atom1 : gridrec.get_neighbors(atom2_crd, __dist_cutoff)) {
 				const double dist = atom1->crd().distance(atom2_crd);
+				dbgmsg("dist = " << dist);
 				const auto &atom_1 = atom1->idatm_type();
 				const pair_of_ints atom_pair = minmax(atom_1, atom_2);
 				const int idx = __get_index(dist);
@@ -380,11 +506,12 @@ namespace Molib {
 				dbgmsg("ligand atom = " << atom2.atom_number() 
 					<< " crd= " << atom2_crd.pdb() << "protein atom = " << atom1->atom_number() 
 					<< " crd= " << atom1->crd().pdb() << " dist= " << dist 
-					<< " atom_pair={" << atom_pair.first << "," << atom_pair.second << "}" 
+					<< " atom_pair={" << help::idatm_unmask[atom_pair.first] << "," << help::idatm_unmask[atom_pair.second] << "}" 
 					<< " lower_bound= " << __get_lower_bound(idx) << " energy_sum=" << energy_sum);
 #endif
 			}
 		}
+		dbgmsg("exiting non_bonded_energy");
 		return energy_sum;
 	}
 
