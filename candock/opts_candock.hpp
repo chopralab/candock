@@ -53,6 +53,7 @@ class CmdLnOpts {
 	double __scale_non_bond;
 
 	string __potential_file;
+	string __obj_dir;
 
 	string __cluster_file;
 	string __top_seeds_file;
@@ -173,6 +174,7 @@ public:
 				potential [0.0-1.0] (default is 1.0)",false,1.0,"double", cmd);
 
 			TCLAP::ValueArg<string> potential_fileArg("","potential_file","Output file for potentials and derivatives",false,"potentials.txt","string", cmd);
+			TCLAP::ValueArg<string> obj_dirArg("","obj_dir","Output directory for objective function and derivatives",false,"obj","string", cmd);
 
 			TCLAP::ValueArg<string> cluster_fileArg("","clusterfile","Clustered representative docked-seed conformations \
 				output file",false,"clustered_seeds.txt","string", cmd);
@@ -270,6 +272,7 @@ public:
 			__scale_non_bond = scale_non_bondArg.getValue();
 
 			__potential_file = potential_fileArg.getValue();
+			__obj_dir = obj_dirArg.getValue();
 
 			__cluster_file = cluster_fileArg.getValue();
 			__top_seeds_file = top_seeds_fileArg.getValue();
@@ -356,7 +359,9 @@ public:
 	string distributions_file() const { return __distributions_file; }
 	double step_non_bond() const { return __step_non_bond; }
 	double scale_non_bond() const { return __scale_non_bond; }
+
 	string potential_file() const { return __potential_file; }
+	string obj_dir() const { return __obj_dir; }
 
 	string cluster_file() const { return __cluster_file; }
 	string top_seeds_file() const { return __top_seeds_file; }

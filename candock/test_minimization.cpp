@@ -70,11 +70,14 @@ int main(int argc, char* argv[]) {
 		ligand_idatm_types = Molib::get_idatm_types(ligands, ligand_idatm_types);
 
 
-		Molib::Score score(Molib::get_idatm_types(receptors), ligand_idatm_types, 
-			cmdl.ref_state(), cmdl.comp(), cmdl.rad_or_raw(), 
-			cmdl.dist_cutoff(), cmdl.distributions_file(), cmdl.step_non_bond(),
-			cmdl.scale_non_bond());
-			
+		Molib::Score score(cmdl.ref_state(), cmdl.comp(), cmdl.rad_or_raw(), cmdl.dist_cutoff(), 
+			cmdl.step_non_bond());
+
+		score.define_composition(Molib::get_idatm_types(receptors), ligand_idatm_types)
+			.process_distributions_file(cmdl.distributions_file())
+			.compile_scoring_function()
+			.parse_objective_function(cmdl.obj_dir(), cmdl.scale_non_bond());
+
 		dbgmsg("START SCORE" << endl << score << "END SCORE");
 
 		/** 

@@ -2,6 +2,7 @@
 #include <string>
 #include <iostream>
 #include <stdio.h>
+#include <math.h>
 
 namespace help {
 
@@ -21,30 +22,56 @@ namespace help {
 		return os;
 	}
 
-	vector<string> gnuplot(const string &x1, const string &x2, const string &datapoints) {
+	std::tuple<double, double, double> gnuplot(const double &x1, const double &x2, const string &datapoints) {
 
-		// fit 1/x^12 repulsion term onto datapoints formatted x y (one-per-line)
-		const string cmd = "gnuplot << EOF 2>&1\n"
-			"f(x) = a/x**12 + b\n"
-			"a=1000000\n"
-			"b=1\n"
-			"fit [" + x1 + ":" + x2 + "] f(x) \"-\" u 1:2 via a,b\n"
-			+ datapoints + "\n"
-			"e\n"
-			"print 'a = ', a, ' b = ', b\n"
-			"EOF\n";
-			
-	    FILE* pipe = popen(cmd.c_str(), "r");
-	    if (!pipe) throw Error("die : install gnuplot!");
-	    char buffer[128];
-	    vector<string> result;
-	    while(!feof(pipe)) {
-	    	if(fgets(buffer, 128, pipe) != NULL)
-	    		result.push_back(buffer);
-	    }
-	    pclose(pipe);
-	    return result;
+		double coeffA = 0, coeffB = 0, WSSR = HUGE_VAL;
 		
+		// try a range of coefficients to get the best fit
+		for (double a = 1e+5; a < 1e+10; a *= 2) { 
+			
+			// fit 1/x^12 repulsion term onto datapoints formatted x y (one-per-line)
+			const string cmd = "gnuplot << EOF 2>&1\n"
+				"f(x) = a/x**12 + b\n"
+				"a=" + help::to_string(a) + "\n"
+				"b=-1\n"
+				"fit [" + help::to_string(x1) + ":" + help::to_string(x2) + "] f(x) \"-\" u 1:2 via a,b\n"
+				+ datapoints + "\n"
+				"e\n"
+				"print 'JANEZ_FITTED ', a, ' ' , b, ' ', FIT_WSSR\n"
+				"EOF\n";
+				
+		    FILE* pipe = popen(cmd.c_str(), "r");
+		    if (!pipe) throw Error("die : install gnuplot!");
+		    char buffer[128];
+		    vector<string> output;
+		    while(!feof(pipe)) {
+				if(fgets(buffer, 128, pipe) != NULL)
+					output.push_back(buffer);
+			}
+			pclose(pipe);
+
+			// convert output to potential
+			for (auto &line : output) {
+				stringstream ss(line);
+				string str1, str2, str3, str4;
+				ss >> str1 >> str2 >> str3 >> str4;
+				if (str1 == "JANEZ_FITTED") {
+					dbgmsg("str1 = " << str1 << " str2 = " << str2 << " str3 = " << str3 << " str4 = " << str4);
+					try { 
+						double w = stod(str4); // this throws exceptions
+						
+						if (WSSR > w) {
+							coeffA = stod(str2);
+							coeffB = stod(str3);
+							WSSR = w;
+						}
+						
+					} catch (...) {}
+				}
+			}
+
+		}
+	    return std::make_tuple(coeffA, coeffB, WSSR);
 	}
 
 	string memusage(const string &msg) {

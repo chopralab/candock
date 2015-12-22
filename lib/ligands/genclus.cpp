@@ -11,6 +11,7 @@
 #include "helper/error.hpp"
 #include "helper/inout.hpp"
 #include "helper/debug.hpp"
+#include "helper/path.hpp"
 #include "cluster/optics.hpp"
 #include "jsonreader.hpp"
 #include "nosqlreader.hpp"
@@ -41,13 +42,13 @@ namespace genclus {
 			}
 			vector<string> lig_name;
 			try {
-				inout::Inout::read_file(names_dir + "/" + 
+				inout::Inout::read_file(Path::join(names_dir, 
 				(
 					(residue.rest() == Molib::Residue::protein || residue.rest() == Molib::Residue::nucleic) ? 
 						(molecule.name().substr(0,4) + molecule.name().substr(5,1)) 
 					: 
 						residue.resn()
-				), lig_name);
+				)), lig_name);
 			}
 			catch (exception& e) {
 				//~ cerr << e.what() << " ... skipping ... " << endl;
@@ -203,8 +204,9 @@ namespace genclus {
 				const string chain_ids = d["chain_id"].asString();
 				const double z_score = d["alignment"][0]["scores"]["z_score"].asDouble();
 				if (z_score < min_z_score) continue;
-				const string pdb_file = bio_dir + "/" 
-					+ (for_gclus ? (pdb_id + chain_ids) : pdb_id) + ".pdb";
+				//~ const string pdb_file = bio_dir + "/" 
+					//~ + (for_gclus ? (pdb_id + chain_ids) : pdb_id) + ".pdb";
+				const string pdb_file = Path::join(bio_dir, (for_gclus ? (pdb_id + chain_ids) : pdb_id) + ".pdb");
 
 				dbgmsg(pdb_id + " " + chain_ids);
 

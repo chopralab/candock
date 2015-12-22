@@ -10,6 +10,7 @@
 #include "helper/error.hpp"
 #include "helper/inout.hpp"
 #include "helper/debug.hpp"
+#include "helper/path.hpp"
 #include "common.hpp"
 #include "genlig.hpp"
 using namespace std;
@@ -184,7 +185,7 @@ namespace genlig {
 				const string pdb_id = d["pdb_id"].asString();
 				const string chain_ids = d["chain_id"].asString();
 				const string mols_name = pdb_id + " " + chain_ids;
-				const string pdb_file = bio_dir + "/" + pdb_id + chain_ids + ".pdb";
+				const string pdb_file = Path::join(bio_dir, pdb_id + chain_ids + ".pdb");
 				//~ const string mols_name = pdb_id;
 				//~ const string pdb_file = bio_dir + "/" + pdb_id + ".pdb";
 				//~ cout << mols_name << " " << pdb_file << endl;
@@ -276,7 +277,7 @@ namespace genlig {
 				const string mols_name = ligand[7];
 				const string name = ligand[8];
 
-				const string bio_file = bio_dir + "/" + mols_name + ".pdb";
+				const string bio_file = Path::join(bio_dir, mols_name + ".pdb");
 				// lig_code = resn:resi:chain_id:model_num:assembly_num:molecule_name
 				const string lig_code = resn + ":" + help::to_string(resi)
 					+ ":" + chain_id + ":" + help::to_string(model_number)

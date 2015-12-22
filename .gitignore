@@ -12,3 +12,4 @@ lib/ligands/glig
 candock/candock_for_centroid_quick
 candock/test_clq
 candock/test_link
+candock/genpot

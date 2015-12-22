@@ -6,6 +6,7 @@ $(LIBDIR)/score $(LIBDIR)/fragmenter $(LIBDIR)/graph $(LIBDIR)/kbforce $(LIBDIR)
 $(LIBDIR)/probis $(LIBDIR)/ligands $(LIBDIR)/docker $(LIBDIR)/centro \
 $(LIBDIR)/modeler $(LIBDIR)/cluster
 EXE	= candock
+POTENTIAL = genpot
 TEST = test_minimization
 TEST2 = test_fragmenting
 TEST3 = test_bsite
@@ -13,6 +14,7 @@ TEST4 = test_clq
 TEST5 = test_link
 TEST6 = test_singlepoint
 OBJS	= candock.o common.o
+OBJS_POTENTIAL	= genpot.o
 OBJS_TEST	= test_minimization.o common.o
 OBJS_TEST2	= test_fragmenting.o common.o
 OBJS_TEST3	= test_bsite.o common.o
@@ -26,20 +28,25 @@ LIBS	= -L. -L$(LIBDIR)/linker -L $(LIBDIR)/pdbreader -L $(LIBDIR)/kabsch \
 -L $(LIBDIR)/helper -L $(LIBDIR)/score -L $(LIBDIR)/fragmenter -L $(LIBDIR)/graph \
 -L $(LIBDIR)/kbforce -L $(LIBDIR)/geom3d -L $(LIBDIR)/modeler -L $(LIBDIR)/probis \
 -L $(LIBDIR)/ligands -L $(LIBDIR)/docker -L $(LIBDIR)/centro -L $(LIBDIR)/cluster \
--lpdb -llinker -ldocker -lscore -lfragmenter -lgraph -lkabsch -lcentro -lcluster -llinker \
--lmodeler -lhelper -lOpenMM_static -ldl -lc -lkbforce -lprobis -lligands -lpdb -lgeom3d \
+-lscore -lpdb -llinker -ldocker -lfragmenter -lgraph -lkabsch -lcentro -lcluster -llinker \
+-lmodeler -lhelper -lOpenMM_static -ldl -lc -lkbforce -lprobis -lligands -lgeom3d \
 -lboost_regex -lboost_filesystem -lboost_system -lpthread -lboost_date_time \
 -lgsl -lgslcblas -lm
 INCL = -I $(LIBDIR)/tclap-1.2.1/include -I $(LIBDIR)/jsoncpp-src-0.6.0-rc2/include \
 -I $(LIBDIR)/jsoncpp-src-0.6.0-rc2/src -I $(LIBDIR) -I $(LIBDIR)/modeler
 
 all : $(EXE)
+pote : $(POTENTIAL)
 test : $(TEST)
 test2 : $(TEST2)
 test3 : $(TEST3)
 test4 : $(TEST4)
 test5 : $(TEST5)
 test6 : $(TEST6)
+
+$(POTENTIAL) : genpot.o $(OBJLIBS)
+	$(ECHO) $(LD) $(PRJCFLAGS) -o $(POTENTIAL) $(OBJS_POTENTIAL) $(LIBS)
+	$(LD) $(PRJCFLAGS) -o $(POTENTIAL) $(OBJS_POTENTIAL) $(LIBS)
 
 $(TEST) : test_minimization.o common.o $(OBJLIBS)
 	$(ECHO) $(LD) $(PRJCFLAGS) -o $(TEST) $(OBJS_TEST) $(LIBS)
@@ -68,6 +75,9 @@ $(TEST6) : test_singlepoint.o common.o $(OBJLIBS)
 $(EXE) : candock.o common.o $(OBJLIBS)
 	$(ECHO) $(LD) $(PRJCFLAGS) -o $(EXE) $(OBJS) $(LIBS)
 	$(LD) $(PRJCFLAGS) -o $(EXE) $(OBJS) $(LIBS)
+
+genpot.o: genpot.cpp opts_genpot.hpp
+	$(CC) $(PRJCFLAGS) $(INCL) -c $<
 
 test_singlepoint.o: test_singlepoint.cpp common.cpp common.hpp \
 	   opts_candock.hpp

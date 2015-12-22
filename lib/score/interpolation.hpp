@@ -18,7 +18,7 @@ namespace Molib {
 	public:
 		static vector<double> derivative(const vector<double> &y, const double step);
 		static vector<double> interpolate(const vector<double> &dataX, const vector<double> &dataY, const double step);
-		static vector<double> interpolate_bspline(const vector<double> &dataX, const vector<double> &dataY, const double step, const size_t k=4, const size_t ncoeff=12);
+		static vector<double> interpolate_bspline(const vector<double> &dataX, const vector<double> &dataY, const double step, const size_t k=4, const size_t ncoeff=24);
 	};
 };
 #endif

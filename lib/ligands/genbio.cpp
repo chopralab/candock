@@ -11,6 +11,7 @@
 #include "helper/error.hpp"
 #include "helper/inout.hpp"
 #include "helper/debug.hpp"
+#include "helper/path.hpp"
 #include "pdbreader/grid.hpp"
 #include "common.hpp"
 #include "genbio.hpp"
@@ -137,7 +138,10 @@ namespace genbio {
 			mols.set_name(mols_name);
 		vector<string> aligned_chains;
 		if (!qpdb_file.empty()) {
-			Molib::PDBreader pr(pdb_dirname + "/" + qpdb_file, 
+			//~ Molib::PDBreader pr(pdb_dirname + "/" + qpdb_file, 
+				//~ (models == "all" ? Molib::PDBreader::all_models : Molib::PDBreader::first_model)
+				//~ |(hydrogens ? Molib::PDBreader::hydrogens : 0));
+			Molib::PDBreader pr(Path::join(pdb_dirname, qpdb_file), 
 				(models == "all" ? Molib::PDBreader::all_models : Molib::PDBreader::first_model)
 				|(hydrogens ? Molib::PDBreader::hydrogens : 0));
 			pr.parse_molecule(mols);
@@ -157,7 +161,8 @@ namespace genbio {
 				try { // if something goes wrong, e.g., pdb file is not found, don't exit..
 					const string pdb_id = d["pdb_id"].asString();
 					const string chain_ids = d["chain_id"].asString();
-					const string pdb_file = pdb_dirname + "/" + pdb_id + ".pdb";
+					//~ const string pdb_file = pdb_dirname + "/" + pdb_id + ".pdb";
+					const string pdb_file = Path::join(pdb_dirname, pdb_id + ".pdb");
 					dbgmsg(pdb_file << " "  << chain_ids);
 					Molib::PDBreader pr(pdb_file, 
 						(models == "all" ? Molib::PDBreader::all_models : Molib::PDBreader::first_model)

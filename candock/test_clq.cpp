@@ -6,6 +6,7 @@
 #include "opts_candock.hpp"
 #include "helper/benchmark.hpp"
 #include "helper/inout.hpp"
+#include "helper/path.hpp"
 #include "common.hpp"
 #include "helper/error.hpp"
 #include "pdbreader/grid.hpp"
@@ -174,8 +175,10 @@ int main(int argc, char* argv[]) {
 #endif
 							dock.run();
 
-							inout::output_file(dock.get_docked(), cmdl.top_seeds_dir() + "/" + dock.get_docked().name() + "/" 
-								+ cmdl.top_seeds_file()); // output docked & clustered seeds
+							//~ inout::output_file(dock.get_docked(), cmdl.top_seeds_dir() + "/" + dock.get_docked().name() + "/" 
+								//~ + cmdl.top_seeds_file()); // output docked & clustered seeds
+							inout::output_file(dock.get_docked(), Path::join(Path::join(cmdl.top_seeds_dir(), dock.get_docked().name()), 
+								cmdl.top_seeds_file())); // output docked & clustered seeds
 
 #ifndef NDEBUG
 							int nn = 0;

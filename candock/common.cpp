@@ -3,6 +3,7 @@
 #include "pdbreader/grid.hpp"
 #include "pdbreader/molecule.hpp"
 #include "helper/benchmark.hpp"
+#include "helper/path.hpp"
 #include "geom3d/matrix.hpp"
 #include "geom3d/pca.hpp"
 #include "geom3d/geom3d.hpp"
@@ -26,7 +27,9 @@ namespace common {
 		for (auto &fragment : model.get_rigid()) { // iterate over seeds
 			if (fragment.is_seed()) {
 				dbgmsg("reading top_seeds_file for seed id = " << fragment.get_seed_id());
-				Molib::PDBreader pdb(top_seeds_dir + "/" + help::to_string(fragment.get_seed_id()) + "/" + top_seeds_file, 
+				//~ Molib::PDBreader pdb(top_seeds_dir + "/" + help::to_string(fragment.get_seed_id()) + "/" + top_seeds_file, 
+					//~ Molib::PDBreader::all_models);
+				Molib::PDBreader pdb(Path::join(Path::join(top_seeds_dir, help::to_string(fragment.get_seed_id())), top_seeds_file), 
 					Molib::PDBreader::all_models);
 				Molib::Molecules &last = top_seeds.add(new Molib::Molecules(pdb.parse_molecule()));
 				if (last.empty()) {

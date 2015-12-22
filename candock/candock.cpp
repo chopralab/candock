@@ -8,6 +8,7 @@
 #include "helper/inout.hpp"
 #include "common.hpp"
 #include "helper/error.hpp"
+#include "helper/path.hpp"
 #include "pdbreader/grid.hpp"
 #include "pdbreader/molecule.hpp"
 #include "pdbreader/pdbreader.hpp"
@@ -234,8 +235,10 @@ int main(int argc, char* argv[]) {
 
 							dock.run();
 
-							inout::output_file(dock.get_docked(), cmdl.top_seeds_dir() + "/" + dock.get_docked().name() + "/" 
-								+ cmdl.top_seeds_file()); // output docked & clustered seeds
+							//~ inout::output_file(dock.get_docked(), cmdl.top_seeds_dir() + "/" + dock.get_docked().name() + "/" 
+								//~ + cmdl.top_seeds_file()); // output docked & clustered seeds
+							inout::output_file(dock.get_docked(), Path::join(Path::join(cmdl.top_seeds_dir(), dock.get_docked().name()),
+								cmdl.top_seeds_file())); // output docked & clustered seeds
 	
 						}
 						catch (Error& e) {

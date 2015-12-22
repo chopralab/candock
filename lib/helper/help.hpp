@@ -13,7 +13,7 @@ using namespace std;
 
 namespace help {
 	string memusage(const string&);
-	vector<string> gnuplot(const string &x1, const string &x2, const string &datapoints);
+	std::tuple<double, double, double> gnuplot(const double &x1, const double &x2, const string &datapoints);
 	
 	struct edge { 
 		string atom_property1;
@@ -882,6 +882,7 @@ namespace help {
 	};
 
 	const map<pair<string, string>, double> repulsion_idx {
+		{{"F", "Sar"}, 3.6}, 
 		{{"Npl", "Npl"}, 2.5}, 
 		{{"Npl", "S3"}, 2.8},
 		{{"O2", "O2-"}, 2.2},
