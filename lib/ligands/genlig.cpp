@@ -184,7 +184,7 @@ namespace genlig {
 			try { // if something goes wrong, e.g., pdb file is not found, don't exit..
 				const string pdb_id = d["pdb_id"].asString();
 				const string chain_ids = d["chain_id"].asString();
-				const string mols_name = pdb_id + " " + chain_ids;
+				const string mols_name = pdb_id + chain_ids;
 				const string pdb_file = Path::join(bio_dir, pdb_id + chain_ids + ".pdb");
 				//~ const string mols_name = pdb_id;
 				//~ const string pdb_file = bio_dir + "/" + pdb_id + ".pdb";

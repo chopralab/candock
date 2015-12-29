@@ -45,32 +45,39 @@ namespace genclus {
 				inout::Inout::read_file(Path::join(names_dir, 
 				(
 					(residue.rest() == Molib::Residue::protein || residue.rest() == Molib::Residue::nucleic) ? 
-						(molecule.name().substr(0,4) + molecule.name().substr(5,1)) 
+						(molecule.name().substr(0,4) + molecule.name().substr(4,1)) 
 					: 
 						residue.resn()
 				)), lig_name);
 			}
 			catch (exception& e) {
-				//~ cerr << e.what() << " ... skipping ... " << endl;
 				dbgmsg(e.what() << " ... skipping ... ");
 			}
-			ligands[mols.name()]->append(to_string(cluster_id) + ":" + residue.resn() + ":" + to_string(residue.resi()) 
+				
+			const string resn = residue.rest() == Molib::Residue::protein ? "PPP" : 
+				(residue.rest() == Molib::Residue::nucleic ? "NNN" : residue.resn());
+			const int resi = residue.rest() == Molib::Residue::protein 
+				|| residue.rest() == Molib::Residue::nucleic ? 1 : residue.resi();
+			
+			ligands[mols.name()]->append(to_string(cluster_id) + ":" + resn + ":" + to_string(resi) 
 				+ ":" + chain.chain_id() + ":" + to_string(model.number()) 
 				+ ":" + to_string(assembly.number()) + ":" + molecule.name() + ":" + mols.name() + ":" 
 				+ (lig_name.empty() ? "-" : remove_special_characters(lig_name[0])) + ":"
 				+ (help::non_specific_binders.find(residue.resn()) == help::non_specific_binders.end() ? "S" : "N")
-										);
+			);
 			dbgmsg(residue.resn() << ":" << to_string(cluster_id) << " molecule_name = " << molecule.name() << " mols_name = " << mols.name());
 		}
 		for (auto &i : ligands) {
 			const string &mols_name = i.first;
-			dbgmsg("mols_name = " << mols_name);
+			dbgmsg("TEST mols_name = " << mols_name);
 			Json::Value &vec = *(i.second);
 			JsonReader::iterator it = jr.end();
 			if(for_gclus) {
-				auto vs = help::ssplit(mols_name, " ");
-				 it = jr.find({make_pair("pdb_id", vs[0]), make_pair("chain_id", vs[1])});
-				 dbgmsg("vs[0] = " << vs[0] << " vs[1] = " << vs[1]);
+				if (mols_name.size() != 5) throw Error("die : format should be PdbId[no-space]ChainID");
+				const string pdb_id = mols_name.substr(0, 4);
+				const string chain_id = mols_name.substr(4, 1);
+				it = jr.find({make_pair("pdb_id", pdb_id), make_pair("chain_id", chain_id)});
+				dbgmsg("pdb_id = " << pdb_id << " chain_id = " << chain_id);
 			} else {
 				 it = jr.find({make_pair("pdb_id", mols_name)});
 			}
@@ -138,12 +145,14 @@ namespace genclus {
 			Molib::Molecule &molecule1 = const_cast<Molib::Molecule&>(patom->br().br().br().br().br());
 			for (auto &pneighbor : grid.get_neighbors(patom->crd(), eps)) {
 				Molib::Molecule &molecule2 = const_cast<Molib::Molecule&>(pneighbor->br().br().br().br().br());
-				const double distance = patom->crd().distance(pneighbor->crd());
-				if (pairwise_distances[&molecule1][&molecule2] < 0.0000000001
-					|| distance < pairwise_distances[&molecule1][&molecule2]) {
+				if (&molecule1 != &molecule2) {
+					const double distance = patom->crd().distance(pneighbor->crd());
+					if (pairwise_distances[&molecule1][&molecule2] < 0.0000000001
+						|| distance < pairwise_distances[&molecule1][&molecule2]) {
+							
+						pairwise_distances[&molecule1][&molecule2] = distance;
 						
-					pairwise_distances[&molecule1][&molecule2] = distance;
-					
+					}
 				}
 			}
 		}
@@ -171,12 +180,9 @@ namespace genclus {
 									Molib::Assembly &cassembly = cmolecule.add(new Molib::Assembly(assembly.number()));
 									Molib::Model &cmodel = cassembly.add(new Molib::Model(model.number()));
 									Molib::Chain &cchain = cmodel.add(new Molib::Chain(chain.chain_id()));
-
 								}
-
 								cmols.last().first().first().first().add(new Molib::Residue(residue));
 								prev_rest = residue.rest();
-
 							}
 							chain.clear();
 						}
@@ -204,8 +210,7 @@ namespace genclus {
 				const string chain_ids = d["chain_id"].asString();
 				const double z_score = d["alignment"][0]["scores"]["z_score"].asDouble();
 				if (z_score < min_z_score) continue;
-				//~ const string pdb_file = bio_dir + "/" 
-					//~ + (for_gclus ? (pdb_id + chain_ids) : pdb_id) + ".pdb";
+
 				const string pdb_file = Path::join(bio_dir, (for_gclus ? (pdb_id + chain_ids) : pdb_id) + ".pdb");
 
 				dbgmsg(pdb_id + " " + chain_ids);
@@ -213,6 +218,18 @@ namespace genclus {
 				Molib::PDBreader pr(pdb_file, Molib::PDBreader::all_models|Molib::PDBreader::sparse_macromol);
 				Molib::Molecules &mols = nrset.add(new Molib::Molecules(pr.parse_molecule()));
 
+				//~ /* since bio files have asymmetric unit + bio assemblies and we 
+				 //~ * don't want asymmetric unit for generating ligands for probis-database...
+				 //~ * if there are more than 1 assemblies, then delete the first one (asymmetric unit) */
+				//~ if (for_gclus) {
+					//~ for (auto &molecule : mols) {	
+						//~ if (molecule.size() > 1) { 
+							//~ molecule.erase(0);
+						//~ }
+					//~ }
+				//~ }
+							
+					
 				for (auto &molecule : mols) {
 					scr[molecule.name()] = z_score;
 				}
@@ -244,6 +261,15 @@ namespace genclus {
 		Molib::Molecule::Vec nucleic_ligands = splitted.get_molecules(Molib::Residue::nucleic);
 		Molib::Molecule::Vec hetero_ligands = splitted.get_molecules(Molib::Residue::hetero);
 		Molib::Molecule::Vec ion_ligands = splitted.get_molecules(Molib::Residue::ion);
+
+#ifndef NDEBUG
+		for (auto &pmol : protein_ligands) {
+			dbgmsg("protein_ligand = " << pmol->name());
+			for (auto &patom : pmol->get_atoms()) {
+				dbgmsg(*patom);
+			}
+		}
+#endif
 		
 		cluster::PairwiseDistances<Molib::Molecule> pd_protein = create_pairwise_distances(protein_ligands, 4.1);
 		cluster::Optics<Molib::Molecule> op(pd_protein, scores, 4.1, 3);

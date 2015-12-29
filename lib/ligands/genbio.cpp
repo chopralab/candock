@@ -66,8 +66,8 @@ namespace genbio {
 					for (auto &residue : chain) {
 						const string lresn = (residue.rest() == Molib::Residue::protein ? "PPP" : (residue.rest() == Molib::Residue::nucleic ? "NNN" : residue.resn()));
 						const int lresi = ((residue.rest() == Molib::Residue::protein || residue.rest() == Molib::Residue::nucleic) ? 1 : residue.resi());
-						const string lig_code = lresn + ":" + to_string(lresi) + ":" + chain.chain_id() + ":" + to_string(model.number()) 
-							+ ":" + to_string(assembly.number()) + ":" + molecule.name() + ":" + molecule.br().name();
+						const string lig_code = lresn + ":" + help::to_string(lresi) + ":" + chain.chain_id() + ":" + help::to_string(model.number()) 
+							+ ":" + help::to_string(assembly.number()) + ":" + molecule.name() + ":" + molecule.br().name();
 						for (auto &atom : residue) {
 							vector<Molib::Atom*> neighbors = grid.get_neighbors(atom.crd(), 4.0);
 							for (Molib::Atom *query_atom : neighbors) {
@@ -138,16 +138,17 @@ namespace genbio {
 			mols.set_name(mols_name);
 		vector<string> aligned_chains;
 		if (!qpdb_file.empty()) {
-			//~ Molib::PDBreader pr(pdb_dirname + "/" + qpdb_file, 
-				//~ (models == "all" ? Molib::PDBreader::all_models : Molib::PDBreader::first_model)
-				//~ |(hydrogens ? Molib::PDBreader::hydrogens : 0));
+
 			Molib::PDBreader pr(Path::join(pdb_dirname, qpdb_file), 
 				(models == "all" ? Molib::PDBreader::all_models : Molib::PDBreader::first_model)
 				|(hydrogens ? Molib::PDBreader::hydrogens : 0));
+
 			pr.parse_molecule(mols);
+
 			mols.set_name(boost::filesystem::path(qpdb_file).stem().string()); // for probis-server, qpdb_file needs to have pdb_id and chain_id
 			mols.last().set_name(boost::filesystem::path(qpdb_file).stem().string());
 			query_grid = genbio::set_grid_query(mols.last(), qcid);
+
 			if (bio != "none") mols.last().init_bio(bio == "all" ? Molib::Molecule::all_bio : Molib::Molecule::first_bio);
 			if (ralch) genbio::remove_assemblies(mols.last(), qcid); // remove assemblies that don't contain query chains
 			if (rnolig) genbio::remove_not_ligands(mols.last(), query_grid); // remove chains that are not near query chains
@@ -161,9 +162,10 @@ namespace genbio {
 				try { // if something goes wrong, e.g., pdb file is not found, don't exit..
 					const string pdb_id = d["pdb_id"].asString();
 					const string chain_ids = d["chain_id"].asString();
-					//~ const string pdb_file = pdb_dirname + "/" + pdb_id + ".pdb";
 					const string pdb_file = Path::join(pdb_dirname, pdb_id + ".pdb");
+
 					dbgmsg(pdb_file << " "  << chain_ids);
+
 					Molib::PDBreader pr(pdb_file, 
 						(models == "all" ? Molib::PDBreader::all_models : Molib::PDBreader::first_model)
 						|(hydrogens ? Molib::PDBreader::hydrogens : 0));
@@ -187,8 +189,6 @@ namespace genbio {
 			}
 		}
 		// now it's safe to remove query chains (they are used in query_grid)
-		if (!bio_file.empty()) inout::output_file(mols, bio_file); // output rotated bio assemblies (or asymmetric units if NO bioassembly)
-		// now it's safe to remove query chains (they are used in query_grid)
 		if (noalch) genbio::remove_chains(mols, aligned_chains); // remove query chains
 		// remove asymmetric units when there are bio assemblies available
 		if (rasym) {
@@ -196,5 +196,7 @@ namespace genbio {
 				genbio::remove_asymmetric_unit(molecule);
 			}
 		}
+		// output bio file
+		if (!bio_file.empty()) inout::output_file(mols, bio_file); // output rotated bio assemblies (or asymmetric units if NO bioassembly)
 	}
 };

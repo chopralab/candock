@@ -612,7 +612,7 @@ namespace Molib {
 			const int &remark_number = r1.first.first;
 			const Residue::res_tuple2 &ligand = r1.first.second;
 			stream << setw(6) << left << "REMARK" << setw(4) << right << remark_number 
-				<< " " << std::get<0>(ligand) << ":" << std::get<1>(ligand) 
+				<< setw(6) << right << "ALRES" << " " << std::get<0>(ligand) << ":" << std::get<1>(ligand) 
 				<< ":" << std::get<2>(ligand) << ":" << std::get<3>(ligand);
 			for (auto &rpair : r1.second) {
 				stream <<  "," << std::get<0>(rpair.first) << ":" 
