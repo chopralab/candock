@@ -97,13 +97,16 @@ namespace Molib {
 					double x, y, z, charge;
 					ss >> atom_id >> atom_name >> x >> y >> z >> atom_type 
 						>> subst_id >> subst_name >> charge;
-						
+					
+					const string element = help::sybyl.count(atom_type) ? help::sybyl.at(atom_type) : "";
+					
 					subst_name = subst_name.substr(0, 3); // truncate longer than 3-lett (pde5a bug)
 					
 					dbgmsg("atom_id = " << atom_id << " atom_name = " << atom_name
 						<< " x = " << x << " y = " << y << " z = " << z
 						<< " atom_type = " << atom_type << " subst_id = " << subst_id
-						<< " subst_name = " << subst_name << " charge = " << charge);
+						<< " subst_name = " << subst_name << " charge = " << charge
+						<< " element = " << element);
 					Geom3D::Coordinate crd(x, y, z);
 					dbgmsg("is hydrogen = " << (__hm & PDBreader::hydrogens) 
 						<< " atom_name = " << atom_name.at(0));
@@ -115,11 +118,14 @@ namespace Molib {
 								chain = &model.add(new Chain('A'));
 							if (!chain->has_residue(Residue::res_pair(subst_id, ' ')))
 								residue = &chain->add(new Residue(subst_name, subst_id, ' ', rest));
+							
 							Atom &a = residue->add(new Atom(atom_id, 
 															atom_name, 
 															crd, 
-															help::idatm_mask.at("???")
+															help::idatm_mask.at("???"),
+															element
 														));
+
 							atom_number_to_atom[&model][atom_id] = &a;
 						}
 					}
