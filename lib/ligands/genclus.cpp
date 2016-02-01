@@ -54,12 +54,7 @@ namespace genclus {
 				dbgmsg(e.what() << " ... skipping ... ");
 			}
 				
-			const string resn = residue.rest() == Molib::Residue::protein ? "PPP" : 
-				(residue.rest() == Molib::Residue::nucleic ? "NNN" : residue.resn());
-			const int resi = residue.rest() == Molib::Residue::protein 
-				|| residue.rest() == Molib::Residue::nucleic ? 1 : residue.resi();
-			
-			ligands[mols.name()]->append(to_string(cluster_id) + ":" + resn + ":" + to_string(resi) 
+			ligands[mols.name()]->append(to_string(cluster_id) + ":" + residue.resn() + ":" + to_string(residue.resi()) 
 				+ ":" + chain.chain_id() + ":" + to_string(model.number()) 
 				+ ":" + to_string(assembly.number()) + ":" + molecule.name() + ":" + mols.name() + ":" 
 				+ (lig_name.empty() ? "-" : remove_special_characters(lig_name[0])) + ":"
@@ -88,6 +83,39 @@ namespace genclus {
 			}
 		}
 	}
+	void squeeze_proteins_nucleic(Molib::Molecules &mols) {
+		for (auto &molecule : mols) {
+			for (auto &assembly : molecule) {
+				for (auto &model : assembly) {
+					for (auto &chain : model) {
+						Geom3D::Coordinate::Vec crdp, crdn;
+						// remove protein and nucleic ligands
+						for (auto &residue : chain)	residue.set_crd(); // they really need to be set!!!
+						chain.remove_if([&chain, &model, &crdp, &crdn](const Molib::Residue &r) {
+							if (r.rest() == Molib::Residue::protein) {
+								crdp.push_back(r.crd());
+								return true;
+							}
+							if (r.rest() == Molib::Residue::nucleic) {
+								crdn.push_back(r.crd());
+							}
+							return false;
+						});
+						// add PPP or NNN instead
+						if (!crdp.empty()) {
+								Molib::Residue &residue = chain.add(new Molib::Residue("PPP", 1, ' ', Molib::Residue::protein));
+								residue.add(new Molib::Atom(1, "CA", Geom3D::compute_geometric_center(crdp), help::idatm_mask.at("???")));
+						}
+						if (!crdn.empty()) {
+								Molib::Residue &residue = chain.add(new Molib::Residue("NNN", 1, ' ', Molib::Residue::nucleic));
+								residue.add(new Molib::Atom(1, "P", Geom3D::compute_geometric_center(crdn), help::idatm_mask.at("???")));
+						}
+					}
+				}
+			}
+		}
+	}
+
 	void remove_ligands_not_in_aligned_region(Molib::Molecules &mols, Json::Value aligned_residues) {
 		set<Molib::Residue::res_tuple2> a = common_ligands::json_to_set(aligned_residues).second;
 		for (auto &molecule : mols) {
@@ -136,23 +164,24 @@ namespace genclus {
 		Molib::Atom::Vec atoms;
 
 		for (auto &pmolecule : ligands)
-			for (auto &patom : pmolecule->get_atoms())
+			for (auto &patom : pmolecule->get_atoms()) {
 				atoms.push_back(patom);
+				dbgmsg("&molecule = " << &const_cast<Molib::Molecule&>(patom->br().br().br().br().br()) 
+					<< " molecule = " << const_cast<Molib::Molecule&>(patom->br().br().br().br().br()).name() 
+					<< " (pmolecule = " << pmolecule << " should be " << pmolecule->name() << ") atom = " << *patom);
+			}
 
 		Molib::Atom::Grid grid(atoms);
 		
 		for (auto &patom : atoms) {
 			Molib::Molecule &molecule1 = const_cast<Molib::Molecule&>(patom->br().br().br().br().br());
-			for (auto &pneighbor : grid.get_neighbors(patom->crd(), eps)) {
+			for (auto &pneighbor : grid.get_neighbors_including_self(patom->crd(), eps)) {
 				Molib::Molecule &molecule2 = const_cast<Molib::Molecule&>(pneighbor->br().br().br().br().br());
-				if (&molecule1 != &molecule2) {
-					const double distance = patom->crd().distance(pneighbor->crd());
-					if (pairwise_distances[&molecule1][&molecule2] < 0.0000000001
-						|| distance < pairwise_distances[&molecule1][&molecule2]) {
-							
-						pairwise_distances[&molecule1][&molecule2] = distance;
-						
-					}
+				const double distance = patom->crd().distance(pneighbor->crd());
+				if (pairwise_distances[&molecule1][&molecule2] < 0.0000000001
+					|| distance < pairwise_distances[&molecule1][&molecule2]) {
+					
+					pairwise_distances[&molecule1][&molecule2] = distance;
 				}
 			}
 		}
@@ -218,18 +247,8 @@ namespace genclus {
 				Molib::PDBreader pr(pdb_file, Molib::PDBreader::all_models|Molib::PDBreader::sparse_macromol);
 				Molib::Molecules &mols = nrset.add(new Molib::Molecules(pr.parse_molecule()));
 
-				//~ /* since bio files have asymmetric unit + bio assemblies and we 
-				 //~ * don't want asymmetric unit for generating ligands for probis-database...
-				 //~ * if there are more than 1 assemblies, then delete the first one (asymmetric unit) */
-				//~ if (for_gclus) {
-					//~ for (auto &molecule : mols) {	
-						//~ if (molecule.size() > 1) { 
-							//~ molecule.erase(0);
-						//~ }
-					//~ }
-				//~ }
-							
-					
+				squeeze_proteins_nucleic(mols);
+				
 				for (auto &molecule : mols) {
 					scr[molecule.name()] = z_score;
 				}

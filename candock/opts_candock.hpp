@@ -169,9 +169,9 @@ public:
 			TCLAP::ValueArg<string> distributions_fileArg("","dist","Select one of the interatomic distance distribution \
 				file(s) provided with this script",false,"data/csd_complete_distance_distributions.txt","string", cmd);
 			TCLAP::ValueArg<double> step_non_bondArg("","step","Step for spline generation of non-bonded knowledge-based \
-				potential [0.0-1.0] (default is 0.1)",false,0.1,"double", cmd);
+				potential [0.0-1.0] (default is 0.01)",false,0.01,"double", cmd);
 			TCLAP::ValueArg<double> scale_non_bondArg("","scale","Scale non-bonded forces and energy for knowledge-based \
-				potential [0.0-1.0] (default is 1.0)",false,1.0,"double", cmd);
+				potential [0.0-1000.0] (default is 10.0)",false,10.0,"double", cmd);
 
 			TCLAP::ValueArg<string> potential_fileArg("","potential_file","Output file for potentials and derivatives",false,"potentials.txt","string", cmd);
 			TCLAP::ValueArg<string> obj_dirArg("","obj_dir","Output directory for objective function and derivatives",false,"obj","string", cmd);

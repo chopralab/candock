@@ -30,6 +30,35 @@ namespace Molib {
 		return freeOxygens;
 	}
 	
+	bool check_dihedrals_for_planarity(const BondSet &ring_bonds) {
+		// test dihedral angles
+		for (auto &pbond : ring_bonds) {
+			Bond &b1 = *pbond;
+			for (auto &b2 : b1) {
+				if (ring_bonds.count(&b2)) {
+					for (auto &b3 : b2) {
+						if (ring_bonds.count(&b3) && &b3 != &b1) {
+							const double dangle = Geom3D::degrees(Geom3D::dihedral(b1.atom1().crd(), b1.atom2().crd(), b3.atom1().crd(), b3.atom2().crd()));
+							
+							dbgmsg("dihedral angle is " 
+								<<  dangle
+								<< " between atoms " << b1.atom1().atom_number() 
+								<< ", " << b1.atom2().atom_number() << ", " << b3.atom1().atom_number()
+								<< ", " << b3.atom2().atom_number());
+								
+							// larger than 10 degrees, means NOT aromatic
+							if (fabs(dangle) > 10 && fabs(fabs(dangle) - 180) > 10) {
+								return false;
+							}
+						}
+					}
+				}
+			}
+		}
+		// aromatic
+		return true;
+	}
+	
 	bool aromatic(const Atom::Set &ring) {
 		double sum = 0.0;
 		int bonds = 0;
@@ -65,11 +94,14 @@ namespace Molib {
 			return false;
 		double homas = 1.0 - (98.89 / bonds) * sum;
 		dbgmsg(homas);
+		bool is_aromatic = true;
 		if (homas < 0.271) {
-			// not aromatic
-			return false;
+			is_aromatic = false;
+			// give it another chance...
+			if (check_dihedrals_for_planarity(ring_bonds)) 
+				is_aromatic = true;
 		}
-		return true;
+		return is_aromatic;
 	}
 	void AtomType::compute_idatm_type(Molecule &molecule) {
 		// angle values used to discriminate between hybridization states

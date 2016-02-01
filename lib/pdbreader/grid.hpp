@@ -144,6 +144,26 @@ public:
 	}
 
 	template<typename U>
+	Points get_neighbors_including_self(const U &point, const double &dist) {
+		Geom3D::Coordinate cmin = __correct(point, -dist);
+		Geom3D::Coordinate cmax = __correct(point, dist);
+		Points points;
+		const double dist_sq = pow(dist, 2);
+		for (int i = cmin.i(); i <= cmax.i(); ++i)
+			for (int j = cmin.j(); j <= cmax.j(); ++j)
+				for (int k = cmin.k(); k <= cmax.k(); ++k) {
+					for (auto neighbor : storage[i][j][k]) {
+						const double d_sq = point.distance_sq(neighbor->crd());
+						if (d_sq < dist_sq) {
+							neighbor->distance(d_sq);
+							points.push_back(neighbor);
+						}
+					}
+				}
+		return points;
+	}
+
+	template<typename U>
 	Points get_neighbors_within_tolerance(const U &point, const double &dist, const double &tol) {
 		return get_neighbors_within_tolerance_asymmetric(point, dist, tol, tol);
 	}

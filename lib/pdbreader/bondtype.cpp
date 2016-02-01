@@ -5,6 +5,7 @@
 #include <string>
 #include <vector>
 #include <cstdlib>
+#include <numeric>  
 #include <boost/regex.hpp>
 #include <boost/algorithm/string.hpp>
 #include <boost/filesystem.hpp>
@@ -149,6 +150,19 @@ namespace Molib {
 		for (int tps = 0; tps < 32; ++tps) {
 			__dfs(0, 0, tps, V, Q, valence_states, max_valence_states);
 		}
+
+		// sort valence states within each tps from lower to higher individual aps (issue #103)
+		sort(valence_states.begin(), valence_states.end(), [] (const vector<AtomParams> &i, const vector<AtomParams> &j) { 
+				int tps_i = 0; for (auto &e : i) tps_i += e.aps;
+				int tps_j = 0; for (auto &e : j) tps_j += e.aps;
+				const AtomParams max_ap_i = *max_element(i.begin(), i.end(), [] (const AtomParams &iap, const AtomParams &jap) { return iap.aps < jap.aps; });
+				const AtomParams max_ap_j = *max_element(j.begin(), j.end(), [] (const AtomParams &iap, const AtomParams &jap) { return iap.aps < jap.aps; });
+				if (tps_i == tps_j)
+					return max_ap_i.aps < max_ap_j.aps;
+				else
+					return tps_i < tps_j;
+			});
+		
 		// convert the result to atom mapping
 		ValenceStateVec vss;
 		for (auto &valence_state : valence_states) {

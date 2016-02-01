@@ -73,6 +73,7 @@ namespace Molib {
 			else for (auto &atom : *this) {	atom.crd().rotate_inline(rota); }
 		}
 		Geom3D::Coordinate& crd() { return __crd; }
+		const Geom3D::Coordinate& crd() const { return __crd; }
 		void set_crd() { for (auto &atom : *this) { __crd = __crd + atom.crd(); } 
 			__crd = __crd / this->size(); } // calculate geom center
 		Atom& add(Atom *a) { return this->aadd(a->atom_number(), a, this); }
@@ -81,6 +82,8 @@ namespace Molib {
 		int resi() const { return __resi; }
 		char ins_code() const { return __ins_code; }
 		Residue::res_type rest() const { return __rest; }
+		Atom& atom(int p) const { return this->element(p); }
+		bool has_atom(int p) { return this->has_element(p); }
 		Atom::Vec get_atoms() const;
 		Residue& erase_properties() { for (auto &atom : *this) atom.erase_properties(); return *this; }
 		friend ostream& operator<< (ostream& stream, const Residue& r);
