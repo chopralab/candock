@@ -228,17 +228,19 @@ namespace OMMIface {
 		dbgmsg("NONBOND LIST (KBFORCES) (SIZE = " << nonbondlist.size() << ") : " << endl << nonbondlist);
 
 		// remove force if it exists
+		dbgmsg("__kbfoce_idx = " << __kbforce_idx);
 		if (__kbforce_idx != -1)
 			system->removeForce(__kbforce_idx);
 
 		KBPlugin::KBForce* kbforce = new KBPlugin::KBForce();
 		kbforce->setStep(__ffield->step);
-		dbgmsg("kbforce step = " << __ffield->step);
+		dbgmsg("kbforce step = " << setprecision(9) << fixed << __ffield->step);
 
 		int warn = 0;
 
 		// init OpenMM's kbforce object
 		for (auto &bond : nonbondlist) {
+			dbgmsg("next iteration in nonbondlist");
 			const Molib::Atom &atom1 = *bond.first;
 			const Molib::Atom &atom2 = *bond.second;
 			const int idx1 = topology.get_index(atom1);
@@ -257,16 +259,21 @@ namespace OMMIface {
 					cerr << e.what() << " (" << ++warn << ")" << endl;
 				}
 			}
-		}	
+		}
+		dbgmsg("out of loop");
 		// and add it back to the system
 		__kbforce_idx = system->addForce(kbforce);
+		dbgmsg("after addForce context = " << (context == nullptr ? "NULL" : "NOTNULL")
+			<< " __kbforce_idx = " << __kbforce_idx);
 		context->reinitialize();
+		dbgmsg("after reinitialize");
 		context->setPositions(positions);
+		dbgmsg("after setPositions");
 
 		if (warn > 0) {
 			throw Error("die : missing parameters detected");
 		}
-
+		dbgmsg("exiting update_knowledge_based_force");
 	}
 	
 	void SystemTopology::init_physics_based_force(Topology &topology) {
@@ -357,23 +364,30 @@ namespace OMMIface {
 			dbgmsg(type1);
 			const int type2 = topology.get_type(atom2);
 			dbgmsg(type2);
+			
+			ForceField::BondType btype;
+			
 			try {				
-				const ForceField::BondType& btype = __ffield->get_bond_type(type1, type2);
-				if (use_constraints && btype.can_constrain) { // Should we constrain C-H bonds?
-					system->addConstraint(idx1, idx2, btype.length);
-				} else {
-					// Note factor of 2 for stiffness below because Amber specifies the constant
-					// as it is used in the harmonic energy term kx^2 with force 2kx; OpenMM wants 
-					// it as used in the force term kx, with energy kx^2/2.
-					bondStretch->addBond(idx1, idx2, btype.length, btype.k);
-					dbgmsg("force_idx = " << force_idx << " idx1 = " << idx1 << " idx2 = " << idx2
-						 << " bond length = " << btype.length << " k = " << btype.k);
-					bondStretchData[idx1].push_back(ForceData{force_idx, idx1, idx2, 0, 0, btype.length, 0, 0, 0, btype.k});
-					bondStretchData[idx2].push_back(ForceData{force_idx, idx1, idx2, 0, 0, btype.length, 0, 0, 0, btype.k});
-					++force_idx;
-				}
+				btype = __ffield->get_bond_type(type1, type2);
+				
 			} catch (ParameterError& e) {
-				cerr << e.what() << " (" << ++warn << ")" << endl;
+				cerr << e.what() << " (WARNINGS ARE NOT INCREASED) (using default parameters for this bond)" << endl;
+				// if everything else fails just constrain at something reasonable
+				btype = ForceField::BondType{atom1.get_bond(atom2).length(), 250000, false};
+			}
+			
+			if (use_constraints && btype.can_constrain) { // Should we constrain C-H bonds?
+				system->addConstraint(idx1, idx2, btype.length);
+			} else {
+				// Note factor of 2 for stiffness below because Amber specifies the constant
+				// as it is used in the harmonic energy term kx^2 with force 2kx; OpenMM wants 
+				// it as used in the force term kx, with energy kx^2/2.
+				bondStretch->addBond(idx1, idx2, btype.length, btype.k);
+				dbgmsg("force_idx = " << force_idx << " idx1 = " << idx1 << " idx2 = " << idx2
+					 << " bond length = " << btype.length << " k = " << btype.k);
+				bondStretchData[idx1].push_back(ForceData{force_idx, idx1, idx2, 0, 0, btype.length, 0, 0, 0, btype.k});
+				bondStretchData[idx2].push_back(ForceData{force_idx, idx1, idx2, 0, 0, btype.length, 0, 0, 0, btype.k});
+				++force_idx;
 			}
 		}
 		dbgmsg("checkpoint3");
@@ -393,21 +407,27 @@ namespace OMMIface {
 			const int type2 = topology.get_type(atom2);
 			const int type3 = topology.get_type(atom3);
 			dbgmsg("checkpoint6");
+			
+			ForceField::AngleType atype;
+			
 			try {
 				dbgmsg("determining angle type between atoms : " << endl
 					<< atom1 << endl << atom2 << endl << atom3);
-				const ForceField::AngleType& atype = 
-					__ffield->get_angle_type(type1, type2, type3);
-				bondBend->addAngle(idx1, idx2, idx3, atype.angle, atype.k);
-				bondBendData[idx1].push_back(ForceData{force_idx, idx1, idx2, idx3, 0, 0, atype.angle, 0, 0, atype.k});
-				bondBendData[idx2].push_back(ForceData{force_idx, idx1, idx2, idx3, 0, 0, atype.angle, 0, 0, atype.k});
-				bondBendData[idx3].push_back(ForceData{force_idx, idx1, idx2, idx3, 0, 0, atype.angle, 0, 0, atype.k});
-				
-				++force_idx;
-
+				atype = __ffield->get_angle_type(type1, type2, type3);
 			} catch (ParameterError& e) {
-				cerr << e.what() << " (" << ++warn << ")" << endl;
+				cerr << e.what() << " (WARNINGS ARE NOT INCREASED) (using default parameters for this angle)" << endl;
+				// if everything else fails just constrain at something reasonable
+				atype = ForceField::AngleType{Geom3D::angle(atom1.crd(), atom2.crd(), atom3.crd()), 500};
 			}
+			dbgmsg("force_idx = " << force_idx << " idx1 = " << idx1 << " idx2 = " << idx2 << " idx3 = " << idx3
+				 << " angle = " << atype.angle << " k = " << atype.k);
+			bondBend->addAngle(idx1, idx2, idx3, atype.angle, atype.k);
+			bondBendData[idx1].push_back(ForceData{force_idx, idx1, idx2, idx3, 0, 0, atype.angle, 0, 0, atype.k});
+			bondBendData[idx2].push_back(ForceData{force_idx, idx1, idx2, idx3, 0, 0, atype.angle, 0, 0, atype.k});
+			bondBendData[idx3].push_back(ForceData{force_idx, idx1, idx2, idx3, 0, 0, atype.angle, 0, 0, atype.k});
+			
+			++force_idx;
+
 			dbgmsg("checkpoint8");
 		}
 		

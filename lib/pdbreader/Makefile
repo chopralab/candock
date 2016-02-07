@@ -2,7 +2,8 @@ include ../../candock/Makefile.inc
 
 OBJLIBS	= libpdb.a
 OBJS	= atom.o molecule.o bond.o pdbreader.o element.o internal.o idatm.o \
-atomtype.o bondtype.o
+atomtype.o bondtype.o hydrogens.o residue.o chain.o model.o assembly.o \
+molecules.o nrset.o
 INCL= -I ../tclap-1.2.1/include/ -I ../all3/idatmtest \
 -I ../jsoncpp-src-0.6.0-rc2/include -I ../jsoncpp-src-0.6.0-rc2/src \
 -I ../../lib/modeler -I ..
@@ -10,14 +11,39 @@ INCL= -I ../tclap-1.2.1/include/ -I ../all3/idatmtest \
 all : $(OBJLIBS)
 
 pdbreader.o: pdbreader.cpp pdbreader.hpp \
-	  molecule.hpp
+	  nrset.hpp molecules.hpp molecule.hpp \
+	  assembly.hpp model.hpp residue.hpp atom.hpp
 	$(CC) $(PRJCFLAGS) $(INCL) -c $<
 
 atom.o: atom.cpp atom.hpp it.hpp \
 	  element.hpp
 	$(CC) $(PRJCFLAGS) $(INCL) -c $<
 
+residue.o: residue.cpp residue.hpp it.hpp \
+	  element.hpp
+	$(CC) $(PRJCFLAGS) $(INCL) -c $<
+
+chain.o: chain.cpp chain.hpp it.hpp \
+	  element.hpp
+	$(CC) $(PRJCFLAGS) $(INCL) -c $<
+
+model.o: model.cpp model.hpp it.hpp \
+	  element.hpp
+	$(CC) $(PRJCFLAGS) $(INCL) -c $<
+
+assembly.o: assembly.cpp assembly.hpp it.hpp \
+	  element.hpp
+	$(CC) $(PRJCFLAGS) $(INCL) -c $<
+
 molecule.o: molecule.cpp molecule.hpp it.hpp \
+	  element.hpp
+	$(CC) $(PRJCFLAGS) $(INCL) -c $<
+
+molecules.o: molecules.cpp molecules.hpp it.hpp \
+	  element.hpp
+	$(CC) $(PRJCFLAGS) $(INCL) -c $<
+
+nrset.o: nrset.cpp nrset.hpp it.hpp \
 	  element.hpp
 	$(CC) $(PRJCFLAGS) $(INCL) -c $<
 
@@ -32,6 +58,9 @@ bond.o: bond.cpp bond.hpp
 	$(CC) $(PRJCFLAGS) $(INCL) -c $<
 
 atomtype.o: atomtype.cpp atomtype.hpp
+	$(CC) $(PRJCFLAGS) $(INCL) -c $<
+
+hydrogens.o: hydrogens.cpp hydrogens.hpp
 	$(CC) $(PRJCFLAGS) $(INCL) -c $<
 
 bondtype.o: bondtype.cpp bondtype.hpp

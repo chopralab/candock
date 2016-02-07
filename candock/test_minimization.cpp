@@ -9,7 +9,7 @@
 #include "common.hpp"
 #include "helper/error.hpp"
 #include "pdbreader/grid.hpp"
-#include "pdbreader/molecule.hpp"
+#include "pdbreader/nrset.hpp"
 #include "pdbreader/pdbreader.hpp"
 #include "modeler/forcefield.hpp"
 #include "score/score.hpp"
@@ -30,29 +30,38 @@ int main(int argc, char* argv[]) {
 		cmdl.init(argc, argv);
 		cmdl.display_time("started");
 		cout << cmdl << endl;
-		
+
 		inout::output_file("", cmdl.mini_file()); // output docked & minimized ligands conformations
 
 		Molib::PDBreader rpdb(cmdl.receptor_file(), 
-			Molib::PDBreader::first_model|Molib::PDBreader::skip_hetatm|Molib::PDBreader::hydrogens);
+			Molib::PDBreader::first_model);
 		Molib::Molecules receptors = rpdb.parse_molecule();
 
 		// if empty, add dummy receptor
 		if (receptors.empty())
 			receptors.add(new Molib::Molecule("dummy"));
 
-		receptors[0].filter(Molib::Residue::protein, cmdl.receptor_chain_id());
-
-			
 		Molib::PDBreader lpdb(cmdl.ligand_file(), 
 			Molib::PDBreader::all_models|Molib::PDBreader::hydrogens, 
 			cmdl.max_num_ligands());
 
-		/* Compute atom types for receptor (gaff types not needed since 
-		 * they are read from the forcefield xml file)
+		/** 
+		 * Compute atom types for receptor and cofactor(s): gaff types for protein, 
+		 * Mg ions, and water are read from the forcefield xml file later on while 
+		 * gaff types for cofactors (ADP, POB, etc.) are calculated de-novo here
 		 * 
 		 */
-		receptors.compute_idatm_type();
+		receptors.compute_idatm_type()
+			.compute_hydrogen()
+			.compute_bond_order()
+			.compute_bond_gaff_type()
+			.refine_idatm_type()
+			.erase_hydrogen()  // needed because refine changes connectivities
+			.compute_hydrogen()   // needed because refine changes connectivities
+			.compute_ring_type()
+			.compute_gaff_type()
+			.compute_rotatable_bonds() // relies on hydrogens being assigned
+			.erase_hydrogen();
 
 		/* Create receptor grid
 		 * 
@@ -66,14 +75,10 @@ int main(int argc, char* argv[]) {
 		if (ligands.empty())
 			ligands.add(new Molib::Molecule("dummy"));
 
-		set<int> ligand_idatm_types;
-		ligand_idatm_types = Molib::get_idatm_types(ligands, ligand_idatm_types);
-
-
 		Molib::Score score(cmdl.ref_state(), cmdl.comp(), cmdl.rad_or_raw(), cmdl.dist_cutoff(), 
 			cmdl.step_non_bond());
 
-		score.define_composition(Molib::get_idatm_types(receptors), ligand_idatm_types)
+		score.define_composition(receptors.get_idatm_types(), ligands.get_idatm_types())
 			.process_distributions_file(cmdl.distributions_file())
 			.compile_scoring_function()
 			.parse_objective_function(cmdl.obj_dir(), cmdl.scale_non_bond());
@@ -89,10 +94,18 @@ int main(int argc, char* argv[]) {
 		OMMIface::ForceField ffield;
 		ffield.parse_gaff_dat_file(cmdl.gaff_dat_file())
 			.add_kb_forcefield(score, cmdl.step_non_bond())
-			.parse_forcefield_file(cmdl.amber_xml_file());
+			.parse_forcefield_file(cmdl.amber_xml_file())
+			.parse_forcefield_file(cmdl.water_xml_file());
 
 	
 		receptors[0].prepare_for_mm(ffield, gridrec);
+
+		/**
+		 * Insert topology for cofactors, but not for standard residues
+		 * that are already known to forcefield (e.g., amino acid residues)
+		 *
+		 */
+		ffield.insert_topology(receptors[0]);
 
 		OMMIface::SystemTopology::loadPlugins();
 
@@ -136,7 +149,6 @@ int main(int argc, char* argv[]) {
 				//~ modeler.unmask(substruct);
 
 				cout << "Initial energy = " << score.non_bonded_energy(gridrec, ligand) << endl;
-
 
 				modeler.minimize_state(ligand, receptors[0], score);
 

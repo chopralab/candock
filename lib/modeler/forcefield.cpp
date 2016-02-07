@@ -208,19 +208,23 @@ namespace OMMIface {
 		for (auto &model : assembly)
 		for (auto &chain : model)
 		for (auto &residue : chain) {
-			this->residue_topology.insert({residue.resn(), ResidueTopology()});
-			ResidueTopology &rtop = this->residue_topology.at(residue.resn());
-			for (auto &atom : residue) {
-				rtop.atom.insert({atom.atom_name(), atom_name_to_type.at(atom.gaff_type())});
-			}
-			for (auto &atom : residue) {
-				for (auto &adj_a : atom) {
-					if (atom.atom_number() < adj_a.atom_number())
-						rtop.bond[atom.atom_name()][adj_a.atom_name()] = true;
+			// additionally check if residue not already in the ffield (this is for adding receptor
+			// topology where amino acids are already in the ffield, but cofactors are not
+			if (!this->residue_exists(residue.resn())) {
+				this->residue_topology.insert({residue.resn(), ResidueTopology()});
+				ResidueTopology &rtop = this->residue_topology.at(residue.resn());
+				for (auto &atom : residue) {
+					rtop.atom.insert({atom.atom_name(), atom_name_to_type.at(atom.gaff_type())});
 				}
+				for (auto &atom : residue) {
+					for (auto &adj_a : atom) {
+						if (atom.atom_number() < adj_a.atom_number())
+							rtop.bond[atom.atom_name()][adj_a.atom_name()] = true;
+					}
+				}
+				dbgmsg("inserted topology for residue " << residue.resn()
+					<< endl << rtop);
 			}
-			dbgmsg("inserted topology for residue " << residue.resn()
-				<< endl << rtop);
 		}
 		return *this;
 	}
@@ -645,41 +649,45 @@ namespace OMMIface {
 					<< " k = " << stod(node->first_attribute("k")->value()));
 		}
 		// parse torsions
-		for (xml_node<> *node = doc.first_node("ForceField")->first_node("PeriodicTorsionForce")->first_node(); node; node = node->next_sibling()) {
-			const string cl1 = (node->first_attribute("class1")->value_size() == 0 ? "X" : node->first_attribute("class1")->value());
-			const string cl2 = (node->first_attribute("class2")->value_size() == 0 ? "X" : node->first_attribute("class2")->value());
-			const string cl3 = (node->first_attribute("class3")->value_size() == 0 ? "X" : node->first_attribute("class3")->value());
-			const string cl4 = (node->first_attribute("class4")->value_size() == 0 ? "X" : node->first_attribute("class4")->value());
-			const bool is_proper = (string("Proper").compare(node->name()) == 0);
-			dbgmsg("node_name = " << node->name() << " is_proper = " << is_proper);
-			xml_attribute<> *attr = node->first_attribute("periodicity1");
-			while(attr) {
-				const int periodicity = stoi(attr->value());
-				attr = attr->next_attribute();
-				const double phase = stod(attr->value());
-				attr = attr->next_attribute();
-				const double k = stod(attr->value());
-				attr = attr->next_attribute();
-				if (is_proper) {
-					TorsionTypeVec &dihedral = this->torsion_type[cl1][cl2][cl3][cl4];
-					dihedral.push_back(TorsionType{periodicity, phase, k});
-					dbgmsg("periodic torsion (dihedral) force between " 
-						<< cl1 << " and " << cl2 << " and " << cl3 << " and " << cl4 << " is "
-						<< " periodicity" << dihedral.size() << " = " << periodicity
-						<< " phase" << dihedral.size() << " = " << phase
-						<< " k" << dihedral.size() << " = " << k);
-				} else {
-					TorsionTypeVec &improper = this->improper_type[cl2][cl3][cl1][cl4];
-					improper.push_back(TorsionType{periodicity, phase, k});
-					dbgmsg("periodic torsion (improper) force between " 
-						<< cl1 << " and " << cl2 << " and " << cl3 << " and " << cl4 << " is "
-						<< " periodicity" << improper.size() << " = " << periodicity
-						<< " phase" << improper.size() << " = " << phase
-						<< " k" << improper.size() << " = " << k
-						<< " (here the FIRST atom is central)");
+		xml_node<> *torsions_node = doc.first_node("ForceField")->first_node("PeriodicTorsionForce");
+		if (torsions_node) {
+			for (xml_node<> *node = torsions_node->first_node(); node; node = node->next_sibling()) {
+				const string cl1 = (node->first_attribute("class1")->value_size() == 0 ? "X" : node->first_attribute("class1")->value());
+				const string cl2 = (node->first_attribute("class2")->value_size() == 0 ? "X" : node->first_attribute("class2")->value());
+				const string cl3 = (node->first_attribute("class3")->value_size() == 0 ? "X" : node->first_attribute("class3")->value());
+				const string cl4 = (node->first_attribute("class4")->value_size() == 0 ? "X" : node->first_attribute("class4")->value());
+				const bool is_proper = (string("Proper").compare(node->name()) == 0);
+				dbgmsg("node_name = " << node->name() << " is_proper = " << is_proper);
+				xml_attribute<> *attr = node->first_attribute("periodicity1");
+				while(attr) {
+					const int periodicity = stoi(attr->value());
+					attr = attr->next_attribute();
+					const double phase = stod(attr->value());
+					attr = attr->next_attribute();
+					const double k = stod(attr->value());
+					attr = attr->next_attribute();
+					if (is_proper) {
+						TorsionTypeVec &dihedral = this->torsion_type[cl1][cl2][cl3][cl4];
+						dihedral.push_back(TorsionType{periodicity, phase, k});
+						dbgmsg("periodic torsion (dihedral) force between " 
+							<< cl1 << " and " << cl2 << " and " << cl3 << " and " << cl4 << " is "
+							<< " periodicity" << dihedral.size() << " = " << periodicity
+							<< " phase" << dihedral.size() << " = " << phase
+							<< " k" << dihedral.size() << " = " << k);
+					} else {
+						TorsionTypeVec &improper = this->improper_type[cl2][cl3][cl1][cl4];
+						improper.push_back(TorsionType{periodicity, phase, k});
+						dbgmsg("periodic torsion (improper) force between " 
+							<< cl1 << " and " << cl2 << " and " << cl3 << " and " << cl4 << " is "
+							<< " periodicity" << improper.size() << " = " << periodicity
+							<< " phase" << improper.size() << " = " << phase
+							<< " k" << improper.size() << " = " << k
+							<< " (here the FIRST atom is central)");
+					}
 				}
 			}
 		}
+		dbgmsg("before parsing nonbonded force");
 		// parse nonbonded force
 		xml_node<> *nb_node = doc.first_node("ForceField")->first_node("NonbondedForce");
 		if (nb_node) {

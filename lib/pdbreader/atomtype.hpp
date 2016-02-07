@@ -8,18 +8,20 @@
 #include <vector>
 #include <cstdlib>
 #include "it.hpp"
+#include "atom.hpp"
 
 using namespace std;
 
 namespace Molib {	
 	class Atom;
+	class Molecule;
 	
 	class AtomType {
 	public:
-		static void compute_idatm_type(Molecule &molecule);
-		static void refine_idatm_type(Molecule &molecule);
-		static void compute_gaff_type(Molecule &molecule);
-		static void compute_ring_type(Molecule &molecule);
+		static void compute_idatm_type(const Atom::Vec &atoms);
+		static void refine_idatm_type(const Atom::Vec &atoms);
+		static void compute_gaff_type(const Atom::Vec &atoms);
+		static void compute_ring_type(const Atom::Vec &atoms);
 	};
 };
 #endif

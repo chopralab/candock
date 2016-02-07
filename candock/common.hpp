@@ -1,4 +1,4 @@
-#include "pdbreader/molecule.hpp"
+#include "pdbreader/nrset.hpp"
 #include "score/score.hpp"
 #include "graph/graph.hpp"
 #include "geom3d/geom3d.hpp"

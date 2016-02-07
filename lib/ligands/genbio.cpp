@@ -4,7 +4,7 @@
 #include "jsonreader.hpp"
 #include "nosqlreader.hpp"
 #include "pdbreader/pdbreader.hpp"
-#include "pdbreader/molecule.hpp"
+#include "pdbreader/molecules.hpp"
 #include "helper/help.hpp"
 //~ #include "opts_genbio.hpp"
 #include "geom3d/matrix.hpp"

@@ -1,19 +1,5 @@
 #ifndef ATOM_H
 #define ATOM_H
-#include <memory>
-#include <iostream>
-#include <set>
-#include <map>
-#include <string>
-#include <vector>
-#include <cstdlib>
-#include <boost/regex.hpp>
-#include <boost/algorithm/string.hpp>
-#include <boost/filesystem.hpp>
-#include <boost/date_time/posix_time/posix_time.hpp>
-#include <boost/algorithm/string/split.hpp>
-#include <boost/algorithm/string.hpp>
-#include <boost/asio/ip/host_name.hpp>
 #include "geom3d/coordinate.hpp"
 #include "geom3d/matrix.hpp"
 #include "it.hpp"
@@ -48,7 +34,7 @@ namespace Molib {
 		map<string, int> __smiles_prop;
 		map<int, int> __aps;
 		void *__br; // back reference
-		map<Atom*, shared_ptr<Bond>> __bonds;
+		map<const Atom*, shared_ptr<Bond>> __bonds;
 		
 	public:
 		Atom(const Atom &rhs) : __atom_number(rhs.__atom_number), 
@@ -75,12 +61,12 @@ namespace Molib {
 		void clear_bonds() { __bonds.clear(); }
 		BondVec get_bonds() const { BondVec bonds; for (auto &kv : __bonds) 
 			bonds.push_back(&*kv.second); return bonds; }
-		const shared_ptr<Bond>& get_shared_ptr_bond(Atom &other) const { return __bonds.at(&other); }
-		Bond& get_bond(Atom &other) const { return *get_shared_ptr_bond(other); }
-		shared_ptr<Bond>& insert_bond(Atom &other, const shared_ptr<Bond> &bond) { return __bonds.insert({&other, bond}).first->second; }
-		shared_ptr<Bond>& insert_bond(Atom &other, Bond *bond) { return __bonds.insert({&other, shared_ptr<Bond>(bond)}).first->second; }
-		void erase_bond(Atom &other) { __bonds.erase(&other); }
-		bool is_adjacent(Atom &other) const { return __bonds.count(&other); }
+		const shared_ptr<Bond>& get_shared_ptr_bond(const Atom &other) const { return __bonds.at(&other); }
+		Bond& get_bond(const Atom &other) const { return *get_shared_ptr_bond(other); }
+		shared_ptr<Bond>& insert_bond(const Atom &other, const shared_ptr<Bond> &bond) { return __bonds.insert({&other, bond}).first->second; }
+		shared_ptr<Bond>& insert_bond(const Atom &other, Bond *bond) { return __bonds.insert({&other, shared_ptr<Bond>(bond)}).first->second; }
+		void erase_bond(const Atom &other) { __bonds.erase(&other); }
+		bool is_adjacent(const Atom &other) const { return __bonds.count(&other); }
 		bool is_adjacent(const string &atom_name) const { for (auto &other : *this) if (other.atom_name() == atom_name) return true; return false; }
 		int get_num_hydrogens() const;
 		int atom_number() const { return __atom_number; }

@@ -6,16 +6,11 @@
 #include <vector>
 #include <cstdlib>
 #include <boost/regex.hpp>
-#include <boost/algorithm/string.hpp>
-#include <boost/filesystem.hpp>
-#include <boost/date_time/posix_time/posix_time.hpp>
-#include <boost/algorithm/string/split.hpp>
-#include <boost/algorithm/string.hpp>
-#include <boost/asio/ip/host_name.hpp>
 #include "bond.hpp"
-#include "atom.hpp"
 #include "geom3d/geom3d.hpp"
-#include "pdbreader/molecule.hpp"
+#include "atom.hpp"
+#include "residue.hpp"
+#include "chain.hpp"
 using namespace std;
 
 namespace Molib {
@@ -58,17 +53,16 @@ namespace Molib {
 			ss << "{" << it->first << "," << it->second << "}" 
 				<< (++it_plus_one == a.__smiles_prop.end() ? "" : ",");
 		}
-		stream << ss.str() << "}"; 
-		stream << endl;
+		stream << ss.str() << "}" << endl; 
 		return stream;
 	}
 
 	ostream& operator<< (ostream& stream, const Atom::Set &atoms) {
-		for (auto &patom : atoms) stream << *patom << endl;
+		for (auto &patom : atoms) stream << *patom;
 		return stream;
 	}
 	ostream& operator<< (ostream& stream, const Atom::Vec &atoms) {
-		for (auto &patom : atoms) stream << *patom << endl;
+		for (auto &patom : atoms) stream << *patom;
 		return stream;
 	}
 

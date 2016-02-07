@@ -1,7 +1,7 @@
 #ifndef GREEDY_CLUSTER_H
 #define GREEDY_CLUSTER_H
 
-#include "pdbreader/molecule.hpp"
+//~ #include "pdbreader/molecule.hpp"
 #include "geom3d/geom3d.hpp"
 #include "linker/partial.hpp"
 

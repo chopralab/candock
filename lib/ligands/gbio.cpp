@@ -1,18 +1,4 @@
-#include <iostream>
-#include <exception>
-#include <typeinfo>
-#include "jsonreader.hpp"
-#include "nosqlreader.hpp"
-#include "pdbreader/pdbreader.hpp"
-#include "pdbreader/molecule.hpp"
-#include "helper/help.hpp"
 #include "opts_genbio.hpp"
-#include "geom3d/matrix.hpp"
-#include "helper/error.hpp"
-#include "helper/inout.hpp"
-#include "helper/debug.hpp"
-#include "pdbreader/grid.hpp"
-#include "common.hpp"
 #include "genbio.hpp"
 using namespace std;
 

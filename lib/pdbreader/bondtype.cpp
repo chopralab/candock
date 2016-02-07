@@ -48,25 +48,40 @@ namespace Molib {
 		}
 		return os;
 	}
-	void BondOrder::compute_bond_gaff_type(Molecule &molecule) {
-		// assign atom types for atomic penalty scores
-		Fragmenter(molecule.get_atoms())
-			.substitute_bonds(help::bond_gaff_type);
-		dbgmsg("MOLECULE AFTER COMPUTING BOND GAFF TYPE " << endl
-			<< molecule);
+	
+	void BondOrder::compute_rotatable_bonds(const Atom::Vec &atoms) {
+		dbgmsg("starting compute_rotatable_bonds");
+		Fragmenter f(atoms);
+		f.substitute_bonds(help::rotatable);
+		// rotatable bond inside a ring is changed back to non-rotatable
+		Rings rings = f.identify_fused_rings();
+		//~ Rings rings = f.identify_rings();
+		for (auto &ring : rings) {
+			for (auto &pbond : get_bonds_in(ring)) {
+				pbond->set_rotatable("");
+			}
+		}
+		dbgmsg("MOLECULE AFTER COMPUTING ROTATABLE BONDS" << endl << atoms);
 	}
-	void BondOrder::compute_bond_order(Molecule &molecule) {
+
+	
+	void BondOrder::compute_bond_gaff_type(const Atom::Vec &atoms) {
+		// assign atom types for atomic penalty scores
+		Fragmenter(atoms)
+			.substitute_bonds(help::bond_gaff_type);
+		dbgmsg("MOLECULE AFTER COMPUTING BOND GAFF TYPE " << endl << atoms);
+	}
+	void BondOrder::compute_bond_order(const Atom::Vec &atoms) {
 		try {
 			// assign atom types for atomic penalty scores
-			Fragmenter(molecule.get_atoms())
+			Fragmenter(atoms)
 				.substitute_atoms(help::atomic_penalty_scores);
-			dbgmsg("MOLECULE AFTER ASSIGNING ATOMIC PENALTY SCORES " << endl
-				<< molecule);
+			dbgmsg("MOLECULE AFTER ASSIGNING ATOMIC PENALTY SCORES " << endl << atoms);
 			// for tps 0, 1, 2, 3, ..., N create all possible combinations of valence states
 			// total number of valence states < 2000
 			const int max_valence_states = 2000;
 			ValenceStateVec valence_states = 
-				__create_valence_states(molecule, max_valence_states);
+				__create_valence_states(atoms, max_valence_states);
 			dbgmsg("VALENCE STATES ARE " << endl << valence_states << "-----");
 			// for each valence state determine bond orders (boaf procedure)
 #ifndef NDEBUG
@@ -77,15 +92,13 @@ namespace Molib {
 				try {
 					BondToOrder bond_orders;
 					if (__basic_rules(valence_state, bond_orders)) {
-						dbgmsg("successfully determined bond orders for molecule " 
-							<< molecule.name() << " : " << endl << bond_orders);
+						dbgmsg("successfully determined bond orders for molecule : " << endl << bond_orders);
 						// set the newly determined bond orders
 						for (auto &kv : bond_orders) {
 							Bond &bond = *kv.first;
 							bond.set_bo(kv.second);
 						}
-						dbgmsg("MOLECULE AFTER COMPUTING BOND ORDERS" 
-							<< endl << molecule);
+						dbgmsg("MOLECULE AFTER COMPUTING BOND ORDERS" << endl << atoms);
 						return;
 					}
 				} catch(BondOrderError &e) {
@@ -93,10 +106,9 @@ namespace Molib {
 				}
 			}
 			// if boaf fails for all saved valence states, a warning message is given
-			throw Error("die : bond order assignment failed for molecule "
-				+ molecule.name());
+			throw Error("die : bond order assignment failed");
 		} catch (exception& e) {
-			cerr << "errmesg : " << e.what() << " for molecule = " << molecule.name() << endl;
+			cerr << "errmesg : " << e.what() << " for molecule = " << endl << atoms << endl;
 		}
 	}
 	
@@ -120,20 +132,17 @@ namespace Molib {
 		}
 	}
 
-	ValenceStateVec BondOrder::__create_valence_states(const Molecule &molecule, 
-		const int max_valence_states) {
+	ValenceStateVec BondOrder::__create_valence_states(const Atom::Vec &atoms, const int max_valence_states) {
 #ifndef NDEBUG
 		Benchmark::reset();
 #endif
-		vector<Atom*> atoms;
 		vector<vector<AtomParams>> V; // vector of AtomParams are sorted by increasing aps
 		vector<vector<AtomParams>> valence_states;
 		vector<AtomParams> Q;
 		// prepare for recursive valence state determination
-		for (auto &patom : molecule.get_atoms()) {
+		for (auto &patom : atoms) {
 			Atom &atom = *patom;
 			dbgmsg(atom);
-			atoms.push_back(&atom);
 			V.push_back(vector<AtomParams>());
 			auto &aps = V.back();
 			for (auto &kv : atom.get_aps()) {

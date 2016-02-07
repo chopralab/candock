@@ -206,7 +206,8 @@ namespace help {
 		{"DA"},
 		{"DT"},
 		{"DG"},
-		{"DC"}
+		{"DC"},
+		{"DU"}
 	};
 	const set<string> ions {
 		{"LI"},
@@ -737,6 +738,8 @@ namespace help {
 		{"TRP",{{"OXT","O2-"},{"CA","C3"},{"CB","C3"},{"C","C2"},{"CD1","Car"},{"CD2","Car"},{"CE2","Car"},{"CE3","Car"},{"CG","Car"},{"CH2","Car"},{"CZ2","Car"},{"CZ3","Car"},{"NE1","Npl"},{"N","Npl"},{"O","O2"},{"H","H"},{"HA","HC"},{"HB2","HC"},{"HB3","HC"},{"HD1","HC"},{"HE1","H"},{"HZ2","HC"},{"HH2","HC"},{"HZ3","HC"},{"HE3","HC"}}},
 		{"TYR",{{"OXT","O2-"},{"CA","C3"},{"CB","C3"},{"C","C2"},{"CD1","Car"},{"CD2","Car"},{"CE1","Car"},{"CE2","Car"},{"CG","Car"},{"CZ","Car"},{"N","Npl"},{"OH","O3"},{"O","O2"},{"H","H"},{"HA","HC"},{"HB2","HC"},{"HB3","HC"},{"HD1","HC"},{"HE1","HC"},{"HH","H"},{"HE2","HC"},{"HD2","HC"}}},
 		{"VAL",{{"OXT","O2-"},{"CA","C3"},{"CB","C3"},{"C","C2"},{"CG1","C3"},{"CG2","C3"},{"N","Npl"},{"O","O2"},{"H","H"},{"HA","HC"},{"HB","HC"},{"HG11","HC"},{"HG12","HC"},{"HG13","HC"},{"HG21","HC"},{"HG22","HC"},{"HG23","HC"}}},
+
+		{"HOH",{{"O","O3"},{"H1","H"},{"H2","H"}}},
 	};
 	const IdatmInfoMap infoMap {
 	        { "Car", { Planar, 3, "aromatic carbon" } },
@@ -783,7 +786,10 @@ namespace help {
 	        { "Cl", { Single, 1, "chloride" } },
 	        { "Br", { Single, 1, "bromium" } },
 	        { "I", { Single, 1, "iodide" } },
-	        { "Si", { Tetrahedral, 4, "silicon" } } // Janez : added for CHEMBL95846 and alike
+	        { "Si", { Tetrahedral, 4, "silicon" } }, // Janez : added for CHEMBL95846 and alike
+	        { "Mg", { Ion, 0, "magnesium" } },
+	        { "Mn", { Ion, 0, "manganese" } },
+	        { "Zn", { Ion, 0, "zinc" } },
 	};
 	const char* const idatm_unmask[] {	
 		"Ac",
@@ -1312,12 +1318,15 @@ namespace help {
 		{{{"Npl#1#3,1H#1ag,ag5","^S|^Oar#2#2#1ag,ag5",""}}, {{"1:idatm=N2"}}}, // change 3-substituted Npl bound to S or O in 5-ring to N2
 		{{{"Npl#1#2#1ag,ag5","^S|^Oar#2#2#1ag,ag5",""}}, {{"1:idatm=N2"}}}, // change 2-substituted Npl bound to S or O in 5-ring to N2
 		{{{"N2#1#2","C2#2#3",""},{"#2","O3#3#1",""}}, {{"1:idatm=Npl"},{"3:idatm=O2"}}}, // correct peptide bond
-		{{{"N1$#1#2",".*#2",""}}, {{"1:idatm=N1+"}}}, // change 2-substituted N1 to N1+ (e.g. azide)
-		{{{"Npl#1#1",".*#2",""}}, {{"1:idatm=N1"}}}, // change 1-substituted Npl (terminal -N=N=N) to N1 (e.g. azide)
+		//~ {{{"N1$#1#2",".*#2",""}}, {{"1:idatm=N1+"}}}, // change 2-substituted N1 to N1+ (e.g. azide)
+		{{{"N1$#1#2","^N#2",""},{"#1","^N#3",""}}, {{"1:idatm=N1+"}}}, // change 2-substituted N1 to N1+ (e.g. azide)
+		//~ {{{"Npl#1#1",".*#2",""}}, {{"1:idatm=N1"}}}, // change 1-substituted Npl (terminal -N=N=N) to N1 (e.g. azide)
+		{{{"Npl#1#1","^N#2",""},{"#2","^N#3",""}}, {{"1:idatm=N1"}}}, // change 1-substituted Npl (terminal -N=N=N) to N1 (e.g. azide)
 		{{{"Npl#1#3,1H","N1|N1\\+#2",""}}, {{"1:idatm=N2+"}}}, // change 3-substituted Npl (first nitrogen in -N(-H)=N=N) to N2+ (e.g. azide)
 		{{{"^S#1#4","Npl#2#2",""},{"#1","Npl#3#2",""},{"#1","^C#4",""},{"#1","^C#5",""}}, {{"2:idatm=N2"},{"3:idatm=N2"}}}, // (R-)(R-)S(=N-)(=N-)
 		{{{"^P#1#3","Npl#2#2",""},{"#1","Npl#3#2",""}}, {{"2:idatm=N2"},{"3:idatm=N2"}}}, // (R-)P(=N-)(=N-)
 		{{{"Npl#1#2","C2#2#3",""},{"#2","C3#3",""},{"#2","C3#4",""}}, {{"1:idatm=N2"}}}, // change 2-substituted Npl bound to isolated C2 to N2
+		{{{"C2#1#3","N3#2",""},{"#1","C3#3",""},{"#1","Pox#4",""}}, {{"1:idatm=C3"}}}, // change wrongly assigned C2 (Ligand ID: POB, Atom Name: C1') to C3
 	};	
 	const rename_rules refine { // idatm rules for final refinement (relies on bond gaff types)
 		{{{"Npl#1#3#sb,db,ag6",".*#2",""}}, {{"1:idatm=N2+"}}}, // change 3-substituted Npl in 6-membered aromatic ring to N2+

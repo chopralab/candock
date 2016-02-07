@@ -35,7 +35,15 @@ int main(int argc, char* argv[]) {
 		 * 
 		 */
 		inout::output_file("", cmdl.nosql_file()); // probis local structural alignments
-		
+
+		/* Initialize parsers for receptor (and ligands) and read
+		 * the receptor molecule(s)
+		 * 
+		 */
+		Molib::PDBreader rpdb(cmdl.receptor_file(), 
+			Molib::PDBreader::first_model);
+		Molib::Molecules receptors = rpdb.parse_molecule();
+
 		/* Identify potential binding sites using ProBiS algorithm
 		 * or alternatively set binding sites from file
 		 * 
@@ -43,7 +51,8 @@ int main(int argc, char* argv[]) {
 		Centro::Centroids centroids;
 		if (cmdl.centroid_in_file().empty()) {
 			probis::compare_against_bslib(argc, argv, cmdl.receptor_file(), 
-				cmdl.receptor_chain_id(), cmdl.bslib_file(), cmdl.ncpu(),
+				receptors[0].get_chain_ids(Molib::Residue::protein), 
+				cmdl.bslib_file(), cmdl.ncpu(),
 				cmdl.nosql_file(), cmdl.json_file());
 			genclus::generate_clusters_of_ligands(cmdl.json_file(), cmdl.json_with_ligs_file(),
 				cmdl.bio_dir(), cmdl.names_dir(), cmdl.neighb(), cmdl.probis_clus_rad(),
@@ -61,16 +70,6 @@ int main(int argc, char* argv[]) {
 		} else { // ... or else set binding sites from file
 			centroids = Centro::set_centroids(cmdl.centroid_in_file(), cmdl.num_bsites());
 		}
-
-		/* Initialize parsers for receptor (and ligands) and read
-		 * the receptor molecule(s)
-		 * 
-		 */
-		Molib::PDBreader rpdb(cmdl.receptor_file(), 
-			Molib::PDBreader::first_model|Molib::PDBreader::skip_hetatm);
-		Molib::Molecules receptors = rpdb.parse_molecule();
-		
-		receptors[0].filter(Molib::Residue::protein, cmdl.receptor_chain_id());
 
 		/* Compute atom types for receptor (gaff types not needed since 
 		 * they are read from the forcefield xml file)

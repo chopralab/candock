@@ -103,7 +103,7 @@ namespace Molib {
 		}
 		return is_aromatic;
 	}
-	void AtomType::compute_idatm_type(Molecule &molecule) {
+	void AtomType::compute_idatm_type(const Atom::Vec &atoms) {
 		// angle values used to discriminate between hybridization states
 		const double angle23val1 = 115.0;
 		const double angle23val2 = 122.0;
@@ -145,14 +145,14 @@ namespace Molib {
 		//   Carbons in aromatic rings are type Car.  Aromatic oxygens are Oar.
 	
 		// initialize idatm type in Atoms
-		for (auto &pa : molecule.get_atoms())
+		for (auto &pa : atoms)
 			pa->set_idatm_type("???");
 	
 		map<const Atom*, int> heavys; // number of heavy atoms bonded
 	
 		// "pass 1":  type hydrogens / deuteriums and compute number of
 		// heavy atoms connected to each atom
-		for (auto &pa : molecule.get_atoms()) {
+		for (auto &pa : atoms) {
 			Atom &a = *pa;
 			const Element &element = a.element();
 			dbgmsg(a.element());
@@ -184,56 +184,55 @@ namespace Molib {
 	
 		// "pass 1.5": use templates for "infallible" typing of standard residue types
 		map<const Atom*, bool> mapped;
-		for (auto &assembly : molecule)
-		for (auto &model : assembly)
-		for (auto &chain : model) {
-			for (auto &residue : chain) {
-				auto it = help::standard_residues.find(residue.resn());
-				if (it != help::standard_residues.end())
-					for (auto &a : residue) {
-						if (!mapped[&a]) {
-							string idatm_type = "???";
-							// is it the N-terminal residue ?
-							if (residue.rest() == Residue::protein 
-								&& &residue == &chain.first()) {
-								if (a.atom_name() == "N")
-									idatm_type = "N3+";
-								else if (a.atom_name() == "H1" || a.atom_name() == "H2" || 
-										a.atom_name() == "H3" || a.atom_name() == "HN1" || 
-										a.atom_name() == "HN2" || a.atom_name() == "HN3")
-									idatm_type = "H";
-							}
-							// is it C-terminal ?
-							if (residue.rest() == Residue::protein
-								&& &residue == &chain.last()) {
-								if (a.atom_name() == "O" || a.atom_name() == "OXT")
-									idatm_type = "O2-";
-								else if (a.atom_name() == "C") 
-									idatm_type = "Cac";
-							}
-							// H on peptide N
-							if (a.atom_name() == "HN")
+		for (auto &patom : atoms) {
+			const Residue &residue = patom->br();
+			const Chain &chain = residue.br();
+			auto it = help::standard_residues.find(residue.resn());
+			if (it != help::standard_residues.end()) {
+				for (auto &a : residue) {
+					if (!mapped[&a]) {
+						string idatm_type = "???";
+						// is it the N-terminal residue ?
+						if (residue.rest() == Residue::protein 
+							&& &residue == &chain.first()) {
+							if (a.atom_name() == "N")
+								idatm_type = "N3+";
+							else if (a.atom_name() == "H1" || a.atom_name() == "H2" || 
+									a.atom_name() == "H3" || a.atom_name() == "HN1" || 
+									a.atom_name() == "HN2" || a.atom_name() == "HN3")
 								idatm_type = "H";
-							// still not known? find it in the table!
-							if (idatm_type == "???") {
-								auto it2 = it->second.find(a.atom_name());
-								if (it2 == it->second.end())
-									throw Error("die : cannot find atom name " 
-										+ a.atom_name() + " of template residue "
-										+ residue.resn());
-								idatm_type = it2->second;
-							}
-							a.set_idatm_type(idatm_type);
-							mapped[&a] = true;
 						}
-						dbgmsg("pass 1.5  : " << a.idatm_type_unmask() << " " << a.atom_name() << " " << a.atom_number());
+						// is it C-terminal ?
+						if (residue.rest() == Residue::protein
+							&& &residue == &chain.last()) {
+							if (a.atom_name() == "O" || a.atom_name() == "OXT")
+								idatm_type = "O2-";
+							else if (a.atom_name() == "C") 
+								idatm_type = "Cac";
+						}
+						// H on peptide N
+						if (a.atom_name() == "HN")
+							idatm_type = "H";
+						// still not known? find it in the table!
+						if (idatm_type == "???") {
+							auto it2 = it->second.find(a.atom_name());
+							if (it2 == it->second.end())
+								throw Error("die : cannot find atom name " 
+									+ a.atom_name() + " of template residue "
+									+ residue.resn());
+							idatm_type = it2->second;
+						}
+						a.set_idatm_type(idatm_type);
+						mapped[&a] = true;
+					}
+					dbgmsg("pass 1.5  : " << a.idatm_type_unmask() << " " << a.atom_name() << " " << a.atom_number());
 				}
 			}
 		}
 		// "pass 2": elements that are typed only by element type
 		// and valences > 1
 		map<Atom*, int> redo;
-		for (auto &pa : molecule.get_atoms()) {
+		for (auto &pa : atoms) {
 			Atom &a = *pa;
 			if (mapped[&a])
 				continue;
@@ -375,7 +374,7 @@ namespace Molib {
 		// by element only in previous pass, but can be typed more accurately
 		// now that the atoms they are bonded to have been typed.  Bond
 		// lengths are used in this pass.  
-		for (auto &pa : molecule.get_atoms()) {
+		for (auto &pa : atoms) {
 			Atom &a = *pa;
 			dbgmsg("pass 3 : atom = " << a.atom_number());
 			if (a.size() != 1)
@@ -457,7 +456,7 @@ namespace Molib {
 	
 		// "pass 4": re-examine all atoms with non-zero 'redo' values and
 		//   retype them if necessary
-		for (auto &pa : molecule.get_atoms()) {
+		for (auto &pa : atoms) {
 			Atom &a = *pa;
 			if (mapped[&a])
 				redo[&a] = 0;
@@ -508,7 +507,7 @@ namespace Molib {
 		//   be double bonded to a carboxylate carbon, phosphate phosphorus,
 		//   sulfate sulfur, sulfone sulfur, sulfoxide sulfur, or sp1 carbon.
 		//   Addition not in original idatm: Nox also
-		for (auto &pa : molecule.get_atoms()) {
+		for (auto &pa : atoms) {
 			Atom &a = *pa;
 			if (a.idatm_type_unmask() != "C2")
 				continue;
@@ -550,7 +549,7 @@ namespace Molib {
 		//   2) make carboxyl oxygens negatively charged even if the proton is
 		//      present (the pKa of the carboxyl group is probably low enough
 		//      that the unprotonated form predominates at physiological pH).
-		for (auto &pa : molecule.get_atoms()) {
+		for (auto &pa : atoms) {
 			Atom &a = *pa;
 			if (a.idatm_type_unmask() == "N3") {
 				if (mapped[&a])
@@ -626,10 +625,8 @@ namespace Molib {
 		//	2) Check that all the atoms of the ring are planar types
 		//	3) Check bond lengths around the ring; see if they are
 		//		consistent with aromatic bond lengths
-		for (auto &assembly : molecule)
-		for (auto &model : assembly)
-		for (auto &chain : model)
-		for (auto &residue : chain) {
+		for (auto &patom : atoms) {
+			const Residue &residue = patom->br();
 			if (! help::standard_residues.count(residue.resn())) {
 				dbgmsg("here I am");
 				Fragmenter frag(residue.get_atoms());
@@ -695,7 +692,7 @@ namespace Molib {
 		//	Discrimination criteria is the average bond length of the two 
 		//	heavy-atom bonds (shorter implies more double-bond character,
 		//	thereby no hydrogen).
-		for (auto &pa : molecule.get_atoms()) {
+		for (auto &pa : atoms) {
 			Atom &a = *pa;
 			if (mapped[&a])
 				continue;
@@ -765,10 +762,8 @@ namespace Molib {
 			dbgmsg("pass 8  : " << a.idatm_type_unmask());
 		}
 		// "pass 9": change O2- to O3- for sulfates, phosphates, N-oxide, S3- for thiophosphate ... 
-		for (auto &assembly : molecule)
-		for (auto &model : assembly)
-		for (auto &chain : model)
-		for (auto &residue : chain) {
+		for (auto &patom : atoms) {
+			const Residue &residue = patom->br();
 			if ( ! help::standard_residues.count(residue.resn())) {
 				Fragmenter(residue.get_atoms()).substitute_atoms(help::special);
 				dbgmsg("pass 9 (renaming special atom types) : " << endl << residue);
@@ -777,38 +772,22 @@ namespace Molib {
 		//~ // missing types: C1-,N2+,N1+,Oar+,O1+,O1,Sar
 		// still missing types: C1-,O1+,O1
 		// no longer missing : Sar,Oar+,N1+,N2+
-		dbgmsg("MOLECULE AFTER IDATM TYPING" << endl << molecule);
+		dbgmsg("MOLECULE AFTER IDATM TYPING" << endl << atoms);
 	}	
-	void AtomType::refine_idatm_type(Molecule &molecule) {
+	void AtomType::refine_idatm_type(const Atom::Vec &atoms) {
 		// "pass 10": refined idatm typing relying on bond orders... 
-		for (auto &assembly : molecule)
-		for (auto &model : assembly)
-		for (auto &chain : model)
-		for (auto &residue : chain) {
-			if ( ! help::standard_residues.count(residue.resn())) {
-				Fragmenter(residue.get_atoms()).substitute_atoms(help::refine);
-				dbgmsg("pass 10 (refining idatm atom types) : " << endl << residue);
-			}
-		}
-		dbgmsg("MOLECULE AFTER REFINED IDATM TYPING" << endl << molecule);
+		Fragmenter(atoms).substitute_atoms(help::refine);
+		dbgmsg("pass 10 (refining idatm atom types) : " << endl << atoms);
 	}
 	
-	void AtomType::compute_gaff_type(Molecule &molecule) {
-		for (auto &assembly : molecule)
-		for (auto &model : assembly)
-		for (auto &chain : model)
-		for (auto &residue : chain) {
-			if (!help::standard_residues.count(residue.resn())) {
-				Fragmenter f(residue.get_atoms());
-				f.substitute_atoms(help::gaff);
-				dbgmsg("pass 1 (gaff applying basic rules) : " << endl << residue);
-				f.flip_conjugated_gaff_types(residue.get_atoms());
-				dbgmsg("pass 2 (gaff distincting conjugated types "
-					<< "cc(cd), ce(cf), nc(nd), ne(nf), pe(pf), and "
-					<< "bridge type cp(cq)) : " << endl << residue);
-			}
-		}
-		dbgmsg("MOLECULE AFTER GAFF TYPING" << endl << molecule);
+	void AtomType::compute_gaff_type(const Atom::Vec &atoms) {
+		Fragmenter f(atoms);
+		f.substitute_atoms(help::gaff);
+		dbgmsg("pass 1 (gaff applying basic rules) : " << endl << atoms);
+		f.flip_conjugated_gaff_types(atoms);
+		dbgmsg("pass 2 (gaff distincting conjugated types "
+			<< "cc(cd), ce(cf), nc(nd), ne(nf), pe(pf), and "
+			<< "bridge type cp(cq)) : " << endl << atoms);
 	}
 
 	BondVec get_double_bonds(const BondSet &bonds) {
@@ -834,76 +813,72 @@ namespace Molib {
 		return false;
 	}
 	
-	void AtomType::compute_ring_type(Molecule &molecule) {
-		dbgmsg("Computing ring types for molecule " << molecule.name());
-		for (auto &assembly : molecule)
-		for (auto &model : assembly)
-		for (auto &chain : model)
-		for (auto &residue : chain) {
-			if (! help::standard_residues.count(residue.resn())) {
-				for (auto &atom : residue)
-					atom.insert_property("NG", 1); // atom belongs to chain
-				Fragmenter frag(residue.get_atoms());
-				Rings rings = frag.identify_rings();
-				//~ Rings rings = frag.identify_fused_rings();
-				for (auto &ring : rings) {
-					for (auto &pa : ring) {
-						pa->erase_property("NG"); // atom belongs to ring
-					}
-				}
-				int r_id = 0;
-				for (auto &ring : rings) {
-					auto ring_bonds = get_bonds_in(ring);
-					auto out_bonds = get_bonds_in(ring, false);
-					for (auto &pbond : ring_bonds) {
-						Bond &bond = *pbond;
-						bond.set_ring(true); // ring bond
-					}
-					// Pure aliphatic atom in a ring, which is made of sp3 carbon
-					string aromatic_type = "AR5"; 
-					// determine the type of aromatic ring
-					if (aromatic(ring)) {
-						int num_c = 0, num_n = 0;
-						for (auto &pa : ring) {
-							if (pa->idatm_type_unmask() == "Car") num_c++;
-							else if (pa->idatm_type_unmask() == "N2" 
-								|| pa->idatm_type_unmask() == "N2+") num_n++;
-						}
-						// calculate number of out-of-ring double bonds
-						auto dbl = get_double_bonds(out_bonds);
-						int num_double_out = 0;
-						for (auto &pbond : dbl) {
-							if (pbond->atom1().has_property("NG")
-							 || pbond->atom2().has_property("NG"))
-								++num_double_out;
-						}			 
-						dbgmsg("num_c = " << num_c << " num_n = " << num_n
-							<< " num_double_out = " << num_double_out);
-						if (ring.size() == 6 && num_c + num_n == 6 && num_double_out == 0) {
-							// Pure aromatic atom (such as benzene and pyridine)
-							aromatic_type = "AR1";
-						} else if (num_double_out > 0) {
-							// Atom in a planar ring, which has one or several double bonds 
-							// formed between non-ring atoms and the ring atoms
-							aromatic_type = "AR3";
-						} else if (get_double_bonds(ring_bonds).size() >= 2 
-							&& two_continuous_single_bonds(ring_bonds)) {
-							// Atom in a planar ring, usually the ring has two 
-							// continous single bonds and at least two double bonds
-							aromatic_type = "AR2";
-						} else {
-							// Atom other than AR1, AR2, AR3 and AR5.
-							aromatic_type = "AR4";
-						}
-					}
-					const string ring_type = "RG" + help::to_string(ring.size());
-					for (auto &pa : ring) {
-						pa->add_property(ring_type)
-							.add_property(aromatic_type);
-					}
-				}
+	/* Determine ring type for e.g. a residue... if residue is indeed inserted
+	 * (as atoms argument) then it should be checked before calling this function whether
+	 * it is not a standard_residue...in which case, ring typing is unneccessary.
+	 */
+	void AtomType::compute_ring_type(const Atom::Vec &atoms) {
+		dbgmsg("Computing ring types");
+		for (auto &patom : atoms)
+				patom->insert_property("NG", 1); // atom belongs to chain
+		Fragmenter frag(atoms);
+		Rings rings = frag.identify_rings();
+		for (auto &ring : rings) {
+			for (auto &pa : ring) {
+				pa->erase_property("NG"); // atom belongs to ring
 			}
 		}
-		dbgmsg("MOLECULE AFTER RING TYPING" << endl << molecule);
+		int r_id = 0;
+		for (auto &ring : rings) {
+			auto ring_bonds = get_bonds_in(ring);
+			auto out_bonds = get_bonds_in(ring, false);
+			for (auto &pbond : ring_bonds) {
+				Bond &bond = *pbond;
+				bond.set_ring(true); // ring bond
+			}
+			// Pure aliphatic atom in a ring, which is made of sp3 carbon
+			string aromatic_type = "AR5"; 
+			// determine the type of aromatic ring
+			if (aromatic(ring)) {
+				int num_c = 0, num_n = 0;
+				for (auto &pa : ring) {
+					if (pa->idatm_type_unmask() == "Car") num_c++;
+					else if (pa->idatm_type_unmask() == "N2" 
+						|| pa->idatm_type_unmask() == "N2+") num_n++;
+				}
+				// calculate number of out-of-ring double bonds
+				auto dbl = get_double_bonds(out_bonds);
+				int num_double_out = 0;
+				for (auto &pbond : dbl) {
+					if (pbond->atom1().has_property("NG")
+					 || pbond->atom2().has_property("NG"))
+						++num_double_out;
+				}			 
+				dbgmsg("num_c = " << num_c << " num_n = " << num_n
+					<< " num_double_out = " << num_double_out);
+				if (ring.size() == 6 && num_c + num_n == 6 && num_double_out == 0) {
+					// Pure aromatic atom (such as benzene and pyridine)
+					aromatic_type = "AR1";
+				} else if (num_double_out > 0) {
+					// Atom in a planar ring, which has one or several double bonds 
+					// formed between non-ring atoms and the ring atoms
+					aromatic_type = "AR3";
+				} else if (get_double_bonds(ring_bonds).size() >= 2 
+					&& two_continuous_single_bonds(ring_bonds)) {
+					// Atom in a planar ring, usually the ring has two 
+					// continous single bonds and at least two double bonds
+					aromatic_type = "AR2";
+				} else {
+					// Atom other than AR1, AR2, AR3 and AR5.
+					aromatic_type = "AR4";
+				}
+			}
+			const string ring_type = "RG" + help::to_string(ring.size());
+			for (auto &pa : ring) {
+				pa->add_property(ring_type)
+					.add_property(aromatic_type);
+			}
+		}
+		dbgmsg("MOLECULE AFTER RING TYPING" << endl << atoms);
 	}
 };

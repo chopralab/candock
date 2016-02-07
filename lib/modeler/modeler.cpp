@@ -98,6 +98,7 @@ namespace OMMIface {
 		__system_topology.minimize(__tolerance, 20);
 
 		vector<OpenMM::Vec3> initial_positions = __system_topology.get_positions_in_nm();
+		dbgmsg("initial_positions (after brief minimization) = " << initial_positions);
 
 		// check if minimization failed
 		if (std::isnan(initial_positions[0][0]))

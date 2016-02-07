@@ -5,42 +5,45 @@
 #include <string>
 #include <vector>
 #include <cstdlib>
-#include <time.h>
-#include <boost/regex.hpp>
-#include <boost/algorithm/string.hpp>
-#include <boost/filesystem.hpp>
-#include <boost/date_time/posix_time/posix_time.hpp>
-#include <boost/algorithm/string/split.hpp>
-#include <boost/algorithm/string.hpp>
-#include <boost/asio/ip/host_name.hpp>
-#include "molecule.hpp"
-#include "atomtype.hpp"
-#include "bondtype.hpp"
 #include "bond.hpp"
+#include "hydrogens.hpp"
 #include "geom3d/geom3d.hpp"
 #include "fragmenter/fragmenter.hpp"
 #include "fragmenter/unique.hpp"
 #include "modeler/forcefield.hpp"
+#include "atom.hpp"
+#include "residue.hpp"
+#include "chain.hpp"
+#include "model.hpp"
+#include "assembly.hpp"
+#include "molecule.hpp"
+
 using namespace std;
 
 namespace Molib {
-	set<int> get_idatm_types(const Molecules &mols, set<int> previous) {
-		for (auto &molecule : mols)
-		for (auto &pa : molecule.get_atoms()) {
-			previous.insert(pa->idatm_type());
-		}
-		return previous;
-	}
-	void Molecule::undo_mm_specific() {
-		for (auto &assembly : *this)
-		for (auto &model : assembly)
-		for (auto &chain : model) {
-			for (auto &residue : chain) {
-				if (residue.resn() == "HIP") residue.set_resn("HIS");
-				if (residue.resn() == "CYX") residue.set_resn("CYS");
-				if (residue.resn().size() == 4) residue.set_resn(residue.resn().substr(1)); // NALA -> ALA
+	
+	string Molecule::get_chain_ids(const unsigned int hm) const {
+
+		set<char> chain_ids;
+
+		for (auto &presidue : this->get_residues()) {
+			auto &residue = *presidue;
+			if ((hm & Residue::protein) && residue.rest() == Residue::protein
+				|| (hm & Residue::nucleic) && residue.rest() == Residue::nucleic
+				|| (hm & Residue::ion) && residue.rest() == Residue::ion
+				|| (hm & Residue::water) && residue.rest() == Residue::water
+				|| (hm & Residue::hetero) && residue.rest() == Residue::hetero) {
+				
+				chain_ids.insert(residue.br().chain_id());
+				
 			}
 		}
+		if (chain_ids.empty()) throw Error("die : no protein in the receptor file?");
+		string chains("");
+		
+		for (auto &ch : chain_ids) chains += ch;
+		dbgmsg("these are protein chains in the receptor file = " << chains);
+		return chains;
 	}
 
 	Atom* get_closest_atom_of(const Atom &atom1, const Atom::Vec &neighbors, const string &atom_name) {
@@ -59,146 +62,36 @@ namespace Molib {
 		return patom2;
 	}
 
-	void Molecule::prepare_for_mm(const OMMIface::ForceField &ff, Atom::Grid &grid) {
-		/* Rename some residues
-		 */
-		for (auto &assembly : *this)
-		for (auto &model : assembly)
-		for (auto &chain : model)
-		for (auto &residue : chain) {
-			if (residue.resn() == "HIS") residue.set_resn("HIP");
-			for (auto &atom : residue) {
-				if (atom.atom_name() == "OXT") { // not foolproof, sometimes OXT is missing !!!
-					residue.set_resn("C" + residue.resn()); // last residue is renamed to CALA, CGLY,...
-					break;
-				}
+	void Molecule::rotate(const Geom3D::Matrix &rota, const bool inverse) {
+		for (auto &assembly : *this) {
+			assembly.rotate(rota, inverse);
+		}
+	}
+
+	void Molecule::init_bio(bio_how_many bhm) {
+		for(auto &i : __bio_rota) {
+			int biomolecule_number = i.first;
+			M0 &matrices = i.second;
+			Assembly &last = add(new Assembly(biomolecule_number, "BIOLOGICAL ASSEMBLY"));
+			last.init_bio(asym(), matrices, __bio_chain[biomolecule_number]);
+			if (bhm == Molecule::first_bio) { // exit after initializing the first assembly
+				break;
 			}
 		}
-		/* Add bonds inside residues to protein atoms according to the topology file.
-		 */
+	}
+
+	void Molecule::undo_mm_specific() {
 		for (auto &assembly : *this)
 		for (auto &model : assembly)
 		for (auto &chain : model) {
 			for (auto &residue : chain) {
-				if (!ff.residue_topology.count(residue.resn())) 
-					throw Error("die : cannot find topology for residue " + residue.resn());
-				dbgmsg("residue topology for residue " << residue.resn());
-				const OMMIface::ForceField::ResidueTopology &rtop = ff.residue_topology.at(residue.resn());
-				for (auto &atom1 : residue) {
-					if(rtop.bond.count(atom1.atom_name())) {
-						for (auto &atom2 : residue) {
-							if (rtop.bond.at(atom1.atom_name()).count(atom2.atom_name())) {
-								atom1.connect(atom2);
-							}
-						}
-					}
-				}
+				if (residue.resn() == "HIP") residue.set_resn("HIS");
+				if (residue.resn() == "CYX") residue.set_resn("CYS");
+				if (residue.resn().size() == 4) residue.set_resn(residue.resn().substr(1)); // NALA -> ALA
 			}
-		}
-		/* Add main chain and disulfide bonds
-		 */
-		for (auto &patom1 : this->get_atoms()) {
-			auto &atom1 = *patom1;
-			Atom *patom2 = nullptr;
-#ifndef NDEBUG
-			if (atom1.atom_name() == "N" || atom1.atom_name() == "C") {
-				dbgmsg("neighbors of atom " << atom1.atom_name() << " " 
-					<< atom1.atom_number() << " " << atom1.crd() << " are : ");
-				for (auto &patom2 : grid.get_neighbors(atom1.crd(), 1.6)) {
-					auto &atom2 = *patom2;
-					dbgmsg("    neighbor : " << atom2.atom_name() << " " 
-						<< atom2.atom_number() << " " << atom2.crd());
-				}
-			}
-#endif
-			if (atom1.atom_name() == "SG") {
-				patom2 = get_closest_atom_of(atom1, grid.get_neighbors(atom1.crd(), 2.5), "SG");
-			} else if (atom1.atom_name() == "N") {
-				patom2 = get_closest_atom_of(atom1, grid.get_neighbors(atom1.crd(), 1.4), "C");
-			}
-			if (patom2) {
-				auto &atom2 = *patom2;
-				Residue &residue1 = const_cast<Residue&>(atom1.br());
-				Residue &residue2 = const_cast<Residue&>(atom2.br());
-				if (&residue1 != &residue2) {
-					atom1.connect(atom2);
-					dbgmsg("added inter-residue bond between atom " << atom1.atom_name() << " " 
-						<< atom1.atom_number() << " and atom " << atom2.atom_name() << " " 
-						<< atom2.atom_number());
-					if (atom1.atom_name() == "SG") {
-						residue1.set_resn("CYX");
-						residue2.set_resn("CYX");
-					}
-				}
-			}
-		}
-		/* Find terminal residues
-		 */
-		for (auto &patom : this->get_atoms()) {
-			auto &atom = *patom;
-			Residue &residue = const_cast<Residue&>(atom.br());
-			if (residue.resn().size() == 3) {
-				if (atom.atom_name() == "N" && !atom.is_adjacent("C")) {
-					residue.set_resn("N" + residue.resn()); // first residue is renamed to NALA, NGLY,...
-				} else if (atom.atom_name() == "C" && !atom.is_adjacent("N")) {
-						residue.set_resn("C" + residue.resn()); // IF NOT ALREADY, rename last residue to CALA, CGLY,...
-				}
-			}
-		}
-		dbgmsg("MOLECULE AFTER PREPARING FOR MOLECULAR MECHANICS" << endl << *this);
-	}
-	
-	
-	Molecule::Vec Molecules::get_molecules(const Residue::res_type &rest) const {
-		Molecule::Vec molecules;
-		for (auto &molecule : *this) {
-			Residue &first = molecule.first().first().first().first();
-			if (first.rest() == rest)
-				molecules.push_back(&molecule);
-		}
-		return molecules;
-	}
-
-	void NRset::jiggle() {
-		srand((unsigned)time(NULL));
-		for (auto &patom : this->get_atoms()) {
-			dbgmsg("before jiggle crd = " << patom->crd());
-			Geom3D::Coordinate dcrd(((double)rand() / (double)RAND_MAX) / 1000, 
-				((double)rand() / (double)RAND_MAX) / 1000,
-				((double)rand() / (double)RAND_MAX) / 1000);
-			patom->set_crd(patom->crd() + dcrd);
-			dbgmsg("after jiggle crd = " << patom->crd());
 		}
 	}
 
-	Molecule::Vec NRset::get_molecules(const Residue::res_type &rest) const {
-		Molecule::Vec molecules;
-		for (auto &mols : *this) {
-			Residue &first = mols.first().first().first().first().first();
-			auto ret = mols.get_molecules(rest);
-			molecules.insert(molecules.end(), ret.begin(), ret.end());
-		}
-		return molecules;
-	}
-
-	Atom::Vec NRset::get_atoms(const string &chain_ids, const Residue::res_type &rest,
-		const int model_number) const {
-		Atom::Vec atoms;
-		for (auto &mols : *this) {
-			auto ret = mols.get_atoms(chain_ids, rest, model_number);
-			atoms.insert(atoms.end(), ret.begin(), ret.end());
-		}
-		return atoms;
-	}
-	Atom::Vec Molecules::get_atoms(const string &chain_ids, const Residue::res_type &rest,
-		const int model_number) const {
-		Atom::Vec atoms;
-		for (auto &molecule : *this) {
-			auto ret = molecule.get_atoms(chain_ids, rest, model_number);
-			atoms.insert(atoms.end(), ret.begin(), ret.end());
-		}
-		return atoms;
-	}
 	Atom::Vec Molecule::get_atoms(const string &chain_ids, const Residue::res_type &rest,
 		const int model_number) const {
 		Atom::Vec atoms;
@@ -216,55 +109,6 @@ namespace Molib {
 		for (auto &patom : this->get_atoms(chain_ids, rest, model_number)) 
 			crds.push_back(patom->crd());
 		return crds;
-	}
-
-	Geom3D::Point::Vec Molecules::get_crds(const string &chain_ids, const Residue::res_type &rest,
-		const int model_number) const { 
-
-		Geom3D::Point::Vec crds;
-		for (auto &patom : this->get_atoms(chain_ids, rest, model_number)) 
-			crds.push_back(patom->crd());
-		return crds;
-	}
-
-	Atom::Vec Assembly::get_atoms(const string &chain_ids, const Residue::res_type &rest,
-		const int model_number) const {
-		Atom::Vec atoms;
-		for (auto &model : *this) {
-			if (model_number == -1 || model.number() == model_number) {
-				auto ret = model.get_atoms(chain_ids, rest);
-				atoms.insert(atoms.end(), ret.begin(), ret.end());
-			}
-		}
-		return atoms;
-	}
-
-	Atom::Vec Model::get_atoms(const string &chain_ids, const Residue::res_type &rest) const {
-		Atom::Vec atoms;
-		for (auto &chain : *this) {
-			if (chain_ids == "" || chain_ids.find(chain.chain_id()) != string::npos) {
-				auto ret = chain.get_atoms(rest);
-				atoms.insert(atoms.end(), ret.begin(), ret.end());
-			}
-		}
-		return atoms;
-	}
-	Atom::Vec Chain::get_atoms(const Residue::res_type &rest) const {
-		Atom::Vec atoms;
-		for (auto &residue : *this) {
-			if (rest == Residue::res_type::notassigned || residue.rest() == rest) {
-				auto ret = residue.get_atoms();
-				atoms.insert(atoms.end(), ret.begin(), ret.end());
-			}
-		}
-		return atoms;
-	}
-	Atom::Vec Residue::get_atoms() const {
-		Atom::Vec atoms;
-		for (auto &atom : *this) {
-			atoms.push_back(&atom);
-		}
-		return atoms;
 	}
 
 	double Molecule::compute_rmsd(const Molecule &molecule) const {
@@ -353,29 +197,6 @@ namespace Molib {
 		return sqrt(md_sq);
 	}
 
-	Molecule& Molecule::compute_rotatable_bonds() {
-		dbgmsg("starting compute_rotatable_bonds");
-		Fragmenter f(this->get_atoms());
-		f.substitute_bonds(help::rotatable);
-		// rotatable bond inside a ring is changed back to non-rotatable
-		Rings rings = f.identify_fused_rings();
-		//~ Rings rings = f.identify_rings();
-		for (auto &ring : rings) {
-			for (auto &pbond : get_bonds_in(ring)) {
-				pbond->set_rotatable("");
-			}
-		}
-		dbgmsg("MOLECULE AFTER COMPUTING ROTATABLE BONDS" << endl << *this);
-		return *this;
-	}
-
-	Molecules& Molecules::compute_overlapping_rigid_segments(const string &seeds_file) { 
-		Unique u(seeds_file); 
-		for (auto &molecule : *this) 
-			molecule.compute_overlapping_rigid_segments(u); 
-		return *this; 
-	}
-
 	Molecule& Molecule::compute_overlapping_rigid_segments(Unique &u) {
 		for (auto &assembly : *this)
 		for (auto &model : assembly) {
@@ -386,6 +207,107 @@ namespace Molib {
 			<< endl << *this);
 		return *this;
 	}
+	
+	Residue::Vec Molecule::get_residues() const {
+		Residue::Vec residues;
+		for (auto &assembly : *this)
+		for (auto &model : assembly)
+		for (auto &chain : model)
+		for (auto &residue : chain) {
+			residues.push_back(&residue);
+		}
+		return residues;
+	}
+
+
+
+	void Molecule::prepare_for_mm(const OMMIface::ForceField &ffield, Atom::Grid &grid) {
+		/* Rename some residues
+		 */
+		for (auto &presidue : this->get_residues()) {
+			auto &residue = *presidue;
+			if (residue.resn() == "HIS") residue.set_resn("HIP");
+			for (auto &atom : residue) {
+				if (atom.atom_name() == "OXT") { // not foolproof, sometimes OXT is missing !!!
+					residue.set_resn("C" + residue.resn()); // last residue is renamed to CALA, CGLY,...
+					break;
+				}
+			}
+		}
+		/* Add bonds inside residues to protein atoms according to the topology file.
+		 */
+		for (auto &presidue : this->get_residues()) {
+			auto &residue = *presidue;
+			if (ffield.residue_topology.count(residue.resn())) {
+				dbgmsg("residue topology for residue " << residue.resn());
+				const OMMIface::ForceField::ResidueTopology &rtop = ffield.residue_topology.at(residue.resn());
+				for (auto &atom1 : residue) {
+					if(rtop.bond.count(atom1.atom_name())) {
+						for (auto &atom2 : residue) {
+							if (rtop.bond.at(atom1.atom_name()).count(atom2.atom_name())) {
+								atom1.connect(atom2);
+							}
+						}
+					}
+				}
+			} else {
+				cerr << "note : cannot find topology for residue " << residue.resn() 
+					<< " (this is normal if receptor file contains water, cofactors etc.)" << endl;
+			}
+		}
+		/* Add main chain and disulfide bonds
+		 */
+		for (auto &patom1 : this->get_atoms()) {
+			auto &atom1 = *patom1;
+			Atom *patom2 = nullptr;
+#ifndef NDEBUG
+			if (atom1.atom_name() == "N" || atom1.atom_name() == "C") {
+				dbgmsg("neighbors of atom " << atom1.atom_name() << " " 
+					<< atom1.atom_number() << " " << atom1.crd() << " are : ");
+				for (auto &patom2 : grid.get_neighbors(atom1.crd(), 1.6)) {
+					auto &atom2 = *patom2;
+					dbgmsg("    neighbor : " << atom2.atom_name() << " " 
+						<< atom2.atom_number() << " " << atom2.crd());
+				}
+			}
+#endif
+			if (atom1.atom_name() == "SG") {
+				patom2 = get_closest_atom_of(atom1, grid.get_neighbors(atom1.crd(), 2.5), "SG");
+			} else if (atom1.atom_name() == "N") {
+				patom2 = get_closest_atom_of(atom1, grid.get_neighbors(atom1.crd(), 1.4), "C");
+			}
+			if (patom2) {
+				auto &atom2 = *patom2;
+				Residue &residue1 = const_cast<Residue&>(atom1.br());
+				Residue &residue2 = const_cast<Residue&>(atom2.br());
+				if (&residue1 != &residue2) {
+					atom1.connect(atom2);
+					dbgmsg("added inter-residue bond between atom " << atom1.atom_name() << " " 
+						<< atom1.atom_number() << " and atom " << atom2.atom_name() << " " 
+						<< atom2.atom_number());
+					if (atom1.atom_name() == "SG") {
+						residue1.set_resn("CYX");
+						residue2.set_resn("CYX");
+					}
+				}
+			}
+		}
+		/* Find terminal residues
+		 */
+		for (auto &patom : this->get_atoms()) {
+			auto &atom = *patom;
+			Residue &residue = const_cast<Residue&>(atom.br());
+			if (residue.resn().size() == 3) {
+				if (atom.atom_name() == "N" && !atom.is_adjacent("C")) {
+					residue.set_resn("N" + residue.resn()); // first residue is renamed to NALA, NGLY,...
+				} else if (atom.atom_name() == "C" && !atom.is_adjacent("N")) {
+						residue.set_resn("C" + residue.resn()); // IF NOT ALREADY, rename last residue to CALA, CGLY,...
+				}
+			}
+		}
+		dbgmsg("MOLECULE AFTER PREPARING FOR MOLECULAR MECHANICS" << endl << *this);
+	}
+	
 
 	Molecule& Molecule::regenerate_bonds(const Molecule &template_molecule) {
 		// copied molecule must be a fragment of template molecule...
@@ -402,33 +324,6 @@ namespace Molib {
 				model.regenerate_bonds(template_model);
 			}
 		}
-		return *this;
-	}
-
-	Model& Model::regenerate_bonds(const Model &template_model) {
-		// copied molecule must be a fragment of template molecule...
-		map<int, Atom*> atom_number_to_atom;
-		for (auto &patom : template_model.get_atoms()) {
-			atom_number_to_atom[patom->atom_number()] = patom;
-		}
-		map<const Atom*, Atom*> atom1_to_copy1;
-		for (auto &patom : this->get_atoms()) {
-			patom->clear(); // clear bondees as they refer to the template molecule
-			patom->clear_bonds(); // clear bonds : fixes double CONECT words bug in PDB output
-			atom1_to_copy1[atom_number_to_atom.at(patom->atom_number())] = patom;
-		}
-		for (auto &kv : atom1_to_copy1) { // regenerate bonds
-			const Atom &atom1 = *kv.first;
-			Atom &copy1 = *kv.second;
-			for (auto &atom2 : atom1) {
-				if (atom1_to_copy1.count(&atom2)) {
-					// copying of bonds does not preserve bond properties !!!
-					Atom &copy2 = *atom1_to_copy1.at(&atom2);
-					copy1.connect(copy2);
-				}
-			}
-		}
-		connect_bonds(get_bonds_in(this->get_atoms()));
 		return *this;
 	}
 
@@ -460,246 +355,12 @@ namespace Molib {
 		dbgmsg("out of filter");
 	}
 	
-	Molecule& Molecule::compute_idatm_type() { 
-		AtomType::compute_idatm_type(*this);
-		return *this;
-	}
-	Molecule& Molecule::refine_idatm_type() { 
-		AtomType::refine_idatm_type(*this);
-		return *this;
-	}
-	Molecule& Molecule::compute_gaff_type() {
-		AtomType::compute_gaff_type(*this);
-		return *this;
-	}
-	Molecule& Molecule::compute_ring_type() {
-		AtomType::compute_ring_type(*this);
-		return *this;
-	}
-	Molecule& Molecule::compute_bond_gaff_type() {
-		BondOrder::compute_bond_gaff_type(*this);
-		return *this;
-	}
-	Molecule& Molecule::compute_bond_order() {
-		BondOrder::compute_bond_order(*this);
-		return *this;
-	}
-
-	Molecule& Molecule::compute_hydrogen() {
-		Molecule &molecule = *this;
-		try {
-			int max_atom_number = 0;
-			for (auto &patom : molecule.get_atoms()) 
-				if (patom->atom_number() > max_atom_number)
-					max_atom_number = patom->atom_number();
-			for (auto &patom : molecule.get_atoms()) {
-				Atom &atom = *patom;
-				Residue &residue = const_cast<Residue&> (atom.br());
-				if (atom.element() != Element::H) { // don't visit "just added" hydrogens
-					int con = help::infoMap.at(atom.idatm_type_unmask()).substituents;
-			
-					/* EXCEPTION for 3-substituted P */
-					if (atom.idatm_type_unmask() == "P" && atom.size() == 3) 
-						con = 3;
-					/* ***************************** */
-
-					int num_h = con - atom.size();
-					dbgmsg("computing hydrogens for " << atom.idatm_type_unmask() << " con = "
-						<< con << " atom.size() = " << atom.size());
-					if (num_h > 0) {
-						dbgmsg("computing missing hydrogens for molecule " << molecule.name()
-							<< " atom " << atom << " con = " << con
-							<< " atom.size() = " << atom.size() << " number of added hydrogens = "
-							<< num_h);
-						// add dummy hydrogen atoms with zero coordinates
-						for (int i = 0; i < num_h; ++i) {
-							const string idatm_type = (atom.element() == Element::C 
-								? "HC" : "H");
-							dbgmsg("idatm_type = " << idatm_type);
-							dbgmsg("idatm_mask = " << help::idatm_mask.at(idatm_type));
-							Atom &hatom = residue.add(new Atom(++max_atom_number, "H", 
-								Geom3D::Coordinate(), help::idatm_mask.at(idatm_type)));
-							atom.connect(hatom);
-							dbgmsg("added hydrogen");
-						}
-					} else if (num_h < 0) {
-						int h_excess = abs(num_h);
-						dbgmsg("deleting excess hydrogens for molecule " << molecule.name()
-							<< " because according to IDATM type : " 
-							<< atom.idatm_type_unmask() << " this atom : "
-							<< atom << " should have " << h_excess 
-							<< " less hydrogens!");
-						// deleting hydrogens
-						for (int i = 0; i < atom.size(); ++i) {
-							auto &bondee = atom[i];
-							if (bondee.element() == Element::H) {
-								if (h_excess-- > 0) {
-									atom.erase(i--);
-									auto &shpbond = atom.get_shared_ptr_bond(bondee);
-									const Bond &deleted_bond = *shpbond;
-									Bond::erase_stale_refs(deleted_bond, atom.get_bonds()); // delete references 
-									dbgmsg("shared_count1 = " << shpbond.use_count());
-									atom.erase_bond(bondee);
-									dbgmsg("shared_count2 = " << shpbond.use_count());
-									bondee.erase_bond(atom);
-									dbgmsg("shared_count3 = " << shpbond.use_count());
-									dbgmsg("residue before erasing hydrogen " << bondee.atom_number() << " for molecule " 
-										<< molecule.name() << endl << residue);
-									residue.erase(bondee.atom_number());
-									dbgmsg("residue after erasing hydrogen " << bondee.atom_number() << " for molecule " 
-										<< molecule.name() << endl << residue);
-								}
-							}
-						}
-						if (h_excess > 0)
-							throw Error("die : deleting of excess hydrogens failed for molecule "
-								+ molecule.name());
-					}
-				}
-			}
-			// connect the new hydrogen bonds with the rest of the bond-graph
-			erase_bonds(get_bonds_in(molecule.get_atoms()));
-			connect_bonds(get_bonds_in(molecule.get_atoms()));
-			dbgmsg("MOLECULE AFTER COMPUTING HYDROGENS " << endl << *this);
-			dbgmsg("BONDS AFTER COMPUTING HYDROGENS " << endl << get_bonds_in(this->get_atoms()));
-		} catch (exception& e) {
-			cerr << "errmesg : " << e.what() << " for molecule = " << molecule.name() << endl;
-		}
-		return *this;
-	}
-	Molecule& Molecule::erase_hydrogen() {
-		Molecule &molecule = *this;
-		for (auto &patom : molecule.get_atoms()) {
-			Atom &atom = *patom;
-			Residue &residue = const_cast<Residue&> (atom.br());
-			if (atom.element() != Element::H) { // don't visit "just erased" hydrogens
-				dbgmsg("deleting all hydrogens for molecule " << molecule.name()
-					<< " for this atom : " << atom);
-				// deleting hydrogens
-				for (int i = 0; i < atom.size(); ++i) {
-					auto &bondee = atom[i];
-					if (bondee.element() == Element::H) {
-						atom.erase(i--);
-						atom.erase_bond(bondee);
-						residue.erase(bondee.atom_number());
-					}
-				}
-			}
-		}
-		dbgmsg("MOLECULE AFTER ERASING HYDROGENS " << endl << *this);
-		return *this;
-	}
-	
-
-	ostream& operator<< (ostream& stream, const Residue& r) {
-		for (auto &atom : r) { 
-			stream << atom;
-		} 
-		return stream;
-	}
-	ostream& operator<< (ostream& stream, const Chain& c) {
-		for (auto &residue : c) { 
-			stream << residue;
-		}
-		stream << "TER" << endl;
-		return stream;
-	}
-
-	ostream& operator<< (ostream& stream, const Model& m) {
-		stream << setw(6) << left << "MODEL" << setw(4) << " " << setw(4) 
-			<< right << m.number() << endl;
-		for (auto &r1 : m.__remarks) {
-			const int &remark_number = r1.first.first;
-			const Residue::res_tuple2 &ligand = r1.first.second;
-			stream << setw(6) << left << "REMARK" << setw(4) << right << remark_number 
-				<< setw(6) << right << "ALRES" << " " << std::get<0>(ligand) << ":" << std::get<1>(ligand) 
-				<< ":" << std::get<2>(ligand) << ":" << std::get<3>(ligand);
-			for (auto &rpair : r1.second) {
-				stream <<  "," << std::get<0>(rpair.first) << ":" 
-					<< std::get<1>(rpair.first) << ":" 
-					<< std::get<2>(rpair.first) << ":" 
-					<< std::get<3>(rpair.first);
-				stream <<  "=" << std::get<0>(rpair.second) << ":" 
-					<< std::get<1>(rpair.second) << ":" 
-					<< std::get<2>(rpair.second) << ":" 
-					<< std::get<3>(rpair.second);
-			}
-			stream << endl;
-		}
-		for (auto &chain : m) {
-			stream << chain;
-		}
-		for (auto &rigid : m.get_rigid()) {
-			stream << "REMARK   8 RIGID " << rigid.get_seed_id();
-			for (auto &atom : rigid.get_core()) stream << " " << 'c' << atom->atom_number();
-			for (auto &atom : rigid.get_join()) stream << " " << 'j' << atom->atom_number();
-			stream << endl;
-		}
-		for (auto &pbond : get_bonds_in(m.get_atoms())) {
-			Bond &bond = *pbond;
-			if (bond.is_rotatable()) {
-				stream << "REMARK   8 ROTA " << bond.get_rotatable() 
-					<< " " << bond.atom1().atom_number() 
-					<< " " << bond.atom2().atom_number() 
-					<< endl;
-			}
-		}
-		for (auto &pbond : get_bonds_in(m.get_atoms())) {
-			Bond &bond = *pbond;
-			stream << "REMARK   8 BONDTYPE " << bond.get_bo() 
-				<< " " << bond.get_bond_gaff_type() 
-				<< " " << bond.atom1().atom_number() 
-				<< " " << bond.atom2().atom_number() 
-				<< endl;
-		}
-		for(auto &chain : m)
-		for(auto &residue : chain) {
-			// don't write conect for standard residues
-			if (!help::standard_residues.count(residue.resn())) {
-				for(auto &atom : residue) {
-					for (auto &adj_a : atom) {
-						int bond_order = atom.get_bond(adj_a).get_bo();
-						if (bond_order == 0) bond_order = 1;
-						for (int bo = 0; bo < bond_order; ++bo) {
-							stream << "CONECT" << setw(5) << right 
-								<< atom.atom_number() << setw(5) 
-								<< right << adj_a.atom_number() << endl;
-						}
-					}
-				}
-			}
-		}
-		stream << "ENDMDL" << endl;
-		return stream;
-	}
-	ostream& operator<< (ostream& stream, const Assembly& a) {
-		stream << setw(6) << left << "REMARK   6 " << a.name() << " " << a.number() << endl;
-		for (auto &model : a) { 
-			stream << model;
-		}
-		stream << "REMARK   6 END" << endl;
-		return stream;
-	}
 	ostream& operator<< (ostream& stream, const Molecule& m) {
 		stream << setw(6) << left << "REMARK   5 MOLECULE " << m.name() << endl;
 		for (auto &assembly : m) {
 			stream << assembly;
 		}
 		stream << setw(6) << left << "REMARK   5 END" << endl;
-		return stream;
-	}
-	ostream& operator<< (ostream& stream, const Molecules& m) {
-		stream << setw(6) << left << "REMARK   4 NRPDB " << m.name() << endl;
-		for (auto &molecule : m) {
-			stream << molecule;
-		}
-		stream << setw(6) << left << "REMARK   4 END" << endl;
-		return stream;
-	}
-	ostream& operator<< (ostream& stream, const NRset& m) {
-		for (auto &molecules : m) {
-			stream << molecules;
-		}
 		return stream;
 	}
 

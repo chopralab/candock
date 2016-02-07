@@ -15,7 +15,6 @@ using namespace std;
 class CmdLnOpts {
 	string __receptor_file;
 	string __ligand_file;
-	string __receptor_chain_id;
 	string __seeds_file;
 	string __prep_file;
 	
@@ -79,6 +78,7 @@ class CmdLnOpts {
 	int __max_num_possibles;
 	
 	string __amber_xml_file;
+	string __water_xml_file;
 	string __fftype;
 	double __tolerance;
 	int __max_iterations;
@@ -115,8 +115,6 @@ public:
 
 			TCLAP::ValueArg<string> receptor_fileArg("","receptor","Receptor filename",true,"default","string", cmd);
 			TCLAP::ValueArg<string> ligand_fileArg("","ligand","Ligand filename",true,"default","string", cmd);
-			TCLAP::ValueArg<string> receptor_chain_idArg("","receptor_chain_id","Chain id(s) of the receptor (default is A)",
-				false,"A","string", cmd);
 			TCLAP::ValueArg<string> seeds_fileArg("","seeds","Read unique seeds from this file, if it exists, and append new \
 				unique seeds if found",false,"seeds.txt","string", cmd);
 			TCLAP::ValueArg<string> prep_fileArg("","prep","Prepared small molecule(s) are outputted to this filename",
@@ -206,6 +204,7 @@ public:
 			TCLAP::ValueArg<int> max_num_possiblesArg("","max_num_possibles","Maximum number of possibles conformations considered for clustering (default is 200000)",false,200000,"int", cmd);
 
 			TCLAP::ValueArg<string> amber_xml_fileArg("","amber_xml","Receptor XML parameters (and topology) input file",false,"data/amber10.xml","string", cmd);
+			TCLAP::ValueArg<string> water_xml_fileArg("","water_xml","Water XML parameters (and topology) input file",false,"data/tip3p.xml","string", cmd);
 			vector<string> allowedFf{"kb","phy"};
 			TCLAP::ValuesConstraint<string> allowedValsFf( allowedFf );
 			TCLAP::ValueArg<string> fftypeArg("","fftype","Forcefield to use 'kb' (knowledge-based, default) or 'phy' (physics-based)",false,"kb",&allowedValsFf, cmd);
@@ -239,7 +238,6 @@ public:
 
 			__receptor_file = receptor_fileArg.getValue();
 			__ligand_file = ligand_fileArg.getValue();
-			__receptor_chain_id = receptor_chain_idArg.getValue();
 			__seeds_file = seeds_fileArg.getValue();
 			__prep_file = prep_fileArg.getValue();
 			__bslib_file = bslib_fileArg.getValue();
@@ -295,6 +293,7 @@ public:
 			__max_num_possibles = max_num_possiblesArg.getValue();
 			
 			__amber_xml_file = amber_xml_fileArg.getValue();
+			__water_xml_file = water_xml_fileArg.getValue();
 			__fftype = fftypeArg.getValue();
 			__tolerance = toleranceArg.getValue();
 			__max_iterations = max_iterationsArg.getValue();
@@ -330,7 +329,6 @@ public:
 
 	string receptor_file() const { return __receptor_file; }
 	string ligand_file() const { return __ligand_file; }
-	string receptor_chain_id() const { return __receptor_chain_id; }
 	string seeds_file() const { return __seeds_file; }
 	string prep_file() const { return __prep_file; }
 	string bslib_file() const { return __bslib_file; }
@@ -384,6 +382,7 @@ public:
 	int max_num_possibles() const { return __max_num_possibles; }
 	
 	string amber_xml_file() const { return __amber_xml_file; }
+	string water_xml_file() const { return __water_xml_file; }
 	string fftype() const { return __fftype; }
 	double tolerance() const { return __tolerance; }
 	int max_iterations() const { return __max_iterations; }

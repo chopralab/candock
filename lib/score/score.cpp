@@ -78,7 +78,9 @@ namespace Molib {
 
 			const string idatm_type1 = help::idatm_unmask[atom_pair.first];
 			const string idatm_type2 = help::idatm_unmask[atom_pair.second];
-
+			
+			dbgmsg("parsing objective function for " << idatm_type1 << " and " << idatm_type2);
+			
 			const string &filename = idatm_type1 + "_" + idatm_type2 + ".txt";
 
 			vector<string> contents;
@@ -99,6 +101,7 @@ namespace Molib {
 			}
 
 		}
+		dbgmsg("parsed objective function");
 	}
 
 	Array1d<double> Score::compute_energy(Atom::Grid &gridrec, const Geom3D::Coordinate &crd, const set<int> &ligand_atom_types) const {

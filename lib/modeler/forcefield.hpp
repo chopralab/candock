@@ -68,6 +68,8 @@ namespace OMMIface {
 		ForceField& insert_topology(const Molib::Molecule&);
 		ForceField& erase_topology(const Molib::Molecule&);
 		ForceField& add_kb_forcefield(const Molib::Score&, const double step);
+		
+		bool residue_exists(const string &name) const { return residue_topology.count(name); }
 
 	};
 	ostream& operator<< (ostream& stream, const ForceField::ResidueTopology& r);

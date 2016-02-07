@@ -9,7 +9,7 @@
 #include "common.hpp"
 #include "helper/error.hpp"
 #include "pdbreader/grid.hpp"
-#include "pdbreader/molecule.hpp"
+#include "pdbreader/nrset.hpp"
 #include "pdbreader/pdbreader.hpp"
 #include "modeler/forcefield.hpp"
 #include "score/score.hpp"
@@ -40,10 +40,8 @@ int main(int argc, char* argv[]) {
 		 * 
 		 */
 		Molib::PDBreader rpdb(cmdl.receptor_file(), 
-			Molib::PDBreader::first_model|Molib::PDBreader::skip_hetatm);
+			Molib::PDBreader::first_model);
 		Molib::Molecules receptors = rpdb.parse_molecule();
-		
-		receptors[0].filter(Molib::Residue::protein, cmdl.receptor_chain_id());
 
 		Molib::PDBreader lpdb(cmdl.ligand_file(), Molib::PDBreader::all_models, 
 			cmdl.max_num_ligands());
@@ -59,26 +57,32 @@ int main(int argc, char* argv[]) {
 		 */
 		Molib::Atom::Grid gridrec(receptors[0].get_atoms());
 
-		/* Read ligands from the ligands file - this file may contain millions
+		/** 
+		 * Read ligands from the ligands file - this file may contain millions
 		 * of ligands, and we read only a few at one time, to save memory
 		 * 
 		 */
 		set<int> ligand_idatm_types;
 		Molib::Molecules ligands;
 		while(lpdb.parse_molecule(ligands)) {
-			ligand_idatm_types = Molib::get_idatm_types(ligands, ligand_idatm_types);
+			ligand_idatm_types = ligands.get_idatm_types(ligand_idatm_types);
 			ligands.clear();
 		}
 
-		/* Read distributions file and initialize scores
+		/**
+		 * Read distributions file and initialize scores
 		 * 
 		 */
-		Molib::Score score(Molib::get_idatm_types(receptors), ligand_idatm_types, 
-			cmdl.ref_state(), cmdl.comp(), cmdl.rad_or_raw(), 
-			cmdl.dist_cutoff(), cmdl.distributions_file(), cmdl.step_non_bond(),
-			cmdl.scale_non_bond());
+		Molib::Score score(cmdl.ref_state(), cmdl.comp(), cmdl.rad_or_raw(), cmdl.dist_cutoff(), 
+			cmdl.step_non_bond());
 
-		/* Forcefield stuff : create forcefield for small molecules (and KB 
+		score.define_composition(receptors.get_idatm_types(), ligand_idatm_types)
+			.process_distributions_file(cmdl.distributions_file())
+			.compile_scoring_function()
+			.parse_objective_function(cmdl.obj_dir(), cmdl.scale_non_bond());
+
+		/**
+		 * Forcefield stuff : create forcefield for small molecules (and KB 
 		 * non-bonded with receptor) and read receptor's forcefield xml file(s) into 
 		 * forcefield object
 		 * 
@@ -86,15 +90,18 @@ int main(int argc, char* argv[]) {
 		OMMIface::ForceField ffield;
 		ffield.parse_gaff_dat_file(cmdl.gaff_dat_file())
 			.add_kb_forcefield(score, cmdl.step_non_bond())
-			.parse_forcefield_file(cmdl.amber_xml_file());
+			.parse_forcefield_file(cmdl.amber_xml_file())
+			.parse_forcefield_file(cmdl.water_xml_file());
 
-		/* Prepare receptor for molecular mechanics: histidines, N-[C-]terminals,
+		/** 
+		 * Prepare receptor for molecular mechanics: histidines, N-[C-]terminals,
 		 * bonds, disulfide bonds, main chain bonds
 		 * 
 		 */
 		receptors[0].prepare_for_mm(ffield, gridrec);
 
-		/* Main loop C with threading support : connection of seeds and
+		/** 
+		 * Main loop C with threading support : connection of seeds and
 		 * minimization
 		 * 
 		 */

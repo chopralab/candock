@@ -5,11 +5,11 @@
 #include <string>
 #include <vector>
 #include <cstdlib>
-#include "molecule.hpp"
 #include "geom3d/geom3d.hpp"
 #include "fragmenter/fragmenter.hpp"
 #include "bond.hpp"
 #include "idatm.hpp"
+#include "molecules.hpp"
 using namespace std;
 
 namespace Idatm {

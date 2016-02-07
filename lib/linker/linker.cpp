@@ -2,7 +2,7 @@
 #include "poses.hpp"
 #include "geom3d/quaternion.hpp"
 #include "score/score.hpp"
-#include "pdbreader/molecule.hpp"
+#include "pdbreader/nrset.hpp"
 #include "pdbreader/bond.hpp"
 #include "helper/benchmark.hpp"
 #include "helper/help.hpp"

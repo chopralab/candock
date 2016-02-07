@@ -7,22 +7,17 @@
 #include "helper/benchmark.hpp"
 #include "helper/inout.hpp"
 #include "helper/path.hpp"
-#include "common.hpp"
 #include "helper/error.hpp"
 #include "pdbreader/grid.hpp"
-#include "pdbreader/molecule.hpp"
+#include "pdbreader/molecules.hpp"
 #include "pdbreader/pdbreader.hpp"
 #include "modeler/forcefield.hpp"
 #include "score/score.hpp"
-#include "linker/linker.hpp"
-#include "probis/probis.hpp"
-#include "ligands/genclus.hpp"
-#include "ligands/genlig.hpp"
-#include "cluster/optics.hpp"
 #include "docker/gpoints.hpp"
 #include "docker/conformations.hpp"
 #include "docker/dock.hpp"
 #include "centro/centroids.hpp"
+#include "common.hpp"
 using namespace std;
 
 CmdLnOpts cmdl;
@@ -53,19 +48,29 @@ int main(int argc, char* argv[]) {
 		 * 
 		 */
 		Molib::PDBreader rpdb(cmdl.receptor_file(), 
-			Molib::PDBreader::first_model|Molib::PDBreader::skip_hetatm);
+			Molib::PDBreader::first_model);
 		Molib::Molecules receptors = rpdb.parse_molecule();
 		
-		receptors[0].filter(Molib::Residue::protein, cmdl.receptor_chain_id());
 
 		Molib::PDBreader lpdb(cmdl.ligand_file(), Molib::PDBreader::all_models, 
 			cmdl.max_num_ligands());
 
-		/* Compute atom types for receptor (gaff types not needed since 
-		 * they are read from the forcefield xml file)
+		/* Compute atom types for receptor and cofactor(s): gaff types for protein, 
+		 * Mg ions, and water are read from the forcefield xml file later on while 
+		 * gaff types for cofactors (ADP, POB, etc.) are calculated de-novo here
 		 * 
 		 */
-		receptors.compute_idatm_type();
+		receptors.compute_idatm_type()
+			.compute_hydrogen()
+			.compute_bond_order()
+			.compute_bond_gaff_type()
+			.refine_idatm_type()
+			.erase_hydrogen()  // needed because refine changes connectivities
+			.compute_hydrogen()   // needed because refine changes connectivities
+			.compute_ring_type()
+			.compute_gaff_type()
+			.compute_rotatable_bonds() // relies on hydrogens being assigned
+			.erase_hydrogen();
 		
 		/* Create receptor grid
 		 * 
@@ -77,7 +82,9 @@ int main(int argc, char* argv[]) {
 		 * 
 		 */
 		OMMIface::ForceField ffield;
-		ffield.parse_forcefield_file(cmdl.amber_xml_file());
+		ffield.parse_forcefield_file(cmdl.amber_xml_file())
+			.parse_forcefield_file(cmdl.water_xml_file());
+
 		receptors[0].prepare_for_mm(ffield, gridrec);
 
 		/* Read ligands from the ligands file - this file may contain millions
@@ -90,7 +97,7 @@ int main(int argc, char* argv[]) {
 
 		Molib::Molecules ligands;
 		while(lpdb.parse_molecule(ligands)) {
-			ligand_idatm_types = Molib::get_idatm_types(ligands, ligand_idatm_types);
+			ligand_idatm_types = ligands.get_idatm_types(ligand_idatm_types);
 			common::create_mols_from_seeds(added, seeds, ligands);
 			ligands.clear();
 		}
@@ -104,12 +111,15 @@ int main(int argc, char* argv[]) {
 		/* Read distributions file and initialize scores
 		 * 
 		 */
-		Molib::Score score(Molib::get_idatm_types(receptors), ligand_idatm_types, 
-			cmdl.ref_state(), cmdl.comp(), cmdl.rad_or_raw(), 
-			cmdl.dist_cutoff(), cmdl.distributions_file(), cmdl.step_non_bond(),
-			cmdl.scale_non_bond());
+		Molib::Score score(cmdl.ref_state(), cmdl.comp(), cmdl.rad_or_raw(), cmdl.dist_cutoff(), 
+			cmdl.step_non_bond());
 
-		dbgmsg(score);
+		score.define_composition(receptors.get_idatm_types(), ligand_idatm_types)
+			.process_distributions_file(cmdl.distributions_file())
+			.compile_scoring_function()
+			.parse_objective_function(cmdl.obj_dir(), cmdl.scale_non_bond());
+
+		dbgmsg("START SCORE" << endl << score << "END SCORE");
 		
 		/* Create gridpoints for ALL centroids representing one or more binding sites
 		 * 

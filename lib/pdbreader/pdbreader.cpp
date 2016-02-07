@@ -14,7 +14,7 @@
 #include "helper/inout.hpp"
 #include "helper/help.hpp"
 #include "helper/debug.hpp"
-#include "molecule.hpp"
+#include "nrset.hpp"
 #include "pdbreader.hpp"
 #include "bond.hpp"
 #include "fragmenter/fragmenter.hpp"
@@ -471,7 +471,11 @@ namespace Molib {
 										<< (atom_iterator2 != atom_number_to_atom[&model].end()));
 									Atom &a2 = *atom_iterator2->second;
 									dbgmsg(a1 << " " << a2);
-									a1.connect(a2);
+									// check if atom1 or atom2 is an ion. Since ions (e.g., MG) sometimes
+									// have CONECT with other ligands (e.g. ADP), don't allow those bonds.
+									if (!help::ions.count(a1.br().resn()) && !help::ions.count(a2.br().resn())) {
+										a1.connect(a2);
+									}
 								}
 								it++;
 							}

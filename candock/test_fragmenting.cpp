@@ -6,17 +6,10 @@
 #include "opts_candock.hpp"
 #include "helper/benchmark.hpp"
 #include "helper/inout.hpp"
-#include "common.hpp"
 #include "helper/error.hpp"
 #include "pdbreader/grid.hpp"
-#include "pdbreader/molecule.hpp"
+#include "pdbreader/molecules.hpp"
 #include "pdbreader/pdbreader.hpp"
-#include "score/score.hpp"
-#include "linker/linker.hpp"
-#include "probis/probis.hpp"
-#include "ligands/genclus.hpp"
-#include "ligands/genlig.hpp"
-#include "cluster/optics.hpp"
 using namespace std;
 
 CmdLnOpts cmdl;
@@ -28,9 +21,6 @@ int main(int argc, char* argv[]) {
 		cmdl.init(argc, argv);
 		cmdl.display_time("started");
 		cout << cmdl << endl;
-		Molib::PDBreader rpdb(cmdl.receptor_file(), 
-			Molib::PDBreader::first_model|Molib::PDBreader::skip_hetatm);
-		//~ Molib::Molecules receptors = rpdb.parse_molecule();
 		
 		Molib::PDBreader lpdb(cmdl.ligand_file(), 
 			Molib::PDBreader::all_models|Molib::PDBreader::hydrogens, 
