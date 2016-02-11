@@ -101,10 +101,20 @@ namespace Molib {
 			const LinkedConf<Linker::Partial> &lowest_point = **confs.begin();
 			reps.push_back(lowest_point.get_molecule());
 			confs.erase(confs.begin());
-			// delete all conformations within RMSD tolerance of this lowest energy yconformation
+			// delete all conformations within RMSD tolerance of this lowest energy conformation
 			for (auto &pconf : grid.get_neighbors(lowest_point.crd(), clus_rad)) {
-				if (pconf->get_molecule().compute_rmsd_ord(lowest_point.get_molecule()) < clus_rad) {
-					confs.erase(pconf);
+				try {
+					dbgmsg("found neighbor of conformation");
+					if (pconf->get_molecule().compute_rmsd_ord(lowest_point.get_molecule()) < clus_rad) {
+						dbgmsg("rmsd between two conformations is " 
+							<< pconf->get_molecule().compute_rmsd_ord(lowest_point.get_molecule()));
+						dbgmsg("conformation1 " << lowest_point.get_molecule());
+						dbgmsg("conformation2 " << pconf->get_molecule());
+						confs.erase(pconf);
+					}
+				} catch(const Error &e) {
+					// if calculation of rmsd didn't succeed don't do nothing
+					// consequently all conformations will be representative
 				}
 			}
 		}

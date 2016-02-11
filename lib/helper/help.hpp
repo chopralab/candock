@@ -1327,7 +1327,8 @@ namespace help {
 		{{{"^P#1#3","Npl#2#2",""},{"#1","Npl#3#2",""}}, {{"2:idatm=N2"},{"3:idatm=N2"}}}, // (R-)P(=N-)(=N-)
 		{{{"Npl#1#2","C2#2#3",""},{"#2","C3#3",""},{"#2","C3#4",""}}, {{"1:idatm=N2"}}}, // change 2-substituted Npl bound to isolated C2 to N2
 		{{{"C2#1#3","N3#2",""},{"#1","C3#3",""},{"#1","Pox#4",""}}, {{"1:idatm=C3"}}}, // change wrongly assigned C2 (Ligand ID: POB, Atom Name: C1') to C3
-	};	
+		{{{"C3#1#1","C1#2",""},{"#2","^C[^1]#3",""}}, {{"1:idatm=C1"}}}, // change terminal C3 bound to C1, which in turn is bound to any C but C1 (Ligand ID: 1DJ, Atom Name: CAA) to C1
+	};
 	const rename_rules refine { // idatm rules for final refinement (relies on bond gaff types)
 		{{{"Npl#1#3#sb,db,ag6",".*#2",""}}, {{"1:idatm=N2+"}}}, // change 3-substituted Npl in 6-membered aromatic ring to N2+
 		{{{"Npl#1#3,1H#sb,db",".*#2",""}}, {{"1:idatm=N2"}}}, // change double-bonded Npl(-H) to N2 (deletes one hydrogen)

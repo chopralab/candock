@@ -18,20 +18,35 @@
 
 namespace common {
 
+	void change_residue_name(Molib::Molecule &ligand, const string &resn) {
+		for (auto &presidue : ligand.get_residues()) {
+			presidue->set_resn(resn);
+		}
+	}
+
+	void change_residue_name(Molib::Molecule &ligand, std::mutex &mtx, int &ligand_cnt) {
+		lock_guard<std::mutex> guard(mtx);
+		++ligand_cnt;
+		for (auto &presidue : ligand.get_residues()) {
+			presidue->set_resn("ligand_" + help::to_string(ligand_cnt));
+		}
+	}
+
 	/* Part7a stuff
 	 * 
 	 */
-	Molib::NRset read_top_seeds_files(const Molib::Molecule &ligand, const string &top_seeds_dir, const string &top_seeds_file) {
+	Molib::NRset read_top_seeds_files(const Molib::Molecule &ligand, const string &top_seeds_dir, const string &top_seeds_file, const int max_top_seeds) {
 		Molib::NRset top_seeds;
 		const Molib::Model &model = ligand.first().first();
 		for (auto &fragment : model.get_rigid()) { // iterate over seeds
 			if (fragment.is_seed()) {
+
 				dbgmsg("reading top_seeds_file for seed id = " << fragment.get_seed_id());
-				//~ Molib::PDBreader pdb(top_seeds_dir + "/" + help::to_string(fragment.get_seed_id()) + "/" + top_seeds_file, 
-					//~ Molib::PDBreader::all_models);
 				Molib::PDBreader pdb(Path::join(Path::join(top_seeds_dir, help::to_string(fragment.get_seed_id())), top_seeds_file), 
-					Molib::PDBreader::all_models);
+					Molib::PDBreader::all_models, max_top_seeds);
+
 				Molib::Molecules &last = top_seeds.add(new Molib::Molecules(pdb.parse_molecule()));
+
 				if (last.empty()) {
 					throw Error("die : there are no docked conformations for seed " + help::to_string(fragment.get_seed_id()));
 				}

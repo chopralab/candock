@@ -52,46 +52,6 @@ namespace Molib {
 		return p3 - v2n * (bond * cos(angle)) - n2 * (yy * cos (dihedral)) + n * (yy * sin(dihedral));
 	}
 
-	//~ AtomToCrd Internal::cartesian(const Atom &ini1, const Atom &ini2, const Atom &ini3, 
-										//~ const Geom3D::Coordinate &crd1, const Geom3D::Coordinate &crd2, 
-										//~ const Geom3D::Coordinate &crd3, const Atom::Set &atoms) const {
-		//~ AtomToCrd new_crd {{&ini1, crd1}, {&ini2, crd2}, {&ini3, crd3}};
-		//~ queue<tuple<const Atom*, const Atom*, const Atom*>> triples;
-		//~ triples.push(make_tuple(&ini1, &ini2, &ini3));
-		//~ while (!triples.empty()) {
-			//~ const Atom *a1 = get<0>(triples.front());
-			//~ const Atom *a2 = get<1>(triples.front());
-			//~ const Atom *a3 = get<2>(triples.front());
-			//~ dbgmsg("cartesian a1 = " << *a1);
-			//~ dbgmsg("cartesian a2 = " << *a2);
-			//~ dbgmsg("cartesian a3 = " << *a3);
-			//~ triples.pop();
-			//~ if (__ic_dihedral.count(a1) && __ic_dihedral.at(a1).count(a2) 
-				//~ && __ic_dihedral.at(a1).at(a2).count(a3)) {
-				//~ for (auto &kv : __ic_dihedral.at(a1).at(a2).at(a3)) {
-					//~ const Atom *a4 = kv.first;
-					//~ if (atoms.count(const_cast<Atom*>(a4))) {
-						//~ if (!new_crd.count(a4)) {
-							//~ new_crd.insert({a4, this->__set_crd(new_crd[a1], 
-															//~ new_crd[a2], 
-															//~ new_crd[a3], 
-															//~ __ic_bond.at(a3).at(a4), 
-															//~ __ic_angle.at(a2).at(a3).at(a4), 
-															//~ __ic_dihedral.at(a1).at(a2).at(a3).at(a4))
-											//~ });
-							//~ dbgmsg("coords of atom " << a4->atom_number() << " are " << a4->crd()
-							//~ << " bond length between " << a3->atom_number() << " and " << a4->atom_number() << " is " << __ic_bond.at(a3).at(a4)
-							//~ << " angle between " << a2->atom_number() << " and " << a3->atom_number() << " and " << a4->atom_number() << " is " << __ic_angle.at(a2).at(a3).at(a4)
-							//~ << " dihedral between " << a1->atom_number() << " and " << a2->atom_number() << " and " << a3->atom_number() << " and " << a4->atom_number() << " is " << __ic_dihedral.at(a1).at(a2).at(a3).at(a4));
-							//~ triples.push(make_tuple(a2, a3, a4));
-						//~ }
-					//~ }
-				//~ }
-			//~ }
-		//~ }
-		//~ new_crd.erase(&ini1);
-		//~ return new_crd;
-	//~ }
 	Geom3D::Point::Vec Internal::cartesian(const Atom &ini1, const Atom &ini2, const Atom &ini3, 
 										const Geom3D::Coordinate &crd1, const Geom3D::Coordinate &crd2, 
 										const Geom3D::Coordinate &crd3, const Atom::Vec &next_atoms) const {

@@ -337,7 +337,9 @@ namespace Molib {
 			//	O and S are sp3 (O3 and S3, respectively)
 			else if (a.size() == 2) {
 				double ang = Geom3D::degrees(Geom3D::angle(a[0].crd(), a.crd(), a[1].crd()));
-	
+				dbgmsg("valence 2 typing for atom = " << a.atom_number() 
+					<< " angle(" << a[0].atom_number() << "," << a.atom_number() 
+					<< "," << a[1].atom_number() << ") = " << ang);
 				if (element == Element::C) {
 					if (ang < angle23val1) {
 						a.set_idatm_type("C3");
@@ -383,7 +385,8 @@ namespace Molib {
 			Atom &bondee = a[0];
 			double sqlen = bondee.crd().distance_sq(a.crd());
 			string bondeeType = bondee.idatm_type_unmask();
-			
+			dbgmsg("sqlen = " << sqlen << " bondeeType = " << bondeeType 
+				<< " mapped = " << boolalpha << mapped[&a]);
 			if (a.idatm_type_unmask() == "C") {
 				if (mapped[&a])
 					continue;

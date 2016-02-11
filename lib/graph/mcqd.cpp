@@ -130,7 +130,8 @@ void Maxclique::expand(Vertices R) {
       cut2(R, Rp);
       //~ cout << "QMs = " << QMAX.size() << endl;
       //~ cout << "Qs = " << Q.size() << endl;
-      if (Rp.size()) {
+      //~ if (Rp.size()) {
+      if (Rp.size() && Q.size() < QMAX.size() + 1) {
         color_sort(Rp);
 		pk++;
         expand(Rp);
@@ -196,7 +197,8 @@ void Maxclique::expand_dyn(Vertices R) {
       Q.push(R.end().get_i());
       Vertices Rp(R.size());
       cut2(R, Rp);
-      if (Rp.size()) {
+      //~ if (Rp.size()) {
+      if (Rp.size() && Q.size() < QMAX.size() + 1) {
         if ((float)S[level].get_i1()/++pk < Tlimit) {
           degree_sort(Rp);
         }

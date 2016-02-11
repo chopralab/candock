@@ -9,7 +9,9 @@
 #include <mutex>
 
 namespace common {
-	Molib::NRset read_top_seeds_files(const Molib::Molecule &ligand, const string &top_seeds_dir, const string &top_seeds_file);
+	void change_residue_name(Molib::Molecule &ligand, const string &resn);
+	void change_residue_name(Molib::Molecule &ligand, std::mutex &mtx, int &ligand_cnt);
+	Molib::NRset read_top_seeds_files(const Molib::Molecule &ligand, const string &top_seeds_dir, const string &top_seeds_file, const int max_top_seeds);
 	void create_mols_from_seeds(set<int> &added, Molib::Molecules &seeds, const Molib::Molecules &mols);
 //~ #ifndef NDEBUG	
 	void create_mols_from_fragments(set<int> &added, Molib::Molecules &seeds, const Molib::Molecules &mols);

@@ -40,7 +40,7 @@ namespace Geom3D {
 	}
 	
 	double compute_rmsd_sq(const Point::Vec &crds1, const Point::Vec &crds2) {
-		dbgmsg("calculate rmsd between two ordered sets of points");
+		dbgmsg("calculate rmsd between two ordered sets of points" );
 		assert(crds1.size() == crds2.size());
 		
 		double sum_squared = 0;

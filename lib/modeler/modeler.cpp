@@ -13,6 +13,8 @@
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string.hpp>
 #include <boost/asio/ip/host_name.hpp>
+#include <stdlib.h>
+#include <time.h>
 using namespace std;
 
 namespace OMMIface {
@@ -44,6 +46,17 @@ namespace OMMIface {
 		for (int i = 0; i < atoms.size(); ++i) {
 			int idx = __topology.get_index(*atoms[i]);
 			__positions[idx] = crds[i];
+		}
+	}
+
+	void Modeler::add_random_crds(const Molib::Atom::Vec &atoms) {
+		srand(time(NULL));
+		for (int i = 0; i < atoms.size(); ++i) {
+			int idx = __topology.get_index(*atoms[i]);
+			const double x = rand() % 100 + 1;
+			const double y = rand() % 100 + 1;
+			const double z = rand() % 100 + 1;
+			__positions[idx] = Geom3D::Point(x, y, z); 
 		}
 	}
 

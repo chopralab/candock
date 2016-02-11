@@ -30,7 +30,7 @@ LIBS	= -L. -L$(LIBDIR)/linker -L $(LIBDIR)/pdbreader -L $(LIBDIR)/kabsch \
 -L $(LIBDIR)/helper -L $(LIBDIR)/score -L $(LIBDIR)/fragmenter -L $(LIBDIR)/graph \
 -L $(LIBDIR)/kbforce -L $(LIBDIR)/geom3d -L $(LIBDIR)/modeler -L $(LIBDIR)/probis \
 -L $(LIBDIR)/ligands -L $(LIBDIR)/docker -L $(LIBDIR)/centro -L $(LIBDIR)/cluster \
--lligands -ldocker -lscore -lpdb -llinker -lfragmenter -lgraph -lkabsch -lcentro -lcluster -llinker \
+-lligands -ldocker -lscore -llinker -lpdb -lfragmenter -lgraph -lkabsch -lcentro -lcluster \
 -lmodeler -lhelper -lOpenMM_static -ldl -lc -lkbforce -lprobis -lgeom3d \
 -lboost_regex -lboost_filesystem -lboost_system -lpthread -lboost_date_time \
 -lgsl -lgslcblas -lm
@@ -183,7 +183,7 @@ libmodeler.a: force_look
 
 clean :
 	$(ECHO) cleaning up in .
-	-$(RM) -f $(EXE) $(TEST) $(TEST2) $(TEST3) $(TEST4) $(TEST5) $(OBJS) $(OBJS_TEST) $(OBJS_TEST2) $(OBJS_TEST3) $(OBJS_TEST4) $(OBJS_TEST5) $(OBJLIBS)
+	-$(RM) -f $(EXE) $(TEST) $(TEST2) $(TEST3) $(TEST4) $(TEST5) $(TEST6) $(TEST6) $(OBJS) $(OBJS_TEST) $(OBJS_TEST2) $(OBJS_TEST3) $(OBJS_TEST4) $(OBJS_TEST5) $(OBJS_TEST6) $(OBJS_TEST7) $(OBJS_POTENTIAL) $(OBJLIBS)
 	-for d in $(DIRS); do (cd $$d; $(MAKE) clean ); done
 
 force_look :

@@ -57,6 +57,8 @@ class CmdLnOpts {
 	string __cluster_file;
 	string __top_seeds_file;
 
+	int __max_top_seeds;
+	
 	int __max_num_ligands;
 	
 	string __gaff_dat_file;
@@ -85,9 +87,10 @@ class CmdLnOpts {
 	int __max_iterations_final;
 	int __update_freq;
 	double __position_tolerance;
-	
-	string __mini_file;
 
+	double __top_percent;
+	int __max_clique_size;
+	
 	int __num_bsites;
 	double __grid_spacing;
 	int __num_univec;
@@ -95,10 +98,7 @@ class CmdLnOpts {
 	double __excluded_radius;
 	double __max_interatomic_distance;
 
-	//~ double __top_percent;
-
 	double __clus_rad;
-	//~ int __num_iter;
 
 	int __ncpu;
 	
@@ -179,6 +179,8 @@ public:
 			TCLAP::ValueArg<string> top_seeds_fileArg("","topseedsfile","Top seeds \
 				output file",false,"top_seeds.pdb","string", cmd);
 
+			TCLAP::ValueArg<int> max_top_seedsArg("","max_top_seeds","Maximum number of top seeds to read for linking (default is 20)",false,20,"int", cmd);
+			
 			TCLAP::ValueArg<int> max_num_ligandsArg("","max_num_ligands","Maximum number of ligands to read in one chunk (default is 10)",false,10,"int", cmd);
 
 			TCLAP::ValueArg<string> gaff_dat_fileArg("","gaff_dat","Gaff DAT forcefield input file",false,"data/gaff.dat","string", cmd);
@@ -213,9 +215,10 @@ public:
 			TCLAP::ValueArg<int> max_iterations_finalArg("","max_iter_final","Maximum iterations for final minimization (default is 100)",false,100,"int", cmd);
 			TCLAP::ValueArg<int> update_freqArg("","update_freq","Update non-bond frequency (default is 10)",false,10,"int", cmd);
 			TCLAP::ValueArg<double> position_toleranceArg("","pos_tol","Minimization position tolerance in Angstroms - only for KB (default is 0.00000000001)",false, 0.00000000001,"double", cmd);
-
-			TCLAP::ValueArg<string> mini_fileArg("","mini_file","Docked & minimized ligands output filename (default minimized.pdb)",false,"minimized.pdb","string", cmd);
 			
+			TCLAP::ValueArg<double> top_percentArg("","top_percent","Top percent of each docked seed to extend to full molecule - only applied to iterative minimization (default is 0.05)",false, 0.05,"double", cmd);
+			TCLAP::ValueArg<int> max_clique_sizeArg("","max_clique_size","Maximum clique size for initial partial conformations generation (default is 3)",false,3,"int", cmd);
+
 			TCLAP::ValueArg<int> num_bsitesArg("","num_bsites","Maximum number of predicted (or given) binding sites to consider for docking (default is 3)",false,3,"int", cmd);
 			
 			TCLAP::ValueArg<double> grid_spacingArg("","grid","Grid spacing (default is 0.5)",false,0.5,"double", cmd);
@@ -225,11 +228,7 @@ public:
 			TCLAP::ValueArg<double> excluded_radiusArg("","excluded","Excluded radius (default is 0.8)",false,0.8,"double", cmd);
 			TCLAP::ValueArg<double> max_interatomic_distanceArg("","interatomic","Maximum interatomic distance (default is 8.0)",false,8.0,"double", cmd);
 
-			//~ TCLAP::ValueArg<double> top_percentArg("","top_percent","Percent of top scores to keep (default is 0.80)",false,0.80,"double", cmd);
-
 			TCLAP::ValueArg<double> clus_radArg("","clus_rad","Cluster radius for docked seeds (default is 2.0)",false,2.0,"double", cmd);
-
-			//~ TCLAP::ValueArg<int> num_iterArg("","num_iter","Number of iterations for maximum weight clique algorithm (default is 1000)",false,1000,"int", cmd);
 
 			TCLAP::ValueArg<int> ncpuArg("","ncpu","Number of CPUs to use concurrently (default is 1)",false,1,"int", cmd);
 
@@ -274,6 +273,9 @@ public:
 
 			__cluster_file = cluster_fileArg.getValue();
 			__top_seeds_file = top_seeds_fileArg.getValue();
+			
+			__max_top_seeds = max_top_seedsArg.getValue();
+			
 			__max_num_ligands = max_num_ligandsArg.getValue();
 			__gaff_dat_file = gaff_dat_fileArg.getValue();
 			__gaff_xml_file = gaff_xml_fileArg.getValue();
@@ -300,8 +302,9 @@ public:
 			__max_iterations_final = max_iterations_finalArg.getValue();
 			__update_freq = update_freqArg.getValue();
 			__position_tolerance = position_toleranceArg.getValue();
-			
-			__mini_file = mini_fileArg.getValue();
+
+			__top_percent = top_percentArg.getValue();
+			__max_clique_size = max_clique_sizeArg.getValue();
 			
 			__num_bsites = num_bsitesArg.getValue();
 			__grid_spacing = grid_spacingArg.getValue();
@@ -309,10 +312,9 @@ public:
 			__conf_spin = conf_spinArg.getValue();
 			__excluded_radius = excluded_radiusArg.getValue();
 			__max_interatomic_distance = max_interatomic_distanceArg.getValue();
-			//~ __top_percent = top_percentArg.getValue();
+
 			__clus_rad = clus_radArg.getValue();
 
-			//~ __num_iter = num_iterArg.getValue();
 			__ncpu = ncpuArg.getValue();
 		} 
 		catch (TCLAP::ArgException &e) { 
@@ -363,6 +365,9 @@ public:
 
 	string cluster_file() const { return __cluster_file; }
 	string top_seeds_file() const { return __top_seeds_file; }
+
+	int max_top_seeds() const { return __max_top_seeds; }
+
 	int max_num_ligands() const { return __max_num_ligands; }
 	string gaff_dat_file() const { return __gaff_dat_file; }
 	string gaff_xml_file() const { return __gaff_xml_file; }
@@ -389,7 +394,9 @@ public:
 	int max_iterations_final() const { return __max_iterations_final; }
 	int update_freq() const { return __update_freq; }
 	double position_tolerance() const { return __position_tolerance; }
-	string mini_file() const { return __mini_file; }
+	
+	double top_percent() const { return __top_percent; }
+	int max_clique_size() const { return __max_clique_size; }
 	
 	int num_bsites() const { return __num_bsites; }
 	double grid_spacing() const { return __grid_spacing; }
@@ -397,10 +404,9 @@ public:
 	double conf_spin() const { return __conf_spin; }
 	double excluded_radius() const { return __excluded_radius; }
 	double max_interatomic_distance() const { return __max_interatomic_distance; }
-	//~ double top_percent() const { return __top_percent; }
+
 	double clus_rad() const { return __clus_rad; }
 
-	//~ int num_iter() const { return __num_iter; }
 	int ncpu() const { return __ncpu; }
 	
 	friend ostream& operator<< (ostream& stream, const CmdLnOpts &cmdl) {

@@ -204,10 +204,8 @@ namespace OMMIface {
 			AtomType &at = kv.second;
 			atom_name_to_type.insert({at.cl, type});
 		}
-		for (auto &assembly : molecule)
-		for (auto &model : assembly)
-		for (auto &chain : model)
-		for (auto &residue : chain) {
+		for (auto &presidue : molecule.get_residues()) {
+			auto &residue = *presidue;
 			// additionally check if residue not already in the ffield (this is for adding receptor
 			// topology where amino acids are already in the ffield, but cofactors are not
 			if (!this->residue_exists(residue.resn())) {
@@ -230,10 +228,8 @@ namespace OMMIface {
 	}
 
 	ForceField& ForceField::erase_topology(const Molib::Molecule &molecule) {
-		for (auto &assembly : molecule)
-		for (auto &model : assembly)
-		for (auto &chain : model)
-		for (auto &residue : chain) {
+		for (auto &presidue : molecule.get_residues()) {
+			auto &residue = *presidue;
 			dbgmsg("erasing topology for residue " << residue.resn()
 				<< endl << residue_topology.at(residue.resn()));
 			this->residue_topology.erase(residue.resn());
