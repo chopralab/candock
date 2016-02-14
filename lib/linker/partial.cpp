@@ -32,31 +32,61 @@ namespace Linker {
 		return os;
 	}
 
+	//~ double Partial::compute_rmsd_ord(const Partial &other) const {
+		//~ Geom3D::Point::Vec crds1, crds2;
+		//~ map<const Molib::Atom*, pair<Geom3D::Point, Geom3D::Point>> crd_map;
+		//~ 
+		//~ for (auto &pstate : this->get_states()) {
+			//~ for (int i = 0; i < pstate->get_segment().get_atoms().size(); ++i) {
+				//~ auto &a = pstate->get_segment().get_atom(i);
+				//~ crd_map[&a].first = pstate->get_crd(i);
+			//~ }
+		//~ }
+		//~ for (auto &pstate : other.get_states()) {
+			//~ for (int i = 0; i < pstate->get_segment().get_atoms().size(); ++i) {
+				//~ auto &a = pstate->get_segment().get_atom(i);
+				//~ crd_map[&a].second = pstate->get_crd(i);
+			//~ }
+		//~ }
+		//~ for (auto &kv : crd_map) {
+			//~ auto &crd1 = kv.second.first;
+			//~ auto &crd2 = kv.second.second;
+			//~ if (crd1 == Geom3D::Point() || crd2 == Geom3D::Point())
+				//~ throw Error("die : cannot compute rmsd between two partial conformations, which have different compositions");
+			//~ crds1.push_back(crd1);
+			//~ crds2.push_back(crd2);
+		//~ }
+		//~ return Geom3D::compute_rmsd(crds1, crds2);
+	//~ }
+
 	double Partial::compute_rmsd_ord(const Partial &other) const {
-		Geom3D::Point::Vec crds1, crds2;
-		map<const Molib::Atom*, pair<Geom3D::Point, Geom3D::Point>> crd_map;
-		
-		for (auto &pstate : this->get_states()) {
-			for (int i = 0; i < pstate->get_segment().get_atoms().size(); ++i) {
-				auto &a = pstate->get_segment().get_atom(i);
-				crd_map[&a].first = pstate->get_crd(i);
+		double sum_squared = 0;
+		int sz = 0;
+		set<Segment::Id> segid1;
+		for (auto &pstate1 : this->get_states()) {
+			segid1.insert(pstate1->get_segment().get_id());
+		}
+		for (auto &pstate2 : other.get_states()) {
+			if (!segid1.count(pstate2->get_segment().get_id()))
+				throw Error("die : cannot compute rmsd between two partial conformations with different compositions");
+		}
+		for (auto &pstate1 : this->get_states()) {
+			for (auto &pstate2 : other.get_states()) {
+				if (pstate1->get_segment().get_id() == pstate2->get_segment().get_id()) {
+					if (pstate1->get_id() == pstate2->get_id()) {
+						sz += pstate1->get_crds().size();
+					} else  {
+						auto &crds1 = pstate1->get_crds();
+						auto &crds2 = pstate2->get_crds();
+						for (int i = 0; i < crds1.size(); ++i) {
+							sum_squared += crds1[i].distance_sq(crds2[i]);
+						}
+						sz += crds1.size();
+					}
+				}
 			}
 		}
-		for (auto &pstate : other.get_states()) {
-			for (int i = 0; i < pstate->get_segment().get_atoms().size(); ++i) {
-				auto &a = pstate->get_segment().get_atom(i);
-				crd_map[&a].second = pstate->get_crd(i);
-			}
-		}
-		for (auto &kv : crd_map) {
-			auto &crd1 = kv.second.first;
-			auto &crd2 = kv.second.second;
-			if (crd1 == Geom3D::Point() || crd2 == Geom3D::Point())
-				throw Error("die : cannot compute rmsd between two partial conformations, which have different compositions");
-			crds1.push_back(crd1);
-			crds2.push_back(crd2);
-		}
-		return Geom3D::compute_rmsd(crds1, crds2);
+		return sqrt(sum_squared / sz);
 	}
 
 	Geom3D::Point Partial::compute_geometric_center() const { 

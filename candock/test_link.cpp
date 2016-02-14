@@ -136,7 +136,7 @@ int main(int argc, char* argv[]) {
 						 * Read top seeds for this ligand
 						 */	 
 						Molib::NRset top_seeds = common::read_top_seeds_files(ligand,
-							cmdl.top_seeds_dir(), cmdl.top_seeds_file(), cmdl.max_top_seeds());
+							cmdl.top_seeds_dir(), cmdl.top_seeds_file(), cmdl.top_percent());
 	
 						ligand.erase_properties(); // required for graph matching
 						top_seeds.erase_properties(); // required for graph matching
@@ -165,8 +165,7 @@ int main(int argc, char* argv[]) {
 							cmdl.upper_tol_seed_dist(), cmdl.max_possible_conf(),
 							cmdl.link_iter(), cmdl.clash_coeff(), cmdl.docked_clus_rad(), 
 							cmdl.max_allow_energy(), cmdl.max_num_possibles(),
-							cmdl.top_percent(), cmdl.max_clique_size(),
-							cmdl.max_iterations_final());
+							cmdl.max_clique_size(), cmdl.max_iterations_final());
 							
 						Linker::DockedConformation::Vec docks = linker.link();
 	

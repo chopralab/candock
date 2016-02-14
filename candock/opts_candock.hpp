@@ -57,8 +57,6 @@ class CmdLnOpts {
 	string __cluster_file;
 	string __top_seeds_file;
 
-	int __max_top_seeds;
-	
 	int __max_num_ligands;
 	
 	string __gaff_dat_file;
@@ -179,8 +177,6 @@ public:
 			TCLAP::ValueArg<string> top_seeds_fileArg("","topseedsfile","Top seeds \
 				output file",false,"top_seeds.pdb","string", cmd);
 
-			TCLAP::ValueArg<int> max_top_seedsArg("","max_top_seeds","Maximum number of top seeds to read for linking (default is 20)",false,20,"int", cmd);
-			
 			TCLAP::ValueArg<int> max_num_ligandsArg("","max_num_ligands","Maximum number of ligands to read in one chunk (default is 10)",false,10,"int", cmd);
 
 			TCLAP::ValueArg<string> gaff_dat_fileArg("","gaff_dat","Gaff DAT forcefield input file",false,"data/gaff.dat","string", cmd);
@@ -216,7 +212,7 @@ public:
 			TCLAP::ValueArg<int> update_freqArg("","update_freq","Update non-bond frequency (default is 10)",false,10,"int", cmd);
 			TCLAP::ValueArg<double> position_toleranceArg("","pos_tol","Minimization position tolerance in Angstroms - only for KB (default is 0.00000000001)",false, 0.00000000001,"double", cmd);
 			
-			TCLAP::ValueArg<double> top_percentArg("","top_percent","Top percent of each docked seed to extend to full molecule - only applied to iterative minimization (default is 0.05)",false, 0.05,"double", cmd);
+			TCLAP::ValueArg<double> top_percentArg("","top_percent","Top percent of each docked seed to extend to full molecule (default is 0.05)",false, 0.05,"double", cmd);
 			TCLAP::ValueArg<int> max_clique_sizeArg("","max_clique_size","Maximum clique size for initial partial conformations generation (default is 3)",false,3,"int", cmd);
 
 			TCLAP::ValueArg<int> num_bsitesArg("","num_bsites","Maximum number of predicted (or given) binding sites to consider for docking (default is 3)",false,3,"int", cmd);
@@ -273,8 +269,6 @@ public:
 
 			__cluster_file = cluster_fileArg.getValue();
 			__top_seeds_file = top_seeds_fileArg.getValue();
-			
-			__max_top_seeds = max_top_seedsArg.getValue();
 			
 			__max_num_ligands = max_num_ligandsArg.getValue();
 			__gaff_dat_file = gaff_dat_fileArg.getValue();
@@ -365,8 +359,6 @@ public:
 
 	string cluster_file() const { return __cluster_file; }
 	string top_seeds_file() const { return __top_seeds_file; }
-
-	int max_top_seeds() const { return __max_top_seeds; }
 
 	int max_num_ligands() const { return __max_num_ligands; }
 	string gaff_dat_file() const { return __gaff_dat_file; }

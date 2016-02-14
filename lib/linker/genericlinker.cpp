@@ -1,6 +1,6 @@
 #include "linker.hpp"
 #include "score/score.hpp"
-#include "pdbreader/molecule.hpp"
+#include "pdbreader/nrset.hpp"
 #include "helper/benchmark.hpp"
 #include "helper/help.hpp"
 #include "helper/array2d.hpp"
@@ -14,6 +14,57 @@ using namespace std;
 
 namespace Linker {
 
+	/**
+	 * Each state is a mapping of docked seed atoms to ligands's 
+	 * segment atoms
+	 */
+	void Linker::GenericLinker::__create_states(const Segment::Graph &segment_graph, const Molib::NRset &top_seeds) {
+		for (auto &seed_mols : top_seeds) {
+			const int seed_id = stoi(seed_mols.name());
+			dbgmsg("seed id = " << seed_id);
+			// loop over segments with this name, seeds coordinates will not change
+			for (auto &segment : segment_graph) {
+				if (segment.get_seed_id() == seed_id) {
+
+					dbgmsg("segment seed id = " << segment.get_seed_id());
+					// create a graph out of the seed "nm" of "to be" ligand molecule
+					Molib::Atom::Graph gs = Molib::Atom::create_graph(seed_mols.first().get_atoms());
+					dbgmsg("gs = " << endl << gs);
+					Molib::Atom::Graph gd = Molib::Atom::create_graph(segment.get_atoms());
+					dbgmsg("gd = " << endl << gd);
+					// map seed molecules atom numbers to ligand molecule
+					Molib::Atom::Graph::Matches m = gd.match(gs);
+					dbgmsg("__create_states : m.size() = " << m.size());
+					// consider ONLY THE FIRST mapping of seed to seed (the symmetry has 
+					// been taken care of in the rigid docking itself)...
+					if (m.size() < 1) throw Error ("die : could not find mapping of docked seed to segment with same name ???");
+					auto &mv = *m.begin();
+					// create a state
+					auto &vertices1 = mv.first;
+					auto &vertices2 = mv.second;
+					// for every docked rigid fragment
+					for (auto &seed_molecule : seed_mols) {
+						Geom3D::Point::Vec crds(vertices2.size());
+						const Molib::Atom::Vec &seed_atoms = seed_molecule.get_atoms();
+						for (int i = 0; i < vertices2.size(); ++i) {
+							crds[vertices1[i]] = seed_atoms.at(vertices2[i])->crd();
+							dbgmsg("adding matched vertex pair " << vertices1[i] 
+								<< "," << vertices2[i] << " new coordinates of atom " 
+								<< segment.get_atom(vertices1[i]).atom_number() << " are " 
+								<< crds[vertices1[i]]);
+						}
+						const double energy = stod(seed_molecule.name());
+						if (energy < __max_allow_energy) {
+							dbgmsg("adding docked state " << segment.get_seed_id() << " with energy of " << energy);
+							// ONLY COPY SEGMENT COORDS NOT SEED
+							segment.add_state(unique_ptr<State>(new State(segment, crds, energy)));
+						}
+					}
+				}
+			}
+		}
+	}
+	
 	/**
 	 * Initialize OpenMM: add ligand coordinates (random) since otherwise 
 	 * there are zeroes (at iterative minimization, when masking out parts 

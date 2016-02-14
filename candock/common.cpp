@@ -35,17 +35,27 @@ namespace common {
 	/* Part7a stuff
 	 * 
 	 */
-	Molib::NRset read_top_seeds_files(const Molib::Molecule &ligand, const string &top_seeds_dir, const string &top_seeds_file, const int max_top_seeds) {
+	Molib::NRset read_top_seeds_files(const Molib::Molecule &ligand, const string &top_seeds_dir, const string &top_seeds_file, const double top_percent) {
 		Molib::NRset top_seeds;
 		const Molib::Model &model = ligand.first().first();
 		for (auto &fragment : model.get_rigid()) { // iterate over seeds
 			if (fragment.is_seed()) {
 
 				dbgmsg("reading top_seeds_file for seed id = " << fragment.get_seed_id());
-				Molib::PDBreader pdb(Path::join(Path::join(top_seeds_dir, help::to_string(fragment.get_seed_id())), top_seeds_file), 
-					Molib::PDBreader::all_models, max_top_seeds);
+				Molib::PDBreader pdb(Path::join(Path::join(top_seeds_dir, help::to_string(fragment.get_seed_id())), 
+					top_seeds_file), Molib::PDBreader::all_models);
+					
+				Molib::Molecules all = pdb.parse_molecule();
 
-				Molib::Molecules &last = top_seeds.add(new Molib::Molecules(pdb.parse_molecule()));
+				const int sz = (int) (all.size() * top_percent);
+				dbgmsg("taking " << sz << " top seeds for seed " << fragment.get_seed_id());
+				
+				// deleting excess top seeds
+				for (int i = all.size() - 1; i > sz; --i) all.erase(i);
+				
+				dbgmsg("number of top seeds left = " << all.size());
+				
+				Molib::Molecules &last = top_seeds.add(new Molib::Molecules(all));
 
 				if (last.empty()) {
 					throw Error("die : there are no docked conformations for seed " + help::to_string(fragment.get_seed_id()));

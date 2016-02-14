@@ -17,57 +17,6 @@ using namespace std;
 
 namespace Linker {
 
-	void Linker::StaticLinker::__create_states(const Segment::Graph &segment_graph, const Molib::NRset &top_seeds) {
-		/* each state is a mapping of docked seed atoms to ligands's 
-		 * segment atoms
-		 */
-		for (auto &seed_mols : top_seeds) {
-			const int seed_id = stoi(seed_mols.name());
-			dbgmsg("seed id = " << seed_id);
-			// loop over segments with this name, seeds coordinates will not change
-			for (auto &segment : segment_graph) {
-				if (segment.get_seed_id() == seed_id) {
-
-					dbgmsg("segment seed id = " << segment.get_seed_id());
-					// create a graph out of the seed "nm" of "to be" ligand molecule
-					Molib::Atom::Graph gs = Molib::Atom::create_graph(seed_mols.first().get_atoms());
-					dbgmsg("gs = " << endl << gs);
-					Molib::Atom::Graph gd = Molib::Atom::create_graph(segment.get_atoms());
-					dbgmsg("gd = " << endl << gd);
-					// map seed molecules atom numbers to ligand molecule
-					Molib::Atom::Graph::Matches m = gd.match(gs);
-					dbgmsg("__create_states : m.size() = " << m.size());
-					// consider ONLY THE FIRST mapping of seed to seed (the symmetry has 
-					// been taken care of in the rigid docking itself)...
-					if (m.size() < 1) throw Error ("die : could not find mapping of docked seed to segment with same name ???");
-					auto &mv = *m.begin();
-					// create a state
-					auto &vertices1 = mv.first;
-					auto &vertices2 = mv.second;
-					// for every docked rigid fragment
-					for (auto &seed_molecule : seed_mols) {
-						Geom3D::Point::Vec crds(vertices2.size());
-						const Molib::Atom::Vec &seed_atoms = seed_molecule.get_atoms();
-						for (int i = 0; i < vertices2.size(); ++i) {
-							crds[vertices1[i]] = seed_atoms.at(vertices2[i])->crd();
-							dbgmsg("adding matched vertex pair " << vertices1[i] 
-								<< "," << vertices2[i] << " new coordinates of atom " 
-								<< segment.get_atom(vertices1[i]).atom_number() << " are " 
-								<< crds[vertices1[i]]);
-						}
-						const double energy = stod(seed_molecule.name());
-						
-						if (energy < __max_allow_energy) {
-							dbgmsg("adding docked state " << segment.get_seed_id() << " with energy of " << energy);
-							// ONLY COPY SEGMENT COORDS NOT SEED
-							segment.add_state(unique_ptr<State>(new State(segment, crds, energy)));
-						}
-					}
-				}
-			}
-		}
-	}
-	
 	DockedConformation Linker::StaticLinker::__a_star(const int segment_graph_size, const Partial &start_conformation, vector<unique_ptr<State>> &states, int iter) {
 
 		
@@ -124,8 +73,8 @@ namespace Linker {
 						__compute_neighbors(curr_state, adj, states));
 					for (auto &pneighbor : ret2) { 
 						dbgmsg("CHECKING NEIGHBOR : " << *pneighbor);
-						//~ dbgmsg("clashes_receptor = " << boolalpha 
-							//~ << __clashes_receptor(*pneighbor));
+						dbgmsg("clashes_receptor = " << boolalpha 
+							<< __clashes_receptor(*pneighbor));
 						dbgmsg("clashes_ligand = " << boolalpha 
 							<< __clashes_ligand(*pneighbor, curr_conformation, curr_state));
 						//~ if (!__clashes_receptor(*pneighbor) 
@@ -193,12 +142,19 @@ namespace Linker {
 
 		State::Vec states;
 		State::Id id = 0;
-		for (auto &seed : seed_graph)
+		for (auto &seed : seed_graph) {
+#ifndef NDEBUG
+			int state_no = 1;
+#endif
 			for (auto &pstate : seed.get_segment().get_states()) {
 				states.push_back(&*pstate);
 				pstate->set_id(id++);
+#ifndef NDEBUG
+				pstate->set_no(state_no++);
+#endif
 				dbgmsg(*pstate);
 			}
+		}
 				
 		//help::memusage("before find compatible state pairs");
 	
@@ -217,6 +173,9 @@ namespace Linker {
 			// find all maximum cliques, of size k; k...number of seed segments
 			Maxclique m(conn);
 
+			dbgmsg("largest possible clique (seed_graph.size()) = " << seed_graph.size());
+			dbgmsg("currently searched for clique (__max_clique_size) = " << __max_clique_size);
+			
 			const int mcq_size = __max_clique_size > seed_graph.size() ? seed_graph.size() : __max_clique_size;
 			const vector<vector<unsigned short int>> &qmaxes = m.mcq(mcq_size);
 	
@@ -238,6 +197,24 @@ namespace Linker {
 					energy += states[i]->get_energy();
 				}
 				possibles_w_energy.push_back(Partial(conf, energy));
+#ifndef NDEBUG
+				stringstream ss;
+				ss << "clique is composed of ";
+				map<int, int> compo;
+				
+				for (auto &i : qmax) {
+					ss << "seed_" << states[i]->get_segment().get_seed_id() 
+						<< " state_" << states[i]->get_no() 
+						<< " ene_" << states[i]->get_energy() << " ";
+					compo[states[i]->get_segment().get_seed_id()] = states[i]->get_no();
+				}
+				ss << "ordered by seed_id : ";
+				for (auto &kv : compo) {
+					ss << kv.first << ":" << kv.second << " ";
+				}
+				ss << "total ene = " << energy;
+				dbgmsg(ss.str());
+#endif
 			}
 	
 			//help::memusage("after possibles_w_energy");

@@ -33,7 +33,9 @@ namespace Linker {
 		Geom3D::Point::Vec __crds;
 		double __energy;
 		Id __id;
-		
+#ifndef NDEBUG
+		int __no;
+#endif		
 	public:
 		State(const Segment &segment, const Geom3D::Point::Vec crds, const double energy=0) : 
 			__segment(segment), __crds(crds), __energy(energy) {}
@@ -47,6 +49,10 @@ namespace Linker {
 		string pdb() const;
 		void set_id(Id id) { __id = id; }
 		const Id get_id() const { return __id; }
+#ifndef NDEBUG
+		void set_no(int no) { __no = no; }
+		const int get_no() const { return __no; }
+#endif
 		friend ostream& operator<< (ostream& stream, const State& s);
 		friend ostream& operator<< (ostream& stream, const Vec& sv);
 	};

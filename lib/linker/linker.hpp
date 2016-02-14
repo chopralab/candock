@@ -62,7 +62,6 @@ namespace Linker {
 			const int __max_possible_conf, __link_iter;
 			const int __max_num_possibles;
 
-			const double __top_percent;
 			const int __max_clique_size;
 	
 			const int __max_iterations_final;
@@ -94,8 +93,8 @@ namespace Linker {
 			State* __is_seed(const Segment &seg, const SegStateMap &docked_seeds);
 
 			DockedConformation::Vec __minimize_final(DockedConformation::Vec &docked_conformations);
-
-			virtual void __create_states(const Segment::Graph &segment_graph, const Molib::NRset &top_seeds) = 0;
+			void __create_states(const Segment::Graph &segment_graph, const Molib::NRset &top_seeds);
+			
 			virtual DockedConformation __a_star(const int segment_graph_size, const Partial &start_conformation, vector<unique_ptr<State>> &states, int iter) = 0;
 			virtual Partial::Vec __generate_rigid_conformations(const Seed::Graph &seed_graph) = 0;
 			virtual DockedConformation __reconstruct(const Partial &conformation) = 0;
@@ -109,7 +108,7 @@ namespace Linker {
 				const double upper_tol_seed_dist, const int max_possible_conf, 
 				const int link_iter, const double clash_coeff, 
 				const double docked_clus_rad, const double max_allow_energy, 
-				const int max_num_possibles, const double top_percent, 
+				const int max_num_possibles, 
 				const int max_clique_size, const int max_iterations_final) : 
 				__ic(ligand.get_atoms()), __modeler(modeler), __receptor(receptor), 
 				__ligand(ligand), __top_seeds(top_seeds), __gridrec(gridrec), 
@@ -119,7 +118,7 @@ namespace Linker {
 				__upper_tol_seed_dist(upper_tol_seed_dist), __max_possible_conf(max_possible_conf),
 				__link_iter(link_iter), __clash_coeff(clash_coeff), 
 				__docked_clus_rad(docked_clus_rad), __max_allow_energy(max_allow_energy), 
-				__max_num_possibles(max_num_possibles),	__top_percent(top_percent), 
+				__max_num_possibles(max_num_possibles), 
 				__max_clique_size(max_clique_size), __max_iterations_final(max_iterations_final)
 			{}
 
@@ -130,7 +129,6 @@ namespace Linker {
 		};
 		
 		class StaticLinker : public GenericLinker {
-			void __create_states(const Segment::Graph &segment_graph, const Molib::NRset &top_seeds);
 			DockedConformation __a_star(const int segment_graph_size, const Partial &start_conformation, vector<unique_ptr<State>> &states, int iter);
 			Partial::Vec __generate_rigid_conformations(const Seed::Graph &seed_graph);
 			DockedConformation __reconstruct(const Partial &conformation);
@@ -139,7 +137,6 @@ namespace Linker {
 		};
 		
 		class IterativeLinker : public GenericLinker {
-			void __create_states(const Segment::Graph &segment_graph, const Molib::NRset &top_seeds);
 			DockedConformation __a_star(const int segment_graph_size, const Partial &start_conformation, vector<unique_ptr<State>> &states, int iter);
 			Partial::Vec __generate_rigid_conformations(const Seed::Graph &seed_graph);
 			DockedConformation __reconstruct(const Partial &conformation);
@@ -159,7 +156,7 @@ namespace Linker {
 			const int max_possible_conf, const int link_iter, 
 			const double clash_coeff, const double docked_clus_rad,
 			const double max_allow_energy, const int max_num_possibles, 
-			const double top_percent, const int max_clique_size,
+			const int max_clique_size,
 			const int max_iterations_final);
 			
 		~Linker() { delete l; }
