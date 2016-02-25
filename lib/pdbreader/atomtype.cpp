@@ -184,8 +184,14 @@ namespace Molib {
 	
 		// "pass 1.5": use templates for "infallible" typing of standard residue types
 		map<const Atom*, bool> mapped;
+
+		Residue::Set residues;
 		for (auto &patom : atoms) {
-			const Residue &residue = patom->br();
+			residues.insert(const_cast<Residue*>(&patom->br()));
+		}
+
+		for (auto &presidue : residues) {
+			const Residue &residue = *presidue;
 			const Chain &chain = residue.br();
 			auto it = help::standard_residues.find(residue.resn());
 			if (it != help::standard_residues.end()) {
@@ -628,8 +634,8 @@ namespace Molib {
 		//	2) Check that all the atoms of the ring are planar types
 		//	3) Check bond lengths around the ring; see if they are
 		//		consistent with aromatic bond lengths
-		for (auto &patom : atoms) {
-			const Residue &residue = patom->br();
+		for (auto &presidue : residues) {
+			const Residue &residue = *presidue;
 			if (! help::standard_residues.count(residue.resn())) {
 				dbgmsg("here I am");
 				Fragmenter frag(residue.get_atoms());
@@ -672,6 +678,7 @@ namespace Molib {
 
 					// Correct types to be aromatic
 					for (auto &pa : r) {
+						dbgmsg("correcting aromatic types in ring " << r);
 						Atom &a = *pa;
 						a.add_property("ag" + help::to_string(r.size()))
 							.add_property("ag");

@@ -17,6 +17,7 @@ namespace Molib {
 		typedef tuple<char, string, int, char> res_tuple2;
 		typedef pair<int, char> res_pair;
 		typedef vector<Residue*> Vec;
+		typedef set<Residue*> Set;
 	private:
 		string __resn;
 		int __resi;
