@@ -108,7 +108,8 @@ namespace Molib {
 			// if boaf fails for all saved valence states, a warning message is given
 			throw Error("die : bond order assignment failed");
 		} catch (exception& e) {
-			cerr << "errmesg : " << e.what() << " for molecule = " << endl << atoms << endl;
+			cerr << "errmesg : " << e.what() << " for residue = " << endl << atoms << endl;
+			throw e;
 		}
 	}
 	

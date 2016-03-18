@@ -217,7 +217,7 @@ public:
 
 			TCLAP::ValueArg<int> num_bsitesArg("","num_bsites","Maximum number of predicted (or given) binding sites to consider for docking (default is 3)",false,3,"int", cmd);
 			
-			TCLAP::ValueArg<double> grid_spacingArg("","grid","Grid spacing (default is 0.5)",false,0.5,"double", cmd);
+			TCLAP::ValueArg<double> grid_spacingArg("","grid","Grid spacing (default is 0.375)",false,0.375,"double", cmd);
 			TCLAP::ValueArg<int> num_univecArg("","num_univec","Number of unit vectors evenly distributed on a sphere for conformation generation (default is 256)",false,256,"int", cmd);
 			TCLAP::ValueArg<double> conf_spinArg("","conf_spin","Spin degrees for conformation generation (default is 10)",false,10,"double", cmd);
 

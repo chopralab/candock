@@ -122,6 +122,7 @@ public:
 	bool empty() const { return (begin() == end()); }
 	size_t size() const { return __m.size(); }
 	void erase(Z p) { __m.erase(p); }
+	void erase_shrink(Z p) { __m[p].swap(__m.rbegin()->second); __m.erase(__m.rbegin()->first);  }
 	void remove_if(std::function<bool (const T&)> fptr) {
 		for(auto it = __m.begin(), ite = __m.end(); it != ite;) {
 			if(fptr(*(it->second)))

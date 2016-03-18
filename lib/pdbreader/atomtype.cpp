@@ -235,6 +235,7 @@ namespace Molib {
 				}
 			}
 		}
+
 		// "pass 2": elements that are typed only by element type
 		// and valences > 1
 		map<Atom*, int> redo;
@@ -243,6 +244,7 @@ namespace Molib {
 			if (mapped[&a])
 				continue;
 			const Element &element = a.element();
+			dbgmsg(element.name());
 	
 			// undifferentiated types
 			if (element >= Element::He && element <= Element::Be
@@ -779,15 +781,30 @@ namespace Molib {
 				dbgmsg("pass 9 (renaming special atom types) : " << endl << residue);
 			}
 		}
+		// "pass 10": check if idatm types and SYBYL atom types (if available) are in sync (issue #109)
+		for (auto &pa : atoms) {
+			Atom &a = *pa;
+			if (mapped[&a])
+				continue;
+			if (a.sybyl_type() == "C.3" && a.idatm_type_unmask() != "C3")
+				a.set_idatm_type("C3");
+			else if (a.sybyl_type() == "C.ar" && a.idatm_type_unmask() == "C3")
+				a.set_idatm_type("C2");
+			else if (a.sybyl_type() == "C.2" && a.idatm_type_unmask() == "C3")
+				a.set_idatm_type("C2");
+			else
+				continue;
+			dbgmsg("pass 10 (checking against SYBYL) : " << a.idatm_type_unmask());
+		}
 		//~ // missing types: C1-,N2+,N1+,Oar+,O1+,O1,Sar
 		// still missing types: C1-,O1+,O1
 		// no longer missing : Sar,Oar+,N1+,N2+
 		dbgmsg("MOLECULE AFTER IDATM TYPING" << endl << atoms);
 	}	
 	void AtomType::refine_idatm_type(const Atom::Vec &atoms) {
-		// "pass 10": refined idatm typing relying on bond orders... 
+		// "pass 11": refined idatm typing relying on bond orders... 
 		Fragmenter(atoms).substitute_atoms(help::refine);
-		dbgmsg("pass 10 (refining idatm atom types) : " << endl << atoms);
+		dbgmsg("pass 11 (refining idatm atom types) : " << endl << atoms);
 	}
 	
 	void AtomType::compute_gaff_type(const Atom::Vec &atoms) {

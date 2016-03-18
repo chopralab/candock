@@ -112,8 +112,8 @@ namespace help {
 		{"Ca", "Ca"},
 		{"Li", "Li"},
 		{"Al", "Al"},
-		{"Du", "Du"},
-		{"Du.C", "Du"},
+		{"Du", "H"}, // dummy atom changed to element H (fix issue #112)
+		{"Du.C", "C"}, // dummyC atom changed to element C (fix issue #112)
 		{"Si", "Si"},
 		{"N.am", "N"},
 		{"S.o", "S"},
@@ -741,6 +741,7 @@ namespace help {
 
 		{"HOH",{{"O","O3"},{"H1","H"},{"H2","H"}}},
 	};
+	
 	const IdatmInfoMap infoMap {
 	        { "Car", { Planar, 3, "aromatic carbon" } },
 	        { "C3", { Tetrahedral, 4, "sp3-hybridized carbon" } },
@@ -791,6 +792,9 @@ namespace help {
 	        { "Mn", { Ion, 0, "manganese" } },
 	        { "Zn", { Ion, 0, "zinc" } },
 	};
+
+	const IdatmEntry &get_info_map(const string &name);
+	
 	const char* const idatm_unmask[] {	
 		"Ac",
 		"Ag",

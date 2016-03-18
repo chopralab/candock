@@ -22,6 +22,15 @@ namespace help {
 		return os;
 	}
 
+	const IdatmEntry &get_info_map(const string &name) { 
+		try { 
+			return help::infoMap.at(name); 
+		} catch(const std::out_of_range&) { 
+			throw Error("cannot find idatm type " + name + " in IdatmInfoMap"); 
+		}
+	}
+	
+
 	std::tuple<double, double, double> gnuplot(const double &x1, const double &x2, const string &datapoints) {
 
 		double coeffA = 0, coeffB = 0, WSSR = HUGE_VAL;

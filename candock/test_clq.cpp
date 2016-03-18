@@ -28,10 +28,6 @@ int main(int argc, char* argv[]) {
 		cmdl.display_time("started");
 		cout << cmdl << endl;
 		
-		/* Create empty output files
-		 * 
-		 */
-
 		/* Identify potential binding sites using ProBiS algorithm
 		 * or alternatively set binding sites from file
 		 * 
@@ -101,6 +97,11 @@ int main(int argc, char* argv[]) {
 			common::create_mols_from_seeds(added, seeds, ligands);
 			ligands.clear();
 		}
+#ifndef NDEBUG
+		for (auto &seed : seeds) {
+			inout::output_file(seed, "seed_" + seed.name() + ".pdb"); 
+		}
+#endif
 		dbgmsg(seeds);
 
 		/* Erase atom properties since they make the graph matching incorrect
@@ -134,7 +135,6 @@ int main(int argc, char* argv[]) {
 		 * 
 		 */
 		Docker::Gpoints gpoints0(cmdl.grid_spacing(), cmdl.max_frag_radius());
-		//~ inout::output_file(gpoints0, cmdl.gridpdb_hcp_file());
 
 		/* Create template grids using ProBiS-ligands algorithm
 		 * WORK IN PROGESS WORK IN PROGESS WORK IN PROGESS WORK IN PROGESS 
@@ -170,7 +170,9 @@ int main(int argc, char* argv[]) {
 								cmdl.num_univec() // number of unit vectors
 								);
 
+#ifndef NDEBUG
 							inout::output_file(conf, "conf_" + seeds[j].name() + ".pdb"); 
+#endif
 							
 							/* Dock this seed's conformations to the entire grid by moving them 
 							 * over all gridpoints and probe where they clash with the receptor: 
@@ -185,8 +187,6 @@ int main(int argc, char* argv[]) {
 #endif
 							dock.run();
 
-							//~ inout::output_file(dock.get_docked(), cmdl.top_seeds_dir() + "/" + dock.get_docked().name() + "/" 
-								//~ + cmdl.top_seeds_file()); // output docked & clustered seeds
 							inout::output_file(dock.get_docked(), Path::join(Path::join(cmdl.top_seeds_dir(), dock.get_docked().name()), 
 								cmdl.top_seeds_file())); // output docked & clustered seeds
 

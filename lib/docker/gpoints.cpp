@@ -214,9 +214,9 @@ namespace Docker {
 					const int mod = gridpoint_counter % 10000;
 					if (mod == 0) {
 						double wall_secs = Benchmark::seconds_from_start();
-						cout << "Processing gridpoint " << gridpoint_counter 
+						dbgmsg("Processing gridpoint " << gridpoint_counter 
 							<< " of approximately " << total_gridpoints 
-							<< " (took " << wall_secs << " seconds)\n";
+							<< " (took " << wall_secs << " seconds)");
 						Benchmark::reset();
 					}
 					gridpoint_counter++;
@@ -292,9 +292,9 @@ namespace Docker {
 					const int mod = gridpoint_counter % 10000;
 					if (mod == 0) {
 						double wall_secs = Benchmark::seconds_from_start();
-						cout << "Processing gridpoint " << gridpoint_counter 
+						dbgmsg("Processing gridpoint " << gridpoint_counter 
 							<< " of approximately " << total_gridpoints 
-							<< " (took " << wall_secs << " seconds)\n";
+							<< " (took " << wall_secs << " seconds)");
 						Benchmark::reset();
 					}
 					gridpoint_counter++;

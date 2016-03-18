@@ -67,27 +67,55 @@ namespace Molib {
 	}
 	
 	Molecules& Molecules::compute_idatm_type() { 
-		for (auto &molecule : *this) {
-			AtomType::compute_idatm_type(molecule.get_atoms());
+		auto &mols = *this;
+		for (int i = 0; i < mols.size(); ++i) {
+			auto &molecule = mols[i];
+			try {
+				AtomType::compute_idatm_type(molecule.get_atoms());
+			} catch (exception &e) {
+				cerr << "errmesg : deleting molecule " << molecule.name() 
+					<< " (computing idatm types failed)" << endl;
+				mols.erase_shrink(i--);
+			}
 		}
-		return *this;
+		return *this; 
 	}
 
 	Molecules& Molecules::compute_hydrogen() { 
-		for (auto &presidue : this->get_residues()) {
-			Residue &residue = *presidue;
-			if (!help::standard_residues.count(residue.resn())) {
-				Hydrogens::compute_hydrogen(residue.get_atoms());
+		auto &mols = *this;
+		for (int i = 0; i < mols.size(); ++i) {
+			auto &molecule = mols[i];
+			try {
+				for (auto &presidue : molecule.get_residues()) {
+					Residue &residue = *presidue;
+					if (!help::standard_residues.count(residue.resn())) {
+						Hydrogens::compute_hydrogen(residue.get_atoms());
+					}
+				}
+			} catch (exception &e) {
+				cerr << "errmesg : deleting molecule " << molecule.name() 
+					<< " (computing hydrogens failed)" << endl;
+				mols.erase_shrink(i--);
 			}
 		}
 		return *this; 
 	}
 
 	Molecules& Molecules::compute_bond_order() { 
-		for (auto &presidue : this->get_residues()) {
-			Residue &residue = *presidue;
-			if (!help::standard_residues.count(residue.resn())) {
-				BondOrder::compute_bond_order(residue.get_atoms());
+		auto &mols = *this;
+		for (int i = 0; i < mols.size(); ++i) {
+			auto &molecule = mols[i];
+			try {
+				for (auto &presidue : molecule.get_residues()) {
+					Residue &residue = *presidue;
+					if (!help::standard_residues.count(residue.resn())) {
+						BondOrder::compute_bond_order(residue.get_atoms());
+					}
+				}
+			} catch (exception &e) {
+				cerr << "errmesg : deleting molecule " << molecule.name() 
+					<< " (bond order assignment failed)" << endl;
+				mols.erase_shrink(i--);
 			}
 		}
 		return *this; 

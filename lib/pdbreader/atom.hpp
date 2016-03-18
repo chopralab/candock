@@ -28,6 +28,7 @@ namespace Molib {
 		string __atom_name;
 		Geom3D::Coordinate __crd;
 		int __idatm_type;
+		string __sybyl_type;
 		string __gaff_type;
 		Element __element;
 		string __smiles_label;
@@ -39,7 +40,8 @@ namespace Molib {
 	public:
 		Atom(const Atom &rhs) : __atom_number(rhs.__atom_number), 
 			__atom_name(rhs.__atom_name), __crd(rhs.__crd), 
-			__idatm_type(rhs.__idatm_type), __gaff_type(rhs.__gaff_type),
+			__idatm_type(rhs.__idatm_type), __sybyl_type(rhs.__sybyl_type), 
+			__gaff_type(rhs.__gaff_type),
 			__element(rhs.__element), __smiles_label(rhs.__smiles_label),
 			__smiles_prop(rhs.__smiles_prop), __aps(rhs.__aps), __br(nullptr) {
 			dbgmsg("Copy constructor : atom");
@@ -54,9 +56,10 @@ namespace Molib {
 			__idatm_type(idatm_type), __element("") {}
 		// if element is missing, try to guess it from atom name
 		Atom(int atom_number, const string &atom_name, const Geom3D::Coordinate &crd, 
-			const int idatm_type, const string &element="") : __atom_number(atom_number), 
-			__atom_name(atom_name), __crd(crd), __idatm_type(idatm_type), 
-			__gaff_type("???"), __element(element == "" ? atom_name : element) {}			
+			const int idatm_type, const string &element="", const string &sybyl_type="") 
+			: __atom_number(atom_number), __atom_name(atom_name), __crd(crd), 
+			__idatm_type(idatm_type), __gaff_type("???"), 
+			__element(element.empty() ? atom_name : element), __sybyl_type(sybyl_type) {}
 		Bond& connect(Atom &a2);
 		void clear_bonds() { __bonds.clear(); }
 		BondVec get_bonds() const { BondVec bonds; for (auto &kv : __bonds) 
@@ -88,6 +91,7 @@ namespace Molib {
 		void set_crd(const Geom3D::Coordinate &crd) { __crd = crd; }
 		string idatm_type_unmask() const { return help::idatm_unmask[__idatm_type]; }
 		int idatm_type() const { return __idatm_type; }
+		const string& sybyl_type() const { return __sybyl_type; }
 		double radius() const { return help::vdw_radius[__idatm_type]; }
 		const string& gaff_type() const { return __gaff_type; }
 		const string& atom_name() const { return __atom_name; }

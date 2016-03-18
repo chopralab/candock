@@ -47,7 +47,7 @@ namespace Molib {
 				
 				if (atom.element() != Element::H) { // don't visit "just added" hydrogens
 					dbgmsg("hydro for : " << atom.idatm_type_unmask());
-					int con = help::infoMap.at(atom.idatm_type_unmask()).substituents;
+					int con = help::get_info_map(atom.idatm_type_unmask()).substituents;
 			
 					/* EXCEPTION for 3-substituted P */
 					if (atom.idatm_type_unmask() == "P" && atom.size() == 3) 
@@ -119,6 +119,7 @@ namespace Molib {
 			dbgmsg("BONDS AFTER COMPUTING HYDROGENS " << endl << get_bonds_in(all_atoms));
 		} catch (exception& e) {
 			cerr << "errmesg : " << e.what() << endl;
+			throw e;
 		}
 	}
 	void Hydrogens::erase_hydrogen(const Atom::Vec &atoms) {

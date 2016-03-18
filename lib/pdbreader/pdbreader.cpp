@@ -93,24 +93,28 @@ namespace Molib {
 					if (atom_line.empty() || atom_line[0] == '@') break;
 					stringstream ss(atom_line);
 					int atom_id, subst_id;
-					string atom_name, atom_type, subst_name;
+					string atom_name, sybyl_type, subst_name;
 					double x, y, z, charge;
-					ss >> atom_id >> atom_name >> x >> y >> z >> atom_type 
+					ss >> atom_id >> atom_name >> x >> y >> z >> sybyl_type 
 						>> subst_id >> subst_name >> charge;
 					
-					const string element = help::sybyl.count(atom_type) ? help::sybyl.at(atom_type) : "";
+					subst_id = 1; // fix value to prevent multiresidue small molecules (issue #110)
+					subst_name = "LIG"; // prevent idatm typing for standard residues (issue #111)
+					
+					const string element = help::sybyl.count(sybyl_type) ? help::sybyl.at(sybyl_type) : "";
 					
 					subst_name = subst_name.substr(0, 3); // truncate longer than 3-lett (pde5a bug)
 					
+					const bool hydrogen = (element == "H" || (atom_name.size() == 1 && atom_name.at(0) == 'H'));
+
 					dbgmsg("atom_id = " << atom_id << " atom_name = " << atom_name
 						<< " x = " << x << " y = " << y << " z = " << z
-						<< " atom_type = " << atom_type << " subst_id = " << subst_id
+						<< " sybyl_type = " << sybyl_type << " subst_id = " << subst_id
 						<< " subst_name = " << subst_name << " charge = " << charge
-						<< " element = " << element);
+						<< " element = " << element << " hydrogen = " << hydrogen);
 					Geom3D::Coordinate crd(x, y, z);
-					dbgmsg("is hydrogen = " << (__hm & PDBreader::hydrogens) 
-						<< " atom_name = " << atom_name.at(0));
-					if ((__hm & PDBreader::hydrogens) || atom_name.at(0) != 'H') {					
+					
+					if ((__hm & PDBreader::hydrogens) || !hydrogen) {					
 						Residue::res_type rest(Residue::hetero);
 						if (!__giant_molecule || rest != Residue::protein || atom_name == "CA") {
 							Model &model = mols.last().last().last();
@@ -123,7 +127,8 @@ namespace Molib {
 															atom_name, 
 															crd, 
 															help::idatm_mask.at("???"),
-															element
+															element,
+															sybyl_type
 														));
 
 							atom_number_to_atom[&model][atom_id] = &a;
@@ -207,8 +212,9 @@ namespace Molib {
 				idatm_type = help::idatm_mask.count(idatm_type) ? idatm_type : "???";
 				string gaff_type = line.size() > 85 ? boost::algorithm::trim_copy(line.substr(85, 5)) : "???";
 				string rest_of_line = line.size() > 90 ? boost::algorithm::trim_copy(line.substr(90)) : "";
-				dbgmsg("is hydrogen = " << (__hm & PDBreader::hydrogens) << " atom_name = " << atom_name.at(0));
-				if ((__hm & PDBreader::hydrogens) || atom_name.at(0) != 'H') {
+				const bool hydrogen = (element == "H" || (atom_name.size() == 1 && atom_name.at(0) == 'H'));
+				dbgmsg("hydrogen = " << boolalpha << hydrogen);
+				if ((__hm & PDBreader::hydrogens) || !hydrogen) {
 					if (alt_loc == ' ' || alt_loc == 'A') {
 						if (!mols.last().is_modified(Residue::res_tuple2(chain_id, resn, resi, ins_code))) {
 							Residue::res_type rest;
