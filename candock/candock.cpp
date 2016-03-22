@@ -274,7 +274,7 @@ int main(int argc, char* argv[]) {
 		mutex mtx2;
 		int ligand_cnt = 0;
 		
-		Molib::PDBreader lpdb2(cmdl.ligand_file(), Molib::PDBreader::all_models, 1);
+		Molib::PDBreader lpdb2(cmdl.prep_file(), Molib::PDBreader::all_models, 1);
 
 		OMMIface::SystemTopology::loadPlugins();
 	
@@ -292,11 +292,12 @@ int main(int argc, char* argv[]) {
 					 * Ligand's resn MUST BE UNIQUE for ffield
 					 */
 					common::change_residue_name(ligand, mtx2, ligand_cnt); 
-					ffield.insert_topology(ligand);
-	
+
 					// if docking of one ligand fails, docking of others shall continue...
 					try { 
 					
+						ffield.insert_topology(ligand);
+	
 						/** 
 						 * Read top seeds for this ligand
 						 */	 

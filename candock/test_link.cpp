@@ -119,7 +119,7 @@ int main(int argc, char* argv[]) {
 				Molib::Molecules ligands;
 
 				while (lpdb2.parse_molecule(ligands)) {
-					
+	
 					Molib::Molecule &ligand = ligands.first();
 					dbgmsg("LINKING LIGAND : " << endl << ligand);
 					
@@ -127,11 +127,12 @@ int main(int argc, char* argv[]) {
 					 * Ligand's resn MUST BE UNIQUE for ffield
 					 */
 					common::change_residue_name(ligand, mtx, ligand_cnt); 
-					ffield.insert_topology(ligand);
-	
+
 					// if docking of one ligand fails, docking of others shall continue...
 					try { 
-					
+
+						ffield.insert_topology(ligand);
+	
 						/** 
 						 * Read top seeds for this ligand
 						 */	 

@@ -126,14 +126,14 @@ public:
 
 			TCLAP::ValueArg<string> top_seeds_dirArg("","top_seeds_dir","Directory for saving top docked seeds (default is top_seeds)",false,"top_seeds","string", cmd);
 
-			TCLAP::ValueArg<string> names_dirArg("","names","Directory with ligand names (default is bslibdb/names)",false,"bslibdb/names","string", cmd);
+			TCLAP::ValueArg<string> names_dirArg("","names","Directory with ligand names (default is bslibdb/data/names)",false,"bslibdb/data/names","string", cmd);
 			TCLAP::SwitchArg neighbSwitch("","neighb","Allow only ligands that are in the similar regions according to REMARKs (not enabled by default)", cmd, false);
 
 			TCLAP::ValueArg<double> probis_clus_radArg("","probis_clus_rad","Cluster radius for predicted ligands by probis (default is 3.0)",false,3.0,"double", cmd);
 			TCLAP::ValueArg<int> probis_min_ptsArg("","probis_min_pts","The minimum number of points (for predicted ligands) required to form a cluster (default is 10)",false,10,"int", cmd);
 			TCLAP::ValueArg<double> probis_min_z_scoreArg("","probis_min_z_score","Minimium z-score of ligands to be considered in clustering (default is 2.5)",false,2.5,"double", cmd);
 
-			TCLAP::ValueArg<string> bio_dirArg("","bio","Directory with ProBiS-ligands bio database (default is bslibdb/bio)",false,"bslibdb/bio","string", cmd);
+			TCLAP::ValueArg<string> bio_dirArg("","bio","Directory with ProBiS-ligands bio database (default is bslibdb/data/bio)",false,"bslibdb/data/bio","string", cmd);
 			TCLAP::ValueArg<string> lig_clus_fileArg("","lig_clus_file","Ligand clusters found by ProBiS are outputted to this file",false,"ligand_clusters.pdb","string", cmd);
 			TCLAP::ValueArg<string> z_scores_fileArg("","z_scores_file","Binding site z-scores are outputted to this file",false,"z_scores.pdb","string", cmd);
 

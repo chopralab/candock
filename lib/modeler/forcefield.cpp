@@ -13,7 +13,7 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/asio/ip/host_name.hpp>
 using namespace std;
-
+//
 namespace OMMIface {
 	ostream& operator<< (ostream& stream, const ForceField::ResidueTopology& r) {
 		for (auto &kv : r.atom) {
@@ -212,6 +212,10 @@ namespace OMMIface {
 				this->residue_topology.insert({residue.resn(), ResidueTopology()});
 				ResidueTopology &rtop = this->residue_topology.at(residue.resn());
 				for (auto &atom : residue) {
+					if (!atom_name_to_type.count(atom.gaff_type())) { // see issue #113
+						throw Error("die : insert topology failed for atom with gaff type (check gaff.dat) = " 
+							+ atom.gaff_type());
+					}
 					rtop.atom.insert({atom.atom_name(), atom_name_to_type.at(atom.gaff_type())});
 				}
 				for (auto &atom : residue) {
