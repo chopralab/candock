@@ -115,7 +115,7 @@ public:
 			TCLAP::ValueArg<string> ligand_fileArg("","ligand","Ligand filename",true,"default","string", cmd);
 			TCLAP::ValueArg<string> seeds_fileArg("","seeds","Read unique seeds from this file, if it exists, and append new \
 				unique seeds if found",false,"seeds.txt","string", cmd);
-			TCLAP::ValueArg<string> prep_fileArg("","prep","Prepared small molecule(s) are outputted to this filename",
+			TCLAP::ValueArg<string> prep_fileArg("","prep","Prepared small molecule(s) are outputted to this filename (default is prepared_ligands.pdb)",
 				false,"prepared_ligands.pdb","string", cmd);
 
 			TCLAP::ValueArg<string> bslib_fileArg("","bslib","Read binding sites library from this file (default is bslibdb/bslib.txt)",
@@ -127,22 +127,22 @@ public:
 			TCLAP::ValueArg<string> top_seeds_dirArg("","top_seeds_dir","Directory for saving top docked seeds (default is top_seeds)",false,"top_seeds","string", cmd);
 
 			TCLAP::ValueArg<string> names_dirArg("","names","Directory with ligand names (default is bslibdb/data/names)",false,"bslibdb/data/names","string", cmd);
-			TCLAP::SwitchArg neighbSwitch("","neighb","Allow only ligands that are in the similar regions according to REMARKs (not enabled by default)", cmd, false);
+			TCLAP::SwitchArg neighbSwitch("","neighb","Allow only ligands that are in the similar regions according to REMARKs (default is disabled)", cmd, false);
 
 			TCLAP::ValueArg<double> probis_clus_radArg("","probis_clus_rad","Cluster radius for predicted ligands by probis (default is 3.0)",false,3.0,"double", cmd);
 			TCLAP::ValueArg<int> probis_min_ptsArg("","probis_min_pts","The minimum number of points (for predicted ligands) required to form a cluster (default is 10)",false,10,"int", cmd);
 			TCLAP::ValueArg<double> probis_min_z_scoreArg("","probis_min_z_score","Minimium z-score of ligands to be considered in clustering (default is 2.5)",false,2.5,"double", cmd);
 
 			TCLAP::ValueArg<string> bio_dirArg("","bio","Directory with ProBiS-ligands bio database (default is bslibdb/data/bio)",false,"bslibdb/data/bio","string", cmd);
-			TCLAP::ValueArg<string> lig_clus_fileArg("","lig_clus_file","Ligand clusters found by ProBiS are outputted to this file",false,"ligand_clusters.pdb","string", cmd);
-			TCLAP::ValueArg<string> z_scores_fileArg("","z_scores_file","Binding site z-scores are outputted to this file",false,"z_scores.pdb","string", cmd);
+			TCLAP::ValueArg<string> lig_clus_fileArg("","lig_clus_file","Ligand clusters found by ProBiS are outputted to this file (default is ligand_clusters.pdb)",false,"ligand_clusters.pdb","string", cmd);
+			TCLAP::ValueArg<string> z_scores_fileArg("","z_scores_file","Binding site z-scores are outputted to this file (default is z_scores.pdb)",false,"z_scores.pdb","string", cmd);
 
 			TCLAP::ValueArg<double> centro_clus_radArg("","centro_clus_rad","Cluster radius for centroid centers (default is 3.0)",false,3.0,"double", cmd);
 
-			TCLAP::ValueArg<string> centroid_in_fileArg("","centro_in","Filename for reading centroids",false,"","string", cmd);
-			TCLAP::ValueArg<string> centroid_out_fileArg("","centro_out","Filename for outputting calculated centroids",false,"","string", cmd);
+			TCLAP::ValueArg<string> centroid_in_fileArg("","centro_in","Filename for reading centroids (default is centroid.txt)",false,"centroid.txt","string", cmd);
+			TCLAP::ValueArg<string> centroid_out_fileArg("","centro_out","Filename for outputting calculated centroids (default is centroid.txt)",false,"centroid.txt","string", cmd);
 
-			TCLAP::ValueArg<string> gridpdb_hcp_fileArg("","gridpdb_hcp","Grid pdb hcp file for output",false,"gridpdb_hcp.pdb","string", cmd);
+			TCLAP::ValueArg<string> gridpdb_hcp_fileArg("","gridpdb_hcp","Grid pdb hcp file for output (default is gridpdb_hcp.pdb)",false,"gridpdb_hcp.pdb","string", cmd);
 			
 			TCLAP::ValueArg<double> max_frag_radiusArg("","max_frag_radius","Maximum fragment radius for creating the initial rotamers (default is 16.0)",false,16.0,"double", cmd);
 
@@ -194,7 +194,7 @@ public:
 			TCLAP::ValueArg<int> max_possible_confArg("","max_possible_conf","Maximum number of possible conformations to link (default is 20, -1 means unlimited)",false,20,"int", cmd);
 			TCLAP::ValueArg<int> link_iterArg("","link_iter","Maximum iterations for linking procedure (default is 1000)",false,1000,"int", cmd);
 
-			TCLAP::ValueArg<string> docked_fileArg("","docked_file","Docked ligands output filename",false,"docked.pdb","string", cmd);
+			TCLAP::ValueArg<string> docked_fileArg("","docked_file","Docked ligands output filename (default is docked.pdb)",false,"docked.pdb","string", cmd);
 			
 			TCLAP::ValueArg<double> docked_clus_radArg("","docked_clus_rad","Cluster radius between docked ligand conformations (default is 2.0)",false,2.0,"double", cmd);
 			TCLAP::ValueArg<double> max_allow_energyArg("","max_allow_energy","Maximum allowed energy for seed conformations (default is 0.0)",false,0.0,"double", cmd);

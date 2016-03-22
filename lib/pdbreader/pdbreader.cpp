@@ -395,19 +395,6 @@ namespace Molib {
 										Residue::res_tuple2(tok2[0].at(0), tok2[1], stoi(tok2[2]), tok2[3].at(0))));
 				}
 			}
-			//~ else if (line.compare(0, 16, "REMARK   8 RIGID") == 0) {
-				//~ Model &model = mols.last().last().last();
-				//~ vector<string> vs = help::ssplit(line.substr(17), " ");
-				//~ Atom::Set as;
-				//~ for (int i = 1; i < vs.size(); i++)	as.insert(atom_number_to_atom[&model][stoi(vs[i])]);
-				//~ model.get_rigid()[vs[0]].insert(as);
-				//~ dbgmsg(vs[0]);
-//~ #ifndef NDEBUG
-				//~ for (int i = 1; i < vs.size(); i++) dbgmsg(vs[i]);
-				//~ for (auto &a : as) dbgmsg(*a);
-				//~ dbgmsg(model.get_rigid());
-//~ #endif
-			//~ }
 			else if (line.compare(0, 16, "REMARK   8 RIGID") == 0) {
 				Model &model = mols.last().last().last();
 				vector<string> vs = help::ssplit(line.substr(17), " ");
@@ -477,11 +464,16 @@ namespace Molib {
 										<< (atom_iterator2 != atom_number_to_atom[&model].end()));
 									Atom &a2 = *atom_iterator2->second;
 									dbgmsg(a1 << " " << a2);
-									// check if atom1 or atom2 is an ion. Since ions (e.g., MG) sometimes
-									// have CONECT with other ligands (e.g. ADP), don't allow those bonds.
-									if (!help::ions.count(a1.br().resn()) && !help::ions.count(a2.br().resn())) {
+									const string &resn1 = a1.br().resn();
+									const string &resn2 = a2.br().resn();
+									if (resn1 == resn2) { // don't allow inter-residue bonds e.g., between MG and ATP, or between FAD and CYS (issue #114)
 										a1.connect(a2);
 									}
+#ifndef NDEBUG
+									else {
+										dbgmsg("Ignoring interresidue bond between " << resn1 << " and " << resn2 << ". Check if that is what you intended!");
+									}
+#endif									
 								}
 								it++;
 							}
