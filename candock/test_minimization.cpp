@@ -31,7 +31,7 @@ int main(int argc, char* argv[]) {
 		cmdl.display_time("started");
 		cout << cmdl << endl;
 
-		inout::output_file("", cmdl.mini_file()); // output docked & minimized ligands conformations
+		inout::output_file("", cmdl.docked_file()); // output docked & minimized ligands conformations
 
 		Molib::PDBreader rpdb(cmdl.receptor_file(), 
 			Molib::PDBreader::first_model);
@@ -110,12 +110,13 @@ int main(int argc, char* argv[]) {
 		OMMIface::SystemTopology::loadPlugins();
 
 		for (auto &ligand : ligands) {
-			ffield.insert_topology(ligand);
 			try {
+				
 				/**
 				 * Minimize system
 				 */
 				
+				ffield.insert_topology(ligand);
 				//~ ligand.set_name("org");
 
 				OMMIface::Modeler modeler(ffield, cmdl.fftype(), cmdl.dist_cutoff(),
@@ -164,7 +165,7 @@ int main(int argc, char* argv[]) {
 				cout << "Minimized energy = " << energy << endl;
 
 				inout::output_file(Molib::Molecule::print_complex(minimized_ligand, minimized_receptor, energy), 
-					cmdl.mini_file(), ios_base::app);
+					cmdl.docked_file(), ios_base::app);
 				
 				//~ /**
 				 //~ * This section is a test to see if you can change positions 

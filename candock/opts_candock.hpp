@@ -226,7 +226,7 @@ public:
 
 			TCLAP::ValueArg<double> clus_radArg("","clus_rad","Cluster radius for docked seeds (default is 2.0)",false,2.0,"double", cmd);
 
-			TCLAP::ValueArg<int> ncpuArg("","ncpu","Number of CPUs to use concurrently (default is 1)",false,1,"int", cmd);
+			TCLAP::ValueArg<int> ncpuArg("","ncpu","Number of CPUs to use concurrently (default is to use all CPUs)",false,thread::hardware_concurrency(),"int", cmd);
 
 			cmd.parse( argc, argv );
 			__quiet = quietSwitch.getValue();
@@ -403,7 +403,8 @@ public:
 	
 	friend ostream& operator<< (ostream& stream, const CmdLnOpts &cmdl) {
 		unsigned int n = thread::hardware_concurrency();
-		stream << endl << "Detected support for " << n << " concurrent threads." << endl;
+		stream << endl << "Detected support for " << n << " concurrent threads." 
+			<< " Using " << cmdl.ncpu() << " threads." << endl;
 		return stream;
 	}
 

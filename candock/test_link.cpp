@@ -45,11 +45,23 @@ int main(int argc, char* argv[]) {
 		Molib::PDBreader lpdb(cmdl.ligand_file(), Molib::PDBreader::all_models, 
 			cmdl.max_num_ligands());
 
-		/* Compute atom types for receptor (gaff types not needed since 
-		 * they are read from the forcefield xml file)
+		/** 
+		 * Compute atom types for receptor and cofactor(s): gaff types for protein, 
+		 * Mg ions, and water are read from the forcefield xml file later on while 
+		 * gaff types for cofactors (ADP, POB, etc.) are calculated de-novo here
 		 * 
 		 */
-		receptors.compute_idatm_type();
+		receptors.compute_idatm_type()
+			.compute_hydrogen()
+			.compute_bond_order()
+			.compute_bond_gaff_type()
+			.refine_idatm_type()
+			.erase_hydrogen()  // needed because refine changes connectivities
+			.compute_hydrogen()   // needed because refine changes connectivities
+			.compute_ring_type()
+			.compute_gaff_type()
+			.compute_rotatable_bonds() // relies on hydrogens being assigned
+			.erase_hydrogen();
 		
 		/* Create receptor grid
 		 * 
@@ -110,6 +122,13 @@ int main(int argc, char* argv[]) {
 		int ligand_cnt = 0;
 		
 		Molib::PDBreader lpdb2(cmdl.ligand_file(), Molib::PDBreader::all_models, 1);
+
+		/**
+		 * Insert topology for cofactors, but not for standard residues
+		 * that are already known to forcefield (e.g., amino acid residues)
+		 *
+		 */
+		ffield.insert_topology(receptors[0]); // fixes issue #115
 
 		OMMIface::SystemTopology::loadPlugins();
 	

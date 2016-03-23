@@ -97,7 +97,7 @@ int main(int argc, char* argv[]) {
 			.compute_gaff_type()
 			.compute_rotatable_bonds() // relies on hydrogens being assigned
 			.erase_hydrogen();
-		
+
 		/* Create receptor grid
 		 * 
 		 */
@@ -275,6 +275,13 @@ int main(int argc, char* argv[]) {
 		int ligand_cnt = 0;
 		
 		Molib::PDBreader lpdb2(cmdl.prep_file(), Molib::PDBreader::all_models, 1);
+
+		/**
+		 * Insert topology for cofactors, but not for standard residues
+		 * that are already known to forcefield (e.g., amino acid residues)
+		 *
+		 */
+		ffield.insert_topology(receptors[0]); // fixes issue #115
 
 		OMMIface::SystemTopology::loadPlugins();
 	

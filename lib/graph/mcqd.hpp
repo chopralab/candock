@@ -31,15 +31,12 @@
 #include <vector>
 #include <set>
 #include "helper/array2d.hpp"
+#include "helper/error.hpp"
 
 using namespace std;
 
 class Maxclique {
 public:
-
-  class myexception : public exception {
-    const char* what() const throw() { return "WARNING: Graph is empty."; }
-  } exc_empty;
 
   //~ struct comp { bool operator()(const pair<vector<unsigned short int>, double> &i, const pair<vector<unsigned short int>, double> &j) 
     //~ { return i.second < j.second; } };
