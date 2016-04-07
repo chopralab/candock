@@ -253,7 +253,7 @@ int main(int argc, char* argv[]) {
 								cmdl.top_seeds_file())); // output docked & clustered seeds
 	
 						}
-						catch (Error& e) {
+						catch (exception& e) {
 							cerr << "skipping seed due to : " << e.what() << endl;
 						}
 					}
@@ -347,7 +347,7 @@ int main(int argc, char* argv[]) {
 							inout::output_file(Molib::Molecule::print_complex(docked.get_ligand(), docked.get_receptor(), docked.get_energy()), 
 								cmdl.docked_file(), ios_base::app); // output docked molecule conformations
 						}
-					} catch (Error& e) { 
+					} catch (exception& e) { 
 						cerr << "Error: skipping ligand " << ligand.name() << " due to : " << e.what() << endl; 
 					} 
 					ffield.erase_topology(ligand); // he he

@@ -199,7 +199,7 @@ int main(int argc, char* argv[]) {
 #endif
 							
 						}
-						catch (Error& e) {
+						catch (exception& e) {
 							cerr << "skipping seed due to : " << e.what() << endl;
 						}
 					}

@@ -1406,6 +1406,7 @@ namespace help {
 		{"c",{"c","c2"}},
 		{"cz",{"cz"}},
 		{"cp",{"cp","ca","cc","cd","c2"}},
+		{"cq",{"cq","ca","cc","cd","c2"}}, // fix issue #118
 		{"ca",{"ca","cp","cc","cd","c2"}},
 		{"cc",{"cc","ca","c2"}},
 		{"cd",{"cd","ca","c2"}},

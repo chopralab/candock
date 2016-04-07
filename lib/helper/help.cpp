@@ -97,7 +97,7 @@ namespace help {
 	    cerr << "Memusage:"  << msg << ":" << result << endl;
 	    return result;
 	}
-
+	
 	vector<vector<string>> get_replacement(const vector<string> &initial) {
 		vector<vector<string>> result;
 		if (initial.size() == 2) {
