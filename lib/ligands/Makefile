@@ -1,4 +1,4 @@
-include ../../candock/Makefile.inc
+include ../../src/Makefile.inc
 #~ include Makefile.inc
 
 #OBJLIBS	= libgenclus.a libgenlig.a libgenbio.a

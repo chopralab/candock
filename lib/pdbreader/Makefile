@@ -1,4 +1,4 @@
-include ../../candock/Makefile.inc
+include ../../src/Makefile.inc
 
 OBJLIBS	= libpdb.a
 OBJS	= atom.o molecule.o bond.o pdbreader.o element.o internal.o idatm.o \

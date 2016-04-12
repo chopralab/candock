@@ -1,4 +1,4 @@
-include ../../candock/Makefile.inc
+include ../../src/Makefile.inc
 
 OBJLIBS	= libprobis.a
 OBJS	= probis.o ligands.o bsite.o eelement.o probe.o \
