@@ -2,9 +2,11 @@
 #include <map>
 #include <set>
 
-#include "Mol.h"
-#include "templates/TAexcept.h"
-#include "timeit.h"
+// #include "Mol.h"
+// #include "templates/TAexcept.h"
+// #include "timeit.h"
+
+#include "atom.hpp"
 
 namespace molecule {
 

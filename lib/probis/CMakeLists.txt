@@ -1,0 +1,73 @@
+include_directories($CMAKE_CURRENT_SOURCE_DIR)
+
+set( probis_SRC args.cc
+        				args.h
+			        	Array.h
+        				atom.cc
+	        			atom.h
+        				biounit.h
+			        	bit.cc
+        				bit.h
+        				bsite.cc
+        				bsite.h
+				        clique.cc
+        				clique.h
+        				cluster.cc
+	        			cluster.h
+        				clusterdata.h
+	        			clusterlib.cc
+        				clusterlib.h
+        				colors.cc
+        				colors.h
+        				const.cc
+        				const.h
+        				debug.hpp
+	              denorm.cc
+        			  denorm.h
+	        		  desc.cc
+        			  desc.h
+        			  eelement.cc
+        			  eelement.h
+        			  geo.cc
+		        	  geo.h
+			          grid.cc
+	        		  grid.h
+			         	item.cc
+        				item.h
+		        	  kabsch.cc
+        				kabsch.h
+		        	  ligand.cc
+				        ligand.h
+				        ligands.cc
+         			  ligands.h
+			          molecule.cc
+        				molecule.h
+		        		motif.cc
+				        motif.h
+		        		nosql.cc
+		        		nosql.h
+				        output.cc
+				        output.h
+				        probe.cc
+				        probe.h
+			        	probis.cpp
+			        	probis.hpp
+				        product.cc
+				        product.h
+				        prog.cc
+				        residue.cc
+				        residue.h
+				        schmitt.cc
+				        schmitt.h
+				        score.cc
+				        score.h
+				        sphere.cc
+				        sphere.h
+				        states.cc
+				        states.h
+				        subgraph.cc
+				        subgraph.h
+			        	Timer.h
+				        vert.h )
+
+add_library(probis STATIC ${probis_SRC})

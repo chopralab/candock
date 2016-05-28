@@ -14,3 +14,4 @@ src/test_clq
 src/test_link
 src/genpot
 src/test_cofactor
+*.DS_Store
