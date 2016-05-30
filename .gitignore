@@ -15,3 +15,5 @@ src/test_link
 src/genpot
 src/test_cofactor
 *.DS_Store
+.kdev4/
+candock.kdev4

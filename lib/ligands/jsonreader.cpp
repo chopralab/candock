@@ -45,7 +45,7 @@ bool JsonReader::print_JSON_tree(const Json::Value &root, const unsigned short d
     cout << " {type=["<< root.type() << "], size=" << root.size() << "}"; 
     if( root.size() > 0 ) {
         cout<<endl;
-        for(Json::ValueIterator itr = root.begin() ; itr != root.end() ; itr++ ) {
+        for(Json::ValueConstIterator itr = root.begin() ; itr != root.end() ; itr++ ) {
             // Print depth. 
             for( int tab = 0 ; tab < depth; tab++) {
                cout << "-";

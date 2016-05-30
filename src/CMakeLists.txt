@@ -4,22 +4,25 @@ include_directories( ../lib/tclap-1.2.1/include )
 include_directories( ../lib/modeler/ )
 
 set( candock_libraries 
-        centro
-        cluster
         docker
-        fragmenter
-        geom3d
-        graph
-        helper
+        score
+        centro
         kabsch
-        kbforce
         ligands
+        cluster   # Ugly GCC hack to fix interdependency issue
         linker
+        cluster
+        graph
         modeler
         pdbreader
         probis
-        score
+        fragmenter
+        kbforce
+        geom3d
+        helper
         OpenMM
+        pthread   # Required for GCC
+        dl
    )
 
 add_executable( candock candock.cpp common.cpp common.hpp opts_candock.hpp )
