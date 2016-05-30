@@ -232,7 +232,7 @@ public:
             TCLAP::SwitchArg     designArg("","design","Generate novel ligands (not enabled by default)",cmd,false);
             TCLAP::ValueArg<int> design_num_fragArg ("","d_num_frag","Number of supplied fragments (identified using maximum clique) to be used for prediction of novel ligands (default is 40)",false,40,"int",cmd);
             TCLAP::ValueArg<int> design_num_predArg ("","d_num_pred","Maximum number of top novel compounds to save (default is 10)",false,10,"int",cmd);
-            TCLAP::ValueArg<int> design_size_linkArg("","d_num_pred","Maximum number of atoms to connect two fragments (default is 5)",false,5,"int",cmd);
+            TCLAP::ValueArg<int> design_size_linkArg("","d_size_link","Maximum number of atoms to connect two fragments (default is 5)",false,5,"int",cmd);
 
 			TCLAP::ValueArg<double> clus_radArg("","clus_rad","Cluster radius for docked seeds (default is 2.0)",false,2.0,"double", cmd);
 
