@@ -15,25 +15,6 @@
 #include "genlig.hpp"
 using namespace std;
 
-ostream& operator<<(ostream& os, const genlig::BindingSiteClusters& bsites)	{
-	for (auto &kv : bsites) {
-		const int &cluster_number = kv.first;
-		const Molib::Molecules &ligands = kv.second;
-		os << "REMARK  99 ______________________ BEGINNING CLUSTER #" << cluster_number << " ______________________" << endl;
-		os << ligands;
-	}
-	return os;
-}	
-
-ostream& operator<<(ostream& os, const genlig::BindingSiteScores& bscores)	{
-	for (auto &kv : bscores) {
-		const int &cluster_number = kv.first;
-		const double &z_score = kv.second;
-		os << cluster_number << " " << z_score << endl;
-	}
-	return os;
-}	
-
 namespace genlig {
 	ResidueSet find_neighbor_residues(Molib::Molecule &ligand, Molib::Atom::Grid &grid) {
 		ResidueSet neighbor_residues;
@@ -313,4 +294,24 @@ namespace genlig {
 		}
 		return {bsites, bscores};
 	}
-}
+	
+	ostream& operator<<(ostream& os, const map<int, Molib::Molecules>& bsites)	{
+		for (auto &kv : bsites) {
+			const int &cluster_number = kv.first;
+			const Molib::Molecules &ligands = kv.second;
+			os << "REMARK  99 ______________________ BEGINNING CLUSTER #" << cluster_number << " ______________________" << endl;
+			os << ligands;
+		}
+		return os;
+    }
+    
+    ostream& operator<<(ostream& os, const map<int, double>& bscores)	{
+        for (auto &kv : bscores) {
+            const int &cluster_number = kv.first;
+            const double &z_score = kv.second;
+            os << cluster_number << " " << z_score << endl;
+        }
+        return os;
+    }
+
+};

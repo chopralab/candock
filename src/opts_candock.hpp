@@ -95,6 +95,11 @@ class CmdLnOpts {
 	double __conf_spin;
 	double __excluded_radius;
 	double __max_interatomic_distance;
+    
+    bool __design;
+    int  __d_num_frag;
+    int  __d_num_pred;
+    int  __d_size_link;
 
 	double __clus_rad;
 
@@ -223,6 +228,11 @@ public:
 
 			TCLAP::ValueArg<double> excluded_radiusArg("","excluded","Excluded radius (default is 0.8)",false,0.8,"double", cmd);
 			TCLAP::ValueArg<double> max_interatomic_distanceArg("","interatomic","Maximum interatomic distance (default is 8.0)",false,8.0,"double", cmd);
+            
+            TCLAP::SwitchArg     designArg("","design","Generate novel ligands (not enabled by default)",cmd,false);
+            TCLAP::ValueArg<int> design_num_fragArg ("","d_num_frag","Number of supplied fragments (identified using maximum clique) to be used for prediction of novel ligands (default is 40)",false,40,"int",cmd);
+            TCLAP::ValueArg<int> design_num_predArg ("","d_num_pred","Maximum number of top novel compounds to save (default is 10)",false,10,"int",cmd);
+            TCLAP::ValueArg<int> design_size_linkArg("","d_num_pred","Maximum number of atoms to connect two fragments (default is 5)",false,5,"int",cmd);
 
 			TCLAP::ValueArg<double> clus_radArg("","clus_rad","Cluster radius for docked seeds (default is 2.0)",false,2.0,"double", cmd);
 
@@ -306,6 +316,11 @@ public:
 			__conf_spin = conf_spinArg.getValue();
 			__excluded_radius = excluded_radiusArg.getValue();
 			__max_interatomic_distance = max_interatomic_distanceArg.getValue();
+            
+            __design      = designArg.getValue();
+            __d_num_frag  = design_num_fragArg.getValue();
+            __d_num_pred  = design_num_predArg.getValue();
+            __d_size_link = design_size_linkArg.getValue();
 
 			__clus_rad = clus_radArg.getValue();
 
@@ -396,6 +411,11 @@ public:
 	double conf_spin() const { return __conf_spin; }
 	double excluded_radius() const { return __excluded_radius; }
 	double max_interatomic_distance() const { return __max_interatomic_distance; }
+    
+    bool design()      const  { return __design; }
+    int  d_num_frag()  const  { return __d_num_frag; }
+    int  d_num_pred()  const  { return __d_num_pred; }
+    int  d_size_link() const  { return __d_size_link; }
 
 	double clus_rad() const { return __clus_rad; }
 

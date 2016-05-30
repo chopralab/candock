@@ -24,7 +24,7 @@ namespace Geom3D {
 		Matrix(const double d[9]) : __matrix(make_pair(gsl_matrix_alloc(3, 3), gsl_vector_alloc(3))) { for (int i=0; i<9; i++) { gsl_matrix_set(__matrix.first, i/3, i%3, d[i]); } gsl_vector_set_all(__matrix.second, 0); }
 		Matrix(gsl_matrix *U, gsl_vector *t) : __matrix(make_pair(gsl_matrix_alloc(3, 3), gsl_vector_alloc(3))) { gsl_matrix_memcpy(__matrix.first, U); gsl_vector_memcpy(__matrix.second, t);}
 		Matrix(const Matrix &other) { __matrix = make_pair(gsl_matrix_alloc(3, 3), gsl_vector_alloc(3)); gsl_matrix_memcpy(__matrix.first, other.rota()); gsl_vector_memcpy(__matrix.second, other.trans()); } // copy constructor
-		Matrix& operator=(const Matrix &other) { gsl_matrix_memcpy(__matrix.first, other.rota()); gsl_vector_memcpy(__matrix.second, other.trans()); } // copy constructor
+        Matrix& operator=(const Matrix &other) { gsl_matrix_memcpy(__matrix.first, other.rota()); gsl_vector_memcpy(__matrix.second, other.trans()); return *this; } // copy constructor
 		Matrix(Json::Value rota, Json::Value trans) { // c++11 :-)
 			__matrix = make_pair(gsl_matrix_alloc(3, 3), gsl_vector_alloc(3));
 		    gsl_matrix_set(__matrix.first, 0, 0, rota[0][0].asDouble());

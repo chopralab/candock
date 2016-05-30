@@ -1,6 +1,6 @@
 #include "geo.h"
 #include "atom.h"
-
+#include <cmath>
 
 float z_score(float raw_score) {
   return (raw_score - POP_MEAN) / POP_SD;

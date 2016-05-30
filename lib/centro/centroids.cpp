@@ -11,17 +11,6 @@
 #include <iostream>
 #include <exception>
 
-ostream& operator<<(ostream& os, const Centro::Centroids& centroids) {
-	for (auto &kv : centroids) {
-		const int bsite_id = kv.first;
-		for (auto &centroid : kv.second) {
-			os << bsite_id << " " << centroid.get_centroid().simple() << " " << fixed
-				<< setprecision(3) << centroid.get_radial_check() << endl;
-		}
-	}
-	return os;
-}
-
 namespace Centro {
 
 	/* Centroid stuff
@@ -82,6 +71,17 @@ namespace Centro {
 				+ centroid_file + "\n");
 		dbgmsg("setting centroids from file : " << endl << centroids);
 		return centroids;
+	}
+	
+	ostream& operator<<(ostream& os, const Centro::Centroids& centroids) {
+		for (auto &kv : centroids) {
+			const int bsite_id = kv.first;
+			for (auto &centroid : kv.second) {
+				os << bsite_id << " " << centroid.get_centroid().simple() << " " << fixed
+					<< setprecision(3) << centroid.get_radial_check() << endl;
+			}
+		}
+		return os;
 	}
 
 };

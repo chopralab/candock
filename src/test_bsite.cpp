@@ -60,7 +60,7 @@ int main(int argc, char* argv[]) {
 			genlig::generate_binding_site_prediction(cmdl.json_with_ligs_file(), 
 			cmdl.bio_dir(), cmdl.num_bsites());
 
-		inout::output_file(binding_sites.first, cmdl.lig_clus_file());
+		//inout::output_file(binding_sites.first, cmdl.lig_clus_file());
 		inout::output_file(binding_sites.second, cmdl.z_scores_file());
 
 		centroids = Centro::set_centroids(binding_sites.first, cmdl.centro_clus_rad());	

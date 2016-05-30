@@ -101,7 +101,7 @@ class MNTS {
 	void max_tabu(int);
 public:
 	MNTS(vector<vector<int>> &qm, Glib::AdjacencyMatrix &conn, const int *weight, const int ii=300, const int w=100, 
-		const int lni=10) : qmax(qm), Edge(conn), Max_Vtx(conn.size()), We(weight), 
+		const int lni=10) : Edge(conn), qmax(qm), Max_Vtx(conn.size()), We(weight), 
 		iter(ii), Waim(w), len_improve(lni), len_time(int (100000000 / lni) + 1), TABUL(7), len_best(0) {
 #ifndef NDEBUG
 		stringstream ss;

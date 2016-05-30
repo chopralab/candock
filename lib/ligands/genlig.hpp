@@ -12,9 +12,9 @@ namespace genlig {
 		const string &lig_file, const string &bsite_file);
 	pair<BindingSiteClusters, BindingSiteScores> generate_binding_site_prediction(const string &json_with_ligs_file, 
 		const string &bio_dir, const int num_bsites);
-}
 
-ostream& operator<<(ostream& os, const genlig::BindingSiteClusters& bsites);
-ostream& operator<<(ostream& os, const genlig::BindingSiteScores& bscores);
+	ostream& operator<<(ostream& os, const map<int, Molib::Molecules>& bsites);
+    ostream& operator<<(ostream& os, const map<int, double>& bscores);
+};
 
 #endif
