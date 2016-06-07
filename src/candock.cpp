@@ -211,12 +211,16 @@ int main(int argc, char* argv[]) {
 		 * 
 		 */
 		threads.clear();
+                mutex mtx3;
+                
+                Molib::NRset all_docked_seeds;
+                
 		for(int i = 0; i < cmdl.ncpu(); ++i) {
 			threads.push_back(
 #ifndef NDEBUG
-				thread([&seeds, &gridrec, &score, &gpoints0, &gpoints, i] () {
+				thread([&seeds, &gridrec, &score, &gpoints0, &gpoints, &all_docked_seeds, &mtx3, i] () {
 #else
-				thread([&seeds, &gpoints0, &gpoints, i] () {
+				thread([&seeds, &gpoints0, &gpoints, &all_docked_seeds, &mtx2, i] () {
 #endif
 					// iterate over docked seeds and dock unique seeds
 					for (int j = i; j < seeds.size(); j+= cmdl.ncpu()) {
@@ -252,6 +256,16 @@ int main(int argc, char* argv[]) {
 								//~ + cmdl.top_seeds_file()); // output docked & clustered seeds
 							inout::output_file(dock.get_docked(), Path::join(Path::join(cmdl.top_seeds_dir(), dock.get_docked().name()),
 								cmdl.top_seeds_file())); // output docked & clustered seeds
+                                                        
+                                                        Molib::Molecules *docked_seeds = new Molib::Molecules( dock.get_docked().name() );
+                                                        
+                                                        const int sz = (int) (dock.get_docked().size() * cmdl.top_percent());
+                                                        
+                                                        for (int i = 0; i <= sz; ++i) docked_seeds->add( new Molib::Molecule( dock.get_docked().element(i) ) );
+                                       
+                                                        std::lock_guard<std::mutex> guard(mtx3);
+                                       
+                                                        all_docked_seeds.aadd(j, docked_seeds, &all_docked_seeds);
 	
 						}
 						catch (exception& e) {
@@ -287,7 +301,7 @@ int main(int argc, char* argv[]) {
 		OMMIface::SystemTopology::loadPlugins();
 	
 		for(int i = 0; i < cmdl.ncpu(); ++i) {
-			threads.push_back(thread([&lpdb2, &receptors, &gridrec, &score, &ffield, &ligand_cnt, &mtx2] () {
+			threads.push_back(thread([&lpdb2, &receptors, &gridrec, &score, &ffield, &ligand_cnt, &mtx2, &all_docked_seeds] () {
 
 				Molib::Molecules ligands;
 
@@ -309,8 +323,15 @@ int main(int argc, char* argv[]) {
 						/** 
 						 * Read top seeds for this ligand
 						 */	 
-						Molib::NRset top_seeds = common::read_top_seeds_files(ligand,
-							cmdl.top_seeds_dir(), cmdl.top_seeds_file(), cmdl.top_percent());
+						Molib::NRset top_seeds;
+                                                
+                                                const Molib::Model &model = ligand.first().first();
+                                                for (auto &fragment : model.get_rigid()) { // iterate over seeds
+                                                    if (fragment.is_seed()) {
+                                                        
+                                                        top_seeds.add( new Molib::Molecules( all_docked_seeds.element( fragment.get_seed_id() ) ) );
+                                                    }
+                                                }
 	
 						ligand.erase_properties(); // required for graph matching
 						top_seeds.erase_properties(); // required for graph matching
