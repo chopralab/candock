@@ -294,7 +294,9 @@ namespace genlig {
 		}
 		return {bsites, bscores};
 	}
-	
+}
+
+namespace Molib {
 	ostream& operator<<(ostream& os, const map<int, Molib::Molecules>& bsites)	{
 		for (auto &kv : bsites) {
 			const int &cluster_number = kv.first;
@@ -304,14 +306,14 @@ namespace genlig {
 		}
 		return os;
     }
-    
-    ostream& operator<<(ostream& os, const map<int, double>& bscores)	{
+}
+
+ostream& operator<<(ostream& os, const map<int, double>& bscores)	{
         for (auto &kv : bscores) {
             const int &cluster_number = kv.first;
             const double &z_score = kv.second;
             os << cluster_number << " " << z_score << endl;
         }
         return os;
-    }
+}
 
-};
