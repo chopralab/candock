@@ -9,6 +9,5 @@ set( modeler_SRC forcefield.cpp
 				         topology.cpp
 				         topology.hpp )
 
-include_directories( ../modeler )
 
 add_library(modeler STATIC ${modeler_SRC})

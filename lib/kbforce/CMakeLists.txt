@@ -12,6 +12,5 @@ set( kbforce_SRC openmmapi/src/KBForce.cpp
 
 include_directories( platforms/reference/include )
 include_directories( openmmapi/include )
-include_directories( ../modeler )
 
 add_library(kbforce STATIC ${kbforce_SRC})

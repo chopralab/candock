@@ -1,6 +1,6 @@
 include_directories($CMAKE_CURRENT_SOURCE_DIR)
 
-include_directories( ../lib/tclap-1.2.1/include )
+include_directories( ../foreign/tclap-1.2.1/include )
 include_directories( ../lib/modeler/ )
 
 set( candock_libraries 
@@ -20,6 +20,9 @@ set( candock_libraries
         kbforce
         geom3d
         helper
+   )
+
+set( additional_libraries 
         pthread   # Required for GCC
         dl
    )
@@ -36,108 +39,103 @@ add_executable( test_cofactor test_cofactor.cpp common.cpp )
 
 target_link_libraries( candock
                          ${candock_libraries}
-                         ${OpenMM_LIBRARIES}
-                         ${GSL_LIBRARIES}
-                         ${JSONCPP_LIBRARIES}
                          ${Boost_LIBRARIES}
                          ${Boost_date_time_LIBRARY}
                          ${Boost_filesystem_LIBRARY}
                          ${Boost_regex_LIBRARY}
                          ${Boost_system_LIBRARY}
+                         ${OPENMM_LIBRARY}
+                         ${GSL_LIBRARIES}
+                         ${additional_libraries}
                      )
 
 target_link_libraries( genpot
                          ${candock_libraries}
-                         ${OpenMM_LIBRARIES}
-                         ${GSL_LIBRARIES}
-                         ${JSONCPP_LIBRARIES}
                          ${Boost_LIBRARIES}
                          ${Boost_date_time_LIBRARY}
                          ${Boost_filesystem_LIBRARY}
                          ${Boost_regex_LIBRARY}
                          ${Boost_system_LIBRARY}
+                         ${GSL_LIBRARIES}
+                         ${additional_libraries}
                      )
 
 target_link_libraries( test_minimization
                          ${candock_libraries}
-                         ${OpenMM_LIBRARIES}
-                         ${GSL_LIBRARIES}
-                         ${JSONCPP_LIBRARIES}
                          ${Boost_LIBRARIES}
                          ${Boost_date_time_LIBRARY}
                          ${Boost_filesystem_LIBRARY}
                          ${Boost_regex_LIBRARY}
                          ${Boost_system_LIBRARY}
+                         ${OPENMM_LIBRARY}
+                         ${GSL_LIBRARIES}
+                         ${additional_libraries}
                      )
 
 target_link_libraries( test_fragmenting
                          ${candock_libraries}
-                         ${OpenMM_LIBRARIES}
-                         ${GSL_LIBRARIES}
-                         ${JSONCPP_LIBRARIES}
                          ${Boost_LIBRARIES}
                          ${Boost_date_time_LIBRARY}
                          ${Boost_filesystem_LIBRARY}
                          ${Boost_regex_LIBRARY}
                          ${Boost_system_LIBRARY}
+                         ${GSL_LIBRARIES}
+                         ${additional_libraries}
                      )
 
 target_link_libraries( test_bsite
                          ${candock_libraries}
-                         ${OpenMM_LIBRARIES}
-                         ${GSL_LIBRARIES}
-                         ${JSONCPP_LIBRARIES}
                          ${Boost_LIBRARIES}
                          ${Boost_date_time_LIBRARY}
                          ${Boost_filesystem_LIBRARY}
                          ${Boost_regex_LIBRARY}
                          ${Boost_system_LIBRARY}
+                         ${GSL_LIBRARIES}
+                         ${additional_libraries}
                      )
 
 target_link_libraries( test_clq
                          ${candock_libraries}
-                         ${OpenMM_LIBRARIES}
-                         ${GSL_LIBRARIES}
-                         ${JSONCPP_LIBRARIES}
                          ${Boost_LIBRARIES}
                          ${Boost_date_time_LIBRARY}
                          ${Boost_filesystem_LIBRARY}
                          ${Boost_regex_LIBRARY}
                          ${Boost_system_LIBRARY}
+                         ${GSL_LIBRARIES}
+                         ${additional_libraries}
                      )
 
 target_link_libraries( test_link
                          ${candock_libraries}
-                         ${OpenMM_LIBRARIES}
-                         ${GSL_LIBRARIES}
-                         ${JSONCPP_LIBRARIES}
                          ${Boost_LIBRARIES}
                          ${Boost_date_time_LIBRARY}
                          ${Boost_filesystem_LIBRARY}
                          ${Boost_regex_LIBRARY}
                          ${Boost_system_LIBRARY}
+                         ${OPENMM_LIBRARY}
+                         ${GSL_LIBRARIES}
+                         ${additional_libraries}
                      )
 
 target_link_libraries( test_singlepoint
                          ${candock_libraries}
-                         ${OpenMM_LIBRARIES}
-                         ${GSL_LIBRARIES}
-                         ${JSONCPP_LIBRARIES}
                          ${Boost_LIBRARIES}
                          ${Boost_date_time_LIBRARY}
                          ${Boost_filesystem_LIBRARY}
                          ${Boost_regex_LIBRARY}
                          ${Boost_system_LIBRARY}
+                         ${GSL_LIBRARIES}
+                         ${additional_libraries}
                      )
 
 target_link_libraries( test_cofactor
                          ${candock_libraries}
-                         ${OpenMM_LIBRARIES}
-                         ${GSL_LIBRARIES}
-                         ${JSONCPP_LIBRARIES}
                          ${Boost_LIBRARIES}
                          ${Boost_date_time_LIBRARY}
                          ${Boost_filesystem_LIBRARY}
                          ${Boost_regex_LIBRARY}
                          ${Boost_system_LIBRARY}
+                         ${OPENMM_LIBRARY}
+                         ${GSL_LIBRARIES}
+                         ${additional_libraries}
                      )

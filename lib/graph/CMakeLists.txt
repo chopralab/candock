@@ -5,7 +5,6 @@ set( graph_SRC graph.hpp
 			         mcqd.hpp
 			         mnts.cpp
 			         mnts.hpp
-			         quaternion.hpp
 			         ullsubstate.hpp
 			         vertex.hpp )
 
