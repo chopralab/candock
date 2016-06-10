@@ -1,0 +1,7 @@
+How to compile:
+
+cmake . -Bbuild
+cd build
+make candock
+
+For release compile use cmake . -Bbuild -DCMAKE_BUILD_TYPE=Release

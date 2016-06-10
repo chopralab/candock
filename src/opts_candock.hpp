@@ -144,7 +144,7 @@ public:
 
 			TCLAP::ValueArg<double> centro_clus_radArg("","centro_clus_rad","Cluster radius for centroid centers (default is 3.0)",false,3.0,"double", cmd);
 
-			TCLAP::ValueArg<string> centroid_in_fileArg("","centro_in","Filename for reading centroids (default is centroid.txt)",false,"centroid.txt","string", cmd);
+			TCLAP::ValueArg<string> centroid_in_fileArg("","centro_in","Filename for reading centroids (default is empty string)",false,"","string", cmd);
 			TCLAP::ValueArg<string> centroid_out_fileArg("","centro_out","Filename for outputting calculated centroids (default is centroid.txt)",false,"centroid.txt","string", cmd);
 
 			TCLAP::ValueArg<string> gridpdb_hcp_fileArg("","gridpdb_hcp","Grid pdb hcp file for output (default is gridpdb_hcp.pdb)",false,"gridpdb_hcp.pdb","string", cmd);

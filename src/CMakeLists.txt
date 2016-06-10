@@ -39,7 +39,6 @@ add_executable( test_cofactor test_cofactor.cpp common.cpp )
 
 target_link_libraries( candock
                          ${candock_libraries}
-                         ${JSONCPP_LIBRARIES}
                          ${Boost_LIBRARIES}
                          ${Boost_date_time_LIBRARY}
                          ${Boost_filesystem_LIBRARY}
@@ -51,89 +50,92 @@ target_link_libraries( candock
                      )
 
 target_link_libraries( genpot
-                         ${JSONCPP_LIBRARIES}
+                         ${candock_libraries}
                          ${Boost_LIBRARIES}
                          ${Boost_date_time_LIBRARY}
                          ${Boost_filesystem_LIBRARY}
                          ${Boost_regex_LIBRARY}
                          ${Boost_system_LIBRARY}
                          ${GSL_LIBRARIES}
-                         ${candock_libraries}
+                         ${additional_libraries}
                      )
 
 target_link_libraries( test_minimization
-                         ${GSL_LIBRARIES}
-                         ${JSONCPP_LIBRARIES}
+                         ${candock_libraries}
                          ${Boost_LIBRARIES}
                          ${Boost_date_time_LIBRARY}
                          ${Boost_filesystem_LIBRARY}
                          ${Boost_regex_LIBRARY}
                          ${Boost_system_LIBRARY}
-                         ${candock_libraries}
+                         ${OPENMM_LIBRARY}
+                         ${GSL_LIBRARIES}
+                         ${additional_libraries}
                      )
 
 target_link_libraries( test_fragmenting
-                         ${GSL_LIBRARIES}
-                         ${JSONCPP_LIBRARIES}
+                         ${candock_libraries}
                          ${Boost_LIBRARIES}
                          ${Boost_date_time_LIBRARY}
                          ${Boost_filesystem_LIBRARY}
                          ${Boost_regex_LIBRARY}
                          ${Boost_system_LIBRARY}
-                         ${candock_libraries}
+                         ${GSL_LIBRARIES}
+                         ${additional_libraries}
                      )
 
 target_link_libraries( test_bsite
-                         ${GSL_LIBRARIES}
-                         ${JSONCPP_LIBRARIES}
+                         ${candock_libraries}
                          ${Boost_LIBRARIES}
                          ${Boost_date_time_LIBRARY}
                          ${Boost_filesystem_LIBRARY}
                          ${Boost_regex_LIBRARY}
                          ${Boost_system_LIBRARY}
-                         ${candock_libraries}
+                         ${GSL_LIBRARIES}
+                         ${additional_libraries}
                      )
 
 target_link_libraries( test_clq
-                         ${GSL_LIBRARIES}
-                         ${JSONCPP_LIBRARIES}
+                         ${candock_libraries}
                          ${Boost_LIBRARIES}
                          ${Boost_date_time_LIBRARY}
                          ${Boost_filesystem_LIBRARY}
                          ${Boost_regex_LIBRARY}
                          ${Boost_system_LIBRARY}
-                         ${candock_libraries}
+                         ${GSL_LIBRARIES}
+                         ${additional_libraries}
                      )
 
 target_link_libraries( test_link
-                         ${GSL_LIBRARIES}
-                         ${JSONCPP_LIBRARIES}
+                         ${candock_libraries}
                          ${Boost_LIBRARIES}
                          ${Boost_date_time_LIBRARY}
                          ${Boost_filesystem_LIBRARY}
                          ${Boost_regex_LIBRARY}
                          ${Boost_system_LIBRARY}
-                         ${candock_libraries}
+                         ${OPENMM_LIBRARY}
+                         ${GSL_LIBRARIES}
+                         ${additional_libraries}
                      )
 
 target_link_libraries( test_singlepoint
-                         ${GSL_LIBRARIES}
-                         ${JSONCPP_LIBRARIES}
+                         ${candock_libraries}
                          ${Boost_LIBRARIES}
                          ${Boost_date_time_LIBRARY}
                          ${Boost_filesystem_LIBRARY}
                          ${Boost_regex_LIBRARY}
                          ${Boost_system_LIBRARY}
-                         ${candock_libraries}
+                         ${GSL_LIBRARIES}
+                         ${additional_libraries}
                      )
 
 target_link_libraries( test_cofactor
-                         ${GSL_LIBRARIES}
-                         ${JSONCPP_LIBRARIES}
+                         ${candock_libraries}
                          ${Boost_LIBRARIES}
                          ${Boost_date_time_LIBRARY}
                          ${Boost_filesystem_LIBRARY}
                          ${Boost_regex_LIBRARY}
                          ${Boost_system_LIBRARY}
-                         ${candock_libraries}
+                         ${OPENMM_LIBRARY}
+                         ${GSL_LIBRARIES}
+                         ${additional_libraries}
                      )
