@@ -6,7 +6,6 @@
 #include "pdbreader/pdbreader.hpp"
 #include "pdbreader/molecules.hpp"
 #include "helper/help.hpp"
-//~ #include "opts_genbio.hpp"
 #include "geom3d/matrix.hpp"
 #include "helper/error.hpp"
 #include "helper/inout.hpp"

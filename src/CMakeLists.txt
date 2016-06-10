@@ -20,7 +20,9 @@ set( candock_libraries
         kbforce
         geom3d
         helper
-        OpenMM
+   )
+
+set( additional_libraries 
         pthread   # Required for GCC
         dl
    )
@@ -36,24 +38,26 @@ add_executable( test_singlepoint test_singlepoint.cpp common.cpp )
 add_executable( test_cofactor test_cofactor.cpp common.cpp )
 
 target_link_libraries( candock
-                         ${GSL_LIBRARIES}
+                         ${candock_libraries}
                          ${JSONCPP_LIBRARIES}
                          ${Boost_LIBRARIES}
                          ${Boost_date_time_LIBRARY}
                          ${Boost_filesystem_LIBRARY}
                          ${Boost_regex_LIBRARY}
                          ${Boost_system_LIBRARY}
-                         ${candock_libraries}
+                         ${OPENMM_LIBRARY}
+                         ${GSL_LIBRARIES}
+                         ${additional_libraries}
                      )
 
 target_link_libraries( genpot
-                         ${GSL_LIBRARIES}
                          ${JSONCPP_LIBRARIES}
                          ${Boost_LIBRARIES}
                          ${Boost_date_time_LIBRARY}
                          ${Boost_filesystem_LIBRARY}
                          ${Boost_regex_LIBRARY}
                          ${Boost_system_LIBRARY}
+                         ${GSL_LIBRARIES}
                          ${candock_libraries}
                      )
 

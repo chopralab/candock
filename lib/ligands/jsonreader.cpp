@@ -7,9 +7,9 @@
 #include "jsonreader.hpp"
 #include "helper/error.hpp"
 #include "helper/inout.hpp"
-#include <json/reader.h>
-#include <json/value.h>
-#include <json/writer.h>
+#include <lib_json/json_reader.cpp>
+#include <lib_json/json_value.cpp>
+#include <lib_json/json_writer.cpp>
 
 JsonReader::iterator JsonReader::find(const vector<pair<const string, const string> > &kv) {
 	for(Json::ValueIterator itr = __root.begin() ; itr != __root.end() ; itr++ ) {
