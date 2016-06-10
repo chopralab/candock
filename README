@@ -4,4 +4,6 @@ cmake . -Bbuild
 cd build
 make candock
 
-For release compile use cmake . -Bbuild -DCMAKE_BUILD_TYPE=Release
+For release compile (with optimization):
+
+cmake . -Bbuild -DCMAKE_BUILD_TYPE=Release
