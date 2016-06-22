@@ -13,10 +13,10 @@ namespace genlig {
 	pair<BindingSiteClusters, BindingSiteScores> generate_binding_site_prediction(const string &json_with_ligs_file, 
 		const string &bio_dir, const int num_bsites);
     
-    // Operator overloading for typedef types can lead to issues.
-    // See http://blog.mezeske.com/?p=170 for details.
+	// Operator overloading for typedef types can lead to issues.
+	// See http://blog.mezeske.com/?p=170 for details.
 	ostream& operator<<(ostream& os, const map<int, Molib::Molecules>& bsites);
-    ostream& operator<<(ostream& os, const map<int, double>& bscores);
+	ostream& operator<<(ostream& os, const map<int, double>& bscores);
 };
 
 #endif
