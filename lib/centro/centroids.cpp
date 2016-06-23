@@ -72,7 +72,7 @@ namespace Centro {
 		dbgmsg("setting centroids from file : " << endl << centroids);
 		return centroids;
 	}
-	
+
 	ostream& operator<<(ostream& os, const Centro::Centroids& centroids) {
 		for (auto &kv : centroids) {
 			const int bsite_id = kv.first;

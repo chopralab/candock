@@ -19,7 +19,7 @@ find_path(
 
 find_library(
 	OPENMM_LIBRARY
-	NAMES libOpenMM_static.a
+	NAMES libOpenMM_static.a libOpenMM.dylib
     PATHS foreign/openmm/lib
 	DOC "openmm library"
 )

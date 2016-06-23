@@ -17,3 +17,6 @@ src/test_cofactor
 *.DS_Store
 .kdev4/
 candock.kdev4
+build/
+build_intel/
+external/

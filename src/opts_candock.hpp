@@ -9,6 +9,7 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/asio/ip/host_name.hpp>
 #include "helper/error.hpp"
+#include "version.h"
 #include <thread>
 using namespace std;
 
@@ -96,11 +97,6 @@ class CmdLnOpts {
 	double __excluded_radius;
 	double __max_interatomic_distance;
     
-    bool __design;
-    int  __d_num_frag;
-    int  __d_num_pred;
-    int  __d_size_link;
-
 	double __clus_rad;
 
 	int __ncpu;
@@ -108,8 +104,23 @@ class CmdLnOpts {
 	bool __quiet;
 	string __program_name;
 	string __version;
+	string __git_version;
 public:
-	CmdLnOpts() : __quiet(false), __version("1.00") {}
+	CmdLnOpts() : __quiet(false), __version(""), __git_version("") {
+		stringstream ss;
+
+		ss << CANDOCK_MAJOR_VERSION << "." << CANDOCK_MINOR_VERSION << "."
+		   << CANDOCK_TWEAK_VERSION;
+
+		__version = ss.str();
+
+		stringstream ss2;
+		
+		ss2<< CANDOCK_GIT_REFERENCE << " on branch " << CANDOCK_GIT_MYCBRANCH;
+		
+		__git_version = ss2.str();
+	}
+
 	void init(int argc, char* argv[]) {
 		__program_name = argv[0];
 		try {			
@@ -228,11 +239,6 @@ public:
 
 			TCLAP::ValueArg<double> excluded_radiusArg("","excluded","Excluded radius (default is 0.8)",false,0.8,"double", cmd);
 			TCLAP::ValueArg<double> max_interatomic_distanceArg("","interatomic","Maximum interatomic distance (default is 8.0)",false,8.0,"double", cmd);
-            
-            TCLAP::SwitchArg     designArg("","design","Generate novel ligands (not enabled by default)",cmd,false);
-            TCLAP::ValueArg<int> design_num_fragArg ("","d_num_frag","Number of supplied fragments (identified using maximum clique) to be used for prediction of novel ligands (default is 40)",false,40,"int",cmd);
-            TCLAP::ValueArg<int> design_num_predArg ("","d_num_pred","Maximum number of top novel compounds to save (default is 10)",false,10,"int",cmd);
-            TCLAP::ValueArg<int> design_size_linkArg("","d_size_link","Maximum number of atoms to connect two fragments (default is 5)",false,5,"int",cmd);
 
 			TCLAP::ValueArg<double> clus_radArg("","clus_rad","Cluster radius for docked seeds (default is 2.0)",false,2.0,"double", cmd);
 
@@ -316,11 +322,6 @@ public:
 			__conf_spin = conf_spinArg.getValue();
 			__excluded_radius = excluded_radiusArg.getValue();
 			__max_interatomic_distance = max_interatomic_distanceArg.getValue();
-            
-            __design      = designArg.getValue();
-            __d_num_frag  = design_num_fragArg.getValue();
-            __d_num_pred  = design_num_predArg.getValue();
-            __d_size_link = design_size_linkArg.getValue();
 
 			__clus_rad = clus_radArg.getValue();
 
@@ -333,7 +334,9 @@ public:
 	}
 	void display_time(string what) {
 		cout << what << " on " << boost::posix_time::to_simple_string(boost::posix_time::second_clock::local_time()) << "\n";
-		cout << "running " << __program_name << " version " << __version << " on hostname " << boost::asio::ip::host_name() << "\n";
+		cout << "running " << __program_name << " on hostname " << boost::asio::ip::host_name() << "\n";
+		cout << "version " << __version << "\n";
+		cout << "buildid " << __git_version << "\n";
 	}
 	// interface
 	bool quiet() const { return __quiet; }
@@ -411,11 +414,6 @@ public:
 	double conf_spin() const { return __conf_spin; }
 	double excluded_radius() const { return __excluded_radius; }
 	double max_interatomic_distance() const { return __max_interatomic_distance; }
-    
-    bool design()      const  { return __design; }
-    int  d_num_frag()  const  { return __d_num_frag; }
-    int  d_num_pred()  const  { return __d_num_pred; }
-    int  d_size_link() const  { return __d_size_link; }
 
 	double clus_rad() const { return __clus_rad; }
 
