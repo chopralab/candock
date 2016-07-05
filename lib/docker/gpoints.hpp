@@ -42,7 +42,7 @@ namespace Docker {
 	private:
 
 		map<int, GpointVec> __gridpoints;
-		Array3d<Gpoint*> __gmap;
+		map<int, Array3d<Gpoint*>> __gmap;
 		const Molib::Score *__score;
 		const set<int> *__ligand_idatm_types;
 		
@@ -66,7 +66,7 @@ namespace Docker {
 		//~ const GpointVec& get_gridpoints0() const { return const_cast<const GpointVec&>(get_gridpoints0()); }
 		map<int, GpointVec>& get_gridpoints() { return __gridpoints; }
 		const Gpoint& get_center_point() const;
-		Array3d<Gpoint*>& get_gmap() { return __gmap; }
+		Array3d<Gpoint*>& get_gmap(const int bsite_id) { try { return __gmap.at(bsite_id); } catch (const std::out_of_range& oor) { throw Error("die : cannot get gmap for bsite #" + help::to_string(bsite_id)); } }
 		
 		friend ostream& operator<<(ostream& os, const Gpoints &gpoints);
 	};
