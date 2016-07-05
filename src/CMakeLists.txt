@@ -37,6 +37,12 @@ add_executable( test_link test_link.cpp common.cpp )
 add_executable( test_singlepoint test_singlepoint.cpp common.cpp )
 add_executable( test_cofactor test_cofactor.cpp common.cpp )
 
+add_executable( candock_oo candock_oo.cpp
+	programstep.hpp
+	findcentroidsstep.cpp
+	findcentroidsstep.hpp
+)
+
 target_link_libraries( candock
                          ${candock_libraries}
                          ${Boost_LIBRARIES}
@@ -138,4 +144,17 @@ target_link_libraries( test_cofactor
                          ${OPENMM_LIBRARY}
                          ${GSL_LIBRARIES}
                          ${additional_libraries}
+                     )
+
+target_link_libraries( candock_oo
+                         ${candock_libraries}
+                         ${Boost_LIBRARIES}
+                         ${Boost_date_time_LIBRARY}
+                         ${Boost_filesystem_LIBRARY}
+                         ${Boost_regex_LIBRARY}
+                         ${Boost_system_LIBRARY}
+                         ${OPENMM_LIBRARY}
+                         ${GSL_LIBRARIES}
+                         ${additional_libraries}
+                         score # another ugly hack???
                      )
