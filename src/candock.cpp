@@ -41,7 +41,7 @@ int main(int argc, char* argv[]) {
 		 */
 		inout::output_file("", cmdl.gridpdb_hcp_file()); // gridpoints for all binding sites
 		inout::output_file("", cmdl.prep_file()); // output prepared ligands
-		inout::output_file("", cmdl.docked_file()); // output docked molecule conformations
+		//inout::output_file("", cmdl.docked_file()); // output docked molecule conformations
 		inout::output_file("", cmdl.nosql_file()); // probis local structural alignments
 		
 		/* Initialize parsers for receptor (and ligands) and read
@@ -346,7 +346,7 @@ int main(int argc, char* argv[]) {
 						for (auto &docked : docks) {
 							common::change_residue_name(docked.get_ligand(), "CAN"); 
 							inout::output_file(Molib::Molecule::print_complex(docked.get_ligand(), docked.get_receptor(), docked.get_energy()), 
-								cmdl.docked_file(), ios_base::app); // output docked molecule conformations
+								Path::join(cmdl.docked_dir(), ligand.name() + ".pdb" ), ios_base::app); // output docked molecule conformations
 						}
 					} catch (exception& e) { 
 						cerr << "Error: skipping ligand " << ligand.name() << " due to : " << e.what() << endl; 
