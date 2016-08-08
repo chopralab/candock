@@ -8,6 +8,7 @@
 #include "helper/inout.hpp"
 #include "common.hpp"
 #include "helper/error.hpp"
+#include "helper/path.hpp"
 #include "pdbreader/grid.hpp"
 #include "pdbreader/nrset.hpp"
 #include "pdbreader/pdbreader.hpp"
@@ -32,7 +33,7 @@ int main(int argc, char* argv[]) {
 		/* Create empty output files
 		 * 
 		 */
-		inout::output_file("", cmdl.docked_file()); // output docked molecule conformations
+		//inout::output_file("", cmdl.docked_file()); // output docked molecule conformations
 		
 		/* Initialize parsers for receptor (and ligands) and read
 		 * the receptor molecule(s)
@@ -192,7 +193,7 @@ int main(int argc, char* argv[]) {
 						for (auto &docked : docks) {
 							common::change_residue_name(docked.get_ligand(), "CAN"); 
 							inout::output_file(Molib::Molecule::print_complex(docked.get_ligand(), docked.get_receptor(), docked.get_energy()), 
-								cmdl.docked_file(), ios_base::app); // output docked molecule conformations
+								Path::join(cmdl.docked_dir(), ligand.name() + ".pdb" ) , ios_base::app); // output docked molecule conformations
 						}
 					} catch (exception& e) { 
 						cerr << "Error: skipping ligand " << ligand.name() << " due to : " << e.what() << endl; 

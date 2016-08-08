@@ -6,6 +6,7 @@
 #include "opts_candock.hpp"
 #include "helper/benchmark.hpp"
 #include "helper/inout.hpp"
+#include "helper/path.hpp"
 #include "helper/error.hpp"
 #include "pdbreader/grid.hpp"
 #include "pdbreader/molecules.hpp"
@@ -23,7 +24,7 @@ int main(int argc, char* argv[]) {
 		cmdl.display_time("started");
 		cout << cmdl << endl;
 		
-		inout::output_file("", cmdl.docked_file()); // output docked & minimized ligands conformations
+		//inout::output_file("", cmdl.docked_file()); // output docked & minimized ligands conformations
 
 		Molib::PDBreader rpdb(cmdl.receptor_file(), 
 			Molib::PDBreader::first_model);
@@ -75,7 +76,7 @@ int main(int argc, char* argv[]) {
 			const double energy = score.non_bonded_energy(gridrec, ligand);
 			
 			inout::output_file(Molib::Molecule::print_complex(ligand, receptors[0], energy), 
-				cmdl.docked_file(), ios_base::app);
+				Path::join( cmdl.docked_dir(), ligand.name() + ".pdb"),  ios_base::app);
 		}
 		
 		cmdl.display_time("finished");
