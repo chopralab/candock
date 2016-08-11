@@ -14,4 +14,3 @@ add_subdirectory(pdbreader)
 add_subdirectory(probis)
 add_subdirectory(score)
 
-include_directories(rapidxml)
