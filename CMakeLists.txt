@@ -14,8 +14,7 @@ find_package(OpenMM  REQUIRED)
 find_package(Git     REQUIRED)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
-set(JSONCPP_INCLUDE_DIR "foreign/jsoncpp-src-0.6.0-rc2/include" "foreign/jsoncpp-src-0.6.0-rc2/src" )
-set(RAPIDXML_INCLUDE_DIR "foreign/" )
+set(JSONCPP_INCLUDE_DIR "foreign/jsoncpp/include" "foreign/jsoncpp/src" )
 
 include_directories(${Boost_INCLUDE_DIRS})
 include_directories(${GSL_INCLUDE_DIRS})
@@ -46,6 +45,8 @@ configure_file( ${PROJECT_SOURCE_DIR}/src/version.hpp.in
 )
             
 include_directories( ${PROJECT_BINARY_DIR} )
+
+include_directories( foreign )
 
 add_subdirectory(lib)
 add_subdirectory(src)
