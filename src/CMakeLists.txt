@@ -1,6 +1,6 @@
 include_directories($CMAKE_CURRENT_SOURCE_DIR)
 
-include_directories( ../lib/tclap-1.2.1/include )
+include_directories( ../foreign/tclap/include )
 include_directories( ../lib/modeler/ )
 
 set( candock_libraries 

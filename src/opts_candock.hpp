@@ -71,7 +71,7 @@ class CmdLnOpts {
 	int __max_possible_conf;
 	int __link_iter;
 
-	string __docked_file;
+	string __docked_dir;
 	
 	double __docked_clus_rad;
 	double __max_allow_energy;
@@ -210,7 +210,7 @@ public:
 			TCLAP::ValueArg<int> max_possible_confArg("","max_possible_conf","Maximum number of possible conformations to link (default is 20, -1 means unlimited)",false,20,"int", cmd);
 			TCLAP::ValueArg<int> link_iterArg("","link_iter","Maximum iterations for linking procedure (default is 1000)",false,1000,"int", cmd);
 
-			TCLAP::ValueArg<string> docked_fileArg("","docked_file","Docked ligands output filename (default is docked.pdb)",false,"docked.pdb","string", cmd);
+			TCLAP::ValueArg<string> docked_dirArg("","docked_dir","Docked ligands output directory (default is docked)",false,"docked","string", cmd);
 			
 			TCLAP::ValueArg<double> docked_clus_radArg("","docked_clus_rad","Cluster radius between docked ligand conformations (default is 2.0)",false,2.0,"double", cmd);
 			TCLAP::ValueArg<double> max_allow_energyArg("","max_allow_energy","Maximum allowed energy for seed conformations (default is 0.0)",false,0.0,"double", cmd);
@@ -297,7 +297,7 @@ public:
 			__upper_tol_seed_dist = upper_tol_seed_distArg.getValue();
 			__max_possible_conf = max_possible_confArg.getValue();
 			__link_iter = link_iterArg.getValue();
-			__docked_file = docked_fileArg.getValue();
+			__docked_dir = docked_dirArg.getValue();
 			
 			__docked_clus_rad = docked_clus_radArg.getValue();
 			__max_allow_energy = max_allow_energyArg.getValue();
@@ -389,7 +389,7 @@ public:
 	double upper_tol_seed_dist() const { return __upper_tol_seed_dist; }
 	int max_possible_conf() const { return __max_possible_conf; }
 	int link_iter() const { return __link_iter; }
-	string docked_file() const { return __docked_file; }
+	string docked_dir() const { return __docked_dir; }
 	
 	double docked_clus_rad() const { return __docked_clus_rad; }
 	double max_allow_energy() const { return __max_allow_energy; }
