@@ -134,7 +134,7 @@ namespace Docker {
         
             // initialize mapping between gridpoints and discretized 3D space
 			__gmap[bsite_id].init(last_column + 1, last_row + 1, last_layer + 1);
-            dbgmsg("gmap szi = " << __gmap.szi << " szj = " << __gmap.szj << " szk = " << __gmap.szk);
+            //dbgmsg("gmap szi = " << __gmap.szi << " szj = " << __gmap.szj << " szk = " << __gmap.szk);
             Geom3D::Coordinate eval;
             for(int column=0;column<=last_column;column++) {
                 int even_column=(column%2==0) ? 1 : 0; // 1 if odd, 0 if even
