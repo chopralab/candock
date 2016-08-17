@@ -19,3 +19,5 @@ candock.kdev4
 build/
 build_intel/
 external/
+.project
+.cproject
