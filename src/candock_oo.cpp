@@ -22,8 +22,6 @@ int main(int argc, char* argv[]) {
 		 */
 		inout::output_file("", cmdl.gridpdb_hcp_file()); // gridpoints for all binding sites
 		inout::output_file("", cmdl.prep_file()); // output prepared ligands
-		inout::output_file("", cmdl.docked_file()); // output docked molecule conformations
-		inout::output_file("", cmdl.nosql_file()); // probis local structural alignments
 		
 		/* Initialize parsers for receptor (and ligands) and read
 		 * the receptor molecule(s)
@@ -33,8 +31,17 @@ int main(int argc, char* argv[]) {
 			Molib::PDBreader::first_model);
 		Molib::Molecules receptors = rpdb.parse_molecule();
 
+		/* Run section of Candock designed to find binding sites
+ 		 * Currently, this runs ProBIS and does not require any
+ 		 * previous step to be competed
+ 		 *
+		 */
+
 		Program::FindCentroidsStep find_centroids(receptors[0]);
+		find_centroids.run_step( cmdl, nullptr );
+
 		
+	
 	} catch ( exception& e) {
 		cerr << e.what() << endl;
 	}

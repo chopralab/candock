@@ -14,12 +14,15 @@ namespace Program {
 		return __get_file_size( cmdl.centroid_in_file() );
 	}
 
-	Centro::Centroids* FindCentroidsStep::__read_from_files( const CmdLnOpts& cmdl ) {
+	void FindCentroidsStep::__read_from_files( const CmdLnOpts& cmdl ) {
 		__result = Centro::set_centroids(cmdl.centroid_in_file(), cmdl.num_bsites());
-		return &__result;
 	}
-	
-	Centro::Centroids* FindCentroidsStep::__continue_from_prev( const CmdLnOpts& cmdl, const ProgramStep* prev ) {
+
+	void FindCentroidsStep::__continue_from_prev( const CmdLnOpts& cmdl, const ProgramStep* prev ) {
+
+		// Creates an empty nosql file
+		inout::output_file("", cmdl.nosql_file()); // probis local structural alignments
+
 		probis::compare_against_bslib(0, 0, cmdl.receptor_file(), 
 			__receptor.get_chain_ids(Molib::Residue::protein), cmdl.bslib_file(), cmdl.ncpu(),
 			cmdl.nosql_file(), cmdl.json_file());
@@ -36,7 +39,5 @@ namespace Program {
 
 		__result = Centro::set_centroids(binding_sites.first, cmdl.centro_clus_rad());	
 		inout::output_file(__result, cmdl.centroid_out_file()); // probis local structural alignments
-
-		return &__result;
 	}
 }

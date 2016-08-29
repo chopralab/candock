@@ -11,14 +11,20 @@ namespace Program {
 	{
 	protected:
 		virtual bool __can_read_from_files(const CmdLnOpts& opts);
-		virtual Centro::Centroids* __read_from_files(const CmdLnOpts& cmdl);
-		virtual Centro::Centroids* __continue_from_prev(const CmdLnOpts& cmdl, const ProgramStep* prev );
+		virtual void __read_from_files(const CmdLnOpts& cmdl);
+		virtual void __continue_from_prev(const CmdLnOpts& cmdl, const ProgramStep* prev );
 		
 		const Molib::Molecule& __receptor;
+
+		Centro::Centroids __result;
 
 	public:
 		FindCentroidsStep( const Molib::Molecule& receptor ) :
 			__receptor( receptor ) { }
+
+		virtual const Centro::Centroids& get_results() const {
+			return __result;
+		}
 
 	};
 
