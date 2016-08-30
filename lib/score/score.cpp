@@ -529,11 +529,11 @@ namespace Molib {
 		return -log(ratio);
 	}
 	
-	double Score::non_bonded_energy(Atom::Grid &gridrec, const Molecule &ligand) const {
+	double Score::non_bonded_energy(const Atom::Grid &gridrec, const Molecule &ligand) const {
 		return this->non_bonded_energy(gridrec, ligand.get_atoms(), ligand.get_crds());
 	}
 
-	double Score::non_bonded_energy(Atom::Grid &gridrec, const Atom::Vec &atoms, const Geom3D::Point::Vec &crds) const {
+	double Score::non_bonded_energy(const Atom::Grid &gridrec, const Atom::Vec &atoms, const Geom3D::Point::Vec &crds) const {
 		double energy_sum = 0.0;
 		for (int i = 0; i < atoms.size(); ++i) {
 			const Atom &atom2 = *atoms[i];
