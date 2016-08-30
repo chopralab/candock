@@ -11,14 +11,14 @@
 namespace Program {
 	
 	bool FindCentroidsStep::__can_read_from_files( const CmdLnOpts& cmdl ) {
-		return __get_file_size( cmdl.centroid_in_file() );
+		return __get_file_size( cmdl.centroid_in_file() ) != 0;
 	}
 
 	void FindCentroidsStep::__read_from_files( const CmdLnOpts& cmdl ) {
 		__result = Centro::set_centroids(cmdl.centroid_in_file(), cmdl.num_bsites());
 	}
 
-	void FindCentroidsStep::__continue_from_prev( const CmdLnOpts& cmdl, const ProgramStep* prev ) {
+	void FindCentroidsStep::__continue_from_prev( const CmdLnOpts& cmdl) {
 
 		// Creates an empty nosql file
 		inout::output_file("", cmdl.nosql_file()); // probis local structural alignments

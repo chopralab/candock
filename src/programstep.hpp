@@ -6,14 +6,13 @@
 
 namespace Program {
 
-	template <class P>
 	class ProgramStep {
 	protected:
 		virtual bool __can_read_from_files(const CmdLnOpts& cmdl) = 0;
 		virtual void __read_from_files(const CmdLnOpts& cmdl) = 0;
-		virtual void __continue_from_prev(const CmdLnOpts& cmdl, const ProgramStep* prev ) = 0;
+		virtual void __continue_from_prev(const CmdLnOpts& cmdl) = 0;
 		
-		int __get_file_size( boost::filesystem::path p ) {
+		static int __get_file_size( boost::filesystem::path p ) {
 			if ( boost::filesystem::exists(p) &&
 			     boost::filesystem::is_regular_file(p) )
 			{
@@ -25,15 +24,13 @@ namespace Program {
 		
 	public:
 
-		void run_step(const CmdLnOpts& cmdl, const ProgramStep* prev) {
+		void run_step(const CmdLnOpts& cmdl) {
 			if ( __can_read_from_files(cmdl) ) {
 				__read_from_files(cmdl);
 			} else {
-				__continue_from_prev(cmdl, prev);
+				__continue_from_prev(cmdl);
 			}
 		}
-
-		virtual const P& get_results() const = 0;
 
 	};
 

@@ -7,12 +7,12 @@
 
 namespace Program {
 
-	class FindCentroidsStep : public ProgramStep< Centro::Centroids >
+	class FindCentroidsStep : public ProgramStep
 	{
 	protected:
-		virtual bool __can_read_from_files(const CmdLnOpts& opts);
+		virtual bool __can_read_from_files(const CmdLnOpts& cmdl);
 		virtual void __read_from_files(const CmdLnOpts& cmdl);
-		virtual void __continue_from_prev(const CmdLnOpts& cmdl, const ProgramStep* prev );
+		virtual void __continue_from_prev(const CmdLnOpts& cmdl);
 		
 		const Molib::Molecule& __receptor;
 
@@ -22,7 +22,7 @@ namespace Program {
 		FindCentroidsStep( const Molib::Molecule& receptor ) :
 			__receptor( receptor ) { }
 
-		virtual const Centro::Centroids& get_results() const {
+		const Centro::Centroids& centroids() const {
 			return __result;
 		}
 
