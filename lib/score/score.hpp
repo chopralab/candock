@@ -58,7 +58,7 @@ namespace Molib {
 		double non_bonded_energy(Atom::Grid &gridrec, const Molecule&) const; // this was formerly called distances_and_scores_frag_lig
 		double non_bonded_energy(Atom::Grid &gridrec, const Atom::Vec &atoms, const Geom3D::Point::Vec &crds) const;
 
-		Array1d<double> compute_energy(Atom::Grid &gridrec, const Geom3D::Coordinate &crd, const set<int> &ligand_atom_types) const;
+		Array1d<double> compute_energy(const Atom::Grid &gridrec, const Geom3D::Coordinate &crd, const set<int> &ligand_atom_types) const;
 
 		const AtomPairValues& get_energies() const { return __energies; }
 		const AtomPairValues& get_derivatives() const { return __derivatives; }

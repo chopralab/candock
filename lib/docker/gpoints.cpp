@@ -52,7 +52,7 @@ namespace Docker {
 		}
 	}
 	Gpoints::Gpoints(const Molib::Score &score, const set<int> &ligand_idatm_types, 
-		const Centro::Centroids &centroids, Molib::Atom::Grid &grid, const double &grid_spacing, 
+		const Centro::Centroids &centroids, const Molib::Atom::Grid &grid, const double &grid_spacing, 
 		const int &dist_cutoff, const double &excluded_radius, const double &max_interatomic_distance)
 		: __score(&score), __ligand_idatm_types(&ligand_idatm_types) {
 		try {
@@ -92,7 +92,7 @@ namespace Docker {
 		return *center_point;
 	}
 
-	void Gpoints::__identify_gridpoints(const Centro::Centroids &centroids, Molib::Atom::Grid &grid, 
+	void Gpoints::__identify_gridpoints(const Centro::Centroids &centroids, const Molib::Atom::Grid &grid, 
 		const double &grid_spacing, const int &dist_cutoff, const double &excluded_radius, 
 		const double &max_interatomic_distance) {
 	
@@ -134,7 +134,7 @@ namespace Docker {
         
             // initialize mapping between gridpoints and discretized 3D space
 			__gmap[bsite_id].init(last_column + 1, last_row + 1, last_layer + 1);
-            dbgmsg("gmap szi = " << __gmap.szi << " szj = " << __gmap.szj << " szk = " << __gmap.szk);
+            //dbgmsg("gmap szi = " << __gmap.szi << " szj = " << __gmap.szj << " szk = " << __gmap.szk);
             Geom3D::Coordinate eval;
             for(int column=0;column<=last_column;column++) {
                 int even_column=(column%2==0) ? 1 : 0; // 1 if odd, 0 if even

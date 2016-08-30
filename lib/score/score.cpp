@@ -104,7 +104,7 @@ namespace Molib {
 		dbgmsg("parsed objective function");
 	}
 
-	Array1d<double> Score::compute_energy(Atom::Grid &gridrec, const Geom3D::Coordinate &crd, const set<int> &ligand_atom_types) const {
+	Array1d<double> Score::compute_energy(const Atom::Grid &gridrec, const Geom3D::Coordinate &crd, const set<int> &ligand_atom_types) const {
 		dbgmsg("computing energy");
 		Array1d<double> energy_sum(*ligand_atom_types.rbegin() + 1);
 		for (auto &patom : gridrec.get_neighbors(crd, __dist_cutoff)) {

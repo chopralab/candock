@@ -48,14 +48,14 @@ namespace Docker {
 		
 		
 		void __identify_gridpoints(const double &grid_spacing, const double &radial_check);
-		void __identify_gridpoints(const Centro::Centroids &centroids, Molib::Atom::Grid &grid, 
+		void __identify_gridpoints(const Centro::Centroids &centroids, const Molib::Atom::Grid &grid, 
 			const double &grid_spacing, const int &dist_cutoff, const double &excluded_radius, 
 			const double &max_interatomic_distance);
 	
 	public:
 		Gpoints(const double &grid_spacing, const double &radial_check);
 		Gpoints(const Molib::Score &score, const set<int> &ligand_idatm_types, 
-			const Centro::Centroids &centroids, Molib::Atom::Grid &grid, 
+			const Centro::Centroids &centroids, const Molib::Atom::Grid &grid, 
 			const double &grid_spacing, const int &dist_cutoff, 
 			const double &excluded_radius, const double &max_interatomic_distance);
 		Gpoints(const Centro::Centroids &centroids, Molib::Atom::Grid &grid, 

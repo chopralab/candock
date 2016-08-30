@@ -124,7 +124,7 @@ public:
 	}
 
 	template<typename U>
-	Points get_neighbors(const U &point, const double &dist) {
+	Points get_neighbors(const U &point, const double &dist) const {
 		Geom3D::Coordinate cmin = __correct(point, -dist);
 		Geom3D::Coordinate cmax = __correct(point, dist);
 		Points points;
