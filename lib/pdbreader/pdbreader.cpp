@@ -39,6 +39,11 @@ namespace Molib {
 	
 	PDBreader::PDBreader(const string &molecule_file, unsigned int hm, 
 		const int num_occur) { 
+		prepare_parser(molecule_file, hm, num_occur);
+	}
+	
+	void PDBreader::prepare_parser(const string &molecule_file, unsigned int hm, 
+		const int num_occur) { 
 		auto ret = molecule_file.find_last_of(".");
 		if (ret == string::npos) 
 			throw Error("die : could not determine the file type of the input molecule");
