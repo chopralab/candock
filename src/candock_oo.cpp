@@ -6,6 +6,7 @@
 #include "findcentroidsstep.hpp"
 #include "fragmentligandsstep.hpp"
 #include "dockfragmentsstep.hpp"
+#include "linkfragmentsstep.hpp"
 
 #include "pdbreader/pdbreader.hpp"
 #include "pdbreader/molecules.hpp"
@@ -13,8 +14,25 @@
 #include "docker/gpoints.hpp"
 #include "docker/conformations.hpp"
 #include "modeler/forcefield.hpp"
+#include "modeler/systemtopology.hpp"
 
 using namespace std;
+
+/*****************************************************************************
+ *
+ * <---receptor.pdb                                             ligands.mol2
+ * |        |                                                        |
+ * |        |                                                        |
+ * |        V                                                        V
+ * |   Find Centroids                                         Fragment Ligands
+ * |        |                                                        |
+ * |        V                                                        |
+ * |->---------------------> Dock Fragments <------------------------|
+ * |                               |                                 |
+ * |                               V                                 |
+ * L-> --------------------> Link Framgents <-------------------------
+ * 
+ * **************************************************************************/
 
 int main(int argc, char* argv[]) {
 	try {
@@ -72,7 +90,19 @@ int main(int argc, char* argv[]) {
 
 		Program::DockFragmentsStep fragment_docker( find_centroids, ligand_fragmenter,
 													score, gridrec );
+		
+		/**
+		 * Insert topology for cofactors, but not for standard residues
+		 * that are already known to forcefield (e.g., amino acid residues)
+		 *
+		 */
+		ffield.insert_topology(receptors[0]); // fixes issue #115
 
+		OMMIface::SystemTopology::loadPlugins();
+
+		Program::LinkFragmentsStep link_fragments( receptors[0], score, ffield, gridrec);
+		link_fragments.run_step(cmdl);
+		
 	} catch ( exception& e) {
 		cerr << e.what() << endl;
 	}

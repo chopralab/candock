@@ -46,6 +46,8 @@ add_executable( candock_oo candock_oo.cpp
 	fragmentligandsstep.cpp
 	dockfragmentsstep.hpp
 	dockfragmentsstep.cpp
+	linkfragmentsstep.hpp
+	linkfragmentsstep.cpp
 )
 
 target_link_libraries( candock

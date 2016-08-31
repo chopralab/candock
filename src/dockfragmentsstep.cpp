@@ -88,7 +88,6 @@ namespace Program {
 			thread.join();
 		}
 
-
 	}
 
 }
