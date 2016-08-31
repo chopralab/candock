@@ -53,7 +53,7 @@ namespace Linker {
 			OMMIface::Modeler &__modeler;
 			const Molib::Molecule &__receptor, &__ligand;
 			const Molib::NRset &__top_seeds;
-			Molib::Atom::Grid &__gridrec;
+			const Molib::Atom::Grid &__gridrec;
 			const Molib::Score &__score;
 			const double __dist_cutoff, __spin_degrees,
 				__tol_seed_dist, __lower_tol_seed_dist, __upper_tol_seed_dist, 
@@ -102,7 +102,7 @@ namespace Linker {
 		public:
 			GenericLinker(OMMIface::Modeler &modeler, const Molib::Molecule &receptor, 
 				const Molib::Molecule &ligand, const Molib::NRset &top_seeds, 
-				Molib::Atom::Grid &gridrec, const Molib::Score &score, 
+				const Molib::Atom::Grid &gridrec, const Molib::Score &score, 
 				const double dist_cutoff, const double spin_degrees, 
 				const double tol_seed_dist, const double lower_tol_seed_dist, 
 				const double upper_tol_seed_dist, const int max_possible_conf, 
@@ -149,7 +149,7 @@ namespace Linker {
 		
 	public:
 		Linker(OMMIface::Modeler &modeler, const Molib::Molecule &receptor, const Molib::Molecule &ligand, 
-			const Molib::NRset &top_seeds, Molib::Atom::Grid &gridrec, 
+			const Molib::NRset &top_seeds, const Molib::Atom::Grid &gridrec, 
 			const Molib::Score &score, const bool iterative, const double dist_cutoff, 
 			const double spin_degrees, const double tol_seed_dist, 
 			const double lower_tol_seed_dist, const double upper_tol_seed_dist, 

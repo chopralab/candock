@@ -236,7 +236,7 @@ public:
 	}
 	
 	template<typename V>
-	bool clashes(const V &atom, const double clash_coeff) {
+	bool clashes(const V &atom, const double clash_coeff) const {
 		const double dist = 3.0;
 		const double vdw1 = atom.radius();
 		Geom3D::Coordinate cmin = __correct(atom.crd(), -dist);

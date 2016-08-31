@@ -78,7 +78,7 @@ namespace Molib {
 		return reps;
 	}
 
-	Linker::Partial::Vec Cluster::greedy(const Linker::Partial::Vec &initial, Molib::Atom::Grid &gridrec, const double clus_rad) {
+	Linker::Partial::Vec Cluster::greedy(const Linker::Partial::Vec &initial, const Molib::Atom::Grid &gridrec, const double clus_rad) {
 
 		Benchmark::reset();
 
