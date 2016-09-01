@@ -26,8 +26,13 @@ namespace Program {
 	}
 
 	void FragmentLigands::__fragment_ligands( Molib::PDBreader& lpdb, const CmdLnOpts& cmdl ) {
+		bool thread_is_not_done;
 		Molib::Molecules ligands;
-		while(lpdb.parse_molecule(ligands)) {
+		{
+			lock_guard<std::mutex> guard(__prevent_re_read_mtx);
+			thread_is_not_done = lpdb.parse_molecule(ligands);
+		}
+		while(thread_is_not_done) {
 			// Compute properties, such as idatm atom types, fragments, seeds,
 			// rotatable bonds etc.
 			ligands.compute_idatm_type()
@@ -44,15 +49,16 @@ namespace Program {
 			{
 				lock_guard<std::mutex> guard(__add_to_typing_mtx);
 				ligands.compute_overlapping_rigid_segments(cmdl.seeds_file());
+				
 				__ligand_idatm_types = ligands.get_idatm_types(__ligand_idatm_types);
 				common::create_mols_from_seeds(__added, __seeds, ligands);
-
-				// For now, we'll reread from disk, but maybe add an option to not do this
-				//for( auto &a : ligands )
-				//	__ligands.add(new Molib::Molecule(a));
 			}
+
 			inout::output_file(ligands, cmdl.prep_file(), ios_base::app);
 			ligands.clear();
+
+			lock_guard<std::mutex> guard(__prevent_re_read_mtx);
+			thread_is_not_done = lpdb.parse_molecule(ligands);
 		}
 	}
 

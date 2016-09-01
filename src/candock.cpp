@@ -146,7 +146,7 @@ int main(int argc, char* argv[]) {
 					ligands.clear();
 
 					lock_guard<std::mutex> guard(mtx_read_lock);
-					bool thread_is_done = lpdb.parse_molecule(ligands);
+					thread_is_not_done = lpdb.parse_molecule(ligands);
 				}
 			}));
 		}
