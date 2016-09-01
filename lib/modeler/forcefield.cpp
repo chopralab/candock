@@ -29,6 +29,12 @@ namespace OMMIface {
 		}
 		return stream;
 	}
+	ostream& operator<<(ostream& os, const ForceField& ff) {
+		for (auto &kv : ff.residue_topology) {
+			os << "Residue: " << kv.first << endl << kv.second << endl;
+		}
+		return os;
+	}
 	ostream& operator<<(ostream& os, const ForceField::KBForces &kb) {
 		for (auto &kv1 : kb) {
 			const int aclass1 = kv1.first;
