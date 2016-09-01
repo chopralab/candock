@@ -6,16 +6,25 @@ namespace Program {
 
 	bool DockFragmentsStep::__can_read_from_files ( const CmdLnOpts& cmdl )
 	{
-		return true;
+		bool all_seeds_are_present = true;
+
+		const Molib::Molecules& all_seeds = __fragmented_ligands.seeds();
+
+		// No early return so that we have the ability to redock missing seeds
+		for (const auto& seed : all_seeds) {
+			all_seeds_are_present &= inout::Inout::file_size( Path::join( Path::join(cmdl.top_seeds_dir(), seed.name()),
+																		  cmdl.top_seeds_file() ) ) != 0;
+		}
+		
+		return all_seeds_are_present;
 	}
 
 	void DockFragmentsStep::__read_from_files ( const CmdLnOpts& cmdl )
 	{
-
+		cout << "Passed the test!" << endl;
 	}
 
 	void DockFragmentsStep::__dock_fragment ( int start, const Docker::Gpoints& gpoints, const Docker::Gpoints& gpoints0, const CmdLnOpts& cmdl) {
-		std::cout << "Fragment Docking has begun" << std::endl;
 		// iterate over docked seeds and dock unique seeds
 		for (int j = start; j < __fragmented_ligands.seeds().size(); j+= cmdl.ncpu()) {
 			try {
@@ -60,7 +69,6 @@ namespace Program {
 
 	void DockFragmentsStep::__continue_from_prev ( const CmdLnOpts& cmdl )
 	{
-		std::cout << "ASFASFASDFSA" << std::endl;
 		/* Create gridpoints for ALL centroids representing one or more binding sites
 		 * 
 		 */
