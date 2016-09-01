@@ -38,8 +38,7 @@ class CmdLnOpts {
 	string __z_scores_file;
 	double __centro_clus_rad;
 	
-	string __centroid_in_file;
-	string __centroid_out_file;
+	string __centroid_file;
 
 	string __gridpdb_hcp_file;
 	double __max_frag_radius;
@@ -155,8 +154,7 @@ public:
 
 			TCLAP::ValueArg<double> centro_clus_radArg("","centro_clus_rad","Cluster radius for centroid centers (default is 3.0)",false,3.0,"double", cmd);
 
-			TCLAP::ValueArg<string> centroid_in_fileArg("","centro_in","Filename for reading centroids (default is empty string)",false,"","string", cmd);
-			TCLAP::ValueArg<string> centroid_out_fileArg("","centro_out","Filename for outputting calculated centroids (default is centroid.txt)",false,"centroid.txt","string", cmd);
+			TCLAP::ValueArg<string> centroid_fileArg("","centroid","Filename for reading and writing centroids (default is site.cen)",false,"site.cen","string", cmd);
 
 			TCLAP::ValueArg<string> gridpdb_hcp_fileArg("","gridpdb_hcp","Grid pdb hcp file for output (default is gridpdb_hcp.pdb)",false,"gridpdb_hcp.pdb","string", cmd);
 			
@@ -267,8 +265,7 @@ public:
 
 			__centro_clus_rad = centro_clus_radArg.getValue();
 
-			__centroid_in_file = centroid_in_fileArg.getValue();
-			__centroid_out_file = centroid_out_fileArg.getValue();
+			__centroid_file = centroid_fileArg.getValue();
 			__gridpdb_hcp_file = gridpdb_hcp_fileArg.getValue();
 			__max_frag_radius = max_frag_radiusArg.getValue();
 			
@@ -359,8 +356,7 @@ public:
 	string lig_clus_file() const { return __lig_clus_file; }
 	string z_scores_file() const { return __z_scores_file; }
 	double centro_clus_rad() const { return __centro_clus_rad; }
-	string centroid_in_file() const { return __centroid_in_file; }
-	string centroid_out_file() const { return __centroid_out_file; }
+	string centroid_file() const { return __centroid_file; }
 	string gridpdb_hcp_file() const { return __gridpdb_hcp_file; }
 	double max_frag_radius() const { return __max_frag_radius; }
 	

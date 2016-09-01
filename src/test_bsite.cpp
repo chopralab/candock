@@ -64,7 +64,7 @@ int main(int argc, char* argv[]) {
 		inout::output_file(binding_sites.second, cmdl.z_scores_file());
 
 		centroids = Centro::set_centroids(binding_sites.first, cmdl.centro_clus_rad());	
-		inout::output_file(centroids, cmdl.centroid_out_file()); // probis local structural alignments
+		inout::output_file(centroids, cmdl.centroid_file()); // probis local structural alignments
 
 		/* Compute atom types for receptor (gaff types not needed since 
 		 * they are read from the forcefield xml file)

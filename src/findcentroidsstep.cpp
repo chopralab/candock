@@ -11,11 +11,11 @@
 namespace Program {
 	
 	bool FindCentroidsStep::__can_read_from_files( const CmdLnOpts& cmdl ) {
-		return __get_file_size( cmdl.centroid_in_file() ) != 0;
+		return inout::Inout::file_size( cmdl.centroid_file() ) != 0;
 	}
 
 	void FindCentroidsStep::__read_from_files( const CmdLnOpts& cmdl ) {
-		__result = Centro::set_centroids(cmdl.centroid_in_file(), cmdl.num_bsites());
+		__result = Centro::set_centroids(cmdl.centroid_file(), cmdl.num_bsites());
 	}
 
 	void FindCentroidsStep::__continue_from_prev( const CmdLnOpts& cmdl) {
@@ -38,6 +38,6 @@ namespace Program {
 		inout::output_file(binding_sites.second, cmdl.z_scores_file());
 
 		__result = Centro::set_centroids(binding_sites.first, cmdl.centro_clus_rad());	
-		inout::output_file(__result, cmdl.centroid_out_file()); // probis local structural alignments
+		inout::output_file(__result, cmdl.centroid_file()); // probis local structural alignments
 	}
 }

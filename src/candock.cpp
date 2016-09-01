@@ -57,7 +57,7 @@ int main(int argc, char* argv[]) {
 		 * 
 		 */
 		Centro::Centroids centroids;
-		if (cmdl.centroid_in_file().empty()) {
+		if (cmdl.centroid_file().empty()) {
 			probis::compare_against_bslib(argc, argv, cmdl.receptor_file(), 
 				receptors[0].get_chain_ids(Molib::Residue::protein), cmdl.bslib_file(), cmdl.ncpu(),
 				cmdl.nosql_file(), cmdl.json_file());
@@ -72,10 +72,10 @@ int main(int argc, char* argv[]) {
 			inout::output_file(binding_sites.second, cmdl.z_scores_file());
 			
 			centroids = Centro::set_centroids(binding_sites.first, cmdl.centro_clus_rad());	
-			inout::output_file(centroids, cmdl.centroid_out_file()); // probis local structural alignments
+			inout::output_file(centroids, cmdl.centroid_file()); // probis local structural alignments
 
 		} else { // ... or else set binding sites from file
-			centroids = Centro::set_centroids(cmdl.centroid_in_file(), cmdl.num_bsites());
+			centroids = Centro::set_centroids(cmdl.centroid_file(), cmdl.num_bsites());
 		}
 
 		Molib::PDBreader lpdb(cmdl.ligand_file(), 

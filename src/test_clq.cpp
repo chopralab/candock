@@ -33,10 +33,10 @@ int main(int argc, char* argv[]) {
 		 * 
 		 */
 		Centro::Centroids centroids;
-		if (cmdl.centroid_in_file().empty()) {
+		if (cmdl.centroid_file().empty()) {
 			throw Error("For testing use --centroid option to provide a centroid file");
 		} else { // ... or else set binding sites from file
-			centroids = Centro::set_centroids(cmdl.centroid_in_file(), cmdl.num_bsites());
+			centroids = Centro::set_centroids(cmdl.centroid_file(), cmdl.num_bsites());
 		}
 
 		/* Initialize parsers for receptor (and ligands) and read
