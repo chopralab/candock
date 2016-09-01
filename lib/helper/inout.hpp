@@ -21,6 +21,7 @@ namespace inout {
 		static void __mkdir(const string&);
 	public:
 		enum f_not_found {panic=0, no_panic=1};
+		static int  file_size(const string &name);
 		static void read_file(const string &name, vector<string>&, 
 			f_not_found=panic, const int num_occur=-1, 
 			const string &pattern=""); // throws Error

@@ -11,17 +11,7 @@ namespace Program {
 		virtual bool __can_read_from_files(const CmdLnOpts& cmdl) = 0;
 		virtual void __read_from_files(const CmdLnOpts& cmdl) = 0;
 		virtual void __continue_from_prev(const CmdLnOpts& cmdl) = 0;
-		
-		static int __get_file_size( boost::filesystem::path p ) {
-			if ( boost::filesystem::exists(p) &&
-			     boost::filesystem::is_regular_file(p) )
-			{
-				return boost::filesystem::file_size(p);
-			} else {
-				return 0;
-			}
-		}
-		
+
 	public:
 
 		void run_step(const CmdLnOpts& cmdl) {

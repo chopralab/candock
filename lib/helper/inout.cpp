@@ -36,6 +36,15 @@ namespace inout {
 	    if (close(fd)==-1) {
 	    }
 	}
+	int  Inout::file_size(const string &name) {
+		if ( boost::filesystem::exists(name) &&
+			boost::filesystem::is_regular_file(name) )
+		{
+			return boost::filesystem::file_size(name);
+		} else {
+			return 0;
+		}
+	}
 	void Inout::read_file(const string &name, string &s, f_not_found w, 
 		const int num_occur, const string &pattern) {
 		streampos pos_in_file = 0;
