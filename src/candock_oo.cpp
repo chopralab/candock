@@ -60,20 +60,27 @@ int main(int argc, char* argv[]) {
 		Program::FragmentLigandsStep ligand_fragmenter;
 		ligand_fragmenter.run_step(cmdl);
 
+		/* Compute atom types for receptor and cofactor(s): gaff types for protein, 
+		 * Mg ions, and water are read from the forcefield xml file later on while 
+		 * gaff types for cofactors (ADP, POB, etc.) are calculated de-novo here
+		 * 
+		 */
+		receptors.compute_idatm_type()
+			.compute_hydrogen()
+			.compute_bond_order()
+			.compute_bond_gaff_type()
+			.refine_idatm_type()
+			.erase_hydrogen()  // needed because refine changes connectivities
+			.compute_hydrogen()   // needed because refine changes connectivities
+			.compute_ring_type()
+			.compute_gaff_type()
+			.compute_rotatable_bonds() // relies on hydrogens being assigned
+			.erase_hydrogen();
+
 		/* Create receptor grid
 		 * 
 		 */
 		Molib::Atom::Grid gridrec(receptors[0].get_atoms());
-
-		/* Prepare receptor for molecular mechanics: histidines, N-[C-]terminals,
-		 * bonds, disulfide bonds, main chain bonds
-		 * 
-		 */
-		OMMIface::ForceField ffield;
-		ffield.parse_forcefield_file(cmdl.amber_xml_file())
-			.parse_forcefield_file(cmdl.water_xml_file());
-
-		receptors[0].prepare_for_mm(ffield, gridrec);
 
 		/* Read distributions file and initialize scores
 		 * 
@@ -90,6 +97,19 @@ int main(int argc, char* argv[]) {
 
 		Program::DockFragmentsStep fragment_docker( find_centroids, ligand_fragmenter,
 													score, gridrec );
+		fragment_docker.run_step(cmdl);
+		
+		/* Prepare receptor for molecular mechanics: histidines, N-[C-]terminals,
+		 * bonds, disulfide bonds, main chain bonds
+		 * 
+		 */
+		OMMIface::ForceField ffield;
+		ffield.parse_gaff_dat_file(cmdl.gaff_dat_file())
+			.add_kb_forcefield(score, cmdl.step_non_bond())
+			.parse_forcefield_file(cmdl.amber_xml_file())
+			.parse_forcefield_file(cmdl.water_xml_file());
+
+		receptors[0].prepare_for_mm(ffield, gridrec);
 		
 		/**
 		 * Insert topology for cofactors, but not for standard residues

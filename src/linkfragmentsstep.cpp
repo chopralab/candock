@@ -89,7 +89,7 @@ namespace Program {
 
 	void LinkFragmentsStep::__continue_from_prev ( const CmdLnOpts& cmdl )
 	{
-		Molib::PDBreader lpdb2(cmdl.ligand_file(), Molib::PDBreader::all_models, 1);
+		Molib::PDBreader lpdb2(cmdl.prep_file(), Molib::PDBreader::all_models, 1);
 
 		std::vector<std::thread> threads;
 

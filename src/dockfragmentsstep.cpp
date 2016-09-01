@@ -6,7 +6,7 @@ namespace Program {
 
 	bool DockFragmentsStep::__can_read_from_files ( const CmdLnOpts& cmdl )
 	{
-		return false;
+		return true;
 	}
 
 	void DockFragmentsStep::__read_from_files ( const CmdLnOpts& cmdl )
@@ -15,6 +15,7 @@ namespace Program {
 	}
 
 	void DockFragmentsStep::__dock_fragment ( int start, const Docker::Gpoints& gpoints, const Docker::Gpoints& gpoints0, const CmdLnOpts& cmdl) {
+		std::cout << "Fragment Docking has begun" << std::endl;
 		// iterate over docked seeds and dock unique seeds
 		for (int j = start; j < __fragmented_ligands.seeds().size(); j+= cmdl.ncpu()) {
 			try {
@@ -59,6 +60,7 @@ namespace Program {
 
 	void DockFragmentsStep::__continue_from_prev ( const CmdLnOpts& cmdl )
 	{
+		std::cout << "ASFASFASDFSA" << std::endl;
 		/* Create gridpoints for ALL centroids representing one or more binding sites
 		 * 
 		 */
@@ -87,6 +89,8 @@ namespace Program {
 		for(auto& thread : threads) {
 			thread.join();
 		}
+		
+		cout << "Done with fragment docking" << std::endl;
 
 	}
 

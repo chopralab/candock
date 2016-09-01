@@ -11,7 +11,7 @@
 namespace Program {
 	
 	bool FragmentLigandsStep::__can_read_from_files( const CmdLnOpts& cmdl ) {
-		return __get_file_size( cmdl.prep_file() ) && __get_file_size( cmdl.seeds_file() );
+		return inout::Inout::file_size( cmdl.prep_file() ) && inout::Inout::file_size( cmdl.seeds_file() );
 	}
 
 	void FragmentLigandsStep::__read_from_files( const CmdLnOpts& cmdl) {
@@ -57,6 +57,11 @@ namespace Program {
 	}
 
 	void FragmentLigandsStep::__continue_from_prev( const CmdLnOpts& cmdl) {
+
+		if ( ! inout::Inout::file_size( cmdl.ligand_file() ) ) {
+			throw Error("Ligand file: " + cmdl.ligand_file() + " not found or is empty!\n");
+		}
+
 		Molib::PDBreader lpdb(cmdl.ligand_file(), 
 			Molib::PDBreader::all_models|Molib::PDBreader::hydrogens, 
 			cmdl.max_num_ligands());
