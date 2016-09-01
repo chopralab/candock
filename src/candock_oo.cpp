@@ -3,10 +3,10 @@
 #include <typeinfo>
 
 #include "opts_candock.hpp"
-#include "findcentroidsstep.hpp"
-#include "fragmentligandsstep.hpp"
-#include "dockfragmentsstep.hpp"
-#include "linkfragmentsstep.hpp"
+#include "findcentroids.hpp"
+#include "fragmentligands.hpp"
+#include "dockfragments.hpp"
+#include "linkfragments.hpp"
 
 #include "pdbreader/pdbreader.hpp"
 #include "pdbreader/molecules.hpp"
@@ -54,10 +54,10 @@ int main(int argc, char* argv[]) {
  		 *
 		 */
 
-		Program::FindCentroidsStep find_centroids(receptors[0]);
+		Program::FindCentroids find_centroids(receptors[0]);
 		find_centroids.run_step(cmdl);
 
-		Program::FragmentLigandsStep ligand_fragmenter;
+		Program::FragmentLigands ligand_fragmenter;
 		ligand_fragmenter.run_step(cmdl);
 
 		/* Compute atom types for receptor and cofactor(s): gaff types for protein, 
@@ -95,7 +95,7 @@ int main(int argc, char* argv[]) {
 
 		dbgmsg("START SCORE" << endl << score << "END SCORE");
 
-		Program::DockFragmentsStep fragment_docker( find_centroids, ligand_fragmenter,
+		Program::DockFragments fragment_docker( find_centroids, ligand_fragmenter,
 													score, gridrec );
 		fragment_docker.run_step(cmdl);
 		
@@ -120,7 +120,7 @@ int main(int argc, char* argv[]) {
 
 		OMMIface::SystemTopology::loadPlugins();
 
-		Program::LinkFragmentsStep link_fragments( receptors[0], score, ffield, gridrec);
+		Program::LinkFragments link_fragments( receptors[0], score, ffield, gridrec);
 		link_fragments.run_step(cmdl);
 		
 	} catch ( exception& e) {

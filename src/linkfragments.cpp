@@ -1,4 +1,4 @@
-#include "linkfragmentsstep.hpp"
+#include "linkfragments.hpp"
 
 #include "common.hpp"
 #include "linker/linker.hpp"
@@ -7,17 +7,17 @@
 
 namespace Program {
 
-	bool LinkFragmentsStep::__can_read_from_files ( const CmdLnOpts& cmdl )
+	bool LinkFragments::__can_read_from_files ( const CmdLnOpts& cmdl )
 	{
 		return false;
 	}
 
-	void LinkFragmentsStep::__read_from_files ( const CmdLnOpts& cmdl )
+	void LinkFragments::__read_from_files ( const CmdLnOpts& cmdl )
 	{
 		
 	}
 
-	void Program::LinkFragmentsStep::__link_ligand_from_fragment( Molib::PDBreader& lpdb2, const CmdLnOpts& cmdl)
+	void Program::LinkFragments::__link_ligand_from_fragment( Molib::PDBreader& lpdb2, const CmdLnOpts& cmdl)
 	{
 		OMMIface::ForceField ffcopy(__ffield);
 		Molib::Molecules ligands;
@@ -87,7 +87,7 @@ namespace Program {
 		}
 	}
 
-	void LinkFragmentsStep::__continue_from_prev ( const CmdLnOpts& cmdl )
+	void LinkFragments::__continue_from_prev ( const CmdLnOpts& cmdl )
 	{
 		Molib::PDBreader lpdb2(cmdl.prep_file(), Molib::PDBreader::all_models, 1);
 

@@ -1,4 +1,4 @@
-#include "fragmentligandsstep.hpp"
+#include "fragmentligands.hpp"
 
 #include <boost/filesystem.hpp>
 #include <mutex>
@@ -10,11 +10,11 @@
 
 namespace Program {
 	
-	bool FragmentLigandsStep::__can_read_from_files( const CmdLnOpts& cmdl ) {
+	bool FragmentLigands::__can_read_from_files( const CmdLnOpts& cmdl ) {
 		return inout::Inout::file_size( cmdl.prep_file() ) && inout::Inout::file_size( cmdl.seeds_file() );
 	}
 
-	void FragmentLigandsStep::__read_from_files( const CmdLnOpts& cmdl) {
+	void FragmentLigands::__read_from_files( const CmdLnOpts& cmdl) {
 		Molib::PDBreader lpdb(cmdl.prep_file(), Molib::PDBreader::all_models, cmdl.max_num_ligands());
 
 		Molib::Molecules ligands;
@@ -25,7 +25,7 @@ namespace Program {
 		}
 	}
 
-	void FragmentLigandsStep::__fragment_ligands( Molib::PDBreader& lpdb, const CmdLnOpts& cmdl ) {
+	void FragmentLigands::__fragment_ligands( Molib::PDBreader& lpdb, const CmdLnOpts& cmdl ) {
 		Molib::Molecules ligands;
 		while(lpdb.parse_molecule(ligands)) {
 			// Compute properties, such as idatm atom types, fragments, seeds,
@@ -56,7 +56,7 @@ namespace Program {
 		}
 	}
 
-	void FragmentLigandsStep::__continue_from_prev( const CmdLnOpts& cmdl) {
+	void FragmentLigands::__continue_from_prev( const CmdLnOpts& cmdl) {
 
 		if ( ! inout::Inout::file_size( cmdl.ligand_file() ) ) {
 			throw Error("Ligand file: " + cmdl.ligand_file() + " not found or is empty!\n");

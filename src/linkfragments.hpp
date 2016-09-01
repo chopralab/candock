@@ -1,5 +1,5 @@
-#ifndef LINKFRAGMENTSSTEP_H
-#define LINKFRAGMENTSSTEP_H
+#ifndef LINKFRAGMENTS_H
+#define LINKFRAGMENTS_H
 
 #include "programstep.hpp"
 #include "pdbreader/molecule.hpp"
@@ -11,7 +11,7 @@
 
 namespace Program {
 
-	class LinkFragmentsStep : public ProgramStep
+	class LinkFragments : public ProgramStep
 	{
 		const Molib::Molecule& __receptor;
 		const Molib::Score& __score;
@@ -27,7 +27,7 @@ namespace Program {
 		virtual void __read_from_files ( const CmdLnOpts& cmdl );
 		virtual void __continue_from_prev ( const CmdLnOpts& cmdl );
 	public:
-		LinkFragmentsStep( const Molib::Molecule& receptor,
+		LinkFragments ( const Molib::Molecule& receptor,
 						   const Molib::Score& score,
 						   const OMMIface::ForceField& ffield,
 						   const Molib::Atom::Grid& gridrec ) : 

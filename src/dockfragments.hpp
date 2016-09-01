@@ -1,10 +1,10 @@
-#ifndef DOCKFRAGMENTSSTEP_H
-#define DOCKFRAGMENTSSTEP_H
+#ifndef DOCKFRAGMENTS_H
+#define DOCKFRAGMENTS_H
 
 #include "programstep.hpp"
 
-#include "findcentroidsstep.hpp"
-#include "fragmentligandsstep.hpp"
+#include "findcentroids.hpp"
+#include "fragmentligands.hpp"
 
 #include "opts_candock.hpp"
 #include "score/score.hpp"
@@ -12,10 +12,10 @@
 
 namespace Program {
 
-	class DockFragmentsStep : public ProgramStep
+	class DockFragments : public ProgramStep
 	{
-		const FindCentroidsStep& __found_centroids;
-		const FragmentLigandsStep& __fragmented_ligands;
+		const FindCentroids& __found_centroids;
+		const FragmentLigands& __fragmented_ligands;
 		
 		const Molib::Score& __score;
 		const Molib::Atom::Grid& __gridrec;
@@ -27,8 +27,8 @@ namespace Program {
 		virtual void __continue_from_prev(const CmdLnOpts& cmdl);
 		
 	public:
-		DockFragmentsStep( const FindCentroidsStep& found_centroids,
-						   const FragmentLigandsStep& fragmented_ligands,
+		DockFragments ( const FindCentroids& found_centroids,
+						   const FragmentLigands& fragmented_ligands,
 						   const Molib::Score& score,
 						   const Molib::Atom::Grid& gridrec
  						) :

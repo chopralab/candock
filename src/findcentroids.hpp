@@ -1,5 +1,5 @@
-#ifndef FINDCENTROIDSSTEP_H
-#define FINDCENTROIDSSTEP_H
+#ifndef FINDCENTROIDS_H
+#define FINDCENTROIDS_H
 
 #include "programstep.hpp"
 #include "centro/centroids.hpp"
@@ -7,7 +7,7 @@
 
 namespace Program {
 
-	class FindCentroidsStep : public ProgramStep
+	class FindCentroids : public ProgramStep
 	{
 	protected:
 		virtual bool __can_read_from_files(const CmdLnOpts& cmdl);
@@ -19,7 +19,7 @@ namespace Program {
 		Centro::Centroids __result;
 
 	public:
-		FindCentroidsStep( const Molib::Molecule& receptor ) :
+		FindCentroids ( const Molib::Molecule& receptor ) :
 			__receptor( receptor ) { }
 
 		const Centro::Centroids& centroids() const {

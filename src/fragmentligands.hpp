@@ -1,5 +1,5 @@
-#ifndef FRAGMENTLIGANDSSTEP_H
-#define FRAGMENTLIGANDSSTEP_H
+#ifndef FRAGMENTLIGANDS_H
+#define FRAGMENTLIGANDS_H
 
 #include <set>
 #include <mutex>
@@ -10,7 +10,7 @@
 
 namespace Program {
 
-	class FragmentLigandsStep : public ProgramStep
+	class FragmentLigands : public ProgramStep
 	{
 		Molib::Molecules __seeds;
 		std::set<int> __ligand_idatm_types;
@@ -30,7 +30,7 @@ namespace Program {
 		virtual void __continue_from_prev(const CmdLnOpts& cmdl);
 
 	public:
-		FragmentLigandsStep( ) { }
+		FragmentLigands( ) { }
 
 		const Molib::Molecules& seeds() const {
 			return __seeds;

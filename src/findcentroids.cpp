@@ -1,4 +1,4 @@
-#include "findcentroidsstep.hpp"
+#include "findcentroids.hpp"
 
 #include <boost/filesystem.hpp>
 
@@ -10,15 +10,15 @@
 
 namespace Program {
 	
-	bool FindCentroidsStep::__can_read_from_files( const CmdLnOpts& cmdl ) {
+	bool FindCentroids::__can_read_from_files( const CmdLnOpts& cmdl ) {
 		return inout::Inout::file_size( cmdl.centroid_file() ) != 0;
 	}
 
-	void FindCentroidsStep::__read_from_files( const CmdLnOpts& cmdl ) {
+	void FindCentroids::__read_from_files( const CmdLnOpts& cmdl ) {
 		__result = Centro::set_centroids(cmdl.centroid_file(), cmdl.num_bsites());
 	}
 
-	void FindCentroidsStep::__continue_from_prev( const CmdLnOpts& cmdl) {
+	void FindCentroids::__continue_from_prev( const CmdLnOpts& cmdl) {
 
 		// Creates an empty nosql file
 		inout::output_file("", cmdl.nosql_file()); // probis local structural alignments

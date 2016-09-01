@@ -1,10 +1,10 @@
-#include "dockfragmentsstep.hpp"
+#include "dockfragments.hpp"
 
 #include "helper/path.hpp"
 
 namespace Program {
 
-	bool DockFragmentsStep::__can_read_from_files ( const CmdLnOpts& cmdl )
+	bool DockFragments::__can_read_from_files ( const CmdLnOpts& cmdl )
 	{
 		bool all_seeds_are_present = true;
 
@@ -19,12 +19,12 @@ namespace Program {
 		return all_seeds_are_present;
 	}
 
-	void DockFragmentsStep::__read_from_files ( const CmdLnOpts& cmdl )
+	void DockFragments::__read_from_files ( const CmdLnOpts& cmdl )
 	{
 		cout << "Passed the test!" << endl;
 	}
 
-	void DockFragmentsStep::__dock_fragment ( int start, const Docker::Gpoints& gpoints, const Docker::Gpoints& gpoints0, const CmdLnOpts& cmdl) {
+	void DockFragments::__dock_fragment ( int start, const Docker::Gpoints& gpoints, const Docker::Gpoints& gpoints0, const CmdLnOpts& cmdl) {
 		// iterate over docked seeds and dock unique seeds
 		for (int j = start; j < __fragmented_ligands.seeds().size(); j+= cmdl.ncpu()) {
 			try {
@@ -67,7 +67,7 @@ namespace Program {
 		}
 	}
 
-	void DockFragmentsStep::__continue_from_prev ( const CmdLnOpts& cmdl )
+	void DockFragments::__continue_from_prev ( const CmdLnOpts& cmdl )
 	{
 		/* Create gridpoints for ALL centroids representing one or more binding sites
 		 * 

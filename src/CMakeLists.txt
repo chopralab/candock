@@ -40,14 +40,14 @@ add_executable( test_cofactor test_cofactor.cpp common.cpp )
 add_executable( candock_oo candock_oo.cpp
 	common.cpp
 	programstep.hpp
-	findcentroidsstep.cpp
-	findcentroidsstep.hpp
-	fragmentligandsstep.hpp
-	fragmentligandsstep.cpp
-	dockfragmentsstep.hpp
-	dockfragmentsstep.cpp
-	linkfragmentsstep.hpp
-	linkfragmentsstep.cpp
+	findcentroids.cpp
+	findcentroids.hpp
+	fragmentligands.hpp
+	fragmentligands.cpp
+	dockfragments.hpp
+	dockfragments.cpp
+	linkfragments.hpp
+	linkfragments.cpp
 )
 
 target_link_libraries( candock
