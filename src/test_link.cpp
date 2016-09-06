@@ -21,12 +21,13 @@
 #include "cluster/optics.hpp"
 #include "cluster/greedy.hpp"
 #include "modeler/modeler.hpp"
-using namespace std;
 
-CmdLnOpts cmdl;
+using namespace std;
+using namespace Program;
 
 int main(int argc, char* argv[]) {
 	try {
+		CmdLnOpts cmdl;
 		cmdl.init(argc, argv);
 		cmdl.display_time("started");
 		cout << cmdl << endl;
@@ -134,7 +135,7 @@ int main(int argc, char* argv[]) {
 		OMMIface::SystemTopology::loadPlugins();
 	
 		for(int i = 0; i < cmdl.ncpu(); ++i) {
-			threads.push_back(thread([&lpdb2, &receptors, &gridrec, &score, &ffield, &ligand_cnt, &mtx] () {
+			threads.push_back(thread([&lpdb2, &receptors, &gridrec, &score, &ffield, &ligand_cnt, &mtx, &cmdl] () {
 
 				Molib::Molecules ligands;
 

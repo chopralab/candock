@@ -8,7 +8,7 @@ set( CANDOCK_TWEAK_VERSION 0 )
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake/")
 
-find_package(Boost   REQUIRED  COMPONENTS date_time filesystem system regex)
+find_package(Boost   REQUIRED  COMPONENTS date_time filesystem system regex program_options)
 find_package(GSL     REQUIRED)
 find_package(OpenMM  REQUIRED)
 find_package(Git     REQUIRED)

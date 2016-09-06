@@ -10,14 +10,15 @@
 #include "pdbreader/grid.hpp"
 #include "pdbreader/molecules.hpp"
 #include "pdbreader/pdbreader.hpp"
-using namespace std;
 
-CmdLnOpts cmdl;
+using namespace std;
+using namespace Program;
 
 ////////////////// TEST FRAGMENTING OF COMPLEX ///////////////////////////
 
 int main(int argc, char* argv[]) {
 	try {
+		CmdLnOpts cmdl;
 		cmdl.init(argc, argv);
 		cmdl.display_time("started");
 		cout << cmdl << endl;
@@ -34,7 +35,7 @@ int main(int argc, char* argv[]) {
 		set<int> added;
 
 		for(int i = 0; i < cmdl.ncpu(); ++i) {
-			threads.push_back(thread([&lpdb, &seeds, &added, &mtx, &mtx_read_lock] () {
+			threads.push_back(thread([&lpdb, &seeds, &added, &mtx, &mtx_read_lock, &cmdl] () {
 				bool thread_is_not_done;
 				Molib::Molecules ligands;
 				{

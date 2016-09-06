@@ -21,14 +21,15 @@
 #include "ligands/genclus.hpp"
 #include "ligands/genlig.hpp"
 #include "cluster/optics.hpp"
-using namespace std;
 
-CmdLnOpts cmdl;
+using namespace std;
+using namespace Program;
 
 ////////////////// TEST MINIMIZATION OF COMPLEX ///////////////////////////
 
 int main(int argc, char* argv[]) {
 	try {
+		CmdLnOpts cmdl;
 		cmdl.init(argc, argv);
 		cmdl.display_time("started");
 		cout << cmdl << endl;

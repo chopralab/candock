@@ -27,6 +27,7 @@
 #include "modeler/modeler.hpp"
 
 using namespace std;
+using namespace Program;
 
 CmdLnOpts cmdl;
 
@@ -70,8 +71,8 @@ int main(int argc, char* argv[]) {
 
 			inout::output_file(binding_sites.first, cmdl.lig_clus_file());
 			inout::output_file(binding_sites.second, cmdl.z_scores_file());
-			
-			centroids = Centro::set_centroids(binding_sites.first, cmdl.centro_clus_rad());	
+
+			centroids = Centro::set_centroids(binding_sites.first, cmdl.centro_clus_rad());
 			inout::output_file(centroids, cmdl.centroid_file()); // probis local structural alignments
 
 		} else { // ... or else set binding sites from file

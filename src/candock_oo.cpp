@@ -36,7 +36,7 @@ using namespace std;
 
 int main(int argc, char* argv[]) {
 	try {
-		CmdLnOpts cmdl;
+		Program::CmdLnOpts cmdl;
 		cmdl.init(argc, argv);
 		cmdl.display_time("started");
 		cout << cmdl << endl;

@@ -19,14 +19,16 @@
 #include "docker/conformations.hpp"
 #include "docker/dock.hpp"
 #include "centro/centroids.hpp"
-using namespace std;
 
-CmdLnOpts cmdl;
+using namespace std;
+using namespace Program;
 
 ////////////////// TEST BINDING SITE DETECTION ///////////////////////////
 
 int main(int argc, char* argv[]) {
 	try {
+
+		CmdLnOpts cmdl;
 
 		cmdl.init(argc, argv);
 		cmdl.display_time("started");
