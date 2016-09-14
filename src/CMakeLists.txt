@@ -28,7 +28,7 @@ set( additional_libraries
    )
 
 add_executable( candock candock.cpp common.cpp common.hpp opts_candock.cpp )
-add_executable( genpot  genpot.cpp )
+add_executable( genpot  genpot.cpp opts_candock.cpp )
 add_executable( test_minimization test_minimization.cpp common.cpp opts_candock.cpp )
 add_executable( test_fragmenting test_fragmenting.cpp common.cpp opts_candock.cpp )
 add_executable( test_bsite test_bsite.cpp common.cpp opts_candock.cpp )

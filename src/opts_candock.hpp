@@ -1,13 +1,9 @@
 #ifndef OPTS_CANDOCK_H
 #define OPTS_CANDOCK_H
-#include <boost/regex.hpp>
-#include <boost/algorithm/string.hpp>
-#include <boost/filesystem.hpp>
-#include <boost/date_time/posix_time/posix_time.hpp>
-#include <boost/algorithm/string/split.hpp>
-#include <boost/algorithm/string.hpp>
-#include <boost/asio/ip/host_name.hpp>
+
 #include <boost/program_options.hpp>
+#include <boost/date_time/posix_time/posix_time.hpp>
+#include <boost/asio/ip/host_name.hpp>
 #include "helper/error.hpp"
 #include "version.h"
 #include <thread>
@@ -134,6 +130,10 @@ namespace Program {
 		// interface
 		bool quiet() const {
 			return __quiet;
+		}
+
+		std::string program_name() const {
+			return __program_name;
 		}
 
 		std::string receptor_file() const {
@@ -344,7 +344,7 @@ namespace Program {
 		}
 
 		friend std::ostream &operator<< (std::ostream &stream, const CmdLnOpts &cmdl) {
-			unsigned int n = thread::hardware_concurrency();
+			unsigned int n = std::thread::hardware_concurrency();
 			stream << endl << "Detected support for " << n << " concurrent threads."
 			       << " Using " << cmdl.ncpu() << " threads." << endl;
 
