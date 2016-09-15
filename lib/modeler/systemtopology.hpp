@@ -8,6 +8,7 @@
 #include "helper/debug.hpp"
 #include "helper/help.hpp"
 #include "pdbreader/molecule.hpp"
+#include "modeler/topology.hpp"
 #include "OpenMM.h"
 using namespace std;
 
@@ -31,7 +32,7 @@ namespace OMMIface {
 		OpenMM::HarmonicAngleForce *bondBend;
 		OpenMM::PeriodicTorsionForce *bondTorsion;
 
-		ForceField *__ffield;
+		const ForceField *__ffield;
 		
 		int __kbforce_idx;
 		vector<bool> masked;
@@ -80,7 +81,7 @@ namespace OMMIface {
 		vector<OpenMM::Vec3> get_positions_in_nm();
 		vector<OpenMM::Vec3> get_forces();
 		void minimize(const double tolerance, const double max_iterations);
-		void set_forcefield(ForceField &ffield) { __ffield = &ffield; }
+		void set_forcefield(const ForceField &ffield) { __ffield = &ffield; }
 	};
 };
 #endif

@@ -12,15 +12,16 @@
 #include "pdbreader/molecules.hpp"
 #include "pdbreader/pdbreader.hpp"
 #include "score/score.hpp"
-using namespace std;
 
-CmdLnOpts cmdl;
+using namespace std;
+using namespace Program;
 
 ////////////////// TEST SINGLEPOINT ENERGY CALCULATION OF COMPLEX ///////////////////////////
 
 int main(int argc, char* argv[]) {
 	try {
-		cmdl.init(argc, argv);
+		CmdLnOpts cmdl;
+		cmdl.init(argc, argv, CmdLnOpts::STARTING | CmdLnOpts::SCORING);
 		cmdl.display_time("started");
 		cout << cmdl << endl;
 		

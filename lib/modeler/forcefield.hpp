@@ -73,5 +73,6 @@ namespace OMMIface {
 
 	};
 	ostream& operator<< (ostream& stream, const ForceField::ResidueTopology& r);
+	ostream& operator<< (ostream& stream, const ForceField& ff);
 }
 #endif
