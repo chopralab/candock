@@ -27,7 +27,7 @@ using namespace std;
  * |   Find Centroids                                         Fragment Ligands
  * |        |                                                        |
  * |        V                                                        |
- * |->---------------------> Dock Fragments <------------------------|
+ * |->------>--------------> Dock Fragments <----------------------<-|
  * |                               |                                 |
  * |                               V                                 |
  * L-> --------------------> Link Framgents <-------------------------
@@ -122,8 +122,9 @@ int main(int argc, char* argv[]) {
 
 		Program::LinkFragments link_fragments( receptors[0], score, ffield, gridrec);
 		link_fragments.run_step(cmdl);
-		
+
 	} catch ( exception& e) {
 		cerr << e.what() << endl;
 	}
 }
+

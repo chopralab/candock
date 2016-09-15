@@ -25,7 +25,7 @@ using namespace Program;
 int main(int argc, char* argv[]) {
 	try {
 		CmdLnOpts cmdl;
-		cmdl.init(argc, argv);
+		cmdl.init(argc, argv, CmdLnOpts::FRAG_DOCKING | CmdLnOpts::FORCE_FIELD | CmdLnOpts::SCORING);
 		cmdl.display_time("started");
 		cout << cmdl << endl;
 		

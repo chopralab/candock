@@ -120,7 +120,18 @@ namespace Program {
 			__git_version = ss2.str();
 		}
 
-		void init (int argc, char *argv[]);
+		enum CMDLN_OPTS_GROUPS {
+			STARTING     = 1 << 0,
+			PROBIS       = 1 << 1,
+			LIG_FRAMGENT = 1 << 2,
+			FRAG_DOCKING = 1 << 3,
+			SCORING      = 1 << 4,
+			FORCE_FIELD  = 1 << 5,
+			LINKING      = 1 << 6,
+			ALL_OPTIONS  = 0xFF
+		};
+
+		void init (int argc, char *argv[], int opts_to_parse = ALL_OPTIONS);
 		void display_time (std::string what) {
 			cout << what << " on " << boost::posix_time::to_simple_string (boost::posix_time::second_clock::local_time()) << "\n";
 			cout << "running " << __program_name << " on hostname " << boost::asio::ip::host_name() << "\n";

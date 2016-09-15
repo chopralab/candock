@@ -10,7 +10,7 @@ namespace po = boost::program_options;
 
 namespace Program {
 
-	void CmdLnOpts::init (int argc, char *argv[]) {
+	void CmdLnOpts::init (int argc, char *argv[], int opts_to_parse) {
  
 		__program_name = argv[0];
 
@@ -183,16 +183,56 @@ namespace Program {
 			;
 
 			po::options_description config_options;
-			config_options.add (starting_inputs).add (probis_options).add (ligand_fragmention_options)
-			.add (frag_dock_options).add (scoring_options).add (force_field_min).add (linking_step);
+			config_options.add(starting_inputs)
+			              .add(probis_options)
+			              .add(ligand_fragmention_options)
+			              .add(frag_dock_options)
+			              .add(scoring_options)
+			              .add(force_field_min)
+			              .add(linking_step);
 
-			generic.add (config_options);
+			po::options_description cmdln_options;
+			cmdln_options.add (generic);
+			cmdln_options.add (config_options);
 
-			po::store (po::parse_command_line (argc, argv, generic), __vm);
+			po::store (po::parse_command_line (argc, argv, cmdln_options), __vm);
 			po::notify (__vm);
 
 			if (__vm.count ("help")) {
-				std::cout << generic << std::endl;
+
+				po::options_description print_options;
+				print_options.add(generic);
+
+				if (opts_to_parse & STARTING ) {
+					print_options.add(starting_inputs);
+				}
+
+				if (opts_to_parse & PROBIS ) {
+					print_options.add(probis_options);
+				} 
+
+				if (opts_to_parse & LIG_FRAMGENT) {
+					print_options.add(ligand_fragmention_options);
+				} 
+
+				if (opts_to_parse & FRAG_DOCKING) {
+					print_options.add(frag_dock_options);
+				}
+
+				if (opts_to_parse & SCORING) {
+					print_options.add (scoring_options);
+				} 
+
+				if (opts_to_parse & FORCE_FIELD ) {
+					print_options.add (force_field_min);
+				} 
+
+				if (opts_to_parse & LINKING ) {
+					print_options.add (linking_step);
+				}
+
+				
+				std::cout << print_options << std::endl;
 				exit (0);
 			}
 

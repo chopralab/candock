@@ -30,7 +30,7 @@ using namespace Program;
 int main(int argc, char* argv[]) {
 	try {
 		CmdLnOpts cmdl;
-		cmdl.init(argc, argv);
+		cmdl.init(argc, argv, CmdLnOpts::STARTING | CmdLnOpts::LIG_FRAMGENT);
 		cmdl.display_time("started");
 		cout << cmdl << endl;
 		

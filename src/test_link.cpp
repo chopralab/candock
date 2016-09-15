@@ -28,7 +28,7 @@ using namespace Program;
 int main(int argc, char* argv[]) {
 	try {
 		CmdLnOpts cmdl;
-		cmdl.init(argc, argv);
+		cmdl.init(argc, argv, CmdLnOpts::SCORING | CmdLnOpts::FORCE_FIELD | CmdLnOpts::LINKING );
 		cmdl.display_time("started");
 		cout << cmdl << endl;
 		/* Create empty output files
@@ -44,7 +44,7 @@ int main(int argc, char* argv[]) {
 			Molib::PDBreader::first_model);
 		Molib::Molecules receptors = rpdb.parse_molecule();
 
-		Molib::PDBreader lpdb(cmdl.ligand_file(), Molib::PDBreader::all_models, 
+		Molib::PDBreader lpdb(cmdl.prep_file(), Molib::PDBreader::all_models, 
 			cmdl.max_num_ligands());
 
 		/** 

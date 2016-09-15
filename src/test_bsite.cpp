@@ -30,7 +30,7 @@ int main(int argc, char* argv[]) {
 
 		CmdLnOpts cmdl;
 
-		cmdl.init(argc, argv);
+		cmdl.init(argc, argv, CmdLnOpts::STARTING | CmdLnOpts::PROBIS);
 		cmdl.display_time("started");
 		cout << cmdl << endl;
 		/* Create empty output files
