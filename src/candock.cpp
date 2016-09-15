@@ -58,7 +58,7 @@ int main(int argc, char* argv[]) {
 		 * 
 		 */
 		Centro::Centroids centroids;
-		if (cmdl.centroid_file().empty()) {
+		if (inout::Inout::file_size(cmdl.centroid_file()) <= 0) {
 			probis::compare_against_bslib(argc, argv, cmdl.receptor_file(), 
 				receptors[0].get_chain_ids(Molib::Residue::protein), cmdl.bslib_file(), cmdl.ncpu(),
 				cmdl.nosql_file(), cmdl.json_file());

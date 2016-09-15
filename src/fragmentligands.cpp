@@ -11,10 +11,13 @@
 namespace Program {
 	
 	bool FragmentLigands::__can_read_from_files( const CmdLnOpts& cmdl ) {
-		return inout::Inout::file_size( cmdl.prep_file() ) && inout::Inout::file_size( cmdl.seeds_file() );
+		return inout::Inout::file_size( cmdl.prep_file() ) > 0 && inout::Inout::file_size( cmdl.seeds_file() ) > 0;
 	}
 
 	void FragmentLigands::__read_from_files( const CmdLnOpts& cmdl) {
+
+		cout << "Reading fragmented files from " << cmdl.prep_file() << endl;
+
 		Molib::PDBreader lpdb(cmdl.prep_file(), Molib::PDBreader::all_models, cmdl.max_num_ligands());
 
 		Molib::Molecules ligands;
@@ -64,9 +67,7 @@ namespace Program {
 
 	void FragmentLigands::__continue_from_prev( const CmdLnOpts& cmdl) {
 
-		if ( ! inout::Inout::file_size( cmdl.ligand_file() ) ) {
-			throw Error("Ligand file: " + cmdl.ligand_file() + " not found or is empty!\n");
-		}
+		cout << "Fragmenting files in " << cmdl.ligand_file() << endl;
 
 		Molib::PDBreader lpdb(cmdl.ligand_file(), 
 			Molib::PDBreader::all_models|Molib::PDBreader::hydrogens, 

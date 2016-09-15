@@ -359,10 +359,9 @@ namespace Program {
 			stream << endl << "Detected support for " << n << " concurrent threads."
 			       << " Using " << cmdl.ncpu() << " threads." << endl;
 
-			
 			for ( const auto& a : cmdl.__vm ) {
 				stream << std::setw(24)<< a.first;
-				
+
 				if ( auto v = boost::any_cast<std::string>(&a.second.value()) )
 					stream << std::setw(50) << *v;
 				else if ( auto v = boost::any_cast<int>(&a.second.value()) )

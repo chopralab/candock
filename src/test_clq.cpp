@@ -34,8 +34,8 @@ int main(int argc, char* argv[]) {
 		 * 
 		 */
 		Centro::Centroids centroids;
-		if (cmdl.centroid_file().empty()) {
-			throw Error("For testing use --centroid option to provide a centroid file");
+		if ( inout::Inout::file_size(cmdl.centroid_file()) <= 0 ) {
+			throw Error("Provided centroid file not found!");
 		} else { // ... or else set binding sites from file
 			centroids = Centro::set_centroids(cmdl.centroid_file(), cmdl.num_bsites());
 		}

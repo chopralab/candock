@@ -28,9 +28,12 @@ namespace Program {
 
 			po::options_description starting_inputs ("Starting Input Files");
 			starting_inputs.add_options()
-			("receptor", po::value<std::string> (&__receptor_file), "Receptor filename")
-			("ligand",   po::value<std::string> (&__ligand_file),   "Ligand filename")
-			("ncpu",     po::value<int> (&__ncpu), "Number of CPUs to use concurrently (use -1 to use all CPUs)")
+			("receptor", po::value<std::string> (&__receptor_file)->default_value("receptor.pdb"),
+			 "Receptor filename")
+			("ligand",   po::value<std::string> (&__ligand_file)  ->default_value("ligands.mol2"),
+			 "Ligand filename")
+			("ncpu",     po::value<int> (&__ncpu)                 ->default_value(-1),
+			 "Number of CPUs to use concurrently (use -1 to use all CPUs)")
 			;
 
 			po::options_description probis_options ("Probis (binding site indentification) Options");
@@ -151,9 +154,9 @@ namespace Program {
 
 			po::options_description linking_step ("Fragment Linking Options");
 			linking_step.add_options()
-			("docked_dir",      po::value<std::string> (&__docked_dir),
+			("docked_dir",      po::value<std::string> (&__docked_dir)->default_value("docked"),
 			 "Docked ligands output directory")
-			("iterative",       po::value<bool> (&__iterative)->default_value (false, "false"),
+			("iterative",       po::value<bool> (&__iterative)->default_value (false, "false")->implicit_value(true),
 			 "Enable iterative minimization during linking")
 			("top_percent",     po::value<double> (&__top_percent)->default_value (0.05, "0.05"),
 			 "Top percent of each docked seed to extend to full molecule")
@@ -241,10 +244,6 @@ namespace Program {
 				std::cout << __git_version << std::endl;
 			}
 
-			if (__ncpu == -1) {
-				__ncpu = thread::hardware_concurrency();
-			}
-
 			if (!config_file.empty()) {
 				std::ifstream config_stream (config_file.c_str());
 
@@ -258,6 +257,10 @@ namespace Program {
 
 			po::store(po::parse_environment(config_options,"CANDOCK_"), __vm);
 			po::notify(__vm);
+
+			if (__ncpu == -1) {
+				__ncpu = thread::hardware_concurrency();
+			}
 
 			if (__fftype != "kb" && __fftype != "phy") {
 				throw po::validation_error (po::validation_error::invalid_option_value,

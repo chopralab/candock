@@ -14,7 +14,7 @@ namespace Program {
 
 	void LinkFragments::__read_from_files ( const CmdLnOpts& cmdl )
 	{
-		
+		throw Error( "You should not be here...yet");
 	}
 
 	void Program::LinkFragments::__link_ligand_from_fragment( Molib::PDBreader& lpdb2, const CmdLnOpts& cmdl)
@@ -89,6 +89,9 @@ namespace Program {
 
 	void LinkFragments::__continue_from_prev ( const CmdLnOpts& cmdl )
 	{
+
+		cout << "Starting to dock the fragments into originally given ligands" << endl;
+
 		Molib::PDBreader lpdb2(cmdl.prep_file(), Molib::PDBreader::all_models, 1);
 
 		std::vector<std::thread> threads;
@@ -99,6 +102,8 @@ namespace Program {
 		for(auto& thread : threads) {
 			thread.join();
 		}
+
+		cout << "Linking of fragments is complete" << endl;
 	}
 
 }

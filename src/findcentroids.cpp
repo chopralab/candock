@@ -11,14 +11,17 @@
 namespace Program {
 	
 	bool FindCentroids::__can_read_from_files( const CmdLnOpts& cmdl ) {
-		return inout::Inout::file_size( cmdl.centroid_file() ) != 0;
+		return inout::Inout::file_size( cmdl.centroid_file() ) > 0;
 	}
 
 	void FindCentroids::__read_from_files( const CmdLnOpts& cmdl ) {
+		cout << "Reading " << cmdl.num_bsites() << " binding sites from " << cmdl.centroid_file() << endl;
 		__result = Centro::set_centroids(cmdl.centroid_file(), cmdl.num_bsites());
 	}
 
 	void FindCentroids::__continue_from_prev( const CmdLnOpts& cmdl) {
+
+		cout << "Running PROBIS for receptor in file: " << cmdl.receptor_file() << endl;
 
 		// Creates an empty nosql file
 		inout::output_file("", cmdl.nosql_file()); // probis local structural alignments
