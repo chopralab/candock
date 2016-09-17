@@ -22,9 +22,10 @@ namespace Docker {
 			Gpoints::PGpointVec &__conf0;
 			double __energy;
 			int __i;
+			int __bsite_id;
 		public:
-			DockedConf(const Gpoints::Gpoint &cavpoint, Gpoints::PGpointVec &conf0, double energy, int i) 
-				: __cavpoint(cavpoint), __conf0(conf0), __energy(energy), __i(i) {}
+			DockedConf(const Gpoints::Gpoint &cavpoint, Gpoints::PGpointVec &conf0, double energy, int i, int bsite_id) 
+				: __cavpoint(cavpoint), __conf0(conf0), __energy(energy), __i(i), __bsite_id(bsite_id) {}
 			//Geom3D::Point& crd() { return __cavpoint.crd(); }
 			const Geom3D::Point& crd() const { return __cavpoint.crd(); }
 			void distance(const double) const {} // dummy
@@ -32,6 +33,7 @@ namespace Docker {
 			const Gpoints::PGpointVec &get_conf0() const { return __conf0; }
 			double get_energy() const { return __energy; }
 			int get_i() const { return __i; }
+			int get_bsite_id() const { return __bsite_id; }
 			struct by_energy {
 				bool operator() (const DockedConf *lhs, const DockedConf *rhs) const {
 					return lhs->__energy < rhs->__energy;

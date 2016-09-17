@@ -92,7 +92,7 @@ namespace Docker {
 						}
 						// if no clashes were found ...
 						if (!reje) {
-							accepted_tmp.push_back(Dock::DockedConf(cavpoint, conf, energy_sum, c));
+							accepted_tmp.push_back(Dock::DockedConf(cavpoint, conf, energy_sum, c, bsite_id));
 #ifndef NDEBUG
 							Molib::Atom::Vec seed_atoms = __seed.get_atoms();
 							const Gpoints::PGpointVec &points = accepted_tmp.back().get_conf0();
@@ -176,33 +176,32 @@ namespace Docker {
 		__docked.set_name(__seed.name()); // molecules(!) name is seed_id
 		
 		Molib::Atom::Vec seed_atoms = __seed.get_atoms();
-		
-		for (auto &kv : __gpoints.get_gridpoints()) {
-            const int bsite_id = kv.first;
-            auto &gmap = __gpoints.get_gmap(bsite_id);
-			// go over all accepted conformations
-			for (auto &conf : confs) {
-				dbgmsg(" conformation size = " << conf.get_conf0().size() 
-					<< " energy = " << conf.get_energy());
-				// correct the seed's new coordinates and ...
-				const Gpoints::PGpointVec &points = conf.get_conf0();
-				for (int i = 0; i < points.size(); ++i) {
-					
-					Molib::Atom &atom = *seed_atoms[i];
-					Docker::Gpoints::Gpoint &gpoint0 = *points[i];
+
+		// go over all accepted conformations
+		for (auto &conf : confs) {
+			auto &gmap = __gpoints.get_gmap(conf.get_bsite_id());
+
+			dbgmsg(" conformation size = " << conf.get_conf0().size() 
+				<< " energy = " << conf.get_energy());
+			// correct the seed's new coordinates and ...
+			const Gpoints::PGpointVec &points = conf.get_conf0();
+			for (int i = 0; i < points.size(); ++i) {
+
+				Molib::Atom &atom = *seed_atoms[i];
+				Docker::Gpoints::Gpoint &gpoint0 = *points[i];
 	
-					Docker::Gpoints::IJK confijk = conf.get_cavpoint().ijk() + gpoint0.ijk();
-					Docker::Gpoints::Gpoint *pgpoint = gmap.data[confijk.i][confijk.j][confijk.k];
-	
-					atom.set_crd(pgpoint->crd());
-				}
-				// save the conformation
-				__docked.add(new Molib::Molecule(__seed)).set_name(help::to_string(conf.get_energy())); // molecule name is energy
-				dbgmsg("conformation energy = " << conf.get_energy() 
-					<< " calculated energy = " << __score.non_bonded_energy(__gridrec, __seed));
-	
+				Docker::Gpoints::IJK confijk = conf.get_cavpoint().ijk() + gpoint0.ijk();
+				Docker::Gpoints::Gpoint *pgpoint = gmap.data[confijk.i][confijk.j][confijk.k];
+
+				atom.set_crd(pgpoint->crd());
 			}
+			// save the conformation
+			__docked.add(new Molib::Molecule(__seed)).set_name(help::to_string(conf.get_energy())); // molecule name is energy
+			dbgmsg("conformation energy = " << conf.get_energy() 
+				<< " calculated energy = " << __score.non_bonded_energy(__gridrec, __seed));
+
 		}
+
 		dbgmsg("Conversion of conformations to mols took " 
 			<< Benchmark::seconds_from_start() << " seconds");
 	}
