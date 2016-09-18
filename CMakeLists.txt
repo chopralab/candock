@@ -13,7 +13,7 @@ find_package(GSL     REQUIRED)
 find_package(OpenMM  REQUIRED)
 find_package(Git     REQUIRED)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=gnu++11")
 set(JSONCPP_INCLUDE_DIR "foreign/jsoncpp/include" "foreign/jsoncpp/src" )
 
 include_directories(${Boost_INCLUDE_DIRS})

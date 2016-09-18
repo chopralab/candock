@@ -17,12 +17,22 @@ find_path(
 	DOC "openmm include dir"
 )
 
-find_library(
-	OPENMM_LIBRARY
-	NAMES OpenMM_static OpenMM
-    PATHS foreign/openmm/lib
-	DOC "openmm library"
-)
+
+if(CYGWIN)
+	find_library(
+		OPENMM_LIBRARY
+		NAMES libOpenMM.dll.a
+    	PATHS foreign/openmm/lib
+		DOC "openmm library"
+	)
+	else()
+	find_library(
+			OPENMM_LIBRARY
+			NAMES libOpenMM_static.a
+			PATHS foreign/openmm/lib
+			DOC "openmm library"
+	)
+endif()
 
 set(OPENMM_INCLUDE_DIR ${OPENMM_INCLUDE_DIR} CACHE STRING INTERNAL)
 set(OPENMM_LIBRARY ${OPENMM_LIBRARY} CACHE STRING INTERNAL)
