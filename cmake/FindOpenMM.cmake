@@ -25,7 +25,14 @@ if(CYGWIN)
     	PATHS foreign/openmm/lib
 		DOC "openmm library"
 	)
-	else()
+elseif(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+	find_library(
+		OPENMM_LIBRARY
+		NAMES libOpenMM.dylib
+    	PATHS foreign/openmm/lib
+		DOC "openmm library"
+    )
+else()
 	find_library(
 			OPENMM_LIBRARY
 			NAMES libOpenMM_static.a
