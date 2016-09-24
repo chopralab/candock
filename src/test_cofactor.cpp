@@ -23,14 +23,14 @@
 #include "modeler/modeler.hpp"
 
 using namespace std;
-
-CmdLnOpts cmdl;
+using namespace Program;
 
 ////////////////// TEST OF RECEPTOR WITH COFACTORS ///////////////////////////
 
 int main(int argc, char* argv[]) {
 	try {
-		cmdl.init(argc, argv);
+		CmdLnOpts cmdl;
+		cmdl.init(argc, argv, CmdLnOpts::STARTING | CmdLnOpts::LIG_FRAMGENT);
 		cmdl.display_time("started");
 		cout << cmdl << endl;
 		

@@ -28,7 +28,7 @@ namespace OMMIface {
 			MinimizationError(const string &msg) : Error(msg) {}
 		};
 	private:
-		ForceField *__ffield;
+		const ForceField *__ffield;
 		string __fftype;
 		double __dist_cutoff_in_nm;
 		double __tolerance;
@@ -44,7 +44,7 @@ namespace OMMIface {
 
 	public:
 
-		Modeler(ForceField &ffield, const string &fftype, double dist_cutoff,
+		Modeler(const ForceField &ffield, const string &fftype, double dist_cutoff,
 			double tolerance, int max_iterations, int update_freq, double position_tolerance,
 			bool use_constraints, double step_size_in_fs) 
 			: 

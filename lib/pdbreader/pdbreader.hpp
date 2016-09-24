@@ -51,9 +51,12 @@ namespace Molib {
 		};
 		Parser *p;
 	public:
+		PDBreader() : p(nullptr){};
 		PDBreader(const string &molecule_file, unsigned int hm=all_models, 
 			const int num_occur=-1);
 		~PDBreader() { delete p; }
+		void prepare_parser(const string &molecule_file, unsigned int hm=all_models, 
+			const int num_occur=-1);
 		void rewind();
 		void set_flags(unsigned int hm);
 		bool parse_molecule(Molecules &mols);

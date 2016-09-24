@@ -22,6 +22,8 @@ namespace Molib {
     ostream& operator<<(ostream& os, const map<int, Molib::Molecules>& bsites);
 }
 
-ostream& operator<<(ostream& os, const map<int, double>& bscores);
+namespace std {
+	ostream& operator<<(ostream& os, const map<int, double>& bscores);
+}
 
 #endif

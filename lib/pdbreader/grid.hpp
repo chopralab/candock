@@ -124,7 +124,7 @@ public:
 	}
 
 	template<typename U>
-	Points get_neighbors(const U &point, const double &dist) {
+	Points get_neighbors(const U &point, const double &dist) const {
 		Geom3D::Coordinate cmin = __correct(point, -dist);
 		Geom3D::Coordinate cmax = __correct(point, dist);
 		Points points;
@@ -236,7 +236,7 @@ public:
 	}
 	
 	template<typename V>
-	bool clashes(const V &atom, const double clash_coeff) {
+	bool clashes(const V &atom, const double clash_coeff) const {
 		const double dist = 3.0;
 		const double vdw1 = atom.radius();
 		Geom3D::Coordinate cmin = __correct(atom.crd(), -dist);

@@ -104,7 +104,7 @@ namespace Molib {
 		dbgmsg("parsed objective function");
 	}
 
-	Array1d<double> Score::compute_energy(Atom::Grid &gridrec, const Geom3D::Coordinate &crd, const set<int> &ligand_atom_types) const {
+	Array1d<double> Score::compute_energy(const Atom::Grid &gridrec, const Geom3D::Coordinate &crd, const set<int> &ligand_atom_types) const {
 		dbgmsg("computing energy");
 		Array1d<double> energy_sum(*ligand_atom_types.rbegin() + 1);
 		for (auto &patom : gridrec.get_neighbors(crd, __dist_cutoff)) {
@@ -529,11 +529,11 @@ namespace Molib {
 		return -log(ratio);
 	}
 	
-	double Score::non_bonded_energy(Atom::Grid &gridrec, const Molecule &ligand) const {
+	double Score::non_bonded_energy(const Atom::Grid &gridrec, const Molecule &ligand) const {
 		return this->non_bonded_energy(gridrec, ligand.get_atoms(), ligand.get_crds());
 	}
 
-	double Score::non_bonded_energy(Atom::Grid &gridrec, const Atom::Vec &atoms, const Geom3D::Point::Vec &crds) const {
+	double Score::non_bonded_energy(const Atom::Grid &gridrec, const Atom::Vec &atoms, const Geom3D::Point::Vec &crds) const {
 		double energy_sum = 0.0;
 		for (int i = 0; i < atoms.size(); ++i) {
 			const Atom &atom2 = *atoms[i];

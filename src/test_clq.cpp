@@ -18,13 +18,14 @@
 #include "docker/dock.hpp"
 #include "centro/centroids.hpp"
 #include "common.hpp"
-using namespace std;
 
-CmdLnOpts cmdl;
+using namespace std;
+using namespace Program;
 
 int main(int argc, char* argv[]) {
 	try {
-		cmdl.init(argc, argv);
+		CmdLnOpts cmdl;
+		cmdl.init(argc, argv, CmdLnOpts::FRAG_DOCKING | CmdLnOpts::FORCE_FIELD | CmdLnOpts::SCORING);
 		cmdl.display_time("started");
 		cout << cmdl << endl;
 		
@@ -33,10 +34,10 @@ int main(int argc, char* argv[]) {
 		 * 
 		 */
 		Centro::Centroids centroids;
-		if (cmdl.centroid_in_file().empty()) {
-			throw Error("For testing use --centroid option to provide a centroid file");
+		if ( inout::Inout::file_size(cmdl.centroid_file()) <= 0 ) {
+			throw Error("Provided centroid file not found!");
 		} else { // ... or else set binding sites from file
-			centroids = Centro::set_centroids(cmdl.centroid_in_file(), cmdl.num_bsites());
+			centroids = Centro::set_centroids(cmdl.centroid_file(), cmdl.num_bsites());
 		}
 
 		/* Initialize parsers for receptor (and ligands) and read
@@ -148,9 +149,9 @@ int main(int argc, char* argv[]) {
 		for(int i = 0; i < cmdl.ncpu(); ++i) {
 			threads.push_back(
 #ifndef NDEBUG
-				thread([&seeds, &gridrec, &score, &gpoints0, &gpoints, i] () {
+				thread([&seeds, &gridrec, &score, &gpoints0, &gpoints, &cmdl, i] () {
 #else
-				thread([&seeds, &gpoints0, &gpoints, i] () {
+				thread([&seeds, &gpoints0, &gpoints, i, &cmdl] () {
 #endif
 					// iterate over seeds and dock unique seeds
 					for (int j = i; j < seeds.size(); j+= cmdl.ncpu()) {

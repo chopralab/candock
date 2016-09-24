@@ -18,20 +18,22 @@ namespace Docker {
 			typedef vector<DockedConf> Vec;
 
 		private:
-			Gpoints::Gpoint &__cavpoint;
+			const Gpoints::Gpoint &__cavpoint;
 			Gpoints::PGpointVec &__conf0;
 			double __energy;
 			int __i;
+			int __bsite_id;
 		public:
-			DockedConf(Gpoints::Gpoint &cavpoint, Gpoints::PGpointVec &conf0, double energy, int i) 
-				: __cavpoint(cavpoint), __conf0(conf0), __energy(energy), __i(i) {}
-			Geom3D::Point& crd() { return __cavpoint.crd(); }
+			DockedConf(const Gpoints::Gpoint &cavpoint, Gpoints::PGpointVec &conf0, double energy, int i, int bsite_id) 
+				: __cavpoint(cavpoint), __conf0(conf0), __energy(energy), __i(i), __bsite_id(bsite_id) {}
+			//Geom3D::Point& crd() { return __cavpoint.crd(); }
 			const Geom3D::Point& crd() const { return __cavpoint.crd(); }
 			void distance(const double) const {} // dummy
-			Gpoints::Gpoint &get_cavpoint() const { return __cavpoint; }
-			Gpoints::PGpointVec &get_conf0() const { return __conf0; }
+			const Gpoints::Gpoint &get_cavpoint() const { return __cavpoint; }
+			const Gpoints::PGpointVec &get_conf0() const { return __conf0; }
 			double get_energy() const { return __energy; }
 			int get_i() const { return __i; }
+			int get_bsite_id() const { return __bsite_id; }
 			struct by_energy {
 				bool operator() (const DockedConf *lhs, const DockedConf *rhs) const {
 					return lhs->__energy < rhs->__energy;
@@ -40,16 +42,16 @@ namespace Docker {
 			double compute_rmsd(const DockedConf &other) const;
 		};
 
-		Gpoints &__gpoints;
+		const Gpoints &__gpoints;
 		Conformations &__conformations;
-		Molib::Molecule &__seed;
+		const Molib::Molecule &__seed;
 		double __rmsd_tol;
 
 		Molib::Molecules __docked;
 
 #ifndef NDEBUG
-		Molib::Score &__score;
-		Molib::Atom::Grid &__gridrec;
+		const Molib::Score &__score;
+		const Molib::Atom::Grid &__gridrec;
 #endif
 		DockedConf::Vec __dock();
 		DockedConf::Vec __cluster(const DockedConf::Vec &confs);
@@ -58,11 +60,11 @@ namespace Docker {
 		
 	public:
 #ifndef NDEBUG
-		Dock(Gpoints &gpoints, Conformations &conformations, Molib::Molecule &seed, Molib::Score &score, 
-			Molib::Atom::Grid &gridrec, const double rmsd_tol=2.0) : __gpoints(gpoints), __conformations(conformations), 
+		Dock(const Gpoints &gpoints, Conformations &conformations, const Molib::Molecule &seed, const Molib::Score &score, 
+			 const Molib::Atom::Grid &gridrec, const double rmsd_tol=2.0) : __gpoints(gpoints), __conformations(conformations), 
 			__seed(seed), __score(score), __gridrec(gridrec), __rmsd_tol(rmsd_tol) {}
 #else
-		Dock(Gpoints &gpoints, Conformations &conformations, Molib::Molecule &seed, const double rmsd_tol=2.0) 
+		Dock(const Gpoints &gpoints, Conformations &conformations, Molib::Molecule &seed, const double rmsd_tol=2.0) 
 			: __gpoints(gpoints), __conformations(conformations), __seed(seed), __rmsd_tol(rmsd_tol) {}
 #endif
 		void run();

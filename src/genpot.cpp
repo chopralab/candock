@@ -4,19 +4,20 @@
 #include <typeinfo>
 #include <thread>
 #include <mutex>
-#include "opts_genpot.hpp"
+#include "opts_candock.hpp"
 #include "helper/benchmark.hpp"
 #include "helper/inout.hpp"
 #include "helper/error.hpp"
 #include "score/score.hpp"
 using namespace std;
 
-CmdLnOpts cmdl;
-
 ////////////////// GENERATE POTENTIAL FUNCTIONS ///////////////////////////
 
 int main(int argc, char* argv[]) {
 	try {
+		
+		Program::CmdLnOpts cmdl;
+		
 		cmdl.init(argc, argv);
 		cmdl.display_time("started");
 		cout << cmdl << endl;

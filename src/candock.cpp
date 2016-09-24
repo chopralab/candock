@@ -27,6 +27,7 @@
 #include "modeler/modeler.hpp"
 
 using namespace std;
+using namespace Program;
 
 CmdLnOpts cmdl;
 
@@ -57,7 +58,7 @@ int main(int argc, char* argv[]) {
 		 * 
 		 */
 		Centro::Centroids centroids;
-		if (cmdl.centroid_in_file().empty()) {
+		if (inout::Inout::file_size(cmdl.centroid_file()) <= 0) {
 			probis::compare_against_bslib(argc, argv, cmdl.receptor_file(), 
 				receptors[0].get_chain_ids(Molib::Residue::protein), cmdl.bslib_file(), cmdl.ncpu(),
 				cmdl.nosql_file(), cmdl.json_file());
@@ -70,12 +71,12 @@ int main(int argc, char* argv[]) {
 
 			inout::output_file(binding_sites.first, cmdl.lig_clus_file());
 			inout::output_file(binding_sites.second, cmdl.z_scores_file());
-			
-			centroids = Centro::set_centroids(binding_sites.first, cmdl.centro_clus_rad());	
-			inout::output_file(centroids, cmdl.centroid_out_file()); // probis local structural alignments
+
+			centroids = Centro::set_centroids(binding_sites.first, cmdl.centro_clus_rad());
+			inout::output_file(centroids, cmdl.centroid_file()); // probis local structural alignments
 
 		} else { // ... or else set binding sites from file
-			centroids = Centro::set_centroids(cmdl.centroid_in_file(), cmdl.num_bsites());
+			centroids = Centro::set_centroids(cmdl.centroid_file(), cmdl.num_bsites());
 		}
 
 		Molib::PDBreader lpdb(cmdl.ligand_file(), 
@@ -111,15 +112,17 @@ int main(int argc, char* argv[]) {
 
 		vector<thread> threads;
 		mutex mtx;
+		mutex mtx_read_lock;
 
 		Molib::Molecules seeds;
 		set<int> added;
 		set<int> ligand_idatm_types;
 
 		for(int i = 0; i < cmdl.ncpu(); ++i) {
-			threads.push_back(thread([&lpdb, &seeds, &added, &ligand_idatm_types, &mtx] () {
+			threads.push_back(thread([&lpdb, &seeds, &added, &ligand_idatm_types, &mtx, &mtx_read_lock] () {
 				Molib::Molecules ligands;
-				while(lpdb.parse_molecule(ligands)) {
+				bool thread_is_not_done = lpdb.parse_molecule(ligands);
+				while(thread_is_not_done) {
 					// Compute properties, such as idatm atom types, fragments, seeds,
 					// rotatable bonds etc.
 					ligands.compute_idatm_type()
@@ -142,6 +145,9 @@ int main(int argc, char* argv[]) {
 					}
 					inout::output_file(ligands, cmdl.prep_file(), ios_base::app);
 					ligands.clear();
+
+					lock_guard<std::mutex> guard(mtx_read_lock);
+					thread_is_not_done = lpdb.parse_molecule(ligands);
 				}
 			}));
 		}

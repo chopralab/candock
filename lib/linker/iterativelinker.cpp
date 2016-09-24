@@ -201,13 +201,30 @@ namespace Linker {
 			possibles_w_energy.resize(__max_num_possibles);
 
 		//help::memusage("after sort of possibles_w_energy");
-		
-		dbgmsg("number of possibles_w_energy = " << possibles_w_energy.size());
-		cout << "Generated " << possibles_w_energy.size() 
+        	dbgmsg("number of possibles_w_energy = " << possibles_w_energy.size());
+
+       		// cluster rigid conformations and take only cluster representatives for further linking
+        	Partial::Vec clustered_possibles_w_energy = Molib::Cluster::greedy(
+       			possibles_w_energy, __gridrec, __docked_clus_rad);
+
+        	//help::memusage("after greedy");
+
+       		dbgmsg("number of clustered_possibles_w_energy = " << clustered_possibles_w_energy.size());
+
+       		if (__max_possible_conf != -1 && clustered_possibles_w_energy.size() > __max_possible_conf) {
+            		clustered_possibles_w_energy.resize(__max_possible_conf);
+            		dbgmsg("number of possible conformations > max_possible_conf, "
+            		       << "resizing to= " << __max_possible_conf << " conformations");
+        	}
+
+        	dbgmsg("RIGID CONFORMATIONS FOR LIGAND " << __ligand.name()
+        	        << " : " << endl << clustered_possibles_w_energy);
+
+		cout << "Generated " << clustered_possibles_w_energy.size() 
 			<< " possible top percent docked seeds that will serve as starting points for reconstruction of ligand " << __ligand.name()
 			<< ", which took " << Benchmark::seconds_from_start() 
 			<< " wallclock seconds" << endl;
-		return possibles_w_energy;
+		return clustered_possibles_w_energy;
 	}
 	
 

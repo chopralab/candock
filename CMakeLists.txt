@@ -8,12 +8,12 @@ set( CANDOCK_TWEAK_VERSION 0 )
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake/")
 
-find_package(Boost   REQUIRED  COMPONENTS date_time filesystem system regex)
+find_package(Boost   REQUIRED  COMPONENTS date_time filesystem system regex program_options)
 find_package(GSL     REQUIRED)
 find_package(OpenMM  REQUIRED)
 find_package(Git     REQUIRED)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=gnu++11")
 set(JSONCPP_INCLUDE_DIR "foreign/jsoncpp/include" "foreign/jsoncpp/src" )
 
 include_directories(${Boost_INCLUDE_DIRS})

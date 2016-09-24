@@ -17,12 +17,29 @@ find_path(
 	DOC "openmm include dir"
 )
 
-find_library(
-	OPENMM_LIBRARY
-	NAMES OpenMM_static OpenMM
-    PATHS foreign/openmm/lib
-	DOC "openmm library"
-)
+
+if(CYGWIN)
+	find_library(
+		OPENMM_LIBRARY
+		NAMES libOpenMM.dll.a
+    	PATHS foreign/openmm/lib
+		DOC "openmm library"
+	)
+elseif(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+	find_library(
+		OPENMM_LIBRARY
+		NAMES libOpenMM.dylib
+    	PATHS foreign/openmm/lib
+		DOC "openmm library"
+    )
+else()
+	find_library(
+			OPENMM_LIBRARY
+			NAMES libOpenMM_static.a
+			PATHS foreign/openmm/lib
+			DOC "openmm library"
+	)
+endif()
 
 set(OPENMM_INCLUDE_DIR ${OPENMM_INCLUDE_DIR} CACHE STRING INTERNAL)
 set(OPENMM_LIBRARY ${OPENMM_LIBRARY} CACHE STRING INTERNAL)
@@ -31,7 +48,7 @@ IF(OPENMM_LIBRARY AND OPENMM_INCLUDE_DIR)
 
 SET(OPENMM_FOUND 1)
 
-ENDIF(OPENMM_INCLUDE_DIR AND OPENMM_LIBRARY)
+ENDIF(OPENMM_LIBRARY AND OPENMM_INCLUDE_DIR)
 
 # ==========================================
 IF(NOT OPENMM_FOUND)
