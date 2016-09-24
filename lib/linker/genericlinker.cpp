@@ -361,6 +361,8 @@ namespace Linker {
 				}
 			}
 		}
+
+		throw Error ("Could not find a good neighbor");
 	}
 
 	Array2d<bool> Linker::GenericLinker::__find_compatible_state_pairs(const Seed::Graph &seed_graph, const int sz) {

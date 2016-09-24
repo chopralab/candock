@@ -16,7 +16,7 @@ namespace Molib {
 		const Atom *a1, *a2, *a3, *a4;
 		Torsion(const Atom *at1, const Atom *at2, const Atom *at3, const Atom *at4) : a1(at1), a2(at2), a3(at3), a4(at4) {}
 		Torsion(const Torsion &other) { a1 = other.a1; a2 = other.a2; a3 = other.a3; a4 = other.a4; }
-		Torsion& operator=(const Torsion &rv) { a1 = rv.a1; a2 = rv.a2; a3 = rv.a3; a4 = rv.a4; }
+		Torsion& operator=(const Torsion &rv) { a1 = rv.a1; a2 = rv.a2; a3 = rv.a3; a4 = rv.a4; return *this; }
 		bool operator==(const Torsion& right) const { return a1 == right.a1 && a2 == right.a2 && a3 == right.a3 && a4 == right.a4; }
 		bool operator!=(const Torsion& right) const { return !(*this == right); }
 	};
