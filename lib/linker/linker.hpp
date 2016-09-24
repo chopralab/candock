@@ -122,6 +122,8 @@ namespace Linker {
 				__max_clique_size(max_clique_size), __max_iterations_final(max_iterations_final)
 			{}
 
+			virtual ~GenericLinker() {}
+
 			void init_openmm();
 			Partial::Vec init_conformations();
 			DockedConformation::Vec compute_conformations(const Partial::Vec &partials);

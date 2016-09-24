@@ -34,7 +34,8 @@ namespace Molib {
 		public:
 			Parser(const string &molecule_file, unsigned int hm=PDBreader::all_models, 
 				const int num_occur=-1)	: __molecule_file(molecule_file), __hm(hm), 
-				__num_occur(num_occur), __pos(0), __giant_molecule(false) {} 
+				__num_occur(num_occur), __pos(0), __giant_molecule(false) {}
+			virtual ~Parser() {}
 			virtual void parse_molecule(Molecules&) = 0;
 			virtual void set_pos(streampos pos) { __pos = pos; };
 			virtual void set_hm(unsigned int hm) { __hm = hm; };
