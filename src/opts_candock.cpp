@@ -182,7 +182,16 @@ namespace Program {
 			 "Maximum allowed energy for seed conformations")
 			("max_num_possibles",   po::value<int> (&__max_num_possibles)->default_value (200000),
 			 "Maximum number of possibles conformations considered for clustering")
+			;
 
+			po::options_description design_step ("Automated Design Options");
+			design_step.add_options()
+			("target_dir",      po::value<std::string>()->default_value(""))
+			("antitarget_dir",  po::value<std::string>()->default_value(""))
+			("skip_initial_linking",     po::value<bool>()->default_value(false))
+			("skip_anitarget_linking",   po::value<bool>()->default_value(false))
+			("number_of_seeds_to_add",   po::value<int>()->default_value(50))
+			("number_of_seeds_to_avoid", po::value<int>()->default_value(50))
 			;
 
 			po::options_description config_options;
@@ -192,7 +201,8 @@ namespace Program {
 			              .add(frag_dock_options)
 			              .add(scoring_options)
 			              .add(force_field_min)
-			              .add(linking_step);
+			              .add(linking_step)
+			              .add(design_step);
 
 			po::options_description cmdln_options;
 			cmdln_options.add (generic);
@@ -318,4 +328,25 @@ namespace Program {
 			throw Error ("die: arguments error");
 		}
 	}
+
+	std::string CmdLnOpts::get_string_option(std::string option) const
+	{
+		return __vm[option].as<std::string>();
+	}
+
+	int CmdLnOpts::get_int_option(std::string option) const
+	{
+		return __vm[option].as<int>();
+	}
+
+	double CmdLnOpts::get_double_option(std::string option) const
+	{
+		return __vm[option].as<double>();
+	}
+
+	bool Program::CmdLnOpts::get_bool_option(std::string option) const
+	{
+		return __vm[option].as<bool>();
+	}
+
 }
