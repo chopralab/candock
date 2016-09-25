@@ -9,6 +9,7 @@
 #include "opts_candock.hpp"
 #include "score/score.hpp"
 #include "docker/dock.hpp"
+#include "pdbreader/nrset.hpp"
 
 namespace Program {
 
@@ -21,6 +22,8 @@ namespace Program {
 		const Molib::Atom::Grid& __gridrec;
 		
 		const std::string& __name;
+
+		Molib::NRset __all_seeds;
 
 		void __dock_fragment(int start, const Docker::Gpoints& gpoints, const Docker::Gpoints& gpoints0, const CmdLnOpts& cmdl);
 	protected:

@@ -76,7 +76,7 @@ namespace Program {
 		Docker::Gpoints gpoints(__score, __fragmented_ligands.ligand_idatm_types(), __found_centroids.centroids(),
 			__gridrec, cmdl.grid_spacing(), cmdl.dist_cutoff(), cmdl.excluded_radius(), 
 			cmdl.max_interatomic_distance());
-		inout::output_file(gpoints, cmdl.gridpdb_hcp_file());
+		inout::output_file(gpoints, __name + "_" + cmdl.gridpdb_hcp_file());
 
 		/* Create a zero centered centroid with 10 A radius (max fragment 
 		 * radius) for getting all conformations of each seed

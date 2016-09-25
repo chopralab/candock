@@ -222,7 +222,7 @@ namespace Molib {
 
 
 
-	void Molecule::prepare_for_mm(const OMMIface::ForceField &ffield, Atom::Grid &grid) {
+	void Molecule::prepare_for_mm(const OMMIface::ForceField &ffield, const Atom::Grid &grid) {
 		/* Rename some residues
 		 */
 		for (auto &presidue : this->get_residues()) {

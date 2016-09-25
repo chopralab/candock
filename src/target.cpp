@@ -68,4 +68,20 @@ namespace Program {
 			a.prepseeds = std::move(pdockfragments);
 		}
 	}
+
+	void Target::link_fragments(const Molib::Score& score, const Program::CmdLnOpts& cmdl) {
+		__ffield.parse_gaff_dat_file(cmdl.gaff_dat_file())
+			.add_kb_forcefield(score, cmdl.step_non_bond())
+			.parse_forcefield_file(cmdl.amber_xml_file())
+			.parse_forcefield_file(cmdl.water_xml_file());
+
+		for ( auto &a : __preprecs ) {
+			a.protein.prepare_for_mm(__ffield, *a.gridrec);
+			__ffield.insert_topology(a.protein);
+			
+			std::unique_ptr<LinkFragments> plinkfragments(new LinkFragments(a.protein, score, __ffield, *a.gridrec));
+			plinkfragments->run_step(cmdl);
+			a.dockedlig = std::move(plinkfragments);
+		}
+	}
 }

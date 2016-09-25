@@ -9,6 +9,7 @@
 
 #include "findcentroids.hpp"
 #include "dockfragments.hpp"
+#include "linkfragments.hpp"
 
 #include <string>
 
@@ -20,14 +21,16 @@ namespace Program {
 
 		// FIXME: There's a better to design this, but this works for *now*
 		struct DockedReceptor {
-			const Molib::Molecule& protein;
+			Molib::Molecule& protein;
 			std::unique_ptr<Molib::Atom::Grid> gridrec;
 			std::unique_ptr<FindCentroids>     centroids;
 			std::unique_ptr<DockFragments>     prepseeds;
+			std::unique_ptr<LinkFragments>     dockedlig;
 		};
 
 		Molib::Molecules            __receptors;
 		std::vector<DockedReceptor> __preprecs;
+		OMMIface::ForceField        __ffield;
 	public:
 		Target(const CmdLnOpts& cmdl, const std::string& input_name);
 
@@ -36,6 +39,7 @@ namespace Program {
 		}
 
 		void dock_fragments(const Molib::Score& score, const FragmentLigands& ligand_fragments, const CmdLnOpts& cmdl);
+		void link_fragments(const Molib::Score& score, const CmdLnOpts& cmdl);
 	};
 
 }

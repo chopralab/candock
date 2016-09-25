@@ -3,10 +3,7 @@
 #include <typeinfo>
 
 #include "opts_candock.hpp"
-#include "findcentroids.hpp"
 #include "fragmentligands.hpp"
-#include "dockfragments.hpp"
-#include "linkfragments.hpp"
 
 #include "pdbreader/pdbreader.hpp"
 #include "pdbreader/molecules.hpp"
@@ -63,27 +60,11 @@ int main(int argc, char* argv[]) {
 
 		targets.dock_fragments(score, ligand_fragmenter, cmdl);
 
-// 		OMMIface::ForceField ffield;
-// 		ffield.parse_gaff_dat_file(cmdl.gaff_dat_file())
-// 			.add_kb_forcefield(score, cmdl.step_non_bond())
-// 			.parse_forcefield_file(cmdl.amber_xml_file())
-// 			.parse_forcefield_file(cmdl.water_xml_file());
-// 
-// 		receptors[0].prepare_for_mm(ffield, gridrec);
-// 		
-// 		/**
-// 		 * Insert topology for cofactors, but not for standard residues
-// 		 * that are already known to forcefield (e.g., amino acid residues)
-// 		 *
-// 		 */
-// 		ffield.insert_topology(receptors[0]); // fixes issue #115
-// 
-// 		OMMIface::SystemTopology::loadPlugins();
-// 
-// 		Program::LinkFragments link_fragments( receptors[0], score, ffield, gridrec);
-// 		link_fragments.run_step(cmdl);
-// 
-// 		cmdl.display_time("finished");
+		OMMIface::SystemTopology::loadPlugins();
+		
+		targets.link_fragments(score, cmdl);
+		
+		cmdl.display_time("finished");
 
 	} catch ( exception& e) {
 		cerr << e.what() << endl;

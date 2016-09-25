@@ -28,11 +28,11 @@ namespace Program {
 		virtual void __continue_from_prev ( const CmdLnOpts& cmdl );
 	public:
 		LinkFragments ( const Molib::Molecule& receptor,
-						   const Molib::Score& score,
-						   const OMMIface::ForceField& ffield,
-						   const Molib::Atom::Grid& gridrec ) : 
-						   __receptor(receptor), __score(score),
-						   __ffield(ffield), __gridrec(gridrec) {};
+						const Molib::Score& score,
+						const OMMIface::ForceField& ffield,
+						const Molib::Atom::Grid& gridrec ) : 
+						__receptor(receptor), __score(score),
+						__ffield(ffield), __gridrec(gridrec) {};
 		
 	};
 }

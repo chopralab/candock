@@ -73,7 +73,7 @@ namespace Molib {
 		Molecule& regenerate_bonds(const Molecule&);
 		Molecule& compute_overlapping_rigid_segments(Unique&);
 
-		void prepare_for_mm(const OMMIface::ForceField &ffield, Atom::Grid &grid);
+		void prepare_for_mm(const OMMIface::ForceField &ffield, const Atom::Grid &grid);
 
 		Geom3D::Coordinate compute_geometric_center() const { return Geom3D::compute_geometric_center(this->get_crds()); }
 		double compute_rmsd(const Molecule&) const;

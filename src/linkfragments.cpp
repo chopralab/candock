@@ -41,17 +41,17 @@ namespace Program {
 				 * Read top seeds for this ligand
 				 */	 
 				Molib::NRset top_seeds = common::read_top_seeds_files(ligand,
-						cmdl.top_seeds_dir(), cmdl.top_seeds_file(), cmdl.top_percent());
-	
+						__receptor.name() + "_" + cmdl.top_seeds_dir(), cmdl.top_seeds_file(), cmdl.top_percent());
+
 				ligand.erase_properties(); // required for graph matching
 				top_seeds.erase_properties(); // required for graph matching
-	
+
 				/** 
 				 * Jiggle the coordinates by one-thousand'th of an Angstrom to avoid minimization failures
 				 * with initial bonded relaxation failed errors
 				 */
 				top_seeds.jiggle();
-	
+
 				/* Init minization options and constants, including ligand and receptor topology
 				 *
 				 */
@@ -77,10 +77,10 @@ namespace Program {
 				for (auto &docked : docks) {
 					common::change_residue_name(docked.get_ligand(), "CAN"); 
 					inout::output_file(Molib::Molecule::print_complex(docked.get_ligand(), docked.get_receptor(), docked.get_energy()), 
-							Path::join(cmdl.docked_dir(), ligand.name() + ".pdb" ) , ios_base::app); // output docked molecule conformations
+							__receptor.name() + "_" + Path::join(cmdl.docked_dir(), ligand.name() + ".pdb" ) , ios_base::app); // output docked molecule conformations
 				}
 			} catch (exception& e) { 
-				cerr << "Error: skipping ligand " << ligand.name() << " due to : " << e.what() << endl; 
+				cerr << "Error: skipping ligand " << ligand.name() << " due to : " << e.what() << endl;
 			} 
 			ffcopy.erase_topology(ligand); // he he
 			ligands.clear();
