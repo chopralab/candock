@@ -5,31 +5,33 @@
 #include "findcentroids.hpp"
 
 namespace Program {
-	Target::Target(const CmdLnOpts& cmdl) {
+	Target::Target(const CmdLnOpts& cmdl, const std::string& input_name ) {
 
 		/* Initialize parsers for receptor and read
 		 * the receptor molecule(s)
 		 * 
 		 */
-		if (!cmdl.get_string_option("target_dir").empty()) {
-			for ( const auto &a : inout::Inout::files_matching_pattern (cmdl.get_string_option("target_dir"), ".pdb")) {
+		if (!cmdl.get_string_option(input_name).empty()) {
+			for ( const auto &a : inout::Inout::files_matching_pattern (cmdl.get_string_option(input_name), ".pdb")) {
 				/* Initialize parsers for receptor (and ligands) and read
 				 * the receptor molecule(s)
 				 * 
 				 */
 				Molib::PDBreader rpdb(a, Molib::PDBreader::first_model);
 				Molib::Molecules receptors = rpdb.parse_molecule();
-				Molib::Molecule& current = __receptors.add(new Molib::Molecule (receptors[0]));
-				current.set_name(a.substr(0, a.length() - 4 ) );
-				cout << a.substr(0, a.length() - 4 ) << endl;
+				Molib::Molecule& current = __receptors.add(new Molib::Molecule ( std::move (receptors[0]) ));
+				current.set_name( a.substr(0, a.length() - 4 ) ); //TODO: Make output a commandline variable in Generic options
 
+				// TODO: The following maybe test made into a seperate function....
 				/* Run section of Candock designed to find binding site1s
 				 * Currently, this runs ProBIS and does not require any
 				 * previous step to be competed.
 				 *
 				 */
-				__centroids.push_back( FindCentroids(current) );
-				__centroids.back().run_step(cmdl);
+				__preprecs.push_back(DockedReceptor {current, nullptr, nullptr, nullptr});
+				std::unique_ptr<FindCentroids> pcen (new FindCentroids(current));
+				pcen->run_step(cmdl);
+				__preprecs.back().centroids = std::move(pcen);
 			}
 		}
 
@@ -53,7 +55,17 @@ namespace Program {
 		/* Create receptor grid
 		 * 
 		 */
-		__gridrec = Molib::Atom::Grid(__receptors[0].get_atoms());
+		for ( auto &a : __preprecs ) {
+			std::unique_ptr<Molib::Atom::Grid> pgridrec(new Molib::Atom::Grid(a.protein.get_atoms()));
+			a.gridrec = std::move(pgridrec);
+		}
+	}
 
+	void Target::dock_fragments(const Molib::Score& score, const FragmentLigands& ligand_fragments, const CmdLnOpts& cmdl) {
+		for ( auto &a : __preprecs ) {
+			std::unique_ptr<DockFragments> pdockfragments(new DockFragments(*a.centroids, ligand_fragments, score, *a.gridrec, a.protein.name()));
+			pdockfragments->run_step(cmdl);
+			a.prepseeds = std::move(pdockfragments);
+		}
 	}
 }

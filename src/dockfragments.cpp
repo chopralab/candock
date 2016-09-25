@@ -12,8 +12,8 @@ namespace Program {
 
 		// No early return so that we have the ability to redock missing seeds
 		for (const auto& seed : all_seeds) {
-			all_seeds_are_present &= inout::Inout::file_size( Path::join( Path::join(cmdl.top_seeds_dir(), seed.name()),
-																		  cmdl.top_seeds_file() ) ) > 0;
+			all_seeds_are_present &= inout::Inout::file_size( __name + "_" + Path::join( Path::join(cmdl.top_seeds_dir(), seed.name()),
+			                                                  cmdl.top_seeds_file() ) ) > 0;
 		}
 		
 		return all_seeds_are_present;
@@ -21,7 +21,7 @@ namespace Program {
 
 	void DockFragments::__read_from_files ( const CmdLnOpts& cmdl )
 	{
-		cout << "All seeds are present in " << cmdl.top_seeds_dir() << ". Docking of fragments skipped." << endl;
+		cout << "All seeds are present in " << cmdl.top_seeds_dir() << " for " << __name << ". Docking of fragments skipped." << endl;
 	}
 
 	void DockFragments::__dock_fragment ( int start, const Docker::Gpoints& gpoints, const Docker::Gpoints& gpoints0, const CmdLnOpts& cmdl) {
@@ -55,9 +55,7 @@ namespace Program {
 
 				dock.run();
 
-				//~ inout::output_file(dock.get_docked(), cmdl.top_seeds_dir() + "/" + dock.get_docked().name() + "/" 
-				//~ + cmdl.top_seeds_file()); // output docked & clustered seeds
-				inout::output_file(dock.get_docked(), Path::join(Path::join(cmdl.top_seeds_dir(), dock.get_docked().name()),
+				inout::output_file(dock.get_docked(), __name + "_" + Path::join(Path::join(cmdl.top_seeds_dir(), dock.get_docked().name()),
 					cmdl.top_seeds_file())); // output docked & clustered seeds
 	
 			}
@@ -70,7 +68,7 @@ namespace Program {
 	void DockFragments::__continue_from_prev ( const CmdLnOpts& cmdl )
 	{
 
-		cout << "Docking fragments into: " << cmdl.top_seeds_dir() << ". Files will be named: " << cmdl.top_seeds_file() << endl;
+		cout << "Docking fragments into: " << __name << "_" << cmdl.top_seeds_dir() << ". Files will be named: " << cmdl.top_seeds_file() << endl;
 
 		/* Create gridpoints for ALL centroids representing one or more binding sites
 		 * 

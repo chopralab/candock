@@ -329,22 +329,22 @@ namespace Program {
 		}
 	}
 
-	std::string CmdLnOpts::get_string_option(std::string option) const
+	std::string CmdLnOpts::get_string_option(const std::string& option) const
 	{
 		return __vm[option].as<std::string>();
 	}
 
-	int CmdLnOpts::get_int_option(std::string option) const
+	int CmdLnOpts::get_int_option           (const std::string& option) const
 	{
 		return __vm[option].as<int>();
 	}
 
-	double CmdLnOpts::get_double_option(std::string option) const
+	double CmdLnOpts::get_double_option     (const std::string& option) const
 	{
 		return __vm[option].as<double>();
 	}
 
-	bool Program::CmdLnOpts::get_bool_option(std::string option) const
+	bool Program::CmdLnOpts::get_bool_option(const std::string& option) const
 	{
 		return __vm[option].as<bool>();
 	}

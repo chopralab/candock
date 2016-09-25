@@ -140,10 +140,10 @@ namespace Program {
 		}
 		// interface
 
-		std::string get_string_option(std::string option) const;
-		bool        get_bool_option(std::string option) const;
-		int         get_int_option(std::string option) const;
-		double      get_double_option (std::string option) const;
+		std::string get_string_option (const std::string& option) const;
+		bool        get_bool_option   (const std::string& option) const;
+		int         get_int_option    (const std::string& option) const;
+		double      get_double_option (const std::string& option) const;
 
 		bool quiet() const {
 			return __quiet;

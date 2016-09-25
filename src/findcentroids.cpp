@@ -30,12 +30,12 @@ namespace Program {
 			__receptor.get_chain_ids(Molib::Residue::protein),
 			cmdl.bslib_file(),
 			cmdl.ncpu(),
-			__receptor.name() + "_" + cmdl.nosql_file(),
-			__receptor.name() + "_" + cmdl.json_file());
+			"output/" + __receptor.name() + "_" + cmdl.nosql_file(),
+			"output/" + __receptor.name() + "_" + cmdl.json_file());
 
 		genclus::generate_clusters_of_ligands(
-			__receptor.name() + "_" + cmdl.json_file(),
-			__receptor.name() + "_" + cmdl.json_with_ligs_file(),
+			"output/" + __receptor.name() + "_" + cmdl.json_file(),
+			"output/" + __receptor.name() + "_" + cmdl.json_with_ligs_file(),
 			cmdl.bio_dir(),
 			cmdl.names_dir(),
 			cmdl.neighb(),
@@ -45,12 +45,12 @@ namespace Program {
 
 		auto binding_sites = 
 			genlig::generate_binding_site_prediction(
-				__receptor.name() + "_" + cmdl.json_with_ligs_file(), 
+				"output/" + __receptor.name() + "_" + cmdl.json_with_ligs_file(), 
 				cmdl.bio_dir(),
 				cmdl.num_bsites());
 
-		inout::output_file(binding_sites.first,  __receptor.name() + "_" + cmdl.lig_clus_file());
-		inout::output_file(binding_sites.second, __receptor.name() + "_" + cmdl.z_scores_file());
+		inout::output_file(binding_sites.first,  "output/" + __receptor.name() + "_" + cmdl.lig_clus_file());
+		inout::output_file(binding_sites.second, "output/" + __receptor.name() + "_" + cmdl.z_scores_file());
 
 		__result = Centro::set_centroids(binding_sites.first, cmdl.centro_clus_rad());
 		inout::output_file(__result, __receptor.name() + "_" + cmdl.centroid_file()); // probis local structural alignments

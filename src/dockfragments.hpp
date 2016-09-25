@@ -19,6 +19,8 @@ namespace Program {
 		
 		const Molib::Score& __score;
 		const Molib::Atom::Grid& __gridrec;
+		
+		const std::string& __name;
 
 		void __dock_fragment(int start, const Docker::Gpoints& gpoints, const Docker::Gpoints& gpoints0, const CmdLnOpts& cmdl);
 	protected:
@@ -28,14 +30,17 @@ namespace Program {
 		
 	public:
 		DockFragments ( const FindCentroids& found_centroids,
-						   const FragmentLigands& fragmented_ligands,
-						   const Molib::Score& score,
-						   const Molib::Atom::Grid& gridrec
+						const FragmentLigands& fragmented_ligands,
+						const Molib::Score& score,
+						const Molib::Atom::Grid& gridrec,
+						const std::string& name
  						) :
-						   __found_centroids(found_centroids),
-						   __fragmented_ligands(fragmented_ligands),
-						   __score(score), __gridrec(gridrec)
-						   {}
+						__found_centroids(found_centroids),
+						__fragmented_ligands(fragmented_ligands),
+						__score(score),
+						__gridrec(gridrec),
+						__name(name)
+						{}
 
 	};
 

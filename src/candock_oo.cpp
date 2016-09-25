@@ -42,30 +42,27 @@ int main(int argc, char* argv[]) {
 		cmdl.init(argc, argv);
 		cmdl.display_time("started");
 		cout << cmdl << endl;
+		
+		Program::FragmentLigands ligand_fragmenter;
+		ligand_fragmenter.run_step(cmdl);
 
-		Program::Target targets(cmdl);
+		Program::Target targets(cmdl, "target_dir");
 
-// 		/* Read distributions file and initialize scores
-// 		 * 
-// 		 */
-// 		Molib::Score score(cmdl.ref_state(), cmdl.comp(), cmdl.rad_or_raw(), cmdl.dist_cutoff(), 
-// 			cmdl.step_non_bond());
-// 
-// 		score.define_composition(receptors.get_idatm_types(), ligand_fragmenter.ligand_idatm_types())
-// 			.process_distributions_file(cmdl.distributions_file())
-// 			.compile_scoring_function()
-// 			.parse_objective_function(cmdl.obj_dir(), cmdl.scale_non_bond());
-// 
-// 		dbgmsg("START SCORE" << endl << score << "END SCORE");
-// 
-// 		Program::DockFragments fragment_docker( find_centroids, ligand_fragmenter,
-// 												score, gridrec );
-// 		fragment_docker.run_step(cmdl);
-// 		
-// 		/* Prepare receptor for molecular mechanics: histidines, N-[C-]terminals,
-// 		 * bonds, disulfide bonds, main chain bonds
-// 		 * 
-// 		 */
+		/* Read distributions file and initialize scores
+		 * 
+		 */
+		Molib::Score score(cmdl.ref_state(), cmdl.comp(), cmdl.rad_or_raw(), cmdl.dist_cutoff(), 
+			cmdl.step_non_bond());
+
+		score.define_composition(targets.get_idatm_types(), ligand_fragmenter.ligand_idatm_types())
+			.process_distributions_file(cmdl.distributions_file())
+			.compile_scoring_function()
+			.parse_objective_function(cmdl.obj_dir(), cmdl.scale_non_bond());
+
+		dbgmsg("START SCORE" << endl << score << "END SCORE");
+
+		targets.dock_fragments(score, ligand_fragmenter, cmdl);
+
 // 		OMMIface::ForceField ffield;
 // 		ffield.parse_gaff_dat_file(cmdl.gaff_dat_file())
 // 			.add_kb_forcefield(score, cmdl.step_non_bond())
