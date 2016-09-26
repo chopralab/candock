@@ -32,12 +32,13 @@ namespace Program {
 		std::vector<DockedReceptor> __preprecs;
 		OMMIface::ForceField        __ffield;
 	public:
-		Target(const CmdLnOpts& cmdl, const std::string& input_name);
+		Target(const std::string& input_name);
 
 		std::set<int> get_idatm_types( const std::set<int>& previous = std::set<int>() ) { 
 			return __receptors.get_idatm_types(previous);
 		}
 
+		void find_centroids(const CmdLnOpts& cmdl);
 		void dock_fragments(const Molib::Score& score, const FragmentLigands& ligand_fragments, const CmdLnOpts& cmdl);
 		void link_fragments(const Molib::Score& score, const CmdLnOpts& cmdl);
 		

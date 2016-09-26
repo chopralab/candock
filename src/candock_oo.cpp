@@ -43,7 +43,9 @@ int main(int argc, char* argv[]) {
 		Program::FragmentLigands ligand_fragmenter;
 		ligand_fragmenter.run_step(cmdl);
 
-		Program::Target targets   (cmdl, "target_dir");
+		Program::Target targets   (cmdl.get_string_option("target_dir"));
+		targets.find_centroids(cmdl);
+		
 		//Program::Target anitargets(cmdl, "antitarget_dir");
 
 		/* Read distributions file and initialize scores
