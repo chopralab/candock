@@ -43,7 +43,8 @@ int main(int argc, char* argv[]) {
 		Program::FragmentLigands ligand_fragmenter;
 		ligand_fragmenter.run_step(cmdl);
 
-		Program::Target targets(cmdl, "target_dir");
+		Program::Target targets   (cmdl, "target_dir");
+		//Program::Target anitargets(cmdl, "antitarget_dir");
 
 		/* Read distributions file and initialize scores
 		 * 
@@ -60,10 +61,11 @@ int main(int argc, char* argv[]) {
 
 		targets.dock_fragments(score, ligand_fragmenter, cmdl);
 
+		targets.determine_overlapping_seeds(cmdl);
+
 		OMMIface::SystemTopology::loadPlugins();
-		
 		targets.link_fragments(score, cmdl);
-		
+
 		cmdl.display_time("finished");
 
 	} catch ( exception& e) {

@@ -5,7 +5,7 @@
 #include "findcentroids.hpp"
 
 namespace Program {
-	Target::Target(const CmdLnOpts& cmdl, const std::string& input_name ) {
+	Target::Target(const CmdLnOpts& cmdl, const std::string& input_name ) { //TODO: Remove cmdl dependency
 
 		/* Initialize parsers for receptor and read
 		 * the receptor molecule(s)
@@ -83,5 +83,30 @@ namespace Program {
 			plinkfragments->run_step(cmdl);
 			a.dockedlig = std::move(plinkfragments);
 		}
+	}
+
+	void Target::determine_overlapping_seeds(const CmdLnOpts& cmdl) { //TODO: Remove cmdl dependency
+
+		std::multiset<std::string> good_seed_list;
+
+		for ( auto &a : __preprecs ) {
+			auto result = a.prepseeds->get_best_seeds(cmdl);
+
+			int max_seeds = cmdl.get_int_option("seeds_to_add");
+			if ( max_seeds != -1 && max_seeds < result.size()) 
+				result.resize( max_seeds );
+
+			for ( auto &b : result )
+				good_seed_list.insert(b.second);
+		}
+
+		for ( auto c = good_seed_list.cbegin(); c != good_seed_list.cend(); ) {
+			if (static_cast<int>(good_seed_list.count(*c)) < cmdl.get_int_option("seeds_till_good")) {
+				good_seed_list.erase(c);
+			} else {
+				++c;
+			}
+		}
+		
 	}
 }

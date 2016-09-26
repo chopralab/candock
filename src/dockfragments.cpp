@@ -28,6 +28,14 @@ namespace Program {
 		// iterate over docked seeds and dock unique seeds
 		for (int j = start; j < __fragmented_ligands.seeds().size(); j+= cmdl.ncpu()) {
 			try {
+				
+				int file_exist_check = inout::Inout::file_size( __name + "_" + Path::join( Path::join(cmdl.top_seeds_dir(), __fragmented_ligands.seeds()[j].name()),
+			                                                  cmdl.top_seeds_file() ) ) > 0;
+				
+				if ( file_exist_check > 0 ) {
+					cout << "Skipping docking of seed: " << __fragmented_ligands.seeds()[j].name() << " because it is already docked!" << endl;
+					continue;
+				}
 				dbgmsg(__fragmented_ligands.seeds()[j]);
 				/* Compute all conformations of this seed with the center
 				 * atom fixed on coordinate origin using maximum clique algorithm
@@ -101,6 +109,24 @@ namespace Program {
 		
 		cout << "Done with fragment docking" << std::endl;
 
+	}
+
+	std::vector<std::pair<double, std::string>> DockFragments::get_best_seeds(const CmdLnOpts& cmdl) {
+		const Molib::Molecules& all_seeds = __fragmented_ligands.seeds();
+
+		std::vector<std::pair<double, std::string>> seed_score_map;
+
+		for ( const auto &seed : all_seeds ) {
+			Molib::PDBreader spdb (__name + "_" + Path::join( Path::join(cmdl.top_seeds_dir(), seed.name()),
+			                                                  cmdl.top_seeds_file()), Molib::PDBreader::first_model);
+
+			Molib::Molecules seed_molec = spdb.parse_molecule();
+			seed_score_map.push_back( {std::stod( seed_molec.first().name()), seed.name()} );
+		}
+
+		std::sort(seed_score_map.begin(), seed_score_map.end() );
+
+		return seed_score_map;
 	}
 
 }

@@ -186,12 +186,14 @@ namespace Program {
 
 			po::options_description design_step ("Automated Design Options");
 			design_step.add_options()
-			("target_dir",      po::value<std::string>()->default_value(""))
-			("antitarget_dir",  po::value<std::string>()->default_value(""))
-			("skip_initial_linking",     po::value<bool>()->default_value(false))
-			("skip_anitarget_linking",   po::value<bool>()->default_value(false))
-			("number_of_seeds_to_add",   po::value<int>()->default_value(50))
-			("number_of_seeds_to_avoid", po::value<int>()->default_value(50))
+			("target_dir",          po::value<std::string>()->default_value(""))
+			("antitarget_dir",      po::value<std::string>()->default_value(""))
+			("target_linking",      po::value<bool>()->default_value(true,"true"))
+			("anitarget_linking",   po::value<bool>()->default_value(true,"true"))
+			("seeds_to_add",        po::value<int>()->default_value(50))
+			("seeds_to_avoid",      po::value<int>()->default_value(50))
+			("seeds_till_good",     po::value<int>()->default_value(-1))
+			("seeds_till_bad",      po::value<int>()->default_value(5000))
 			;
 
 			po::options_description config_options;

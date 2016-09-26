@@ -40,6 +40,10 @@ namespace Program {
 			return __ligand_idatm_types;
 		}
 
+		const std::set<int>& all_seeds() const {
+			return __added;
+		}
+
 	};
 
 }

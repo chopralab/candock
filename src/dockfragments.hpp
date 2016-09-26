@@ -45,6 +45,8 @@ namespace Program {
 						__name(name)
 						{}
 
+		std::vector<std::pair<double, std::string>> get_best_seeds (const CmdLnOpts &cmdl);
+
 	};
 
 }
