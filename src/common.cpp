@@ -28,7 +28,7 @@ namespace common {
 		lock_guard<std::mutex> guard(mtx);
 		++ligand_cnt;
 		for (auto &presidue : ligand.get_residues()) {
-			presidue->set_resn("ligand_" + help::to_string(ligand_cnt));
+			presidue->set_resn("ligand_" + std::to_string(ligand_cnt));
 		}
 	}
 
@@ -42,7 +42,7 @@ namespace common {
 			if (fragment.is_seed()) {
 
 				dbgmsg("reading top_seeds_file for seed id = " << fragment.get_seed_id());
-				Molib::PDBreader pdb(Path::join(Path::join(top_seeds_dir, help::to_string(fragment.get_seed_id())), 
+				Molib::PDBreader pdb(Path::join(Path::join(top_seeds_dir, std::to_string(fragment.get_seed_id())), 
 					top_seeds_file), Molib::PDBreader::all_models);
 					
 				Molib::Molecules all = pdb.parse_molecule();
@@ -58,7 +58,7 @@ namespace common {
 				Molib::Molecules &last = top_seeds.add(new Molib::Molecules(all));
 
 				if (last.empty()) {
-					throw Error("die : there are no docked conformations for seed " + help::to_string(fragment.get_seed_id()));
+					throw Error("die : there are no docked conformations for seed " + std::to_string(fragment.get_seed_id()));
 				}
 			}
 		}
@@ -76,7 +76,7 @@ namespace common {
 						dbgmsg("added " << fragment.get_seed_id());
 						added.insert(fragment.get_seed_id());
 						// add to new molecules
-						Molib::Molecule &seed = seeds.add(new Molib::Molecule(help::to_string(fragment.get_seed_id())));
+						Molib::Molecule &seed = seeds.add(new Molib::Molecule(std::to_string(fragment.get_seed_id())));
 						Molib::Assembly &a = seed.add(new Molib::Assembly(0));
 						Molib::Model &mod = a.add(new Molib::Model(1));
 						Molib::Chain &c = mod.add(new Molib::Chain('X'));
@@ -103,7 +103,7 @@ namespace common {
 						dbgmsg("added " << fragment.get_seed_id());
 						added.insert(fragment.get_seed_id());
 						// add to new molecules
-						Molib::Molecule &seed = seeds.add(new Molib::Molecule(help::to_string(fragment.get_seed_id())));
+						Molib::Molecule &seed = seeds.add(new Molib::Molecule(std::to_string(fragment.get_seed_id())));
 						Molib::Assembly &a = seed.add(new Molib::Assembly(0));
 						Molib::Model &mod = a.add(new Molib::Model(1));
 						Molib::Chain &c = mod.add(new Molib::Chain('X'));

@@ -7,6 +7,7 @@
 #include <gsl/gsl_errno.h>
 #include <gsl/gsl_spline.h>
 #include <math.h>
+#include <string>
 
 namespace Molib {
 	ostream& operator<< (ostream& stream, const vector<double> &energy) {
@@ -69,7 +70,7 @@ namespace Molib {
 			}
 			const string &filename = idatm_type1 + "_" + idatm_type2 + ".txt";
 			
-			inout::Inout::file_open_put_stream(Path::join(Path::join(obj_dir, help::to_string(__step_non_bond)), filename), ss);
+			inout::Inout::file_open_put_stream(Path::join(Path::join(obj_dir, std::to_string(__step_non_bond)), filename), ss);
 		}
 	}
 
@@ -84,7 +85,7 @@ namespace Molib {
 			const string &filename = idatm_type1 + "_" + idatm_type2 + ".txt";
 
 			vector<string> contents;
-			inout::Inout::read_file(Path::join(Path::join(obj_dir, help::to_string(__step_non_bond)), filename), contents);
+			inout::Inout::read_file(Path::join(Path::join(obj_dir, std::to_string(__step_non_bond)), filename), contents);
 			
 			for (auto &line : contents) {
 				stringstream ss(line);
@@ -370,7 +371,7 @@ namespace Molib {
 				int i = 0;
 				for (double xi = dataX.front(); xi <= dataX.back(); xi += __step_non_bond) {
 					if (xi >= x1 && xi <=x2) {
-						datapoints += help::to_string(xi) + " " + help::to_string(potential[i]) + "\n";
+						datapoints += std::to_string(xi) + " " + std::to_string(potential[i]) + "\n";
 					}
 					++i;
 				}

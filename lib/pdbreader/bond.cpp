@@ -209,8 +209,8 @@ namespace Molib {
 
 	ostream& operator<< (ostream& stream, const Bond& b) {
 		return stream << "(address = " << &b << " atom1 = " 
-			<< (b.__atom1 ? help::to_string(b.atom1().atom_number()) : "nullptr")
-			<< ", atom2 = " << (b.__atom2 ? help::to_string(b.atom2().atom_number()) : "nullptr") 
+			<< (b.__atom1 ? std::to_string(b.atom1().atom_number()) : "nullptr")
+			<< ", atom2 = " << (b.__atom2 ? std::to_string(b.atom2().atom_number()) : "nullptr") 
 			<< ", bond_gaff_type = " << b.get_bond_gaff_type() << ", rotatable = " 
 			<< b.get_rotatable() << ", aromatic = " << boolalpha << b.is_aromatic() << ")";
 	}

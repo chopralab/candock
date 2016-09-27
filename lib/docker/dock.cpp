@@ -196,7 +196,7 @@ namespace Docker {
 				atom.set_crd(pgpoint->crd());
 			}
 			// save the conformation
-			__docked.add(new Molib::Molecule(__seed)).set_name(help::to_string(conf.get_energy())); // molecule name is energy
+			__docked.add(new Molib::Molecule(__seed)).set_name(std::to_string(conf.get_energy())); // molecule name is energy
 			dbgmsg("conformation energy = " << conf.get_energy() 
 				<< " calculated energy = " << __score.non_bonded_energy(__gridrec, __seed));
 
