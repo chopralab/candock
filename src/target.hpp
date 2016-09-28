@@ -44,7 +44,7 @@ namespace Program {
 		void dock_fragments(const Molib::Score& score, const FragmentLigands& ligand_fragments, const CmdLnOpts& cmdl);
 		void link_fragments(const Molib::Score& score, const CmdLnOpts& cmdl);
 		
-		void determine_overlapping_seeds(const int max_seeds, const int number_of_occurances, const bool is_anti_target);
+		std::multiset<std::string> determine_overlapping_seeds(const int max_seeds, const int number_of_occurances, const bool is_anti_target);
 	};
 
 }

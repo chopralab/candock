@@ -89,7 +89,7 @@ namespace Program {
 		}
 	}
 
-	void Target::determine_overlapping_seeds(const int max_seeds, const int number_of_occurances, const bool is_anti_target) { //TODO: Remove cmdl dependency
+	std::multiset<std::string> Target::determine_overlapping_seeds(const int max_seeds, const int number_of_occurances, const bool is_anti_target) { //TODO: Remove cmdl dependency
 
 		std::multiset<std::string> good_seed_list;
 
@@ -110,6 +110,7 @@ namespace Program {
 				++c;
 			}
 		}
-		
+
+		return good_seed_list;
 	}
 }

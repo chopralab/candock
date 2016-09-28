@@ -15,6 +15,8 @@
 #include "helper/inout.hpp"
 #include "target.hpp"
 
+#include <algorithm>
+
 using namespace std;
 
 /*****************************************************************************
@@ -43,10 +45,12 @@ int main(int argc, char* argv[]) {
 		Program::FragmentLigands ligand_fragmenter;
 		ligand_fragmenter.run_step(cmdl);
 
+		//TODO: Combine into one class?????
 		Program::Target targets (cmdl.get_string_option("target_dir"));
 		targets.find_centroids(cmdl);
 		
-		//Program::Target anitargets(cmdl, "antitarget_dir");
+		Program::Target antitargets(cmdl.get_string_option("antitarget_dir"));
+		antitargets.find_centroids(cmdl);
 
 		/* Read distributions file and initialize scores
 		 * 
@@ -54,7 +58,9 @@ int main(int argc, char* argv[]) {
 		Molib::Score score(cmdl.ref_state(), cmdl.comp(), cmdl.rad_or_raw(), cmdl.dist_cutoff(), 
 			cmdl.step_non_bond());
 
-		score.define_composition(targets.get_idatm_types(), ligand_fragmenter.ligand_idatm_types())
+		//TODO: Make this prettier
+		score.define_composition(targets.get_idatm_types(antitargets.get_idatm_types()),
+								 ligand_fragmenter.ligand_idatm_types())
 			.process_distributions_file(cmdl.distributions_file())
 			.compile_scoring_function()
 			.parse_objective_function(cmdl.obj_dir(), cmdl.scale_non_bond());
@@ -62,8 +68,16 @@ int main(int argc, char* argv[]) {
 		dbgmsg("START SCORE" << endl << score << "END SCORE");
 
 		targets.dock_fragments(score, ligand_fragmenter, cmdl);
+		antitargets.dock_fragments(score, ligand_fragmenter, cmdl);
 
-		targets.determine_overlapping_seeds(cmdl.get_int_option("seeds_to_add"), cmdl.get_int_option("seeds_till_good"), false);
+		multiset<string>  target_seeds =     targets.determine_overlapping_seeds(cmdl.get_int_option("seeds_to_add"), cmdl.get_int_option("seeds_till_good"), false);
+		multiset<string> atarget_seeds = antitargets.determine_overlapping_seeds(cmdl.get_int_option("seeds_to_avoid"), cmdl.get_int_option("seeds_till_bad"), true);
+
+		set<string> solo_target_seeds;
+		std::set_difference( target_seeds.begin(),  target_seeds.end(),
+							atarget_seeds.begin(), atarget_seeds.end(),
+							std::inserter(solo_target_seeds, solo_target_seeds.end())
+		);
 
 		OMMIface::SystemTopology::loadPlugins();
 		targets.link_fragments(score, cmdl);
