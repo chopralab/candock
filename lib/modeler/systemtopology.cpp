@@ -325,7 +325,7 @@ namespace OMMIface {
 	}
 	
 	void SystemTopology::init_bonded(Topology &topology, const bool use_constraints) {
-			
+
 		int warn = 0;
 
 		bondStretchData.resize(topology.atoms.size());
@@ -341,17 +341,17 @@ namespace OMMIface {
 		system->addForce(bondTorsion);
 
 		dbgmsg("initializing openmm");
-		
+
 		// Process the bonds:
 		//  (1) If we're using constraints, tell System about constrainable bonds;
 		//      otherwise, tell HarmonicBondForce the bond stretch parameters 
 		//      (tricky units!).
 		//  (2) Create a list of bonds for generating nonbond exclusions.
-		
+
 		int force_idx = 0;
-		
 		for (auto &bond : topology.bonds) {
 			dbgmsg("checkpoint0");
+			
 			const Molib::Atom &atom1 = *bond.first;
 			dbgmsg(atom1);
 			const Molib::Atom &atom2 = *bond.second;
@@ -364,18 +364,16 @@ namespace OMMIface {
 			dbgmsg(type1);
 			const int type2 = topology.get_type(atom2);
 			dbgmsg(type2);
-			
+
 			ForceField::BondType btype;
-			
-			try {				
+
+			try {
 				btype = __ffield->get_bond_type(type1, type2);
-				
 			} catch (ParameterError& e) {
 				cerr << e.what() << " (WARNINGS ARE NOT INCREASED) (using default parameters for this bond)" << endl;
 				// if everything else fails just constrain at something reasonable
 				btype = ForceField::BondType{atom1.get_bond(atom2).length(), 250000, false};
 			}
-			
 			if (use_constraints && btype.can_constrain) { // Should we constrain C-H bonds?
 				system->addConstraint(idx1, idx2, btype.length);
 			} else {
@@ -407,9 +405,9 @@ namespace OMMIface {
 			const int type2 = topology.get_type(atom2);
 			const int type3 = topology.get_type(atom3);
 			dbgmsg("checkpoint6");
-			
+
 			ForceField::AngleType atype;
-			
+
 			try {
 				dbgmsg("determining angle type between atoms : " << endl
 					<< atom1 << endl << atom2 << endl << atom3);
@@ -425,12 +423,12 @@ namespace OMMIface {
 			bondBendData[idx1].push_back(ForceData{force_idx, idx1, idx2, idx3, 0, 0, atype.angle, 0, 0, atype.k});
 			bondBendData[idx2].push_back(ForceData{force_idx, idx1, idx2, idx3, 0, 0, atype.angle, 0, 0, atype.k});
 			bondBendData[idx3].push_back(ForceData{force_idx, idx1, idx2, idx3, 0, 0, atype.angle, 0, 0, atype.k});
-			
+
 			++force_idx;
 
 			dbgmsg("checkpoint8");
 		}
-		
+
 		force_idx = 0;
 		// Create the 1-2-3-4 bond torsion (dihedral) terms.
 		for (auto &dihedral : topology.dihedrals) {
@@ -467,7 +465,7 @@ namespace OMMIface {
 				cerr << e.what() << " (" << ++warn << ")" << endl;
 			}
 		}
-		
+
 		// Create the 1-2-3-4 improper terms where 3 is the central atom
 		for (auto &dihedral : topology.impropers) {
 			dbgmsg("checkpoint9");

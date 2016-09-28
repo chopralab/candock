@@ -49,9 +49,9 @@ int main(int argc, char* argv[]) {
 		Molib::Molecules receptors = rpdb.parse_molecule();
 
 		/* Run section of Candock designed to find binding sites
- 		 * Currently, this runs ProBIS and does not require any
- 		 * previous step to be competed.
- 		 *
+		 * Currently, this runs ProBIS and does not require any
+		 * previous step to be competed.
+		 *
 		 */
 
 		Program::FindCentroids find_centroids(receptors[0]);
@@ -96,7 +96,7 @@ int main(int argc, char* argv[]) {
 		dbgmsg("START SCORE" << endl << score << "END SCORE");
 
 		Program::DockFragments fragment_docker( find_centroids, ligand_fragmenter,
-													score, gridrec );
+												score, gridrec );
 		fragment_docker.run_step(cmdl);
 		
 		/* Prepare receptor for molecular mechanics: histidines, N-[C-]terminals,
