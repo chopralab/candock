@@ -111,14 +111,15 @@ namespace Program {
 
 	}
 
-	std::vector<std::pair<double, std::string>> DockFragments::get_best_seeds(const CmdLnOpts& cmdl) {
+	std::vector<std::pair<double, std::string>> DockFragments::get_best_seeds() {
 		const Molib::Molecules& all_seeds = __fragmented_ligands.seeds();
 
 		std::vector<std::pair<double, std::string>> seed_score_map;
 
 		for ( const auto &seed : all_seeds ) {
-			Molib::PDBreader spdb (__name + "_" + Path::join( Path::join(cmdl.top_seeds_dir(), seed.name()),
-			                                                  cmdl.top_seeds_file()), Molib::PDBreader::first_model);
+			//FIXME: Do not read from disk here
+			Molib::PDBreader spdb (__name + "_" + Path::join( Path::join(__cmdl.top_seeds_dir(), seed.name()),
+			                                                  __cmdl.top_seeds_file()), Molib::PDBreader::first_model);
 
 			Molib::Molecules seed_molec = spdb.parse_molecule();
 			seed_score_map.push_back( {std::stod( seed_molec.first().name()), seed.name()} );

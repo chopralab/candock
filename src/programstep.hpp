@@ -6,6 +6,7 @@
 
 namespace Program {
 
+	// TODO: Possibly introduce an iterator function to iterator over results
 	class ProgramStep {
 	protected:
 		virtual bool __can_read_from_files(const CmdLnOpts& cmdl) = 0;

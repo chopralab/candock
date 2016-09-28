@@ -25,6 +25,8 @@ namespace Program {
 
 		Molib::NRset __all_seeds;
 
+		const CmdLnOpts& __cmdl; //TODO: remove this dependency
+
 		void __dock_fragment(int start, const Docker::Gpoints& gpoints, const Docker::Gpoints& gpoints0, const CmdLnOpts& cmdl);
 	protected:
 		virtual bool __can_read_from_files(const CmdLnOpts& cmdl);
@@ -36,16 +38,18 @@ namespace Program {
 						const FragmentLigands& fragmented_ligands,
 						const Molib::Score& score,
 						const Molib::Atom::Grid& gridrec,
-						const std::string& name
- 						) :
+						const std::string& name,
+						const CmdLnOpts& cmdl
+					  ) :
 						__found_centroids(found_centroids),
 						__fragmented_ligands(fragmented_ligands),
 						__score(score),
 						__gridrec(gridrec),
-						__name(name)
+						__name(name),
+						__cmdl(cmdl)
 						{}
 
-		std::vector<std::pair<double, std::string>> get_best_seeds (const CmdLnOpts &cmdl);
+		std::vector<std::pair<double, std::string>> get_best_seeds ();
 
 	};
 

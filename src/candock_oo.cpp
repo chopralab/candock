@@ -43,7 +43,7 @@ int main(int argc, char* argv[]) {
 		Program::FragmentLigands ligand_fragmenter;
 		ligand_fragmenter.run_step(cmdl);
 
-		Program::Target targets   (cmdl.get_string_option("target_dir"));
+		Program::Target targets (cmdl.get_string_option("target_dir"));
 		targets.find_centroids(cmdl);
 		
 		//Program::Target anitargets(cmdl, "antitarget_dir");
@@ -63,7 +63,7 @@ int main(int argc, char* argv[]) {
 
 		targets.dock_fragments(score, ligand_fragmenter, cmdl);
 
-		targets.determine_overlapping_seeds(cmdl);
+		targets.determine_overlapping_seeds(cmdl.get_int_option("seeds_to_add"), cmdl.get_int_option("seeds_till_good"), false);
 
 		OMMIface::SystemTopology::loadPlugins();
 		targets.link_fragments(score, cmdl);

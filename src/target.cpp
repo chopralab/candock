@@ -67,7 +67,7 @@ namespace Program {
 
 	void Target::dock_fragments(const Molib::Score& score, const FragmentLigands& ligand_fragments, const CmdLnOpts& cmdl) {
 		for ( auto &a : __preprecs ) {
-			std::unique_ptr<DockFragments> pdockfragments(new DockFragments(*a.centroids, ligand_fragments, score, *a.gridrec, a.protein.name()));
+			std::unique_ptr<DockFragments> pdockfragments(new DockFragments(*a.centroids, ligand_fragments, score, *a.gridrec, a.protein.name(), cmdl));
 			pdockfragments->run_step(cmdl);
 			a.prepseeds = std::move(pdockfragments);
 		}
@@ -89,14 +89,13 @@ namespace Program {
 		}
 	}
 
-	void Target::determine_overlapping_seeds(const CmdLnOpts& cmdl) { //TODO: Remove cmdl dependency
+	void Target::determine_overlapping_seeds(const int max_seeds, const int number_of_occurances, const bool is_anti_target) { //TODO: Remove cmdl dependency
 
 		std::multiset<std::string> good_seed_list;
 
 		for ( auto &a : __preprecs ) {
-			auto result = a.prepseeds->get_best_seeds(cmdl);
+			auto result = a.prepseeds->get_best_seeds();
 
-			int max_seeds = cmdl.get_int_option("seeds_to_add");
 			if ( max_seeds != -1 && max_seeds < result.size()) 
 				result.resize( max_seeds );
 
@@ -105,8 +104,8 @@ namespace Program {
 		}
 
 		for ( auto c = good_seed_list.cbegin(); c != good_seed_list.cend(); ) {
-			if (static_cast<int>(good_seed_list.count(*c)) < cmdl.get_int_option("seeds_till_good")) {
-				good_seed_list.erase(c);
+			if ((static_cast<int>(good_seed_list.count(*c)) < number_of_occurances) && !is_anti_target) {
+				c = good_seed_list.erase(c);
 			} else {
 				++c;
 			}
