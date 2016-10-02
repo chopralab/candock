@@ -193,7 +193,7 @@ namespace Program {
 			("seeds_to_add",        po::value<int>()->default_value(50))
 			("seeds_to_avoid",      po::value<int>()->default_value(50))
 			("seeds_till_good",     po::value<int>()->default_value(-1))
-			("seeds_till_bad",      po::value<int>()->default_value(5000))
+			("seeds_till_bad",      po::value<int>()->default_value(-1))
 			;
 
 			po::options_description config_options;

@@ -89,7 +89,7 @@ namespace Program {
 		}
 	}
 
-	std::multiset<std::string> Target::determine_overlapping_seeds(const int max_seeds, const int number_of_occurances, const bool is_anti_target) { //TODO: Remove cmdl dependency
+	std::multiset<std::string> Target::determine_overlapping_seeds(const int max_seeds, const int number_of_occurances) {
 
 		std::multiset<std::string> good_seed_list;
 
@@ -104,7 +104,7 @@ namespace Program {
 		}
 
 		for ( auto c = good_seed_list.cbegin(); c != good_seed_list.cend(); ) {
-			if ((static_cast<int>(good_seed_list.count(*c)) < number_of_occurances) && !is_anti_target) {
+			if (static_cast<int>(good_seed_list.count(*c)) < number_of_occurances) {
 				c = good_seed_list.erase(c);
 			} else {
 				++c;

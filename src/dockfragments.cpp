@@ -1,6 +1,7 @@
 #include "dockfragments.hpp"
 
 #include "helper/path.hpp"
+#include "helper/inout.hpp"
 
 namespace Program {
 
@@ -112,17 +113,25 @@ namespace Program {
 	}
 
 	std::vector<std::pair<double, std::string>> DockFragments::get_best_seeds() {
+		
+		//std::vector<string> seeds_to_add = inout::Inout::files_matching_pattern(__name + "_" + __cmdl.top_seeds_dir(), "*/" + __cmdl.top_seeds_file());
+		
 		const Molib::Molecules& all_seeds = __fragmented_ligands.seeds();
 
 		std::vector<std::pair<double, std::string>> seed_score_map;
 
 		for ( const auto &seed : all_seeds ) {
 			//FIXME: Do not read from disk here
-			Molib::PDBreader spdb (__name + "_" + Path::join( Path::join(__cmdl.top_seeds_dir(), seed.name()),
-			                                                  __cmdl.top_seeds_file()), Molib::PDBreader::first_model);
+			dbgmsg("Reading: " << seed.name() << endl);
+			try {
+				Molib::PDBreader spdb (__name + "_" + Path::join( Path::join(__cmdl.top_seeds_dir(), seed.name()),
+			                                                      __cmdl.top_seeds_file()), Molib::PDBreader::first_model, 1);
 
-			Molib::Molecules seed_molec = spdb.parse_molecule();
-			seed_score_map.push_back( {std::stod( seed_molec.first().name()), seed.name()} );
+				Molib::Molecules seed_molec = spdb.parse_molecule();
+				seed_score_map.push_back( {std::stod( seed_molec.first().name()), seed.name()} );
+			} catch ( Error e) {
+					cerr << "Skipping seed " << seed.name() << " because " << e.what() << endl;
+			}
 		}
 
 		std::sort(seed_score_map.begin(), seed_score_map.end() );

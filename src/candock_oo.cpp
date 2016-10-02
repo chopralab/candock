@@ -70,8 +70,9 @@ int main(int argc, char* argv[]) {
 		targets.dock_fragments(score, ligand_fragmenter, cmdl);
 		antitargets.dock_fragments(score, ligand_fragmenter, cmdl);
 
-		multiset<string>  target_seeds =     targets.determine_overlapping_seeds(cmdl.get_int_option("seeds_to_add"), cmdl.get_int_option("seeds_till_good"), false);
-		multiset<string> atarget_seeds = antitargets.determine_overlapping_seeds(cmdl.get_int_option("seeds_to_avoid"), cmdl.get_int_option("seeds_till_bad"), true);
+		cout << "Determining the best seeds to add" << endl;
+		multiset<string>  target_seeds =     targets.determine_overlapping_seeds(cmdl.get_int_option("seeds_to_add"),   cmdl.get_int_option("seeds_till_good"));
+		multiset<string> atarget_seeds = antitargets.determine_overlapping_seeds(cmdl.get_int_option("seeds_to_avoid"), cmdl.get_int_option("seeds_till_bad"));
 
 		set<string> solo_target_seeds;
 		std::set_difference( target_seeds.begin(),  target_seeds.end(),
@@ -80,7 +81,12 @@ int main(int argc, char* argv[]) {
 		);
 
 		OMMIface::SystemTopology::loadPlugins();
-		targets.link_fragments(score, cmdl);
+
+		if (cmdl.get_bool_option("target_linking"))
+			targets.link_fragments(score, cmdl);
+
+		if (cmdl.get_bool_option("antitarget_linking"))
+			antitargets.link_fragments(score,cmdl);
 
 		cmdl.display_time("finished");
 
