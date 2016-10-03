@@ -8,15 +8,17 @@
 #include "ligands/genclus.hpp"
 #include "pdbreader/molecules.hpp"
 
+#include "helper/path.hpp"
+
 namespace Program {
 	
 	bool FindCentroids::__can_read_from_files( const CmdLnOpts& cmdl ) {
-		return inout::Inout::file_size( __receptor.name() + "_" + cmdl.centroid_file() ) > 0;
+		return inout::Inout::file_size( Path::join(__receptor.name(), cmdl.centroid_file()) ) > 0;
 	}
 
 	void FindCentroids::__read_from_files( const CmdLnOpts& cmdl ) {
 		cout << "Reading " << cmdl.num_bsites() << " binding sites from " << __receptor.name() + "_" + cmdl.centroid_file() << endl;
-		__result = Centro::set_centroids(__receptor.name() + "_" + cmdl.centroid_file(), cmdl.num_bsites());
+		__result = Centro::set_centroids( Path::join(__receptor.name(), cmdl.centroid_file()), cmdl.num_bsites());
 	}
 
 	void FindCentroids::__continue_from_prev( const CmdLnOpts& cmdl) {
@@ -30,12 +32,12 @@ namespace Program {
 			__receptor.get_chain_ids(Molib::Residue::protein),
 			cmdl.bslib_file(),
 			cmdl.ncpu(),
-			"output/" + __receptor.name() + "_" + cmdl.nosql_file(),
-			"output/" + __receptor.name() + "_" + cmdl.json_file());
+			Path::join(__receptor.name(), cmdl.nosql_file()),
+			Path::join(__receptor.name(),cmdl.json_file()));
 
 		genclus::generate_clusters_of_ligands(
-			"output/" + __receptor.name() + "_" + cmdl.json_file(),
-			"output/" + __receptor.name() + "_" + cmdl.json_with_ligs_file(),
+			Path::join(__receptor.name(), cmdl.json_file()),
+			Path::join(__receptor.name(), cmdl.json_with_ligs_file()),
 			cmdl.bio_dir(),
 			cmdl.names_dir(),
 			cmdl.neighb(),
@@ -45,14 +47,14 @@ namespace Program {
 
 		auto binding_sites = 
 			genlig::generate_binding_site_prediction(
-				"output/" + __receptor.name() + "_" + cmdl.json_with_ligs_file(), 
+				Path::join(__receptor.name(), cmdl.json_with_ligs_file()), 
 				cmdl.bio_dir(),
 				cmdl.num_bsites());
 
-		inout::output_file(binding_sites.first,  "output/" + __receptor.name() + "_" + cmdl.lig_clus_file());
-		inout::output_file(binding_sites.second, "output/" + __receptor.name() + "_" + cmdl.z_scores_file());
+		inout::output_file(binding_sites.first,  Path::join(__receptor.name(), cmdl.lig_clus_file()));
+		inout::output_file(binding_sites.second, Path::join(__receptor.name(), cmdl.z_scores_file()));
 
 		__result = Centro::set_centroids(binding_sites.first, cmdl.centro_clus_rad());
-		inout::output_file(__result, __receptor.name() + "_" + cmdl.centroid_file()); // probis local structural alignments
+		inout::output_file(__result, Path::join(__receptor.name(), cmdl.centroid_file())); // probis local structural alignments
 	}
 }

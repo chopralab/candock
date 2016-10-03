@@ -25,6 +25,15 @@ namespace Program {
 		while (lpdb2.parse_molecule(ligands)) {
 	
 			Molib::Molecule &ligand = ligands.first();
+
+			boost::filesystem::path p(__receptor.name());
+			p = p / cmdl.docked_dir() / (ligand.name() + ".pdb");
+			if ( inout::Inout::file_size(p.string()) > 0) {
+				cout << ligand.name() << " is alread docked to " << __receptor.name() << ", skipping." << endl;
+				ligands.clear();
+				continue;
+			}
+
 			dbgmsg("LINKING LIGAND : " << endl << ligand);
 
 			/**
@@ -39,9 +48,9 @@ namespace Program {
 
 				/** 
 				 * Read top seeds for this ligand
-				 */	 
+				 */
 				Molib::NRset top_seeds = common::read_top_seeds_files(ligand,
-						__receptor.name() + "_" + cmdl.top_seeds_dir(), cmdl.top_seeds_file(), cmdl.top_percent());
+						Path::join(__receptor.name(), cmdl.top_seeds_dir()), cmdl.top_seeds_file(), cmdl.top_percent());
 
 				ligand.erase_properties(); // required for graph matching
 				top_seeds.erase_properties(); // required for graph matching
@@ -77,10 +86,13 @@ namespace Program {
 				for (auto &docked : docks) {
 					common::change_residue_name(docked.get_ligand(), "CAN"); 
 					inout::output_file(Molib::Molecule::print_complex(docked.get_ligand(), docked.get_receptor(), docked.get_energy()), 
-							__receptor.name() + "_" + Path::join(cmdl.docked_dir(), ligand.name() + ".pdb" ) , ios_base::app); // output docked molecule conformations
+							p.string(), ios_base::app); // output docked molecule conformations
 				}
 			} catch (exception& e) { 
 				cerr << "Error: skipping ligand " << ligand.name() << " due to : " << e.what() << endl;
+				stringstream ss;
+				ss << "REMARK  20 non-binder with " << __receptor.name() << " because " << e.what() << endl << ligand;
+				inout::Inout::file_open_put_stream(p.string(), ss, ios_base::app);
 			} 
 			ffcopy.erase_topology(ligand); // he he
 			ligands.clear();

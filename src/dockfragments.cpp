@@ -13,8 +13,9 @@ namespace Program {
 
 		// No early return so that we have the ability to redock missing seeds
 		for (const auto& seed : all_seeds) {
-			all_seeds_are_present &= inout::Inout::file_size( __name + "_" + Path::join( Path::join(cmdl.top_seeds_dir(), seed.name()),
-			                                                  cmdl.top_seeds_file() ) ) > 0;
+			boost::filesystem::path p (__name);
+			p = p / cmdl.top_seeds_dir() / seed.name() / cmdl.top_seeds_file();
+			all_seeds_are_present &= inout::Inout::file_size(p.string()) > 0;
 		}
 		
 		return all_seeds_are_present;
@@ -29,10 +30,10 @@ namespace Program {
 		// iterate over docked seeds and dock unique seeds
 		for (int j = start; j < __fragmented_ligands.seeds().size(); j+= cmdl.ncpu()) {
 			try {
-				
-				int file_exist_check = inout::Inout::file_size( __name + "_" + Path::join( Path::join(cmdl.top_seeds_dir(), __fragmented_ligands.seeds()[j].name()),
-			                                                  cmdl.top_seeds_file() ) ) > 0;
-				
+				boost::filesystem::path p (__name);
+				p = p / cmdl.top_seeds_dir() / __fragmented_ligands.seeds()[j].name() / cmdl.top_seeds_file();
+				int file_exist_check = inout::Inout::file_size(p.string()) > 0;
+
 				if ( file_exist_check > 0 ) {
 					cout << "Skipping docking of seed: " << __fragmented_ligands.seeds()[j].name() << " because it is already docked!" << endl;
 					continue;
@@ -64,9 +65,8 @@ namespace Program {
 
 				dock.run();
 
-				inout::output_file(dock.get_docked(), __name + "_" + Path::join(Path::join(cmdl.top_seeds_dir(), dock.get_docked().name()),
-					cmdl.top_seeds_file())); // output docked & clustered seeds
-	
+				inout::output_file(dock.get_docked(), p.string()); // output docked & clustered seeds
+
 			}
 			catch (exception& e) {
 				cerr << "skipping seed due to : " << e.what() << endl;
@@ -85,7 +85,7 @@ namespace Program {
 		Docker::Gpoints gpoints(__score, __fragmented_ligands.ligand_idatm_types(), __found_centroids.centroids(),
 			__gridrec, cmdl.grid_spacing(), cmdl.dist_cutoff(), cmdl.excluded_radius(), 
 			cmdl.max_interatomic_distance());
-		inout::output_file(gpoints, __name + "_" + cmdl.gridpdb_hcp_file());
+		inout::output_file(gpoints, Path::join(__name, cmdl.gridpdb_hcp_file()));
 
 		/* Create a zero centered centroid with 10 A radius (max fragment 
 		 * radius) for getting all conformations of each seed
@@ -124,13 +124,14 @@ namespace Program {
 			//FIXME: Do not read from disk here
 			dbgmsg("Reading: " << seed.name() << endl);
 			try {
-				Molib::PDBreader spdb (__name + "_" + Path::join( Path::join(__cmdl.top_seeds_dir(), seed.name()),
-			                                                      __cmdl.top_seeds_file()), Molib::PDBreader::first_model, 1);
+				boost::filesystem::path p (__name);
+				p = p / __cmdl.top_seeds_dir() / seed.name() / __cmdl.top_seeds_file();
+				Molib::PDBreader spdb (p.string(), Molib::PDBreader::first_model, 1);
 
 				Molib::Molecules seed_molec = spdb.parse_molecule();
 				seed_score_map.push_back( {std::stod( seed_molec.first().name()), seed.name()} );
 			} catch ( Error e) {
-					cerr << "Skipping seed " << seed.name() << " because " << e.what() << endl;
+					cerr << "Skipping seed " << seed.name() << " in " << __name << " because " << e.what() << endl;
 			}
 		}
 
