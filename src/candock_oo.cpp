@@ -58,7 +58,7 @@ int main(int argc, char* argv[]) {
 		Molib::Score score(cmdl.ref_state(), cmdl.comp(), cmdl.rad_or_raw(), cmdl.dist_cutoff(), 
 			cmdl.step_non_bond());
 
-		//TODO: Make this prettier
+		//TODO: Make specific to each protein
 		score.define_composition(targets.get_idatm_types(antitargets.get_idatm_types()),
 								 ligand_fragmenter.ligand_idatm_types())
 			.process_distributions_file(cmdl.distributions_file())
@@ -67,7 +67,7 @@ int main(int argc, char* argv[]) {
 
 		dbgmsg("START SCORE" << endl << score << "END SCORE");
 
-		targets.dock_fragments(score, ligand_fragmenter, cmdl);
+		    targets.dock_fragments(score, ligand_fragmenter, cmdl);
 		antitargets.dock_fragments(score, ligand_fragmenter, cmdl);
 
 		cout << "Determining the best seeds to add" << endl;

@@ -44,6 +44,10 @@ namespace Program {
 			// if docking of one ligand fails, docking of others shall continue...
 			try { 
 
+				if ( ligand.first().first().get_rigid().size() < 1 ) {
+					throw Error("No seeds to link");
+				}
+
 				ffcopy.insert_topology(ligand);
 
 				/** 
