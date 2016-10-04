@@ -44,14 +44,18 @@ namespace Molib {
 		Atom& add(Atom *a) { return this->aadd(a->atom_number(), a, this); }
 		string resn() const { return __resn; }
 		void set_resn(const string &resn) { __resn = resn; }
+		void set_resi(int resi) { __resi = resi; }
 		int resi() const { return __resi; }
 		char ins_code() const { return __ins_code; }
 		Residue::res_type rest() const { return __rest; }
 		Atom& atom(int p) const { return this->element(p); }
 		bool has_atom(int p) { return this->has_element(p); }
 		Atom::Vec get_atoms() const;
+		void renumber_atoms(int new_start);
 		Residue& erase_properties() { for (auto &atom : *this) atom.erase_properties(); return *this; }
-		
+
+		Residue& regenerate_bonds(const Residue&);
+
 		friend ostream& operator<< (ostream& stream, const Residue& r);
 	};
 

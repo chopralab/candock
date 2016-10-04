@@ -1,6 +1,9 @@
+include_directories($CMAKE_CURRENT_SOURCE_DIR)
+
 add_subdirectory(centro)
 add_subdirectory(cluster)
 add_subdirectory(docker)
+add_subdirectory(design)
 add_subdirectory(fragmenter)
 add_subdirectory(geom3d)
 add_subdirectory(graph)

@@ -44,7 +44,7 @@ namespace Molib {
 				dbgmsg("Copy constructor : molecule");
 				add(new Assembly(assembly));
 			}
-			regenerate_bonds(rhs); 
+			regenerate_bonds(rhs);
 		}
 		Molecule(const Molib::Molecule &rhs, const Geom3D::Point::Vec &crds);
 		typedef enum {first_bio, all_bio} bio_how_many;

@@ -35,34 +35,42 @@ namespace common {
 	/* Part7a stuff
 	 * 
 	 */
-	Molib::NRset read_top_seeds_files(const Molib::Molecule &ligand, const string &top_seeds_dir, const string &top_seeds_file, const double top_percent) {
+	Molib::NRset read_top_seeds_files(const std::set<std::string> &seeds, const string &top_seeds_dir, const string &top_seeds_file, const double top_percent) {
 		Molib::NRset top_seeds;
+		for ( auto &fragment : seeds ) {
+			dbgmsg("reading top_seeds_file for seed id = " << fragment);
+			Molib::PDBreader pdb(Path::join(Path::join(top_seeds_dir, fragment), 
+								top_seeds_file), Molib::PDBreader::all_models);
+
+			Molib::Molecules all = pdb.parse_molecule();
+
+			const int sz = static_cast<int> (all.size() * top_percent);
+			dbgmsg("taking " << sz << " top seeds for seed " << fragment);
+
+			// deleting excess top seeds
+			for (int i = all.size() - 1; i > sz; --i) all.erase(i);
+
+			dbgmsg("number of top seeds left = " << all.size());
+
+			Molib::Molecules &last = top_seeds.add(new Molib::Molecules(all));
+
+			if (last.empty()) {
+				throw Error("die : there are no docked conformations for seed " + fragment);
+			}
+		}
+
+		return top_seeds;
+	}
+
+	Molib::NRset read_top_seeds_files(const Molib::Molecule &ligand, const string &top_seeds_dir, const string &top_seeds_file, const double top_percent) {
+		std::set<string> seeds_to_read;
 		const Molib::Model &model = ligand.first().first();
 		for (auto &fragment : model.get_rigid()) { // iterate over seeds
 			if (fragment.is_seed()) {
-
-				dbgmsg("reading top_seeds_file for seed id = " << fragment.get_seed_id());
-				Molib::PDBreader pdb(Path::join(Path::join(top_seeds_dir, help::to_string(fragment.get_seed_id())), 
-					top_seeds_file), Molib::PDBreader::all_models);
-					
-				Molib::Molecules all = pdb.parse_molecule();
-
-				const int sz = (int) (all.size() * top_percent);
-				dbgmsg("taking " << sz << " top seeds for seed " << fragment.get_seed_id());
-				
-				// deleting excess top seeds
-				for (int i = all.size() - 1; i > sz; --i) all.erase(i);
-				
-				dbgmsg("number of top seeds left = " << all.size());
-				
-				Molib::Molecules &last = top_seeds.add(new Molib::Molecules(all));
-
-				if (last.empty()) {
-					throw Error("die : there are no docked conformations for seed " + help::to_string(fragment.get_seed_id()));
-				}
+				seeds_to_read.insert(std::to_string(fragment.get_seed_id()));
 			}
 		}
-		return top_seeds;
+		return read_top_seeds_files(seeds_to_read, top_seeds_dir, top_seeds_file, top_percent);
 	}
 
 	void create_mols_from_seeds(set<int> &added, Molib::Molecules &seeds, const Molib::Molecules &mols) {

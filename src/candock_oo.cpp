@@ -14,8 +14,10 @@
 #include "modeler/systemtopology.hpp"
 #include "helper/inout.hpp"
 #include "target.hpp"
+#include "design/design.hpp"
 
 #include <algorithm>
+#include "common.hpp"
 
 using namespace std;
 
@@ -87,6 +89,14 @@ int main(int argc, char* argv[]) {
 
 		if (cmdl.get_bool_option("antitarget_linking"))
 			antitargets.link_fragments(score,cmdl);
+
+		Molib::PDBreader lpdb2(cmdl.prep_file(), Molib::PDBreader::all_models, 1);
+		Molib::Molecules mol;
+		lpdb2.parse_molecule(mol);
+
+		cout << "Starting Design with " << solo_target_seeds.size() << " seeds." << endl;
+		
+		inout::output_file(design::Design::add_fragments_to_existing_molecule( mol.first(), common::read_top_seeds_files(solo_target_seeds, "targets/syk/" + cmdl.top_seeds_dir(), cmdl.top_seeds_file(), cmdl.top_percent() ) ), "designed.pdb");
 
 		cmdl.display_time("finished");
 

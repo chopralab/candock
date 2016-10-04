@@ -178,5 +178,6 @@ target_link_libraries( candock_oo
                          ${OPENMM_LIBRARY}
                          ${GSL_LIBRARIES}
                          ${additional_libraries}
+                         design
                          score # another ugly hack???
                      )
