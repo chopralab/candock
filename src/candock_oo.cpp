@@ -96,7 +96,9 @@ int main(int argc, char* argv[]) {
 
 		cout << "Starting Design with " << solo_target_seeds.size() << " seeds." << endl;
 		
-		inout::output_file(design::Design::add_fragments_to_existing_molecule( mol.first(), common::read_top_seeds_files(solo_target_seeds, "targets/syk/" + cmdl.top_seeds_dir(), cmdl.top_seeds_file(), cmdl.top_percent() ) ), "designed.pdb");
+		design::Design designer( mol.first() );
+		designer.add_fragments_to_existing_molecule(common::read_top_seeds_files(solo_target_seeds, "targets/syk/" + cmdl.top_seeds_dir(), cmdl.top_seeds_file(), cmdl.top_percent() ));
+		inout::output_file(designer.get_prepared_designs(), "designed.pdb");
 
 		cmdl.display_time("finished");
 

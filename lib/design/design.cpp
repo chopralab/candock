@@ -5,35 +5,71 @@
 #include <pdbreader/bondtype.hpp>
 
 namespace design {
-	Molib::Molecules Design::add_fragments_to_existing_molecule(const Molib::Molecule& start, const Molib::NRset& nr) {
 
-		const string original_name = start.name();
+	Design::Design(const Molib::Molecule &start) : __original(start) {
+		if (__original.empty()) {
+			throw Error("Invalid molecule given for modificatiton");
+		}
+
+		// Create a new molecule, original bonds will be copied
+		Molib::Hydrogens::compute_hydrogen(__original.get_atoms());
+	}
+
+	const Molib::Molecules& Design::get_prepared_designs() {
+		cout << "ASDF" << endl;
+		for ( auto &molecule : __designs ) {
+
+			Molib::Chain   &first_chain  = molecule.first().first().first();
+			Molib::Residue &main_residue = first_chain.first();
+
+			auto starting_residue = first_chain.begin();
+			starting_residue++;
+
+			for ( auto residue = starting_residue; residue != first_chain.end(); ++residue )  {
+				if ( residue->resi() == 1 )
+					continue;
+				for ( auto &atom : *residue ) {
+					main_residue.add(new Molib::Atom(atom));
+				}
+			}
+			
+			for ( auto residue = starting_residue; residue != first_chain.end(); ++residue )  {
+				if ( residue->resi() == 1 )
+					continue;
+				for ( auto &atom : *residue ) {
+					for ( auto &bond : atom.get_bonds()) {
+						Molib::Atom &copy = main_residue.element(atom.atom_number());
+						Molib::Atom &original_bondee = bond->second_atom(atom);
+						copy.connect( main_residue.element(original_bondee.atom_number()));
+					}
+				}
+			}
+			
+			for ( auto residue = starting_residue; residue != first_chain.end(); ++residue )  {
+				if ( residue->resi() == 1 )
+					continue;
+				cout << residue->resi() << " " << residue->ins_code() << endl;
+				first_chain.erase( Molib::Residue::res_pair(residue->resi(), residue->ins_code()) );
+			}
+		}
+		
+		return __designs;
+	}
+
+	void Design::add_fragments_to_existing_molecule(const Molib::NRset& nr) {
 
 		if (nr.size() == 0) {
 			throw Error("No seeds given for modificatiton");
 		}
-		
-		if (start.empty()) {
-			throw Error("Invalid molecule given for modificatiton");
-		}
-
-		Molib::Molecules all_designs;
 
 		for ( const auto &seed : nr ) {
-
-			cout << "Attempting seed " << seed.name() << endl;
-
-			// Create a new molecule, original bonds will be copied
-			Molib::Molecule modificatiton(start);
-			Molib::Hydrogens::compute_hydrogen(modificatiton.get_atoms());
-			Molib::BondOrder::compute_bond_order(modificatiton.get_atoms());
 
 			// Copy seed as new residue, this will have its bonds in place
 			const Molib::Residue &r = seed.first().first().first().first().first();
 			Molib::Residue asmb(r);
 			asmb.regenerate_bonds(r);
-			asmb.set_resi(modificatiton.first().first().first().size() + 1);
-			asmb.renumber_atoms(modificatiton.get_atoms().size());
+			asmb.set_resi(__original.first().first().first().size() + 1);
+			asmb.renumber_atoms(__original.get_atoms().size());
 
 			// "atom" is the search atom (only used for its position and type)
 			for ( auto &atom : asmb ) {
@@ -43,7 +79,7 @@ namespace design {
 					continue;
 				}
 
-				for ( auto &start_atom : modificatiton.get_atoms() ) {
+				for ( auto &start_atom : __original.get_atoms() ) {
 
 					// Make sure the ligand atom has an open valency
 					if (start_atom->get_num_hydrogens() == 0 || start_atom->element() == Molib::Element::H) {
@@ -52,16 +88,19 @@ namespace design {
 
 					// Check to see if the atom types are the same
 					if (atom.idatm_type_unmask() == start_atom->idatm_type_unmask()) {
-						modificatiton.set_name( original_name +"_design_with_" + seed.name() + "_on_" + std::to_string(start_atom->atom_number()) );
+
+						Molib::Molecule modificatiton(__original);
+
+						modificatiton.set_name( __original.name() +"_design_with_" + seed.name() + "_on_" + std::to_string(start_atom->atom_number()) );
 
 						// Copy the new molecule into the returnable object
-						all_designs.add( new Molib::Molecule(modificatiton) );
+						__designs.add( new Molib::Molecule(modificatiton) );
 
 						// Remove all hydrogens from the original ligand (they are not needed anymore)
-						Molib::Hydrogens::erase_hydrogen(all_designs.last().get_atoms());
+						Molib::Hydrogens::erase_hydrogen(__designs.last().get_atoms());
 
 						// Add new fragment as a "residue" of the molecule
-						Molib::Chain &chain = all_designs.last().first().first().first();
+						Molib::Chain &chain = __designs.last().first().first().first();
 						chain.add(new Molib::Residue(asmb));
 						chain.last().regenerate_bonds(asmb);
 
@@ -70,30 +109,21 @@ namespace design {
 						Molib::Atom &start2 = chain.first().element( start_atom->atom_number() );
 						Molib::Atom &mod_atom = atom2.get_bonds().front()->second_atom(atom2);
 						mod_atom.connect( start2 );
-						
-						chain.last().erase(atom2.atom_number());
+
+						// Fix internal atom graph
+						for (int i = 0; i < mod_atom.size(); ++i) {
+							if (mod_atom[i].atom_number() == atom2.atom_number()) {
+								mod_atom.erase(i);
+								break;
+							}
+						}
+
 						mod_atom.erase_bond(atom2);
-						
-						Molib::Atom::Vec remover = chain.last().get_atoms();
-						remover.erase( std::remove_if( remover.begin(), remover.end(), 
-							[&atom2] (Molib::Atom *patom) -> bool {
-								return atom2.atom_number() == patom->atom_number();
-							} ), remover.end());
+						chain.last().erase(atom2.atom_number());
 					}
 				}
 			}
 		}
-
-		return all_designs.compute_hydrogen()
-				   .compute_bond_order()
-				   .compute_bond_gaff_type()
-				   .refine_idatm_type()
-				   .erase_hydrogen()  // needed because refine changes connectivities
-				   .compute_hydrogen()   // needed because refine changes connectivities
-				   .compute_ring_type()
-				   .compute_gaff_type()
-				   .compute_rotatable_bonds() // relies on hydrogens being assigned
-				   .erase_hydrogen();;
 	}
 
 }

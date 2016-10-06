@@ -114,7 +114,7 @@ namespace Molib {
 				}
 			} catch (exception &e) {
 				cerr << "errmesg : deleting molecule " << molecule.name() 
-					<< " (bond order assignment failed)" << endl;
+					<< " (bond order assignment failed) because " << e.what() << endl;
 				mols.erase_shrink(i--);
 			}
 		}

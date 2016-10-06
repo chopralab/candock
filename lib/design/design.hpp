@@ -6,9 +6,19 @@
 namespace design {
 
 	class Design {
-		Molib::NRset __designs;
+		Molib::Molecules __designs;
+		Molib::Molecule  __original;
 	public:
-		static Molib::Molecules add_fragments_to_existing_molecule(const Molib::Molecule& start, const Molib::NRset& nr);
+		
+		Design( const Molib::Molecule &start );
+		
+		void add_fragments_to_existing_molecule(const Molib::NRset& nr);
+		
+		const Molib::Molecules& get_internal_designs() const {
+			return __designs;
+		}
+		
+		const Molib::Molecules& get_prepared_designs();
 	};
 }
 
