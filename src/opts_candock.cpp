@@ -24,6 +24,8 @@ namespace Program {
 			("version,v", "Print the program version")
 			("quiet,q", "Quiet mode (default is verbose)")
 			("conifg,c", po::value<std::string> (&config_file)->default_value (""), "Configuration File")
+			("ncpu",     po::value<int> (&__ncpu)             ->default_value(-1),
+			 "Number of CPUs to use concurrently (use -1 to use all CPUs)")
 			;
 
 			po::options_description starting_inputs ("Starting Input Files");
@@ -32,8 +34,6 @@ namespace Program {
 			 "Receptor filename")
 			("ligand",   po::value<std::string> (&__ligand_file)  ->default_value("ligands.mol2"),
 			 "Ligand filename")
-			("ncpu",     po::value<int> (&__ncpu)                 ->default_value(-1),
-			 "Number of CPUs to use concurrently (use -1 to use all CPUs)")
 			;
 
 			po::options_description probis_options ("Probis (binding site indentification) Options");
@@ -240,8 +240,8 @@ namespace Program {
 			}
 
 			if (__vm.count ("version")) {
-				std::cout << __version << std::endl;
-				std::cout << __git_version << std::endl;
+				print_version();
+				exit (0);
 			}
 
 			if (!config_file.empty()) {
