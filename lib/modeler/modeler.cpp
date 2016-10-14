@@ -141,7 +141,7 @@ namespace OMMIface {
 
 
 			inout::output_file(Molib::Molecule::print_complex(minimized_ligand, minimized_receptor, energy), 
-				ligand.name() + "_frame_" + help::to_string(iter) + ".pdb");
+				ligand.name() + "_frame_" + std::to_string(iter) + ".pdb");
 #endif
 
 			__system_topology.minimize(__tolerance, __update_freq);
