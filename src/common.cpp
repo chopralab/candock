@@ -4,6 +4,7 @@
 #include "pdbreader/molecule.hpp"
 #include "helper/benchmark.hpp"
 #include "helper/path.hpp"
+#include "helper/grep.hpp"
 #include "geom3d/matrix.hpp"
 #include "geom3d/pca.hpp"
 #include "geom3d/geom3d.hpp"
@@ -37,24 +38,31 @@ namespace common {
 	 */
 	Molib::NRset read_top_seeds_files(const Molib::Molecule &ligand, const string &top_seeds_dir, const string &top_seeds_file, const double top_percent) {
 		Molib::NRset top_seeds;
+
+		boost::regex regex;
+		regex.assign("REMARK   5 MOLECULE ", boost::regex_constants::basic);
+
 		const Molib::Model &model = ligand.first().first();
 		for (auto &fragment : model.get_rigid()) { // iterate over seeds
 			if (fragment.is_seed()) {
 
+				boost::filesystem::path file_to_read(top_seeds_dir);
+				file_to_read /= std::to_string(fragment.get_seed_id());
+				file_to_read /= top_seeds_file;
+				std::ifstream file( file_to_read.c_str() );
+
+				const size_t number_of_seeds = Grep::count_matches(file, regex);
+				const int sz = static_cast<int> (number_of_seeds * top_percent);
+				dbgmsg("taking " << sz << " top seeds for seed " << fragment.get_seed_id());
+
+				// Add one in case the user is silly enough to select a top_percent of 0.000
+				Molib::PDBreader pdb( file_to_read.string(), Molib::PDBreader::all_models, sz + 1 );
+
 				dbgmsg("reading top_seeds_file for seed id = " << fragment.get_seed_id());
-				Molib::PDBreader pdb(Path::join(Path::join(top_seeds_dir, std::to_string(fragment.get_seed_id())), 
-					top_seeds_file), Molib::PDBreader::all_models);
-					
 				Molib::Molecules all = pdb.parse_molecule();
 
-				const int sz = (int) (all.size() * top_percent);
-				dbgmsg("taking " << sz << " top seeds for seed " << fragment.get_seed_id());
-				
-				// deleting excess top seeds
-				for (int i = all.size() - 1; i > sz; --i) all.erase(i);
-				
 				dbgmsg("number of top seeds left = " << all.size());
-				
+
 				Molib::Molecules &last = top_seeds.add(new Molib::Molecules(all));
 
 				if (last.empty()) {
