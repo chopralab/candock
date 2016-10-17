@@ -16,12 +16,11 @@ namespace design {
 	}
 
 	const Molib::Molecules& Design::get_prepared_designs() {
-		cout << "ASDF" << endl;
 		for ( auto &molecule : __designs ) {
 
 			Molib::Chain   &first_chain  = molecule.first().first().first();
 			Molib::Residue &main_residue = first_chain.first();
-
+			
 			auto starting_residue = first_chain.begin();
 			starting_residue++;
 
@@ -29,31 +28,78 @@ namespace design {
 				if ( residue->resi() == 1 )
 					continue;
 				for ( auto &atom : *residue ) {
-					main_residue.add(new Molib::Atom(atom));
+					main_residue.add(new Molib::Atom(atom)).clear_bonds();
 				}
 			}
-			
+
 			for ( auto residue = starting_residue; residue != first_chain.end(); ++residue )  {
 				if ( residue->resi() == 1 )
 					continue;
-				for ( auto &atom : *residue ) {
-					for ( auto &bond : atom.get_bonds()) {
-						Molib::Atom &copy = main_residue.element(atom.atom_number());
-						Molib::Atom &original_bondee = bond->second_atom(atom);
-						copy.connect( main_residue.element(original_bondee.atom_number()));
+
+				for ( auto &bond : Molib::get_bonds_in(residue->get_atoms()) ) {
+					Molib::Atom &copy   = main_residue.element(bond->atom1().atom_number());
+					Molib::Atom &bondee = main_residue.element(bond->atom2().atom_number());
+					copy.connect( bondee );
+				}
+
+				//TODO: Clean this up
+				for ( auto &bond : Molib::get_bonds_in(residue->get_atoms(),false) ) {
+					if ( bond->atom1().br().resi() == 1 && bond->atom2().br().resi() != 1) {
+
+						int atom_to_remove = -1;
+
+						for ( int i = 0; i < bond->atom1().size(); ++i ) {
+							if ( bond->atom2().atom_number() == bond->atom1()[i].atom_number() ) {
+								atom_to_remove = i;
+								break;
+							}
+						}
+
+						if (atom_to_remove == -1)
+							throw Error("Odd connection");
+
+						bond->atom1().connect(main_residue.element(bond->atom2().atom_number()));
+						bond->atom1().erase(atom_to_remove);
+						bond->atom1().erase_bond(bond->atom2());
+						break;
+					} 
+					
+					if ( bond->atom2().br().resi() == 1 && bond->atom1().br().resi() != 1) {
+
+						int atom_to_remove = -1;
+
+						for ( int i = 0; i < bond->atom2().size(); ++i ) {
+							if ( bond->atom1().atom_number() == bond->atom2()[i].atom_number() ) {
+								atom_to_remove = i;
+								break;
+							}
+						}
+
+						if (atom_to_remove == -1)
+							throw Error("Odd connection");
+
+						bond->atom2().connect(main_residue.element(bond->atom1().atom_number()));
+						bond->atom2().erase(atom_to_remove);
+						bond->atom2().erase_bond(bond->atom1());
+						break;
 					}
 				}
-			}
-			
-			for ( auto residue = starting_residue; residue != first_chain.end(); ++residue )  {
-				if ( residue->resi() == 1 )
-					continue;
-				cout << residue->resi() << " " << residue->ins_code() << endl;
+				
 				first_chain.erase( Molib::Residue::res_pair(residue->resi(), residue->ins_code()) );
 			}
 		}
-		
-		return __designs;
+
+		return __designs.compute_idatm_type()
+				        .compute_hydrogen()
+				        .compute_bond_order()
+				        .compute_bond_gaff_type()
+				        .refine_idatm_type()
+				        .erase_hydrogen()  // needed because refine changes connectivities
+				        .compute_hydrogen()   // needed because refine changes connectivities
+				        .compute_ring_type()
+				        .compute_gaff_type()
+				        .compute_rotatable_bonds() // relies on hydrogens being assigned
+				        .erase_hydrogen();
 	}
 
 	void Design::add_fragments_to_existing_molecule(const Molib::NRset& nr) {

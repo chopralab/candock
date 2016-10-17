@@ -190,6 +190,7 @@ namespace Program {
 			("antitarget_dir",      po::value<std::string>()->default_value(""))
 			("target_linking",      po::value<bool>()->default_value(true,"true"))
 			("antitarget_linking",  po::value<bool>()->default_value(true,"true"))
+			("fragment_bag",        po::value<std::string>()->default_value(""))
 			("seeds_to_add",        po::value<int>()->default_value(50))
 			("seeds_to_avoid",      po::value<int>()->default_value(50))
 			("seeds_till_good",     po::value<int>()->default_value(-1))

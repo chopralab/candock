@@ -28,7 +28,7 @@ namespace Program {
 		}
 	}
 
-	void FragmentLigands::__fragment_ligands( Molib::PDBreader& lpdb, const CmdLnOpts& cmdl ) {
+	void FragmentLigands::__fragment_ligands( Molib::PDBreader& lpdb, const CmdLnOpts& cmdl, bool write_out ) {
 		bool thread_is_not_done;
 		Molib::Molecules ligands;
 		{
@@ -57,9 +57,10 @@ namespace Program {
 				common::create_mols_from_seeds(__added, __seeds, ligands);
 			}
 
-			inout::output_file(ligands, cmdl.prep_file(), ios_base::app);
-			ligands.clear();
+			if (write_out)
+				inout::output_file(ligands, cmdl.prep_file(), ios_base::app);
 
+			ligands.clear();
 			lock_guard<std::mutex> guard(__prevent_re_read_mtx);
 			thread_is_not_done = lpdb.parse_molecule(ligands);
 		}
@@ -76,7 +77,7 @@ namespace Program {
 		std::vector<std::thread> threads;
 
 		for(int i = 0; i < cmdl.ncpu(); ++i) {
-			threads.push_back( std::thread([&,this] {__fragment_ligands(lpdb, cmdl);} ) );
+			threads.push_back( std::thread([&,this] {__fragment_ligands(lpdb, cmdl, true);} ) );
 		}
 		for(auto& thread : threads) {
 			thread.join();

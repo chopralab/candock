@@ -22,12 +22,12 @@ namespace Program {
 		std::mutex __prevent_re_read_mtx;
 		std::mutex __add_to_typing_mtx;
 
-		void __fragment_ligands ( Molib::PDBreader& lpdb, const CmdLnOpts& cmdl );
+		void __fragment_ligands ( Molib::PDBreader& lpdb, const CmdLnOpts& cmdl, bool write_out = true );
 
 	protected:
 		virtual bool __can_read_from_files(const CmdLnOpts& cmdl);
-		virtual void __read_from_files(const CmdLnOpts& cmdl);
-		virtual void __continue_from_prev(const CmdLnOpts& cmdl);
+		virtual void __read_from_files    (const CmdLnOpts& cmdl);
+		virtual void __continue_from_prev (const CmdLnOpts& cmdl);
 
 	public:
 		FragmentLigands( ) { }
