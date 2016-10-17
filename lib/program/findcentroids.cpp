@@ -4,7 +4,7 @@
 
 #include "probis/probis.hpp"
 #include "helper/inout.hpp"
-#include "opts_candock.hpp"
+#include "cmdlnopts.hpp"
 #include "ligands/genclus.hpp"
 #include "pdbreader/molecules.hpp"
 

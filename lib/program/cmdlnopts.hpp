@@ -1,5 +1,5 @@
-#ifndef OPTS_CANDOCK_H
-#define OPTS_CANDOCK_H
+#ifndef CMDLNOPTS_H
+#define CMDLNOPTS_H
 
 #include <boost/program_options.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>

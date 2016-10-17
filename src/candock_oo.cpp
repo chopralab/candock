@@ -2,11 +2,11 @@
 #include <exception>
 #include <typeinfo>
 
-#include "opts_candock.hpp"
-#include "findcentroids.hpp"
-#include "fragmentligands.hpp"
-#include "dockfragments.hpp"
-#include "linkfragments.hpp"
+#include "program/cmdlnopts.hpp"
+#include "program/findcentroids.hpp"
+#include "program/fragmentligands.hpp"
+#include "program/dockfragments.hpp"
+#include "program/linkfragments.hpp"
 
 #include "pdbreader/pdbreader.hpp"
 #include "pdbreader/molecules.hpp"

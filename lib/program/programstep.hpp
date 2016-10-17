@@ -1,7 +1,7 @@
 #ifndef PROGRAMSTEP_H
 #define PROGRAMSTEP_H
 
-#include "opts_candock.hpp"
+#include "cmdlnopts.hpp"
 #include <boost/filesystem.hpp>
 
 namespace Program {

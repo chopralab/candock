@@ -5,7 +5,7 @@
 
 #include "helper/inout.hpp"
 #include "common.hpp"
-#include "opts_candock.hpp"
+#include "cmdlnopts.hpp"
 #include "pdbreader/molecules.hpp"
 
 namespace Program {
