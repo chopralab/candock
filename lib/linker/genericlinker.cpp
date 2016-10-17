@@ -107,7 +107,9 @@ namespace Linker {
 	DockedConformation::Vec Linker::GenericLinker::compute_conformations(const Partial::Vec &partials) {
 
 		DockedConformation::Vec docked_conformations;
-		
+
+		size_t failed_connections = 0;
+
 		for (auto &partial : partials) {
 			auto &conformation = partial.get_states();
 				
@@ -122,11 +124,15 @@ namespace Linker {
 						__a_star(__segment_graph.size(), grow_link_energy, states, __link_iter));
 				} catch (ConnectionError& e) {
 					dbgmsg("exception : " << e.what());
+					++failed_connections;
 					for (auto &failed_pair : e.get_failed_state_pairs())
 						__blacklist.insert(failed_pair);
 				}
 			}
 		}
+
+		if (failed_connections >= partials.size())
+			throw Error ("No generated confirmations are valid.");
 
 		if (__max_iterations_final > 0)
 			return __minimize_final(docked_conformations);

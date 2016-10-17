@@ -41,9 +41,9 @@ namespace help {
 			// fit 1/x^12 repulsion term onto datapoints formatted x y (one-per-line)
 			const string cmd = "gnuplot << EOF 2>&1\n"
 				"f(x) = a/x**12 + b\n"
-				"a=" + help::to_string(a) + "\n"
+				"a=" + std::to_string(a) + "\n"
 				"b=-1\n"
-				"fit [" + help::to_string(x1) + ":" + help::to_string(x2) + "] f(x) \"-\" u 1:2 via a,b\n"
+				"fit [" + std::to_string(x1) + ":" + std::to_string(x2) + "] f(x) \"-\" u 1:2 via a,b\n"
 				+ datapoints + "\n"
 				"e\n"
 				"print 'JANEZ_FITTED ', a, ' ' , b, ' ', FIT_WSSR\n"

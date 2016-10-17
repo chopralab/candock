@@ -4,6 +4,7 @@
 #include "pdbreader/molecule.hpp"
 #include "helper/benchmark.hpp"
 #include "helper/path.hpp"
+#include "helper/grep.hpp"
 #include "geom3d/matrix.hpp"
 #include "geom3d/pca.hpp"
 #include "geom3d/geom3d.hpp"
@@ -28,7 +29,7 @@ namespace common {
 		lock_guard<std::mutex> guard(mtx);
 		++ligand_cnt;
 		for (auto &presidue : ligand.get_residues()) {
-			presidue->set_resn("ligand_" + help::to_string(ligand_cnt));
+			presidue->set_resn("ligand_" + std::to_string(ligand_cnt));
 		}
 	}
 
@@ -37,18 +38,26 @@ namespace common {
 	 */
 	Molib::NRset read_top_seeds_files(const std::set<std::string> &seeds, const string &top_seeds_dir, const string &top_seeds_file, const double top_percent) {
 		Molib::NRset top_seeds;
+
+		boost::regex regex;
+		regex.assign("REMARK   5 MOLECULE ", boost::regex_constants::basic);
+
 		for ( auto &fragment : seeds ) {
-			dbgmsg("reading top_seeds_file for seed id = " << fragment);
-			Molib::PDBreader pdb(Path::join(Path::join(top_seeds_dir, fragment), 
-								top_seeds_file), Molib::PDBreader::all_models);
 
-			Molib::Molecules all = pdb.parse_molecule();
+			boost::filesystem::path file_to_read(top_seeds_dir);
+			file_to_read /= fragment;
+			file_to_read /= top_seeds_file;
+			std::ifstream file( file_to_read.c_str() );
 
-			const int sz = static_cast<int> (all.size() * top_percent);
+			const size_t number_of_seeds = Grep::count_matches(file, regex);
+			const int sz = static_cast<int> (number_of_seeds * top_percent);
 			dbgmsg("taking " << sz << " top seeds for seed " << fragment);
 
-			// deleting excess top seeds
-			for (int i = all.size() - 1; i > sz; --i) all.erase(i);
+			// Add one in case the user is silly enough to select a top_percent of 0.000
+			Molib::PDBreader pdb( file_to_read.string(), Molib::PDBreader::all_models, sz + 1 );
+
+			dbgmsg("reading top_seeds_file for seed id = " << fragment);
+			Molib::Molecules all = pdb.parse_molecule();
 
 			dbgmsg("number of top seeds left = " << all.size());
 
@@ -84,7 +93,7 @@ namespace common {
 						dbgmsg("added " << fragment.get_seed_id());
 						added.insert(fragment.get_seed_id());
 						// add to new molecules
-						Molib::Molecule &seed = seeds.add(new Molib::Molecule(help::to_string(fragment.get_seed_id())));
+						Molib::Molecule &seed = seeds.add(new Molib::Molecule(std::to_string(fragment.get_seed_id())));
 						Molib::Assembly &a = seed.add(new Molib::Assembly(0));
 						Molib::Model &mod = a.add(new Molib::Model(1));
 						Molib::Chain &c = mod.add(new Molib::Chain('X'));
@@ -111,7 +120,7 @@ namespace common {
 						dbgmsg("added " << fragment.get_seed_id());
 						added.insert(fragment.get_seed_id());
 						// add to new molecules
-						Molib::Molecule &seed = seeds.add(new Molib::Molecule(help::to_string(fragment.get_seed_id())));
+						Molib::Molecule &seed = seeds.add(new Molib::Molecule(std::to_string(fragment.get_seed_id())));
 						Molib::Assembly &a = seed.add(new Molib::Assembly(0));
 						Molib::Model &mod = a.add(new Molib::Model(1));
 						Molib::Chain &c = mod.add(new Molib::Chain('X'));

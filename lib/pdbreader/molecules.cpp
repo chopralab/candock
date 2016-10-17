@@ -74,7 +74,7 @@ namespace Molib {
 				AtomType::compute_idatm_type(molecule.get_atoms());
 			} catch (exception &e) {
 				cerr << "errmesg : deleting molecule " << molecule.name() 
-					<< " (computing idatm types failed)" << endl;
+					<< " (computing idatm types failed) due to " << e.what() << endl;
 				mols.erase_shrink(i--);
 			}
 		}

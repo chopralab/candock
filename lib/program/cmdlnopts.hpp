@@ -1,5 +1,5 @@
-#ifndef OPTS_CANDOCK_H
-#define OPTS_CANDOCK_H
+#ifndef CMDLNOPTS_H
+#define CMDLNOPTS_H
 
 #include <boost/program_options.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
@@ -133,11 +133,9 @@ namespace Program {
 
 		void init (int argc, char *argv[], int opts_to_parse = ALL_OPTIONS);
 		void display_time (std::string what) {
-			cout << what << " on " << boost::posix_time::to_simple_string (boost::posix_time::second_clock::local_time()) << "\n";
-			cout << "running " << __program_name << " on hostname " << boost::asio::ip::host_name() << "\n";
-			cout << "version " << __version << "\n";
-			cout << "buildid " << __git_version << "\n";
+			cout << what << " on " << boost::posix_time::to_simple_string (boost::posix_time::second_clock::local_time()) << std::endl;
 		}
+
 		// interface
 
 		std::string get_string_option (const std::string& option) const;
@@ -147,6 +145,35 @@ namespace Program {
 
 		bool quiet() const {
 			return __quiet;
+		}
+
+		void print_version() const {
+
+			std::cout << 
+			"-----------------------------------------------------------------------|\n"
+			"|         CCCCC    AAA   NN   NN DDDDD    OOOOO   CCCCC  KK  KK        |\n"
+			"|        CC       AAAAA  NNN  NN DD  DD  OO   OO CC      KK KK         |\n"
+			"|        CC      AA   AA NN N NN DD   DD OO   OO CC      KKKK          |\n"
+			"|        CC      AAAAAAA NN  NNN DD   DD OO   OO CC      KK KK         |\n"
+			"|         CCCCC  AA   AA NN   NN DDDDDD   OOOO0   CCCCC  KK  KK        |\n"
+			"|                                                                      |\n"
+			"|                             It can-dock!                             |\n"
+			"|                                                                      |\n" 
+			"|              Copyright 2016  Chopra Lab (chopralab.org)              |\n"
+			"|                          Purdue  University                          |\n"
+			"|                                                                      |\n"
+			"|                      Member of the CANDIY Suite                      |\n"
+			"|______________________________________________________________________|\n"
+			<< std::endl;
+
+			std::cout << "running " << __program_name << " on hostname " << boost::asio::ip::host_name() << std::endl;
+			std::cout << "version " << __version      << std::endl;
+			std::cout << "buildid " << __git_version  << std::endl;
+
+			std::cout << std::endl << "Detected support for "
+			          << std::thread::hardware_concurrency() << " concurrent threads."
+			          << " Using " << __ncpu << " threads." << endl;
+
 		}
 
 		std::string program_name() const {
@@ -361,21 +388,19 @@ namespace Program {
 		}
 
 		friend std::ostream &operator<< (std::ostream &stream, const CmdLnOpts &cmdl) {
-			unsigned int n = std::thread::hardware_concurrency();
-			stream << endl << "Detected support for " << n << " concurrent threads."
-			       << " Using " << cmdl.ncpu() << " threads." << endl;
+			
+			cmdl.print_version();
 
 			for ( const auto& a : cmdl.__vm ) {
-				stream << std::setw(24)<< a.first;
-
-				if ( auto v = boost::any_cast<std::string>(&a.second.value()) )
-					stream << std::setw(50) << *v;
+				stream << std::setw(22)<< a.first << " = ";
+				if      ( auto v = boost::any_cast<std::string>(&a.second.value()) )
+					stream << std::setw(47) << *v;
 				else if ( auto v = boost::any_cast<int>(&a.second.value()) )
-					stream << std::setw(50) << *v;
+					stream << std::setw(47) << *v;
 				else if ( auto v = boost::any_cast<double>(&a.second.value()) )
-					stream << std::setw(50) << *v;
+					stream << std::setw(47) << *v;
 				else if ( auto v = boost::any_cast<bool>(&a.second.value()) )
-					stream << std::setw(50) << *v;
+					stream << std::setw(47) << *v;
 
 				stream << std::endl;
 			}

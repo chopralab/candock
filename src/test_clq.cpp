@@ -3,7 +3,7 @@
 #include <typeinfo>
 #include <thread>
 #include <mutex>
-#include "opts_candock.hpp"
+#include "program/cmdlnopts.hpp"
 #include "helper/benchmark.hpp"
 #include "helper/inout.hpp"
 #include "helper/path.hpp"
@@ -17,7 +17,7 @@
 #include "docker/conformations.hpp"
 #include "docker/dock.hpp"
 #include "centro/centroids.hpp"
-#include "common.hpp"
+#include "program/common.hpp"
 
 using namespace std;
 using namespace Program;

@@ -279,7 +279,7 @@ namespace Linker {
 		}
 		
 		Molib::Molecule ligand(__ligand);
-		ligand.set_name(__ligand.name() + "_" + help::to_string(++conf_number));
+		ligand.set_name(__ligand.name() + "_" + std::to_string(++conf_number));
 		
 		cout << "Reconstruction of molecules took " << Benchmark::seconds_from_start() 
 			<< " wallclock seconds" << endl;

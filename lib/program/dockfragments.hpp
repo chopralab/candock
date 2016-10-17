@@ -6,7 +6,7 @@
 #include "findcentroids.hpp"
 #include "fragmentligands.hpp"
 
-#include "opts_candock.hpp"
+#include "cmdlnopts.hpp"
 #include "score/score.hpp"
 #include "docker/dock.hpp"
 #include "pdbreader/nrset.hpp"

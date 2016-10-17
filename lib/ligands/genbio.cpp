@@ -65,14 +65,14 @@ namespace genbio {
 					for (auto &residue : chain) {
 						const string lresn = (residue.rest() == Molib::Residue::protein ? "PPP" : (residue.rest() == Molib::Residue::nucleic ? "NNN" : residue.resn()));
 						const int lresi = ((residue.rest() == Molib::Residue::protein || residue.rest() == Molib::Residue::nucleic) ? 1 : residue.resi());
-						const string lig_code = lresn + ":" + help::to_string(lresi) + ":" + chain.chain_id() + ":" + help::to_string(model.number()) 
-							+ ":" + help::to_string(assembly.number()) + ":" + molecule.name() + ":" + molecule.br().name();
+						const string lig_code = lresn + ":" + std::to_string(lresi) + ":" + chain.chain_id() + ":" + std::to_string(model.number()) 
+							+ ":" + std::to_string(assembly.number()) + ":" + molecule.name() + ":" + molecule.br().name();
 						for (auto &atom : residue) {
 							vector<Molib::Atom*> neighbors = grid.get_neighbors(atom.crd(), 4.0);
 							for (Molib::Atom *query_atom : neighbors) {
 								const Molib::Residue &qr = query_atom->br();
 								const Molib::Chain &qc = query_atom->br().br();
-								const Molib::Residue::res_tuple2 &r1 = Molib::Residue::res_tuple2(qc.chain_id(), help::to_string(help::get_one_letter(qr.resn())), qr.resi(), qr.ins_code());
+								const Molib::Residue::res_tuple2 &r1 = Molib::Residue::res_tuple2(qc.chain_id(), std::to_string(help::get_one_letter(qr.resn())), qr.resi(), qr.ins_code());
 								if (aligned_residues && aligned_residues->find(r1) != aligned_residues->end()) {
 									const Molib::Residue::res_tuple2 &r2 = aligned_residues->find(r1)->second;
 									model.set_remark(7, Molib::Residue::res_tuple2(chain.chain_id(), lresn, lresi, (residue.rest() == Molib::Residue::protein || residue.rest() == Molib::Residue::nucleic ? ' ' :residue.ins_code())), 

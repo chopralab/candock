@@ -2,8 +2,11 @@
 #include <exception>
 #include <typeinfo>
 
-#include "opts_candock.hpp"
-#include "fragmentligands.hpp"
+#include "program/cmdlnopts.hpp"
+#include "program/findcentroids.hpp"
+#include "program/fragmentligands.hpp"
+#include "program/dockfragments.hpp"
+#include "program/linkfragments.hpp"
 
 #include "pdbreader/pdbreader.hpp"
 #include "pdbreader/molecules.hpp"
@@ -13,11 +16,11 @@
 #include "modeler/forcefield.hpp"
 #include "modeler/systemtopology.hpp"
 #include "helper/inout.hpp"
-#include "target.hpp"
+#include "program/target.hpp"
 #include "design/design.hpp"
 
 #include <algorithm>
-#include "common.hpp"
+#include "program/common.hpp"
 
 using namespace std;
 
@@ -43,7 +46,7 @@ int main(int argc, char* argv[]) {
 		cmdl.init(argc, argv);
 		cmdl.display_time("started");
 		cout << cmdl << endl;
-		
+
 		Program::FragmentLigands ligand_fragmenter;
 		ligand_fragmenter.run_step(cmdl);
 

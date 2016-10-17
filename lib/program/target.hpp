@@ -5,7 +5,7 @@
 #include "modeler/forcefield.hpp"
 #include "docker/gpoints.hpp"
 #include "pdbreader/molecules.hpp"
-#include "opts_candock.hpp"
+#include "cmdlnopts.hpp"
 
 #include "findcentroids.hpp"
 #include "dockfragments.hpp"

@@ -12,6 +12,8 @@
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string.hpp>
 #include <boost/asio/ip/host_name.hpp>
+#include <string>
+#include <sstream>
 using namespace std;
 //
 namespace OMMIface {
@@ -72,7 +74,7 @@ namespace OMMIface {
 	const ForceField::AtomType& ForceField::get_atom_type(const int type) const {
 		try { return atom_type.at(type); } catch(const out_of_range&) {}
 		throw ParameterError("warning : missing atom type " 
-			+ help::to_string(type));
+			+ std::to_string(type));
 	}
 	const ForceField::BondType& ForceField::get_bond_type(const int type1, 
 		const int type2) const {
@@ -396,7 +398,9 @@ namespace OMMIface {
 
 	template<typename T>
 	const char* str(rapidxml::xml_document<> &doc, const T &i) {
-		return doc.allocate_string(help::to_string(i).c_str());
+		std::ostringstream s;
+		s << i;
+		return doc.allocate_string(s.str().c_str());
 	}
 
 	void ForceField::output_forcefield_file(const string &fn) { // output XML forcefield & topology file
@@ -503,7 +507,7 @@ namespace OMMIface {
 						torsion_node->append_attribute(doc.allocate_attribute("class4", cl4.c_str()));
 						int i = 0;
 						for (auto &tt : kv4.second) {
-							const string &num = help::to_string(++i);
+							const string &num = std::to_string(++i);
 							torsion_node->append_attribute(doc.allocate_attribute(str(doc, ("periodicity" + num)), str(doc, tt.periodicity)));
 							torsion_node->append_attribute(doc.allocate_attribute(str(doc, "phase" + num), str(doc, tt.phase)));
 							torsion_node->append_attribute(doc.allocate_attribute(str(doc, "k" + num), str(doc, tt.k)));
@@ -531,7 +535,7 @@ namespace OMMIface {
 						torsion_node->append_attribute(doc.allocate_attribute("class4", cl4.c_str()));
 						int i = 0;
 						for (auto &tt : kv4.second) {
-							const string &num = help::to_string(++i);
+							const string &num = std::to_string(++i);
 							torsion_node->append_attribute(doc.allocate_attribute(str(doc, ("periodicity" + num)), str(doc, tt.periodicity)));
 							torsion_node->append_attribute(doc.allocate_attribute(str(doc, "phase" + num), str(doc, tt.phase)));
 							torsion_node->append_attribute(doc.allocate_attribute(str(doc, "k" + num), str(doc, tt.k)));

@@ -3,10 +3,10 @@
 #include <typeinfo>
 #include <thread>
 #include <mutex>
-#include "opts_candock.hpp"
+#include "program/cmdlnopts.hpp"
 #include "helper/benchmark.hpp"
 #include "helper/inout.hpp"
-#include "common.hpp"
+#include "program/common.hpp"
 #include "helper/error.hpp"
 #include "pdbreader/grid.hpp"
 #include "pdbreader/nrset.hpp"

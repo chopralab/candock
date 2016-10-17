@@ -123,7 +123,7 @@ namespace genlig {
 			Molib::Chain &chain = *pchain;
 			Molib::Residue &residue = chain.add(new Molib::Residue(*presidue));
 			Molib::Residue::res_tuple2 r(residue.br().chain_id(), 
-				help::to_string(help::get_one_letter(residue.resn())), 
+				std::to_string(help::get_one_letter(residue.resn())), 
 				residue.resi(), residue.ins_code());
 			if (aligned_part_of_binding_site.count(r))
 				for (auto &atom : residue) atom.set_idatm_type("Npl");
@@ -260,9 +260,9 @@ namespace genlig {
 
 				const string bio_file = Path::join(bio_dir, mols_name + ".pdb");
 				// lig_code = resn:resi:chain_id:model_num:assembly_num:molecule_name
-				const string lig_code = resn + ":" + help::to_string(resi)
-					+ ":" + chain_id + ":" + help::to_string(model_number)
-					+ ":" + help::to_string(assembly_number)
+				const string lig_code = resn + ":" + std::to_string(resi)
+					+ ":" + chain_id + ":" + std::to_string(model_number)
+					+ ":" + std::to_string(assembly_number)
 					+ ":" + molecule_name +  ":" + mols_name;
 				dbgmsg("after lig_code");
 				

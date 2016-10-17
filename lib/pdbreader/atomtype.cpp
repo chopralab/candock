@@ -682,7 +682,7 @@ namespace Molib {
 					for (auto &pa : r) {
 						dbgmsg("correcting aromatic types in ring " << r);
 						Atom &a = *pa;
-						a.add_property("ag" + help::to_string(r.size()))
+						a.add_property("ag" + std::to_string(r.size()))
 							.add_property("ag");
 						if (a.idatm_type_unmask() == "C2")
 							a.set_idatm_type("Car");
@@ -900,7 +900,7 @@ namespace Molib {
 					aromatic_type = "AR4";
 				}
 			}
-			const string ring_type = "RG" + help::to_string(ring.size());
+			const string ring_type = "RG" + std::to_string(ring.size());
 			for (auto &pa : ring) {
 				pa->add_property(ring_type)
 					.add_property(aromatic_type);

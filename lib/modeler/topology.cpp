@@ -67,7 +67,6 @@ namespace OMMIface {
 
 			if (!ffield.residue_topology.count(residue.resn())) 
 				throw Error("die : cannot find topology for residue " + residue.resn());
-
 			dbgmsg("residue topology for residue " << residue.resn());
 
 			const ForceField::ResidueTopology &rtop = ffield.residue_topology.at(residue.resn());

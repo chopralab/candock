@@ -3,7 +3,7 @@
 #include <typeinfo>
 #include <thread>
 #include <mutex>
-#include "opts_candock.hpp"
+#include "program/cmdlnopts.hpp"
 #include "helper/benchmark.hpp"
 #include "helper/inout.hpp"
 #include "helper/path.hpp"

@@ -5471,8 +5471,8 @@
    <ExternalBond from="0"/>
    <ExternalBond from="15"/>
   </Residue>
-  <Residue name="Mg+">
-   <Atom name="Mg+" type="1976"/>
+  <Residue name="MG">
+   <Atom name="MG" type="1976"/>
   </Residue>
   <Residue name="NALA">
    <Atom name="N" type="727"/>
@@ -6466,8 +6466,91 @@
    <ExternalBond from="0"/>
    <ExternalBond from="12"/>
   </Residue>
+  <Residue name="PTR">
+   <Atom name="N" type="347"/>
+   <Atom name="H" type="348"/>
+   <Atom name="CA" type="349"/>
+   <Atom name="HA" type="350"/>
+   <Atom name="CB" type="351"/>
+   <Atom name="HB2" type="352"/>
+   <Atom name="HB3" type="352"/>
+   <Atom name="CG" type="353"/>
+   <Atom name="CD1" type="354"/>
+   <Atom name="HD1" type="355"/>
+   <Atom name="CE1" type="356"/>
+   <Atom name="HE1" type="357"/>
+   <Atom name="CZ" type="358"/>
+   <Atom name="OH" type="359"/>
+   <Atom name="CE2" type="361"/>
+   <Atom name="HE2" type="362"/>
+   <Atom name="CD2" type="363"/>
+   <Atom name="HD2" type="364"/>
+   <Atom name="C" type="365"/>
+   <Atom name="O" type="366"/>
+   <Atom name="P" type="1043"/>
+   <Atom name="O1P" type="1044"/>
+   <Atom name="O2P" type="1045"/>
+   <Atom name="O3P" type="1044"/>
+   <Bond from="0" to="1"/>
+   <Bond from="0" to="2"/>
+   <Bond from="2" to="3"/>
+   <Bond from="2" to="4"/>
+   <Bond from="2" to="18"/>
+   <Bond from="4" to="5"/>
+   <Bond from="4" to="6"/>
+   <Bond from="4" to="7"/>
+   <Bond from="7" to="8"/>
+   <Bond from="7" to="16"/>
+   <Bond from="8" to="9"/>
+   <Bond from="8" to="10"/>
+   <Bond from="10" to="11"/>
+   <Bond from="10" to="12"/>
+   <Bond from="12" to="13"/>
+   <Bond from="12" to="14"/>
+   <Bond from="14" to="15"/>
+   <Bond from="14" to="16"/>
+   <Bond from="16" to="17"/>
+   <Bond from="18" to="19"/>
+   <Bond from="13" to="20"/>
+   <Bond from="20" to="21"/>
+   <Bond from="20" to="22"/>
+   <Bond from="20" to="23"/>
+   <ExternalBond from="0"/>
+   <ExternalBond from="18"/>
+  </Residue>
   <Residue name="Rb+">
    <Atom name="Rb+" type="1978"/>
+  </Residue>
+  <Residue name="SEP">
+   <Atom name="N" type="302"/>
+   <Atom name="H" type="303"/>
+   <Atom name="CA" type="304"/>
+   <Atom name="HA" type="305"/>
+   <Atom name="CB" type="306"/>
+   <Atom name="HB2" type="307"/>
+   <Atom name="HB3" type="307"/>
+   <Atom name="OG" type="1046"/>
+   <Atom name="C" type="310"/>
+   <Atom name="O" type="311"/>
+   <Atom name="P" type="1043"/>
+   <Atom name="O1P" type="1044"/>
+   <Atom name="O2P" type="1045"/>
+   <Atom name="O3P" type="1044"/>
+   <Bond from="0" to="1"/>
+   <Bond from="0" to="2"/>
+   <Bond from="2" to="3"/>
+   <Bond from="2" to="4"/>
+   <Bond from="2" to="8"/>
+   <Bond from="4" to="5"/>
+   <Bond from="4" to="6"/>
+   <Bond from="4" to="7"/>
+   <Bond from="8" to="9"/>
+   <Bond from="7" to="10"/>
+   <Bond from="10" to="11"/>
+   <Bond from="10" to="12"/>
+   <Bond from="10" to="13"/>
+   <ExternalBond from="0"/>
+   <ExternalBond from="8"/>
   </Residue>
   <Residue name="SER">
    <Atom name="N" type="302"/>
@@ -6524,6 +6607,43 @@
    <Bond from="12" to="13"/>
    <ExternalBond from="0"/>
    <ExternalBond from="12"/>
+  </Residue>
+  <Residue name="TPO">
+   <Atom name="N" type="312"/>
+   <Atom name="H" type="313"/>
+   <Atom name="CA" type="314"/>
+   <Atom name="HA" type="315"/>
+   <Atom name="CB" type="316"/>
+   <Atom name="HB" type="317"/>
+   <Atom name="CG2" type="318"/>
+   <Atom name="HG21" type="319"/>
+   <Atom name="HG22" type="319"/>
+   <Atom name="HG23" type="319"/>
+   <Atom name="OG1" type="1046"/>
+   <Atom name="C" type="322"/>
+   <Atom name="O" type="323"/>
+   <Atom name="P" type="1043"/>
+   <Atom name="O1P" type="1044"/>
+   <Atom name="O2P" type="1045"/>
+   <Atom name="O3P" type="1044"/>
+   <Bond from="0" to="1"/>
+   <Bond from="0" to="2"/>
+   <Bond from="2" to="3"/>
+   <Bond from="2" to="4"/>
+   <Bond from="2" to="11"/>
+   <Bond from="4" to="5"/>
+   <Bond from="4" to="6"/>
+   <Bond from="4" to="10"/>
+   <Bond from="6" to="7"/>
+   <Bond from="6" to="8"/>
+   <Bond from="6" to="9"/>
+   <Bond from="11" to="12"/>
+   <Bond from="10" to="13"/>
+   <Bond from="13" to="14"/>
+   <Bond from="13" to="15"/>
+   <Bond from="13" to="16"/>
+   <ExternalBond from="0"/>
+   <ExternalBond from="11"/>
   </Residue>
   <Residue name="TRP">
    <Atom name="N" type="324"/>
@@ -6942,6 +7062,7 @@
   <Bond class1="CA" class2="NA" length="0.1381" k="357313.6"/>
   <Bond class1="CA" class2="NC" length="0.1339" k="404174.4"/>
   <Bond class1="CA" class2="OH" length="0.1364" k="376560.0"/>
+  <Bond class1="CA" class2="OS" length="0.1364" k="376560.0"/>
   <Bond class1="CB" class2="CB" length="0.137" k="435136.0"/>
   <Bond class1="CB" class2="N*" length="0.1374" k="364844.8"/>
   <Bond class1="CB" class2="NB" length="0.1391" k="346435.2"/>
@@ -7050,6 +7171,7 @@
   <Bond class1="EP" class2="SH" length="0.07" k="502080.0"/>
   <Bond class1="CI" class2="H1" length="0.109" k="284512.0"/>
   <Bond class1="CI" class2="CT" length="0.1526" k="259408.0"/>
+  <Bond class1="OS" class2="CT" length="0.141" k="267776.0"/>
   <Bond class1="OS" class2="CI" length="0.141" k="267776.0"/>
   <Bond class1="OH" class2="CI" length="0.141" k="267776.0"/>
   <Bond class1="C5" class2="H5" length="0.108" k="307105.6"/>
@@ -7258,6 +7380,7 @@
   <Angle class1="CT" class2="CT" class3="OH" angle="1.91113553093" k="418.4"/>
   <Angle class1="CX" class2="CT" class3="OH" angle="1.91113553093" k="418.4"/>
   <Angle class1="CT" class2="CT" class3="OS" angle="1.91113553093" k="418.4"/>
+  <Angle class1="CX" class2="CT" class3="OS" angle="1.91113553093" k="418.4"/>
   <Angle class1="CT" class2="CT" class3="S" angle="2.00189265204" k="418.4"/>
   <Angle class1="CX" class2="CT" class3="S" angle="2.00189265204" k="418.4"/>
   <Angle class1="CT" class2="CT" class3="SH" angle="1.89542756767" k="418.4"/>
@@ -7382,6 +7505,7 @@
   <Angle class1="CT" class2="OS" class3="P" angle="2.10312174865" k="836.8"/>
   <Angle class1="C" class2="OS" class3="P" angle="2.10312174865" k="836.8"/>
   <Angle class1="P" class2="OS" class3="P" angle="2.10312174865" k="836.8"/>
+  <Angle class1="P" class2="OH" class3="C" angle="2.10312174865" k="836.8"/>
   <Angle class1="O2" class2="P" class3="OH" angle="1.88896984943" k="376.56"/>
   <Angle class1="O2" class2="P" class3="O2" angle="2.09264977314" k="1171.52"/>
   <Angle class1="OP" class2="P" class3="OP" angle="2.09264977314" k="1171.52"/>
