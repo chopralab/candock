@@ -101,6 +101,7 @@ int main(int argc, char* argv[]) {
 		
 		design::Design designer( mol.first() );
 		designer.add_fragments_to_existing_molecule(common::read_top_seeds_files(solo_target_seeds, "targets/syk/" + cmdl.top_seeds_dir(), cmdl.top_seeds_file(), cmdl.top_percent() ));
+		inout::output_file(designer.get_internal_designs(), "interal_designs.pdb");
 		inout::output_file(designer.get_prepared_designs(), "designed.pdb");
 
 		cmdl.display_time("finished");

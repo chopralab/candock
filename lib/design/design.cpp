@@ -39,7 +39,7 @@ namespace design {
 				for ( auto &bond : Molib::get_bonds_in(residue->get_atoms()) ) {
 					Molib::Atom &copy   = main_residue.element(bond->atom1().atom_number());
 					Molib::Atom &bondee = main_residue.element(bond->atom2().atom_number());
-					copy.connect( bondee );
+					copy.connect( bondee ).set_bo(bond->get_bo());
 				}
 
 				//TODO: Clean this up
@@ -58,7 +58,7 @@ namespace design {
 						if (atom_to_remove == -1)
 							throw Error("Odd connection");
 
-						bond->atom1().connect(main_residue.element(bond->atom2().atom_number()));
+						bond->atom1().connect(main_residue.element(bond->atom2().atom_number())).set_bo(bond->get_bo());
 						bond->atom1().erase(atom_to_remove);
 						bond->atom1().erase_bond(bond->atom2());
 						break;
@@ -78,7 +78,7 @@ namespace design {
 						if (atom_to_remove == -1)
 							throw Error("Odd connection");
 
-						bond->atom2().connect(main_residue.element(bond->atom1().atom_number()));
+						bond->atom2().connect(main_residue.element(bond->atom1().atom_number())).set_bo(bond->get_bo());
 						bond->atom2().erase(atom_to_remove);
 						bond->atom2().erase_bond(bond->atom1());
 						break;
@@ -91,7 +91,6 @@ namespace design {
 
 		return __designs.compute_idatm_type()
 				        .compute_hydrogen()
-				        .compute_bond_order()
 				        .compute_bond_gaff_type()
 				        .refine_idatm_type()
 				        .erase_hydrogen()  // needed because refine changes connectivities
@@ -118,10 +117,10 @@ namespace design {
 			asmb.renumber_atoms(__original.get_atoms().size());
 
 			// "atom" is the search atom (only used for its position and type)
-			for ( auto &atom : asmb ) {
+			for ( auto &search_atom : asmb ) {
 
 				// Check if the atom is "exposed", I.E. not in a ring or the middle of a chain
-				if (atom.get_bonds().size() != 1 || atom.element() == Molib::Element::H) {
+				if (search_atom.get_bonds().size() != 1 || search_atom.element() == Molib::Element::H) {
 					continue;
 				}
 
@@ -133,28 +132,33 @@ namespace design {
 					}
 
 					// Check to see if the atom types are the same
-					if (atom.idatm_type_unmask() == start_atom->idatm_type_unmask()) {
-
+					if (search_atom.idatm_type() == start_atom->idatm_type()) {
 						Molib::Molecule modificatiton(__original);
-
-						modificatiton.set_name( __original.name() +"_design_with_" + seed.name() + "_on_" + std::to_string(start_atom->atom_number()) );
 
 						// Copy the new molecule into the returnable object
 						__designs.add( new Molib::Molecule(modificatiton) );
 
 						// Remove all hydrogens from the original ligand (they are not needed anymore)
+						Molib::BondOrder::compute_bond_order(__designs.last().get_atoms());
 						Molib::Hydrogens::erase_hydrogen(__designs.last().get_atoms());
 
 						// Add new fragment as a "residue" of the molecule
 						Molib::Chain &chain = __designs.last().first().first().first();
 						chain.add(new Molib::Residue(asmb));
 						chain.last().regenerate_bonds(asmb);
+						Molib::Hydrogens::compute_hydrogen  (chain.last().get_atoms());
+						Molib::BondOrder::compute_bond_order(chain.last().get_atoms());
+						Molib::Hydrogens::erase_hydrogen    (chain.last().get_atoms());
 
 						// Create the relevent bond between the ligand and fragment, remove the "search atom"
-						Molib::Atom &atom2  = chain.last ().element( atom.atom_number() );
+						Molib::Atom &atom2  = chain.last ().element( search_atom.atom_number() );
 						Molib::Atom &start2 = chain.first().element( start_atom->atom_number() );
 						Molib::Atom &mod_atom = atom2.get_bonds().front()->second_atom(atom2);
-						mod_atom.connect( start2 );
+						mod_atom.connect( start2 ).set_bo(1);
+
+						__designs.last().set_name( __original.name() +"_design_with_" + seed.name() + 
+							"_on_" + std::to_string(start_atom->atom_number()) +
+							"_to_" + std::to_string(mod_atom.atom_number()) );
 
 						// Fix internal atom graph
 						for (int i = 0; i < mod_atom.size(); ++i) {
