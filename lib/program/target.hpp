@@ -1,15 +1,14 @@
 #ifndef TARGET_H
 #define TARGET_H
 
-#include "score/score.hpp"
-#include "modeler/forcefield.hpp"
-#include "docker/gpoints.hpp"
-#include "pdbreader/molecules.hpp"
 #include "cmdlnopts.hpp"
 
 #include "findcentroids.hpp"
 #include "dockfragments.hpp"
 #include "linkfragments.hpp"
+
+#include "docker/gpoints.hpp"
+#include "pdbreader/molecules.hpp"
 
 #include <string>
 
@@ -23,15 +22,16 @@ namespace Program {
 		// TODO:  Consider using ProgramSteps instead of named things?
 		struct DockedReceptor {
 			Molib::Molecule& protein;
-			std::unique_ptr<Molib::Atom::Grid> gridrec;
-			std::unique_ptr<FindCentroids>     centroids;
-			std::unique_ptr<DockFragments>     prepseeds;
-			std::unique_ptr<LinkFragments>     dockedlig;
+			std::unique_ptr<Molib::Score>         score;
+			std::unique_ptr<OMMIface::ForceField> ffield;
+			std::unique_ptr<Molib::Atom::Grid>    gridrec;
+			std::unique_ptr<FindCentroids>        centroids;
+			std::unique_ptr<DockFragments>        prepseeds;
+			std::unique_ptr<LinkFragments>        dockedlig;
 		};
 
 		Molib::Molecules            __receptors;
 		std::vector<DockedReceptor> __preprecs;
-		OMMIface::ForceField        __ffield;
 	public:
 		Target(const std::string& input_name);
 
@@ -41,8 +41,8 @@ namespace Program {
 
 		// TODO: Instead of named function, pass in fully initiallized ProgramSteps????????
 		void find_centroids(const CmdLnOpts& cmdl);
-		void dock_fragments(const Molib::Score& score, const FragmentLigands& ligand_fragments, const CmdLnOpts& cmdl);
-		void link_fragments(const Molib::Score& score, const CmdLnOpts& cmdl);
+		void dock_fragments(const FragmentLigands& ligand_fragments, const CmdLnOpts& cmdl);
+		void link_fragments(const CmdLnOpts& cmdl);
 		
 		std::multiset<std::string> determine_overlapping_seeds(const int max_seeds, const int number_of_occurances);
 	};

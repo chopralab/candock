@@ -9,10 +9,8 @@
 #include "program/linkfragments.hpp"
 
 #include "pdbreader/molecules.hpp"
-#include "score/score.hpp"
 #include "docker/gpoints.hpp"
 #include "docker/conformations.hpp"
-#include "modeler/forcefield.hpp"
 #include "modeler/systemtopology.hpp"
 #include "helper/inout.hpp"
 #include "program/target.hpp"
@@ -56,23 +54,10 @@ int main(int argc, char* argv[]) {
 		Program::Target antitargets(cmdl.get_string_option("antitarget_dir"));
 		antitargets.find_centroids(cmdl);
 
-		/* Read distributions file and initialize scores
-		 * 
-		 */
-		Molib::Score score(cmdl.ref_state(), cmdl.comp(), cmdl.rad_or_raw(), cmdl.dist_cutoff(), 
-			cmdl.step_non_bond());
-
-		//TODO: Make specific to each protein
-		score.define_composition(targets.get_idatm_types(antitargets.get_idatm_types()),
-								 ligand_fragmenter.ligand_idatm_types())
-			.process_distributions_file(cmdl.distributions_file())
-			.compile_scoring_function()
-			.parse_objective_function(cmdl.obj_dir(), cmdl.scale_non_bond());
-
 		dbgmsg("START SCORE" << endl << score << "END SCORE");
 
-		    targets.dock_fragments(score, ligand_fragmenter, cmdl);
-		antitargets.dock_fragments(score, ligand_fragmenter, cmdl);
+		    targets.dock_fragments(ligand_fragmenter, cmdl);
+		antitargets.dock_fragments(ligand_fragmenter, cmdl);
 
 		set<string> solo_target_seeds;
 		vector<string> forced_seeds = cmdl.get_string_vector("force_seed");
@@ -94,10 +79,10 @@ int main(int argc, char* argv[]) {
 		OMMIface::SystemTopology::loadPlugins();
 
 		if (cmdl.get_bool_option("target_linking"))
-			targets.link_fragments(score, cmdl);
+			targets.link_fragments(cmdl);
 
 		if (cmdl.get_bool_option("antitarget_linking"))
-			antitargets.link_fragments(score,cmdl);
+			antitargets.link_fragments(cmdl);
 
 		Molib::PDBreader lpdb2(cmdl.prep_file(), Molib::PDBreader::all_models, 1);
 		Molib::Molecules mol;

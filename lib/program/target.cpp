@@ -65,25 +65,47 @@ namespace Program {
 		}
 	}
 
-	void Target::dock_fragments(const Molib::Score& score, const FragmentLigands& ligand_fragments, const CmdLnOpts& cmdl) {
+	void Target::dock_fragments(const FragmentLigands& ligand_fragments, const CmdLnOpts& cmdl) {
 		for ( auto &a : __preprecs ) {
-			std::unique_ptr<DockFragments> pdockfragments(new DockFragments(*a.centroids, ligand_fragments, score, *a.gridrec, a.protein.name(), cmdl));
+			/* Read distributions file and initialize scores
+			* 
+			*/
+
+			std::unique_ptr<Molib::Score> score (new Molib::Score(cmdl.ref_state(), cmdl.comp(),
+																  cmdl.rad_or_raw(), cmdl.dist_cutoff(),
+																  cmdl.step_non_bond()));
+			
+			score->define_composition(__receptors.get_idatm_types(),
+									ligand_fragments.ligand_idatm_types())
+									.process_distributions_file(cmdl.distributions_file())
+									.compile_scoring_function()
+									.parse_objective_function(cmdl.obj_dir(), cmdl.scale_non_bond());
+
+			a.score = std::move(score);
+
+			std::unique_ptr<DockFragments> pdockfragments(new DockFragments(*a.centroids, ligand_fragments, *a.score, *a.gridrec, a.protein.name(), cmdl));
 			pdockfragments->run_step(cmdl);
 			a.prepseeds = std::move(pdockfragments);
 		}
 	}
 
-	void Target::link_fragments(const Molib::Score& score, const Program::CmdLnOpts& cmdl) {
-		__ffield.parse_gaff_dat_file(cmdl.gaff_dat_file())
-			.add_kb_forcefield(score, cmdl.step_non_bond())
-			.parse_forcefield_file(cmdl.amber_xml_file())
-			.parse_forcefield_file(cmdl.water_xml_file());
+	void Target::link_fragments(const Program::CmdLnOpts& cmdl) {
 
 		for ( auto &a : __preprecs ) {
-			a.protein.prepare_for_mm(__ffield, *a.gridrec);
-			__ffield.insert_topology(a.protein);
 			
-			std::unique_ptr<LinkFragments> plinkfragments(new LinkFragments(a.protein, score, __ffield, *a.gridrec));
+			std::unique_ptr<OMMIface::ForceField> ffield ( new OMMIface::ForceField);
+			
+			ffield->parse_gaff_dat_file(cmdl.gaff_dat_file())
+				.add_kb_forcefield(*a.score, cmdl.step_non_bond())
+				.parse_forcefield_file(cmdl.amber_xml_file())
+				.parse_forcefield_file(cmdl.water_xml_file());
+			
+			a.ffield = std::move(ffield);
+			
+			a.protein.prepare_for_mm(*a.ffield, *a.gridrec);
+			a.ffield->insert_topology(a.protein);
+			
+			std::unique_ptr<LinkFragments> plinkfragments(new LinkFragments(a.protein, *a.score, *a.ffield, *a.gridrec));
 			plinkfragments->run_step(cmdl);
 			a.dockedlig = std::move(plinkfragments);
 		}
