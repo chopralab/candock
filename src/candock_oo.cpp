@@ -8,7 +8,6 @@
 #include "program/dockfragments.hpp"
 #include "program/linkfragments.hpp"
 
-#include "pdbreader/pdbreader.hpp"
 #include "pdbreader/molecules.hpp"
 #include "score/score.hpp"
 #include "docker/gpoints.hpp"
@@ -75,15 +74,22 @@ int main(int argc, char* argv[]) {
 		    targets.dock_fragments(score, ligand_fragmenter, cmdl);
 		antitargets.dock_fragments(score, ligand_fragmenter, cmdl);
 
-		cout << "Determining the best seeds to add" << endl;
-		multiset<string>  target_seeds =     targets.determine_overlapping_seeds(cmdl.get_int_option("seeds_to_add"),   cmdl.get_int_option("seeds_till_good"));
-		multiset<string> atarget_seeds = antitargets.determine_overlapping_seeds(cmdl.get_int_option("seeds_to_avoid"), cmdl.get_int_option("seeds_till_bad"));
-
 		set<string> solo_target_seeds;
-		std::set_difference( target_seeds.begin(),  target_seeds.end(),
-							atarget_seeds.begin(), atarget_seeds.end(),
-							std::inserter(solo_target_seeds, solo_target_seeds.end())
-		);
+		vector<string> forced_seeds = cmdl.get_string_vector("force_seed");
+
+		if (forced_seeds.size() != 0) {
+			std::copy( forced_seeds.begin(), forced_seeds.end(), std::inserter(solo_target_seeds, solo_target_seeds.end()));
+		} else {
+
+			cout << "Determining the best seeds to add" << endl;
+			multiset<string>  target_seeds =     targets.determine_overlapping_seeds(cmdl.get_int_option("seeds_to_add"),   cmdl.get_int_option("seeds_till_good"));
+			multiset<string> atarget_seeds = antitargets.determine_overlapping_seeds(cmdl.get_int_option("seeds_to_avoid"), cmdl.get_int_option("seeds_till_bad"));
+
+			std::set_difference( target_seeds.begin(),  target_seeds.end(),
+							    atarget_seeds.begin(), atarget_seeds.end(),
+							    std::inserter(solo_target_seeds, solo_target_seeds.end())
+			);
+		}
 
 		OMMIface::SystemTopology::loadPlugins();
 
@@ -100,7 +106,7 @@ int main(int argc, char* argv[]) {
 		cout << "Starting Design with " << solo_target_seeds.size() << " seeds." << endl;
 		
 		design::Design designer( mol.first() );
-		designer.add_fragments_to_existing_molecule(common::read_top_seeds_files(solo_target_seeds, "targets/syk/" + cmdl.top_seeds_dir(), cmdl.top_seeds_file(), cmdl.top_percent() ));
+		designer.add_fragments_to_existing_molecule(common::read_top_seeds_files(solo_target_seeds, "targets/syk/" + cmdl.top_seeds_dir(), cmdl.top_seeds_file(), 0));
 		inout::output_file(designer.get_internal_designs(), "interal_designs.pdb");
 		inout::output_file(designer.get_prepared_designs(), "designed.pdb");
 

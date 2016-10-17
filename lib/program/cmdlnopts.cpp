@@ -195,6 +195,7 @@ namespace Program {
 			("seeds_to_avoid",      po::value<int>()->default_value(50))
 			("seeds_till_good",     po::value<int>()->default_value(-1))
 			("seeds_till_bad",      po::value<int>()->default_value(-1))
+			("force_seed",          po::value< std::vector<std::string>>())
 			;
 
 			po::options_description config_options;
@@ -347,9 +348,17 @@ namespace Program {
 		return __vm[option].as<double>();
 	}
 
-	bool Program::CmdLnOpts::get_bool_option(const std::string& option) const
+	bool CmdLnOpts::get_bool_option         (const std::string& option) const
 	{
 		return __vm[option].as<bool>();
+	}
+
+	std::vector<std::string> CmdLnOpts::get_string_vector (const std::string& option) const
+	{
+		if ( __vm.count(option) )
+			return __vm[option].as<std::vector<std::string>>();
+		else
+			return std::vector<std::string>();
 	}
 
 }

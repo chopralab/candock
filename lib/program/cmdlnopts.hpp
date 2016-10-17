@@ -7,6 +7,7 @@
 #include "helper/error.hpp"
 #include "version.h"
 #include <thread>
+#include <vector>
 
 namespace Program {
 
@@ -142,6 +143,8 @@ namespace Program {
 		bool        get_bool_option   (const std::string& option) const;
 		int         get_int_option    (const std::string& option) const;
 		double      get_double_option (const std::string& option) const;
+
+		std::vector<std::string> get_string_vector (const std::string& option) const;
 
 		bool quiet() const {
 			return __quiet;
