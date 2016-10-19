@@ -12,7 +12,8 @@ namespace design {
 		
 		Design( const Molib::Molecule &start );
 		
-		void add_fragments_to_existing_molecule(const Molib::NRset& nr);
+		void functionalize_hydrogens_with_fragments(const Molib::NRset& nr);
+		void functionalize_hydrogens_with_single_atoms( const std::vector< std::string >& idatms );
 		
 		const Molib::Molecules& get_internal_designs() const {
 			return __designs;

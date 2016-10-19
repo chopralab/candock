@@ -13,6 +13,7 @@ namespace design {
 
 		// Create a new molecule, original bonds will be copied
 		Molib::Hydrogens::compute_hydrogen(__original.get_atoms());
+		__original.erase_properties();
 	}
 
 	const Molib::Molecules& Design::get_prepared_designs() {
@@ -98,10 +99,11 @@ namespace design {
 				        .compute_ring_type()
 				        .compute_gaff_type()
 				        .compute_rotatable_bonds() // relies on hydrogens being assigned
-				        .erase_hydrogen();
+				        .erase_hydrogen()
+				        .compute_overlapping_rigid_segments("desinged_seeds.txt");
 	}
 
-	void Design::add_fragments_to_existing_molecule(const Molib::NRset& nr) {
+	void Design::functionalize_hydrogens_with_fragments(const Molib::NRset& nr) {
 
 		if (nr.size() == 0) {
 			throw Error("No seeds given for modificatiton");
@@ -174,6 +176,34 @@ namespace design {
 				}
 			}
 		}
+	}
+
+	void Design::functionalize_hydrogens_with_single_atoms(const std::vector<std::string>& idatms)
+	{
+		if ( idatms.empty() )
+			throw Error("No atom types given for addition to the molecule");
+
+		for ( auto &atom_type  : idatms )
+		for ( auto &start_atom : __original.get_atoms() ) {
+			// Make sure the ligand atom has an open valency
+			if (start_atom->get_num_hydrogens() == 0 || start_atom->element() == Molib::Element::H) {
+				continue;
+			}
+
+			// Copy the new molecule into the returnable object
+			__designs.add( new Molib::Molecule(__original) );
+			__designs.last().set_name( __original.name() + "_added_" + atom_type + "_on_" + std::to_string(start_atom->atom_number()));
+
+			// Remove all hydrogens from the original ligand (they are not needed anymore)
+			Molib::BondOrder::compute_bond_order(__designs.last().get_atoms());
+			Molib::Hydrogens::erase_hydrogen(    __designs.last().get_atoms());
+
+			Molib::Residue& mod_residue = __designs.last().first().first().first().first();
+			Molib::Atom& new_atom = mod_residue.add(new Molib::Atom(mod_residue.size() + 1, atom_type, Geom3D::Coordinate(0,0,0), help::idatm_mask.at(atom_type) ) );
+
+			mod_residue.element(start_atom->atom_number()).connect(new_atom).set_bo(1);
+		}
+
 	}
 
 }
