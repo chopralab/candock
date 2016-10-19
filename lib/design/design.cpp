@@ -90,8 +90,8 @@ namespace design {
 			}
 		}
 
-		return __designs.compute_idatm_type()
-				        .compute_hydrogen()
+		return __designs.compute_hydrogen()
+						.compute_bond_order()
 				        .compute_bond_gaff_type()
 				        .refine_idatm_type()
 				        .erase_hydrogen()  // needed because refine changes connectivities
@@ -141,16 +141,12 @@ namespace design {
 						__designs.add( new Molib::Molecule(modificatiton) );
 
 						// Remove all hydrogens from the original ligand (they are not needed anymore)
-						Molib::BondOrder::compute_bond_order(__designs.last().get_atoms());
 						Molib::Hydrogens::erase_hydrogen(__designs.last().get_atoms());
 
 						// Add new fragment as a "residue" of the molecule
 						Molib::Chain &chain = __designs.last().first().first().first();
 						chain.add(new Molib::Residue(asmb));
 						chain.last().regenerate_bonds(asmb);
-						Molib::Hydrogens::compute_hydrogen  (chain.last().get_atoms());
-						Molib::BondOrder::compute_bond_order(chain.last().get_atoms());
-						Molib::Hydrogens::erase_hydrogen    (chain.last().get_atoms());
 
 						// Create the relevent bond between the ligand and fragment, remove the "search atom"
 						Molib::Atom &atom2  = chain.last ().element( search_atom.atom_number() );
@@ -183,27 +179,29 @@ namespace design {
 		if ( idatms.empty() )
 			throw Error("No atom types given for addition to the molecule");
 
-		for ( auto &atom_type  : idatms )
-		for ( auto &start_atom : __original.get_atoms() ) {
-			// Make sure the ligand atom has an open valency
-			if (start_atom->get_num_hydrogens() == 0 || start_atom->element() == Molib::Element::H) {
-				continue;
+		for ( auto &atom_type  : idatms ) {
+			for ( auto &start_atom : __original.get_atoms() ) {
+				// Make sure the ligand atom has an open valency
+				if (start_atom->get_num_hydrogens() == 0 || start_atom->element() == Molib::Element::H) {
+					continue;
+				}
+
+				// Copy the new molecule into the returnable object
+				__designs.add( new Molib::Molecule(__original) );
+				__designs.last().set_name( __original.name() + "_added_" + atom_type + "_on_" + std::to_string(start_atom->atom_number()));
+
+				// Remove all hydrogens from the original ligand (they are not needed anymore)
+				Molib::BondOrder::compute_bond_order(__designs.last().get_atoms());
+				Molib::Hydrogens::erase_hydrogen(    __designs.last().get_atoms());
+
+				Molib::Residue& mod_residue = __designs.last().first().first().first().first();
+				Molib::Atom& new_atom = ( atom_type == "C" || atom_type == "O" || atom_type == "N" || atom_type == "S" ) ?
+					mod_residue.add(new Molib::Atom(mod_residue.size() + 1, atom_type, Geom3D::Coordinate(0,0,0), help::idatm_mask.at(atom_type + "3") ) ) :
+					mod_residue.add(new Molib::Atom(mod_residue.size() + 1, atom_type, Geom3D::Coordinate(0,0,0), help::idatm_mask.at(atom_type ) ) ) ;
+
+				mod_residue.element(start_atom->atom_number()).connect(new_atom).set_bo(1);
 			}
-
-			// Copy the new molecule into the returnable object
-			__designs.add( new Molib::Molecule(__original) );
-			__designs.last().set_name( __original.name() + "_added_" + atom_type + "_on_" + std::to_string(start_atom->atom_number()));
-
-			// Remove all hydrogens from the original ligand (they are not needed anymore)
-			Molib::BondOrder::compute_bond_order(__designs.last().get_atoms());
-			Molib::Hydrogens::erase_hydrogen(    __designs.last().get_atoms());
-
-			Molib::Residue& mod_residue = __designs.last().first().first().first().first();
-			Molib::Atom& new_atom = mod_residue.add(new Molib::Atom(mod_residue.size() + 1, atom_type, Geom3D::Coordinate(0,0,0), help::idatm_mask.at(atom_type) ) );
-
-			mod_residue.element(start_atom->atom_number()).connect(new_atom).set_bo(1);
 		}
-
 	}
 
 }
