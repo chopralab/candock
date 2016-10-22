@@ -228,7 +228,4 @@ namespace Molib {
 			molecule.compute_overlapping_rigid_segments(u); 
 		return *this; 
 	}
-
-
-
 };

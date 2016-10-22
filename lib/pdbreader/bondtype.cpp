@@ -18,6 +18,7 @@
 #include "fragmenter/fragmenter.hpp"
 #include "fragmenter/unique.hpp"
 #include "helper/benchmark.hpp"
+#include "helper/renamerules.hpp"
 #include "bond.hpp"
 #include "bondtype.hpp"
 using namespace std;
