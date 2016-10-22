@@ -2,7 +2,7 @@
 #define FRAGMENTER_H
 #include "helper/debug.hpp"
 #include "graph/graph.hpp"
-#include "helper/help.hpp"
+#include "helper/smiles.hpp"
 #include "pdbreader/bond.hpp"
 #include "pdbreader/atom.hpp"
 #include <tuple>

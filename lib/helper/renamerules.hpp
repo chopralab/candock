@@ -1,7 +1,7 @@
 #ifndef RENAMERULES_H
 #define RENAMERULES_H
 
-#include "helper/help.hpp"
+#include "helper/smiles.hpp"
 
 namespace help {
 

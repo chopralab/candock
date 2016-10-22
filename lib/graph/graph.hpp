@@ -4,7 +4,7 @@
 #include "ullsubstate.hpp"
 #include "pdbreader/it.hpp"
 #include "helper/error.hpp"
-#include "helper/help.hpp"
+#include "helper/smiles.hpp"
 #include "helper/debug.hpp"
 #include "helper/benchmark.hpp"
 #include <memory>

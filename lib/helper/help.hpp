@@ -15,21 +15,6 @@ namespace help {
 	string memusage(const string&);
 	std::tuple<double, double, double> gnuplot(const double &x1, const double &x2, const string &datapoints);
 	
-	struct edge { 
-		string atom_property1;
-		string atom_property2;
-		string bond_property;
-	};
-	typedef vector<edge> smiles;
-	ostream& operator<<(ostream& os, const smiles& edges);
-	struct rename_rule {
-		smiles pattern;
-		vector<string> rule;
-	};
-	typedef vector<rename_rule> rename_rules;
-
-	ostream& operator<<(ostream& os, const rename_rule& rule);
-	
 	enum IdatmGeometry {
 		Ion=0, Single=1, Linear=2, Planar=3, Tetrahedral=4, TrigonalBipyramidal=5
 	};
