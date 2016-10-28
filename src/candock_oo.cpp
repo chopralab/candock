@@ -94,7 +94,7 @@ int main(int argc, char* argv[]) {
 		
 		design::Design designer( mol.first() );
 		//designer.functionalize_hydrogens_with_fragments(common::read_top_seeds_files(solo_target_seeds, "targets/syk/" + cmdl.top_seeds_dir(), cmdl.top_seeds_file(), 0));
-		designer.functionalize_hydrogens_with_single_atoms( {"C", "N", "O", "S", "F", "Cl", "Br", "I"}  );
+		designer.functionalize_extremes_with_single_atoms( {"C", "N", "O", "S", "F", "Cl", "Br", "I"}  );
 		inout::output_file(designer.get_internal_designs(), "interal_designs.pdb");
 		inout::output_file(designer.get_prepared_designs(), "designed.pdb");
 

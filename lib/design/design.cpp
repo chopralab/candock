@@ -204,4 +204,37 @@ namespace design {
 		}
 	}
 
+	void Design::functionalize_extremes_with_single_atoms(const std::vector< std::string >& idatms) {
+		if ( idatms.empty() )
+			throw Error("No atom types given for addition to the molecule");
+
+		for ( auto &atom_type  : idatms ) {
+			for ( auto &start_atom : __original.get_atoms() ) {
+				// Make sure the ligand atom has an open valency
+				if (start_atom->element() == Molib::Element::H || start_atom->get_bonds().size() - start_atom->get_num_hydrogens() != 1 ) {
+					continue;
+				}
+
+				// Copy the new molecule into the returnable object
+				__designs.add( new Molib::Molecule(__original) );
+				__designs.last().set_name( __original.name() + "_changed_" + std::to_string(start_atom->atom_number()) + "_" + atom_type );
+
+				// Remove all hydrogens from the original ligand (they are not needed anymore)
+				Molib::BondOrder::compute_bond_order(__designs.last().get_atoms());
+				Molib::Hydrogens::erase_hydrogen(    __designs.last().get_atoms());
+
+				Molib::Residue& mod_residue = __designs.last().first().first().first().first();
+
+				Molib::Atom& atom_to_change = mod_residue.element(start_atom->atom_number());
+				atom_to_change.set_atom_name(atom_type);
+				atom_to_change.set_element(Molib::Element(atom_type));
+				atom_type == "C" || atom_type == "O" || atom_type == "N" || atom_type == "S" ? 
+					atom_to_change.set_idatm_type(atom_type + "3") :
+					atom_to_change.set_idatm_type(atom_type);
+				atom_to_change.set_gaff_type("???");
+			}
+		}
+
+	}
+
 }

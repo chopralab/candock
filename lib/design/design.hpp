@@ -14,6 +14,7 @@ namespace design {
 		
 		void functionalize_hydrogens_with_fragments(const Molib::NRset& nr);
 		void functionalize_hydrogens_with_single_atoms( const std::vector< std::string >& idatms );
+		void functionalize_extremes_with_single_atoms( const std::vector< std::string >& idatms );
 		
 		const Molib::Molecules& get_internal_designs() const {
 			return __designs;

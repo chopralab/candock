@@ -96,6 +96,7 @@ namespace Molib {
 		const string& gaff_type() const { return __gaff_type; }
 		const string& atom_name() const { return __atom_name; }
 		Element element() const { return __element; }
+		void set_element(const Element& e) { __element = e; };
 		Geom3D::Coordinate& crd() { return __crd; }
 		const Geom3D::Coordinate& crd() const { return __crd; }
 		friend ostream& operator<< (ostream& stream, const Atom& a);
