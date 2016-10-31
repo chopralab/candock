@@ -16,15 +16,28 @@ namespace Program {
 
 	void FragmentLigands::__read_from_files( const CmdLnOpts& cmdl) {
 
-		cout << "Reading fragmented files from " << cmdl.prep_file() << endl;
+		if ( inout::Inout::file_size( cmdl.seeds_pdb_file() ) <= 0 ) {
 
-		Molib::PDBreader lpdb(cmdl.prep_file(), Molib::PDBreader::all_models, cmdl.max_num_ligands());
+			cout << "Could not read seeds from " << cmdl.seeds_pdb_file() << endl;
+			cout << "Reading fragmented files from " << cmdl.prep_file() << endl;
 
-		Molib::Molecules ligands;
-		while(lpdb.parse_molecule(ligands)) {
-			__ligand_idatm_types = ligands.get_idatm_types(__ligand_idatm_types);
-			common::create_mols_from_seeds(__added, __seeds, ligands);
-			ligands.clear();
+			Molib::PDBreader lpdb(cmdl.prep_file(), Molib::PDBreader::all_models, cmdl.max_num_ligands());
+
+			Molib::Molecules ligands;
+			while(lpdb.parse_molecule(ligands)) {
+				__ligand_idatm_types = ligands.get_idatm_types(__ligand_idatm_types);
+				common::create_mols_from_seeds(__added, __seeds, ligands);
+				ligands.clear();
+			}
+
+			__seeds.erase_properties();
+
+			inout::output_file(__seeds, cmdl.seeds_pdb_file(), ios_base::app);
+		} else {
+			Molib::PDBreader lpdb(cmdl.seeds_pdb_file(), Molib::PDBreader::all_models);
+			__ligand_idatm_types = __seeds.get_idatm_types(__ligand_idatm_types);
+			for (const auto& mol : __seeds)
+				__added.insert( stoi(mol.name()) );
 		}
 	}
 
@@ -88,6 +101,8 @@ namespace Program {
 		 *
 		 */
 		__seeds.erase_properties();
+
+		inout::output_file(__seeds, cmdl.seeds_pdb_file(), ios_base::app);
 
 	}
 }

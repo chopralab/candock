@@ -18,6 +18,7 @@ namespace Program {
 		std::string __ligand_file;
 		std::string __seeds_file;
 		std::string __prep_file;
+		std::string __seeds_pdb_file;
 
 		std::string __bslib_file;
 		std::string __nosql_file;
@@ -194,6 +195,9 @@ namespace Program {
 		}
 		std::string prep_file() const {
 			return __prep_file;
+		}
+		std::string seeds_pdb_file() const {
+			return __seeds_pdb_file;
 		}
 		std::string bslib_file() const {
 			return __bslib_file;

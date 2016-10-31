@@ -76,6 +76,8 @@ namespace Program {
 			 "Read unique seeds from this file, if it exists, and append new unique seeds if found")
 			("prep",  po::value<std::string> (&__prep_file) ->default_value ("prepared_ligands.pdb"),
 			 "Prepared small molecule(s) are outputted to this filename")
+			("seeds_pdb", po::value<std::string> (&__seeds_pdb_file)->default_value("seeds.pdb"),
+			 "File to save full seeds into.")
 			("max_num_ligands", po::value<int> (&__max_num_ligands)->default_value (10),
 			 "Maximum number of ligands to read in one chunk")
 			;
