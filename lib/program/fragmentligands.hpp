@@ -22,7 +22,7 @@ namespace Program {
 		std::mutex __prevent_re_read_mtx;
 		std::mutex __add_to_typing_mtx;
 
-		void __fragment_ligands ( Molib::PDBreader& lpdb, const CmdLnOpts& cmdl, bool write_out = true );
+		void __fragment_ligands ( Molib::PDBreader& lpdb, const CmdLnOpts& cmdl, const bool write_out);
 
 	protected:
 		virtual bool __can_read_from_files(const CmdLnOpts& cmdl);
@@ -31,6 +31,8 @@ namespace Program {
 
 	public:
 		FragmentLigands( ) { }
+
+		void add_seeds_from_molecules(const Molib::Molecules& molecules,  const Program::CmdLnOpts& cmdl);
 
 		const Molib::Molecules& seeds() const {
 			return __seeds;

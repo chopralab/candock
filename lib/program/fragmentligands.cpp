@@ -32,7 +32,7 @@ namespace Program {
 
 			__seeds.erase_properties();
 
-			inout::output_file(__seeds, cmdl.seeds_pdb_file(), ios_base::app);
+			inout::output_file(__seeds, cmdl.seeds_pdb_file(), ios_base::out);
 		} else {
 			Molib::PDBreader lpdb(cmdl.seeds_pdb_file(), Molib::PDBreader::all_models);
 			__ligand_idatm_types = __seeds.get_idatm_types(__ligand_idatm_types);
@@ -41,7 +41,7 @@ namespace Program {
 		}
 	}
 
-	void FragmentLigands::__fragment_ligands( Molib::PDBreader& lpdb, const CmdLnOpts& cmdl, bool write_out ) {
+	void FragmentLigands::__fragment_ligands( Molib::PDBreader& lpdb, const CmdLnOpts& cmdl, const bool write_out) {
 		bool thread_is_not_done;
 		Molib::Molecules ligands;
 		{
@@ -95,6 +95,27 @@ namespace Program {
 		for(auto& thread : threads) {
 			thread.join();
 		}
+
+		const string fragment_bag = cmdl.get_string_option("fragment_bag");
+
+		if (inout::Inout::file_size(fragment_bag) > 0) {
+
+			cout << "Adding fragments from " << fragment_bag << endl;
+
+			Molib::PDBreader lpdb_additional(fragment_bag, 
+				Molib::PDBreader::all_models|Molib::PDBreader::hydrogens, 
+				cmdl.max_num_ligands());
+
+			std::vector<std::thread> threads2;
+
+			for(int i = 0; i < cmdl.ncpu(); ++i) {
+				threads2.push_back( std::thread([&,this] {__fragment_ligands(lpdb_additional, cmdl, false);} ) );
+			}
+			for(auto& thread : threads2) {
+				thread.join();
+			}
+		}
+
 		dbgmsg(__seeds);
 
 		/* Erase atom properties since they make the graph matching incorrect
@@ -102,7 +123,13 @@ namespace Program {
 		 */
 		__seeds.erase_properties();
 
-		inout::output_file(__seeds, cmdl.seeds_pdb_file(), ios_base::app);
-
+		inout::output_file(__seeds, cmdl.seeds_pdb_file(), ios_base::out);
+	}
+	
+	void FragmentLigands::add_seeds_from_molecules(const Molib::Molecules& molecules, const Program::CmdLnOpts& cmdl) {
+		__ligand_idatm_types = molecules.get_idatm_types(__ligand_idatm_types);
+		common::create_mols_from_seeds(__added, __seeds, molecules);
+		__seeds.erase_properties();
+		inout::output_file(__seeds, cmdl.seeds_pdb_file(), ios_base::out);
 	}
 }

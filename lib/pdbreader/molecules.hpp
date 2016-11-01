@@ -50,7 +50,7 @@ namespace Molib {
 		Molecules& compute_overlapping_rigid_segments(const string &seeds_file="");
 		Molecules& erase_properties() { for (auto &molecule : *this) molecule.erase_properties(); return *this; }
 
-		set<int> get_idatm_types(set<int> previous=set<int>());
+		set<int> get_idatm_types(set<int> previous=set<int>()) const;
 		
 
 		friend ostream& operator<< (ostream& stream, const Molecules& m);
