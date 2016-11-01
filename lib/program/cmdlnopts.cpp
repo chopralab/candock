@@ -188,16 +188,26 @@ namespace Program {
 
 			po::options_description design_step ("Automated Design Options");
 			design_step.add_options()
-			("target_dir",          po::value<std::string>()->default_value("")->implicit_value("targets"))
-			("antitarget_dir",      po::value<std::string>()->default_value("")->implicit_value("atargets"))
-			("target_linking",      po::value<bool>()->default_value(true,"true"))
-			("antitarget_linking",  po::value<bool>()->default_value(true,"true"))
-			("fragment_bag",        po::value<std::string>()->default_value("")->implicit_value("fragment_bag.mol2"))
-			("seeds_to_add",        po::value<int>()->default_value(50))
-			("seeds_to_avoid",      po::value<int>()->default_value(50))
-			("seeds_till_good",     po::value<int>()->default_value(-1))
-			("seeds_till_bad",      po::value<int>()->default_value(-1))
-			("force_seed",          po::value< std::vector<std::string>>())
+			("target_dir",          po::value<std::string>()->default_value("")->implicit_value("targets"),
+			 "Directory containing PDB files. These are docked against and labeled as targets. ")
+			("antitarget_dir",      po::value<std::string>()->default_value("")->implicit_value("atargets"),
+			 "Directory containing PDB files. These are docked against and labeled as antitargets")
+			("target_linking",      po::value<bool>()->default_value(true,"true"),
+			 "Should the ligands be linked for target")
+			("antitarget_linking",  po::value<bool>()->default_value(true,"true"),
+			 "Shoutd the ligands be linked for antitargets")
+			("fragment_bag",        po::value<std::string>()->default_value("")->implicit_value("fragment_bag.mol2"),
+			 "Additional fragments to be added to seeds.pdb")
+			("seeds_to_add",        po::value<int>()->default_value(50),
+			 "Number of seeds from seeds.pdb to be considered for addition to the ligands in prepared_ligands.pdb")
+			("seeds_to_avoid",      po::value<int>()->default_value(50),
+			 "Number of seeds from seeds.pdb to be considered for removal from determined from seeds_to_add")
+			("seeds_till_good",     po::value<int>()->default_value(-1),
+			 "Number of times a seed must be present in the top_seeds for targets until it is considered for addition")
+			("seeds_till_bad",      po::value<int>()->default_value(-1),
+			 "Number of times a seed must be present in the top_seeds for antitargets until it is removed from the good list")
+			("force_seed",          po::value< std::vector<std::string>>(),
+			 "Force addition of a certain seed from seeds.pdb")
 			;
 
 			po::options_description config_options;
