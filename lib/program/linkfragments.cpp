@@ -95,7 +95,7 @@ namespace Program {
 			} catch (exception& e) { 
 				cerr << "Error: skipping ligand " << ligand.name() << " due to : " << e.what() << endl;
 				stringstream ss;
-				ss << "REMARK  20 non-binder with " << __receptor.name() << " because " << e.what() << endl << ligand;
+				ss << "REMARK  20 non-binder " << ligand.name() << " with " << __receptor.name() << " because " << e.what() << endl << ligand;
 				inout::Inout::file_open_put_stream(p.string(), ss, ios_base::app);
 			} 
 			ffcopy.erase_topology(ligand); // he he

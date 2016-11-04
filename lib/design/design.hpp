@@ -20,7 +20,7 @@ namespace design {
 			return __designs;
 		}
 		
-		const Molib::Molecules& get_prepared_designs();
+		const Molib::Molecules& prepare_designs( const std::string& seeds_file );
 	};
 }
 

@@ -16,7 +16,7 @@ namespace design {
 		__original.erase_properties();
 	}
 
-	const Molib::Molecules& Design::get_prepared_designs() {
+	const Molib::Molecules& Design::prepare_designs( const std::string& seeds_file ) {
 		for ( auto &molecule : __designs ) {
 
 			Molib::Chain   &first_chain  = molecule.first().first().first();
@@ -100,7 +100,7 @@ namespace design {
 				        .compute_gaff_type()
 				        .compute_rotatable_bonds() // relies on hydrogens being assigned
 				        .erase_hydrogen()
-				        .compute_overlapping_rigid_segments("desinged_seeds.txt");
+				        .compute_overlapping_rigid_segments(seeds_file);
 	}
 
 	void Design::functionalize_hydrogens_with_fragments(const Molib::NRset& nr) {

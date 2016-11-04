@@ -63,7 +63,7 @@ int main(int argc, char* argv[]) {
 		antitargets.dock_fragments(ligand_fragmenter, cmdl);
 
 		set<string> solo_target_seeds;
-		vector<string> forced_seeds = cmdl.get_string_vector("force_seed");
+		const vector<string>& forced_seeds = cmdl.get_string_vector("force_seed");
 
 		if (forced_seeds.size() != 0) {
 			std::copy( forced_seeds.begin(), forced_seeds.end(), std::inserter(solo_target_seeds, solo_target_seeds.end()));
@@ -91,12 +91,25 @@ int main(int argc, char* argv[]) {
 		lpdb2.parse_molecule(mol);
 
 		cout << "Starting Design with " << solo_target_seeds.size() << " seeds." << endl;
-		
+
 		design::Design designer( mol.first() );
-		//designer.functionalize_hydrogens_with_fragments(common::read_top_seeds_files(solo_target_seeds, "targets/syk/" + cmdl.top_seeds_dir(), cmdl.top_seeds_file(), 0));
-		designer.functionalize_extremes_with_single_atoms( {"C", "N", "O", "S", "F", "Cl", "Br", "I"}  );
-		inout::output_file(designer.get_internal_designs(), "interal_designs.pdb");
-		inout::output_file(designer.get_prepared_designs(), "designed.pdb");
+		
+		if (! solo_target_seeds.empty() )
+			designer.functionalize_hydrogens_with_fragments(common::read_top_seeds_files(solo_target_seeds, "targets/syk/" + cmdl.top_seeds_dir(), cmdl.top_seeds_file(), 0));
+
+		const vector<string>& h_single_atoms = cmdl.get_string_vector("add_single_atoms");
+		const vector<string>& a_single_atoms = cmdl.get_string_vector("change_terminal_atom");
+
+		if (!a_single_atoms.empty())
+			designer.functionalize_extremes_with_single_atoms(a_single_atoms);
+		if (!h_single_atoms.empty())
+			designer.functionalize_hydrogens_with_single_atoms(h_single_atoms);
+
+#ifndef NDEBUG
+		inout::output_file(designer.get_internal_designs(), "internal_designs.pdb");
+#endif
+
+		inout::output_file(designer.prepare_designs(cmdl.seeds_file()), "designed.pdb");
 
 		cmdl.display_time("finished");
 

@@ -106,6 +106,8 @@ namespace Program {
 		std::string __program_name;
 		std::string __version;
 		std::string __git_version;
+		
+		std::vector<std::string> __blankstring;
 	public:
 		CmdLnOpts() : __quiet (false), __version (""), __git_version ("") {
 			std::stringstream ss;
@@ -140,12 +142,12 @@ namespace Program {
 
 		// interface
 
-		std::string get_string_option (const std::string& option) const;
+		const std::string& get_string_option (const std::string& option) const;
 		bool        get_bool_option   (const std::string& option) const;
 		int         get_int_option    (const std::string& option) const;
 		double      get_double_option (const std::string& option) const;
 
-		std::vector<std::string> get_string_vector (const std::string& option) const;
+		const std::vector<std::string>& get_string_vector (const std::string& option) const;
 
 		bool quiet() const {
 			return __quiet;
