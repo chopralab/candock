@@ -2,7 +2,7 @@
 
 #include "pdbreader/pdbreader.hpp"
 
-#include "findcentroids.hpp"
+#include "helper/path.hpp"
 
 namespace Program {
 	Target::Target(const std::string& input_name ) {
@@ -20,6 +20,7 @@ namespace Program {
 			Molib::Molecules receptors = rpdb.parse_molecule();
 			Molib::Molecule& current = __receptors.add(new Molib::Molecule ( std::move (receptors[0]) ));
 			current.set_name( a.substr(0, a.length() - 4 ) );
+			inout::output_file("JUNK", Path::join(current.name(),"temp"));
 
 			__preprecs.push_back(DockedReceptor {current, nullptr, nullptr, nullptr});
 		}

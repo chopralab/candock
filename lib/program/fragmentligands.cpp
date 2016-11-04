@@ -35,9 +35,11 @@ namespace Program {
 			inout::output_file(__seeds, cmdl.seeds_pdb_file(), ios_base::out);
 		} else {
 			Molib::PDBreader lpdb(cmdl.seeds_pdb_file(), Molib::PDBreader::all_models);
+			lpdb.parse_molecule(__seeds);
 			__ligand_idatm_types = __seeds.get_idatm_types(__ligand_idatm_types);
-			for (const auto& mol : __seeds)
+			for (const auto& mol : __seeds) {
 				__added.insert( stoi(mol.name()) );
+            }
 		}
 	}
 
