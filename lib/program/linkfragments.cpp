@@ -4,17 +4,39 @@
 #include "linker/linker.hpp"
 #include "modeler/modeler.hpp"
 #include "helper/path.hpp"
+#include "helper/grep.hpp"
 
 namespace Program {
 
 	bool LinkFragments::__can_read_from_files ( const CmdLnOpts& cmdl )
 	{
-		return false;
+		boost::regex regex;
+		regex.assign("REMARK   5 MOLECULE (\\w*)");
+		std::ifstream file( cmdl.prep_file() );
+		
+		std::vector<std::string> all_names = Grep::search_stream(file, regex);
+		
+		boost::filesystem::path p ( __receptor.name());
+		p /= cmdl.docked_dir();
+		
+		bool is_done = true;
+		
+		for (auto molec : all_names) {
+			boost::filesystem::path p2 = p / (molec + ".pdb");
+			if ( inout::Inout::file_size(p2.string()) <= 0) {
+				is_done = false;
+			} else {
+				Molib::PDBreader conf(p2.string(), Molib::PDBreader::skip_atom | Molib::PDBreader::first_model, 1);
+				conf.parse_molecule(__all_top_poses);
+			}
+		}
+		
+		return is_done;
 	}
 
 	void LinkFragments::__read_from_files ( const CmdLnOpts& cmdl )
 	{
-		throw Error( "You should not be here...yet");
+		cout << "Linking for all molecules in " << cmdl.prep_file() << " for " << __receptor.name() << " is complete, skipping." << endl;
 	}
 
 	void Program::LinkFragments::__link_ligand_from_fragment( Molib::PDBreader& lpdb2, const CmdLnOpts& cmdl)
@@ -23,13 +45,15 @@ namespace Program {
 		Molib::Molecules ligands;
 
 		while (lpdb2.parse_molecule(ligands)) {
-	
+
 			Molib::Molecule &ligand = ligands.first();
 
 			boost::filesystem::path p(__receptor.name());
 			p = p / cmdl.docked_dir() / (ligand.name() + ".pdb");
 			if ( inout::Inout::file_size(p.string()) > 0) {
-				cout << ligand.name() << " is alread docked to " << __receptor.name() << ", skipping." << endl;
+				cout << ligand.name() << " is alread docked to " << __receptor.name() << ", reading from already docked file." << endl;
+				Molib::PDBreader conf(p.string(), Molib::PDBreader::skip_atom | Molib::PDBreader::first_model, 1);
+				conf.parse_molecule(__all_top_poses);
 				ligands.clear();
 				continue;
 			}
@@ -86,12 +110,15 @@ namespace Program {
 						cmdl.max_clique_size(), cmdl.max_iterations_final());
 
 				Linker::DockedConformation::Vec docks = linker.link();
+				Linker::DockedConformation::sort(docks);
 
+				int model = 0;
 				for (auto &docked : docks) {
 					common::change_residue_name(docked.get_ligand(), "CAN"); 
-					inout::output_file(Molib::Molecule::print_complex(docked.get_ligand(), docked.get_receptor(), docked.get_energy()), 
+					inout::output_file(Molib::Molecule::print_complex(docked.get_ligand(), docked.get_receptor(), docked.get_energy(), ++model), 
 							p.string(), ios_base::app); // output docked molecule conformations
 				}
+				__all_top_poses.add( new Molib::Molecule (docks[0].get_ligand()) );
 			} catch (exception& e) { 
 				cerr << "Error: skipping ligand " << ligand.name() << " due to : " << e.what() << endl;
 				stringstream ss;

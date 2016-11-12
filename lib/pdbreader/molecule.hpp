@@ -90,7 +90,7 @@ namespace Molib {
 		}
 		Molecule& erase_properties() { for (auto &assembly : *this) assembly.erase_properties(); return *this; }
 		friend ostream& operator<< (ostream& stream, const Molecule& m);
-		static string print_complex(Molecule &ligand, Molecule &receptor, const double energy);
+		static string print_complex(Molecule &ligand, Molecule &receptor, const double energy, const int model = 1);
 	};
 	
 } // Molib

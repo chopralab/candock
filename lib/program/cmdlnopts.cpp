@@ -206,11 +206,11 @@ namespace Program {
 			 "Number of times a seed must be present in the top_seeds for targets until it is considered for addition")
 			("seeds_till_bad",      po::value<int>()->default_value(-1),
 			 "Number of times a seed must be present in the top_seeds for antitargets until it is removed from the good list")
-			("force_seed",          po::value< std::vector<std::string>>(),
+			("force_seed",          po::value< std::vector<std::string>>()->multitoken(),
 			 "Force addition of a certain seed from seeds.pdb. Multiple seeds can be given")
-			("add_single_atoms",    po::value< std::vector<std::string>>(),
+			("add_single_atoms",    po::value< std::vector<std::string>>()->multitoken(),
 			 "Change hydrogens to given atoms. Multiple atoms can be given.")
-			("change_terminal_atom",po::value< std::vector<std::string>>(),
+			("change_terminal_atom",po::value< std::vector<std::string>>()->multitoken(),
 			 "Change non-hydrogen atoms that terminate chains to given atoms. Multiple atoms can be given.")
 			;
 

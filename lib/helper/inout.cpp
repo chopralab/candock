@@ -25,7 +25,7 @@ namespace inout {
 	}
 
 	int Inout::__lock(const string &name) {
-		int fd = open(name.c_str(),O_RDWR|O_CREAT,S_IRUSR|S_IWUSR); 	
+		int fd = open(name.c_str(),O_RDWR|O_CREAT,S_IRUSR|S_IWUSR);
 		if (flock(fd,LOCK_EX) == -1) {
 		} 
 		return fd;
@@ -124,7 +124,7 @@ namespace inout {
 			}
 		}
 		else {
-			throw Error("die : Cannot open directory " + p.string());
+			throw Error("die : Cannot open directory \"" + p.string() + '"');
 		}
 		vector<string> filenames;
 		for(string &s : fn) {

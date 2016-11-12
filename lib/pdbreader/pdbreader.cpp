@@ -202,6 +202,7 @@ namespace Molib {
 		Residue *residue = nullptr;
 		for (string &line : pdb_raw) {
 			if ((__hm & PDBreader::skip_hetatm) && line.compare(0, 6, "HETATM") == 0) continue;
+			if ((__hm & PDBreader::skip_atom  ) && line.compare(0, 4, "ATOM")   == 0) continue;
 			if (line.compare(0, 4, "ATOM") == 0 || line.compare(0, 6, "HETATM") == 0) {
 				__generate_molecule(mols, found_molecule, "");
 				__generate_assembly(mols, found_assembly, 0, "ASYMMETRIC UNIT");

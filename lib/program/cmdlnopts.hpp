@@ -402,15 +402,23 @@ namespace Program {
 
 			for ( const auto& a : cmdl.__vm ) {
 				stream << std::setw(22)<< a.first << " = ";
-				if      ( auto v = boost::any_cast<std::string>(&a.second.value()) )
+				if        ( auto v = boost::any_cast<std::string>(&a.second.value()) ) {
 					stream << std::setw(47) << *v;
-				else if ( auto v = boost::any_cast<int>(&a.second.value()) )
+				} else if ( auto v = boost::any_cast<int>(&a.second.value()) ) {
 					stream << std::setw(47) << *v;
-				else if ( auto v = boost::any_cast<double>(&a.second.value()) )
+				} else if ( auto v = boost::any_cast<double>(&a.second.value()) ) {
 					stream << std::setw(47) << *v;
-				else if ( auto v = boost::any_cast<bool>(&a.second.value()) )
+				} else if ( auto v = boost::any_cast<bool>(&a.second.value()) ) {
 					stream << std::setw(47) << *v;
-
+				} else if ( auto v = boost::any_cast<std::vector<std::string>>(&a.second.value()) ) {
+					std::string combination("");
+					for ( const auto& s : *v ) {
+						combination += s;
+						combination += ", ";
+					}
+					stream << std::setw(47) << combination;
+				}
+				
 				stream << std::endl;
 			}
 
