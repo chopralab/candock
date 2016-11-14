@@ -532,6 +532,9 @@ namespace help {
 	        { "Mg", { Ion, 0, "magnesium" } },
 	        { "Mn", { Ion, 0, "manganese" } },
 	        { "Zn", { Ion, 0, "zinc" } },
+	        { "Ca", { Ion, 0, "calcium" } },
+	        { "Na", { Ion, 0, "sodium" } },
+			{ "K",  { Ion, 0, "potassium" } },
 	};
 
 	const IdatmEntry &get_info_map(const string &name);
