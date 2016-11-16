@@ -49,7 +49,7 @@ int main(int argc, char* argv[]) {
 		Molib::Molecules receptors = rpdb.parse_molecule();
 		
 
-		Molib::PDBreader lpdb(cmdl.ligand_file(), Molib::PDBreader::all_models, 
+		Molib::PDBreader lpdb(cmdl.prep_file(), Molib::PDBreader::all_models, 
 			cmdl.max_num_ligands());
 
 		/* Compute atom types for receptor and cofactor(s): gaff types for protein, 

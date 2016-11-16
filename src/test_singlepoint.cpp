@@ -55,7 +55,7 @@ int main(int argc, char* argv[]) {
 		Molib::Atom::Grid gridrec(receptors[0].get_atoms());
 		
 
-		Molib::PDBreader lpdb(cmdl.ligand_file(), 
+		Molib::PDBreader lpdb(cmdl.prep_file(), 
 			Molib::PDBreader::all_models|Molib::PDBreader::hydrogens, 
 			cmdl.max_num_ligands());
 

@@ -56,7 +56,7 @@ int main(int argc, char* argv[]) {
 			.compute_rotatable_bonds() // relies on hydrogens being assigned
 			.erase_hydrogen();
 
-		inout::output_file(receptors, cmdl.prep_file());
+		inout::output_file(receptors, "prepared_receptor.pdb");
 		
 		cmdl.display_time("finished");
 
