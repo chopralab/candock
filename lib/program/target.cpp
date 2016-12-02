@@ -3,9 +3,14 @@
 #include "pdbreader/pdbreader.hpp"
 
 #include "helper/path.hpp"
+#include "common.hpp"
 
 namespace Program {
 	Target::Target(const std::string& input_name ) {
+
+		if (!boost::filesystem::exists(input_name)) {
+			throw Error("Provided file or directory does not exist.");
+		}
 
 		/* Initialize parsers for receptor and read
 		 * the receptor molecule(s)
@@ -90,7 +95,7 @@ namespace Program {
 		}
 	}
 
-	void Target::link_fragments(const Program::CmdLnOpts& cmdl) {
+	void Target::link_fragments(const CmdLnOpts& cmdl) {
 
 		for ( auto &a : __preprecs ) {
 			
@@ -109,6 +114,31 @@ namespace Program {
 			std::unique_ptr<LinkFragments> plinkfragments(new LinkFragments(a.protein, *a.score, *a.ffield, *a.gridrec));
 			plinkfragments->run_step(cmdl);
 			a.dockedlig = std::move(plinkfragments);
+		}
+	}
+
+	void Target::design_ligands(const CmdLnOpts& cmdl, const std::set<std::string>& seeds_to_add) {
+		for ( auto &a : __preprecs ) {
+			std::unique_ptr<design::Design> designer( new design::Design( a.dockedlig->top_poses().first() ));
+			if (! seeds_to_add.empty() )
+				designer->functionalize_hydrogens_with_fragments(common::read_top_seeds_files(seeds_to_add,
+																 Path::join(a.protein.name(), cmdl.top_seeds_dir()),
+																 cmdl.top_seeds_file(), cmdl.top_percent() ));
+
+			const vector<string>& h_single_atoms = cmdl.get_string_vector("add_single_atoms");
+			const vector<string>& a_single_atoms = cmdl.get_string_vector("change_terminal_atom");
+
+			if (!a_single_atoms.empty())
+				designer->functionalize_extremes_with_single_atoms(a_single_atoms);
+			if (!h_single_atoms.empty())
+				designer->functionalize_hydrogens_with_single_atoms(h_single_atoms);
+
+//#ifndef NDEBUG
+			inout::output_file(designer->get_internal_designs(), "internal_designs.pdb");
+//#endif
+
+			inout::output_file(designer->prepare_designs(cmdl.seeds_file()), "designed.pdb");
+			//ligand_fragmenter.add_seeds_from_molecules(designer.designs(), cmdl);
 		}
 	}
 
