@@ -230,10 +230,21 @@ namespace design {
 				Molib::BondOrder::compute_bond_order(__designs.last().get_atoms());
 				Molib::Hydrogens::erase_hydrogen(    __designs.last().get_atoms());
 
+				Geom3D::Coordinate crd;
+
+				for (const auto bond : start_atom->get_bonds()) {
+					const Molib::Atom& other = bond->second_atom(*start_atom);
+					if( other.element() == Molib::Element::H)
+						continue;
+					crd = crd + ( start_atom->crd() - other.crd() );
+				}
+
+				crd = crd + start_atom->crd();
+
 				Molib::Residue& mod_residue = __designs.last().first().first().first().first();
 				Molib::Atom& new_atom = ( atom_type == "C" || atom_type == "O" || atom_type == "N" || atom_type == "S" ) ?
-					mod_residue.add(new Molib::Atom(mod_residue.size() + 1, atom_type, Geom3D::Coordinate(0,0,0), help::idatm_mask.at(atom_type + "3") ) ) :
-					mod_residue.add(new Molib::Atom(mod_residue.size() + 1, atom_type, Geom3D::Coordinate(0,0,0), help::idatm_mask.at(atom_type ) ) ) ;
+					mod_residue.add(new Molib::Atom(mod_residue.size() + 1, atom_type, crd, help::idatm_mask.at(atom_type + "3") ) ) :
+					mod_residue.add(new Molib::Atom(mod_residue.size() + 1, atom_type, crd, help::idatm_mask.at(atom_type ) ) ) ;
 
 				mod_residue.element(start_atom->atom_number()).connect(new_atom).set_bo(1);
 			}
