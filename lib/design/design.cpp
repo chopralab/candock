@@ -119,11 +119,8 @@ namespace design {
 		
 		return false;
 	}
-	
 
-	void Design::functionalize_hydrogens_with_fragments(const Molib::NRset& nr) {
-
-		const double cutoff = 2.0;
+	void Design::functionalize_hydrogens_with_fragments(const Molib::NRset& nr, const double cutoff, const double clash_coeff) {
 
 		if (nr.size() == 0) {
 			throw Error("No seeds given for modificatiton");
@@ -163,7 +160,7 @@ namespace design {
 						continue;
 					}
 
-					if ( check_clash_for_design(__original.get_atoms(), seed.get_atoms(), 0.75, search_atom.atom_number()) )
+					if ( check_clash_for_design(__original.get_atoms(), seed.get_atoms(), clash_coeff, search_atom.atom_number()) )
 						continue;
 
 					success = true;

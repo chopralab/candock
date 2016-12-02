@@ -123,7 +123,8 @@ namespace Program {
 			if (! seeds_to_add.empty() )
 				designer->functionalize_hydrogens_with_fragments(common::read_top_seeds_files(seeds_to_add,
 																 Path::join(a.protein.name(), cmdl.top_seeds_dir()),
-																 cmdl.top_seeds_file(), cmdl.top_percent() ));
+																 cmdl.top_seeds_file(), cmdl.top_percent() ),
+																 cmdl.tol_seed_dist(), cmdl.clash_coeff() );
 
 			const vector<string>& h_single_atoms = cmdl.get_string_vector("add_single_atoms");
 			const vector<string>& a_single_atoms = cmdl.get_string_vector("change_terminal_atom");
