@@ -136,7 +136,7 @@ namespace Program {
 		};
 
 		void init (int argc, char *argv[], int opts_to_parse = ALL_OPTIONS);
-		void display_time (std::string what) {
+		void display_time (std::string what) const {
 			cout << what << " on " << boost::posix_time::to_simple_string (boost::posix_time::second_clock::local_time()) << std::endl;
 		}
 

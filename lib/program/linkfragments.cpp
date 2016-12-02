@@ -52,8 +52,6 @@ namespace Program {
 			p = p / cmdl.docked_dir() / (ligand.name() + ".pdb");
 			if ( inout::Inout::file_size(p.string()) > 0) {
 				cout << ligand.name() << " is alread docked to " << __receptor.name() << ", reading from already docked file." << endl;
-				Molib::PDBreader conf(p.string(), Molib::PDBreader::skip_atom | Molib::PDBreader::first_model, 1);
-				conf.parse_molecule(__all_top_poses);
 				ligands.clear();
 				continue;
 			}
@@ -119,9 +117,10 @@ namespace Program {
 							p.string(), ios_base::app); // output docked molecule conformations
 				}
 				__all_top_poses.add( new Molib::Molecule (docks[0].get_ligand()) );
-			} catch (exception& e) { 
-				cerr << "Error: skipping ligand " << ligand.name() << " due to : " << e.what() << endl;
+			} catch (exception& e) {
+				cerr << "Error: skipping ligand " << ligand.name() << " with " << __receptor.name() << " due to : " << e.what() << endl;
 				stringstream ss;
+				common::change_residue_name(ligand, "CAN");
 				ss << "REMARK  20 non-binder " << ligand.name() << " with " << __receptor.name() << " because " << e.what() << endl << ligand;
 				inout::Inout::file_open_put_stream(p.string(), ss, ios_base::app);
 			} 
