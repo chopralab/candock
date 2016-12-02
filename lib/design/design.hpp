@@ -21,6 +21,7 @@ namespace design {
 		}
 		
 		const Molib::Molecules& prepare_designs( const std::string& seeds_file );
+		const Molib::Molecules& designs() const { return __designs; }
 	};
 }
 

@@ -14,6 +14,7 @@ namespace design {
 		// Create a new molecule, original bonds will be copied
 		Molib::Hydrogens::compute_hydrogen(__original.get_atoms());
 		__original.erase_properties();
+		__original.first().first().first().first().renumber_atoms(1);
 	}
 
 	const Molib::Molecules& Design::prepare_designs( const std::string& seeds_file ) {
@@ -64,7 +65,7 @@ namespace design {
 						bond->atom1().erase_bond(bond->atom2());
 						break;
 					} 
-					
+
 					if ( bond->atom2().br().resi() == 1 && bond->atom1().br().resi() != 1) {
 
 						int atom_to_remove = -1;
@@ -91,7 +92,7 @@ namespace design {
 		}
 
 		return __designs.compute_hydrogen()
-						.compute_bond_order()
+				        .compute_bond_order()
 				        .compute_bond_gaff_type()
 				        .refine_idatm_type()
 				        .erase_hydrogen()  // needed because refine changes connectivities
@@ -103,73 +104,111 @@ namespace design {
 				        .compute_overlapping_rigid_segments(seeds_file);
 	}
 
+	
+	bool check_clash_for_design( Molib::Atom::Vec molecule, Molib::Atom::Vec seed, double clash_coeff, int skip ) {
+		for (const auto i : molecule) {
+			const double vdw1 = i->radius();
+			for (const auto j : seed) {
+				if (j->atom_number() == skip) { 
+					continue;
+				}
+				const double vdw2 = j->radius();
+				if (i->crd().distance_sq(j->crd()) < pow(clash_coeff * (vdw1 + vdw2), 2)) return true;
+			}
+		}
+		
+		return false;
+	}
+	
+
 	void Design::functionalize_hydrogens_with_fragments(const Molib::NRset& nr) {
+
+		const double cutoff = 2.0;
 
 		if (nr.size() == 0) {
 			throw Error("No seeds given for modificatiton");
 		}
 
-		for ( const auto &seed : nr ) {
+		for ( auto &start_atom : __original.get_atoms() ) {
 
-			// Copy seed as new residue, this will have its bonds in place
-			const Molib::Residue &r = seed.first().first().first().first().first();
-			Molib::Residue asmb(r);
-			asmb.regenerate_bonds(r);
-			asmb.set_resi(__original.first().first().first().size() + 1);
-			asmb.renumber_atoms(__original.get_atoms().size());
+			// Make sure the ligand atom has an open valency
+			if (start_atom->get_num_hydrogens() == 0 || start_atom->element() == Molib::Element::H) {
+				continue;
+			}
 
-			// "atom" is the search atom (only used for its position and type)
-			for ( auto &search_atom : asmb ) {
+			for ( const auto &fragment : nr )  {
+			
+			// This variable controls if we've already added the seed
+			bool success = false;
+			for ( const auto &seed     : fragment) { 
 
-				// Check if the atom is "exposed", I.E. not in a ring or the middle of a chain
-				if (search_atom.get_bonds().size() != 1 || search_atom.element() == Molib::Element::H) {
-					continue;
-				}
+				// Copy seed as new residue, this will have its bonds in place
+				const Molib::Residue &r = seed.first().first().first().first();
 
-				for ( auto &start_atom : __original.get_atoms() ) {
+				// "atom" is the search atom (only used for its position and type)
+				for ( auto &search_atom : r ) {
 
-					// Make sure the ligand atom has an open valency
-					if (start_atom->get_num_hydrogens() == 0 || start_atom->element() == Molib::Element::H) {
+					// Check if the atom is "exposed", I.E. not in a ring or the middle of a chain
+					if (search_atom.get_bonds().size() != 1 || search_atom.element() == Molib::Element::H) {
 						continue;
 					}
 
 					// Check to see if the atom types are the same
-					if (search_atom.idatm_type() == start_atom->idatm_type()) {
-						Molib::Molecule modificatiton(__original);
-
-						// Copy the new molecule into the returnable object
-						__designs.add( new Molib::Molecule(modificatiton) );
-
-						// Remove all hydrogens from the original ligand (they are not needed anymore)
-						Molib::Hydrogens::erase_hydrogen(__designs.last().get_atoms());
-
-						// Add new fragment as a "residue" of the molecule
-						Molib::Chain &chain = __designs.last().first().first().first();
-						chain.add(new Molib::Residue(asmb));
-						chain.last().regenerate_bonds(asmb);
-
-						// Create the relevent bond between the ligand and fragment, remove the "search atom"
-						Molib::Atom &atom2  = chain.last ().element( search_atom.atom_number() );
-						Molib::Atom &start2 = chain.first().element( start_atom->atom_number() );
-						Molib::Atom &mod_atom = atom2.get_bonds().front()->second_atom(atom2);
-						mod_atom.connect( start2 ).set_bo(1);
-
-						__designs.last().set_name( __original.name() +"_design_with_" + seed.name() + 
-							"_on_" + std::to_string(start_atom->atom_number()) +
-							"_to_" + std::to_string(mod_atom.atom_number()) );
-
-						// Fix internal atom graph
-						for (int i = 0; i < mod_atom.size(); ++i) {
-							if (mod_atom[i].atom_number() == atom2.atom_number()) {
-								mod_atom.erase(i);
-								break;
-							}
-						}
-
-						mod_atom.erase_bond(atom2);
-						chain.last().erase(atom2.atom_number());
+					if (search_atom.idatm_type() != start_atom->idatm_type()) {
+						continue;
 					}
+
+					// Ensure the fragment is close enough to the original ligand in the pocket
+					if (start_atom->crd().distance( search_atom.crd() ) > cutoff ) {
+						continue;
+					}
+
+					if ( check_clash_for_design(__original.get_atoms(), seed.get_atoms(), 0.75, search_atom.atom_number()) )
+						continue;
+
+					success = true;
+					Molib::Molecule modificatiton(__original);
+
+					// Copy the new molecule into the returnable object
+					__designs.add( new Molib::Molecule(modificatiton) );
+
+					// Remove all hydrogens from the original ligand (they are not needed anymore)
+					Molib::Hydrogens::erase_hydrogen(__designs.last().get_atoms());
+
+					// Add new fragment as a "residue" of the molecule
+					Molib::Chain &chain = __designs.last().first().first().first();
+					Molib::Residue* new_res = new Molib::Residue(r);
+					new_res->regenerate_bonds(r);
+					new_res->set_resi(__original.first().first().first().size() + 1);
+					chain.add(new_res);
+
+					// Create the relevent bond between the ligand and fragment, remove the "search atom"
+					Molib::Atom &atom2  = chain.last ().element( search_atom.atom_number() );
+					Molib::Atom &start2 = chain.first().element( start_atom->atom_number() );
+					Molib::Atom &mod_atom = atom2.get_bonds().front()->second_atom(atom2);
+					chain.last().renumber_atoms(__original.get_atoms().size());
+					mod_atom.connect( start2 ).set_bo(1);
+
+					__designs.last().set_name( __original.name() +"_design_with_" + fragment.name() + 
+						"_on_" + std::to_string(start_atom->atom_number()) +
+						"_to_" + std::to_string(mod_atom.atom_number()) );
+
+					// Fix internal atom graph
+					for (int i = 0; i < mod_atom.size(); ++i) {
+						if (mod_atom[i].atom_number() == atom2.atom_number()) {
+							mod_atom.erase(i);
+							break;
+						}
+					}
+
+					mod_atom.erase_bond(atom2);
+					chain.last().erase(search_atom.atom_number());
 				}
+			}
+			
+			if (success)
+				break;
+			
 			}
 		}
 	}
