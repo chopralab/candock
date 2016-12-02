@@ -276,6 +276,8 @@ namespace Molib {
 				patom2 = get_closest_atom_of(atom1, grid.get_neighbors(atom1.crd(), 2.5), "SG");
 			} else if (atom1.atom_name() == "N") {
 				patom2 = get_closest_atom_of(atom1, grid.get_neighbors(atom1.crd(), 1.4), "C");
+			} else if (atom1.atom_name() == "O3'") {
+				patom2 = get_closest_atom_of(atom1, grid.get_neighbors(atom1.crd(), 1.7), "P");
 			}
 			if (patom2) {
 				auto &atom2 = *patom2;
@@ -302,7 +304,13 @@ namespace Molib {
 				if (atom.atom_name() == "N" && !atom.is_adjacent("C")) {
 					residue.set_resn("N" + residue.resn()); // first residue is renamed to NALA, NGLY,...
 				} else if (atom.atom_name() == "C" && !atom.is_adjacent("N")) {
-						residue.set_resn("C" + residue.resn()); // IF NOT ALREADY, rename last residue to CALA, CGLY,...
+					residue.set_resn("C" + residue.resn()); // IF NOT ALREADY, rename last residue to CALA, CGLY,...
+				}
+			} else if (residue.resn().size() == 1) {
+				if (atom.atom_name() == "O3'" && !atom.is_adjacent("P")) {
+					residue.set_resn(residue.resn() + "3");
+				} else if (atom.atom_name() == "O5'" && !atom.is_adjacent("P")) {
+					residue.set_resn(residue.resn() + "5");
 				}
 			}
 		}

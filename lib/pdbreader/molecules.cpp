@@ -88,7 +88,8 @@ namespace Molib {
 			try {
 				for (auto &presidue : molecule.get_residues()) {
 					Residue &residue = *presidue;
-					if (!help::standard_residues.count(residue.resn())) {
+					if (!(help::standard_residues.count(residue.resn())
+					   || help::ions.count(residue.resn()))) {
 						Hydrogens::compute_hydrogen(residue.get_atoms());
 					}
 				}
@@ -108,7 +109,8 @@ namespace Molib {
 			try {
 				for (auto &presidue : molecule.get_residues()) {
 					Residue &residue = *presidue;
-					if (!help::standard_residues.count(residue.resn())) {
+					if (!(help::standard_residues.count(residue.resn())
+					   || help::ions.count(residue.resn()))) {
 						BondOrder::compute_bond_order(residue.get_atoms());
 					}
 				}
@@ -124,7 +126,8 @@ namespace Molib {
 	Molecules& Molecules::compute_bond_gaff_type() { 
 		for (auto &presidue : this->get_residues()) {
 			Residue &residue = *presidue;
-			if (!help::standard_residues.count(residue.resn())) {
+			if (!(help::standard_residues.count(residue.resn())
+			   || help::ions.count(residue.resn()))) {
 				BondOrder::compute_bond_gaff_type(residue.get_atoms());
 			}
 		}
@@ -134,7 +137,8 @@ namespace Molib {
 	Molecules& Molecules::refine_idatm_type() { 
 		for (auto &presidue : this->get_residues()) {
 			Residue &residue = *presidue;
-			if (!help::standard_residues.count(residue.resn())) {
+			if (!(help::standard_residues.count(residue.resn())
+			   || help::ions.count(residue.resn()))) {
 				AtomType::refine_idatm_type(residue.get_atoms());
 			}
 		}
@@ -144,7 +148,9 @@ namespace Molib {
 	Molecules& Molecules::erase_hydrogen() { 
 		for (auto &presidue : this->get_residues()) {
 			Residue &residue = *presidue;
-			if (!help::standard_residues.count(residue.resn())) {
+			// Remove hydrogens added to protonated ions as well
+			if (!(help::standard_residues.count(residue.resn())
+			   || help::ions.count(residue.resn()))) {
 				Hydrogens::erase_hydrogen(residue.get_atoms());
 			}
 		}
@@ -155,7 +161,8 @@ namespace Molib {
 	Molecules& Molecules::compute_ring_type() { 
 		for (auto &presidue : this->get_residues()) {
 			Residue &residue = *presidue;
-			if (!help::standard_residues.count(residue.resn())) {
+			if (!(help::standard_residues.count(residue.resn())
+			   || help::ions.count(residue.resn()))) {
 				AtomType::compute_ring_type(residue.get_atoms());
 			}
 		}
@@ -165,7 +172,8 @@ namespace Molib {
 	Molecules& Molecules::compute_gaff_type() { 
 		for (auto &presidue : this->get_residues()) {
 			Residue &residue = *presidue;
-			if (!help::standard_residues.count(residue.resn())) {
+			if (!(help::standard_residues.count(residue.resn())
+			   || help::metals.count(residue.resn()))) {
 				AtomType::compute_gaff_type(residue.get_atoms());
 			}
 		}
@@ -174,7 +182,8 @@ namespace Molib {
 	Molecules& Molecules::compute_rotatable_bonds() { 
 		for (auto &presidue : this->get_residues()) {
 			Residue &residue = *presidue;
-			if (!help::standard_residues.count(residue.resn())) {
+			if (!(help::standard_residues.count(residue.resn())
+			   || help::ions.count(residue.resn()))) {
 				BondOrder::compute_rotatable_bonds(residue.get_atoms());
 			}
 		}
@@ -228,7 +237,4 @@ namespace Molib {
 			molecule.compute_overlapping_rigid_segments(u); 
 		return *this; 
 	}
-
-
-
 };

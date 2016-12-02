@@ -1,5 +1,6 @@
 #include "fragmenter.hpp"
 #include "unique.hpp"
+#include "helper/renamerules.hpp"
 #include <queue>
 #include <iterator>
 #include "pdbreader/molecule.hpp"

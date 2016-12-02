@@ -123,7 +123,7 @@ int main(int argc, char* argv[]) {
 		mutex mtx;
 		int ligand_cnt = 0;
 		
-		Molib::PDBreader lpdb2(cmdl.ligand_file(), Molib::PDBreader::all_models, 1);
+		Molib::PDBreader lpdb2(cmdl.prep_file(), Molib::PDBreader::all_models, 1);
 
 		/**
 		 * Insert topology for cofactors, but not for standard residues

@@ -44,7 +44,7 @@ int main(int argc, char* argv[]) {
 		if (receptors.empty())
 			receptors.add(new Molib::Molecule("dummy"));
 
-		Molib::PDBreader lpdb(cmdl.ligand_file(), 
+		Molib::PDBreader lpdb(cmdl.prep_file(), 
 			Molib::PDBreader::all_models|Molib::PDBreader::hydrogens, 
 			cmdl.max_num_ligands());
 

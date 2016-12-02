@@ -15,6 +15,9 @@ set( helper_SRC array1d.hpp
 				        inout.cpp
 				        inout.hpp
 				        path.cpp
-				        path.hpp )
+				        path.hpp
+				        renamerules.hpp
+				        smiles.cpp
+				        smiles.hpp )
 
 add_library(helper STATIC ${helper_SRC})
