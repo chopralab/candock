@@ -390,7 +390,11 @@ namespace Molib {
 			patom->set_atom_number(++reenum);
 			ss << setw(66) << left << *patom;
 		}
-		//~ ss << get_bonds_in(ligand.get_atoms());
+		for ( auto &b : get_bonds_in(ligand.get_atoms()) ) {
+			ss  << "CONECT" << setw(5) << right 
+				<< b->atom1().atom_number() << setw(5) 
+				<< right << b->atom2().atom_number() << endl;
+		}
 		ss << "ENDMDL" << endl;
 		return ss.str();
 	}
