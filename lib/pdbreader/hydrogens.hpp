@@ -1,24 +1,17 @@
 #ifndef HYDROGENS_H
 #define HYDROGENS_H
-#include <memory>
-#include <iostream>
-#include <set>
-#include <map>
-#include <unordered_map>
-#include <string>
-#include <vector>
-#include <cstdlib>
-#include "it.hpp"
-#include "atom.hpp"
 
-using namespace std;
-
-namespace Molib {	
+// TODO: Possible place these functions in residue.cpp
+namespace Molib {
 	class Atom;
+	class Residue;
 	class Hydrogens {
 	public:
-		static void compute_hydrogen(const Atom::Vec &atoms);
-		static void erase_hydrogen(const Atom::Vec &atoms);
+		// These functions modify the reside structure of the atoms given to them.
+		// thus I feel it is correct to pass this into the functions, not the atom
+		// vectors.
+		static void compute_hydrogen(Residue &res);
+		static void erase_hydrogen(Residue &res);
 	};
 };
 #endif

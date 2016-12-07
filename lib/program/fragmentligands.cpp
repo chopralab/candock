@@ -60,7 +60,6 @@ namespace Program {
 			inout::output_file(ligands, cmdl.prep_file(), ios_base::app);
 			ligands.clear();
 
-			lock_guard<std::mutex> guard(__prevent_re_read_mtx);
 			thread_is_not_done = lpdb.parse_molecule(ligands);
 		}
 	}

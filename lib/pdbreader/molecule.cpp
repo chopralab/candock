@@ -6,7 +6,6 @@
 #include <vector>
 #include <cstdlib>
 #include "bond.hpp"
-#include "hydrogens.hpp"
 #include "geom3d/geom3d.hpp"
 #include "fragmenter/fragmenter.hpp"
 #include "fragmenter/unique.hpp"

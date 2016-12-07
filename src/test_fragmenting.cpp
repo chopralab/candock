@@ -60,11 +60,8 @@ int main(int argc, char* argv[]) {
 						lock_guard<std::mutex> guard(mtx);
 						ligands.compute_overlapping_rigid_segments(cmdl.seeds_file());
 					}
-
 					inout::output_file(ligands, cmdl.prep_file(), ios_base::app);
 					ligands.clear();
-
-					lock_guard<std::mutex> guard(mtx_read_lock);
 					thread_is_not_done = lpdb.parse_molecule(ligands);
 				}
 			}));

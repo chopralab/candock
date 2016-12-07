@@ -5,7 +5,6 @@
 #include <vector>
 #include "atomtype.hpp"
 #include "bondtype.hpp"
-#include "hydrogens.hpp"
 #include "atom.hpp"
 #include "residue.hpp"
 using namespace std;

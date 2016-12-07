@@ -5,7 +5,6 @@
 #include <string>
 #include <vector>
 #include <cstdlib>
-#include "hydrogens.hpp"
 #include "geom3d/geom3d.hpp"
 #include "atom.hpp"
 #include "residue.hpp"

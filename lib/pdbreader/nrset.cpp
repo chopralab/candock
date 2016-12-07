@@ -7,7 +7,6 @@
 #include <cstdlib>
 #include <time.h>
 #include "nrset.hpp"
-#include "hydrogens.hpp"
 #include "geom3d/geom3d.hpp"
 #include "atom.hpp"
 #include "residue.hpp"
