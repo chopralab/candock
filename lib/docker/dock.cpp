@@ -117,7 +117,7 @@ namespace Docker {
 				__cluster_fast(accepted_tmp, accepted);
 			}
 		}
-		cout << "Fragment docking took " << Benchmark::seconds_from_start() << " seconds"
+		cout << "Fragment docking for seed " << __seed.name() << " took " << Benchmark::seconds_from_start() << " seconds"
 			<< " number of accepted confomations is " << accepted.size() << endl;
 
 		return accepted;
@@ -164,7 +164,7 @@ namespace Docker {
 				}
 			}
 		}
-		cout << "Clustering accepted conformations took " 
+		cout << "Clustering accepted conformations for seed " << __seed.name() << " took " 
 			<< Benchmark::seconds_from_start() << " seconds" << endl;
 		return reps;
 	}

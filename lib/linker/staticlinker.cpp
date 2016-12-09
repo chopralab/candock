@@ -138,7 +138,7 @@ namespace Linker {
 	
 	Partial::Vec Linker::StaticLinker::__generate_rigid_conformations(const Seed::Graph &seed_graph) {
 		Benchmark::reset();
-		cout << "Generating rigid conformations of states..." << endl;
+		cout << "Generating rigid conformations of states for " << __ligand.name() << "..." << endl;
 
 		State::Vec states;
 		State::Id id = 0;
@@ -166,7 +166,7 @@ namespace Linker {
 		//help::memusage("before max.clique.search");
 		
 		cout << "find_compatible_state_pairs took " << Benchmark::seconds_from_start() 
-			<< " wallclock seconds" << endl;
+			<< " wallclock seconds for " << __ligand.name() << endl;
 		
 		Partial::Vec possibles_w_energy;
 		{
@@ -182,7 +182,7 @@ namespace Linker {
 			//help::memusage("after max.clique.search");
 	
 			cout << "found " << qmaxes.size() << " maximum cliques, which took " 
-				<< Benchmark::seconds_from_start() << " wallclock seconds" << endl;
+				<< Benchmark::seconds_from_start() << " wallclock seconds for " << __ligand.name() << endl;
 	
 			if (qmaxes.empty())
 				throw Error("die : couldn't find any possible conformations for ligand " 
@@ -256,7 +256,7 @@ namespace Linker {
 	
 	DockedConformation Linker::StaticLinker::__reconstruct(const Partial &conformation) {
 		Benchmark::reset();
-		cout << "Reconstructing docked ligands..." << endl;
+		cout << "Reconstructing docked ligands for " << __ligand.name() << "..." << endl;
 		int conf_number = 0;
 		
 		// ligand
@@ -282,7 +282,7 @@ namespace Linker {
 		ligand.set_name(__ligand.name() + "_" + std::to_string(++conf_number));
 		
 		cout << "Reconstruction of molecules took " << Benchmark::seconds_from_start() 
-			<< " wallclock seconds" << endl;
+			<< " wallclock seconds for " << __ligand.name() << endl;
 		return DockedConformation(ligand, __receptor, conformation.get_energy());
 	}
 };
