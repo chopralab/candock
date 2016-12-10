@@ -217,6 +217,14 @@ namespace OMMIface {
 			// additionally check if residue not already in the ffield (this is for adding receptor
 			// topology where amino acids are already in the ffield, but cofactors are not
 			if (!this->residue_exists(residue.resn())) {
+
+				if ( help::ions.count(residue.resn()) != 0 ) {
+					this->residue_topology.insert({residue.resn(), ResidueTopology()});
+					ResidueTopology &rtop = this->residue_topology.at(residue.resn());
+					rtop.atom.insert({residue.first().atom_name(), 1});
+					continue;
+				}
+
 				this->residue_topology.insert({residue.resn(), ResidueTopology()});
 				ResidueTopology &rtop = this->residue_topology.at(residue.resn());
 				for (auto &atom : residue) {
