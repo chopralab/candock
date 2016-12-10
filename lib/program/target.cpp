@@ -8,8 +8,12 @@
 namespace Program {
 	Target::Target(const std::string& input_name ) {
 
+		// If the user doesn't want to use this feature
+		if (input_name == "")
+			return;
+
 		if (!boost::filesystem::exists(input_name)) {
-			throw Error("Provided file or directory does not exist.");
+			throw Error("Provided file or directory does not exist: " + input_name);
 		}
 
 		/* Initialize parsers for receptor and read
@@ -117,7 +121,7 @@ namespace Program {
 		}
 	}
 
-	void Target::design_ligands(const CmdLnOpts& cmdl, const std::set<std::string>& seeds_to_add) {
+	void Target::design_ligands(const CmdLnOpts& cmdl, const std::set<std::string>& seeds_to_add ) {
 		for ( auto &a : __preprecs ) {
 			std::unique_ptr<design::Design> designer( new design::Design( a.dockedlig->top_poses().first() ));
 			if (! seeds_to_add.empty() )
@@ -134,12 +138,11 @@ namespace Program {
 			if (!h_single_atoms.empty())
 				designer->functionalize_hydrogens_with_single_atoms(h_single_atoms);
 
-//#ifndef NDEBUG
+#ifndef NDEBUG
 			inout::output_file(designer->get_internal_designs(), "internal_designs.pdb");
-//#endif
+#endif
 
 			inout::output_file(designer->prepare_designs(cmdl.seeds_file()), "designed.pdb");
-			//ligand_fragmenter.add_seeds_from_molecules(designer.designs(), cmdl);
 		}
 	}
 

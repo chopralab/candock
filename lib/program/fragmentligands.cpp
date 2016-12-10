@@ -127,7 +127,7 @@ namespace Program {
 
 		inout::output_file(__seeds, cmdl.seeds_pdb_file(), ios_base::out);
 	}
-	
+
 	void FragmentLigands::add_seeds_from_molecules(const Molib::Molecules& molecules, const Program::CmdLnOpts& cmdl) {
 		__ligand_idatm_types = molecules.get_idatm_types(__ligand_idatm_types);
 		common::create_mols_from_seeds(__added, __seeds, molecules);

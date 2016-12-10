@@ -116,7 +116,6 @@ namespace design {
 				if (i->crd().distance_sq(j->crd()) < pow(clash_coeff * (vdw1 + vdw2), 2)) return true;
 			}
 		}
-		
 		return false;
 	}
 
@@ -134,9 +133,10 @@ namespace design {
 			}
 
 			for ( const auto &fragment : nr )  {
-			
+
+			std::set< std::pair<int, int> > already_added;
+
 			// This variable controls if we've already added the seed
-			bool success = false;
 			for ( const auto &seed     : fragment) { 
 
 				// Copy seed as new residue, this will have its bonds in place
@@ -144,6 +144,12 @@ namespace design {
 
 				// "atom" is the search atom (only used for its position and type)
 				for ( auto &search_atom : r ) {
+
+					std::pair<int,int> test_already_added(search_atom.idatm_type(), start_atom->idatm_type());
+
+					if ( already_added.count( test_already_added ) != 0 ){
+						continue;
+					}
 
 					// Check if the atom is "exposed", I.E. not in a ring or the middle of a chain
 					if (search_atom.get_bonds().size() != 1 || search_atom.element() == Molib::Element::H) {
@@ -163,7 +169,7 @@ namespace design {
 					if ( check_clash_for_design(__original.get_atoms(), seed.get_atoms(), clash_coeff, search_atom.atom_number()) )
 						continue;
 
-					success = true;
+					already_added.insert( test_already_added );
 					Molib::Molecule modificatiton(__original);
 
 					// Copy the new molecule into the returnable object
@@ -200,11 +206,13 @@ namespace design {
 
 					mod_atom.erase_bond(atom2);
 					chain.last().erase(search_atom.atom_number());
+					
+					cout << "Created: " << __designs.last().name() << endl;
 				}
 			}
 			
-			if (success)
-				break;
+			//if (success)
+			//	break;
 			
 			}
 		}

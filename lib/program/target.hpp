@@ -29,7 +29,6 @@ namespace Program {
 			std::unique_ptr<FindCentroids>        centroids;
 			std::unique_ptr<DockFragments>        prepseeds;
 			std::unique_ptr<LinkFragments>        dockedlig;
-			std::unique_ptr<design::Design>       designlig;
 		};
 
 		Molib::Molecules            __receptors;

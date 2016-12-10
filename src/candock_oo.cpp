@@ -88,8 +88,6 @@ int main(int argc, char* argv[]) {
 		targets.design_ligands(cmdl, solo_target_seeds);
 
 		cmdl.display_time("finished");
-
-
 	} catch ( exception& e) {
 		cerr << e.what() << endl;
 		return 1;
