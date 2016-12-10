@@ -12,7 +12,7 @@
 
 using namespace std;
 
-namespace Molib {	
+namespace Molib {
 	class Atom;
 	class Molecule;
 	

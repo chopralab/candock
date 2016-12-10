@@ -22,27 +22,23 @@
 using namespace std;
 
 namespace Molib {
-	void Hydrogens::compute_hydrogen(const Atom::Vec &atoms) {
+	void Hydrogens::compute_hydrogen(Residue &res) {
 		try {
-			if (atoms.empty()) {
+			if (res.empty()) {
 				throw Error("die : compute hydrogens for empty atoms set?");
 			}
 
-			Atom::Vec all_atoms;
-
-			for (auto &patom : atoms) all_atoms.push_back(patom);
+			Atom::Vec all_atoms = res.get_atoms();
 
 			// atom numbers must be unique for the WHOLE molecule, that is why
 			// max atom number has to be found on molecule level
 			int max_atom_number = 0;
-			const Molecule &molecule = atoms.front()->br().br().br().br().br();
+			const Molecule &molecule = res.br().br().br().br();
 			for (auto &patom : molecule.get_atoms()) 
 				if (patom->atom_number() > max_atom_number)
 					max_atom_number = patom->atom_number();
 			
-			for (auto &patom : atoms) {
-				Atom &atom = *patom;
-				Residue &residue = const_cast<Residue&> (atom.br());
+			for (auto &atom : res) {
 				dbgmsg("computing hydrogens for residue = " << residue.resn());
 				
 				if (atom.element() != Element::H) { // don't visit "just added" hydrogens
@@ -67,7 +63,7 @@ namespace Molib {
 								? "HC" : "H");
 							dbgmsg("idatm_type = " << idatm_type);
 							dbgmsg("idatm_mask = " << help::idatm_mask.at(idatm_type));
-							Atom &hatom = residue.add(new Atom(++max_atom_number, "H", 
+							Atom &hatom = res.add(new Atom(++max_atom_number, "H", 
 								Geom3D::Coordinate(), help::idatm_mask.at(idatm_type)));
 							atom.connect(hatom);
 							dbgmsg("added hydrogen");
@@ -94,7 +90,7 @@ namespace Molib {
 									bondee.erase_bond(atom);
 									dbgmsg("shared_count3 = " << shpbond.use_count());
 									dbgmsg("residue before erasing hydrogen " << bondee.atom_number() << endl << residue);
-									residue.erase(bondee.atom_number());
+									res.erase(bondee.atom_number());
 									dbgmsg("residue after erasing hydrogen " << bondee.atom_number() << endl << residue);
 									
 									auto it = find(all_atoms.begin(), all_atoms.end(), &bondee);
@@ -122,13 +118,12 @@ namespace Molib {
 			throw e;
 		}
 	}
-	void Hydrogens::erase_hydrogen(const Atom::Vec &atoms) {
-		Atom::Vec natoms(atoms.begin(), atoms.end());
+	void Hydrogens::erase_hydrogen(Residue &res) {
+		Atom::Vec natoms = res.get_atoms();
 		natoms.erase(std::remove_if(natoms.begin(), natoms.end(),
-			[] (Atom *patom) -> bool {
+			[&res] (Atom *patom) -> bool {
 				
 				Atom &hatom = *patom;
-				Residue &residue = const_cast<Residue&> (hatom.br());
 				dbgmsg("deleting hydrogens for residue = " << residue.resn());
 				if (hatom.element() == Element::H) {
 					dbgmsg("deleting this hydrogen atom : " << hatom);
@@ -146,7 +141,7 @@ namespace Molib {
 					// erase bond to bondee-H
 					bondee.erase_bond(hatom);
 					// erase H from this residue
-					residue.erase(hatom.atom_number());
+					res.erase(hatom.atom_number());
 					return true; // erase H from atoms vector
 				}
 				return false;
@@ -154,5 +149,6 @@ namespace Molib {
 			}), natoms.end());
 		dbgmsg("MOLECULE AFTER ERASING HYDROGENS " << endl << natoms);
 	}
+
 };
 

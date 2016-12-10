@@ -90,7 +90,7 @@ namespace Molib {
 					Residue &residue = *presidue;
 					if (!(help::standard_residues.count(residue.resn())
 					   || help::ions.count(residue.resn()))) {
-						Hydrogens::compute_hydrogen(residue.get_atoms());
+						Hydrogens::compute_hydrogen(residue);
 					}
 				}
 			} catch (exception &e) {
@@ -151,7 +151,7 @@ namespace Molib {
 			// Remove hydrogens added to protonated ions as well
 			if (!(help::standard_residues.count(residue.resn())
 			   || help::ions.count(residue.resn()))) {
-				Hydrogens::erase_hydrogen(residue.get_atoms());
+				Hydrogens::erase_hydrogen(residue);
 			}
 		}
 		return *this;
