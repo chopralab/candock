@@ -37,7 +37,7 @@ namespace Docker {
 		try {
 			const double conf_spin_in_radians = Geom3D::radians(conf_spin / 2);
 			
-			Benchmark::reset();
+			Benchmark bench;
 	
 			// get uniform sphere points, i.e., unit vectors
 			Geom3D::Point::Vec unit_vectors = Geom3D::uniform_sphere(num_univec);
@@ -141,7 +141,7 @@ namespace Docker {
 			}
 			
 			cout << "time to find " << __conf_vec.size() << " conformations of seed " 
-				<< seed.name() << " took " << Benchmark::seconds_from_start() 
+				<< seed.name() << " took " << bench.seconds_from_start() 
 				<< " wallclock seconds" << endl;
 	
 	

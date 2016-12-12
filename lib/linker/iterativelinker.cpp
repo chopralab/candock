@@ -136,7 +136,7 @@ namespace Linker {
 	 */
 
 	Partial::Vec Linker::IterativeLinker::__generate_rigid_conformations(const Seed::Graph &seed_graph) {
-		Benchmark::reset();
+		Benchmark bench;
 		cout << "Generating rigid conformations of states for " << __ligand.name() << "..." << endl;
 
 		State::Vec states;
@@ -158,7 +158,7 @@ namespace Linker {
 
 		//help::memusage("before max.clique.search");
 		
-		cout << "find_compatible_state_pairs took " << Benchmark::seconds_from_start() 
+		cout << "find_compatible_state_pairs took " << bench.seconds_from_start() 
 			<< " wallclock seconds for " << __ligand.name() << endl;
 		
 		Partial::Vec possibles_w_energy;
@@ -172,7 +172,7 @@ namespace Linker {
 			//help::memusage("after max.clique.search");
 	
 			cout << "found " << qmaxes.size() << " maximum cliques, which took " 
-				<< Benchmark::seconds_from_start() << " wallclock seconds for " << __ligand.name() << endl;
+				<< bench.seconds_from_start() << " wallclock seconds for " << __ligand.name() << endl;
 	
 			if (qmaxes.empty())
 				throw Error("die : couldn't find any possible conformations for ligand " 
@@ -222,14 +222,14 @@ namespace Linker {
 
 		cout << "Generated " << clustered_possibles_w_energy.size() 
 			<< " possible top percent docked seeds that will serve as starting points for reconstruction of ligand " << __ligand.name()
-			<< ", which took " << Benchmark::seconds_from_start() 
+			<< ", which took " << bench.seconds_from_start() 
 			<< " wallclock seconds" << endl;
 		return clustered_possibles_w_energy;
 	}
 	
 
 	DockedConformation Linker::IterativeLinker::__reconstruct(const Partial &conformation) {
-		Benchmark::reset();
+		Benchmark bench;
 		cout << "Reconstructing docked ligands for " << __ligand.name() << "..." << endl;
 		int conf_number = 0;
 		
@@ -262,7 +262,7 @@ namespace Linker {
 		for (auto &patom : receptor.get_atoms()) {
 			patom->set_crd(crds[i++]);
 		}
-		cout << "Reconstruction of molecules took " << Benchmark::seconds_from_start() 
+		cout << "Reconstruction of molecules took " << bench.seconds_from_start() 
 			<< " wallclock seconds for " << __ligand.name() << endl;
 		return DockedConformation(ligand, receptor, conformation.get_energy());
 	}

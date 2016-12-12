@@ -31,7 +31,7 @@ namespace Docker {
 	}
 
 	Dock::DockedConf::Vec Dock::__dock() {
-		Benchmark::reset();
+		Benchmark bench;
 
 		DockedConf::Vec accepted;
 		
@@ -117,7 +117,7 @@ namespace Docker {
 				__cluster_fast(accepted_tmp, accepted);
 			}
 		}
-		cout << "Fragment docking for seed " << __seed.name() << " took " << Benchmark::seconds_from_start() << " seconds"
+		cout << "Fragment docking for seed " << __seed.name() << " took " << bench.seconds_from_start() << " seconds"
 			<< " number of accepted confomations is " << accepted.size() << endl;
 
 		return accepted;
@@ -144,7 +144,7 @@ namespace Docker {
 
 	Dock::DockedConf::Vec Dock::__cluster(const DockedConf::Vec &conformations) {
 
-		Benchmark::reset();
+		Benchmark bench;
 		DockedConf::Vec reps;
 
 		set<const Dock::DockedConf*, Dock::DockedConf::by_energy> confs;
@@ -165,13 +165,13 @@ namespace Docker {
 			}
 		}
 		cout << "Clustering accepted conformations for seed " << __seed.name() << " took " 
-			<< Benchmark::seconds_from_start() << " seconds" << endl;
+			<< bench.seconds_from_start() << " seconds" << endl;
 		return reps;
 	}
 
 	void Dock::__set_docked(const DockedConf::Vec &confs) {
 
-		Benchmark::reset();
+		Benchmark bench;
 
 		__docked.set_name(__seed.name()); // molecules(!) name is seed_id
 		
@@ -203,7 +203,7 @@ namespace Docker {
 		}
 
 		dbgmsg("Conversion of conformations to mols took " 
-			<< Benchmark::seconds_from_start() << " seconds");
+			<< bench.seconds_from_start() << " seconds");
 	}
 
 };

@@ -136,7 +136,7 @@ namespace Molib {
 
 	ValenceStateVec BondOrder::__create_valence_states(const Atom::Vec &atoms, const int max_valence_states) {
 #ifndef NDEBUG
-		Benchmark::reset();
+		Benchmark bench;
 #endif
 		vector<vector<AtomParams>> V; // vector of AtomParams are sorted by increasing aps
 		vector<vector<AtomParams>> valence_states;
@@ -185,9 +185,9 @@ namespace Molib {
 		}
 		dbgmsg(vss);
 #ifndef NDEBUG
-		double wall_secs = Benchmark::seconds_from_start();
+		double wall_secs = bench.seconds_from_start();
 		dbgmsg("Creating valence states took " << wall_secs << " seconds");
-		Benchmark::reset();
+		bench.reset();
 #endif
 		return vss;
 	}

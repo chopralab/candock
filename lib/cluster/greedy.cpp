@@ -15,7 +15,7 @@ namespace Molib {
 	 */
 	Geom3D::Point::Vec Cluster::greedy(const Geom3D::Point::Vec &initial, const double clus_rad) {
 
-		Benchmark::reset();
+		Benchmark bench;
 
 		Geom3D::Point::ConstSet confs;
 		for (auto &point : initial)
@@ -38,14 +38,14 @@ namespace Molib {
 			}
 		}
 		cout << "Clustering " << initial.size() << " accepted conformations resulted in "
-			<< reps.size() << " clusters took " << Benchmark::seconds_from_start() 
+			<< reps.size() << " clusters took " << bench.seconds_from_start() 
 			<< " seconds" << endl;
 		return reps;
 	}
 
 	Molib::Molecules Cluster::greedy(const Molib::Molecules &initial, const Molib::Score &score, Molib::Atom::Grid &gridrec, const double clus_rad) {
 
-		Benchmark::reset();
+		Benchmark bench;
 
 		LinkedConf<Molecule>::UPVec conformations;
 		for (auto &molecule : initial)
@@ -73,14 +73,14 @@ namespace Molib {
 			}
 		}
 		cout << "Clustering " << initial.size() << " accepted conformations resulted in "
-			<< reps.size() << " clusters took " << Benchmark::seconds_from_start() 
+			<< reps.size() << " clusters took " << bench.seconds_from_start() 
 			<< " seconds" << endl;
 		return reps;
 	}
 
 	Linker::Partial::Vec Cluster::greedy(const Linker::Partial::Vec &initial, const Molib::Atom::Grid &gridrec, const double clus_rad) {
 
-		Benchmark::reset();
+		Benchmark bench;
 
 		LinkedConf<Linker::Partial>::UPVec conformations;
 		for (auto &molecule : initial) {
@@ -119,7 +119,7 @@ namespace Molib {
 			}
 		}
 		cout << "Clustering " << initial.size() << " accepted conformations resulted in "
-			<< reps.size() << " clusters took " << Benchmark::seconds_from_start() 
+			<< reps.size() << " clusters took " << bench.seconds_from_start() 
 			<< " seconds" << endl;
 		return reps;
 	}

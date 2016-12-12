@@ -96,7 +96,7 @@ namespace Docker {
 		const double &grid_spacing, const int &dist_cutoff, const double &excluded_radius, 
 		const double &max_interatomic_distance) {
 	
-		Benchmark::reset();
+		Benchmark bench;
 	
 		if (centroids.empty()) 
 			throw Error("die : there are no centroids");
@@ -210,11 +210,11 @@ namespace Docker {
                         }
                         const int mod = gridpoint_counter % 10000;
                         if (mod == 0) {
-                            double wall_secs = Benchmark::seconds_from_start();
+                            double wall_secs =bench.seconds_from_start();
                             dbgmsg("Processing gridpoint " << gridpoint_counter 
                                 << " of approximately " << total_gridpoints 
                                 << " (took " << wall_secs << " seconds)");
-                            Benchmark::reset();
+                            bench.reset();
                         }
                         gridpoint_counter++;
                     }
@@ -238,7 +238,7 @@ namespace Docker {
 	
 	void Gpoints::__identify_gridpoints(const double &grid_spacing, const double &radial_check) {
 	
-		Benchmark::reset();
+		Benchmark bench;
 	
 		// find the minimium and maximum coordinates
 		Geom3D::Point center(0,0,0);
@@ -290,11 +290,11 @@ namespace Docker {
 					}
 					const int mod = gridpoint_counter % 10000;
 					if (mod == 0) {
-						double wall_secs = Benchmark::seconds_from_start();
+						double wall_secs = bench.seconds_from_start();
 						dbgmsg("Processing gridpoint " << gridpoint_counter 
 							<< " of approximately " << total_gridpoints 
 							<< " (took " << wall_secs << " seconds)");
-						Benchmark::reset();
+						bench.reset();
 					}
 					gridpoint_counter++;
 				}

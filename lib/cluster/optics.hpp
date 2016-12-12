@@ -205,7 +205,7 @@ namespace cluster {
 			double eps, int min_pts) : __distance(pairwise_distances), 
 			__scores(scores), __eps(eps), __min_pts(min_pts) {
 
-			Benchmark::reset();
+			Benchmark bench;
 			cout << "starting clustering ..." << endl;
 
 			__JANEZ_HV = (CompareDistanceLess()(-1.0, 1.0) ? HUGE_VAL : -HUGE_VAL);
@@ -254,7 +254,7 @@ namespace cluster {
 					__expand_cluster_order(*p);
 			}
 			cout << "total time required for clustering was " 
-				<< Benchmark::seconds_from_start() << " wallclock seconds\n";
+				<< bench.seconds_from_start() << " wallclock seconds\n";
 		}
 
 		pair<Clusters<T>, Clusters<T>> extract_dbscan(const double eps_cur,

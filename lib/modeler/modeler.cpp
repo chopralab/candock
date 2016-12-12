@@ -89,17 +89,17 @@ namespace OMMIface {
 	}
 	
 	void Modeler::minimize_physical() {
-		Benchmark::reset();
+		Benchmark bench;
 		cout << "Doing energy minimization using physical forcefield" << endl;
 
 		__system_topology.minimize(__tolerance, __max_iterations);
 
-		cout << "time to minimize took " << Benchmark::seconds_from_start() 
+		cout << "time to minimize took " << bench.seconds_from_start() 
 			<< " wallclock seconds" << endl;
 	}
 
 	void Modeler::minimize_knowledge_based(const Molib::Molecule &ligand, const Molib::Molecule &receptor, const Molib::Score &score) {
-		Benchmark::reset();
+		Benchmark bench;
 		cout << "Doing energy minimization of ligand " << ligand.name() << " using knowledge-based forcefield" << endl;
 
 		// for knowledge-based forcefield we implement a custom update nonbond
@@ -176,14 +176,14 @@ namespace OMMIface {
 			// update knowledge-based nonbond list
 			__system_topology.update_knowledge_based_force(__topology, minimized_positions, __dist_cutoff_in_nm);
 				
-			iter += __update_freq;						
+			iter += __update_freq;
 
 			initial_positions = minimized_positions;
 			dbgmsg("ending minimization step iter = " << iter);
 
 		}
 		cout << "Minimized in " << iter << " iterations, which took " 
-			<< Benchmark::seconds_from_start() << " wallclock seconds" << endl;
+			<< bench.seconds_from_start() << " wallclock seconds" << endl;
 	}
 
 	void Modeler::init_openmm_positions() {

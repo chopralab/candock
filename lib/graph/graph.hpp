@@ -223,7 +223,7 @@ namespace Glib {
 	
 	template<class Vertex>
 	typename Graph<Vertex>::Cliques Graph<Vertex>::max_weight_clique(const int iter) {
-		Benchmark::reset();
+		Benchmark bench;
 		unique_ptr<int[]> weight(new int[this->size()]);
 		for (int i = 0; i < this->size(); ++i) weight[i] = this->element(i).weight();
 		vector<vector<int>> qmax;
@@ -238,7 +238,7 @@ namespace Glib {
 				dbgmsg("clique push vertex = " << vnum);
 			}
 		}
-		cout << "time to find max.weight clique " << Benchmark::seconds_from_start() << " wallclock seconds" << endl;
+		cout << "time to find max.weight clique " << bench.seconds_from_start() << " wallclock seconds" << endl;
 		return clique;
 	}
 

@@ -166,7 +166,7 @@ namespace Molib {
 	}
 	
 	Score& Score::process_distributions_file(const string &distributions_file) {
-		Benchmark::reset();
+		Benchmark bench;
 		cout << "processing combined histogram ...\n";
 		vector<string> distributions_file_raw;
 		inout::Inout::read_file(distributions_file, distributions_file_raw);
@@ -214,7 +214,7 @@ namespace Molib {
 				}
 			}
 		}
-		cout << "time to process distributions file " << Benchmark::seconds_from_start() 
+		cout << "time to process distributions file " << bench.seconds_from_start() 
 			<< " wallclock seconds" << endl;
 		return *this;
 	}

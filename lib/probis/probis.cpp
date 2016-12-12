@@ -13,7 +13,7 @@ namespace probis {
 		const string &receptor_chain_id, const string &bslib_file, const int ncpu, 
 		const string &nosql_file, const string &json_file) {
 		try {
-			Benchmark::reset();
+			Benchmark bench;
 			cout << "Starting ProBiS for binding sites prediction" << endl;
 		    Args args;
 		    _longnames = true;
@@ -38,7 +38,7 @@ namespace probis {
 			PROTEIN1 = receptor_file;
 			state7(&args);
 			cout << "Binding sites prediction took " 
-				<< Benchmark::seconds_from_start() << " wallclock seconds\n";
+				<< bench.seconds_from_start() << " wallclock seconds\n";
 
 		}  // .. konec try bloka
 		catch (Err e) {
