@@ -17,8 +17,6 @@ set( pdbreader_SRC assembly.cpp
         				   grid.hpp
         				   hydrogens.cpp
         				   hydrogens.hpp
-        				   idatm.cpp
-	        			   idatm.hpp
 				           internal.cpp
         				   internal.hpp
 				           it.hpp
