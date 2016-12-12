@@ -31,3 +31,5 @@ namespace Glib {
 		const int weight() const { return __vertex.weight; }
 	};
 };
+
+#endif
