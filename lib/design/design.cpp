@@ -12,7 +12,7 @@ namespace design {
 		}
 
 		// Create a new molecule, original bonds will be copied
-		Molib::Hydrogens::compute_hydrogen(__original.get_atoms());
+		Molib::Hydrogens::compute_hydrogen(__original.first().first().first().first());
 		__original.erase_properties();
 		__original.first().first().first().first().renumber_atoms(1);
 	}
@@ -176,7 +176,7 @@ namespace design {
 					__designs.add( new Molib::Molecule(modificatiton) );
 
 					// Remove all hydrogens from the original ligand (they are not needed anymore)
-					Molib::Hydrogens::erase_hydrogen(__designs.last().get_atoms());
+					Molib::Hydrogens::erase_hydrogen(__designs.last().first().first().first().first());
 
 					// Add new fragment as a "residue" of the molecule
 					Molib::Chain &chain = __designs.last().first().first().first();
@@ -235,8 +235,8 @@ namespace design {
 				__designs.last().set_name( __original.name() + "_added_" + atom_type + "_on_" + std::to_string(start_atom->atom_number()));
 
 				// Remove all hydrogens from the original ligand (they are not needed anymore)
-				Molib::BondOrder::compute_bond_order(__designs.last().get_atoms());
-				Molib::Hydrogens::erase_hydrogen(    __designs.last().get_atoms());
+				Molib::BondOrder::compute_bond_order(__designs.get_atoms());
+				Molib::Hydrogens::erase_hydrogen(    __designs.last().first().first().first().first());
 
 				Geom3D::Coordinate crd;
 
@@ -276,7 +276,7 @@ namespace design {
 
 				// Remove all hydrogens from the original ligand (they are not needed anymore)
 				Molib::BondOrder::compute_bond_order(__designs.last().get_atoms());
-				Molib::Hydrogens::erase_hydrogen(    __designs.last().get_atoms());
+				Molib::Hydrogens::erase_hydrogen(    __designs.last().first().first().first().first());
 
 				Molib::Residue& mod_residue = __designs.last().first().first().first().first();
 
