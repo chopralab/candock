@@ -39,7 +39,7 @@ namespace Molib {
 					max_atom_number = patom->atom_number();
 			
 			for (auto &atom : res) {
-				dbgmsg("computing hydrogens for residue = " << residue.resn());
+				dbgmsg("computing hydrogens for residue = " << res.resn());
 				
 				if (atom.element() != Element::H) { // don't visit "just added" hydrogens
 					dbgmsg("hydro for : " << atom.idatm_type_unmask());
@@ -89,9 +89,9 @@ namespace Molib {
 									dbgmsg("shared_count2 = " << shpbond.use_count());
 									bondee.erase_bond(atom);
 									dbgmsg("shared_count3 = " << shpbond.use_count());
-									dbgmsg("residue before erasing hydrogen " << bondee.atom_number() << endl << residue);
+									dbgmsg("residue before erasing hydrogen " << bondee.atom_number() << endl << res);
 									res.erase(bondee.atom_number());
-									dbgmsg("residue after erasing hydrogen " << bondee.atom_number() << endl << residue);
+									dbgmsg("residue after erasing hydrogen " << bondee.atom_number() << endl << res);
 									
 									auto it = find(all_atoms.begin(), all_atoms.end(), &bondee);
 									if (it != all_atoms.end()) {
@@ -124,7 +124,7 @@ namespace Molib {
 			[&res] (Atom *patom) -> bool {
 				
 				Atom &hatom = *patom;
-				dbgmsg("deleting hydrogens for residue = " << residue.resn());
+				dbgmsg("deleting hydrogens for residue = " << res.resn());
 				if (hatom.element() == Element::H) {
 					dbgmsg("deleting this hydrogen atom : " << hatom);
 					// H is always bonded to just one other heavy atom
