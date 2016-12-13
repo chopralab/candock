@@ -20,11 +20,15 @@ namespace Program {
 		 * the receptor molecule(s)
 		 * 
 		 */
-		for ( const auto &a : inout::Inout::files_matching_pattern (input_name, ".pdb")) {
-			/* Initialize parsers for receptor (and ligands) and read
-			 * the receptor molecule(s)
-			 * 
-			 */
+		if ( inout::Inout::file_size(input_name) > 0 ) {
+			// If the option given is a regular file, act like previous versions
+			Molib::PDBreader rpdb(input_name, Molib::PDBreader::first_model);
+			Molib::Molecules receptors = rpdb.parse_molecule();
+			Molib::Molecule& current = __receptors.add(new Molib::Molecule ( std::move (receptors[0]) ));
+			current.set_name("."); // Emulate the original version of candock
+			__preprecs.push_back(DockedReceptor {current, nullptr, nullptr, nullptr});
+		} else for ( const auto &a : inout::Inout::files_matching_pattern (input_name, ".pdb")) {
+			// Otherwise we treat it like the new version intends.
 			Molib::PDBreader rpdb(a, Molib::PDBreader::first_model);
 			Molib::Molecules receptors = rpdb.parse_molecule();
 			Molib::Molecule& current = __receptors.add(new Molib::Molecule ( std::move (receptors[0]) ));
@@ -84,7 +88,7 @@ namespace Program {
 			std::unique_ptr<Molib::Score> score (new Molib::Score(cmdl.ref_state(), cmdl.comp(),
 																  cmdl.rad_or_raw(), cmdl.dist_cutoff(),
 																  cmdl.step_non_bond()));
-			
+
 			score->define_composition(__receptors.get_idatm_types(),
 									ligand_fragments.ligand_idatm_types())
 									.process_distributions_file(cmdl.distributions_file())
