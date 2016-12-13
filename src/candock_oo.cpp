@@ -54,7 +54,7 @@ int main(int argc, char* argv[]) {
 		Program::Target targets (cmdl.get_string_option("target_dir"));
 		targets.find_centroids(cmdl);
 		targets.dock_fragments(ligand_fragmenter, cmdl);
-		
+
 		Program::Target antitargets(cmdl.get_string_option("antitarget_dir"));
 		antitargets.find_centroids(cmdl);
 		antitargets.dock_fragments(ligand_fragmenter, cmdl);

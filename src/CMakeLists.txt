@@ -5,6 +5,7 @@ include_directories( ../lib/modeler/ )
 
 set( candock_libraries 
         program
+        design
         docker
         score
         centro
@@ -36,6 +37,7 @@ set( all_needed_libraries
      ${additional_libraries}
    )
 
+# Original, to be deprecated programs
 add_executable( candock candock.cpp )
 add_executable( genpot  genpot.cpp )
 add_executable( test_minimization test_minimization.cpp )
@@ -45,7 +47,13 @@ add_executable( test_clq test_clq.cpp )
 add_executable( test_link test_link.cpp )
 add_executable( test_singlepoint test_singlepoint.cpp )
 add_executable( test_cofactor test_cofactor.cpp )
-add_executable( candock_oo candock_oo.cpp )
+
+# New programs with new features that change functionality
+add_executable( candock_oo        candock_oo.cpp )
+add_executable( cd_bsite_probis   cd_bsite_probis.cpp )
+add_executable( cd_prep_fragments cd_prep_fragments.cpp )
+add_executable( cd_dock_fragments cd_dock_fragments.cpp )
+add_executable( cd_link_fragments cd_link_fragments.cpp )
 
 target_link_libraries( candock ${all_needed_libraries} )
 target_link_libraries( genpot ${all_needed_libraries} )
@@ -56,4 +64,9 @@ target_link_libraries( test_clq ${all_needed_libraries} )
 target_link_libraries( test_link ${all_needed_libraries} )
 target_link_libraries( test_singlepoint ${all_needed_libraries} )
 target_link_libraries( test_cofactor ${all_needed_libraries} )
-target_link_libraries( candock_oo ${all_needed_libraries} design)
+
+target_link_libraries( candock_oo        ${all_needed_libraries} )
+target_link_libraries( cd_bsite_probis   ${all_needed_libraries} )
+target_link_libraries( cd_prep_fragments ${all_needed_libraries} )
+target_link_libraries( cd_dock_fragments ${all_needed_libraries} )
+target_link_libraries( cd_link_fragments ${all_needed_libraries} )
