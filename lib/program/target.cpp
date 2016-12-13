@@ -33,7 +33,7 @@ namespace Program {
 			Molib::Molecules receptors = rpdb.parse_molecule();
 			Molib::Molecule& current = __receptors.add(new Molib::Molecule ( std::move (receptors[0]) ));
 			current.set_name( a.substr(0, a.length() - 4 ) );
-			inout::output_file("JUNK", Path::join(current.name(),"temp"));
+			boost::filesystem::create_directory(current.name());
 
 			__preprecs.push_back(DockedReceptor {current, nullptr, nullptr, nullptr});
 		}
@@ -75,12 +75,25 @@ namespace Program {
 			 */
 
 			pcen->run_step(cmdl);
-			__preprecs.back().centroids = std::move(pcen);
+			a.centroids = std::move(pcen);
 		}
 	}
 
 	void Target::dock_fragments(const FragmentLigands& ligand_fragments, const CmdLnOpts& cmdl) {
 		for ( auto &a : __preprecs ) {
+
+			// Prepare the receptor for docking to
+			std::unique_ptr<OMMIface::ForceField> ffield ( new OMMIface::ForceField);
+
+			ffield->parse_gaff_dat_file(cmdl.gaff_dat_file())
+				.add_kb_forcefield(*a.score, cmdl.step_non_bond())
+				.parse_forcefield_file(cmdl.amber_xml_file())
+				.parse_forcefield_file(cmdl.water_xml_file());
+
+			a.ffield = std::move(ffield);
+
+			a.protein.prepare_for_mm(*a.ffield, *a.gridrec);
+
 			/* Read distributions file and initialize scores
 			* 
 			*/
@@ -106,19 +119,7 @@ namespace Program {
 	void Target::link_fragments(const CmdLnOpts& cmdl) {
 
 		for ( auto &a : __preprecs ) {
-			
-			std::unique_ptr<OMMIface::ForceField> ffield ( new OMMIface::ForceField);
-			
-			ffield->parse_gaff_dat_file(cmdl.gaff_dat_file())
-				.add_kb_forcefield(*a.score, cmdl.step_non_bond())
-				.parse_forcefield_file(cmdl.amber_xml_file())
-				.parse_forcefield_file(cmdl.water_xml_file());
-			
-			a.ffield = std::move(ffield);
-			
-			a.protein.prepare_for_mm(*a.ffield, *a.gridrec);
 			a.ffield->insert_topology(a.protein);
-			
 			std::unique_ptr<LinkFragments> plinkfragments(new LinkFragments(a.protein, *a.score, *a.ffield, *a.gridrec));
 			plinkfragments->run_step(cmdl);
 			a.dockedlig = std::move(plinkfragments);
