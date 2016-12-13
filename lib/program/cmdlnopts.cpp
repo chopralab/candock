@@ -76,6 +76,8 @@ namespace Program {
 			 "Read unique seeds from this file, if it exists, and append new unique seeds if found")
 			("prep",  po::value<std::string> (&__prep_file) ->default_value ("prepared_ligands.pdb"),
 			 "Prepared small molecule(s) are outputted to this filename")
+			("seeds_pdb", po::value<std::string> (&__seeds_pdb_file)->default_value("seeds.pdb"),
+			 "File to save full seeds into.")
 			("max_num_ligands", po::value<int> (&__max_num_ligands)->default_value (10),
 			 "Maximum number of ligands to read in one chunk")
 			;
@@ -182,7 +184,34 @@ namespace Program {
 			 "Maximum allowed energy for seed conformations")
 			("max_num_possibles",   po::value<int> (&__max_num_possibles)->default_value (200000),
 			 "Maximum number of possibles conformations considered for clustering")
+			;
 
+			po::options_description design_step ("Automated Design Options");
+			design_step.add_options()
+			("target_dir",          po::value<std::string>()->default_value("")->implicit_value("targets"),
+			 "Directory containing PDB files. These are docked against and labeled as targets. ")
+			("antitarget_dir",      po::value<std::string>()->default_value("")->implicit_value("atargets"),
+			 "Directory containing PDB files. These are docked against and labeled as antitargets")
+			("target_linking",      po::value<bool>()->default_value(true,"true"),
+			 "Should the ligands be linked for target")
+			("antitarget_linking",  po::value<bool>()->default_value(true,"true"),
+			 "Shoutd the ligands be linked for antitargets")
+			("fragment_bag",        po::value<std::string>()->default_value("")->implicit_value("fragment_bag.mol2"),
+			 "Additional fragments to be added to seeds.pdb")
+			("seeds_to_add",        po::value<int>()->default_value(50),
+			 "Number of seeds from seeds.pdb to be considered for addition to the ligands in prepared_ligands.pdb")
+			("seeds_to_avoid",      po::value<int>()->default_value(50),
+			 "Number of seeds from seeds.pdb to be considered for removal from determined from seeds_to_add")
+			("seeds_till_good",     po::value<int>()->default_value(-1),
+			 "Number of times a seed must be present in the top_seeds for targets until it is considered for addition")
+			("seeds_till_bad",      po::value<int>()->default_value(-1),
+			 "Number of times a seed must be present in the top_seeds for antitargets until it is removed from the good list")
+			("force_seed",          po::value< std::vector<std::string>>()->multitoken(),
+			 "Force addition of a certain seed from seeds.pdb. Multiple seeds can be given")
+			("add_single_atoms",    po::value< std::vector<std::string>>()->multitoken(),
+			 "Change hydrogens to given atoms. Multiple atoms can be given.")
+			("change_terminal_atom",po::value< std::vector<std::string>>()->multitoken(),
+			 "Change non-hydrogen atoms that terminate chains to given atoms. Multiple atoms can be given.")
 			;
 
 			po::options_description config_options;
@@ -192,7 +221,8 @@ namespace Program {
 			              .add(frag_dock_options)
 			              .add(scoring_options)
 			              .add(force_field_min)
-			              .add(linking_step);
+			              .add(linking_step)
+			              .add(design_step);
 
 			po::options_description cmdln_options;
 			cmdln_options.add (generic);
@@ -318,4 +348,33 @@ namespace Program {
 			throw Error ("die: arguments error");
 		}
 	}
+
+	const std::string& CmdLnOpts::get_string_option(const std::string& option) const
+	{
+		return __vm[option].as<std::string>();
+	}
+
+	int CmdLnOpts::get_int_option           (const std::string& option) const
+	{
+		return __vm[option].as<int>();
+	}
+
+	double CmdLnOpts::get_double_option     (const std::string& option) const
+	{
+		return __vm[option].as<double>();
+	}
+
+	bool CmdLnOpts::get_bool_option         (const std::string& option) const
+	{
+		return __vm[option].as<bool>();
+	}
+
+	const std::vector<std::string>& CmdLnOpts::get_string_vector (const std::string& option) const
+	{
+		if ( __vm.count(option) )
+			return __vm[option].as<std::vector<std::string>>();
+		else
+			return __blankstring;
+	}
+
 }

@@ -12,4 +12,9 @@ namespace Linker {
 		os << "end link --------------------------------" << endl;
 		return os;
 	}
+
+	void DockedConformation::sort(DockedConformation::Vec& v) {
+		std::sort(v.begin(), v.end());
+	}
+
 };

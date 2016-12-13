@@ -26,7 +26,7 @@ namespace Molib {
 		Assembly(const Assembly &rhs) : __number(rhs.__number), __name(rhs.__name) { 
 			for (auto &model : rhs) { 
 				dbgmsg("Copy constructor : assembly");
-				add(new Model(model)); 
+				add(new Model(model));
 			} 
 		}
 		

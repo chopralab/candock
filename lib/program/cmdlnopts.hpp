@@ -7,6 +7,7 @@
 #include "helper/error.hpp"
 #include "version.h"
 #include <thread>
+#include <vector>
 
 namespace Program {
 
@@ -17,6 +18,7 @@ namespace Program {
 		std::string __ligand_file;
 		std::string __seeds_file;
 		std::string __prep_file;
+		std::string __seeds_pdb_file;
 
 		std::string __bslib_file;
 		std::string __nosql_file;
@@ -104,6 +106,8 @@ namespace Program {
 		std::string __program_name;
 		std::string __version;
 		std::string __git_version;
+		
+		std::vector<std::string> __blankstring;
 	public:
 		CmdLnOpts() : __quiet (false), __version (""), __git_version ("") {
 			std::stringstream ss;
@@ -132,11 +136,19 @@ namespace Program {
 		};
 
 		void init (int argc, char *argv[], int opts_to_parse = ALL_OPTIONS);
-		void display_time (std::string what) {
+		void display_time (std::string what) const {
 			cout << what << " on " << boost::posix_time::to_simple_string (boost::posix_time::second_clock::local_time()) << std::endl;
 		}
 
 		// interface
+
+		const std::string& get_string_option (const std::string& option) const;
+		bool        get_bool_option   (const std::string& option) const;
+		int         get_int_option    (const std::string& option) const;
+		double      get_double_option (const std::string& option) const;
+
+		const std::vector<std::string>& get_string_vector (const std::string& option) const;
+
 		bool quiet() const {
 			return __quiet;
 		}
@@ -185,6 +197,9 @@ namespace Program {
 		}
 		std::string prep_file() const {
 			return __prep_file;
+		}
+		std::string seeds_pdb_file() const {
+			return __seeds_pdb_file;
 		}
 		std::string bslib_file() const {
 			return __bslib_file;
@@ -387,15 +402,23 @@ namespace Program {
 
 			for ( const auto& a : cmdl.__vm ) {
 				stream << std::setw(22)<< a.first << " = ";
-				if      ( auto v = boost::any_cast<std::string>(&a.second.value()) )
+				if        ( auto v = boost::any_cast<std::string>(&a.second.value()) ) {
 					stream << std::setw(47) << *v;
-				else if ( auto v = boost::any_cast<int>(&a.second.value()) )
+				} else if ( auto v = boost::any_cast<int>(&a.second.value()) ) {
 					stream << std::setw(47) << *v;
-				else if ( auto v = boost::any_cast<double>(&a.second.value()) )
+				} else if ( auto v = boost::any_cast<double>(&a.second.value()) ) {
 					stream << std::setw(47) << *v;
-				else if ( auto v = boost::any_cast<bool>(&a.second.value()) )
+				} else if ( auto v = boost::any_cast<bool>(&a.second.value()) ) {
 					stream << std::setw(47) << *v;
-
+				} else if ( auto v = boost::any_cast<std::vector<std::string>>(&a.second.value()) ) {
+					std::string combination("");
+					for ( const auto& s : *v ) {
+						combination += s;
+						combination += ", ";
+					}
+					stream << std::setw(47) << combination;
+				}
+				
 				stream << std::endl;
 			}
 

@@ -19,7 +19,7 @@ namespace Molib {
 	class Molecules;
 	class PDBreader {
 	public:
-		typedef enum {first_model=1, all_models=2, hydrogens=4, skip_hetatm=8, sparse_macromol=16} pdb_read_options;
+		typedef enum {first_model=1, all_models=2, hydrogens=4, skip_hetatm=8, skip_atom=16, sparse_macromol=32} pdb_read_options;
 	private:
 		class Parser {
 		protected:

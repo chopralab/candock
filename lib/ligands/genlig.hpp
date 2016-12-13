@@ -17,8 +17,9 @@ namespace genlig {
 
 // Operator overloading for typedef types can lead to issues.
 // See http://blog.mezeske.com/?p=170 for details.
+
 namespace Molib {
-	ostream& operator<<(ostream& os, const map<int, Molib::Molecules>& bsites);
+    ostream& operator<<(ostream& os, const map<int, Molib::Molecules>& bsites);
 }
 
 namespace std {

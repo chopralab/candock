@@ -94,7 +94,7 @@ namespace Linker {
 	}
 
 	void Partial::sort(Partial::Vec &v) {
-		::sort(v.begin(), v.end(), Partial::comp());
+		std::sort(v.begin(), v.end(), Partial::comp());
 	}
 
 	Geom3D::Point::Vec Partial::get_ligand_crds() const { 

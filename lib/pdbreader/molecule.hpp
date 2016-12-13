@@ -44,7 +44,7 @@ namespace Molib {
 				dbgmsg("Copy constructor : molecule");
 				add(new Assembly(assembly));
 			}
-			regenerate_bonds(rhs); 
+			regenerate_bonds(rhs);
 		}
 		Molecule(const Molib::Molecule &rhs, const Geom3D::Point::Vec &crds);
 		typedef enum {first_bio, all_bio} bio_how_many;
@@ -73,7 +73,7 @@ namespace Molib {
 		Molecule& regenerate_bonds(const Molecule&);
 		Molecule& compute_overlapping_rigid_segments(Unique&);
 
-		void prepare_for_mm(const OMMIface::ForceField &ffield, Atom::Grid &grid);
+		void prepare_for_mm(const OMMIface::ForceField &ffield, const Atom::Grid &grid);
 
 		Geom3D::Coordinate compute_geometric_center() const { return Geom3D::compute_geometric_center(this->get_crds()); }
 		double compute_rmsd(const Molecule&) const;
@@ -90,7 +90,7 @@ namespace Molib {
 		}
 		Molecule& erase_properties() { for (auto &assembly : *this) assembly.erase_properties(); return *this; }
 		friend ostream& operator<< (ostream& stream, const Molecule& m);
-		static string print_complex(Molecule &ligand, Molecule &receptor, const double energy);
+		static string print_complex(Molecule &ligand, Molecule &receptor, const double energy, const int model = 1);
 	};
 	
 } // Molib

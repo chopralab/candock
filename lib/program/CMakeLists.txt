@@ -12,6 +12,8 @@ set( program_SRC common.cpp
 			     dockfragments.cpp
 			     dockfragments.hpp
 			     linkfragments.cpp
-			     linkfragments.hpp)
+			     linkfragments.hpp
+			     target.cpp
+			     target.hpp)
 
 add_library(program STATIC ${program_SRC})

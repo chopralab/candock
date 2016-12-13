@@ -221,7 +221,7 @@ namespace Molib {
 
 
 
-	void Molecule::prepare_for_mm(const OMMIface::ForceField &ffield, Atom::Grid &grid) {
+	void Molecule::prepare_for_mm(const OMMIface::ForceField &ffield, const Atom::Grid &grid) {
 		/* Rename some residues
 		 */
 		for (auto &presidue : this->get_residues()) {
@@ -383,10 +383,10 @@ namespace Molib {
 		}
 	}
 
-	string Molecule::print_complex(Molecule &ligand, Molecule &receptor, const double energy) {
+	string Molecule::print_complex(Molecule &ligand, Molecule &receptor, const double energy, const int model) {
 		stringstream ss;
 		ss << "REMARK   1 MINIMIZED COMPLEX OF " << ligand.name() << " AND " << receptor.name() << " WITH SCORE OF " << energy << endl;
-		ss << "MODEL" << endl;
+		ss << "MODEL    " << model << endl;
 		int reenum = 0;
 		for (auto &patom : receptor.get_atoms()) {
 			ss << setw(66) << left << *patom;
@@ -397,7 +397,11 @@ namespace Molib {
 			patom->set_atom_number(++reenum);
 			ss << setw(66) << left << *patom;
 		}
-		//~ ss << get_bonds_in(ligand.get_atoms());
+		for ( auto &b : get_bonds_in(ligand.get_atoms()) ) {
+			ss  << "CONECT" << setw(5) << right 
+				<< b->atom1().atom_number() << setw(5) 
+				<< right << b->atom2().atom_number() << endl;
+		}
 		ss << "ENDMDL" << endl;
 		return ss.str();
 	}

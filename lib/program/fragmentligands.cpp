@@ -16,19 +16,34 @@ namespace Program {
 
 	void FragmentLigands::__read_from_files( const CmdLnOpts& cmdl) {
 
-		cout << "Reading fragmented files from " << cmdl.prep_file() << endl;
+		if ( inout::Inout::file_size( cmdl.seeds_pdb_file() ) <= 0 ) {
 
-		Molib::PDBreader lpdb(cmdl.prep_file(), Molib::PDBreader::all_models, cmdl.max_num_ligands());
+			cout << "Could not read seeds from " << cmdl.seeds_pdb_file() << endl;
+			cout << "Reading fragmented files from " << cmdl.prep_file() << endl;
 
-		Molib::Molecules ligands;
-		while(lpdb.parse_molecule(ligands)) {
-			__ligand_idatm_types = ligands.get_idatm_types(__ligand_idatm_types);
-			common::create_mols_from_seeds(__added, __seeds, ligands);
-			ligands.clear();
+			Molib::PDBreader lpdb(cmdl.prep_file(), Molib::PDBreader::all_models, cmdl.max_num_ligands());
+
+			Molib::Molecules ligands;
+			while(lpdb.parse_molecule(ligands)) {
+				__ligand_idatm_types = ligands.get_idatm_types(__ligand_idatm_types);
+				common::create_mols_from_seeds(__added, __seeds, ligands);
+				ligands.clear();
+			}
+
+			__seeds.erase_properties();
+
+			inout::output_file(__seeds, cmdl.seeds_pdb_file(), ios_base::out);
+		} else {
+			Molib::PDBreader lpdb(cmdl.seeds_pdb_file(), Molib::PDBreader::all_models);
+			lpdb.parse_molecule(__seeds);
+			__ligand_idatm_types = __seeds.get_idatm_types(__ligand_idatm_types);
+			for (const auto& mol : __seeds) {
+				__added.insert( stoi(mol.name()) );
+            }
 		}
 	}
 
-	void FragmentLigands::__fragment_ligands( Molib::PDBreader& lpdb, const CmdLnOpts& cmdl ) {
+	void FragmentLigands::__fragment_ligands( Molib::PDBreader& lpdb, const CmdLnOpts& cmdl, const bool write_out) {
 		bool thread_is_not_done;
 		Molib::Molecules ligands;
 		{
@@ -57,9 +72,10 @@ namespace Program {
 				common::create_mols_from_seeds(__added, __seeds, ligands);
 			}
 
-			inout::output_file(ligands, cmdl.prep_file(), ios_base::app);
-			ligands.clear();
+			if (write_out)
+				inout::output_file(ligands, cmdl.prep_file(), ios_base::app);
 
+			ligands.clear();
 			thread_is_not_done = lpdb.parse_molecule(ligands);
 		}
 	}
@@ -75,11 +91,32 @@ namespace Program {
 		std::vector<std::thread> threads;
 
 		for(int i = 0; i < cmdl.ncpu(); ++i) {
-			threads.push_back( std::thread([&,this] {__fragment_ligands(lpdb, cmdl);} ) );
+			threads.push_back( std::thread([&,this] {__fragment_ligands(lpdb, cmdl, true);} ) );
 		}
 		for(auto& thread : threads) {
 			thread.join();
 		}
+
+		const string fragment_bag = cmdl.get_string_option("fragment_bag");
+
+		if (inout::Inout::file_size(fragment_bag) > 0) {
+
+			cout << "Adding fragments from " << fragment_bag << endl;
+
+			Molib::PDBreader lpdb_additional(fragment_bag, 
+				Molib::PDBreader::all_models|Molib::PDBreader::hydrogens, 
+				cmdl.max_num_ligands());
+
+			std::vector<std::thread> threads2;
+
+			for(int i = 0; i < cmdl.ncpu(); ++i) {
+				threads2.push_back( std::thread([&,this] {__fragment_ligands(lpdb_additional, cmdl, false);} ) );
+			}
+			for(auto& thread : threads2) {
+				thread.join();
+			}
+		}
+
 		dbgmsg(__seeds);
 
 		/* Erase atom properties since they make the graph matching incorrect
@@ -87,5 +124,13 @@ namespace Program {
 		 */
 		__seeds.erase_properties();
 
+		inout::output_file(__seeds, cmdl.seeds_pdb_file(), ios_base::out);
+	}
+
+	void FragmentLigands::add_seeds_from_molecules(const Molib::Molecules& molecules, const Program::CmdLnOpts& cmdl) {
+		__ligand_idatm_types = molecules.get_idatm_types(__ligand_idatm_types);
+		common::create_mols_from_seeds(__added, __seeds, molecules);
+		__seeds.erase_properties();
+		inout::output_file(__seeds, cmdl.seeds_pdb_file(), ios_base::out);
 	}
 }

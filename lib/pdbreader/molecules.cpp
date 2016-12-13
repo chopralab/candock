@@ -33,7 +33,7 @@ namespace Molib {
 		return stream;
 	}
 
-	set<int> Molecules::get_idatm_types(set<int> previous) {
+	set<int> Molecules::get_idatm_types(set<int> previous) const {
 		for (auto &molecule : *this)
 		for (auto &pa : molecule.get_atoms()) {
 			previous.insert(pa->idatm_type());
@@ -116,7 +116,7 @@ namespace Molib {
 				}
 			} catch (exception &e) {
 				cerr << "errmesg : deleting molecule " << molecule.name() 
-					<< " (bond order assignment failed)" << endl;
+					<< " (bond order assignment failed) because " << e.what() << endl;
 				mols.erase_shrink(i--);
 			}
 		}
