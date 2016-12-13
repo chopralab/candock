@@ -28,6 +28,14 @@ set( additional_libraries
         dl
    )
 
+set( all_needed_libraries
+     ${candock_libraries}
+     ${Boost_LIBRARIES}
+     ${OPENMM_LIBRARY}
+     ${GSL_LIBRARIES}
+     ${additional_libraries}
+   )
+
 add_executable( candock candock.cpp )
 add_executable( genpot  genpot.cpp )
 add_executable( test_minimization test_minimization.cpp )
@@ -39,128 +47,13 @@ add_executable( test_singlepoint test_singlepoint.cpp )
 add_executable( test_cofactor test_cofactor.cpp )
 add_executable( candock_oo candock_oo.cpp )
 
-target_link_libraries( candock
-                         ${candock_libraries}
-                         ${Boost_LIBRARIES}
-                         ${Boost_date_time_LIBRARY}
-                         ${Boost_filesystem_LIBRARY}
-                         ${Boost_regex_LIBRARY}
-                         ${Boost_system_LIBRARY}
-                         ${Boost_program_options_LIBRARY}
-                         ${OPENMM_LIBRARY}
-                         ${GSL_LIBRARIES}
-                         ${additional_libraries}
-                     )
-
-target_link_libraries( genpot
-                         ${candock_libraries}
-                         ${Boost_LIBRARIES}
-                         ${Boost_date_time_LIBRARY}
-                         ${Boost_filesystem_LIBRARY}
-                         ${Boost_regex_LIBRARY}
-                         ${Boost_system_LIBRARY}
-                         ${Boost_program_options_LIBRARY}
-                         ${GSL_LIBRARIES}
-                         ${additional_libraries}
-                     )
-
-target_link_libraries( test_minimization
-                         ${candock_libraries}
-                         ${Boost_LIBRARIES}
-                         ${Boost_date_time_LIBRARY}
-                         ${Boost_filesystem_LIBRARY}
-                         ${Boost_regex_LIBRARY}
-                         ${Boost_system_LIBRARY}
-                         ${Boost_program_options_LIBRARY}
-                         ${OPENMM_LIBRARY}
-                         ${GSL_LIBRARIES}
-                         ${additional_libraries}
-                     )
-
-target_link_libraries( test_fragmenting
-                         ${candock_libraries}
-                         ${Boost_LIBRARIES}
-                         ${Boost_date_time_LIBRARY}
-                         ${Boost_filesystem_LIBRARY}
-                         ${Boost_regex_LIBRARY}
-                         ${Boost_system_LIBRARY}
-                         ${Boost_program_options_LIBRARY}
-                         ${GSL_LIBRARIES}
-                         ${additional_libraries}
-                     )
-
-target_link_libraries( test_bsite
-                         ${candock_libraries}
-                         ${Boost_LIBRARIES}
-                         ${Boost_date_time_LIBRARY}
-                         ${Boost_filesystem_LIBRARY}
-                         ${Boost_regex_LIBRARY}
-                         ${Boost_system_LIBRARY}
-                         ${Boost_program_options_LIBRARY}
-                         ${GSL_LIBRARIES}
-                         ${additional_libraries}
-                     )
-
-target_link_libraries( test_clq
-                         ${candock_libraries}
-                         ${Boost_LIBRARIES}
-                         ${Boost_date_time_LIBRARY}
-                         ${Boost_filesystem_LIBRARY}
-                         ${Boost_regex_LIBRARY}
-                         ${Boost_system_LIBRARY}
-                         ${Boost_program_options_LIBRARY}
-                         ${GSL_LIBRARIES}
-                         ${additional_libraries}
-                     )
-
-target_link_libraries( test_link
-                         ${candock_libraries}
-                         ${Boost_LIBRARIES}
-                         ${Boost_date_time_LIBRARY}
-                         ${Boost_filesystem_LIBRARY}
-                         ${Boost_regex_LIBRARY}
-                         ${Boost_system_LIBRARY}
-                         ${Boost_program_options_LIBRARY}
-                         ${OPENMM_LIBRARY}
-                         ${GSL_LIBRARIES}
-                         ${additional_libraries}
-                     )
-
-target_link_libraries( test_singlepoint
-                         ${candock_libraries}
-                         ${Boost_LIBRARIES}
-                         ${Boost_date_time_LIBRARY}
-                         ${Boost_filesystem_LIBRARY}
-                         ${Boost_regex_LIBRARY}
-                         ${Boost_system_LIBRARY}
-                         ${Boost_program_options_LIBRARY}
-                         ${GSL_LIBRARIES}
-                         ${additional_libraries}
-                     )
-
-target_link_libraries( test_cofactor
-                         ${candock_libraries}
-                         ${Boost_LIBRARIES}
-                         ${Boost_date_time_LIBRARY}
-                         ${Boost_filesystem_LIBRARY}
-                         ${Boost_regex_LIBRARY}
-                         ${Boost_system_LIBRARY}
-                         ${Boost_program_options_LIBRARY}
-                         ${OPENMM_LIBRARY}
-                         ${GSL_LIBRARIES}
-                         ${additional_libraries}
-                     )
-
-target_link_libraries( candock_oo
-                         ${candock_libraries}
-                         ${Boost_LIBRARIES}
-                         ${Boost_date_time_LIBRARY}
-                         ${Boost_filesystem_LIBRARY}
-                         ${Boost_regex_LIBRARY}
-                         ${Boost_system_LIBRARY}
-                         ${Boost_program_options_LIBRARY}
-                         ${OPENMM_LIBRARY}
-                         ${GSL_LIBRARIES}
-                         ${additional_libraries}
-                         score # another ugly hack???
-                     )
+target_link_libraries( candock ${all_needed_libraries} )
+target_link_libraries( genpot ${all_needed_libraries} )
+target_link_libraries( test_minimization ${all_needed_libraries} )
+target_link_libraries( test_fragmenting ${all_needed_libraries} )
+target_link_libraries( test_bsite ${all_needed_libraries} )
+target_link_libraries( test_clq ${all_needed_libraries} )
+target_link_libraries( test_link ${all_needed_libraries} )
+target_link_libraries( test_singlepoint ${all_needed_libraries} )
+target_link_libraries( test_cofactor ${all_needed_libraries} )
+target_link_libraries( candock_oo ${all_needed_libraries} )
