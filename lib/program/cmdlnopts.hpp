@@ -132,7 +132,8 @@ namespace Program {
 			SCORING      = 1 << 4,
 			FORCE_FIELD  = 1 << 5,
 			LINKING      = 1 << 6,
-			ALL_OPTIONS  = 0xFF
+			DESIGN       = 1 << 7,
+			ALL_OPTIONS  = 0xFFFF
 		};
 
 		void init (int argc, char *argv[], int opts_to_parse = ALL_OPTIONS);

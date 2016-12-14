@@ -264,6 +264,10 @@ namespace Program {
 					print_options.add (linking_step);
 				}
 
+				if (opts_to_parse & DESIGN ) {
+					print_options.add (design_step);
+				}
+
 				
 				std::cout << print_options << std::endl;
 				exit (0);

@@ -49,11 +49,11 @@ add_executable( test_singlepoint test_singlepoint.cpp )
 add_executable( test_cofactor test_cofactor.cpp )
 
 # New programs with new features that change functionality
-add_executable( candock_oo        candock_oo.cpp )
 add_executable( cd_bsite_probis   cd_bsite_probis.cpp )
 add_executable( cd_prep_fragments cd_prep_fragments.cpp )
 add_executable( cd_dock_fragments cd_dock_fragments.cpp )
 add_executable( cd_link_fragments cd_link_fragments.cpp )
+add_executable( cd_design_ligands cd_design_ligands.cpp )
 
 target_link_libraries( candock ${all_needed_libraries} )
 target_link_libraries( genpot ${all_needed_libraries} )
@@ -65,8 +65,8 @@ target_link_libraries( test_link ${all_needed_libraries} )
 target_link_libraries( test_singlepoint ${all_needed_libraries} )
 target_link_libraries( test_cofactor ${all_needed_libraries} )
 
-target_link_libraries( candock_oo        ${all_needed_libraries} )
 target_link_libraries( cd_bsite_probis   ${all_needed_libraries} )
 target_link_libraries( cd_prep_fragments ${all_needed_libraries} )
 target_link_libraries( cd_dock_fragments ${all_needed_libraries} )
 target_link_libraries( cd_link_fragments ${all_needed_libraries} )
+target_link_libraries( cd_design_ligands ${all_needed_libraries} )
