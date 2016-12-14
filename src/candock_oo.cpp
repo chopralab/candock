@@ -85,7 +85,7 @@ int main(int argc, char* argv[]) {
 
 		cout << "Starting Design with " << solo_target_seeds.size() << " seeds." << endl;
 
-		targets.design_ligands(cmdl, solo_target_seeds);
+		targets.design_ligands(cmdl, ligand_fragmenter, solo_target_seeds);
 
 		cmdl.display_time("finished");
 	} catch ( exception& e) {

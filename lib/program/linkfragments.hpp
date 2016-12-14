@@ -24,7 +24,7 @@ namespace Program {
 		std::mutex __concurrent_numbering;
 		int __ligand_cnt = 0;
 
-		void __link_ligand_from_fragment( Molib::PDBreader& lpdb2, const CmdLnOpts& cmdl );
+		void __link_ligand ( Molib::Molecule ligand, const CmdLnOpts& cmdl, const OMMIface::ForceField& ffield);
 	protected:
 		virtual bool __can_read_from_files ( const CmdLnOpts& cmdl );
 		virtual void __read_from_files ( const CmdLnOpts& cmdl );
@@ -37,6 +37,7 @@ namespace Program {
 						__receptor(receptor), __score(score),
 						__ffield(ffield), __gridrec(gridrec) {};
 
+		void link_ligands (const Molib::Molecules ligands, const CmdLnOpts &cmdl);
 		const Molib::Molecules& top_poses() const { return __all_top_poses; }
 	};
 }

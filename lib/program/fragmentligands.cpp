@@ -34,6 +34,9 @@ namespace Program {
 
 			inout::output_file(__seeds, cmdl.seeds_pdb_file(), ios_base::out);
 		} else {
+
+			cout << "Reading seeds from: " << cmdl.seeds_pdb_file() << endl;
+
 			Molib::PDBreader lpdb(cmdl.seeds_pdb_file(), Molib::PDBreader::all_models);
 			lpdb.parse_molecule(__seeds);
 			__ligand_idatm_types = __seeds.get_idatm_types(__ligand_idatm_types);

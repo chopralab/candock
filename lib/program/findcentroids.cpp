@@ -17,7 +17,7 @@ namespace Program {
 	}
 
 	void FindCentroids::__read_from_files( const CmdLnOpts& cmdl ) {
-		cout << "Reading " << cmdl.num_bsites() << " binding sites from " << __receptor.name() + "_" + cmdl.centroid_file() << endl;
+		cout << "Reading " << cmdl.num_bsites() << " binding sites from " << __receptor.name() + "/" + cmdl.centroid_file() << endl;
 		__result = Centro::set_centroids( Path::join(__receptor.name(), cmdl.centroid_file()), cmdl.num_bsites());
 	}
 

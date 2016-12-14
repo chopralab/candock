@@ -82,18 +82,6 @@ namespace Program {
 	void Target::dock_fragments(const FragmentLigands& ligand_fragments, const CmdLnOpts& cmdl) {
 		for ( auto &a : __preprecs ) {
 
-			// Prepare the receptor for docking to
-			std::unique_ptr<OMMIface::ForceField> ffield ( new OMMIface::ForceField);
-
-			ffield->parse_gaff_dat_file(cmdl.gaff_dat_file())
-				.add_kb_forcefield(*a.score, cmdl.step_non_bond())
-				.parse_forcefield_file(cmdl.amber_xml_file())
-				.parse_forcefield_file(cmdl.water_xml_file());
-
-			a.ffield = std::move(ffield);
-
-			a.protein.prepare_for_mm(*a.ffield, *a.gridrec);
-
 			/* Read distributions file and initialize scores
 			* 
 			*/
@@ -109,6 +97,18 @@ namespace Program {
 									.parse_objective_function(cmdl.obj_dir(), cmdl.scale_non_bond());
 
 			a.score = std::move(score);
+
+			// Prepare the receptor for docking to
+			std::unique_ptr<OMMIface::ForceField> ffield ( new OMMIface::ForceField);
+
+			ffield->parse_gaff_dat_file(cmdl.gaff_dat_file())
+				.add_kb_forcefield(*a.score, cmdl.step_non_bond())
+				.parse_forcefield_file(cmdl.amber_xml_file())
+				.parse_forcefield_file(cmdl.water_xml_file());
+
+			a.ffield = std::move(ffield);
+
+			a.protein.prepare_for_mm(*a.ffield, *a.gridrec);
 
 			std::unique_ptr<DockFragments> pdockfragments(new DockFragments(*a.centroids, ligand_fragments, *a.score, *a.gridrec, a.protein.name(), cmdl));
 			pdockfragments->run_step(cmdl);
@@ -126,7 +126,7 @@ namespace Program {
 		}
 	}
 
-	void Target::design_ligands(const CmdLnOpts& cmdl, const std::set<std::string>& seeds_to_add ) {
+	void Target::design_ligands(const CmdLnOpts& cmdl, FragmentLigands& ligand_fragments, const std::set<std::string>& seeds_to_add ) {
 		for ( auto &a : __preprecs ) {
 			std::unique_ptr<design::Design> designer( new design::Design( a.dockedlig->top_poses().first() ));
 			if (! seeds_to_add.empty() )
@@ -148,6 +148,9 @@ namespace Program {
 #endif
 
 			inout::output_file(designer->prepare_designs(cmdl.seeds_file()), "designed.pdb");
+			ligand_fragments.add_seeds_from_molecules(designer->designs(), cmdl);
+			a.prepseeds->run_step(cmdl);
+			a.dockedlig->link_ligands(designer->designs(), cmdl);
 		}
 	}
 
