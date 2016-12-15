@@ -108,33 +108,4 @@ namespace common {
 			}
 		}
 	}
-//~ #ifndef NDEBUG
-	void create_mols_from_fragments(set<int> &added, Molib::Molecules &seeds, const Molib::Molecules &mols) {
-		for (auto &molecule : mols)
-		for (auto &assembly : molecule)
-		for (auto &model : assembly) {
-			for (auto &fragment : model.get_rigid()) { // iterate over seeds
-				if (fragment.is_seed()) {
-					dbgmsg("considering to add " << fragment.get_seed_id());
-					if (!added.count(fragment.get_seed_id())) { // take seeds that haven't been docked already
-						dbgmsg("added " << fragment.get_seed_id());
-						added.insert(fragment.get_seed_id());
-						// add to new molecules
-						Molib::Molecule &seed = seeds.add(new Molib::Molecule(std::to_string(fragment.get_seed_id())));
-						Molib::Assembly &a = seed.add(new Molib::Assembly(0));
-						Molib::Model &mod = a.add(new Molib::Model(1));
-						Molib::Chain &c = mod.add(new Molib::Chain('X'));
-						Molib::Residue &r = c.add(new Molib::Residue("XXX", 1, ' ', Molib::Residue::hetero));
-						for (const Molib::Atom *atom : fragment.get_all()) {
-							Molib::Atom &at = r.add(new Molib::Atom(*atom));
-							dbgmsg("added atom = " << at);
-						}
-						seed.regenerate_bonds(molecule);
-					}
-				}
-			}
-		}
-	}
-//~ #endif
-
 };
