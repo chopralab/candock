@@ -106,8 +106,7 @@ namespace Program {
 		std::string __program_name;
 		std::string __version;
 		std::string __git_version;
-		
-		std::vector<std::string> __blankstring;
+
 	public:
 		CmdLnOpts() : __quiet (false), __version (""), __git_version ("") {
 			std::stringstream ss;

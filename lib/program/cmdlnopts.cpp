@@ -206,11 +206,11 @@ namespace Program {
 			 "Number of times a seed must be present in the top_seeds for targets until it is considered for addition")
 			("seeds_till_bad",      po::value<int>()->default_value(-1),
 			 "Number of times a seed must be present in the top_seeds for antitargets until it is removed from the good list")
-			("force_seed",          po::value< std::vector<std::string>>()->multitoken(),
+			("force_seed",          po::value< std::vector<std::string>>()->multitoken()->default_value(std::vector<std::string>(),""),
 			 "Force addition of a certain seed from seeds.pdb. Multiple seeds can be given")
-			("add_single_atoms",    po::value< std::vector<std::string>>()->multitoken(),
+			("add_single_atoms",    po::value< std::vector<std::string>>()->multitoken()->default_value(std::vector<std::string>(),""),
 			 "Change hydrogens to given atoms. Multiple atoms can be given.")
-			("change_terminal_atom",po::value< std::vector<std::string>>()->multitoken(),
+			("change_terminal_atom",po::value< std::vector<std::string>>()->multitoken()->default_value(std::vector<std::string>(),""),
 			 "Change non-hydrogen atoms that terminate chains to given atoms. Multiple atoms can be given.")
 			;
 
@@ -375,10 +375,7 @@ namespace Program {
 
 	const std::vector<std::string>& CmdLnOpts::get_string_vector (const std::string& option) const
 	{
-		if ( __vm.count(option) )
-			return __vm[option].as<std::vector<std::string>>();
-		else
-			return __blankstring;
+		return __vm[option].as<std::vector<std::string>>();
 	}
 
 }
