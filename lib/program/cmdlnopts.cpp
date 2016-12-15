@@ -198,6 +198,8 @@ namespace Program {
 			 "Shoutd the ligands be linked for antitargets")
 			("fragment_bag",        po::value<std::string>()->default_value("")->implicit_value("fragment_bag.mol2"),
 			 "Additional fragments to be added to seeds.pdb")
+			("fragment_mol",        po::value<std::string>()->default_value("")->implicit_value("fragment_mol.mol2"),
+			 "Additional fragments to be added to seeds.pdb without rotatable bonds being cut.")
 			("seeds_to_add",        po::value<int>()->default_value(50),
 			 "Number of seeds from seeds.pdb to be considered for addition to the ligands in prepared_ligands.pdb")
 			("seeds_to_avoid",      po::value<int>()->default_value(50),

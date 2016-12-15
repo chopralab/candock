@@ -188,6 +188,8 @@ namespace Molib {
 		else if (prop.substr(0,2) == "AR" || prop.substr(0,2) == "RG"
 			 || prop.substr(0,2) == "NG" || prop.substr(0,2) == "ag")
 			return this->get_num_property(prop);
+		else
+			throw Error("Invalid property: " + prop);
 	}
 	int Atom::get_num_bond_with_bond_gaff_type(const string &prop) const {
 		const Atom &atom = *this;
