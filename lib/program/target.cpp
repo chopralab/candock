@@ -127,7 +127,28 @@ namespace Program {
 	}
 
 	void Target::design_ligands(const CmdLnOpts& cmdl, FragmentLigands& ligand_fragments, const std::set<std::string>& seeds_to_add ) {
+#ifndef NDEBUG
+		for (auto &s : seeds_to_add ) {
+			cout << s << endl;
+		}
+#endif
 		for ( auto &a : __preprecs ) {
+			
+			if ( inout::Inout::file_size("designed.pdb") ) {
+				
+				cout << "designed.pdb found -- skipping generation of new designs" << endl;
+				
+				Molib::PDBreader dpdb ("designed.pdb", Molib::PDBreader::all_models );
+				Molib::Molecules designs;
+				dpdb.parse_molecule(designs);
+
+				ligand_fragments.add_seeds_from_molecules(designs, cmdl);
+				a.prepseeds->run_step(cmdl);
+				a.dockedlig->link_ligands(designs, cmdl);
+
+				continue;
+			}
+			
 			std::unique_ptr<design::Design> designer( new design::Design( a.dockedlig->top_poses().first() ));
 			if (! seeds_to_add.empty() )
 				designer->functionalize_hydrogens_with_fragments(common::read_top_seeds_files(seeds_to_add,
@@ -142,11 +163,9 @@ namespace Program {
 				designer->functionalize_extremes_with_single_atoms(a_single_atoms);
 			if (!h_single_atoms.empty())
 				designer->functionalize_hydrogens_with_single_atoms(h_single_atoms);
-
 #ifndef NDEBUG
 			inout::output_file(designer->get_internal_designs(), "internal_designs.pdb");
 #endif
-
 			inout::output_file(designer->prepare_designs(cmdl.seeds_file()), "designed.pdb");
 			ligand_fragments.add_seeds_from_molecules(designer->designs(), cmdl);
 			a.prepseeds->run_step(cmdl);

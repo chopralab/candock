@@ -39,7 +39,7 @@ namespace Program {
 		cout << "Linking for all molecules in " << cmdl.prep_file() << " for " << __receptor.name() << " is complete, skipping." << endl;
 	}
 
-	void LinkFragments::__link_ligand( Molib::Molecule ligand, const CmdLnOpts& cmdl, const OMMIface::ForceField& ffield ) {
+	void LinkFragments::__link_ligand( Molib::Molecule& ligand, const CmdLnOpts& cmdl, const OMMIface::ForceField& ffield ) {
 		boost::filesystem::path p(__receptor.name());
 		p = p / cmdl.docked_dir() / (ligand.name() + ".pdb");
 		if ( inout::Inout::file_size(p.string()) > 0) {
@@ -145,7 +145,7 @@ namespace Program {
 		cout << "Linking of fragments is complete" << endl;
 	}
 
-	void LinkFragments::link_ligands(const Molib::Molecules ligands, const CmdLnOpts& cmdl) {
+	void LinkFragments::link_ligands(const Molib::Molecules& ligands, const CmdLnOpts& cmdl) {
 		int j = 0;
 
 		std::vector<std::thread> threads;

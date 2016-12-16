@@ -2,6 +2,7 @@
 #include "program/cmdlnopts.hpp"
 #include "program/fragmentligands.hpp"
 #include "program/target.hpp"
+#include "modeler/systemtopology.hpp"
 
 ////////////////// LINKING OF FRAGMENTS ///////////////////////////
 
@@ -26,6 +27,7 @@ int main(int argc, char* argv[]) {
 		Program::Target targets (cmdl.receptor_file());
 		targets.find_centroids(cmdl);
 		targets.dock_fragments(ligand_fragmenter, cmdl);
+		OMMIface::SystemTopology::loadPlugins();
 		targets.link_fragments(cmdl);
 
 		cmdl.display_time("Finished");

@@ -184,12 +184,13 @@ namespace design {
 					new_res->regenerate_bonds(r);
 					new_res->set_resi(__original.first().first().first().size() + 1);
 					chain.add(new_res);
+					Molib::Residue& add_res = chain.element( Molib::Residue::res_pair(new_res->resi(), new_res->ins_code()) );
 
 					// Create the relevent bond between the ligand and fragment, remove the "search atom"
-					Molib::Atom &atom2  = chain.last ().element( search_atom.atom_number() );
+					Molib::Atom &atom2  = add_res      .element( search_atom.atom_number() );
 					Molib::Atom &start2 = chain.first().element( start_atom->atom_number() );
 					Molib::Atom &mod_atom = atom2.get_bonds().front()->second_atom(atom2);
-					chain.last().renumber_atoms(__original.get_atoms().size());
+					add_res.renumber_atoms(__original.get_atoms().size());
 					mod_atom.connect( start2 ).set_bo(1);
 
 					__designs.last().set_name( __original.name() +"_design_with_" + fragment.name() + 
@@ -205,7 +206,7 @@ namespace design {
 					}
 
 					mod_atom.erase_bond(atom2);
-					chain.last().erase(search_atom.atom_number());
+					add_res.erase(search_atom.atom_number());
 					
 					cout << "Created: " << __designs.last().name() << endl;
 				}
