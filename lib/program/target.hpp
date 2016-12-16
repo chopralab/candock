@@ -47,7 +47,9 @@ namespace Program {
 		void design_ligands(const CmdLnOpts& cmdl, FragmentLigands& ligand_fragments, const std::set<std::string>& seeds_to_add);
 
 		// TODO: Ideally this would be done internally.....
-		std::multiset<std::string> determine_overlapping_seeds(const int max_seeds, const int number_of_occurances);
+		std::multiset<std::string> determine_overlapping_seeds(const int max_seeds, const int number_of_occurances) const;
+
+		static std::set<std::string> determine_non_overlapping_seeds( const Target& targets, const Target& antitargets, const CmdLnOpts& cmdl );
 	};
 
 }

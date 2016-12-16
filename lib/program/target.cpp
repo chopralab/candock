@@ -148,7 +148,7 @@ namespace Program {
 
 				continue;
 			}
-			
+
 			std::unique_ptr<design::Design> designer( new design::Design( a.dockedlig->top_poses().first() ));
 			if (! seeds_to_add.empty() )
 				designer->functionalize_hydrogens_with_fragments(common::read_top_seeds_files(seeds_to_add,
@@ -173,7 +173,7 @@ namespace Program {
 		}
 	}
 
-	std::multiset<std::string> Target::determine_overlapping_seeds(const int max_seeds, const int number_of_occurances) {
+	std::multiset<std::string> Target::determine_overlapping_seeds(const int max_seeds, const int number_of_occurances) const {
 
 		std::multiset<std::string> good_seed_list;
 
@@ -196,5 +196,25 @@ namespace Program {
 		}
 
 		return good_seed_list;
+	}
+
+	std::set<std::string> Target::determine_non_overlapping_seeds( const Target& targets, const Target& antitargets, const CmdLnOpts& cmdl ) {
+		set<string> solo_target_seeds;
+		const vector<string>& forced_seeds = cmdl.get_string_vector("force_seed");
+
+		if (forced_seeds.size() != 0 && forced_seeds[0] != "off") {
+			std::copy( forced_seeds.begin(), forced_seeds.end(), std::inserter(solo_target_seeds, solo_target_seeds.end()));
+		} else {
+			cout << "Determining the best seeds to add" << endl;
+			multiset<string>  target_seeds =     targets.determine_overlapping_seeds(cmdl.get_int_option("seeds_to_add"),   cmdl.get_int_option("seeds_till_good"));
+			multiset<string> atarget_seeds = antitargets.determine_overlapping_seeds(cmdl.get_int_option("seeds_to_avoid"), cmdl.get_int_option("seeds_till_bad"));
+
+			std::set_difference( target_seeds.begin(),  target_seeds.end(),
+							    atarget_seeds.begin(), atarget_seeds.end(),
+							    std::inserter(solo_target_seeds, solo_target_seeds.end())
+			);
+		}
+
+		return solo_target_seeds;
 	}
 }

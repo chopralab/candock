@@ -49,7 +49,7 @@ namespace Program {
 						__cmdl(cmdl)
 						{}
 
-		std::vector<std::pair<double, std::string>> get_best_seeds ();
+		std::vector<std::pair<double, std::string>> get_best_seeds () const;
 
 	};
 

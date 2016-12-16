@@ -59,31 +59,14 @@ int main(int argc, char* argv[]) {
 		antitargets.find_centroids(cmdl);
 		antitargets.dock_fragments(ligand_fragmenter, cmdl);
 
-		set<string> solo_target_seeds;
-		const vector<string>& forced_seeds = cmdl.get_string_vector("force_seed");
-
-		if (forced_seeds.size() != 0 && forced_seeds[0] != "off") {
-			std::copy( forced_seeds.begin(), forced_seeds.end(), std::inserter(solo_target_seeds, solo_target_seeds.end()));
-		} else {
-			cout << "Determining the best seeds to add" << endl;
-			multiset<string>  target_seeds =     targets.determine_overlapping_seeds(cmdl.get_int_option("seeds_to_add"),   cmdl.get_int_option("seeds_till_good"));
-			multiset<string> atarget_seeds = antitargets.determine_overlapping_seeds(cmdl.get_int_option("seeds_to_avoid"), cmdl.get_int_option("seeds_till_bad"));
-
-			std::set_difference( target_seeds.begin(),  target_seeds.end(),
-							    atarget_seeds.begin(), atarget_seeds.end(),
-							    std::inserter(solo_target_seeds, solo_target_seeds.end())
-			);
-		}
-
 		OMMIface::SystemTopology::loadPlugins();
 
-		if (cmdl.get_bool_option("target_linking"))
-			targets.link_fragments(cmdl);
+		targets.link_fragments(cmdl);
 
 		if (cmdl.get_bool_option("antitarget_linking"))
 			antitargets.link_fragments(cmdl);
 
-		cout << "Starting Design with " << solo_target_seeds.size() << " seeds." << endl;
+		set<string> solo_target_seeds = Program::Target::determine_non_overlapping_seeds(targets, antitargets, cmdl);
 
 		targets.design_ligands(cmdl, ligand_fragmenter, solo_target_seeds);
 

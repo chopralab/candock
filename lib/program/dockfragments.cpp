@@ -112,7 +112,7 @@ namespace Program {
 
 	}
 
-	std::vector<std::pair<double, std::string>> DockFragments::get_best_seeds() {
+	std::vector<std::pair<double, std::string>> DockFragments::get_best_seeds() const {
 		
 		//std::vector<string> seeds_to_add = inout::Inout::files_matching_pattern(__name + "_" + __cmdl.top_seeds_dir(), "*/" + __cmdl.top_seeds_file());
 		
