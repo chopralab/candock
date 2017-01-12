@@ -1,0 +1,190 @@
+#!/usr/bin/env bash
+
+# Load default variables
+
+: ${MCANDOCK_PATH:=@CMAKE_INSTALL_PREFIX@}
+: ${MCANDOCK_VER:=v@CANDOCK_MAJOR_VERSION@.@CANDOCK_MINOR_VERSION@.@CANDOCK_TWEAK_VERSION@}
+
+: ${MCANDOCK_SUP_PATH:=@CMAKE_INSTALL_PREFIX@}
+
+: ${MCANDOCK_frag_separator:=$MCANDOCK_MOD_PATH/splitfragments.pl}
+
+: ${MCANDOCK_extractor:=$MCANDOCK_MOD_PATH/extract_candock_to_scores_and_models.pl}
+: ${MCANDOCK_poses:=1}
+: ${MCANDOCK_pymol:=/depot/gchopra/apps/pymol/pymol}
+
+# Check if were running in a PBS environment
+
+if [[ ! -z $PBS_O_WORKDIR ]]
+then
+	: ${MCANDOCK_working_dir:=$PBS_O_WORKDIR}
+else
+	: ${MCANDOCK_working_dir:=$PWD}
+fi
+
+function get_option() {
+        $MCANDOCK_PATH/$MCANDOCK_VER/cd_check_options | grep '=' | grep -w $1 | awk -F '=' '{ print $2}' | sed -e 's/\s*//'
+}
+
+function find_centroids() {
+
+    if [[ -s `get_option bsite` ]]
+    then
+        echo "Existing binding site found in `get_option bsite`"
+        return
+    fi
+
+    ln -s $MCANDOCK_SUP_PATH/bslibdb  bslibdb
+
+    module load gcc/5.2.0
+
+    SECONDS=0
+
+    $MCANDOCK_PATH/$MCANDOCK_VER/test_bsite
+
+    echo "bsite took $SECONDS seconds to complete"
+
+    module unload gcc
+
+    unlink bslibdb
+
+    chmod g+r `get_option centroid`
+    chmod g+r `get_option gridpdb_hcp`
+    chmod g+r `get_option json`
+    chmod g+r `get_option nosql`
+    chmod g+r `get_option jsonwl`
+    chmod g+r `get_option lig_clus_file`
+    chmod g+r `get_option z_scores_file`
+}
+
+function prep_fragments() {
+
+    if [[ -s `get_option prep` ]]
+    then
+        echo "Existing fragmentation found in `get_option prep`"
+        return
+    fi
+
+    cd $MCANDOCK_working_dir
+    echo "Running fragment in $PWD"
+
+    module load gcc/5.2.0
+
+    SECONDS=0
+
+    $MCANDOCK_PATH/$MCANDOCK_VER/test_fragmenting
+
+    echo "Fragmenting took $SECONDS seconds to complete"
+
+    module unload gcc
+
+    chmod g+r `get_option prep`
+    chmod g+r `get_option seeds`
+}
+
+function make_fragments() {
+    cd $MCANDOCK_working_dir
+    echo "Running make_fragments in $PWD"
+
+    prep_fragments
+
+    perl $frag_separator $prep > separated_fragments.pdb
+
+    chmod g+r separated_fragments.pdb	
+}
+
+function dock_fragments() {
+
+    if [[ -d `get_option top_seeds_dir` ]]
+    then
+        echo "Seeds database found at `get_option top_seeds_dir`"
+        return
+    fi
+
+    cd $MCANDOCK_working_dir
+    echo "Running dock in $PWD"
+
+    bsite
+    prep_fragments
+
+    ln -s $MCANDOCK_SUP_PATH/obj   obj
+    ln -s $MCANDOCK_SUP_PATH/data  data
+
+    module load gcc/5.2.0
+
+    SECONDS=0
+
+    $MCANDOCK_PATH/$MCANDOCK_VER/test_clq
+
+    echo "Docking of fragments took $SECONDS seconds to complete"
+
+    module unload gcc
+
+    unlink obj
+    unlink data
+    
+    chmod -R g+r `get_option top_seeds_dir`
+}
+
+function link_fragments() {
+
+    if [[ -d `get_option docked_dir` ]]
+    then
+        echo "Seeds database found at `get_option top_seeds_dir`"
+        return
+    fi
+
+    cd $MCANDOCK_working_dir
+    echo "Running link in $PWD"
+
+    dock_fragments
+
+    if [[ -s `get_option seeds` ]]
+    then
+        numseeds=$(wc -l `get_option seeds` | awk '{print $1}')
+        numdockd=$(ls `get_option top_seeds_dir`/*/top_seeds.pdb | wc -w)
+        if [[ "$numseeds" -ne "$numdockd" ]]
+        then
+            echo "Warning: inconsistant seeds.txt($numseeds) and seeds data_base($numdockd)"
+        fi
+    else
+        echo "Warning: no seeds.txt file, cannot check consistancy"
+    fi
+
+    ln -s $MCANDOCK_SUP_PATH/obj   obj
+    ln -s $MCANDOCK_SUP_PATH/data  data
+
+    module load gcc/5.2.0
+
+    SECONDS=0
+
+    $MCANDOCK_PATH/$MCANDOCK_VER/test_link
+
+    echo "Linking of fragments took $SECONDS seconds to complete"
+
+    module unload gcc
+
+    unlink obj
+    unlink data
+
+    chmod -R g+r docked/
+}
+
+function extract_result() {
+    cd $MCANDOCK_working_dir
+    echo "Running extract in $PWD"
+    
+    mkdir extract
+    cd extract
+
+    perl $eMCANDOCK_xtractor $([[ "$MCANDOCK_MAKE_PYMOL" -eq 0 ]] && echo -f) -n $MCANDOCK_poses ../docked/*.pdb > ../scores.csv
+
+    $MCANDOCK_pymol -c create_pse.py
+    mv all.pse ..
+
+    cd ..
+    rm -fr extract
+
+    chmod g+r scores.csv
+    chmod g+r all.pse
+}

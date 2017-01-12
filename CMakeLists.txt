@@ -3,8 +3,8 @@ project(candock)
 cmake_minimum_required(VERSION 3.2 FATAL_ERROR)
 
 set( CANDOCK_MAJOR_VERSION 0 )
-set( CANDOCK_MINOR_VERSION 2 )
-set( CANDOCK_TWEAK_VERSION 1 )
+set( CANDOCK_MINOR_VERSION 3 )
+set( CANDOCK_TWEAK_VERSION 0 )
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake/")
 
@@ -50,3 +50,4 @@ include_directories( foreign )
 
 add_subdirectory(lib)
 add_subdirectory(src)
+add_subdirectory(scripts)

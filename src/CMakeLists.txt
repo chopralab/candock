@@ -49,6 +49,7 @@ add_executable( test_singlepoint test_singlepoint.cpp )
 add_executable( test_cofactor test_cofactor.cpp )
 
 # New programs with new features that change functionality
+add_executable( cd_check_options  cd_check_options.cpp )
 add_executable( cd_bsite_probis   cd_bsite_probis.cpp )
 add_executable( cd_prep_fragments cd_prep_fragments.cpp )
 add_executable( cd_dock_fragments cd_dock_fragments.cpp )
@@ -65,8 +66,29 @@ target_link_libraries( test_link ${all_needed_libraries} )
 target_link_libraries( test_singlepoint ${all_needed_libraries} )
 target_link_libraries( test_cofactor ${all_needed_libraries} )
 
+target_link_libraries( cd_check_options  ${all_needed_libraries} )
 target_link_libraries( cd_bsite_probis   ${all_needed_libraries} )
 target_link_libraries( cd_prep_fragments ${all_needed_libraries} )
 target_link_libraries( cd_dock_fragments ${all_needed_libraries} )
 target_link_libraries( cd_link_fragments ${all_needed_libraries} )
 target_link_libraries( cd_design_ligands ${all_needed_libraries} )
+
+install( TARGETS
+    candock genpot
+    test_minimization
+    test_fragmenting
+    test_bsite
+    test_clq
+    test_link
+    test_singlepoint
+    test_cofactor
+    
+    cd_check_options
+    cd_bsite_probis
+    cd_prep_fragments
+    cd_dock_fragments
+    cd_link_fragments
+    cd_design_ligands
+    
+    RUNTIME DESTINATION v${CANDOCK_MAJOR_VERSION}.${CANDOCK_MINOR_VERSION}.${CANDOCK_TWEAK_VERSION}
+)

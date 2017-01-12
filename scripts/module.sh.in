@@ -5,9 +5,10 @@
 #PBS -l naccesspolicy=shared
 
 : ${MCANDOCK_MOD_PATH:=$([[ "$PBS_ENVIRONMENT" -eq "PBS_BATCH" ]] \
-	&& echo /depot/gchopra/apps/bin/candock/modules/v0.2.0 \
+	&& echo @CMAKE_INSTALL_PREFIX@/modules/v@CANDOCK_MAJOR_VERSION@.@CANDOCK_MINOR_VERSION@.@CANDOCK_TWEAK_VERSION@ \
 	|| echo $( cd $( dirname ${BASH_SOURCE[0]} ) && pwd ) )}
 
+# Only used if submitted to torque
 : ${module_to_run:=$PBS_JOBNAME}
 
 echo "Using modules in $MCANDOCK_MOD_PATH"

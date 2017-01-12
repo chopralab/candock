@@ -4,8 +4,8 @@
 
 if [[ ! -z $PBS_ENVIRONMENT ]]
 then
-	echo "DO NOT 'qsub' this script :-)"
-	exit 1
+    echo "DO NOT 'qsub' this script :-)"
+    exit 1
 fi
 
 export module_to_run=$1
