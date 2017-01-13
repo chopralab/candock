@@ -43,7 +43,7 @@ execute_process(
 configure_file( ${PROJECT_SOURCE_DIR}/src/version.hpp.in
                 ${PROJECT_BINARY_DIR}/version.h
 )
-            
+
 include_directories( ${PROJECT_BINARY_DIR} )
 
 include_directories( foreign )
