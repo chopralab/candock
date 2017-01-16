@@ -26,6 +26,7 @@ namespace Program {
 			Molib::Molecules receptors = rpdb.parse_molecule();
 			Molib::Molecule& current = __receptors.add(new Molib::Molecule ( std::move (receptors[0]) ));
 			current.set_name(input_name.substr(0, input_name.length() - 4)); // Emulate the original version of candock
+                        boost::filesystem::create_directory(current.name());
 			__preprecs.push_back(DockedReceptor {current, nullptr, nullptr, nullptr});
 		} else for ( const auto &a : inout::Inout::files_matching_pattern (input_name, ".pdb")) {
 			// Otherwise we treat it like the new version intends.
