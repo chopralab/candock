@@ -25,7 +25,7 @@ namespace Program {
 			Molib::PDBreader rpdb(input_name, Molib::PDBreader::first_model);
 			Molib::Molecules receptors = rpdb.parse_molecule();
 			Molib::Molecule& current = __receptors.add(new Molib::Molecule ( std::move (receptors[0]) ));
-			current.set_name("."); // Emulate the original version of candock
+			current.set_name(input_name.substr(0, input_name.length() - 4)); // Emulate the original version of candock
 			__preprecs.push_back(DockedReceptor {current, nullptr, nullptr, nullptr});
 		} else for ( const auto &a : inout::Inout::files_matching_pattern (input_name, ".pdb")) {
 			// Otherwise we treat it like the new version intends.

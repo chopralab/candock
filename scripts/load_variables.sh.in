@@ -17,9 +17,9 @@
 
 if [[ ! -z $PBS_O_WORKDIR ]]
 then
-	: ${MCANDOCK_working_dir:=$PBS_O_WORKDIR}
+        : ${MCANDOCK_working_dir:=$PBS_O_WORKDIR}
 else
-	: ${MCANDOCK_working_dir:=$PWD}
+        : ${MCANDOCK_working_dir:=$PWD}
 fi
 
 function get_option() {
