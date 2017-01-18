@@ -76,6 +76,7 @@ namespace Program {
 		double __docked_clus_rad;
 		double __max_allow_energy;
 		bool __iterative;
+		bool __cuda;
 		int __max_num_possibles;
 
 		std::string __amber_xml_file;
@@ -332,6 +333,9 @@ namespace Program {
 		}
 		bool iterative() const {
 			return __iterative;
+		}
+		bool cuda() const {
+			return __cuda;
 		}
 		int max_num_possibles() const {
 			return __max_num_possibles;

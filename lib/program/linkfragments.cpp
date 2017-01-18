@@ -84,7 +84,7 @@ namespace Program {
 			 * 
 			 */
 			Linker::Linker linker(modeler, __receptor, ligand, top_seeds, __gridrec, __score, 
-					cmdl.iterative(), cmdl.dist_cutoff(), cmdl.spin_degrees(), 
+					cmdl.cuda(), cmdl.iterative(), cmdl.dist_cutoff(), cmdl.spin_degrees(), 
 					cmdl.tol_seed_dist(), cmdl.lower_tol_seed_dist(), 
 					cmdl.upper_tol_seed_dist(), cmdl.max_possible_conf(),
 					cmdl.link_iter(), cmdl.clash_coeff(), cmdl.docked_clus_rad(), 
