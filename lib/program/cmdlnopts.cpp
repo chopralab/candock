@@ -160,6 +160,8 @@ namespace Program {
 			 "Docked ligands output directory")
 			("iterative",       po::value<bool> (&__iterative)->default_value (false, "false")->implicit_value(true),
 			 "Enable iterative minimization during linking")
+			("cuda",       po::value<bool> (&__cuda)->default_value (false, "false")->implicit_value(true),
+			 "Enable cuda iterative linker during linking")
 			("top_percent",     po::value<double> (&__top_percent)->default_value (0.05, "0.05"),
 			 "Top percent of each docked seed to extend to full molecule")
 			("max_clique_size", po::value<int> (&__max_clique_size)->default_value (3),

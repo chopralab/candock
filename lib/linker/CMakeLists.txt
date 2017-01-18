@@ -3,6 +3,7 @@ include_directories($CMAKE_CURRENT_SOURCE_DIR)
 set( linker_SRC dockedconformation.cpp
         				dockedconformation.hpp
 				        genericlinker.cpp
+					cuda_iterativelinker.cpp
 				        iterativelinker.cpp
 				        linker.cpp
 				        linker.hpp

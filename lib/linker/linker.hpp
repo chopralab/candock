@@ -147,12 +147,22 @@ namespace Linker {
 			using GenericLinker::GenericLinker;
 		};
 		
+		class CUDA_IterativeLinker : public GenericLinker {
+			DockedConformation __a_star(const int segment_graph_size, const Partial &start_conformation, vector<unique_ptr<State>> &states, int iter);
+			Partial::Vec __generate_rigid_conformations(const Seed::Graph &seed_graph);
+			DockedConformation __reconstruct(const Partial &conformation);
+
+		public:
+			using GenericLinker::GenericLinker;
+		};
+
 		GenericLinker *l;
+		
 		
 	public:
 		Linker(OMMIface::Modeler &modeler, const Molib::Molecule &receptor, const Molib::Molecule &ligand, 
 			const Molib::NRset &top_seeds, const Molib::Atom::Grid &gridrec, 
-			const Molib::Score &score, const bool iterative, const double dist_cutoff, 
+			const Molib::Score &score, const bool cuda, const bool iterative, const double dist_cutoff, 
 			const double spin_degrees, const double tol_seed_dist, 
 			const double lower_tol_seed_dist, const double upper_tol_seed_dist, 
 			const int max_possible_conf, const int link_iter, 
