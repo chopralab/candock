@@ -28,6 +28,7 @@ namespace Program {
 			} else {
 				Molib::PDBreader conf(p2.string(), Molib::PDBreader::skip_atom | Molib::PDBreader::first_model, 1);
 				conf.parse_molecule(__all_top_poses);
+				__all_top_poses.last().set_name(molec);
 			}
 		}
 		

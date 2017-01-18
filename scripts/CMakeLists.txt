@@ -18,6 +18,7 @@ install( PROGRAMS ${PROJECT_BINARY_DIR}/load_variables.sh
                   ${PROJECT_SOURCE_DIR}/scripts/find_centroids.sh
                   ${PROJECT_SOURCE_DIR}/scripts/prep_fragments.sh
                   ${PROJECT_SOURCE_DIR}/scripts/make_fragments.sh
+                  ${PROJECT_SOURCE_DIR}/scripts/dock_fragments.sh
                   ${PROJECT_SOURCE_DIR}/scripts/link_fragments.sh
                   ${PROJECT_SOURCE_DIR}/scripts/extract_result.sh
          DESTINATION
