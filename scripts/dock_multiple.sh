@@ -15,8 +15,8 @@ prot_list=$working_dir/all.lst
 
 shift 2
 
-export  MCANDOCK_prep=$working_dir/compounds/prepared_ligands.pdb
-export MCANDOCK_seeds=$working_dir/compounds/seeds.txt
+export CANDOCK_prep=$working_dir/compounds/prepared_ligands.pdb
+export CANDOCK_seeds=$working_dir/compounds/seeds.txt
 
 : ${limit:=1000}
 : ${start:=1}
@@ -38,9 +38,9 @@ do
         continue
     fi
 
-    export MCANDOCK_receptor=$working_dir/structures/$i.pdb
-    export MCANDOCK_bsite=$working_dir/structures/$i.cen
-    export MCANDOCK_top_seeds_dir=$working_dir/seeds_database/$i/top_seeds
+    export CANDOCK_receptor=$working_dir/structures/$i.pdb
+    export CANDOCK_centroid=$working_dir/structures/$i.cen
+    export CANDOCK_top_seeds_dir=$working_dir/seeds_database/$i/top_seeds
 
     if [[ ! -d $i ]]
     then

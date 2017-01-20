@@ -28,7 +28,7 @@ function get_option() {
 
 function find_centroids() {
 
-    if [[ -s `get_option bsite` ]]
+    if [[ -s `get_option centroid` ]]
     then
         echo "Existing binding site found in `get_option bsite`"
         return

@@ -56,6 +56,11 @@ add_executable( cd_dock_fragments cd_dock_fragments.cpp )
 add_executable( cd_link_fragments cd_link_fragments.cpp )
 add_executable( cd_design_ligands cd_design_ligands.cpp )
 
+if(CUDA_FOUND)
+#CUDA programs
+cuda_add_executable( cuda_link_fragments cd_link_fragments.cpp )
+endif(CUDA_FOUND)
+
 target_link_libraries( candock ${all_needed_libraries} )
 target_link_libraries( genpot ${all_needed_libraries} )
 target_link_libraries( test_minimization ${all_needed_libraries} )
@@ -72,6 +77,10 @@ target_link_libraries( cd_prep_fragments ${all_needed_libraries} )
 target_link_libraries( cd_dock_fragments ${all_needed_libraries} )
 target_link_libraries( cd_link_fragments ${all_needed_libraries} )
 target_link_libraries( cd_design_ligands ${all_needed_libraries} )
+
+if(CUDA_FOUND)
+target_link_libraries( cuda_link_fragments ${all_needed_libraries} )
+endif(CUDA_FOUND)
 
 install( TARGETS
     candock genpot
