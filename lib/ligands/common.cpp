@@ -1,6 +1,7 @@
 #include "pdbreader/molecule.hpp"
 #include "pdbreader/pdbreader.hpp"
 #include "common.hpp"
+#include <json/json.h>
 
 ostream& operator<< (ostream& stream, const ResidueSet& residues) {
 	for (auto &presidue : residues)

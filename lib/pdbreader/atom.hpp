@@ -110,7 +110,7 @@ namespace Molib {
 		bool compatible(const Atom &atom) const;
 		string get_label() const { return (__smiles_label.empty() 
 			? help::idatm_unmask[__idatm_type] : __smiles_label); }
-		const int weight() const { return 0; } // dummy for graph ostream operator
+                int weight() const { return 0; } // dummy for graph ostream operator
 
 		static Graph create_graph(const Vec &atoms);
 		static Graph create_graph(const Set &atoms);

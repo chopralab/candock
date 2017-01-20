@@ -27,7 +27,7 @@ namespace Linker {
 		//~ throw Error("die : couldn't find adjacent in segment");
 	//~ }
 //~ 
-	const int Segment::adjacent_in_segment(const Molib::Atom &atom, 
+	int Segment::adjacent_in_segment(const Molib::Atom &atom, 
 		const Molib::Atom &forbidden) const { 
 		for (auto &adj : atom) {
 			if (&adj != &forbidden && has_atom(adj)) 

@@ -108,10 +108,10 @@ private:
 	int szi, szj;
 public:
 
-	const int get_szi() const { return szi; }
-	const int get_szj() const { return szj; }
-	
-	const bool get(int i, int j) const {
+        int get_szi() const { return szi; }
+        int get_szj() const { return szj; }
+
+        bool get(int i, int j) const {
 	  return data[i/WORD][j]&1<<(i%WORD);
 	}
 	

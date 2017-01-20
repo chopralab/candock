@@ -4,6 +4,7 @@ set( geom3d_SRC coordinate.cpp
 			        	coordinate.hpp
         				geom3d.cpp
 			        	geom3d.hpp
+			        	matrix.cpp
         				matrix.hpp
 			        	pca.cpp
 			        	pca.hpp
