@@ -19,6 +19,7 @@ namespace Molib {
 		typedef tuple<int, string, unique_ptr<Geom3D::Coordinate>, double> atom_tuple;
 		typedef pair<Atom*, Atom*> Pair;
 		typedef vector<Atom*> Vec;
+                typedef vector<const Atom*> ConstVec;
 		typedef set<Atom*> Set;
 		typedef ::Grid<Atom> Grid;
 		typedef Glib::Graph<Atom> Graph;

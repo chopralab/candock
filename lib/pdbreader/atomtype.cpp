@@ -909,4 +909,19 @@ namespace Molib {
 		}
 		dbgmsg("MOLECULE AFTER RING TYPING" << endl << atoms);
 	}
+	
+	std::tuple<double, int, int> AtomType::determine_lipinski(const Atom::Vec &atoms) {
+                double molar_mass = 0.0;
+                int h_bond_acceptors = 0;
+                int h_bond_donors = 0;
+                for (auto atom : atoms) {
+                        molar_mass += atom->element().mass();
+                        if ( atom->element() == Element::N || atom->element() == Element::O ) {
+                                ++h_bond_acceptors;
+                                h_bond_donors += atom->get_num_hydrogens();
+                                
+                        }
+                }
+                return std::make_tuple(molar_mass, h_bond_acceptors, h_bond_donors);
+        }
 };
