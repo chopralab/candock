@@ -6,4 +6,4 @@ make candock
 
 For release compile (with optimization):
 
-cmake . -Bbuild -DCMAKE_BUILD_TYPE=Release
+cmake3 . -Bbuild -DCMAKE_BUILD_TYPE=Release
