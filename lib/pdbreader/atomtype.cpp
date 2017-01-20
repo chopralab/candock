@@ -22,6 +22,7 @@
 using namespace std;
 
 namespace Molib {
+namespace AtomType {
 	int freeOxygens(const Atom &a, map<const Atom*, int> &heavys) {
 		int freeOxygens = 0;
 		for (auto &bondee : a) {
@@ -104,7 +105,7 @@ namespace Molib {
 		}
 		return is_aromatic;
 	}
-	void AtomType::compute_idatm_type(const Atom::Vec &atoms) {
+	void compute_idatm_type(const Atom::Vec &atoms) {
 		// angle values used to discriminate between hybridization states
 		const double angle23val1 = 115.0;
 		const double angle23val2 = 122.0;
@@ -802,13 +803,13 @@ namespace Molib {
 		// no longer missing : Sar,Oar+,N1+,N2+
 		dbgmsg("MOLECULE AFTER IDATM TYPING" << endl << atoms);
 	}	
-	void AtomType::refine_idatm_type(const Atom::Vec &atoms) {
+	void refine_idatm_type(const Atom::Vec &atoms) {
 		// "pass 11": refined idatm typing relying on bond orders... 
 		Fragmenter(atoms).substitute_atoms(help::refine);
 		dbgmsg("pass 11 (refining idatm atom types) : " << endl << atoms);
 	}
 	
-	void AtomType::compute_gaff_type(const Atom::Vec &atoms) {
+	void compute_gaff_type(const Atom::Vec &atoms) {
 		Fragmenter f(atoms);
 		f.substitute_atoms(help::gaff);
 		dbgmsg("pass 1 (gaff applying basic rules) : " << endl << atoms);
@@ -845,7 +846,7 @@ namespace Molib {
 	 * (as atoms argument) then it should be checked before calling this function whether
 	 * it is not a standard_residue...in which case, ring typing is unneccessary.
 	 */
-	void AtomType::compute_ring_type(const Atom::Vec &atoms) {
+	void compute_ring_type(const Atom::Vec &atoms) {
 		dbgmsg("Computing ring types");
 		for (auto &patom : atoms)
 				patom->insert_property("NG", 1); // atom belongs to chain
@@ -910,7 +911,7 @@ namespace Molib {
 		dbgmsg("MOLECULE AFTER RING TYPING" << endl << atoms);
 	}
 	
-	std::tuple<double, int, int> AtomType::determine_lipinski(const Atom::Vec &atoms) {
+	std::tuple<double, int, int> determine_lipinski(const Atom::Vec &atoms) {
                 double molar_mass = 0.0;
                 int h_bond_acceptors = 0;
                 int h_bond_donors = 0;
@@ -924,4 +925,5 @@ namespace Molib {
                 }
                 return std::make_tuple(molar_mass, h_bond_acceptors, h_bond_donors);
         }
+}
 };

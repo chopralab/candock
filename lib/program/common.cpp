@@ -5,17 +5,9 @@
 #include "helper/benchmark.hpp"
 #include "helper/path.hpp"
 #include "helper/grep.hpp"
-#include "geom3d/matrix.hpp"
-#include "geom3d/pca.hpp"
-#include "geom3d/geom3d.hpp"
-#include "kabsch/kabsch.hpp"
 #include "score/score.hpp"
 #include "pdbreader/pdbreader.hpp"
 #include "pdbreader/atom.hpp"
-#include <gsl/gsl_matrix_double.h>
-#include <gsl/gsl_statistics_double.h>
-#include <gsl/gsl_eigen.h>
-#include <gsl/gsl_blas.h>
 
 namespace common {
 

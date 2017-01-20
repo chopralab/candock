@@ -19,7 +19,7 @@ namespace design {
 		__original.first().first().first().first().renumber_atoms(1);
 	}
 
-	const Molib::Molecules& Design::prepare_designs( const std::string& seeds_file ) {
+	const Molib::Molecules& Design::prepare_designs() {
 		for ( auto &molecule : __designs ) {
 
 			Molib::Chain   &first_chain  = molecule.first().first().first();
@@ -93,17 +93,7 @@ namespace design {
 			}
 		}
 
-		return __designs.compute_hydrogen()
-				        .compute_bond_order()
-				        .compute_bond_gaff_type()
-				        .refine_idatm_type()
-				        .erase_hydrogen()  // needed because refine changes connectivities
-				        .compute_hydrogen()   // needed because refine changes connectivities
-				        .compute_ring_type()
-				        .compute_gaff_type()
-				        .compute_rotatable_bonds() // relies on hydrogens being assigned
-				        .erase_hydrogen()
-				        .compute_overlapping_rigid_segments(seeds_file);
+		return __designs;
 	}
 
 	

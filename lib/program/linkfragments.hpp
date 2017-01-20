@@ -39,6 +39,7 @@ namespace Program {
 
 		void link_ligands (const Molib::Molecules& ligands, const CmdLnOpts &cmdl);
 		const Molib::Molecules& top_poses() const { return __all_top_poses; }
+		void clear_top_poses() { __all_top_poses.clear(); };
 	};
 }
 

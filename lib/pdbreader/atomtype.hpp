@@ -16,14 +16,13 @@ namespace Molib {
 	class Atom;
 	class Molecule;
 	
-	class AtomType {
-	public:
-		static void compute_idatm_type(const Atom::Vec &atoms);
-		static void refine_idatm_type(const Atom::Vec &atoms);
-		static void compute_gaff_type(const Atom::Vec &atoms);
-		static void compute_ring_type(const Atom::Vec &atoms);
+	namespace AtomType {
+		void compute_idatm_type(const Atom::Vec &atoms);
+		void refine_idatm_type(const Atom::Vec &atoms);
+		void compute_gaff_type(const Atom::Vec &atoms);
+		void compute_ring_type(const Atom::Vec &atoms);
                 
-                static std::tuple<double, int, int> determine_lipinski(const Atom::Vec &atoms);
+                std::tuple<double, int, int> determine_lipinski(const Atom::Vec &atoms);
 	};
 };
 #endif

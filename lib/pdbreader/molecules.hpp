@@ -1,7 +1,6 @@
 #ifndef MOLECULES_H
 #define MOLECULES_H
 #include "geom3d/geom3d.hpp"
-#include "geom3d/matrix.hpp"
 #include "helper/help.hpp"
 #include "it.hpp"
 #include "grid.hpp"
@@ -26,6 +25,7 @@ namespace Molib {
 			for (auto &molecule : rhs) { dbgmsg("Copy constructor : molecules");add(new Molecule(molecule)); } 
 		}
 		Molecule& add(Molecule *m) { return this->aadd(m, this); }
+		void add(const Molecules& rhs) { for (auto &molecule : rhs) { add(new Molecule(molecule)); } }
 		void set_name(const string &name) { __name = name; }
 		const string& name() const { return __name; }
 		void rotate(const Geom3D::Matrix &rota, const bool inverse=false);
