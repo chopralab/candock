@@ -134,25 +134,26 @@ namespace Program {
 			cout << s << endl;
 		}
 #endif
-
-                if ( inout::Inout::file_size("designed.pdb") ) {
-                        cout << "designed.pdb found -- skipping generation of new designs" << endl;
-                        for ( auto &a : __preprecs ) {
-                                Molib::PDBreader dpdb ("designed.pdb", Molib::PDBreader::all_models );
-                                Molib::Molecules designs;
-                                dpdb.parse_molecule(designs);
-
-                                ligand_fragments.add_seeds_from_molecules(designs, cmdl);
-                                a.prepseeds->run_step(cmdl);
-                                a.dockedlig->link_ligands(designs, cmdl);
-                        }
-                }
-
-
+                int n = 1;
                 Molib::Unique created_design("designed.txt");
-                Molib::Molecules all_designs;
-                for ( auto &a : __preprecs ) {
-                        for ( auto &molecule : a.dockedlig->top_poses() ) {
+                while (true) { // Probably a bad idea
+
+                    cout << "Starting design iteration #" << n << endl;
+
+                    stringstream design_file;
+                    design_file << "designed_" << n++ << ".pdb";
+                    Molib::Molecules all_designs;
+                    if ( inout::Inout::file_size(design_file.str()) ) {
+                            cout << design_file.str() << " found -- skipping generation of new designs this iteration" << endl;
+                            Molib::PDBreader dpdb (design_file.str(), Molib::PDBreader::all_models );
+                            Molib::Molecules designs;
+                            dpdb.parse_molecule(designs);
+
+                            ligand_fragments.add_seeds_from_molecules(designs, cmdl);
+                            all_designs.add(designs);
+                    } else {
+                        for ( auto &a : __preprecs ) {
+                            for ( auto &molecule : a.dockedlig->top_poses() ) {
                                 design::Design designer ( molecule, created_design);
                                 if (! seeds_to_add.empty() )
                                         designer.functionalize_hydrogens_with_fragments(common::read_top_seeds_files(seeds_to_add,
@@ -171,24 +172,35 @@ namespace Program {
                                 inout::output_file(designer->get_internal_designs(), "internal_designs.pdb");
 #endif
                                 all_designs.add( designer.prepare_designs() );
+                            }
                         }
-                }
-                all_designs.compute_hydrogen()
-                           .compute_bond_order()
-                           .compute_bond_gaff_type()
-                           .refine_idatm_type()
-                           .erase_hydrogen()  // needed because refine changes connectivities
-                           .compute_hydrogen()   // needed because refine changes connectivities
-                           .compute_ring_type()
-                           .compute_gaff_type()
-                           .compute_rotatable_bonds() // relies on hydrogens being assigned
-                           .erase_hydrogen()
-                           .compute_overlapping_rigid_segments(cmdl.seeds_file());
+                    }
 
-                ligand_fragments.add_seeds_from_molecules(all_designs, cmdl);
-                for ( auto &b : __preprecs ) {
+                    if ( all_designs.size() == 0 ) {
+                            cout << "No new designs, exiting" << endl;
+                            return;
+                    }
+
+                    all_designs.compute_hydrogen()
+                               .compute_bond_order()
+                               .compute_bond_gaff_type()
+                               .refine_idatm_type()
+                               .erase_hydrogen()  // needed because refine changes connectivities
+                               .compute_hydrogen()   // needed because refine changes connectivities
+                               .compute_ring_type()
+                               .compute_gaff_type()
+                               .compute_rotatable_bonds() // relies on hydrogens being assigned
+                               .erase_hydrogen()
+                               .compute_overlapping_rigid_segments(cmdl.seeds_file());
+
+                    inout::output_file(all_designs, design_file.str());
+
+                    ligand_fragments.add_seeds_from_molecules(all_designs, cmdl);
+                    for ( auto &b : __preprecs ) {
                         b.prepseeds->run_step(cmdl);
+                        b.dockedlig->clear_top_poses();
                         b.dockedlig->link_ligands(all_designs, cmdl);
+                    }
                 }
 	}
 
