@@ -4,10 +4,11 @@
 #include <pdbreader/hydrogens.hpp>
 #include <pdbreader/bondtype.hpp>
 #include <pdbreader/atomtype.hpp>
+#include <fragmenter/unique.hpp>
 
 namespace design {
 
-	Design::Design(const Molib::Molecule &start) : __original(start) {
+	Design::Design(const Molib::Molecule &start, Molib::Unique &existing) : __original(start), __existing(existing) {
 		if (__original.empty()) {
 			throw Error("Invalid molecule given for modificatiton");
 		}
@@ -184,8 +185,6 @@ namespace design {
 						continue;
                                         }
 
-					
-
 					already_added.insert( test_already_added );
 
 					// Copy the new molecule into the returnable object
@@ -222,7 +221,16 @@ namespace design {
 
 					mod_atom.erase_bond(atom2);
 					add_res.erase(search_atom.atom_number());
-					
+                                        Molib::Atom::Vec test = new_design.get_atoms();
+                                        Molib::Atom::Set set_of_new_atoms ( test.begin(), test.end() );
+                                        if ( ! __existing.is_seed_unique(set_of_new_atoms) ) {
+                                                cout << new_design.name() << " already has been designed!" << endl;
+                                                __designs.erase(__designs.size() - 1);
+                                                continue;
+                                        }
+                                        
+                                        __existing.get_seed_id(set_of_new_atoms);
+                                        
 					cout << "Created: " << new_design.name() << endl;
                                         cout << "Lipsinki is " << std::get<0>(original_lipinski) + std::get<0>(frag_lipinski) << " "
                                                                << std::get<1>(original_lipinski) + std::get<1>(frag_lipinski) << " "

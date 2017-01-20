@@ -36,7 +36,7 @@ namespace Molib {
 		dbgmsg("exiting read_seeds_file");
 	}
 
-	bool Unique::__match(BondGraph &g, USeeds::iterator it1, USeeds::iterator it2, size_t &si) {
+	bool Unique::__match(BondGraph &g, USeeds::const_iterator it1, USeeds::const_iterator it2, size_t &si) const {
 		dbgmsg("we are in __match");
 		while (it1 != it2) {
 			BondGraph &g2 = *(it1->second.graph);
@@ -53,7 +53,7 @@ namespace Molib {
 		return false;
 	}
 
-	size_t Unique::__hash(const Atom::Set &atoms) {
+	size_t Unique::__hash(const Atom::Set &atoms) const {
 		map<string, int> chemical_formula;
 		for (auto &a : atoms)
 			chemical_formula[a->get_label()]++;
@@ -104,4 +104,37 @@ namespace Molib {
 		dbgmsg("si = " << si);
 		return si;
 	}
+	bool Unique::is_seed_unique(const Atom::Set &seed) const {
+		help::smiles edges;
+		auto bonds = Molib::get_bonds_in(seed);
+		for (auto &pbond : bonds) {
+			const Molib::Bond &bond = *pbond;
+			stringstream vertex1, vertex2;
+			vertex1 << bond.atom1().get_label() << "#" << bond.atom1().atom_number();
+			vertex2 << bond.atom2().get_label() << "#" << bond.atom2().atom_number();
+			edges.push_back(help::edge{vertex1.str(), vertex2.str(), ""});
+		}
+		dbgmsg("before outputting edges");
+		dbgmsg(edges);
+		dbgmsg("before calculating hash");
+		size_t hsh = __hash(seed);
+		size_t si = 0;
+		// Glib::Graph<AtomTag> g(create_atom_tags(s), true, false);
+		// Atom::Graph g = create_graph(edges);
+		dbgmsg("before creating bond graph");
+		BondGraph g = create_graph(edges);
+		dbgmsg(hsh);
+		auto ret = __unique_seeds.equal_range(hsh);
+#ifndef NDEBUG
+		for (auto &kv : __unique_seeds) dbgmsg("hash = " << kv.first);
+#endif
+		dbgmsg("ret.first == ret.second " << boolalpha << (ret.first == ret.second));
+		// seed's hash OR graph doesn't match any hash OR graph already in db, so add seed
+		if (ret.first == ret.second || !__match(g, ret.first, ret.second, si)) { 
+                        return true;
+                }
+		dbgmsg("si = " << si);
+		return false;
+	}
+
 }

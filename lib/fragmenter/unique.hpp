@@ -22,8 +22,8 @@ namespace Molib {
 		USeeds __unique_seeds;
 		const string __seeds_file;
 		void __read_seeds_file();
-		bool __match(BondGraph&, USeeds::iterator, USeeds::iterator, size_t&);
-		size_t __hash(const Atom::Set&);
+		bool __match(BondGraph&, USeeds::const_iterator, USeeds::const_iterator, size_t&) const;
+		size_t __hash(const Atom::Set&) const;
 		size_t __unique(const Atom::Set&);
 	public:
 		Unique(string seeds_file="") : __seeds_file(seeds_file), 
@@ -39,6 +39,7 @@ namespace Molib {
 			}
 		}
 		size_t get_seed_id(const Atom::Set &a) { return __unique(a); }
+		bool is_seed_unique( const Atom::Set &a) const;
 		friend ostream& operator<<(ostream& os, const USeeds& useeds);
 	};
 }

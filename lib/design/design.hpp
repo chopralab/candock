@@ -8,9 +8,10 @@ namespace design {
 	class Design {
 		Molib::Molecules __designs;
 		Molib::Molecule  __original;
+                Molib::Unique &__existing;
 	public:
 		
-		Design( const Molib::Molecule &start );
+		Design( const Molib::Molecule &start, Molib::Unique &existing );
 		
 		void functionalize_hydrogens_with_fragments(const Molib::NRset& nr, const double cutoff, const double clash_coeff);
 		void functionalize_hydrogens_with_single_atoms( const std::vector< std::string >& idatms );

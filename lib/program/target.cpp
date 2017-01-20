@@ -4,6 +4,7 @@
 
 #include "helper/path.hpp"
 #include "common.hpp"
+#include <fragmenter/unique.hpp>
 
 namespace Program {
 	Target::Target(const std::string& input_name ) {
@@ -133,6 +134,7 @@ namespace Program {
 			cout << s << endl;
 		}
 #endif
+		Molib::Unique created_design("designs.txt");
 		for ( auto &a : __preprecs ) {
 			
 			if ( inout::Inout::file_size("designed.pdb") ) {
@@ -150,7 +152,7 @@ namespace Program {
 				continue;
 			}
 
-			std::unique_ptr<design::Design> designer( new design::Design( a.dockedlig->top_poses().first() ));
+			std::unique_ptr<design::Design> designer( new design::Design( a.dockedlig->top_poses().first(), created_design) );
 			if (! seeds_to_add.empty() )
 				designer->functionalize_hydrogens_with_fragments(common::read_top_seeds_files(seeds_to_add,
                                                                                     Path::join(a.protein.name(), cmdl.top_seeds_dir()),
