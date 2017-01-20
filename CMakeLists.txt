@@ -18,8 +18,16 @@ find_package(Boost   REQUIRED  COMPONENTS date_time filesystem system regex prog
 find_package(GSL     REQUIRED)
 find_package(OpenMM  REQUIRED)
 find_package(Git     REQUIRED)
+find_package(CUDA)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=gnu++11")
+if(CUDA_FOUND)
+SET(CUDA_PROPAGATE_HOST_FLAGS OFF)
+set(CUDA_NVCC_FLAGS "${CUDA_NVCC_FLAGS} -std=c++11 -arch=compute_61 -code=sm_61" )
+endif(CUDA_FOUND)
+
+
+#Change to c++11 due to gnu specific extensions that break cuda
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 set(JSONCPP_INCLUDE_DIR "foreign/jsoncpp/include" "foreign/jsoncpp/src" )
 
 include_directories(${Boost_INCLUDE_DIRS})
