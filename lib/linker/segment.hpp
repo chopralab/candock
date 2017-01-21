@@ -69,7 +69,7 @@ namespace Linker {
 		void set_max_linker_length(const Segment &other, const double d) {	if (d > __max_linker_length[&other]) __max_linker_length[&other] = d; }
 		const Molib::Bond& get_bond(const Segment &other) const { return __bond.at(&other); }
 		void set_bond(const Segment &other, Molib::Atom &a1, Molib::Atom &a2);
-		const int adjacent_in_segment(const Molib::Atom &atom, const Molib::Atom &forbidden) const;
+		int adjacent_in_segment(const Molib::Atom &atom, const Molib::Atom &forbidden) const;
 		const Id get_id() const { return __id; }
 		void set_join_atom(const Molib::Atom &atom) { __join_atom[get_idx(atom)] = true; }
 		bool is_join_atom(const int i) const { return __join_atom[i]; }
