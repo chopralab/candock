@@ -22,7 +22,7 @@ namespace Linker {
 		Molib::Molecule& get_receptor() { return *__receptor; }
 		const Molib::Molecule& get_receptor() const { return *__receptor; }
 		double get_energy() { return __energy; }
-		const double get_energy() const { return __energy; }
+		double get_energy() const { return __energy; }
 
 		bool operator<( const DockedConformation& other ) { return this->get_energy() < other.get_energy(); }
 		static void sort(DockedConformation::Vec &v);
