@@ -70,7 +70,7 @@ namespace Molib {
 		// the following are required for BondGraph :-)
 		bool compatible(const Bond &other) const;
 		string get_label() const;
-		const int weight() const { return 0; } // dummy for graph ostream operator
+		int weight() const { return 0; } // dummy for graph ostream operator
 	};
 	
 	typedef Glib::Graph<Bond> BondGraph;

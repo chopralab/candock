@@ -12,6 +12,9 @@
 #include "geom3d/geom3d.hpp"
 #include "cluster/greedy.hpp"
 #include <queue>
+#include <iostream>
+
+#include "cuda_linker.h"
 
 using namespace std;
 
@@ -27,6 +30,11 @@ namespace Linker {
 	DockedConformation Linker::CUDA_IterativeLinker::__a_star(const int segment_graph_size, 
 		const Partial &start_conformation, vector<unique_ptr<State>> &states, int iter) {
 		
+        cout << "Segment Graph Size " << segment_graph_size << endl;
+        cout << "Iter " << iter << endl;
+        
+
+
 		for (auto &pstate : start_conformation.get_states())
 			states.push_back(unique_ptr<State>(new State(*pstate)));
 		if (start_conformation.empty())
@@ -34,6 +42,11 @@ namespace Linker {
 		SegStateMap docked_seeds;
 		for (auto &pstate : states) 
 			docked_seeds.insert({&pstate->get_segment(), &*pstate});
+
+        //Move data to GPU
+        cuda_linker cuda;
+        cuda.setup();
+
 		set<State::ConstPair> failed_state_pairs;
 		Partial min_conformation(MAX_ENERGY);
 		PriorityQueue openset; // openset has conformations sorted from lowest to highest energy
