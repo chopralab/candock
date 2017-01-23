@@ -354,7 +354,7 @@ namespace cluster {
 			
 			// find cluster representatives
 			dbgmsg("representatives : ");
-			for(auto it = clustered_points.begin(), end = clustered_points.end();
+            for(auto it = clustered_points.begin(), end = clustered_points.end();
 				it != end; it = clustered_points.upper_bound(it->first)) {
 				
 				auto range = clustered_points.equal_range(it->first);

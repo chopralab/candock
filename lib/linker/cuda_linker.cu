@@ -15,16 +15,18 @@
 #include "modeler/modeler.hpp"
 #include "geom3d/geom3d.hpp"
 #include "cluster/greedy.hpp"
+#include "partial.hpp"
 #include <queue>
 #include <iostream>
-__global__ void find_good_neighbor() {
+
+namespace Linker{
+
+
+
+void cuda_linker::setup(const int segment_graph_size, const Partial &start_conformation, vector<unique_ptr<State>> &states, int iter){
+    //First load all data onto gpu
+
+
 
 }
-
-
-
-void cuda_linker::setup() {
-    
-
-
 }
