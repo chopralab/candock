@@ -78,8 +78,8 @@ private:
     int *i;
     int sz;
   public:
-    ColorClass() : sz(0), i(0) {}
-    ColorClass(const int sz) : sz(sz), i(0) { init(sz); }
+    ColorClass() : i(0), sz(0) {}
+    ColorClass(const int sz) : i(0), sz(sz) { init(sz); }
     ~ColorClass() { if (i) delete [] i;
     }
     ColorClass(const ColorClass& dh) { // copy
@@ -125,7 +125,7 @@ private:
 public:
   
   //~ Maxclique(const Array2d<bool>&, const vector<double> &scores=vector<double>(), const float=0.025);
-  Maxclique(const Array2d<bool>&, const float=0.025);
+  Maxclique(const Array2d<bool>& conn, const float tt=0.025);
   ~Maxclique() {
     if (C) delete [] C;
     if (S) delete [] S;

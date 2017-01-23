@@ -147,7 +147,7 @@ namespace Program {
 	}
 
 	void LinkFragments::link_ligands(const Molib::Molecules& ligands, const CmdLnOpts& cmdl) {
-		int j = 0;
+		size_t j = 0;
 
 		std::vector<std::thread> threads;
 		std::mutex counter_protect;

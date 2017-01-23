@@ -19,7 +19,7 @@ namespace Molib {
 
 		deriva.push_back((y[1] - y[0]) / step); // first
 
-		for (int i = 1; i < y.size() - 1; ++i) {
+		for (size_t i = 1; i < y.size() - 1; ++i) {
 			deriva.push_back((y[i + 1] - y[i - 1]) / (2 * step)); // symmetric difference quotient
 		}
 
@@ -78,9 +78,9 @@ namespace Molib {
 		gsl_vector *x = gsl_vector_alloc(n), *y = gsl_vector_alloc(n);
 		gsl_matrix *X = gsl_matrix_alloc(n, ncoeffs), *cov = gsl_matrix_alloc(ncoeffs, ncoeffs);
 		gsl_multifit_linear_workspace *mw = gsl_multifit_linear_alloc(n, ncoeffs);
-		double chisq, Rsq, dof, tss;
+		double chisq;
 	
-		for (int i = 0; i < dataX.size(); ++i) {
+		for (size_t i = 0; i < dataX.size(); ++i) {
 			const double xi = dataX[i];
 			const double yi = dataY[i];
 			const double sigma = 0.1 * yi;
@@ -94,14 +94,14 @@ namespace Molib {
 		gsl_bspline_knots_uniform(dataX.front(), dataX.back(), bw);
 	
 		/* construct the fit matrix X */
-		for (int i = 0; i < n; ++i) {
+		for (size_t i = 0; i < n; ++i) {
 			double xi = gsl_vector_get(x, i);
 			
 			/* compute B_j(xi) for all j */
 			gsl_bspline_eval(xi, B, bw);
 			
 			/* fill in row i of X */
-			for (int j = 0; j < ncoeffs; ++j) {
+			for (size_t j = 0; j < ncoeffs; ++j) {
 				double Bj = gsl_vector_get(B, j);
 				gsl_matrix_set(X, i, j, Bj);
 			}
@@ -109,13 +109,12 @@ namespace Molib {
 
 		/* do the fit */
 		gsl_multifit_wlinear(X, w, y, c, cov, &chisq, mw);
-	
-		dof = n - ncoeffs;
-		tss = gsl_stats_wtss(w->data, 1, y->data, 1, y->size);
-		Rsq = 1.0 - chisq / tss;
-	
-		dbgmsg("chisq/dof = " << chisq / dof << ", Rsq = " << Rsq << "\n");
-
+#ifdef NDEBUG
+		gsl_stats_wtss(w->data, 1, y->data, 1, y->size);
+#else
+                double tss = gsl_stats_wtss(w->data, 1, y->data, 1, y->size);
+		dbgmsg("chisq/dof = " << chisq / (n - ncoeffs) << ", Rsq = " << 1.0 - chisq / tss << "\n");
+#endif
 		/* output the smoothed curve */
 		for (double xi = dataX.front(); xi <= dataX.back(); xi += step) {
 			double yi, yerr;		

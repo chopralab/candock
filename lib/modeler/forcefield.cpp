@@ -46,7 +46,7 @@ namespace OMMIface {
 				const auto &der = kv2.second.derivative;
 				os << "KB forcefield for " << help::idatm_unmask[aclass1] 
 					<< " and " << help::idatm_unmask[aclass2] << " : " << endl; 
-				for (int i = 0; i < pot.size(); ++i)
+				for (size_t i = 0; i < pot.size(); ++i)
 					os << "i = " << i << " pot = " << pot[i] << " der = "
 						<< der[i] << endl;
 			}
@@ -55,15 +55,17 @@ namespace OMMIface {
 	}
 	const ForceField::KBType& ForceField::get_kb_force_type(const Molib::Atom &atom1, 
 		const Molib::Atom &atom2, const int type1, const int type2) const {
-		const AtomType &atype1 = atom_type.at(type1);
-		const AtomType &atype2 = atom_type.at(type2);
 		const int &aclass1 = atom1.idatm_type(); 
 		const int &aclass2 = atom2.idatm_type();
+#ifndef NDEBUG
+                const AtomType &atype1 = atom_type.at(type1);
+		const AtomType &atype2 = atom_type.at(type2);
 		dbgmsg("add kb force type1 = " << type1 << " type2 = " 
 			<< type2 << " atype1.cl = " << atype1.cl << " atype2.cl = " << atype2.cl 
 			<< " aclass1 = " << help::idatm_unmask[aclass1] 
 			<< " aclass2 = " << help::idatm_unmask[aclass2]);
-		try { return kb_force_type.at(aclass1).at(aclass2); } catch(const out_of_range&) {}
+#endif
+                try { return kb_force_type.at(aclass1).at(aclass2); } catch(const out_of_range&) {}
 		try { return kb_force_type.at(aclass2).at(aclass1); } catch(const out_of_range&) {}
 		stringstream ss;
 		ss << "warning : missing kb force type " << help::idatm_unmask[aclass1] 

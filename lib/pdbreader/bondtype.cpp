@@ -35,7 +35,7 @@ namespace Molib {
 		return os;
 	}
 	ostream& operator<< (ostream& os, const ValenceStateVec& valence_states) {
-		for (int i = 0; i < valence_states.size(); ++i) {
+		for (size_t i = 0; i < valence_states.size(); ++i) {
 			os << "VALENCE STATE NR. " << i << " : " << endl << valence_states[i];
 		}
 		return os;
@@ -117,12 +117,12 @@ namespace Molib {
 	void BondOrder::__dfs(const int level, const int sum, const int tps, 
 		const vector<vector<AtomParams>> &V, vector<AtomParams> &Q, 
 		vector<vector<AtomParams>> &valence_states, const int max_valence_states) {
-		if (valence_states.size() > max_valence_states) return;
+		if (static_cast<int>(valence_states.size()) > max_valence_states) return;
 		auto &params = V[level];
 		for (auto &p : params) {
 			if (p.aps + sum <= tps) {
 				Q.push_back(p);
-				if (level + 1 < V.size()) {
+				if (level + 1 < static_cast<int>(V.size())) {
 					__dfs(level + 1, p.aps + sum, tps, V, Q,
 						valence_states, max_valence_states);
 				} else if (p.aps + sum == tps) {
@@ -179,7 +179,7 @@ namespace Molib {
 		for (auto &valence_state : valence_states) {
 			vss.push_back(ValenceState());
 			ValenceState &vs = vss.back();
-			for (int i = 0; i < valence_state.size(); ++i) {
+			for (size_t i = 0; i < valence_state.size(); ++i) {
 				vs[atoms[i]] = valence_state[i];
 			}
 		}
@@ -196,10 +196,9 @@ namespace Molib {
 		// b) if discrepancy happens (av is not 0 when con is 0 or av is 0 when con is not 0)
 		// reset the bond order to 2 and then 3.
 		for (auto &kv : valence_state) {
-			const Atom &atom = *kv.first;
 			const AtomParams &apar = kv.second;
-			if (apar.val != 0 && apar.con == 0
-				|| apar.val == 0 && apar.con != 0) {
+			if ( (apar.val != 0 && apar.con == 0)
+                          || (apar.val == 0 && apar.con != 0)) {
 				return true;
 			}
 		}
@@ -282,7 +281,6 @@ namespace Molib {
 	Bond& BondOrder::__get_first_unassigned_bond(const ValenceState &valence_state, BondToOrder &bond_orders) {
 		for (auto &kv : valence_state) {
 			const Atom &atom = *kv.first;
-			const AtomParams &apar = kv.second;
 			for (auto &pbond : atom.get_bonds()) {
 				Bond &bond = *pbond;
 				if (!bond_orders.count(&bond)) { // unassigned bond order

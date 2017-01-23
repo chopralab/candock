@@ -68,7 +68,7 @@ namespace Molib {
 	
 	Molecules& Molecules::compute_idatm_type() { 
 		auto &mols = *this;
-		for (int i = 0; i < mols.size(); ++i) {
+		for (size_t i = 0; i < mols.size(); ++i) {
 			auto &molecule = mols[i];
 			try {
 				AtomType::compute_idatm_type(molecule.get_atoms());
@@ -83,7 +83,7 @@ namespace Molib {
 
 	Molecules& Molecules::compute_hydrogen() { 
 		auto &mols = *this;
-		for (int i = 0; i < mols.size(); ++i) {
+		for (size_t i = 0; i < mols.size(); ++i) {
 			auto &molecule = mols[i];
 			try {
 				for (auto &presidue : molecule.get_residues()) {
@@ -104,7 +104,7 @@ namespace Molib {
 
 	Molecules& Molecules::compute_bond_order() { 
 		auto &mols = *this;
-		for (int i = 0; i < mols.size(); ++i) {
+		for (size_t i = 0; i < mols.size(); ++i) {
 			auto &molecule = mols[i];
 			try {
 				for (auto &presidue : molecule.get_residues()) {

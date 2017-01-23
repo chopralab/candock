@@ -99,8 +99,7 @@ namespace common {
 						Molib::Chain &c = mod.add(new Molib::Chain('X'));
 						Molib::Residue &r = c.add(new Molib::Residue("XXX", 1, ' ', Molib::Residue::hetero));
 						for (const Molib::Atom *atom : fragment.get_all()) {
-							Molib::Atom &at = r.add(new Molib::Atom(*atom));
-							dbgmsg("added atom = " << at);
+							r.add(new Molib::Atom(*atom));
 						}
 						seed.regenerate_bonds(molecule);
 					}

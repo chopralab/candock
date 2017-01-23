@@ -181,7 +181,7 @@ namespace Program {
 		for ( auto &a : __preprecs ) {
 			auto result = a.prepseeds->get_best_seeds();
 
-			if ( max_seeds != -1 && max_seeds < result.size()) 
+			if ( max_seeds != -1 && static_cast<size_t>(max_seeds) < result.size()) 
 				result.resize( max_seeds );
 
 			for ( auto &b : result )

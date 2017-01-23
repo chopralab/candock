@@ -102,7 +102,7 @@ namespace Molib {
 
 		// order coordinates according to next's segment atom order
 		Geom3D::Point::Vec crds;
-		for (int i = 0; i < next_atoms.size(); ++i) {
+		for (size_t i = 0; i < next_atoms.size(); ++i) {
 			crds.push_back(new_crd.at(next_atoms[i]));
 		}
 		return crds;

@@ -49,7 +49,7 @@ namespace Molib {
 
 		Atom(const int atom_number, const string &smiles_label, 
 			const map<string, int> smiles_prop) : __atom_number(atom_number), 
-			__smiles_label(smiles_label), __smiles_prop(smiles_prop), __element(""),
+			 __element(""), __smiles_label(smiles_label), __smiles_prop(smiles_prop),
 			__br(nullptr) {}
 		Atom(const Geom3D::Coordinate &crd) : __crd(crd), __element("") {}
 		Atom(const Geom3D::Coordinate &crd, const int &idatm_type) : __crd(crd), 
@@ -58,8 +58,8 @@ namespace Molib {
 		Atom(int atom_number, const string &atom_name, const Geom3D::Coordinate &crd, 
 			const int idatm_type, const string &element="", const string &sybyl_type="") 
 			: __atom_number(atom_number), __atom_name(atom_name), __crd(crd), 
-			__idatm_type(idatm_type), __gaff_type("???"), 
-			__element(element.empty() ? atom_name : element), __sybyl_type(sybyl_type) {}
+			__idatm_type(idatm_type), __sybyl_type(sybyl_type), __gaff_type("???"), 
+                        __element(element.empty() ? atom_name : element) {}
 		Bond& connect(Atom &a2);
 		void clear_bonds() { __bonds.clear(); }
 		BondVec get_bonds() const { BondVec bonds; for (auto &kv : __bonds) 

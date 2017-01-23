@@ -118,8 +118,8 @@ int Clique::CUT2(int p, vector<Vert* > &B, vector<Vert* > &A) {
 }
 
 void Clique::COLOR_SORT(vector<Vert* > &R) {
-  register unsigned int i;
-  register int j, k, p, min_k, maxno;
+  unsigned int i;
+  int j, k, p, min_k, maxno;
   vector<vector< Vert* > > C ;
   C.reserve(R.size() + 2 );
 #ifndef NDEBUG
@@ -682,7 +682,9 @@ void Clique::read_dimacs(Subgraph *subgraph, char name[], int num_i) {
     }
   }
   assign_connect(subgraph->item[num_i]);
+#ifndef NDEBUG
   double dens = (double) num_edges / (subgraph->item[num_i]->vert.size() * (subgraph->item[num_i]->vert.size() - 1) / 2);
   dbgmsg("|E| = " << num_edges << "  |V| = " << subgraph->item[num_i]->vert.size() <<"  gostota = " << dens);
+#endif
   f.close();
 }

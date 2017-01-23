@@ -42,7 +42,6 @@ namespace Molib {
 	Molecule::Vec NRset::get_molecules(const Residue::res_type &rest) const {
 		Molecule::Vec molecules;
 		for (auto &mols : *this) {
-			Residue &first = mols.first().first().first().first().first();
 			auto ret = mols.get_molecules(rest);
 			molecules.insert(molecules.end(), ret.begin(), ret.end());
 		}

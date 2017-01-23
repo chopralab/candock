@@ -44,7 +44,7 @@ void Atom::print_atom(ostream &os) {
     os << buffer;
   }
   os << endl;
-  delete buffer;
+  delete[] buffer;
 }
 
 bool Atom::overlap(Coor center) {

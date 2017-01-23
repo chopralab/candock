@@ -26,8 +26,7 @@ namespace Molib {
 		size_t __hash(const Atom::Set&);
 		size_t __unique(const Atom::Set&);
 	public:
-		Unique(string seeds_file="") : __seeds_file(seeds_file), 
-			__unique_seeds(USeeds()) {
+		Unique(string seeds_file="") : __unique_seeds(USeeds()), __seeds_file(seeds_file) {
 			if (__seeds_file != "") 
 				__read_seeds_file();
 		}

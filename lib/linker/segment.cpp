@@ -14,7 +14,7 @@ namespace Linker {
 		: __atoms(atoms), __seed_id(seed_id), __id(idx), __join_atom(atoms.size(), false), 
 		__common_atom(atoms.size(), false) { 
 
-		for (int i = 0; i < atoms.size(); ++i) 
+		for (size_t i = 0; i < atoms.size(); ++i) 
 			__amap[atoms[i]] = i; 
 	}
 
@@ -54,9 +54,9 @@ namespace Linker {
 			vertices.push_back(unique_ptr<Segment>(new Segment(fragatoms, fragment.get_seed_id(), idx++)));
 		}
 		// connect segments
-		for (int i = 0; i < vertices.size(); ++i) {
+		for (size_t i = 0; i < vertices.size(); ++i) {
 			Segment &s1 = *vertices[i];
-			for (int j = i + 1; j < vertices.size(); ++j) {
+			for (size_t j = i + 1; j < vertices.size(); ++j) {
 				Segment &s2 = *vertices[j];
 				auto inter = Glib::intersection(s1.get_atoms(), s2.get_atoms());
 				dbgmsg(s1.get_atoms().size() << " " << s2.get_atoms().size() << " " << inter.size());
@@ -165,17 +165,16 @@ namespace Linker {
 
 	void Segment::__init_max_linker_length(const Segment::Paths &paths) {
 		for (auto &kv : paths) {
-			auto &seg_pair = kv.first;
 			Segment::Graph::Path path(kv.second.begin(), kv.second.end());
 			__compute_max_linker_length(path);
 		}
 	}
 
 	void Segment::__compute_max_linker_length(Segment::Graph::Path &path) {
-		for (int j = 0; j < path.size() - 1; j++) {
+		for (size_t j = 0; j < path.size() - 1; j++) {
 
 			double d = 0.0;
-			int i = j;
+			size_t i = j;
 			
 			Molib::Atom *front_atom = &path[i]->get_bond(*path[i + 1]).atom1();
 			

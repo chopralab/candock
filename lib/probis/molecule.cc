@@ -173,12 +173,10 @@ void Molecule::read_PDB(bool _firstModel, int atomType, bool _allChains, int sav
           plain_pdb[i].find("AND CHAINS:") != string::npos) {
         if (reset == 0) bio_cid.clear();
         size_t found;
-        pair <int, int> bio_id = make_pair(model, bio_num);
 	
         found=plain_pdb[i].find_first_of(",");
         
         while (found!=string::npos) {
-//          biounit[ bio_id ]->chain_id.insert( plain_pdb[i].at(found-1) ); 
           bio_cid.insert( plain_pdb[i].at(found-1) ); 
           found=plain_pdb[i].find_first_of(",",found+1);
         }
@@ -187,7 +185,6 @@ void Molecule::read_PDB(bool _firstModel, int atomType, bool _allChains, int sav
         size_t lci = plain_pdb[i].find_last_not_of(" \t\f\v\n\r");
         
         if ( isalnum(plain_pdb[i].at (lci) ) ) {
-//          biounit[ bio_id ]->chain_id.insert( plain_pdb[i].at(lci) );
           bio_cid.insert( plain_pdb[i].at(lci) );
         }
       }

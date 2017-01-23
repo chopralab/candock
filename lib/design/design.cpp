@@ -50,7 +50,7 @@ namespace design {
 
 						int atom_to_remove = -1;
 
-						for ( int i = 0; i < bond->atom1().size(); ++i ) {
+						for ( size_t i = 0; i < bond->atom1().size(); ++i ) {
 							if ( bond->atom2().atom_number() == bond->atom1()[i].atom_number() ) {
 								atom_to_remove = i;
 								break;
@@ -70,7 +70,7 @@ namespace design {
 
 						int atom_to_remove = -1;
 
-						for ( int i = 0; i < bond->atom2().size(); ++i ) {
+						for ( size_t i = 0; i < bond->atom2().size(); ++i ) {
 							if ( bond->atom1().atom_number() == bond->atom2()[i].atom_number() ) {
 								atom_to_remove = i;
 								break;
@@ -198,7 +198,7 @@ namespace design {
 						"_to_" + std::to_string(mod_atom.atom_number()) );
 
 					// Fix internal atom graph
-					for (int i = 0; i < mod_atom.size(); ++i) {
+					for (size_t i = 0; i < mod_atom.size(); ++i) {
 						if (mod_atom[i].atom_number() == atom2.atom_number()) {
 							mod_atom.erase(i);
 							break;

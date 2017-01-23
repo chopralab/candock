@@ -36,7 +36,6 @@ namespace Docker {
 		DockedConf::Vec accepted;
 		
 		auto &conformations = __conformations.get_conformations();
-		auto &confmap = __conformations.get_confmap();
 		Array1d<bool> rejected(conformations.size());
 
 		Molib::Atom::Vec seed_atoms = __seed.get_atoms();
@@ -49,7 +48,7 @@ namespace Docker {
 				DockedConf::Vec accepted_tmp;
 				// reset map of rejected conformations to zero
 				rejected.reset();
-				for (int c = 0; c < conformations.size(); ++c) {
+				for (size_t c = 0; c < conformations.size(); ++c) {
 					Gpoints::PGpointVec &conf = conformations[c];
 					// test if c-th conformation clashes with receptor: if yes, reject it
 					if (!rejected.data[c]) {
@@ -58,7 +57,7 @@ namespace Docker {
 						// go over coordinates of the c-th conformation
 						dbgmsg("testing conformation " << c);
 
-						for (int i = 0; i < conf.size(); ++i) {
+						for (size_t i = 0; i < conf.size(); ++i) {
 							Docker::Gpoints::Gpoint &gpoint0 = *conf[i];
 							Docker::Gpoints::IJK confijk = cavpoint.ijk() + gpoint0.ijk();
 
@@ -185,7 +184,7 @@ namespace Docker {
 				<< " energy = " << conf.get_energy());
 			// correct the seed's new coordinates and ...
 			const Gpoints::PGpointVec &points = conf.get_conf0();
-			for (int i = 0; i < points.size(); ++i) {
+			for (size_t i = 0; i < points.size(); ++i) {
 
 				Molib::Atom &atom = *seed_atoms[i];
 				Docker::Gpoints::Gpoint &gpoint0 = *points[i];

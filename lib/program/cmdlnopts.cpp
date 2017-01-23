@@ -146,7 +146,7 @@ namespace Program {
 			 "Minimization position tolerance in Angstroms - only for KB")
 			("mini_tol",  po::value<double> (&__tolerance)->default_value (0.0001),
 			 "Minimization tolerance")
-			("max_iter",  po::value<int> (&__max_iterations)->default_value (100),
+			("max_iter",  po::value<int> (&__max_iterations)->default_value (10),
 			 "Maximum iterations for minimization during linking")
 			("max_iter_final", po::value<int> (&__max_iterations_final)->default_value (100),
 			 "Maximum iterations for final minimization")
@@ -176,7 +176,7 @@ namespace Program {
 			 "Lower tolerance on seed distance for getting initial conformations of docked fragments")
 			("upper_tol_seed_dist", po::value<double> (&__upper_tol_seed_dist)->default_value (2.0, "2.0"),
 			 "Upper tolerance on seed distance for getting initial conformations of docked fragments")
-			("max_possible_conf",   po::value<int> (&__max_possible_conf)->default_value (20),
+			("max_possible_conf",   po::value<int> (&__max_possible_conf)->default_value (-1),
 			 "Maximum number of possible conformations to link (-1 means unlimited)")
 			("link_iter",           po::value<int> (&__link_iter)->default_value (1000),
 			 "Maximum iterations for linking procedure")

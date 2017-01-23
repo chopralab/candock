@@ -19,7 +19,7 @@ class Kabsch {
 	int __kabsch(unsigned int, gsl_matrix*, gsl_matrix*, gsl_matrix*, gsl_vector*, double*);
 	static const double __NORM_EPS;
 public:
-	Kabsch (const int sz=0) : __sz(sz), __counter(0), __X(nullptr), __Y(nullptr), __U(nullptr), __t(nullptr) { resize(sz); }
+	Kabsch (const int sz=0) : __X(nullptr), __Y(nullptr), __U(nullptr), __t(nullptr), __counter(0), __sz(sz) { resize(sz); }
 	~Kabsch () { clear(); }
 	void resize(const int sz) { __sz = sz; if (sz>0) { clear(); __X = gsl_matrix_alloc(sz, 3); __Y = gsl_matrix_alloc(sz, 3); __U = gsl_matrix_alloc(3, 3); __t = gsl_vector_alloc(3); }}
 	void clear() { __counter = 0; if (__X) gsl_matrix_free(__X); if (__Y) gsl_matrix_free(__Y); if (__U) gsl_matrix_free(__U); if (__t) gsl_vector_free(__t); __X = nullptr; __Y = nullptr; __U = nullptr; __t = nullptr; }

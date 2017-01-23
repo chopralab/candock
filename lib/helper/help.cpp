@@ -386,4 +386,39 @@ namespace help {
 		{"MXE", {"2-METHOXYETHANOL", ""}},
 		{"XE", {"XENON", ""}},
 	};
+        
+        string replace_str_char(string str, const string& replace, char ch) {
+                size_t found = str.find_first_of(replace);
+                while (found != string::npos) { // While our position in the sting is in range.
+                        str[found] = ch; // Change the character at position.
+                        found = str.find_first_of(replace, found+1); // Relocate again.
+                }
+                return str; // return our new string.
+        }
+        vector<string> ssplit(const string &source, const char*delimiter, bool keepEmpty) {
+                vector<string> results;
+                size_t prev = 0;
+                size_t next = 0;
+                while ((next = source.find_first_of(delimiter, prev)) != string::npos){
+                        if (keepEmpty || (next - prev != 0)) {
+                                results.push_back(source.substr(prev, next - prev));
+                        }
+                        prev = next + 1;
+                }
+                if (prev < source.size()) {
+                        results.push_back(source.substr(prev));
+                }
+                return results;
+        }
+
+        char get_one_letter(string s) { 
+                auto it = one_letter.find(s); 
+                if (it == one_letter.end()) { 
+                        dbgmsg("warn : residues name " << s << 
+                                " not found in to_one_letter..."); 
+                        return ' '; 
+                } 
+                return it->second; 
+        }
+
 };
