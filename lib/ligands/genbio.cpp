@@ -32,9 +32,9 @@ namespace genbio {
 		}
 	}
 	void remove_assemblies(Molib::Molecule &molecule, const string chain_ids) { // remove assemblies that don't have aligned chain_ids
-		for (int i = 0; i < molecule.size(); i++) {
+		for (size_t i = 0; i < molecule.size(); i++) {
 			Molib::Assembly &assembly = molecule[i];
-			int sz = 0;
+			size_t sz = 0;
 			for (char chain_id : chain_ids) {
 				if (!assembly.first().has_chain(chain_id)) {
 					sz++;

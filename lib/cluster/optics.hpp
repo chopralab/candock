@@ -47,11 +47,11 @@ namespace cluster {
 		//~ static const MapD<T> &__scores;
 		//~ MapD<T> &__scores;
 		double __eps;
-		int __min_pts;
+		size_t __min_pts;
 
 		double __JANEZ_HV;
 
-		void __set_core_distance(T &p, int min_pts) {
+		void __set_core_distance(T &p, size_t min_pts) {
 			if (__neighbors[&p].size() < min_pts) {
 				__core_distance[&p] = __JANEZ_HV;
 			} else {
@@ -202,7 +202,7 @@ namespace cluster {
 		}
 	public:
 		Optics(PairwiseDistances<T> &pairwise_distances, const MapD<T> &scores, 
-			double eps, int min_pts) : __distance(pairwise_distances), 
+			double eps, size_t min_pts) : __distance(pairwise_distances), 
 			__scores(scores), __eps(eps), __min_pts(min_pts) {
 
 			Benchmark bench;
@@ -258,7 +258,7 @@ namespace cluster {
 		}
 
 		pair<Clusters<T>, Clusters<T>> extract_dbscan(const double eps_cur,
-			const int max_num_clus=9999999, const bool do_sort=false) { // returns the original objects together with their cluster_ids
+			const size_t max_num_clus=9999999, const bool do_sort=false) { // returns the original objects together with their cluster_ids
 
 			assert(CompareDistanceLess()(eps_cur, __eps));  // eps_cur must be < eps
 			Clusters<T> clustered_points, representative_points;
@@ -322,8 +322,8 @@ namespace cluster {
 #endif
 				dbgmsg("sorting3 was requested");
 				// sort according to scores
-				for (int i = 0; i <__ordered_file.size(); ++i) {
-					for (int j = i + 1; j <__ordered_file.size(); ++j) {
+				for (size_t i = 0; i <__ordered_file.size(); ++i) {
+					for (size_t j = i + 1; j <__ordered_file.size(); ++j) {
 						//~ dbgmsg("before2 sorting : " << *__ordered_file[i] << " " << *__ordered_file[j]);
 						if (CompareScoreLess()(__scores.at(__ordered_file[i]), __scores.at(__ordered_file[j]))) {
 							T *tmp = __ordered_file[i];

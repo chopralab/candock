@@ -91,7 +91,7 @@ namespace Molib {
 			inout::Inout::panic, __num_occur, "@<TRIPOS>MOLECULE");
 		bool found_molecule = false, found_assembly = false, found_model = false;
 		map<const Model*, map<const int, Atom*>> atom_number_to_atom;
-		for (int i = 0; i < mol2_raw.size(); ++i) {
+		for (size_t i = 0; i < mol2_raw.size(); ++i) {
 			const string &line = mol2_raw[i];
 			if (line.find("@<TRIPOS>ATOM") != string::npos) {
 				__generate_molecule(mols, found_molecule, "");
@@ -195,7 +195,6 @@ namespace Molib {
 		boost::smatch m;
 		set<char> bio_chain;
 		int biomolecule_number = -1;
-		int coord_index = 1;
 		bool found_molecule = false, found_assembly = false, found_model = false;
 		map<const Model*, map<const int, Atom*>> atom_number_to_atom;
 		Chain *chain = nullptr;
@@ -239,8 +238,10 @@ namespace Molib {
 
 							if ( rest == Residue::water && __hm & PDBreader::skip_atom ) continue;
 
-							if ((__hm & PDBreader::sparse_macromol) && (rest == Residue::protein && atom_name != "CA"
-								|| rest == Residue::nucleic && atom_name != "P")) continue;
+							if ((__hm & PDBreader::sparse_macromol) && 
+                                                             ((rest == Residue::protein && atom_name != "CA")
+                                                           || (rest == Residue::nucleic && atom_name != "P")))
+                                                            continue;
 
 							if (!__giant_molecule || rest != Residue::protein || atom_name == "CA") {
 								Model &model = mols.last().last().last();
@@ -413,7 +414,7 @@ namespace Molib {
 				Model &model = mols.last().last().last();
 				vector<string> vs = help::ssplit(line.substr(17), " ");
 				Atom::Set core, join;
-				for (int i = 1; i < vs.size(); ++i)	{
+				for (size_t i = 1; i < vs.size(); ++i)	{
 					const int atom_number = stoi(vs[i].substr(1));
 					if (vs[i][0] == 'c')
 						core.insert(atom_number_to_atom[&model][atom_number]);
@@ -452,7 +453,7 @@ namespace Molib {
 				const string ln = boost::algorithm::trim_right_copy(line.substr(6));
 				dbgmsg("--" << ln << "--");
 				vector<int> anum;
-				for (int i = 0; i < ln.size(); i+=5) {
+				for (size_t i = 0; i < ln.size(); i+=5) {
 					const int atom_number = stoi(ln.substr(i, 5));
 					dbgmsg(atom_number);
 					anum.push_back(atom_number);

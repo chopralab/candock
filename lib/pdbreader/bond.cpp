@@ -37,11 +37,13 @@ namespace Molib {
 	}
 
 	bool Bond::compatible(const Bond &other) const { 
-		/* this is "smiles" bond and "other" is real molecule bond */
-		return (atom1().compatible(other.atom1()) && atom2().compatible(other.atom2())
-			|| atom1().compatible(other.atom2()) && atom2().compatible(other.atom1()))
-			&& (get_bond_gaff_type().empty() || get_bond_gaff_type() == other.get_bond_gaff_type())
-			&& (get_bo() == 0 || get_bo() == other.get_bo());
+                /* this is "smiles" bond and "other" is real molecule bond */
+                const bool smiles_compat_selfa = atom1().compatible(other.atom1()) && atom2().compatible(other.atom2());
+                const bool smiles_compat_other = atom1().compatible(other.atom2()) && atom2().compatible(other.atom1());
+                const bool bond_gaff_compatible= get_bond_gaff_type().empty() || get_bond_gaff_type() == other.get_bond_gaff_type();
+                const bool bond_order_compatible=get_bo() == 0 || get_bo() == other.get_bo();
+
+                return (smiles_compat_selfa || smiles_compat_other) && bond_gaff_compatible && bond_order_compatible;
 	}
 
 	void Bond::set_members(const string &str) {
@@ -166,9 +168,9 @@ namespace Molib {
 			bonds.push_back(unique_ptr<Bond>(new Bond(new Atom(atom1), new Atom(atom2), true)));
 			bonds.back()->set_members(e.bond_property);
 		}
-		for (int i = 0; i < bonds.size(); ++i) {
+		for (size_t i = 0; i < bonds.size(); ++i) {
 			Bond &bond1 = *bonds[i];
-			for (int j = i + 1; j < bonds.size(); ++j) {
+			for (size_t j = i + 1; j < bonds.size(); ++j) {
 				Bond &bond2 = *bonds[j];
 				if (bond1.is_adjacent(bond2)) {
 					bond1.add(&bond2);
@@ -191,7 +193,7 @@ namespace Molib {
 			dbgmsg("bonds before deletion");
 			for (auto &adj : bond) dbgmsg(adj);
 #endif
-			for (int j = 0; j < bond.size(); ++j) {
+			for (size_t j = 0; j < bond.size(); ++j) {
 				if (&deleted_bond == &bond[j]) {
 					dbgmsg("deleting reference to bond"
 						<< endl << " bond " << bond 

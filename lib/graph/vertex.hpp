@@ -17,7 +17,6 @@ namespace Glib {
 	class Vertex : public template_vector_container<Vertex<T>*, Vertex<T>> {
 		T &__vertex;
 	public:
-		template<typename T>
 		Vertex(const T &vertex) : __vertex(vertex) {}
 
 		T& get_vertex() const { return __vertex; }

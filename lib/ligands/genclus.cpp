@@ -142,11 +142,15 @@ namespace genclus {
 								dbgmsg("INTERSECTION " << get<0>(iv) << ":" << get<1>(iv) << ":" << get<2>(iv) << ":" << get<3>(iv));
 							}
 #endif
-							if ((r.rest() == Molib::Residue::protein && v.size() < 5 || (r.rest() == Molib::Residue::nucleic && v.size() < 4))
-								|| (r.rest() == Molib::Residue::hetero && v.size() < 3) || (r.rest() == Molib::Residue::ion && v.size() < 3)) {
-								return true; // delete if less than 2 residues are in intersection
-							}
-							return false; // don't delete
+                                                        // delete if less than 2 residues are in intersection
+                                                        const bool is_prot_res = r.rest() == Molib::Residue::protein && v.size() < 5;
+                                                        const bool is_nuca_res = r.rest() == Molib::Residue::nucleic && v.size() < 4;
+                                                        const bool is_hetr_res = r.rest() == Molib::Residue::hetero  && v.size() < 3;
+                                                        const bool is_ionc_res = r.rest() == Molib::Residue::ion     && v.size() < 3;
+                                                        if ( is_prot_res || is_nuca_res || is_hetr_res || is_ionc_res ) {
+                                                                return true;
+                                                        }
+                                                        return false; // don't delete
 						});
 					}
 				}
@@ -208,7 +212,7 @@ namespace genclus {
 									Molib::Molecule &cmolecule = cmols.add(new Molib::Molecule(molecule.name()));
 									Molib::Assembly &cassembly = cmolecule.add(new Molib::Assembly(assembly.number()));
 									Molib::Model &cmodel = cassembly.add(new Molib::Model(model.number()));
-									Molib::Chain &cchain = cmodel.add(new Molib::Chain(chain.chain_id()));
+									cmodel.add(new Molib::Chain(chain.chain_id()));
 								}
 								cmols.last().first().first().first().add(new Molib::Residue(residue));
 								prev_rest = residue.rest();

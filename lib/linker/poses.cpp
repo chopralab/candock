@@ -18,7 +18,7 @@ namespace Linker {
 				auto &segment = seed.get_segment();
 				for (auto &pstate : segment.get_states()) {
 					auto &state = *pstate;
-					for (int i = 0; i < state.get_crds().size(); ++i) {
+					for (size_t i = 0; i < state.get_crds().size(); ++i) {
 						if (segment.is_join_atom(i))
 							dbgmsg("pushing to atompoints crd = " << state.get_crd(i) << " atom = " << segment.get_atom(i) << " for STATE = " << state);
 							__atompoints[segment.get_id()].push_back(unique_ptr<AtomPoint>(new AtomPoint(state.get_crd(i), segment.get_atom(i), state)));
@@ -36,7 +36,7 @@ namespace Linker {
 		const double max_linker_length, const double lower_tol_seed_dist, const double upper_tol_seed_dist) {
 		State::Set join;
 		AtomPoint::Grid &g = __grid.at(segment2.get_id());
-		for (int i = 0; i < state.get_segment().get_atoms().size(); ++i) {
+		for (size_t i = 0; i < state.get_segment().get_atoms().size(); ++i) {
 			dbgmsg("atom1 = " << state.get_segment().get_atom(i).atom_number() << " atom2 = " << jatoms.first->atom_number()
 				<< " equal = " << boolalpha << (&state.get_segment().get_atom(i) == jatoms.first));
 			if (&state.get_segment().get_atom(i) == jatoms.first) {

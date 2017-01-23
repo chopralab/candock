@@ -46,7 +46,7 @@ namespace Linker {
 					for (auto &seed_molecule : seed_mols) {
 						Geom3D::Point::Vec crds(vertices2.size());
 						const Molib::Atom::Vec &seed_atoms = seed_molecule.get_atoms();
-						for (int i = 0; i < vertices2.size(); ++i) {
+						for (size_t i = 0; i < vertices2.size(); ++i) {
 							crds[vertices1[i]] = seed_atoms.at(vertices2[i])->crd();
 							dbgmsg("adding matched vertex pair " << vertices1[i] 
 								<< "," << vertices2[i] << " new coordinates of atom " 
@@ -186,7 +186,7 @@ namespace Linker {
 	}
 	
 	bool Linker::GenericLinker::__clashes_receptor(const State &current) const {
-		for (int i = 0; i < current.get_crds().size(); ++i) {
+		for (size_t i = 0; i < current.get_crds().size(); ++i) {
 			const Molib::Atom &a = current.get_segment().get_atom(i); 
 			const Geom3D::Coordinate &c = current.get_crd(i); 
 			dbgmsg("in clashes_receptor test coordinate = " << c);
@@ -283,7 +283,7 @@ namespace Linker {
 		}
 		
 		State::Vec ret;
-		for (int i = ini_sz; i < states.size(); ++i) ret.push_back(&*states[i]);
+		for (size_t i = ini_sz; i < states.size(); ++i) ret.push_back(&*states[i]);
 	
 		return ret;
 	}
@@ -374,14 +374,12 @@ namespace Linker {
 		/* Find all pairs of compatible states at correct distances for 
 		 * the multi-seed molecules
 		 */
-		 
-		int idx = 0;
 		
 		Array2d<bool> conn(sz);
 		Poses poses(seed_graph);
-		for (int u = 0; u < seed_graph.size(); ++u) {
+		for (size_t u = 0; u < seed_graph.size(); ++u) {
 			Segment &segment1 = seed_graph[u].get_segment();
-			for (int v = u + 1; v < seed_graph.size(); ++v) {
+			for (size_t v = u + 1; v < seed_graph.size(); ++v) {
 				Segment &segment2 = seed_graph[v].get_segment();
 				const double max_linker_length = segment1.get_max_linker_length(segment2);
 				Molib::Atom::Pair jatoms{&segment1.get_bond(segment1.get_next(segment2)).atom1(), 
@@ -420,8 +418,8 @@ namespace Linker {
 	bool Linker::GenericLinker::__has_blacklisted(const State::Vec &conformation, 
 		const set<State::ConstPair> &blacklist) {
 
-		for (int i = 0; i < conformation.size(); ++i) {
-			for (int j = i + 1; j < conformation.size(); ++j) {
+		for (size_t i = 0; i < conformation.size(); ++i) {
+			for (size_t j = i + 1; j < conformation.size(); ++j) {
 				if (blacklist.count({conformation[i], conformation[j]})
 					|| blacklist.count({conformation[j], conformation[i]}))
 					return true;

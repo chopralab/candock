@@ -154,7 +154,7 @@ int main(int argc, char* argv[]) {
 				thread([&seeds, &gpoints0, &gpoints, i, &cmdl] () {
 #endif
 					// iterate over seeds and dock unique seeds
-					for (int j = i; j < seeds.size(); j+= cmdl.ncpu()) {
+					for (size_t j = i; j < seeds.size(); j+= cmdl.ncpu()) {
 						try {
 							dbgmsg(seeds[j]);
 

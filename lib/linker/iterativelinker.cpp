@@ -166,7 +166,7 @@ namespace Linker {
 			// find all maximum cliques with the number of seed segments of __max_clique_size
 			Maxclique m(conn);
 			
-			const int mcq_size = __max_clique_size > seed_graph.size() ? seed_graph.size() : __max_clique_size;
+			const int mcq_size = std::min(__max_clique_size, static_cast<int>(seed_graph.size()));
 			const vector<vector<unsigned short int>> &qmaxes = m.mcq(mcq_size);
 	
 			//help::memusage("after max.clique.search");
@@ -197,7 +197,7 @@ namespace Linker {
 		// sort conformations according to their total energy
 		Partial::sort(possibles_w_energy);
 
-		if (possibles_w_energy.size() > __max_num_possibles)
+		if (static_cast<int>(possibles_w_energy.size()) > __max_num_possibles)
 			possibles_w_energy.resize(__max_num_possibles);
 
 		//help::memusage("after sort of possibles_w_energy");
@@ -211,7 +211,7 @@ namespace Linker {
 
        		dbgmsg("number of clustered_possibles_w_energy = " << clustered_possibles_w_energy.size());
 
-       		if (__max_possible_conf != -1 && clustered_possibles_w_energy.size() > __max_possible_conf) {
+       		if (__max_possible_conf != -1 && static_cast<int>(clustered_possibles_w_energy.size()) > __max_possible_conf) {
             		clustered_possibles_w_energy.resize(__max_possible_conf);
             		dbgmsg("number of possible conformations > max_possible_conf, "
             		       << "resizing to= " << __max_possible_conf << " conformations");
@@ -243,7 +243,7 @@ namespace Linker {
 				const Molib::Bond &b = segment.get_bond(adjacent);
 				overlap.insert(&b.atom2());
 			}
-			for (int i = 0; i < state.get_segment().get_atoms().size(); ++i) {
+			for (size_t i = 0; i < state.get_segment().get_atoms().size(); ++i) {
 				Molib::Atom &atom = const_cast<Molib::Atom&>(state.get_segment().get_atom(i)); // ugly, correct this
 				if (!overlap.count(&atom)) {
 					const Geom3D::Coordinate &crd = state.get_crd(i);

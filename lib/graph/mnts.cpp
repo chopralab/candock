@@ -45,13 +45,12 @@ void MNTS::initialize() {
 
 }
 void MNTS::clearGamma() {
-	int i, j, k, l;
 	int tm1 = Max_Vtx*sizeof( int );
 	memset( vectex.get(), 0, tm1 );
 	memset(  funch.get(), 0, tm1 );
 	memset(address.get(), 0, tm1 );
 	memset( tabuin.get(), 0, tm1 );
-	for( i = 0; i < Max_Vtx; i++ ) {
+	for( int i = 0; i < Max_Vtx; i++ ) {
 		C0[ i ] = i;
 		address[ i ] = i;
 	}
@@ -62,7 +61,7 @@ void MNTS::clearGamma() {
 	Wbest = 0;
 }
 int MNTS::selectC0() {
-	int i, j, k, l, m;
+	int i, k, l;
 	l = 0;
 	if( len0 > 30 ) {
 		k = randomInt( len0 );
@@ -82,7 +81,7 @@ int MNTS::selectC0() {
 	}
 }
 int MNTS::WselectC0( ) {
-	int i, j, k, l1, l2, w1, w2, m;
+	int i, k, l1, l2, w1, w2;
 	l1 = 0;
 	l2 = 0;
 	w1 = 0;
@@ -126,7 +125,7 @@ int MNTS::WselectC0( ) {
 }
 int MNTS::expand(int SelN)
 {
-    int i, j, k, k1, l, am, m, n, n1;
+    int i, k1, m, n, n1;
     
     m = C0[ SelN ];
     cruset[ len++ ] = m;
@@ -181,7 +180,7 @@ int MNTS::expand(int SelN)
 
 int MNTS::selectC1( )
 {
-    int i, j, k, l, m;
+    int i, k, l;
     l = 0;
     for( i = 0; i < len1; i++ )
     {
@@ -201,7 +200,7 @@ int MNTS::selectC1( )
 
 int MNTS::WselectC1( )
 {
-     int i, j, k, l, l1, l2, wmn, w1, w2, m, n;
+     int i, j, k=0, l, l1, l2, wmn, w1, w2, m, n;
      l1 = 0;
      l2 = 0;
      w1 = -1000000;
@@ -220,8 +219,6 @@ int MNTS::WselectC1( )
              for( j = 0; j < len; j++ )
              {
                 k = cruset[ j ];
-                //~ if( Edge[ m ][ k ] == 1 )
-                //~ if( Edge[ m ][ k ] )
                 if( !Edge[ m ][ k ] )
                   break;
              }
@@ -282,7 +279,7 @@ int MNTS::WselectC1( )
 
 int MNTS::plateau( int SelN )
 {
-     int i, j, k, k1, l, m0, m, m1, n, n1, mm1, ti;
+     int i, k1, m, m1=0, n, n1, ti;
      
      m = C1[ SelN  ];
      for(ti = 0; ti < len; ti++)
@@ -385,7 +382,7 @@ int MNTS::plateau( int SelN )
 
 int MNTS::Mumi_Weigt()
 {
-    int i, j, k, l1, m;
+    int i, k, l1;
     int w1 = 5000000;
     l1 = 0;
     for( i = 0; i < len; i++ )
@@ -412,7 +409,7 @@ int MNTS::Mumi_Weigt()
 
 int MNTS::backtract()
 {
-     int i, j, k, l, m, m1, n, ti, k1, n1;
+     int i, m1, n, ti, k1, n1;
      ti = Mumi_Weigt();
      if( ti == -1 )
       return -1;
@@ -449,11 +446,13 @@ int MNTS::backtract()
            len1++;
         }
      }
+     
+     return 0;
 }
 
 int MNTS::tabu( int Max_Iter )
 {
-     int i, j, k, l, bestlen = 0, am, am1, ww, ww1, ww2, ti, m1;
+     int k, am, am1, ww, ww1, ww2, ti, m1;
      Iter = 0;
      clearGamma(); 
      while( 1 )
@@ -461,7 +460,7 @@ int MNTS::tabu( int Max_Iter )
         am = selectC0();
         if( am != -1 )
         {
-            l = expand( am );
+            expand( am );
             Iter++;
             if( Wbest == Waim )
                return Wbest;
@@ -481,7 +480,7 @@ int MNTS::tabu( int Max_Iter )
         
             if( ww > ww1 )
             {
-                l = expand( am );
+                expand( am );
                 
                 Iter++;
                 if( Wbest == Waim )
@@ -489,7 +488,7 @@ int MNTS::tabu( int Max_Iter )
             }
             else
             {
-                l = plateau( am1 );
+                plateau( am1 );
                 if( Wbest == Waim )
                     return Wbest; 
                 Iter++;
@@ -497,7 +496,7 @@ int MNTS::tabu( int Max_Iter )
         }
         else if( (am != -1) && (am1 == -1) )
         {
-             l = expand( am );
+             expand( am );
              if( Wbest == Waim )
                return Wbest;
                 
@@ -511,7 +510,7 @@ int MNTS::tabu( int Max_Iter )
              ww2 = - We[ m1 ];
              if( ww1 > ww2 )
              {
-                l = plateau( am1 );
+                plateau( am1 );
                 if( Wbest == Waim )
                     return Wbest; 
                 Iter++;
@@ -550,7 +549,7 @@ int MNTS::tabu( int Max_Iter )
      //~ }
 //~ }
 void MNTS::output() {
-	int i , j, k, l, sum; 
+	int i; 
 	stringstream ss;
 	//~ for( i = 0; i < 100; i++ ) {
 	for( i = 0; i < iter; i++ ) {
@@ -591,9 +590,8 @@ void MNTS::output() {
 void MNTS::max_tabu(int ii) {
 	//~ Benchmark::reset();
 	qmax.push_back(vector<int>());
-	int i, j, k, l, m, lbest;
+	int i, l, lbest;
 	lbest = 0;
-	int lenbest = 0;
 	Titer = 0;
 	int M_iter = 0;
 	//~ starting_time = (double)clock();

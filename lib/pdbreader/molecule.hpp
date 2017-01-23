@@ -38,8 +38,8 @@ namespace Molib {
 		map<int, set<char> > __bio_chain;
 	public:
 		Molecule(const string name) : __name(name) {}
-		Molecule(const Molecule &rhs) : __name(rhs.__name), __modified(rhs.__modified), 
-			__site(rhs.__site), __bio_rota(rhs.__bio_rota), __bio_chain(rhs.__bio_chain) { 
+		Molecule(const Molecule &rhs) : __modified(rhs.__modified), 
+			__site(rhs.__site), __name(rhs.__name), __bio_rota(rhs.__bio_rota), __bio_chain(rhs.__bio_chain) { 
 			for (auto &assembly : rhs) { 
 				dbgmsg("Copy constructor : molecule");
 				add(new Assembly(assembly));

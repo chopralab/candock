@@ -95,9 +95,9 @@ namespace Docker {
 	void Gpoints::__identify_gridpoints(const Centro::Centroids &centroids, const Molib::Atom::Grid &grid, 
 		const double &grid_spacing, const int &dist_cutoff, const double &excluded_radius, 
 		const double &max_interatomic_distance) {
-	
+#ifndef NDEGU
 		Benchmark bench;
-	
+#endif
 		if (centroids.empty()) 
 			throw Error("die : there are no centroids");
 	
@@ -208,6 +208,7 @@ namespace Docker {
                                 }
                             }
                         }
+#ifndef NDEBUG
                         const int mod = gridpoint_counter % 10000;
                         if (mod == 0) {
                             double wall_secs =bench.seconds_from_start();
@@ -216,6 +217,7 @@ namespace Docker {
                                 << " (took " << wall_secs << " seconds)");
                             bench.reset();
                         }
+#endif
                         gridpoint_counter++;
                     }
                     dbgmsg("column = " << column);
@@ -237,9 +239,9 @@ namespace Docker {
 	}
 	
 	void Gpoints::__identify_gridpoints(const double &grid_spacing, const double &radial_check) {
-	
+#ifndef NDEBUG
 		Benchmark bench;
-	
+#endif
 		// find the minimium and maximum coordinates
 		Geom3D::Point center(0,0,0);
 	
@@ -288,6 +290,7 @@ namespace Docker {
 							points_kept++;
 						}
 					}
+#ifndef NDEBUG
 					const int mod = gridpoint_counter % 10000;
 					if (mod == 0) {
 						double wall_secs = bench.seconds_from_start();
@@ -296,6 +299,7 @@ namespace Docker {
 							<< " (took " << wall_secs << " seconds)");
 						bench.reset();
 					}
+#endif
 					gridpoint_counter++;
 				}
 				dbgmsg("column = " << column);
