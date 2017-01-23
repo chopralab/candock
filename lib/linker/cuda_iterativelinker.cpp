@@ -42,11 +42,11 @@ namespace Linker {
 		SegStateMap docked_seeds;
 		for (auto &pstate : states) 
 			docked_seeds.insert({&pstate->get_segment(), &*pstate});
-
+#ifdef COMPILE_CUDA
         //Move data to GPU
         cuda_linker cuda;
         cuda.setup();
-
+#endif
 		set<State::ConstPair> failed_state_pairs;
 		Partial min_conformation(MAX_ENERGY);
 		PriorityQueue openset; // openset has conformations sorted from lowest to highest energy

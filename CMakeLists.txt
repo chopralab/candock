@@ -23,6 +23,7 @@ find_package(CUDA)
 if(CUDA_FOUND)
 SET(CUDA_PROPAGATE_HOST_FLAGS OFF)
 set(CUDA_NVCC_FLAGS "${CUDA_NVCC_FLAGS} -std=c++11 -arch=compute_61 -code=sm_61" )
+add_definitions(-DCOMPILE_CUDA)
 endif(CUDA_FOUND)
 
 
