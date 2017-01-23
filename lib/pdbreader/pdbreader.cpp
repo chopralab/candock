@@ -220,6 +220,12 @@ namespace Molib {
 				double z_coord = stof(line.substr(46, 8));
 				Geom3D::Coordinate crd(x_coord, y_coord, z_coord);
 				string element = line.size() > 77 ? boost::algorithm::trim_copy(line.substr(76,2)) : "";
+                                if (element.empty()) {
+                                        if ( ! std::isdigit( line.at(11) ) )
+                                                element = line.at(13);
+                                        else
+                                                element = boost::algorithm::trim_copy(line.substr(11,2));
+                                }
 				string idatm_type = line.size() > 80 ? boost::algorithm::trim_copy(line.substr(80, 5)) : "???";
 				idatm_type = help::idatm_mask.count(idatm_type) ? idatm_type : "???";
 				string gaff_type = line.size() > 85 ? boost::algorithm::trim_copy(line.substr(85, 5)) : "???";
