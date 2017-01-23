@@ -354,11 +354,7 @@ namespace cluster {
 			
 			// find cluster representatives
 			dbgmsg("representatives : ");
-<<<<<<< HEAD
 			for(typename Clusters<T>::iterator it = clustered_points.begin(), end = clustered_points.end();
-=======
-            for(auto it = clustered_points.begin(), end = clustered_points.end();
->>>>>>> 3967c99b7595b6fd9826d3820da263dff2cce3c0
 				it != end; it = clustered_points.upper_bound(it->first)) {
 				
 				auto range = clustered_points.equal_range(it->first);
