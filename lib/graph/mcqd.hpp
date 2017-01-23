@@ -113,7 +113,7 @@ private:
   
   StepCount *S;
  
-  const bool connection(const int i, const int j) const { return __conn.get(i, j); }
+  bool connection(const int i, const int j) const { return __conn.get(i, j); }
   bool cut1(const int, const ColorClass&);
   void cut2(const Vertices&, Vertices&);
   void color_sort(Vertices&);

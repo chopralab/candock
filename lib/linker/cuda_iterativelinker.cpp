@@ -45,7 +45,7 @@ namespace Linker {
 #ifdef COMPILE_CUDA
         //Move data to GPU
         cuda_linker cuda;
-        cuda.setup();
+        cuda.setup(segment_graph_size, start_conformation, states, iter);
 #endif
 		set<State::ConstPair> failed_state_pairs;
 		Partial min_conformation(MAX_ENERGY);
