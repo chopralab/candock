@@ -395,6 +395,14 @@ namespace Molib {
 			patom->set_atom_number(++reenum);
 			ss << setw(66) << left << *patom;
 		}
+                for (auto &pbond : get_bonds_in(ligand.get_atoms())) {
+			Bond &bond = *pbond;
+			ss << "REMARK   8 BONDTYPE " << bond.get_bo() 
+				<< " " << bond.get_bond_gaff_type() 
+				<< " " << bond.atom1().atom_number() 
+				<< " " << bond.atom2().atom_number() 
+				<< endl;
+		}
 		for ( auto &b : get_bonds_in(ligand.get_atoms()) ) {
 			ss  << "CONECT" << setw(5) << right 
 				<< b->atom1().atom_number() << setw(5) 

@@ -60,13 +60,19 @@ int main(int argc, char* argv[]) {
 		antitargets.dock_fragments(ligand_fragmenter, cmdl);
 
 		OMMIface::SystemTopology::loadPlugins();
-
+                
 		targets.link_fragments(cmdl);
 
 		if (cmdl.get_bool_option("antitarget_linking"))
 			antitargets.link_fragments(cmdl);
 
-		set<string> solo_target_seeds = Program::Target::determine_non_overlapping_seeds(targets, antitargets, cmdl);
+                
+                set<string> solo_target_seeds = Program::Target::determine_non_overlapping_seeds(targets, antitargets, cmdl);
+                cout << "ASDFASDF " <<  inout::Inout::file_size(cmdl.prep_file()) << endl;
+                if (/*cmdl.get_bool_option("new_scaffold") || */ ! inout::Inout::file_size(cmdl.prep_file())) {
+                    cout << "Good" << endl;
+                        targets.make_scaffolds(cmdl, ligand_fragmenter, solo_target_seeds);
+                }
 
 		targets.design_ligands(cmdl, ligand_fragmenter, solo_target_seeds);
 

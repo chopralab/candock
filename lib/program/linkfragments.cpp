@@ -115,6 +115,11 @@ namespace Program {
 
 		cout << "Starting to dock the fragments into originally given ligands" << endl;
 
+                if ( ! inout::Inout::file_size(cmdl.prep_file()) ) {
+                        cout << cmdl.prep_file() << " is either blank or missing, no (initial) ligand docking will take place.";
+                        return;
+                }
+
 		Molib::PDBreader lpdb2(cmdl.prep_file(), Molib::PDBreader::all_models, 1);
 
 		std::vector<std::thread> threads;

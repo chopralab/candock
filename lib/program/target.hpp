@@ -44,6 +44,7 @@ namespace Program {
 		void find_centroids(const CmdLnOpts& cmdl);
 		void dock_fragments(const FragmentLigands& ligand_fragments, const CmdLnOpts& cmdl);
 		void link_fragments(const CmdLnOpts& cmdl);
+                void make_scaffolds(const CmdLnOpts& cmdl, FragmentLigands& ligand_fragments, const std::set<std::string>& seeds_to_add);
 		void design_ligands(const CmdLnOpts& cmdl, FragmentLigands& ligand_fragments, const std::set<std::string>& seeds_to_add);
 
 		// TODO: Ideally this would be done internally.....

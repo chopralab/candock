@@ -21,6 +21,8 @@ namespace design {
 			return __designs;
 		}
 		
+                void change_original_name( const std::string& name );
+		
 		const Molib::Molecules& prepare_designs();
 		const Molib::Molecules& designs() const { return __designs; }
 	};

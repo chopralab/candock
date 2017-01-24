@@ -11,7 +11,9 @@
 namespace Program {
 	
 	bool FragmentLigands::__can_read_from_files( const CmdLnOpts& cmdl ) {
-		return inout::Inout::file_size( cmdl.prep_file() ) > 0 && inout::Inout::file_size( cmdl.seeds_file() ) > 0;
+		return (inout::Inout::file_size( cmdl.seeds_pdb_file() ) > 0 
+		     || inout::Inout::file_size( cmdl.prep_file()      ) > 0 )
+                     && inout::Inout::file_size( cmdl.seeds_file() ) > 0;
 	}
 
 	void FragmentLigands::__read_from_files( const CmdLnOpts& cmdl) {

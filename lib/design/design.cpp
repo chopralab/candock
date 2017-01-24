@@ -91,6 +91,22 @@ namespace design {
 				
 				first_chain.erase( Molib::Residue::res_pair(residue->resi(), residue->ins_code()) );
 			}
+			
+                        // Find terminal atoms that have invalid atom types for terminal atoms.
+                        // These checks need to be changed (improved) when dealing with correct bond typing
+                        for ( auto atom : molecule.get_atoms() ) {
+                                if ( (atom->idatm_type_unmask() == "Car"
+                                   || atom->idatm_type_unmask() == "C2")
+                                   && atom->get_bonds().size() == 1 
+                                   && atom->get_bonds().at(0)->second_atom(*atom).idatm_type_unmask().back() != '2'  ) {
+                                    atom->set_idatm_type("C3");
+                                } else if ( (atom->idatm_type_unmask() == "Nar"
+                                   || atom->idatm_type_unmask() == "N2")
+                                   && atom->get_bonds().size() == 1
+                                   && atom->get_bonds().at(0)->second_atom(*atom).idatm_type_unmask().back() != '2'  ) {
+                                    atom->set_idatm_type("N3");
+                                }
+                        }
 		}
 
 		return __designs;
@@ -165,6 +181,21 @@ namespace design {
 					if (search_atom.idatm_type() != start_atom->idatm_type()) {
 						continue;
 					}
+
+//                                        // Find terminal atoms that have invalid atom types for terminal atoms.
+//                                        // These test should never complete for non-fragments
+//                                         if ( (start_atom->idatm_type_unmask() == "Car"
+//                                             || start_atom->idatm_type_unmask() == "C2")
+//                                             && start_atom->get_bonds().size() == 1 
+//                                             && start_atom->get_bonds().at(0)->second_atom(*start_atom).idatm_type_unmask().back() != '2'  ) {
+//                                                     continue;
+//                                         } else if ( (start_atom->idatm_type_unmask() == "Nar"
+//                                             || start_atom->idatm_type_unmask() == "N2")
+//                                             && start_atom->get_bonds().size() == 1
+//                                             && start_atom->get_bonds().at(0)->second_atom(*start_atom).idatm_type_unmask().back() != '2'  ) {
+//                                                     continue;
+//                                         }
+// 
 
 					// Ensure the fragment is close enough to the original ligand in the pocket
 					if (start_atom->crd().distance( search_atom.crd() ) > cutoff ) {
@@ -306,5 +337,10 @@ namespace design {
 		}
 
 	}
+
+        void design::Design::change_original_name(const std::string& name) {
+                __original.set_name(name);
+        }
+
 
 }
