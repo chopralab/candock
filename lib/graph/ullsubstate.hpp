@@ -59,7 +59,7 @@ namespace Glib {
 	 * Constructor. Makes an empty state.
 	 ---------------------------------------------------------*/
 	template<class Graph1, class Graph2>
-	UllSubState<Graph1, Graph2>::UllSubState(Graph1 &ag1, Graph2 &ag2) : core_len(0), g1(ag1), g2(ag2), n1(ag1.size()), n2(ag2.size()), core_1(ag1.size(), NULL_NODE), core_2(ag2.size(), NULL_NODE) { 
+	UllSubState<Graph1, Graph2>::UllSubState(Graph1 &ag1, Graph2 &ag2) : core_len(0), core_1(ag1.size(), NULL_NODE), core_2(ag2.size(), NULL_NODE), g1(ag1), g2(ag2), n1(ag1.size()), n2(ag2.size()) { 
 		dbgmsg(core_1.size());
 		dbgmsg(core_2.size());
 #ifndef NDEBUG
@@ -89,7 +89,7 @@ namespace Glib {
 	 * Copy constructor. 
 	 ---------------------------------------------------------*/
 	template<class Graph1, class Graph2>
-	UllSubState<Graph1, Graph2>::UllSubState(const UllSubState<Graph1, Graph2> &state) : g1(state.g1), g2(state.g2), n1(state.n1), n2(state.n2), core_len(state.core_len), core_1(state.core_1.size()), core_2(state.core_2.size()) { 
+	UllSubState<Graph1, Graph2>::UllSubState(const UllSubState<Graph1, Graph2> &state) :  core_len(state.core_len), core_1(state.core_1.size()), core_2(state.core_2.size()), g1(state.g1), g2(state.g2), n1(state.n1), n2(state.n2) { 
 		copy(state.core_1.begin(), state.core_1.end(), core_1.begin());
 		copy(state.core_2.begin(), state.core_2.end(), core_2.begin());
 	 	M = unique_ptr<unique_ptr<byte[]>[]>(new unique_ptr<byte[]>[n1]);

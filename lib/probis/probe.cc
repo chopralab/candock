@@ -32,7 +32,7 @@ void Probe::print_probe(ostream &os) {
   print_sphere(os);
   sprintf(buffer, "%5d", color);
   os << buffer << endl;
-  delete buffer;
+  delete[] buffer;
 }
 
 #ifdef CILE

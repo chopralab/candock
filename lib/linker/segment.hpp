@@ -54,9 +54,9 @@ namespace Linker {
 		const Molib::Atom::Vec& get_atoms() const { return __atoms; }
 		const Molib::Atom& get_atom(const int i) const { return *__atoms[i]; }
 		bool has_atom(const Molib::Atom &atom) const { return __amap.count(&atom); }
-		const int get_idx(const Molib::Atom &atom) const { return __amap.at(&atom); }
-		const string get_label() const { stringstream ss; ss << *this; return ss.str(); } // graph ostream operator
-		const int weight() const { return 0; } // dummy for graph ostream operator
+                int get_idx(const Molib::Atom &atom) const { return __amap.at(&atom); }
+		string get_label() const { stringstream ss; ss << *this; return ss.str(); } // graph ostream operator
+		int weight() const { return 0; } // dummy for graph ostream operator
 		void add_state(unique_ptr<State> s) { __state.push_back(std::move(s)); }
 		bool is_seed() const { return __seed_id != -1; }
 		bool is_leaf() const { return size() == 1; }
@@ -69,8 +69,8 @@ namespace Linker {
 		void set_max_linker_length(const Segment &other, const double d) {	if (d > __max_linker_length[&other]) __max_linker_length[&other] = d; }
 		const Molib::Bond& get_bond(const Segment &other) const { return __bond.at(&other); }
 		void set_bond(const Segment &other, Molib::Atom &a1, Molib::Atom &a2);
-		const int adjacent_in_segment(const Molib::Atom &atom, const Molib::Atom &forbidden) const;
-		const Id get_id() const { return __id; }
+		int adjacent_in_segment(const Molib::Atom &atom, const Molib::Atom &forbidden) const;
+        Id get_id() const { return __id; }
 		void set_join_atom(const Molib::Atom &atom) { __join_atom[get_idx(atom)] = true; }
 		bool is_join_atom(const int i) const { return __join_atom[i]; }
 		void set_common_atom(const Molib::Atom &atom) { __common_atom[get_idx(atom)] = true; }

@@ -25,18 +25,15 @@ namespace Molib {
 
 		set<char> chain_ids;
 
-		for (auto &presidue : this->get_residues()) {
-			auto &residue = *presidue;
-			if ((hm & Residue::protein) && residue.rest() == Residue::protein
-				|| (hm & Residue::nucleic) && residue.rest() == Residue::nucleic
-				|| (hm & Residue::ion) && residue.rest() == Residue::ion
-				|| (hm & Residue::water) && residue.rest() == Residue::water
-				|| (hm & Residue::hetero) && residue.rest() == Residue::hetero) {
-				
-				chain_ids.insert(residue.br().chain_id());
-				
-			}
-		}
+                for (auto &presidue : this->get_residues()) {
+                        if ( ((hm & Residue::protein) && presidue->rest() == Residue::protein)
+                         ||  ((hm & Residue::nucleic) && presidue->rest() == Residue::nucleic)
+                         ||  ((hm & Residue::ion)     && presidue->rest() == Residue::ion)
+                         ||  ((hm & Residue::water)   && presidue->rest() == Residue::water)
+                         ||  ((hm & Residue::hetero)  && presidue->rest() == Residue::hetero)) {
+                                chain_ids.insert(presidue->br().chain_id());
+                        }
+                }
 		if (chain_ids.empty()) throw Error("die : no protein in the receptor file?");
 		string chains("");
 		
@@ -135,7 +132,7 @@ namespace Molib {
 			if (vertices2.size() != g1.size()) 
 				throw Error("die : RMSD calculation aborted due to imperfect match"); 
 			double sum_squared = 0;
-			for (int i = 0; i < vertices2.size(); ++i) {
+			for (size_t i = 0; i < vertices2.size(); ++i) {
 				Atom &a1 = g1[vertices1[i]];
 				Atom &a2 = g2[vertices2[i]];
 				sum_squared += a1.crd().distance_sq(a2.crd());
@@ -177,8 +174,8 @@ namespace Molib {
 		dbgmsg("calculate max distance between atoms in an Atom::Set ...");
 		double md_sq = 0.0;
 		Atom::Vec atoms = this->get_atoms();
-		for (int i = 0; i < atoms.size(); ++i)
-			for (int j = i + 1; j < atoms.size(); ++j) {
+		for (size_t i = 0; i < atoms.size(); ++i)
+			for (size_t j = i + 1; j < atoms.size(); ++j) {
 				const double dist_sq = atoms[i]->crd().distance_sq(atoms[j]->crd());
 				if (dist_sq > md_sq) md_sq = dist_sq;
 			}
@@ -190,7 +187,7 @@ namespace Molib {
 			<< " and other atoms in molecule ...");
 		double md_sq = 0.0;
 		Atom::Vec atoms = this->get_atoms();
-		for (int i = 0; i < atoms.size(); ++i) {
+		for (size_t i = 0; i < atoms.size(); ++i) {
 			const double dist_sq = atom.crd().distance_sq(atoms[i]->crd());
 			if (dist_sq > md_sq) md_sq = dist_sq;
 		}
@@ -344,15 +341,15 @@ namespace Molib {
 		for (auto &chain : model)
 			if (chain_ids == "" || chain_ids.find(chain.chain_id()) != string::npos) {
 				for (auto &residue : chain)
-					if ((hm & Residue::protein) && residue.rest() == Residue::protein
-						|| (hm & Residue::nucleic) && residue.rest() == Residue::nucleic
-						|| (hm & Residue::ion) && residue.rest() == Residue::ion
-						|| (hm & Residue::water) && residue.rest() == Residue::water
-						|| (hm & Residue::hetero) && residue.rest() == Residue::hetero) {
-					} else {
-						dbgmsg("erasing residue " << residue.resi() << " ins_code = " << residue.ins_code());
-						chain.erase(Residue::res_pair(residue.resi(), residue.ins_code()));
-					}
+                                        if ( ((hm & Residue::protein) && residue.rest() == Residue::protein)
+                                         ||  ((hm & Residue::nucleic) && residue.rest() == Residue::nucleic)
+                                         ||  ((hm & Residue::ion)     && residue.rest() == Residue::ion)
+                                         ||  ((hm & Residue::water)   && residue.rest() == Residue::water)
+                                         ||  ((hm & Residue::hetero)  && residue.rest() == Residue::hetero)) {
+                                        } else {
+                                                dbgmsg("erasing residue " << residue.resi() << " ins_code = " << residue.ins_code());
+                                                chain.erase(Residue::res_pair(residue.resi(), residue.ins_code()));
+                                        }
 			}
 			else {
 				dbgmsg("erasing chain " << chain.chain_id());
@@ -361,6 +358,7 @@ namespace Molib {
 			
 		regenerate_bonds(saved);
 		dbgmsg("out of filter");
+                return *this;
 	}
 	
 	ostream& operator<< (ostream& stream, const Molecule& m) {
@@ -378,7 +376,7 @@ namespace Molib {
 	Molecule::Molecule(const Molib::Molecule &rhs, const Geom3D::Point::Vec &crds) : Molecule(rhs) {
 
 		auto atoms = get_atoms();
-		for (int i = 0; i < atoms.size(); ++i) {
+		for (size_t i = 0; i < atoms.size(); ++i) {
 			atoms[i]->set_crd(crds[i]);
 		}
 	}

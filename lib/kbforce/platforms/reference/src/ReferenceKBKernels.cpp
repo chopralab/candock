@@ -194,7 +194,7 @@ double ReferenceCalcKBForceKernel::execute(ContextImpl& context, bool includeFor
         RealVec delta = pos[p1] - pos[p2];
         RealOpenMM r2 = delta.dot(delta);
         RealOpenMM r = sqrt(r2);
-		int dist = (int) floor(r / step);
+		size_t dist = static_cast<size_t> (floor(r / step));
 		if (dist >= (*potential[i]).size()) continue; // effectively add zero to energy and force
 		energy += (*potential[i])[dist];
 
@@ -217,7 +217,7 @@ double ReferenceCalcKBForceKernel::execute(ContextImpl& context, bool includeFor
 }
 
 void ReferenceCalcKBForceKernel::copyParametersToContext(ContextImpl& context, const KBForce& force) {
-    if (force.getNumBonds() != particle1.size())
+    if ( static_cast<size_t>(force.getNumBonds()) != particle1.size())
         throw OpenMMException("updateParametersInContext: The number of KB bonds has changed");
     for (int i = 0; i < force.getNumBonds(); i++) {
         int p1, p2;

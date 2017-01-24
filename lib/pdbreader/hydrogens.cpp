@@ -76,7 +76,7 @@ namespace Molib {
 							<< atom << " should have " << h_excess 
 							<< " less hydrogens!");
 						// deleting hydrogens
-						for (int i = 0; i < atom.size(); ++i) {
+						for (size_t i = 0; i < atom.size(); ++i) {
 							auto &bondee = atom[i];
 							if (bondee.element() == Element::H) {
 								if (h_excess-- > 0) {
@@ -131,7 +131,7 @@ namespace Molib {
 					auto &bondee = hatom[0]; 
 
 					// delete the H from bondee's neighbor list
-					for (int i = 0; i < bondee.size(); ++i) {
+					for (size_t i = 0; i < bondee.size(); ++i) {
 						if (bondee[i].atom_number() == hatom.atom_number()) {
 							dbgmsg("erasing H from bondee at index = " << i);
 							bondee.erase(i);

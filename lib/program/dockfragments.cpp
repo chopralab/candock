@@ -28,7 +28,7 @@ namespace Program {
 
 	void DockFragments::__dock_fragment ( int start, const Docker::Gpoints& gpoints, const Docker::Gpoints& gpoints0, const CmdLnOpts& cmdl) {
 		// iterate over docked seeds and dock unique seeds
-		for (int j = start; j < __fragmented_ligands.seeds().size(); j+= cmdl.ncpu()) {
+		for (size_t j = start; j < __fragmented_ligands.seeds().size(); j+= cmdl.ncpu()) {
 			try {
 				boost::filesystem::path p (__name);
 				p = p / cmdl.top_seeds_dir() / __fragmented_ligands.seeds()[j].name() / cmdl.top_seeds_file();

@@ -249,9 +249,9 @@ namespace AtomType {
 			dbgmsg(element.name());
 	
 			// undifferentiated types
-			if (element >= Element::He && element <= Element::Be
-			  || element >= Element::Ne && element <= Element::Si
-			  || element >= Element::Cl) {
+			if ( (element >= Element::He && element <= Element::Be)
+			  || (element >= Element::Ne && element <= Element::Si)
+			  ||  element >= Element::Cl) {
 			  	a.set_idatm_type(element.name());
 			  	dbgmsg(a.idatm_type_unmask());
 				continue;
@@ -857,7 +857,7 @@ namespace AtomType {
 				pa->erase_property("NG"); // atom belongs to ring
 			}
 		}
-		int r_id = 0;
+
 		for (auto &ring : rings) {
 			auto ring_bonds = get_bonds_in(ring);
 			auto out_bonds = get_bonds_in(ring, false);

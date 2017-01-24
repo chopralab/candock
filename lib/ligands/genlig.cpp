@@ -114,7 +114,7 @@ namespace genlig {
 		Molib::Assembly &assembly = bsite.add(new Molib::Assembly(0));
 		Molib::Model &model = assembly.add(new Molib::Model(1));
 		char chain_id = ' ';
-		Molib::Chain *pchain;
+		Molib::Chain *pchain = nullptr;
 		for (auto &presidue : neighbor_residues) {
 			if (presidue->br().chain_id() != chain_id) {
 				pchain = &model.add(new Molib::Chain(presidue->br().chain_id()));
@@ -244,9 +244,9 @@ namespace genlig {
 				d["alignment"][0]["translation_vector"]);
 			const double z_score = d["alignment"][0]["scores"]["z_score"].asDouble();
 			const Json::Value &hetero = d["hetero"];
-			for (int i = 0; i < hetero.size(); ++i) { // go over the hetero ligands only
+			for (size_t i = 0; i < hetero.size(); ++i) { // go over the hetero ligands only
 				dbgmsg(hetero[i].asString());
-				const vector<string> ligand = help::ssplit(hetero[i].asString(), ":");
+				const vector<string> ligand = help::ssplit(hetero[ static_cast<int>(i)].asString(), ":");
 				dbgmsg(ligand.size());
 				const int cluster_number = stoi(ligand[0]);
 				const string resn = ligand[1];

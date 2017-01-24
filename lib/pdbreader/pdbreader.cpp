@@ -91,7 +91,7 @@ namespace Molib {
 			inout::Inout::panic, __num_occur, "@<TRIPOS>MOLECULE");
 		bool found_molecule = false, found_assembly = false, found_model = false;
 		map<const Model*, map<const int, Atom*>> atom_number_to_atom;
-		for (int i = 0; i < mol2_raw.size(); ++i) {
+		for (size_t i = 0; i < mol2_raw.size(); ++i) {
 			const string &line = mol2_raw[i];
 			if (line.find("@<TRIPOS>ATOM") != string::npos) {
 				__generate_molecule(mols, found_molecule, "");
@@ -195,7 +195,6 @@ namespace Molib {
 		boost::smatch m;
 		set<char> bio_chain;
 		int biomolecule_number = -1;
-		int coord_index = 1;
 		bool found_molecule = false, found_assembly = false, found_model = false;
 		map<const Model*, map<const int, Atom*>> atom_number_to_atom;
 		Chain *chain = nullptr;
@@ -221,6 +220,12 @@ namespace Molib {
 				double z_coord = stof(line.substr(46, 8));
 				Geom3D::Coordinate crd(x_coord, y_coord, z_coord);
 				string element = line.size() > 77 ? boost::algorithm::trim_copy(line.substr(76,2)) : "";
+                                if (element.empty()) {
+                                        if ( std::isdigit( line.at(12) ) )
+                                                element = line.at(13);
+                                        else
+                                                element = boost::algorithm::trim_copy(line.substr(12,2));
+                                }
 				string idatm_type = line.size() > 80 ? boost::algorithm::trim_copy(line.substr(80, 5)) : "???";
 				idatm_type = help::idatm_mask.count(idatm_type) ? idatm_type : "???";
 				string gaff_type = line.size() > 85 ? boost::algorithm::trim_copy(line.substr(85, 5)) : "???";
@@ -239,8 +244,10 @@ namespace Molib {
 
 							if ( rest == Residue::water && __hm & PDBreader::skip_atom ) continue;
 
-							if ((__hm & PDBreader::sparse_macromol) && (rest == Residue::protein && atom_name != "CA"
-								|| rest == Residue::nucleic && atom_name != "P")) continue;
+							if ((__hm & PDBreader::sparse_macromol) && 
+                                                             ((rest == Residue::protein && atom_name != "CA")
+                                                           || (rest == Residue::nucleic && atom_name != "P")))
+                                                            continue;
 
 							if (!__giant_molecule || rest != Residue::protein || atom_name == "CA") {
 								Model &model = mols.last().last().last();
@@ -413,7 +420,7 @@ namespace Molib {
 				Model &model = mols.last().last().last();
 				vector<string> vs = help::ssplit(line.substr(17), " ");
 				Atom::Set core, join;
-				for (int i = 1; i < vs.size(); ++i)	{
+				for (size_t i = 1; i < vs.size(); ++i)	{
 					const int atom_number = stoi(vs[i].substr(1));
 					if (vs[i][0] == 'c')
 						core.insert(atom_number_to_atom[&model][atom_number]);
@@ -452,7 +459,7 @@ namespace Molib {
 				const string ln = boost::algorithm::trim_right_copy(line.substr(6));
 				dbgmsg("--" << ln << "--");
 				vector<int> anum;
-				for (int i = 0; i < ln.size(); i+=5) {
+				for (size_t i = 0; i < ln.size(); i+=5) {
 					const int atom_number = stoi(ln.substr(i, 5));
 					dbgmsg(atom_number);
 					anum.push_back(atom_number);

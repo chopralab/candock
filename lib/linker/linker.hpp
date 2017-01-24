@@ -115,9 +115,9 @@ namespace Linker {
 				__score(score), __dist_cutoff(dist_cutoff),
 				__spin_degrees(Geom3D::radians(spin_degrees / 2)), // it needs to be divided by two due to quaternion rotation (it seems to double the angles)..
 				__tol_seed_dist(tol_seed_dist), __lower_tol_seed_dist(lower_tol_seed_dist), 
-				__upper_tol_seed_dist(upper_tol_seed_dist), __max_possible_conf(max_possible_conf),
-				__link_iter(link_iter), __clash_coeff(clash_coeff), 
-				__docked_clus_rad(docked_clus_rad), __max_allow_energy(max_allow_energy), 
+				__upper_tol_seed_dist(upper_tol_seed_dist), __clash_coeff(clash_coeff),
+				__docked_clus_rad(docked_clus_rad), __max_allow_energy(max_allow_energy),
+				__max_possible_conf(max_possible_conf), __link_iter(link_iter),
 				__max_num_possibles(max_num_possibles), 
 				__max_clique_size(max_clique_size), __max_iterations_final(max_iterations_final)
 			{}

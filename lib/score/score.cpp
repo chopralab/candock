@@ -11,7 +11,7 @@
 
 namespace Molib {
 	ostream& operator<< (ostream& stream, const vector<double> &energy) {
-		for (int i = 0; i < energy.size(); ++i) {
+		for (size_t i = 0; i < energy.size(); ++i) {
 			stream << i << "=" << energy[i] << " ";
 		}
 		return stream;
@@ -21,7 +21,7 @@ namespace Molib {
 		for (auto &kv : energies) {
 			auto &atom_pair = kv.first;
 			auto &energy = kv.second;
-			for (int i = 0; i < energy.size(); ++i) {
+			for (size_t i = 0; i < energy.size(); ++i) {
 				stream << help::idatm_unmask[atom_pair.first] << " " << help::idatm_unmask[atom_pair.second] 
 					<< " " << i << " " << energy[i] << endl;
 			}
@@ -36,7 +36,7 @@ namespace Molib {
 			auto &ene = score.__energies.at(atom_pair);
 			auto &der = score.__derivatives.at(atom_pair);
 			stream << "#objective function" << endl;
-			for (int i = 0; i < ene.size(); ++i) {
+			for (size_t i = 0; i < ene.size(); ++i) {
 				stream << help::idatm_unmask[atom_pair.first] << "\t"
 					<< help::idatm_unmask[atom_pair.second] << "\t" 
 					<< fixed << setprecision(3) << i * score.__step_non_bond << "\t" 
@@ -44,7 +44,7 @@ namespace Molib {
 					<< fixed << setprecision(3) << der[i] << endl;
 			}
 			stream << "#scoring function" << endl;
-			for (int i = 0; i < sene.size(); ++i) {
+			for (size_t i = 0; i < sene.size(); ++i) {
 				stream << help::idatm_unmask[atom_pair.first] << "\t"
 					<< help::idatm_unmask[atom_pair.second] << "\t" 
 					<< fixed << setprecision(3) << score.__get_lower_bound(i) << "\t" 
@@ -65,13 +65,14 @@ namespace Molib {
 			const string idatm_type1 = help::idatm_unmask[atom_pair.first];
 			const string idatm_type2 = help::idatm_unmask[atom_pair.second];
 
-			for (int i = 0; i < ene.size(); ++i) {
+			for (size_t i = 0; i < ene.size(); ++i) {
 				ss << setprecision(8) << ene[i] << endl;
 			}
 			const string &filename = idatm_type1 + "_" + idatm_type2 + ".txt";
 			
 			inout::Inout::file_open_put_stream(Path::join(Path::join(obj_dir, std::to_string(__step_non_bond)), filename), ss);
 		}
+		return *this;
 	}
 
 	Score& Score::parse_objective_function(const string &obj_dir, const double scale_non_bond) {
@@ -103,6 +104,7 @@ namespace Molib {
 
 		}
 		dbgmsg("parsed objective function");
+                return *this;
 	}
 
 	Array1d<double> Score::compute_energy(const Atom::Grid &gridrec, const Geom3D::Coordinate &crd, const set<int> &ligand_atom_types) const {
@@ -206,7 +208,7 @@ namespace Molib {
 			const pair_of_ints &atom_pair = el1.first;
 			if (__sum_gij_of_r_numerator[atom_pair] > 0) {
 				const vector<double> &gij_of_r_vals = el1.second;
-				for (int i = 0; i < gij_of_r_vals.size(); ++i) {
+				for (size_t i = 0; i < gij_of_r_vals.size(); ++i) {
 					const double &gij_of_r_value = gij_of_r_vals[i];
 					__gij_of_r_bin_range_sum[i] += gij_of_r_value / __sum_gij_of_r_numerator[atom_pair];
 					dbgmsg("__gij_of_r_bin_range_sum[" <<  __get_lower_bound(i) 
@@ -236,13 +238,13 @@ namespace Molib {
 
 			vector<double> energy(gij_of_r_vals.size(), -HUGE_VAL);
 			
-			const int start_idx = __get_index(vdW_sum - 0.6);
-			const int end_idx = __get_index(vdW_sum + 1.0);
+			const size_t start_idx = __get_index(vdW_sum - 0.6);
+			const size_t end_idx = __get_index(vdW_sum + 1.0);
 
 			dbgmsg(start_idx << " " << end_idx);
 
 
-			for (int i = 0; i < gij_of_r_vals.size(); ++i) {
+			for (size_t i = 0; i < gij_of_r_vals.size(); ++i) {
 				const double lower_bound = __get_lower_bound(i);
 				dbgmsg(lower_bound);
 				const double &gij_of_r_numerator = gij_of_r_vals[i];
@@ -269,13 +271,13 @@ namespace Molib {
 			dbgmsg("raw energies before interpolations : " << endl << energy);
 
 			// correct for outliers only in the TRUE potential region of the potential
-			for (int i = start_idx; i < energy.size() - 2; ++i) {
+			for (size_t i = start_idx; i < energy.size() - 2; ++i) {
 				if (energy[i] != 0 && energy[i] != 5) {
-					int j = i + 1;
+					size_t j = i + 1;
 					while (j < i + 3 && j < energy.size() && (energy[j] == 0 || energy[j] == 5)) { ++j; }
 					if (j > i + 1 && j < energy.size()) {
 						const double k0 = (energy[j] - energy[i]) / (j - i);
-						for (int k = 1; k < j - i; ++k) {
+						for (size_t k = 1; k < j - i; ++k) {
 							energy[i + k] = energy[i] + k0 * k;
 						}
 					}
@@ -284,8 +286,8 @@ namespace Molib {
 
 			// locate global minimum and repulsion index in interval [vdW_sum - 0.6, vdW_sum + 1.0]
 			double global_min = HUGE_VAL;
-			int global_min_idx = start_idx;
-			int repulsion_idx = global_min_idx;
+			size_t global_min_idx = start_idx;
+			size_t repulsion_idx = global_min_idx;
 
 			try { 
 				repulsion_idx = __get_index(help::repulsion_idx.at(make_pair(idatm_type1, idatm_type2)));
@@ -296,7 +298,7 @@ namespace Molib {
 
 					dbgmsg("de-novo calculation of repulsion idx");
 					
-					for (int i = start_idx; i < end_idx && i < energy.size(); ++i) {
+					for (size_t i = start_idx; i < end_idx && i < energy.size(); ++i) {
 						if (energy[i] != -HUGE_VAL) {
 							if (energy[i] < global_min) {
 								global_min = energy[i];
@@ -320,14 +322,14 @@ namespace Molib {
 			
 			// calculate slope points & minor correction to repulsion index
 			vector<double> deriva;
-			for (int i = repulsion_idx; i < repulsion_idx + 5 && i < energy.size() - 1; ++i) {
+			for (size_t i = repulsion_idx; i < repulsion_idx + 5 && i < energy.size() - 1; ++i) {
 				double d = (energy[i + 1] - energy[i]) / __step_in_file;
 				deriva.push_back(d);
 			}
 			
-			// find up to 3 most negative derivatives -> slope
-			set<int> slope;
-			for (int i = 0; i < 3 && i < deriva.size(); ++i) {
+			// find up to 3 most negative derivatives and store index to slope
+			set<size_t> slope;
+			for (size_t i = 0; i < 3 && i < deriva.size(); ++i) {
 				auto it = min_element(deriva.begin(), deriva.end(), [](double i, double j) { return i < j; });
 				if (*it < 0) { // derivative < 0
 					int i0 = repulsion_idx + (it - deriva.begin());
@@ -357,7 +359,7 @@ namespace Molib {
 				dbgmsg("energies before interpolations : " << endl << energy);
 	
 				vector<double> dataX, dataY;
-				for (int i = repulsion_idx; i < energy.size(); ++i) { // unset everything below this value
+				for (size_t i = repulsion_idx; i < energy.size(); ++i) { // unset everything below this value
 					dataX.push_back(__get_lower_bound(i));
 					dataY.push_back(energy[i]);
 				}
@@ -452,7 +454,7 @@ namespace Molib {
 			const double w1 = help::vdw_radius[atom_pair.first];
 			const double w2 = help::vdw_radius[atom_pair.second];
 			const double vdW_sum = ((w1 > 0 && w2 > 0) ? w1 + w2 : 4.500);
-			const int repulsion_idx = __get_index(vdW_sum - 0.6);
+			const size_t repulsion_idx = __get_index(vdW_sum - 0.6);
 			const string idatm_type1 = help::idatm_unmask[atom_pair.first];
 			const string idatm_type2 = help::idatm_unmask[atom_pair.second];
 			dbgmsg("atom1 = " << idatm_type1
@@ -460,7 +462,7 @@ namespace Molib {
 				<< " vdW_sum = " << vdW_sum
 				<< " repulsion index (below is forbidden area) = " << repulsion_idx);
 			vector<double> energy(gij_of_r_vals.size(), -HUGE_VAL);
-			for (int i = 0; i < gij_of_r_vals.size(); ++i) {
+			for (size_t i = 0; i < gij_of_r_vals.size(); ++i) {
 				const double lower_bound = __get_lower_bound(i);
 				const double &gij_of_r_numerator = gij_of_r_vals[i];
 				dbgmsg("lower bound for atom_pair " << idatm_type1
@@ -536,7 +538,7 @@ namespace Molib {
 
 	double Score::non_bonded_energy(const Atom::Grid &gridrec, const Atom::Vec &atoms, const Geom3D::Point::Vec &crds) const {
 		double energy_sum = 0.0;
-		for (int i = 0; i < atoms.size(); ++i) {
+		for (size_t i = 0; i < atoms.size(); ++i) {
 			const Atom &atom2 = *atoms[i];
 			const Geom3D::Coordinate &atom2_crd = crds[i];
 			const auto &atom_2 = atom2.idatm_type();

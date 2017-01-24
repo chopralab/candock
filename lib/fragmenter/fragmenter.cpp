@@ -32,7 +32,7 @@ namespace Molib {
 	}
 
 	ostream& operator<<(ostream& os, const Fragmenter::Fragment::Vec& fragments)	{
-		for (int i = 0; i < fragments.size(); ++i) {
+		for (size_t i = 0; i < fragments.size(); ++i) {
 			auto &fragment = fragments[i];
 			os << "FRAGMENT " << i << " SEED_ID = " << fragment.get_seed_id() << " : " << endl;
 			for (auto &patom : fragment.get_core())
@@ -88,20 +88,20 @@ namespace Molib {
 						if (!visited.count(&bondee) && (help::gaff_group_1.count(bondee.gaff_type()) 
 							|| help::gaff_group_2.count(bondee.gaff_type()))) {
 							if (bond.is_double() || bond.is_triple() || bond.is_aromatic()) {
-								if (help::gaff_group_1.count(current.gaff_type()) 
-									&& help::gaff_group_1.count(bondee.gaff_type())
-									|| help::gaff_group_2.count(current.gaff_type()) 
-									&& help::gaff_group_2.count(bondee.gaff_type())) {
+								if ( (help::gaff_group_1.count(current.gaff_type()) 
+                                                                   && help::gaff_group_1.count(bondee.gaff_type()) )
+                                                                 || ( help::gaff_group_2.count(current.gaff_type()) 
+                                                                   && help::gaff_group_2.count(bondee.gaff_type()) )) {
 									dbgmsg("bondee gaff type (case 1) = "
 										<< bondee.gaff_type());
 									bondee.set_gaff_type(help::gaff_flip.at(bondee.gaff_type()));
 									visited.insert(&bondee);
 								}
 							} else if (bond.is_single()) {
-								if (help::gaff_group_1.count(current.gaff_type()) 
-									&& help::gaff_group_2.count(bondee.gaff_type())
-									|| help::gaff_group_2.count(current.gaff_type()) 
-									&& help::gaff_group_1.count(bondee.gaff_type())) {
+								if ( (help::gaff_group_1.count(current.gaff_type()) 
+                                                                   && help::gaff_group_2.count(bondee.gaff_type()) )
+                                                                 ||  (help::gaff_group_2.count(current.gaff_type()) 
+                                                                   && help::gaff_group_1.count(bondee.gaff_type()))) {
 									dbgmsg("bondee gaff type (case 2) = "
 										<< bondee.gaff_type());
 									bondee.set_gaff_type(help::gaff_flip.at(bondee.gaff_type()));
@@ -187,7 +187,7 @@ namespace Molib {
 		for (auto &match : matches) {
 			map<Bond*, Bond*> bond_match;
 			dbgmsg("MATCH SIZE = " << match.first.size());
-			for (int i = 0; i < match.first.size(); ++i) {
+			for (size_t i = 0; i < match.first.size(); ++i) {
 				auto &nid1 = match.first[i];
 				auto &nid2 = match.second[i];
 				Bond &bond1 = smiles_graph[nid1];
@@ -253,7 +253,6 @@ namespace Molib {
 	Fragmenter::Fragment::Vec Fragmenter::identify_overlapping_rigid_segments(const Atom::Vec &atoms, Unique &u) {
 		Fragment::Vec fragments;
 		Atom::Set visited;
-		int i=0;
 		for (auto &pa : atoms) {
 			if (!visited.count(pa)) {
 				// insert core atoms that are connected to this atom

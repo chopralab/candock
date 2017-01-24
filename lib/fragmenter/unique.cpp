@@ -5,10 +5,10 @@
 namespace Molib {
 	ostream& operator<<(ostream& os, const Unique::USeeds& useeds) {
 		for (auto &kv : useeds) {
-			BondGraph &g = *kv.second.graph;
 			os << kv.second.seed_id << " " << kv.first << " " 
-				<< kv.second.graph->get_smiles() << endl;
+                           << kv.second.graph->get_smiles() << endl;
 		}
+		return os;
 	}
 
 	void Unique::__read_seeds_file() {

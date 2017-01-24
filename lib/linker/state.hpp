@@ -48,10 +48,10 @@ namespace Linker {
 		bool clashes(const State &other, const double clash_coeff) const; // clashes between this and other state
 		string pdb() const;
 		void set_id(Id id) { __id = id; }
-		const Id get_id() const { return __id; }
+                Id get_id() const { return __id; }
 #ifndef NDEBUG
 		void set_no(int no) { __no = no; }
-		const int get_no() const { return __no; }
+		int get_no() const { return __no; }
 #endif
 		friend ostream& operator<< (ostream& stream, const State& s);
 		friend ostream& operator<< (ostream& stream, const Vec& sv);

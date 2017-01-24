@@ -20,7 +20,7 @@ namespace Docker {
 		const Molib::Atom::Vec atoms = conformations.__seed.get_atoms();
 		for (auto &conf : conformations.get_conformations()) {
 			os << "MODEL" << endl;
-			for (int i = 0; i < conf.size(); ++i) {
+			for (size_t i = 0; i < conf.size(); ++i) {
 				Gpoints::Gpoint &gpoint0 = *conf[i];
 				Molib::Atom &atom = *atoms[i];
 				atom.set_crd(gpoint0.crd());
@@ -108,15 +108,15 @@ namespace Docker {
 	
 			// pre-compute rmsd between ALL conformations
 			__rmsd.init(confs.size(), confs.size());
-			for (int i = 0; i < confs.size(); ++i) {
-				for (int j = i + 1; j < confs.size(); ++j) {
+			for (size_t i = 0; i < confs.size(); ++i) {
+				for (size_t j = i + 1; j < confs.size(); ++j) {
 					__rmsd.data[i][j] = __rmsd.data[j][i] = (float) Geom3D::compute_rmsd(confs[i], confs[j]);
 				}
 			}
 			dbgmsg("after rmsd calculation");
 	
 			// go over all conformations & get the closest gripoint
-			for (int i = 0; i < confs.size(); ++i) {
+			for (size_t i = 0; i < confs.size(); ++i) {
 	
 				auto &conf = confs[i];
 				Gpoints::PGpointVec points; // init size of vec!

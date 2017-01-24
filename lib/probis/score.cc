@@ -27,7 +27,7 @@ void Score::get_internal_blosum() {
   }
     
 
-  char A[25];
+  unsigned char A[25];
 
   /*read the one letter codes of aacids */
   sscanf(bl[0].c_str(), "%*c %c %c %c %c %c %c %c %c %c %c %c %c %c %c %c %c %c %c %c %c %c %c %c %c", 
@@ -37,15 +37,16 @@ void Score::get_internal_blosum() {
   /*read the matrix */
 
   for (int i = 1; i < 25; i++) {
+    unsigned char idx = static_cast<unsigned char> (bl[i].at(0));
     sscanf(bl[i].c_str(), "%*c %hd %hd %hd %hd %hd %hd %hd %hd %hd %hd %hd %hd %hd %hd %hd %hd %hd %hd %hd %hd %hd %hd %hd %hd", 
-           &blosum_matrix[bl[i].at(0)][A[0]],  &blosum_matrix[bl[i].at(0)][A[1]],  &blosum_matrix[bl[i].at(0)][A[2]],
-           &blosum_matrix[bl[i].at(0)][A[3]],  &blosum_matrix[bl[i].at(0)][A[4]],  &blosum_matrix[bl[i].at(0)][A[5]],
-           &blosum_matrix[bl[i].at(0)][A[6]],  &blosum_matrix[bl[i].at(0)][A[7]],  &blosum_matrix[bl[i].at(0)][A[8]],
-           &blosum_matrix[bl[i].at(0)][A[9]],  &blosum_matrix[bl[i].at(0)][A[10]], &blosum_matrix[bl[i].at(0)][A[11]],
-           &blosum_matrix[bl[i].at(0)][A[12]], &blosum_matrix[bl[i].at(0)][A[13]], &blosum_matrix[bl[i].at(0)][A[14]],
-           &blosum_matrix[bl[i].at(0)][A[15]], &blosum_matrix[bl[i].at(0)][A[16]], &blosum_matrix[bl[i].at(0)][A[17]],
-           &blosum_matrix[bl[i].at(0)][A[18]], &blosum_matrix[bl[i].at(0)][A[19]], &blosum_matrix[bl[i].at(0)][A[20]],
-           &blosum_matrix[bl[i].at(0)][A[21]], &blosum_matrix[bl[i].at(0)][A[22]], &blosum_matrix[bl[i].at(0)][A[23]]);
+           &blosum_matrix[idx][A[0]],  &blosum_matrix[idx][A[1]],  &blosum_matrix[idx][A[2]],
+           &blosum_matrix[idx][A[3]],  &blosum_matrix[idx][A[4]],  &blosum_matrix[idx][A[5]],
+           &blosum_matrix[idx][A[6]],  &blosum_matrix[idx][A[7]],  &blosum_matrix[idx][A[8]],
+           &blosum_matrix[idx][A[9]],  &blosum_matrix[idx][A[10]], &blosum_matrix[idx][A[11]],
+           &blosum_matrix[idx][A[12]], &blosum_matrix[idx][A[13]], &blosum_matrix[idx][A[14]],
+           &blosum_matrix[idx][A[15]], &blosum_matrix[idx][A[16]], &blosum_matrix[idx][A[17]],
+           &blosum_matrix[idx][A[18]], &blosum_matrix[idx][A[19]], &blosum_matrix[idx][A[20]],
+           &blosum_matrix[idx][A[21]], &blosum_matrix[idx][A[22]], &blosum_matrix[idx][A[23]]);
 //    cout << buffer[0] << " " << blosum_matrix[buffer[0]][A[0]] << " " << A[0] << " " << A[1] << " " << A[23] << endl;
   }
 }
@@ -56,25 +57,25 @@ void Score::get_blosum() {
   */
 
   ifstream blosum(BLOSUM);
-  char buffer[256];
-  char A[25];
+  unsigned char buffer[256];
+  unsigned char A[25];
   if (!blosum.is_open()) { 
     throw Err("Error (SCORE) : Cannot open blosum matrix file.", 8); 
   }
   /*read the comments first */
   while (!blosum.eof()) {
-    blosum.getline (buffer,200);
+    blosum.getline ((char*)buffer,200);
     if (buffer[0] != '#') break;
   }
   /*read the one letter codes of aacids */
-  sscanf(buffer, "%*c %c %c %c %c %c %c %c %c %c %c %c %c %c %c %c %c %c %c %c %c %c %c %c %c", 
+  sscanf((char*)buffer, "%*c %c %c %c %c %c %c %c %c %c %c %c %c %c %c %c %c %c %c %c %c %c %c %c %c", 
          &A[0], &A[1],&A[2],&A[3],&A[4],&A[5],&A[6],&A[7],&A[8],&A[9],&A[10],&A[11],&A[12],&A[13],
          &A[14],&A[15],&A[16],&A[17],&A[18],&A[19],&A[20],&A[21],&A[22],&A[23]);
   /*read the matrix */
   while (!blosum.eof()) {
-    blosum.getline (buffer,200);
+    blosum.getline ((char*)buffer,200);
     if (!isalpha(buffer[0])) break;
-    sscanf(buffer, "%*c %hd %hd %hd %hd %hd %hd %hd %hd %hd %hd %hd %hd %hd %hd %hd %hd %hd %hd %hd %hd %hd %hd %hd %hd", 
+    sscanf((char*)buffer, "%*c %hd %hd %hd %hd %hd %hd %hd %hd %hd %hd %hd %hd %hd %hd %hd %hd %hd %hd %hd %hd %hd %hd %hd %hd", 
            &blosum_matrix[buffer[0]][A[0]], &blosum_matrix[buffer[0]][A[1]], &blosum_matrix[buffer[0]][A[2]],
            &blosum_matrix[buffer[0]][A[3]], &blosum_matrix[buffer[0]][A[4]], &blosum_matrix[buffer[0]][A[5]],
            &blosum_matrix[buffer[0]][A[6]], &blosum_matrix[buffer[0]][A[7]], &blosum_matrix[buffer[0]][A[8]],
@@ -88,7 +89,7 @@ void Score::get_blosum() {
   blosum.close();
 }
 
-int Score::score_blosum(char amino1, char amino2) {
+int Score::score_blosum(unsigned char amino1, unsigned char amino2) {
   /*
     Calculate blosum score for each matching aminoacid. Input are two aminoacids, one-letter codes,
     the output is blosum score (bit score). 

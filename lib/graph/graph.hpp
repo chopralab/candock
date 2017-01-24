@@ -70,7 +70,7 @@ namespace Glib {
 	template<typename T>
 	T intersection(T p1, T p2) {
 		T v;
-		auto it = set_intersection(p1.begin(), p1.end(), 
+		set_intersection(p1.begin(), p1.end(), 
 			p2.begin(), p2.end(), 
 			inserter(v, v.begin()));
 		return v;
@@ -372,13 +372,14 @@ namespace Glib {
 		__expand(this->first(), path, cycles, visited);
 		dbgmsg("after expanding the vertices");
 		dbgmsg("CYCLES FOUND : ");
+#ifndef NDEBUG
 		for (auto &cycle : cycles) {
 			dbgmsg("CYCLE : ");
 			for (auto &pvertex : cycle) {
 				dbgmsg(*pvertex);
 			}
 		}
-
+#endif
 		//~ dbgmsg("CYCLES FOUND : " << cycles);
 		return cycles;
 	}

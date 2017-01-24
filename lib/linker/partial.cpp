@@ -78,7 +78,7 @@ namespace Linker {
 					} else  {
 						auto &crds1 = pstate1->get_crds();
 						auto &crds2 = pstate2->get_crds();
-						for (int i = 0; i < crds1.size(); ++i) {
+						for (size_t i = 0; i < crds1.size(); ++i) {
 							sum_squared += crds1[i].distance_sq(crds2[i]);
 						}
 						sz += crds1.size();

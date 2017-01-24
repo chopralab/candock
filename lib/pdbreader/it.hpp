@@ -58,7 +58,7 @@ public:
 	//~ void erase(int i) { __m.erase(i); }
 	void erase(int i) { __m.erase(__m.begin() + i); }
 	void remove_if(std::function<bool (const P&)> fptr) {
-		for(auto it = __m.begin(), ite = __m.end(); it != ite;) {
+		for(__iterator it = __m.begin(), ite = __m.end(); it != ite;) {
 			if(fptr(*it))
 				it = __m.erase(it);
 			else
@@ -124,7 +124,7 @@ public:
 	void erase(Z p) { __m.erase(p); }
 	void erase_shrink(Z p) { __m[p].swap(__m.rbegin()->second); __m.erase(__m.rbegin()->first);  }
 	void remove_if(std::function<bool (const T&)> fptr) {
-		for(auto it = __m.begin(), ite = __m.end(); it != ite;) {
+		for(__iterator it = __m.begin(), ite = __m.end(); it != ite;) {
 			if(fptr(*(it->second)))
 				it = __m.erase(it);
 			else

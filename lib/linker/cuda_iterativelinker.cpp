@@ -12,6 +12,9 @@
 #include "geom3d/geom3d.hpp"
 #include "cluster/greedy.hpp"
 #include <queue>
+#include <iostream>
+
+#include "cuda_linker.h"
 
 using namespace std;
 
@@ -27,6 +30,11 @@ namespace Linker {
 	DockedConformation Linker::CUDA_IterativeLinker::__a_star(const int segment_graph_size, 
 		const Partial &start_conformation, vector<unique_ptr<State>> &states, int iter) {
 		
+        cout << "Segment Graph Size " << segment_graph_size << endl;
+        cout << "Iter " << iter << endl;
+        
+
+
 		for (auto &pstate : start_conformation.get_states())
 			states.push_back(unique_ptr<State>(new State(*pstate)));
 		if (start_conformation.empty())
@@ -34,6 +42,11 @@ namespace Linker {
 		SegStateMap docked_seeds;
 		for (auto &pstate : states) 
 			docked_seeds.insert({&pstate->get_segment(), &*pstate});
+#ifdef COMPILE_CUDA
+        //Move data to GPU
+        cuda_linker cuda;
+        cuda.setup(segment_graph_size, start_conformation, states, iter);
+#endif
 		set<State::ConstPair> failed_state_pairs;
 		Partial min_conformation(MAX_ENERGY);
 		PriorityQueue openset; // openset has conformations sorted from lowest to highest energy
@@ -166,7 +179,7 @@ namespace Linker {
 			// find all maximum cliques with the number of seed segments of __max_clique_size
 			Maxclique m(conn);
 			
-			const int mcq_size = __max_clique_size > seed_graph.size() ? seed_graph.size() : __max_clique_size;
+			const int mcq_size = std::min(__max_clique_size, static_cast<int>(seed_graph.size()) );
 			const vector<vector<unsigned short int>> &qmaxes = m.mcq(mcq_size);
 	
 			//help::memusage("after max.clique.search");
@@ -197,7 +210,7 @@ namespace Linker {
 		// sort conformations according to their total energy
 		Partial::sort(possibles_w_energy);
 
-		if (possibles_w_energy.size() > __max_num_possibles)
+		if (static_cast<int>(possibles_w_energy.size()) > __max_num_possibles)
 			possibles_w_energy.resize(__max_num_possibles);
 
 		//help::memusage("after sort of possibles_w_energy");
@@ -211,7 +224,7 @@ namespace Linker {
 
        		dbgmsg("number of clustered_possibles_w_energy = " << clustered_possibles_w_energy.size());
 
-       		if (__max_possible_conf != -1 && clustered_possibles_w_energy.size() > __max_possible_conf) {
+       		if (__max_possible_conf != -1 && static_cast<int>(clustered_possibles_w_energy.size()) > __max_possible_conf) {
             		clustered_possibles_w_energy.resize(__max_possible_conf);
             		dbgmsg("number of possible conformations > max_possible_conf, "
             		       << "resizing to= " << __max_possible_conf << " conformations");
@@ -243,7 +256,7 @@ namespace Linker {
 				const Molib::Bond &b = segment.get_bond(adjacent);
 				overlap.insert(&b.atom2());
 			}
-			for (int i = 0; i < state.get_segment().get_atoms().size(); ++i) {
+			for (size_t i = 0; i < state.get_segment().get_atoms().size(); ++i) {
 				Molib::Atom &atom = const_cast<Molib::Atom&>(state.get_segment().get_atom(i)); // ugly, correct this
 				if (!overlap.count(&atom)) {
 					const Geom3D::Coordinate &crd = state.get_crd(i);

@@ -47,13 +47,13 @@ namespace Molib {
 		double __energy_mean(const pair_of_ints&, const double&);
 		double __energy_cumulative(const pair_of_ints&, const double&);
 		
-		int __get_index(const double d) const { return (int) floor((d + 0.0000000001) / (const double) __step_in_file); }
-		double __get_lower_bound(const int idx) const { return (double) idx * (const double) __step_in_file; }
+		int __get_index(const double d) const { return (int) floor((d + 0.0000000001) / (double) __step_in_file); }
+		double __get_lower_bound(const int idx) const { return (double) idx * (double) __step_in_file; }
 	public:
 		Score(const string &ref_state, const string &comp, const string &rad_or_raw, 
 			const double &dist_cutoff, const double &step_non_bond) 
-			: __ref_state(ref_state), __comp(comp), __rad_or_raw(rad_or_raw), __dist_cutoff(dist_cutoff), 
-			__step_non_bond(step_non_bond), __total_quantity(0), __eps(0.0000001), __step_in_file(-1) {}
+			: __total_quantity(0), __eps(0.0000001), __ref_state(ref_state), __comp(comp), __rad_or_raw(rad_or_raw),
+			  __dist_cutoff(dist_cutoff), __step_non_bond(step_non_bond), __step_in_file(-1) {}
 				
 		double non_bonded_energy(const Atom::Grid &gridrec, const Molecule&) const; // this was formerly called distances_and_scores_frag_lig
 		double non_bonded_energy(const Atom::Grid &gridrec, const Atom::Vec &atoms, const Geom3D::Point::Vec &crds) const;

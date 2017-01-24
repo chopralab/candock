@@ -17,8 +17,8 @@ namespace Linker {
 				vertices.push_back(unique_ptr<Seed>(new Seed(s)));
 			}
 		}				
-		for (int i = 0; i < vertices.size(); ++i) { // ... edges ...
-			for (int j = i + 1; j < vertices.size(); ++j) {
+		for (size_t i = 0; i < vertices.size(); ++i) { // ... edges ...
+			for (size_t j = i + 1; j < vertices.size(); ++j) {
 				const Segment &seg_i = vertices[i]->get_segment();
 				const Segment &seg_j = vertices[j]->get_segment();
 				dbgmsg("i = " << i << " j = " << j << " "

@@ -197,7 +197,7 @@ namespace OMMIface {
 
 		// we have to set new coordinates for atoms
 		AtomPoint::UPVec atompoints;
-		for (int i = 0; i < positions.size(); ++i) {
+		for (size_t i = 0; i < positions.size(); ++i) {
 			atompoints.push_back(unique_ptr<AtomPoint>(new AtomPoint(
 				Geom3D::Point(positions[i][0], positions[i][1], positions[i][2]),
 				*topology.atoms[i])));

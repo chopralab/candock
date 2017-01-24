@@ -3,7 +3,7 @@
 #include <utility>
 
 //~ Maxclique::Maxclique (const Array2d<bool> &conn, const vector<double> &scores, const float tt) : __conn(conn), __scores(scores), pk(0), level(1), Tlimit(tt), V(conn.get_szi()), Q(conn.get_szi()), QMAX(conn.get_szi()) {
-Maxclique::Maxclique (const Array2d<bool> &conn, const float tt) : __conn(conn), pk(0), level(1), Tlimit(tt), V(conn.get_szi()), Q(conn.get_szi()), QMAX(conn.get_szi()) {
+Maxclique::Maxclique (const Array2d<bool> &conn, const float tt) : __conn(conn), pk(0), level(1), Tlimit(tt), V(conn.get_szi()), QMAX(conn.get_szi()), Q(conn.get_szi()) {
   if (conn.get_szi()==0) throw Error("WARNING: Graph is empty (meaning that the molecule is built of non-seed fragments only)."); // fixes issue #116
   for (int i=0; i < conn.get_szi(); i++) V.push(i);
   C = new ColorClass[conn.get_szi() + 1];

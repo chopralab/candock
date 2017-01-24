@@ -16,7 +16,7 @@ class Score : public Kabsch {
 //  ~Score () { }
   void get_blosum();
   void get_internal_blosum();
-  int score_blosum(char, char);
+  int score_blosum(unsigned char, unsigned char);
   void bit_score(vector <Item* > &);
   void E_score(Molecule*, Molecule*, vector <Item* > &);
   void cluster_score(const vector <Item* > &item);

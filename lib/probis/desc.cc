@@ -61,7 +61,7 @@ void Descriptor::print_desc(ostream &os) {
   print_sphere(os);
   sprintf(buffer, "%3d%3d%5d%3c", s->mnsp, psurf, atom->num, atom->chain_id);
   os << buffer << endl;
-  delete buffer;
+  delete[] buffer;
 }
 
 //void Descriptor::trim(string chain1, string chain2) {

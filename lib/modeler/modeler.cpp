@@ -43,7 +43,7 @@ namespace OMMIface {
 	}
 
 	void Modeler::add_crds(const Molib::Atom::Vec &atoms, const Geom3D::Point::Vec &crds) {
-		for (int i = 0; i < atoms.size(); ++i) {
+		for (size_t i = 0; i < atoms.size(); ++i) {
 			int idx = __topology.get_index(*atoms[i]);
 			__positions[idx] = crds[i];
 		}
@@ -51,7 +51,7 @@ namespace OMMIface {
 
 	void Modeler::add_random_crds(const Molib::Atom::Vec &atoms) {
 		srand(time(NULL));
-		for (int i = 0; i < atoms.size(); ++i) {
+		for (size_t i = 0; i < atoms.size(); ++i) {
 			int idx = __topology.get_index(*atoms[i]);
 			const double x = rand() % 100 + 1;
 			const double y = rand() % 100 + 1;
@@ -68,7 +68,7 @@ namespace OMMIface {
 
 		const vector<OpenMM::Vec3>& positions_in_nm = __system_topology.get_positions_in_nm();
 		Geom3D::Point::Vec crds;
-		for (int i = 0; i < atoms.size(); ++i) {
+		for (size_t i = 0; i < atoms.size(); ++i) {
 			int idx = __topology.get_index(*atoms[i]);
 			crds.push_back(Geom3D::Point(
 				positions_in_nm[idx][0] * OpenMM::AngstromsPerNm,
@@ -100,7 +100,7 @@ namespace OMMIface {
 
 	void Modeler::minimize_knowledge_based(const Molib::Molecule &ligand, const Molib::Molecule &receptor, const Molib::Score &score) {
 		Benchmark bench;
-		cout << "Doing energy minimization of ligand " << ligand.name() << " using knowledge-based forcefield" << endl;
+		dbgmsg( "Doing energy minimization of ligand " << ligand.name() << " using knowledge-based forcefield");
 
 		// for knowledge-based forcefield we implement a custom update nonbond
 		// function
@@ -160,7 +160,7 @@ namespace OMMIface {
 #endif			
 			// check if positions have converged
 			double max_error = 0;
-			for (int i = 0; i < initial_positions.size(); ++i) {
+			for (size_t i = 0; i < initial_positions.size(); ++i) {
 				OpenMM::Vec3 dif_pos = initial_positions[i] - minimized_positions[i];
 				 const double error = dif_pos.dot(dif_pos);
 				 if (error > max_error)
@@ -182,8 +182,8 @@ namespace OMMIface {
 			dbgmsg("ending minimization step iter = " << iter);
 
 		}
-		cout << "Minimized in " << iter << " iterations, which took " 
-			<< bench.seconds_from_start() << " wallclock seconds" << endl;
+		dbgmsg( "Minimized in " << iter << " iterations, which took " 
+			<< bench.seconds_from_start() << " wallclock seconds");
 	}
 
 	void Modeler::init_openmm_positions() {
