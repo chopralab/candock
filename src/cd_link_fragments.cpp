@@ -24,7 +24,7 @@ int main(int argc, char* argv[]) {
 		Program::FragmentLigands ligand_fragmenter;
 		ligand_fragmenter.run_step(cmdl);
 
-		Program::Target targets (cmdl.receptor_file());
+		Program::Target targets (cmdl.get_string_option("receptor"));
 		targets.find_centroids(cmdl);
 		targets.dock_fragments(ligand_fragmenter, cmdl);
 		OMMIface::SystemTopology::loadPlugins();

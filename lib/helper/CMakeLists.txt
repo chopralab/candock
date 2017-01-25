@@ -14,6 +14,8 @@ set( helper_SRC array1d.hpp
 				        help.hpp
 				        inout.cpp
 				        inout.hpp
+				        options.cpp
+				        options.hpp
 				        path.cpp
 				        path.hpp
 				        renamerules.hpp

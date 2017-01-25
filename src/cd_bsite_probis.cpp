@@ -17,7 +17,7 @@ int main(int argc, char* argv[]) {
 
 		cmdl.display_time("Starting");
 
-		Program::Target targets (cmdl.receptor_file());
+		Program::Target targets (cmdl.get_string_option("receptor"));
 		targets.find_centroids(cmdl);
 
 		cmdl.display_time("Finished");

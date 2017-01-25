@@ -12,12 +12,12 @@ namespace Program {
 	{
 		boost::regex regex;
 		regex.assign("REMARK   5 MOLECULE (\\w*)");
-		std::ifstream file( cmdl.prep_file() );
+		std::ifstream file( cmdl.get_string_option("prep") );
 		
 		std::vector<std::string> all_names = Grep::search_stream(file, regex);
 		
 		boost::filesystem::path p ( __receptor.name());
-		p /= cmdl.docked_dir();
+		p /= cmdl.get_string_option("docked_dir");
 		
 		bool is_done = true;
 		
@@ -37,12 +37,12 @@ namespace Program {
 
 	void LinkFragments::__read_from_files ( const CmdLnOpts& cmdl )
 	{
-		cout << "Linking for all molecules in " << cmdl.prep_file() << " for " << __receptor.name() << " is complete, skipping." << endl;
+		cout << "Linking for all molecules in " << cmdl.get_string_option("prep") << " for " << __receptor.name() << " is complete, skipping." << endl;
 	}
 
 	void LinkFragments::__link_ligand( Molib::Molecule& ligand, const CmdLnOpts& cmdl, const OMMIface::ForceField& ffield ) {
 		boost::filesystem::path p(__receptor.name());
-		p = p / cmdl.docked_dir() / (ligand.name() + ".pdb");
+		p = p / cmdl.get_string_option("docked_dir") / (ligand.name() + ".pdb");
 		if ( inout::Inout::file_size(p.string()) > 0) {
 			cout << ligand.name() << " is alread docked to " << __receptor.name() << ", reading from already docked file." << endl;
 			return;
@@ -60,7 +60,8 @@ namespace Program {
 				* Read top seeds for this ligand
 				*/
 			Molib::NRset top_seeds = common::read_top_seeds_files(ligand,
-					Path::join(__receptor.name(), cmdl.top_seeds_dir()), cmdl.top_seeds_file(), cmdl.top_percent());
+					Path::join(__receptor.name(), cmdl.get_string_option("top_seeds_dir")),
+                                                   cmdl.get_string_option("top_seeds_file"), cmdl.get_double_option("top_percent"));
 
 			ligand.erase_properties(); // required for graph matching
 			top_seeds.erase_properties(); // required for graph matching
@@ -71,25 +72,28 @@ namespace Program {
 			*/
 			top_seeds.jiggle();
 
-			/* Init minization options and constants, including ligand and receptor topology
-			 *
-			 */
-			OMMIface::Modeler modeler(ffield, cmdl.fftype(), cmdl.dist_cutoff(),
-					cmdl.tolerance(), cmdl.max_iterations(), cmdl.update_freq(), 
-					cmdl.position_tolerance(), false, 2.0);
+                        /* Init minization options and constants, including ligand and receptor topology
+                         *
+                         */
+                        OMMIface::Modeler modeler(ffield, cmdl.get_string_option("fftype"), cmdl.get_int_option("cutoff"),
+                                                  cmdl.get_bool_option("mini_tol"), cmdl.get_int_option("max_iter"), cmdl.get_int_option("update_freq"), 
+                                                  cmdl.get_double_option("pos_tol"), false, 2.0);
 
-			/**
-			 * Connect seeds with rotatable linkers, account for symmetry, optimize 
-			 * seeds with appendices, minimize partial conformations between linking.
-			 * 
-			 */
-			Linker::Linker linker(modeler, __receptor, ligand, top_seeds, __gridrec, __score, 
-					cmdl.cuda(), cmdl.iterative(), cmdl.dist_cutoff(), cmdl.spin_degrees(), 
-					cmdl.tol_seed_dist(), cmdl.lower_tol_seed_dist(), 
-					cmdl.upper_tol_seed_dist(), cmdl.max_possible_conf(),
-					cmdl.link_iter(), cmdl.clash_coeff(), cmdl.docked_clus_rad(), 
-					cmdl.max_allow_energy(), cmdl.max_num_possibles(),
-					cmdl.max_clique_size(), cmdl.max_iterations_final());
+                        /**
+                         * Connect seeds with rotatable linkers, account for symmetry, optimize 
+                         * seeds with appendices, minimize partial conformations between linking.
+                         * 
+                         */
+                        Linker::Linker linker(modeler, __receptor, ligand, top_seeds, __gridrec, __score, 
+                                        cmdl.get_bool_option("cuda"), cmdl.get_bool_option("iterative"),
+                                        cmdl.get_double_option("cutoff"), cmdl.get_int_option("spin"), 
+                                        cmdl.get_double_option("tol_seed_dist"), cmdl.get_double_option("lower_tol_seed_dist"), 
+                                        cmdl.get_double_option("upper_tol_seed_dist"),
+                                        cmdl.get_int_option("max_possible_conf"),
+                                        cmdl.get_int_option("link_iter"),
+                                        cmdl.get_double_option("clash_coeff"), cmdl.get_double_option("docked_clus_rad"), 
+                                        cmdl.get_double_option("max_allow_energy"), cmdl.get_int_option("max_num_possibles"),
+                                        cmdl.get_int_option("max_clique_size"), cmdl.get_int_option("max_iterations_final"));
 
 			Linker::DockedConformation::Vec docks = linker.link();
 			Linker::DockedConformation::sort(docks);
@@ -115,7 +119,7 @@ namespace Program {
 
 		cout << "Starting to dock the fragments into originally given ligands" << endl;
 
-		Molib::PDBreader lpdb2(cmdl.prep_file(), Molib::PDBreader::all_models, 1);
+		Molib::PDBreader lpdb2(cmdl.get_string_option("prep"), Molib::PDBreader::all_models, 1);
 
 		std::vector<std::thread> threads;
 

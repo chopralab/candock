@@ -11,10 +11,12 @@ namespace Program {
 
 		const Molib::Molecules& all_seeds = __fragmented_ligands.seeds();
 
-		// No early return so that we have the ability to redock missing seeds
+                // No early return so that we have the ability to redock missing seeds
+                const string &top_seeds_dir = cmdl.get_string_option("top_seeds_dir");
+                const string &top_seeds_file= cmdl.get_string_option("top_seeds_file");
 		for (const auto& seed : all_seeds) {
 			boost::filesystem::path p (__name);
-			p = p / cmdl.top_seeds_dir() / seed.name() / cmdl.top_seeds_file();
+			p = p / top_seeds_dir / seed.name() / top_seeds_file;
 			all_seeds_are_present &= inout::Inout::file_size(p.string()) > 0;
 		}
 		
@@ -23,15 +25,18 @@ namespace Program {
 
 	void DockFragments::__read_from_files ( const CmdLnOpts& cmdl )
 	{
-		cout << "All seeds are present in " << cmdl.top_seeds_dir() << " for " << __name << ". Docking of fragments skipped." << endl;
+		cout << "All seeds are present in " << cmdl.get_string_option("top_seeds_dir") << " for " << __name << ". Docking of fragments skipped." << endl;
 	}
 
 	void DockFragments::__dock_fragment ( int start, const Docker::Gpoints& gpoints, const Docker::Gpoints& gpoints0, const CmdLnOpts& cmdl) {
 		// iterate over docked seeds and dock unique seeds
+                const string &top_seeds_dir = cmdl.get_string_option("top_seeds_dir");
+                const string &top_seeds_file= cmdl.get_string_option("top_seeds_file");
+
 		for (size_t j = start; j < __fragmented_ligands.seeds().size(); j+= cmdl.ncpu()) {
 			try {
 				boost::filesystem::path p (__name);
-				p = p / cmdl.top_seeds_dir() / __fragmented_ligands.seeds()[j].name() / cmdl.top_seeds_file();
+				p = p / top_seeds_dir / __fragmented_ligands.seeds()[j].name() / top_seeds_file;
 				int file_exist_check = inout::Inout::file_size(p.string()) > 0;
 
 				if ( file_exist_check > 0 ) {
@@ -39,14 +44,14 @@ namespace Program {
 					continue;
 				}
 				dbgmsg(__fragmented_ligands.seeds()[j]);
-				/* Compute all conformations of this seed with the center
-				 * atom fixed on coordinate origin using maximum clique algorithm
-				 * 
-				 */
-				Docker::Conformations conf(__fragmented_ligands.seeds()[j], gpoints0, 
-						                   cmdl.conf_spin(), // degrees
-						                   cmdl.num_univec() // number of unit vectors
-									  );
+                                /* Compute all conformations of this seed with the center
+                                 * atom fixed on coordinate origin using maximum clique algorithm
+                                 * 
+                                 */
+                                Docker::Conformations conf(__fragmented_ligands.seeds()[j], gpoints0, 
+                                                            cmdl.get_double_option("conf_spin"), // degrees
+                                                            cmdl.get_int_option("num_univec") // number of unit vectors
+                                                          );
 
 #ifndef NDEBUG
 				inout::output_file(conf, "conf_" + __fragmented_ligands.seeds()[j].name() + ".pdb"); 
@@ -58,9 +63,9 @@ namespace Program {
 				 *
 				 */
 #ifndef NDEBUG
-				Docker::Dock dock(gpoints, conf, __fragmented_ligands.seeds()[j], __score, __gridrec, cmdl.clus_rad());
+				Docker::Dock dock(gpoints, conf, __fragmented_ligands.seeds()[j], __score, __gridrec,  cmdl.get_double_option("clus_rad"));
 #else
-				Docker::Dock dock(gpoints, conf, __fragmented_ligands.seeds()[j], cmdl.clus_rad());
+				Docker::Dock dock(gpoints, conf, __fragmented_ligands.seeds()[j], cmdl.get_double_option("clus_rad"));
 #endif
 
 				dock.run();
@@ -74,41 +79,42 @@ namespace Program {
 		}
 	}
 
-	void DockFragments::__continue_from_prev ( const CmdLnOpts& cmdl )
-	{
+        void DockFragments::__continue_from_prev ( const CmdLnOpts& cmdl ) {
 
-		cout << "Docking fragments into: " << __name << "_" << cmdl.top_seeds_dir() << ". Files will be named: " << cmdl.top_seeds_file() << endl;
+                cout << "Docking fragments into: " << __name << "_" << cmdl.get_string_option("top_seeds_dir") << 
+                        ". Files will be named: " << cmdl.get_string_option("top_seeds_file") << endl;
 
-		/* Create gridpoints for ALL centroids representing one or more binding sites
-		 * 
-		 */
-		Docker::Gpoints gpoints(__score, __fragmented_ligands.ligand_idatm_types(), __found_centroids.centroids(),
-			__gridrec, cmdl.grid_spacing(), cmdl.dist_cutoff(), cmdl.excluded_radius(), 
-			cmdl.max_interatomic_distance());
-		inout::output_file(gpoints, Path::join(__name, cmdl.gridpdb_hcp_file()));
+                /* Create gridpoints for ALL centroids representing one or more binding sites
+                 * 
+                 */
+                Docker::Gpoints gpoints(__score, __fragmented_ligands.ligand_idatm_types(), __found_centroids.centroids(),
+                                        __gridrec, cmdl.get_double_option("grid_spacing"), cmdl.get_int_option("cutoff"),
+                                        cmdl.get_double_option("excluded_radius"), 
+                                        cmdl.get_double_option("max_interatomic_distance"));
+                inout::output_file(gpoints, Path::join(__name, cmdl.get_string_option("gridpdb_hcp")));
 
-		/* Create a zero centered centroid with 10 A radius (max fragment 
-		 * radius) for getting all conformations of each seed
-		 * 
-		 */
-		Docker::Gpoints gpoints0(cmdl.grid_spacing(), cmdl.max_frag_radius());
+                /* Create a zero centered centroid with 10 A radius (max fragment 
+                 * radius) for getting all conformations of each seed
+                 * 
+                 */
+                Docker::Gpoints gpoints0(cmdl.get_double_option("grid_spacing"), cmdl.get_double_option("max_frag_radius"));
 
-		/* Create template grids using ProBiS-ligands algorithm
-		 * WORK IN PROGESS WORK IN PROGESS WORK IN PROGESS WORK IN PROGESS 
-		 * WORK IN PROGESS WORK IN PROGESS WORK IN PROGESS WORK IN PROGESS 
-		 * WORK IN PROGESS WORK IN PROGESS WORK IN PROGESS WORK IN PROGESS 
-		 */
+                /* Create template grids using ProBiS-ligands algorithm
+                 * WORK IN PROGESS WORK IN PROGESS WORK IN PROGESS WORK IN PROGESS 
+                 * WORK IN PROGESS WORK IN PROGESS WORK IN PROGESS WORK IN PROGESS 
+                 * WORK IN PROGESS WORK IN PROGESS WORK IN PROGESS WORK IN PROGESS 
+                 */
 
-		std::vector<std::thread> threads;
+                std::vector<std::thread> threads;
 
-		for(int i = 0; i < cmdl.ncpu(); ++i) {
-			threads.push_back( std::thread([&,this,i] {__dock_fragment(i, gpoints, gpoints0, cmdl);} ) );
-		}
-		for(auto& thread : threads) {
-			thread.join();
-		}
-		
-		cout << "Done with fragment docking" << std::endl;
+                for(int i = 0; i < cmdl.ncpu(); ++i) {
+                        threads.push_back( std::thread([&,this,i] {__dock_fragment(i, gpoints, gpoints0, cmdl);} ) );
+                }
+                for(auto& thread : threads) {
+                        thread.join();
+                }
+                
+                cout << "Done with fragment docking" << std::endl;
 
 	}
 
@@ -125,7 +131,7 @@ namespace Program {
 			dbgmsg("Reading: " << seed.name() << endl);
 			try {
 				boost::filesystem::path p (__name);
-				p = p / __cmdl.top_seeds_dir() / seed.name() / __cmdl.top_seeds_file();
+				p = p / __cmdl.get_string_option("top_seeds_dir") / seed.name() / __cmdl.get_string_option("top_seeds_file");
 				Molib::PDBreader spdb (p.string(), Molib::PDBreader::first_model, 1);
 
 				Molib::Molecules seed_molec = spdb.parse_molecule();

@@ -37,17 +37,6 @@ set( all_needed_libraries
      ${additional_libraries}
    )
 
-# Original, to be deprecated programs
-add_executable( candock candock.cpp )
-add_executable( genpot  genpot.cpp )
-add_executable( test_minimization test_minimization.cpp )
-add_executable( test_fragmenting test_fragmenting.cpp )
-add_executable( test_bsite test_bsite.cpp )
-add_executable( test_clq test_clq.cpp )
-add_executable( test_link test_link.cpp )
-add_executable( test_singlepoint test_singlepoint.cpp )
-add_executable( test_cofactor test_cofactor.cpp )
-
 # New programs with new features that change functionality
 add_executable( cd_check_options  cd_check_options.cpp )
 add_executable( cd_bsite_probis   cd_bsite_probis.cpp )
@@ -61,16 +50,6 @@ if(CUDA_FOUND)
 cuda_add_executable( cuda_link_fragments cd_link_fragments.cpp )
 endif(CUDA_FOUND)
 
-target_link_libraries( candock ${all_needed_libraries} )
-target_link_libraries( genpot ${all_needed_libraries} )
-target_link_libraries( test_minimization ${all_needed_libraries} )
-target_link_libraries( test_fragmenting ${all_needed_libraries} )
-target_link_libraries( test_bsite ${all_needed_libraries} )
-target_link_libraries( test_clq ${all_needed_libraries} )
-target_link_libraries( test_link ${all_needed_libraries} )
-target_link_libraries( test_singlepoint ${all_needed_libraries} )
-target_link_libraries( test_cofactor ${all_needed_libraries} )
-
 target_link_libraries( cd_check_options  ${all_needed_libraries} )
 target_link_libraries( cd_bsite_probis   ${all_needed_libraries} )
 target_link_libraries( cd_prep_fragments ${all_needed_libraries} )
@@ -82,16 +61,7 @@ if(CUDA_FOUND)
 target_link_libraries( cuda_link_fragments ${all_needed_libraries} )
 endif(CUDA_FOUND)
 
-install( TARGETS
-    candock genpot
-    test_minimization
-    test_fragmenting
-    test_bsite
-    test_clq
-    test_link
-    test_singlepoint
-    test_cofactor
-    
+install( TARGETS    
     cd_check_options
     cd_bsite_probis
     cd_prep_fragments

@@ -83,29 +83,29 @@ namespace Program {
 	void Target::dock_fragments(const FragmentLigands& ligand_fragments, const CmdLnOpts& cmdl) {
 		for ( auto &a : __preprecs ) {
 
-			/* Read distributions file and initialize scores
-			* 
-			*/
+                        /* Read distributions file and initialize scores
+                        * 
+                        */
 
-			std::unique_ptr<Molib::Score> score (new Molib::Score(cmdl.ref_state(), cmdl.comp(),
-																  cmdl.rad_or_raw(), cmdl.dist_cutoff(),
-																  cmdl.step_non_bond()));
+                        std::unique_ptr<Molib::Score> score (new Molib::Score(cmdl.get_string_option("ref"), cmdl.get_string_option("comp"),
+                                                                              cmdl.get_string_option("func"),cmdl.get_int_option("cutoff"),
+                                                                              cmdl.get_double_option("step")));
 
-			score->define_composition(__receptors.get_idatm_types(),
-									ligand_fragments.ligand_idatm_types())
-									.process_distributions_file(cmdl.distributions_file())
-									.compile_scoring_function()
-									.parse_objective_function(cmdl.obj_dir(), cmdl.scale_non_bond());
+                        score->define_composition(__receptors.get_idatm_types(),
+                                                   ligand_fragments.ligand_idatm_types())
+                                                 .process_distributions_file(cmdl.get_string_option("dist"))
+                                                 .compile_scoring_function()
+                                                 .parse_objective_function(cmdl.get_string_option("obj_dir"), cmdl.get_double_option("scale"));
 
 			a.score = std::move(score);
 
 			// Prepare the receptor for docking to
 			std::unique_ptr<OMMIface::ForceField> ffield ( new OMMIface::ForceField);
 
-			ffield->parse_gaff_dat_file(cmdl.gaff_dat_file())
-				.add_kb_forcefield(*a.score, cmdl.step_non_bond())
-				.parse_forcefield_file(cmdl.amber_xml_file())
-				.parse_forcefield_file(cmdl.water_xml_file());
+			ffield->parse_gaff_dat_file(cmdl.get_string_option("gaff_dat"))
+				.add_kb_forcefield(*a.score, cmdl.get_double_option("step"))
+				.parse_forcefield_file(cmdl.get_string_option("amber_xml"))
+				.parse_forcefield_file(cmdl.get_string_option("water_xml"));
 
 			a.ffield = std::move(ffield);
 
@@ -152,10 +152,10 @@ namespace Program {
 
 			std::unique_ptr<design::Design> designer( new design::Design( a.dockedlig->top_poses().first() ));
 			if (! seeds_to_add.empty() )
-				designer->functionalize_hydrogens_with_fragments(common::read_top_seeds_files(seeds_to_add,
-																 Path::join(a.protein.name(), cmdl.top_seeds_dir()),
-																 cmdl.top_seeds_file(), cmdl.top_percent() ),
-																 cmdl.tol_seed_dist(), cmdl.clash_coeff() );
+                                designer->functionalize_hydrogens_with_fragments(common::read_top_seeds_files(seeds_to_add,
+                                                                                    Path::join(a.protein.name(), cmdl.get_string_option("top_seeds_dir")),
+                                                                                    cmdl.get_string_option("top_seeds_file"), cmdl.get_double_option("top_percent")),
+                                                                                    cmdl.get_double_option("tol_seed_dist"), cmdl.get_double_option("clash_coeff") );
 
 			const vector<string>& h_single_atoms = cmdl.get_string_vector("add_single_atoms");
 			const vector<string>& a_single_atoms = cmdl.get_string_vector("change_terminal_atom");
@@ -167,7 +167,7 @@ namespace Program {
 #ifndef NDEBUG
 			inout::output_file(designer->get_internal_designs(), "internal_designs.pdb");
 #endif
-			inout::output_file(designer->prepare_designs(cmdl.seeds_file()), "designed.pdb");
+			inout::output_file(designer->prepare_designs(cmdl.get_string_option("seeds")), "designed.pdb");
 			ligand_fragments.add_seeds_from_molecules(designer->designs(), cmdl);
 			a.prepseeds->run_step(cmdl);
 			a.dockedlig->link_ligands(designer->designs(), cmdl);
