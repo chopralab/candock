@@ -366,22 +366,18 @@ namespace Program {
 	}
 
         const std::string& CmdLnOpts::get_string_option(const std::string& option) const {
-                cout << "String: " << option << endl;
                 return __vm[option].as<std::string>();
         }
 
         int CmdLnOpts::get_int_option           (const std::string& option) const {
-                cout << "Int: " << option << endl;
                 return __vm[option].as<int>();
         }
 
         double CmdLnOpts::get_double_option     (const std::string& option) const {
-                cout << "Double: " << option << endl;
                 return __vm[option].as<double>();
         }
 
         bool CmdLnOpts::get_bool_option         (const std::string& option) const {
-                cout << "Bool: " << option << endl;
                 return __vm[option].as<bool>();
         }
 
