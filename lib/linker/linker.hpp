@@ -36,9 +36,12 @@ namespace Linker {
 	class Linker {
 	
 		class GenericLinker {
+        public:
+            typedef map<const Segment*, State*> SegStateMap;
+            
 		protected:
 			typedef map<const Molib::Atom*, Segment*> AtomToSegment;
-			typedef map<const Segment*, State*> SegStateMap;
+			
 			static const int MAX_ENERGY = 999999;
 			typedef multiset<Partial, Partial::comp> PriorityQueue;
 	

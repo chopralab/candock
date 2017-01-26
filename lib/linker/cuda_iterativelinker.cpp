@@ -33,19 +33,23 @@ namespace Linker {
         cout << "Segment Graph Size " << segment_graph_size << endl;
         cout << "Iter " << iter << endl;
         
+        int num_states = 0, num_docked_seeds = 0;
 
-
-		for (auto &pstate : start_conformation.get_states())
+		for (auto &pstate : start_conformation.get_states()) {
 			states.push_back(unique_ptr<State>(new State(*pstate)));
+            num_states++;
+        }
 		if (start_conformation.empty())
 			throw Error ("die : at least one docked anchor state is required for linking");
 		SegStateMap docked_seeds;
-		for (auto &pstate : states) 
+		for (auto &pstate : states) { 
 			docked_seeds.insert({&pstate->get_segment(), &*pstate});
+            num_docked_seeds++;
+        }
 #ifdef COMPILE_CUDA
         //Move data to GPU
         cuda_linker cuda;
-        cuda.setup(segment_graph_size, start_conformation, states, iter);
+        cuda.setup(segment_graph_size, states, iter, num_states, num_docked_seeds);
 #endif
 		set<State::ConstPair> failed_state_pairs;
 		Partial min_conformation(MAX_ENERGY);
@@ -177,7 +181,7 @@ namespace Linker {
 		Partial::Vec possibles_w_energy;
 		{
 			// find all maximum cliques with the number of seed segments of __max_clique_size
-			Maxclique m(conn);
+			Maxclique m(conn);       
 			
 			const int mcq_size = std::min(__max_clique_size, static_cast<int>(seed_graph.size()) );
 			const vector<vector<unsigned short int>> &qmaxes = m.mcq(mcq_size);
