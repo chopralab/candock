@@ -28,7 +28,7 @@ endif(CUDA_FOUND)
 
 
 #Change to c++11 due to gnu specific extensions that break cuda
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -g -Wall -Werror")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wall -Werror")
 set(JSONCPP_INCLUDE_DIR "foreign/jsoncpp/include" "foreign/jsoncpp/src" )
 
 include_directories(${Boost_INCLUDE_DIRS})
