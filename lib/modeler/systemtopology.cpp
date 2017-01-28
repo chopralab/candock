@@ -26,8 +26,8 @@ namespace OMMIface {
 		// Load all available OpenMM plugins from their default location.
 		
 		dbgmsg("before loading plugins");
-		OpenMM::Platform::loadPluginsFromDirectory
-			(OpenMM::Platform::getDefaultPluginsDirectory());
+		//OpenMM::Platform::loadPluginsFromDirectory
+			//(OpenMM::Platform::getDefaultPluginsDirectory());
 		registerKBReferenceKernelFactories();
 		dbgmsg("after loading plugins");
 		
