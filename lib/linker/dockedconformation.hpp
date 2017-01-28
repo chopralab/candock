@@ -24,9 +24,9 @@ namespace Linker {
 		double get_energy() { return __energy; }
 		double get_energy() const { return __energy; }
 
-		bool operator<( const DockedConformation& other ) { return this->get_energy() < other.get_energy(); }
 		static void sort(DockedConformation::Vec &v);
 
+        friend bool operator<( const DockedConformation& first, const DockedConformation& second ) { return first.get_energy() < second.get_energy(); }
 		friend ostream& operator<<(ostream& os, const DockedConformation &conf);
 	};
 	
