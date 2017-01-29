@@ -1,7 +1,8 @@
 #include <iostream>
-#include "program/cmdlnopts.hpp"
-#include "program/fragmentligands.hpp"
 #include "program/target.hpp"
+#include "program/fragmentligands.hpp"
+#include "program/cmdlnopts.hpp"
+#include "version.hpp"
 
 ////////////////// DOCKING OF FRAGMENTS ///////////////////////////
 
@@ -10,18 +11,19 @@ using namespace std;
 int main(int argc, char* argv[]) {
         try {
 
-                Program::CmdLnOpts *cmdlopts = new Program::CmdLnOpts;
-
-                cmdlopts->init(argc, argv, Program::CmdLnOpts::STARTING |
-                                           Program::CmdLnOpts::FORCE_FIELD |
-                                           Program::CmdLnOpts::SCORING |
-                                           Program::CmdLnOpts::FRAG_DOCKING );
+                help::Options::set_options( new Program::CmdLnOpts (
+                    argc, argv, Program::CmdLnOpts::STARTING |
+                                Program::CmdLnOpts::FORCE_FIELD |
+                                Program::CmdLnOpts::SCORING |
+                                Program::CmdLnOpts::FRAG_DOCKING ));
 
                 Benchmark main_timer;
                 main_timer.display_time("Starting");
-                cout << *cmdlopts << endl;
 
-                help::Options::set_options(cmdlopts);
+                cout << Version::get_banner()   <<
+                        Version::get_version()  <<
+                        Version::get_run_info() <<
+                        help::Options::get_options()->configuration_file() << endl;
 
                 Program::FragmentLigands ligand_fragmenter;
                 ligand_fragmenter.run_step();

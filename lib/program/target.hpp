@@ -1,8 +1,6 @@
 #ifndef TARGET_H
 #define TARGET_H
 
-#include "cmdlnopts.hpp"
-
 #include "findcentroids.hpp"
 #include "dockfragments.hpp"
 #include "linkfragments.hpp"

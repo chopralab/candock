@@ -1,6 +1,7 @@
 #include <iostream>
 #include "program/cmdlnopts.hpp"
 #include "program/target.hpp"
+#include "version.hpp"
 
 ////////////////// BINDING SITE DETECTION USING PROBIS ///////////////////////////
 
@@ -9,15 +10,18 @@ using namespace std;
 int main(int argc, char* argv[]) {
         try {
 
-                Program::CmdLnOpts *cmdlopts = new Program::CmdLnOpts;
-                cmdlopts->init(argc, argv, Program::CmdLnOpts::STARTING |
-                                           Program::CmdLnOpts::PROBIS);
+                help::Options::set_options( new Program::CmdLnOpts(
+                    argc, argv, Program::CmdLnOpts::STARTING |
+                                Program::CmdLnOpts::PROBIS));
 
                 Benchmark main_timer;
-                main_timer.display_time("Started");
-                cout << *cmdlopts << endl;
+                main_timer.display_time("Starting");
 
-                help::Options::set_options(cmdlopts);
+                cout << Version::get_banner()   <<
+                        Version::get_version()  <<
+                        Version::get_run_info() <<
+                        help::Options::get_options()->configuration_file() << endl;
+
 
                 Program::Target targets (cmdl.get_string_option("receptor"));
                 targets.find_centroids();

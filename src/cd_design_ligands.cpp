@@ -3,21 +3,11 @@
 #include <typeinfo>
 
 #include "program/cmdlnopts.hpp"
-#include "program/findcentroids.hpp"
-#include "program/fragmentligands.hpp"
-#include "program/dockfragments.hpp"
-#include "program/linkfragments.hpp"
-
-#include "pdbreader/molecules.hpp"
-#include "docker/gpoints.hpp"
-#include "docker/conformations.hpp"
-#include "modeler/systemtopology.hpp"
-#include "helper/inout.hpp"
 #include "program/target.hpp"
-#include "design/design.hpp"
+#include "program/fragmentligands.hpp"
+#include "modeler/systemtopology.hpp"
 
-#include <algorithm>
-#include "program/common.hpp"
+#include "version.hpp"
 
 using namespace std;
 
@@ -42,14 +32,16 @@ using namespace std;
 
 int main(int argc, char* argv[]) {
         try {
-                Program::CmdLnOpts *cmdlopts = new Program::CmdLnOpts;
-                cmdlopts->init(argc, argv, Program::CmdLnOpts::DESIGN);
+                help::Options::set_options( new Program::CmdLnOpts( 
+                    argc, argv, Program::CmdLnOpts::DESIGN));
 
                 Benchmark main_timer;
-                main_timer.display_time("started");
-                cout << *cmdlopts << endl;
+                main_timer.display_time("Starting");
 
-                help::Options::set_options(cmdlopts);
+                cout << Version::get_banner()   <<
+                        Version::get_version()  <<
+                        Version::get_run_info() <<
+                        help::Options::get_options()->configuration_file() << endl;
 
                 Program::FragmentLigands ligand_fragmenter;
                 ligand_fragmenter.run_step();
@@ -74,7 +66,7 @@ int main(int argc, char* argv[]) {
 
                 targets.design_ligands(ligand_fragmenter, solo_target_seeds);
 
-                main_timer.display_time("finished");
+                main_timer.display_time("Finished");
         } catch ( exception& e) {
                 cerr << e.what() << endl;
                 return 1;

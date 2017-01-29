@@ -10,7 +10,7 @@ namespace po = boost::program_options;
 
 namespace Program {
 
-	void CmdLnOpts::init (int argc, char *argv[], int opts_to_parse) {
+	void CmdLnOpts::__init (int argc, char *argv[], int opts_to_parse) {
  
 		__program_name = argv[0];
 
@@ -21,7 +21,6 @@ namespace Program {
 			po::options_description generic ("Generic options");
 			generic.add_options()
 			("help,h", "Show this help")
-			("version,v", "Print the program version")
 			("quiet,q", "Quiet mode (default is verbose)")
 			("conifg,c", po::value<std::string> (&config_file)->default_value (""), "Configuration File")
 			("ncpu",     po::value<int> (&__ncpu)             ->default_value(-1),
@@ -272,13 +271,7 @@ namespace Program {
 					print_options.add (design_step);
 				}
 
-				
 				std::cout << print_options << std::endl;
-				exit (0);
-			}
-
-			if (__vm.count ("version")) {
-				print_version();
 				exit (0);
 			}
 
@@ -366,22 +359,18 @@ namespace Program {
 	}
 
         const std::string& CmdLnOpts::get_string_option(const std::string& option) const {
-                cout << "String: " << option << endl;
                 return __vm[option].as<std::string>();
         }
 
         int CmdLnOpts::get_int_option           (const std::string& option) const {
-                cout << option << endl;
                 return __vm[option].as<int>();
         }
 
         double CmdLnOpts::get_double_option     (const std::string& option) const {
-            cout << option << endl;
                 return __vm[option].as<double>();
         }
 
         bool CmdLnOpts::get_bool_option         (const std::string& option) const {
-            cout << option << endl;
                 return __vm[option].as<bool>();
         }
 
@@ -389,4 +378,29 @@ namespace Program {
                 return __vm[option].as<std::vector<std::string>>();
         }
 
+        std::ostream & operator<<(std::ostream &stream, const CmdLnOpts &cmdl_) {
+                for ( const auto& a : cmdl_.__vm ) {
+                        stream << std::setw(22)<< a.first << " = ";
+                        if        ( auto v = boost::any_cast<std::string>(&a.second.value()) ) {
+                                stream << std::setw(47) << *v;
+                        } else if ( auto v = boost::any_cast<int>(&a.second.value()) ) {
+                                stream << std::setw(47) << *v;
+                        } else if ( auto v = boost::any_cast<double>(&a.second.value()) ) {
+                                stream << std::setw(47) << *v;
+                        } else if ( auto v = boost::any_cast<bool>(&a.second.value()) ) {
+                                stream << std::setw(47) << *v;
+                        } else if ( auto v = boost::any_cast<std::vector<std::string>>(&a.second.value()) ) {
+                                std::string combination("");
+                                for ( const auto& s : *v ) {
+                                        combination += s;
+                                        combination += ", ";
+                                }
+                                stream << std::setw(47) << combination;
+                        }
+
+                        stream << std::endl;
+                }
+
+                return stream;
+        }
 }

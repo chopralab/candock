@@ -1,5 +1,6 @@
 #include <iostream>
 #include "program/cmdlnopts.hpp"
+#include "version.hpp"
 
 ////////////////// BINDING SITE DETECTION USING PROBIS ///////////////////////////
 
@@ -8,10 +9,12 @@ using namespace std;
 int main(int argc, char* argv[]) {
         try {
 
-                Program::CmdLnOpts *cmdlopts = new Program::CmdLnOpts;
+                help::Options::set_options(new Program::CmdLnOpts(argc, argv));
 
-                cmdlopts->init(argc, argv);
-                cout << *cmdlopts << endl;
+                cout << Version::get_banner()   <<
+                        Version::get_version()  <<
+                        Version::get_run_info() <<
+                        help::Options::get_options()->configuration_file() << endl;
                 
         } catch (exception& e) {
                 cerr << e.what() << endl;
