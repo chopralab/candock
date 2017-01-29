@@ -24,11 +24,11 @@ namespace Program {
 		std::mutex __concurrent_numbering;
 		int __ligand_cnt = 0;
 
-		void __link_ligand ( Molib::Molecule& ligand, const CmdLnOpts& cmdl, const OMMIface::ForceField& ffield);
+		void __link_ligand ( Molib::Molecule& ligand, const OMMIface::ForceField& ffield);
 	protected:
-		virtual bool __can_read_from_files ( const CmdLnOpts& cmdl );
-		virtual void __read_from_files ( const CmdLnOpts& cmdl );
-		virtual void __continue_from_prev ( const CmdLnOpts& cmdl );
+		virtual bool __can_read_from_files ();
+		virtual void __read_from_files ();
+		virtual void __continue_from_prev ();
 	public:
 		LinkFragments ( const Molib::Molecule& receptor,
 						const Molib::Score& score,
@@ -37,7 +37,7 @@ namespace Program {
 						__receptor(receptor), __score(score),
 						__ffield(ffield), __gridrec(gridrec) {};
 
-		void link_ligands (const Molib::Molecules& ligands, const CmdLnOpts &cmdl);
+		void link_ligands (const Molib::Molecules& ligands);
 		const Molib::Molecules& top_poses() const { return __all_top_poses; }
 	};
 }

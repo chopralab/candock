@@ -8,7 +8,7 @@
 
 namespace Program {
 
-	bool LinkFragments::__can_read_from_files ( const CmdLnOpts& cmdl )
+	bool LinkFragments::__can_read_from_files ()
 	{
 		boost::regex regex;
 		regex.assign("REMARK   5 MOLECULE (\\w*)");
@@ -35,12 +35,12 @@ namespace Program {
 		return is_done;
 	}
 
-	void LinkFragments::__read_from_files ( const CmdLnOpts& cmdl )
+	void LinkFragments::__read_from_files ()
 	{
 		cout << "Linking for all molecules in " << cmdl.get_string_option("prep") << " for " << __receptor.name() << " is complete, skipping." << endl;
 	}
 
-	void LinkFragments::__link_ligand( Molib::Molecule& ligand, const CmdLnOpts& cmdl, const OMMIface::ForceField& ffield ) {
+	void LinkFragments::__link_ligand( Molib::Molecule& ligand, const OMMIface::ForceField& ffield ) {
 		boost::filesystem::path p(__receptor.name());
 		p = p / cmdl.get_string_option("docked_dir") / (ligand.name() + ".pdb");
 		if ( inout::Inout::file_size(p.string()) > 0) {
@@ -76,7 +76,7 @@ namespace Program {
                          *
                          */
                         OMMIface::Modeler modeler(ffield, cmdl.get_string_option("fftype"), cmdl.get_int_option("cutoff"),
-                                                  cmdl.get_bool_option("mini_tol"), cmdl.get_int_option("max_iter"), cmdl.get_int_option("update_freq"), 
+                                                  cmdl.get_double_option("mini_tol"), cmdl.get_int_option("max_iter"), cmdl.get_int_option("update_freq"), 
                                                   cmdl.get_double_option("pos_tol"), false, 2.0);
 
                         /**
@@ -86,14 +86,14 @@ namespace Program {
                          */
                         Linker::Linker linker(modeler, __receptor, ligand, top_seeds, __gridrec, __score, 
                                         cmdl.get_bool_option("cuda"), cmdl.get_bool_option("iterative"),
-                                        cmdl.get_double_option("cutoff"), cmdl.get_int_option("spin"), 
+                                        cmdl.get_int_option("cutoff"), cmdl.get_int_option("spin"), 
                                         cmdl.get_double_option("tol_seed_dist"), cmdl.get_double_option("lower_tol_seed_dist"), 
                                         cmdl.get_double_option("upper_tol_seed_dist"),
                                         cmdl.get_int_option("max_possible_conf"),
                                         cmdl.get_int_option("link_iter"),
                                         cmdl.get_double_option("clash_coeff"), cmdl.get_double_option("docked_clus_rad"), 
                                         cmdl.get_double_option("max_allow_energy"), cmdl.get_int_option("max_num_possibles"),
-                                        cmdl.get_int_option("max_clique_size"), cmdl.get_int_option("max_iterations_final"));
+                                        cmdl.get_int_option("max_clique_size"), cmdl.get_int_option("max_iter_final"));
 
 			Linker::DockedConformation::Vec docks = linker.link();
 			Linker::DockedConformation::sort(docks);
@@ -114,7 +114,7 @@ namespace Program {
 		} 
 	}
 
-	void LinkFragments::__continue_from_prev ( const CmdLnOpts& cmdl )
+	void LinkFragments::__continue_from_prev ( )
 	{
 
 		cout << "Starting to dock the fragments into originally given ligands" << endl;
@@ -136,7 +136,7 @@ namespace Program {
 					 */
 					common::change_residue_name(ligand, __concurrent_numbering, __ligand_cnt);
 					ffcopy.insert_topology(ligand);
-					__link_ligand(ligand, cmdl, ffcopy);
+					__link_ligand(ligand, ffcopy);
 					ffcopy.erase_topology(ligand); // he he
 					ligands.clear();
 				}
@@ -150,7 +150,7 @@ namespace Program {
 		cout << "Linking of fragments is complete" << endl;
 	}
 
-	void LinkFragments::link_ligands(const Molib::Molecules& ligands, const CmdLnOpts& cmdl) {
+	void LinkFragments::link_ligands(const Molib::Molecules& ligands) {
 		size_t j = 0;
 
 		std::vector<std::thread> threads;
@@ -177,7 +177,7 @@ namespace Program {
 					 */
 					common::change_residue_name(ligand, __concurrent_numbering, __ligand_cnt);
 					ffcopy.insert_topology(ligand);
-					__link_ligand(ligand, cmdl, ffcopy);
+					__link_ligand(ligand, ffcopy);
 					ffcopy.erase_topology(ligand); // he he
 				}
 			} ) );

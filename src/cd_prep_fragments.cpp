@@ -7,24 +7,30 @@
 using namespace std;
 
 int main(int argc, char* argv[]) {
-	try {
+        try {
 
-		Program::CmdLnOpts cmdl;
+                Program::CmdLnOpts *cmdlopts = new Program::CmdLnOpts;
+                cmdlopts->init(argc, argv, Program::CmdLnOpts::STARTING |
+                                           Program::CmdLnOpts::LIG_FRAMGENT );
 
-		cmdl.init(argc, argv, Program::CmdLnOpts::STARTING |
-		                      Program::CmdLnOpts::LIG_FRAMGENT );
-		cout << cmdl << endl;
+                cout << *cmdlopts << endl;
 
-		cmdl.display_time("Starting");
+                Benchmark main_timer;
+                main_timer.display_time("started");
+                cout << *cmdlopts << endl;
 
-		Program::FragmentLigands ligand_fragmenter;
-		ligand_fragmenter.run_step(cmdl);
+                help::Options::set_options(cmdlopts);
 
-		cmdl.display_time("Finished");
+                main_timer.display_time("Starting");
 
-	} catch (exception& e) {
-		cerr << e.what() << endl;
-		return 1;
-	}
-	return 0;
+                Program::FragmentLigands ligand_fragmenter;
+                ligand_fragmenter.run_step();
+
+                main_timer.display_time("Finished");
+
+        } catch (exception& e) {
+                cerr << e.what() << endl;
+                return 1;
+        }
+        return 0;
 }

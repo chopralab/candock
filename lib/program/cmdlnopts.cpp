@@ -86,7 +86,7 @@ namespace Program {
 			frag_dock_options.add_options()
 			("top_seeds_dir",  po::value<std::string> ()->default_value ("top_seeds"),
 			 "Directory for saving top docked seeds")
-			("topseedsfile",   po::value<std::string> ()->default_value ("top_seeds.pdb"),
+			("top_seeds_file",   po::value<std::string> ()->default_value ("top_seeds.pdb"),
 			 "Top seeds output file")
 			("gridpdb_hcp",    po::value<std::string> ()->default_value ("gridpdb_hcp.pdb"),
 			 "Grid pdb hcp file for output")
@@ -366,18 +366,22 @@ namespace Program {
 	}
 
         const std::string& CmdLnOpts::get_string_option(const std::string& option) const {
+                cout << "String: " << option << endl;
                 return __vm[option].as<std::string>();
         }
 
         int CmdLnOpts::get_int_option           (const std::string& option) const {
+                cout << option << endl;
                 return __vm[option].as<int>();
         }
 
         double CmdLnOpts::get_double_option     (const std::string& option) const {
+            cout << option << endl;
                 return __vm[option].as<double>();
         }
 
         bool CmdLnOpts::get_bool_option         (const std::string& option) const {
+            cout << option << endl;
                 return __vm[option].as<bool>();
         }
 

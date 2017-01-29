@@ -1,14 +1,15 @@
 #ifndef CMDLNOPTS_H
 #define CMDLNOPTS_H
 
-#include <boost/program_options.hpp>
-#include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/asio/ip/host_name.hpp>
+#include <boost/program_options.hpp>
 #include "helper/error.hpp"
 #include "helper/options.hpp"
 #include "version.h"
 #include <thread>
 #include <vector>
+#include <iostream>
+#include <iomanip>
 
 namespace Program {
 
@@ -50,11 +51,10 @@ namespace Program {
 		};
 
 		void init (int argc, char *argv[], int opts_to_parse = ALL_OPTIONS);
-		void display_time (std::string what) const {
-			cout << what << " on " << boost::posix_time::to_simple_string (boost::posix_time::second_clock::local_time()) << std::endl;
-		}
 
 		// interface
+
+		
 
 		const std::string& get_string_option (const std::string& option) const;
 		bool        get_bool_option   (const std::string& option) const;
@@ -100,11 +100,11 @@ namespace Program {
 
 		}
 
-		friend std::ostream &operator<< (std::ostream &stream, const CmdLnOpts &cmdl) {
+		friend std::ostream &operator<< (std::ostream &stream, const CmdLnOpts &cmdl_) {
 			
-			cmdl.print_version();
+			cmdl_.print_version();
 
-			for ( const auto& a : cmdl.__vm ) {
+			for ( const auto& a : cmdl_.__vm ) {
 				stream << std::setw(22)<< a.first << " = ";
 				if        ( auto v = boost::any_cast<std::string>(&a.second.value()) ) {
 					stream << std::setw(47) << *v;

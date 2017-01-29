@@ -8,30 +8,33 @@
 using namespace std;
 
 int main(int argc, char* argv[]) {
-	try {
+        try {
 
-		Program::CmdLnOpts cmdl;
+                Program::CmdLnOpts *cmdlopts = new Program::CmdLnOpts;
 
-		cmdl.init(argc, argv, Program::CmdLnOpts::STARTING |
-		                      Program::CmdLnOpts::FORCE_FIELD |
-		                      Program::CmdLnOpts::SCORING |
-		                      Program::CmdLnOpts::FRAG_DOCKING );
-		cout << cmdl << endl;
+                cmdlopts->init(argc, argv, Program::CmdLnOpts::STARTING |
+                                           Program::CmdLnOpts::FORCE_FIELD |
+                                           Program::CmdLnOpts::SCORING |
+                                           Program::CmdLnOpts::FRAG_DOCKING );
 
-		cmdl.display_time("Starting");
+                Benchmark main_timer;
+                main_timer.display_time("Starting");
+                cout << *cmdlopts << endl;
 
-		Program::FragmentLigands ligand_fragmenter;
-		ligand_fragmenter.run_step(cmdl);
+                help::Options::set_options(cmdlopts);
 
-		Program::Target targets (cmdl.get_string_option("receptor"));
-		targets.find_centroids(cmdl);
-		targets.dock_fragments(ligand_fragmenter, cmdl);
+                Program::FragmentLigands ligand_fragmenter;
+                ligand_fragmenter.run_step();
 
-		cmdl.display_time("Finished");
+                Program::Target targets (cmdl.get_string_option("receptor"));
+                targets.find_centroids();
+                targets.dock_fragments(ligand_fragmenter);
 
-	} catch (exception& e) {
-		cerr << e.what() << endl;
-		return 1;
-	}
-	return 0;
+                main_timer.display_time("Finished");
+
+        } catch (exception& e) {
+                cerr << e.what() << endl;
+                return 1;
+        }
+        return 0;
 }

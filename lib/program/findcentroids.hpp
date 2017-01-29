@@ -10,9 +10,9 @@ namespace Program {
 	class FindCentroids : public ProgramStep
 	{
 	protected:
-		virtual bool __can_read_from_files(const CmdLnOpts& cmdl);
-		virtual void __read_from_files(const CmdLnOpts& cmdl);
-		virtual void __continue_from_prev(const CmdLnOpts& cmdl);
+		virtual bool __can_read_from_files();
+		virtual void __read_from_files();
+		virtual void __continue_from_prev();
 		
 		const Molib::Molecule& __receptor;
 

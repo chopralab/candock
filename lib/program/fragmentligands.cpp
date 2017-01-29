@@ -5,16 +5,16 @@
 
 #include "helper/inout.hpp"
 #include "common.hpp"
-#include "cmdlnopts.hpp"
 #include "pdbreader/molecules.hpp"
+#include "helper/options.hpp"
 
 namespace Program {
 	
-	bool FragmentLigands::__can_read_from_files( const CmdLnOpts& cmdl ) {
+	bool FragmentLigands::__can_read_from_files() {
 		return inout::Inout::file_size( cmdl.get_string_option("prep") ) > 0 && inout::Inout::file_size( cmdl.get_string_option("seeds") ) > 0;
 	}
 
-	void FragmentLigands::__read_from_files( const CmdLnOpts& cmdl) {
+	void FragmentLigands::__read_from_files() {
 
 		if ( inout::Inout::file_size( cmdl.get_string_option("seeds_pdb") ) <= 0 ) {
 
@@ -46,7 +46,7 @@ namespace Program {
 		}
 	}
 
-	void FragmentLigands::__fragment_ligands( Molib::PDBreader& lpdb, const CmdLnOpts& cmdl, const bool write_out_for_linking, const bool no_rotatable_bond) {
+	void FragmentLigands::__fragment_ligands( Molib::PDBreader& lpdb, const bool write_out_for_linking, const bool no_rotatable_bond) {
 		bool thread_is_not_done;
 		Molib::Molecules ligands;
 		{
@@ -88,7 +88,7 @@ namespace Program {
 		}
 	}
 
-	void FragmentLigands::__continue_from_prev( const CmdLnOpts& cmdl) {
+	void FragmentLigands::__continue_from_prev() {
 
 		if (inout::Inout::file_size(cmdl.get_string_option("ligand")) > 0) {
 			cout << "Fragmenting files in " << cmdl.get_string_option("ligand") << endl;
@@ -100,7 +100,7 @@ namespace Program {
 			std::vector<std::thread> threads1;
 
 			for(int i = 0; i < cmdl.ncpu(); ++i) {
-				threads1.push_back( std::thread([&,this] {__fragment_ligands(lpdb, cmdl, true, false);} ) );
+				threads1.push_back( std::thread([&,this] {__fragment_ligands(lpdb, true, false);} ) );
 			}
 			for(auto& thread : threads1) {
 				thread.join();
@@ -120,7 +120,7 @@ namespace Program {
 			std::vector<std::thread> threads2;
 
 			for(int i = 0; i < cmdl.ncpu(); ++i) {
-				threads2.push_back( std::thread([&,this] {__fragment_ligands(lpdb_additional, cmdl, false, false);} ) );
+				threads2.push_back( std::thread([&,this] {__fragment_ligands(lpdb_additional, false, false);} ) );
 			}
 			for(auto& thread : threads2) {
 				thread.join();
@@ -139,7 +139,7 @@ namespace Program {
 			std::vector<std::thread> threads3;
 
 			for(int i = 0; i < cmdl.ncpu(); ++i) {
-				threads3.push_back( std::thread([&,this] {__fragment_ligands(lpdb_additional, cmdl, false, true);} ) );
+				threads3.push_back( std::thread([&,this] {__fragment_ligands(lpdb_additional, false, true);} ) );
 			}
 			for(auto& thread : threads3) {
 				thread.join();
@@ -156,7 +156,7 @@ namespace Program {
 		inout::output_file(__seeds, cmdl.get_string_option("seeds_pdb"), ios_base::out);
 	}
 
-	void FragmentLigands::add_seeds_from_molecules(const Molib::Molecules& molecules, const Program::CmdLnOpts& cmdl) {
+	void FragmentLigands::add_seeds_from_molecules(const Molib::Molecules& molecules) {
 		__ligand_idatm_types = molecules.get_idatm_types(__ligand_idatm_types);
 		common::create_mols_from_seeds(__added, __seeds, molecules);
 		__seeds.erase_properties();

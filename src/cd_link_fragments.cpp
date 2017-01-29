@@ -9,32 +9,34 @@
 using namespace std;
 
 int main(int argc, char* argv[]) {
-	try {
+        try {
 
-		Program::CmdLnOpts cmdl;
+                Program::CmdLnOpts *cmdlopts = new Program::CmdLnOpts;
+                cmdlopts->init(argc, argv, Program::CmdLnOpts::STARTING |
+                                           Program::CmdLnOpts::FORCE_FIELD |
+                                           Program::CmdLnOpts::SCORING |
+                                           Program::CmdLnOpts::LINKING );
 
-		cmdl.init(argc, argv, Program::CmdLnOpts::STARTING |
-		                      Program::CmdLnOpts::FORCE_FIELD |
-		                      Program::CmdLnOpts::SCORING |
-		                      Program::CmdLnOpts::LINKING );
-		cout << cmdl << endl;
+                Benchmark main_timer;
+                main_timer.display_time("started");
+                cout << *cmdlopts << endl;
 
-		cmdl.display_time("Starting");
+                help::Options::set_options(cmdlopts);
 
-		Program::FragmentLigands ligand_fragmenter;
-		ligand_fragmenter.run_step(cmdl);
+                Program::FragmentLigands ligand_fragmenter;
+                ligand_fragmenter.run_step();
 
-		Program::Target targets (cmdl.get_string_option("receptor"));
-		targets.find_centroids(cmdl);
-		targets.dock_fragments(ligand_fragmenter, cmdl);
-		OMMIface::SystemTopology::loadPlugins();
-		targets.link_fragments(cmdl);
+                Program::Target targets (cmdl.get_string_option("receptor"));
+                targets.find_centroids();
+                targets.dock_fragments(ligand_fragmenter);
+                OMMIface::SystemTopology::loadPlugins();
+                targets.link_fragments();
 
-		cmdl.display_time("Finished");
+                main_timer.display_time("Finished");
 
-	} catch (exception& e) {
-		cerr << e.what() << endl;
-		return 1;
-	}
-	return 0;
+        } catch (exception& e) {
+                cerr << e.what() << endl;
+                return 1;
+        }
+        return 0;
 }

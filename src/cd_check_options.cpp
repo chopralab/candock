@@ -6,16 +6,16 @@
 using namespace std;
 
 int main(int argc, char* argv[]) {
-	try {
+        try {
 
-		Program::CmdLnOpts cmdl;
+                Program::CmdLnOpts *cmdlopts = new Program::CmdLnOpts;
 
-		cmdl.init(argc, argv);
-		cout << cmdl << endl;
+                cmdlopts->init(argc, argv);
+                cout << *cmdlopts << endl;
                 
-	} catch (exception& e) {
-		cerr << e.what() << endl;
-		return 1;
-	}
-	return 0;
+        } catch (exception& e) {
+                cerr << e.what() << endl;
+                return 1;
+        }
+        return 0;
 }

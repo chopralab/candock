@@ -7,24 +7,27 @@
 using namespace std;
 
 int main(int argc, char* argv[]) {
-	try {
+        try {
 
-		Program::CmdLnOpts cmdl;
+                Program::CmdLnOpts *cmdlopts = new Program::CmdLnOpts;
+                cmdlopts->init(argc, argv, Program::CmdLnOpts::STARTING |
+                                           Program::CmdLnOpts::PROBIS);
 
-		cmdl.init(argc, argv, Program::CmdLnOpts::STARTING |
-		                      Program::CmdLnOpts::PROBIS);
-		cout << cmdl << endl;
+                Benchmark main_timer;
+                main_timer.display_time("Started");
+                cout << *cmdlopts << endl;
 
-		cmdl.display_time("Starting");
+                help::Options::set_options(cmdlopts);
 
-		Program::Target targets (cmdl.get_string_option("receptor"));
-		targets.find_centroids(cmdl);
+                Program::Target targets (cmdl.get_string_option("receptor"));
+                targets.find_centroids();
 
-		cmdl.display_time("Finished");
+                main_timer.display_time("Finished");
 
-	} catch (exception& e) {
-		cerr << e.what() << endl;
-		return 1;
-	}
-	return 0;
+
+        } catch (exception& e) {
+                cerr << e.what() << endl;
+                return 1;
+        }
+        return 0;
 }

@@ -2,17 +2,18 @@
 
 #include "helper/path.hpp"
 #include "helper/inout.hpp"
+#include "helper/options.hpp"
 
 namespace Program {
 
-	bool DockFragments::__can_read_from_files ( const CmdLnOpts& cmdl )
+	bool DockFragments::__can_read_from_files ()
 	{
 		bool all_seeds_are_present = true;
 
 		const Molib::Molecules& all_seeds = __fragmented_ligands.seeds();
 
                 // No early return so that we have the ability to redock missing seeds
-                const string &top_seeds_dir = cmdl.get_string_option("top_seeds_dir");
+                const string &top_seeds_dir = help::Options::get_options()->get_string_option("top_seeds_dir");
                 const string &top_seeds_file= cmdl.get_string_option("top_seeds_file");
 		for (const auto& seed : all_seeds) {
 			boost::filesystem::path p (__name);
@@ -23,12 +24,12 @@ namespace Program {
 		return all_seeds_are_present;
 	}
 
-	void DockFragments::__read_from_files ( const CmdLnOpts& cmdl )
+	void DockFragments::__read_from_files ()
 	{
 		cout << "All seeds are present in " << cmdl.get_string_option("top_seeds_dir") << " for " << __name << ". Docking of fragments skipped." << endl;
 	}
 
-	void DockFragments::__dock_fragment ( int start, const Docker::Gpoints& gpoints, const Docker::Gpoints& gpoints0, const CmdLnOpts& cmdl) {
+	void DockFragments::__dock_fragment ( int start, const Docker::Gpoints& gpoints, const Docker::Gpoints& gpoints0 ) {
 		// iterate over docked seeds and dock unique seeds
                 const string &top_seeds_dir = cmdl.get_string_option("top_seeds_dir");
                 const string &top_seeds_file= cmdl.get_string_option("top_seeds_file");
@@ -79,7 +80,7 @@ namespace Program {
 		}
 	}
 
-        void DockFragments::__continue_from_prev ( const CmdLnOpts& cmdl ) {
+        void DockFragments::__continue_from_prev () {
 
                 cout << "Docking fragments into: " << __name << "_" << cmdl.get_string_option("top_seeds_dir") << 
                         ". Files will be named: " << cmdl.get_string_option("top_seeds_file") << endl;
@@ -88,16 +89,16 @@ namespace Program {
                  * 
                  */
                 Docker::Gpoints gpoints(__score, __fragmented_ligands.ligand_idatm_types(), __found_centroids.centroids(),
-                                        __gridrec, cmdl.get_double_option("grid_spacing"), cmdl.get_int_option("cutoff"),
-                                        cmdl.get_double_option("excluded_radius"), 
-                                        cmdl.get_double_option("max_interatomic_distance"));
+                                        __gridrec, cmdl.get_double_option("grid"), cmdl.get_int_option("cutoff"),
+                                        cmdl.get_double_option("excluded"), 
+                                        cmdl.get_double_option("interatomic"));
                 inout::output_file(gpoints, Path::join(__name, cmdl.get_string_option("gridpdb_hcp")));
 
                 /* Create a zero centered centroid with 10 A radius (max fragment 
                  * radius) for getting all conformations of each seed
                  * 
                  */
-                Docker::Gpoints gpoints0(cmdl.get_double_option("grid_spacing"), cmdl.get_double_option("max_frag_radius"));
+                Docker::Gpoints gpoints0(cmdl.get_double_option("grid"), cmdl.get_double_option("max_frag_radius"));
 
                 /* Create template grids using ProBiS-ligands algorithm
                  * WORK IN PROGESS WORK IN PROGESS WORK IN PROGESS WORK IN PROGESS 
@@ -108,7 +109,7 @@ namespace Program {
                 std::vector<std::thread> threads;
 
                 for(int i = 0; i < cmdl.ncpu(); ++i) {
-                        threads.push_back( std::thread([&,this,i] {__dock_fragment(i, gpoints, gpoints0, cmdl);} ) );
+                        threads.push_back( std::thread([&,this,i] {__dock_fragment(i, gpoints, gpoints0);} ) );
                 }
                 for(auto& thread : threads) {
                         thread.join();
@@ -131,7 +132,7 @@ namespace Program {
 			dbgmsg("Reading: " << seed.name() << endl);
 			try {
 				boost::filesystem::path p (__name);
-				p = p / __cmdl.get_string_option("top_seeds_dir") / seed.name() / __cmdl.get_string_option("top_seeds_file");
+				p = p / cmdl.get_string_option("top_seeds_dir") / seed.name() / cmdl.get_string_option("top_seeds_file");
 				Molib::PDBreader spdb (p.string(), Molib::PDBreader::first_model, 1);
 
 				Molib::Molecules seed_molec = spdb.parse_molecule();

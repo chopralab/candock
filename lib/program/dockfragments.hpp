@@ -6,7 +6,6 @@
 #include "findcentroids.hpp"
 #include "fragmentligands.hpp"
 
-#include "cmdlnopts.hpp"
 #include "score/score.hpp"
 #include "docker/dock.hpp"
 #include "pdbreader/nrset.hpp"
@@ -25,28 +24,24 @@ namespace Program {
 
 		Molib::NRset __all_seeds;
 
-		const CmdLnOpts& __cmdl; //TODO: remove this dependency
-
-		void __dock_fragment(int start, const Docker::Gpoints& gpoints, const Docker::Gpoints& gpoints0, const CmdLnOpts& cmdl);
+		void __dock_fragment(int start, const Docker::Gpoints& gpoints, const Docker::Gpoints& gpoints0);
 	protected:
-		virtual bool __can_read_from_files(const CmdLnOpts& cmdl);
-		virtual void __read_from_files(const CmdLnOpts& cmdl);
-		virtual void __continue_from_prev(const CmdLnOpts& cmdl);
+		virtual bool __can_read_from_files();
+		virtual void __read_from_files();
+		virtual void __continue_from_prev();
 		
 	public:
 		DockFragments ( const FindCentroids& found_centroids,
 						const FragmentLigands& fragmented_ligands,
 						const Molib::Score& score,
 						const Molib::Atom::Grid& gridrec,
-						const std::string& name,
-						const CmdLnOpts& cmdl
+						const std::string& name
 					  ) :
 						__found_centroids(found_centroids),
 						__fragmented_ligands(fragmented_ligands),
 						__score(score),
 						__gridrec(gridrec),
-						__name(name),
-						__cmdl(cmdl)
+						__name(name)
 						{}
 
 		std::vector<std::pair<double, std::string>> get_best_seeds () const;
