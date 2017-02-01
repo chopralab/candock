@@ -31,7 +31,7 @@ namespace Version {
         }
 
         std::string get_run_info() {
-                return std::string("running ") + std::to_string(cmdl.program_name()) + " on hostname " + boost::asio::ip::host_name() + "\n" +
+                return std::string("running ") + cmdl.program_name() + " on hostname " + boost::asio::ip::host_name() + "\n" +
                        "Detected support for " + std::to_string(std::thread::hardware_concurrency()) + " concurrent threads." + "\n\t" +
                        " Using " + std::to_string(cmdl.ncpu()) + " threads.\n";
         }
