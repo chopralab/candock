@@ -58,15 +58,125 @@ void ReferenceCalcKBForceKernel::initialize(const System& system, const KBForce&
     int numBonds = force.getNumBonds();
     particle1.resize(numBonds);
     particle2.resize(numBonds);
-   
+    //~ length.resize(numBonds);
+    //~ k.resize(numBonds);
 	potential.resize(numBonds);
 	derivative.resize(numBonds);
     for (int i = 0; i < numBonds; i++)
+        //~ force.getBondParameters(i, particle1[i], particle2[i], length[i], k[i]);
         force.getBondParameters(i, particle1[i], particle2[i], potential[i], derivative[i]);
     // initialize global parameters.
     step = force.getStep();
 }
 
+//~ double ReferenceCalcKBForceKernel::execute(ContextImpl& context, bool includeForces, bool includeEnergy) {
+    //~ vector<RealVec>& pos = extractPositions(context);
+    //~ vector<RealVec>& force = extractForces(context);
+    //~ int numBonds = particle1.size();
+    //~ double energy = 0;
+    //~ 
+    //~ // Compute the interactions.
+    //~ 
+    //~ for (int i = 0; i < numBonds; i++) {
+        //~ int p1 = particle1[i];
+        //~ int p2 = particle2[i];
+        //~ RealVec delta = pos[p1]-pos[p2];
+        //~ RealOpenMM r2 = delta.dot(delta);
+        //~ RealOpenMM r = sqrt(r2);
+        //~ RealOpenMM dr = (r-length[i]);
+        //~ RealOpenMM dr2 = dr*dr;
+        //~ energy += k[i]*dr2*dr2;
+        //~ RealOpenMM dEdR = 4*k[i]*dr2*dr;
+        //~ dEdR = (r > 0) ? (dEdR/r) : 0;
+        //~ force[p1] -= delta*dEdR;
+        //~ force[p2] += delta*dEdR;
+    //~ }
+    //~ return energy;
+//~ }
+//~ double ReferenceCalcKBForceKernel::execute(ContextImpl& context, bool includeForces, bool includeEnergy) {
+    //~ std::cerr << "starting energy calculation (in execute) " << std::endl;
+    //~ vector<RealVec>& pos = extractPositions(context);
+    //~ vector<RealVec>& force = extractForces(context);
+    //~ int numBonds = particle1.size();
+    //~ double energy = 0;
+    //~ // Compute the interactions.
+    //~ 
+    //~ for (int i = 0; i < numBonds; i++) {
+        //~ int p1 = particle1[i];
+        //~ int p2 = particle2[i];
+        //~ RealVec delta = pos[p1]-pos[p2];
+        //~ RealOpenMM r2 = delta.dot(delta);
+        //~ RealOpenMM r = sqrt(r2);
+		//~ int dist = (int) round(r / step);
+		//~ energy += (*potential[i])[dist];
+ //~ 
+		//~ std::cerr << "kb particle1 = " << p1 << " particle2 = " << p2 << " distance = " 
+			//~ << r << " index for potential = " << dist << " potential = " << (*potential[i])[dist] 
+			//~ << " derivative = " << (*derivative[i])[dist] << std::endl;
+ //~ 
+        //~ RealOpenMM dEdR = (*derivative[i])[dist];
+        //~ dEdR = (r > 0) ? (dEdR/r) : 0;
+        //~ force[p1] -= delta*dEdR;
+        //~ force[p2] += delta*dEdR;
+    //~ }
+    //~ std::cerr << "kb energy = " << energy << std::endl;
+    //~ return energy;
+//~ }
+
+//~ double ReferenceCalcKBForceKernel::execute(ContextImpl& context, bool includeForces, bool includeEnergy) {
+    //~ // std::cerr << "starting energy calculation (in execute) " << std::endl;
+    //~ dbgmsg("starting energy calculation (in execute) ");
+    //~ vector<RealVec>& pos = extractPositions(context);
+    //~ vector<RealVec>& force = extractForces(context);
+    //~ int numBonds = particle1.size();
+    //~ double energy = 0;
+//~ 
+	//~ dbgmsg("numBonds = " << numBonds);
+    //~ // Compute the interactions.
+    //~ 
+    //~ for (int i = 0; i < numBonds; i++) {
+        //~ int p1 = particle1[i];
+        //~ int p2 = particle2[i];
+        //~ RealVec delta = pos[p1] - pos[p2];
+        //~ RealOpenMM r2 = delta.dot(delta);
+        //~ // RealOpenMM r = 10 * sqrt(r2);
+        //~ RealOpenMM r = sqrt(r2);
+		//~ // int dist = (int) round(r / step);
+		//~ // int dist = (int) round(r / step);
+		//~ int dist = (int) floor(r / step);
+		//~ if (dist >= (*potential[i]).size()) continue; // effectively add zero to energy and force
+        //~ // RealOpenMM dr = (r-length[i]);
+        //~ // RealOpenMM dr2 = dr*dr;
+        //~ // energy += k[i]*dr2*dr2;
+		//~ // energy += scale * (*potential[i])[dist];
+		//~ energy += (*potential[i])[dist];
+ //~ 
+		//~ // std::cerr << "kb particle1 = " << p1 << " particle2 = " << p2 
+			//~ // << " distance = " << r << " index for potential = " << dist 
+			//~ // << " potential = " << (*potential[i])[dist] 
+			//~ // << " derivative = " << (*derivative[i])[dist] 
+			//~ // << " size of potential = " << (*potential[i]).size() << std::endl;
+//~ 
+		//~ // dbgmsg("kb particle1 = " << p1 << " particle2 = " << p2 
+			//~ // << " distance = " << r << " index for potential = " << dist 
+			//~ // << " potential = " << (*potential[i])[dist] 
+			//~ // << " derivative = " << (*derivative[i])[dist] 
+			//~ // << " size of potential = " << (*potential[i]).size());
+ //~ 
+        //~ // RealOpenMM dEdR = 4*k[i]*dr2*dr;
+        //~ RealOpenMM dEdR = scale * (*derivative[i])[dist];
+        //~ // RealOpenMM dEdR = (*derivative[i])[dist];
+        //~ dEdR = (r > 0) ? (dEdR/r) : 0;
+        //~ force[p1] -= delta*dEdR;
+        //~ force[p2] += delta*dEdR;
+    //~ }
+    //~ // std::cerr << "kb energy = " << energy << std::endl;
+    //~ dbgmsg("knowledge-based energy is calculated as : energy (" << energy 
+		//~ << ") * scale (" << setprecision(20) << scale << ") = " 
+		//~ << setprecision(20) << energy * scale);
+    //~ // return energy;
+    //~ return energy * scale;
+//~ }
 
 double ReferenceCalcKBForceKernel::execute(ContextImpl& context, bool includeForces, bool includeEnergy) {
     dbgmsg("starting energy calculation (in execute) ");

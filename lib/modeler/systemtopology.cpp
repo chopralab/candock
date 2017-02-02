@@ -12,11 +12,14 @@
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string.hpp>
 #include <boost/asio/ip/host_name.hpp>
+
+
 using namespace std;
 
 namespace OMMIface {
 	extern "C" OPENMM_EXPORT void registerKBReferenceKernelFactories();
-
+extern "C" OPENMM_EXPORT void loadPluginsFromDirectory();
+    
     SystemTopology::~SystemTopology() {
 		dbgmsg("calling destructor of SystemTopology");
 		delete context; delete integrator; delete system;
@@ -26,8 +29,10 @@ namespace OMMIface {
 		// Load all available OpenMM plugins from their default location.
 		
 		dbgmsg("before loading plugins");
-		//OpenMM::Platform::loadPluginsFromDirectory
-			//(OpenMM::Platform::getDefaultPluginsDirectory());
+		OpenMM::Platform::loadPluginsFromDirectory
+			(OpenMM::Platform::getDefaultPluginsDirectory());
+        //OpenMM::Platform::loadPluginLibrary("/usr/local/openmm/lib/plugins/libOpenMMCUDA.so");
+        //OpenMM::Platform::loadPluginLibrary();
 		registerKBReferenceKernelFactories();
 		dbgmsg("after loading plugins");
 		

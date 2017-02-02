@@ -1,5 +1,16 @@
 include_directories($CMAKE_CURRENT_SOURCE_DIR)
 
+
+if(CUDA_FOUND)
+set (kbforce_SRC openmmapi/src/KBForce.cpp
+		        		 openmmapi/include/KBForce.h
+				         openmmapi/src/KBForceImpl.cpp
+				         openmmapi/include/KBKernels.h
+				         platforms/cuda/src/ReferenceKBKernelFactory.cpp 
+				         platforms/cuda/src/ReferenceKBKernels.h
+				         platforms/cuda/src/ReferenceKBKernels.cpp
+				         )
+else(CUDA_FOUND)
 set( kbforce_SRC openmmapi/src/KBForce.cpp
 		        		 openmmapi/include/KBForce.h
 				         openmmapi/src/KBForceImpl.cpp
@@ -9,6 +20,7 @@ set( kbforce_SRC openmmapi/src/KBForce.cpp
 				         platforms/reference/src/ReferenceKBKernels.h
 				         platforms/reference/src/ReferenceKBKernels.cpp
 				 )
+endif(CUDA_FOUND)
 
 include_directories( platforms/reference/include )
 include_directories( openmmapi/include )
