@@ -46,22 +46,12 @@ KBForce::~KBForce() {
 	//~ std::cout << "calling destructor of KBForce" << endl;
 }
 
-//~ int KBForce::addBond(int particle1, int particle2, double length, double k) {
-    //~ bonds.push_back(BondInfo(particle1, particle2, length, k));
-    //~ return bonds.size()-1;
-//~ }
 int KBForce::addBond(int particle1, int particle2, vector<double> &potential, vector<double> &derivative) {
     bonds.push_back(BondInfo(particle1, particle2, potential, derivative));
     return bonds.size()-1;
 }
 
-//~ void KBForce::getBondParameters(int index, int& particle1, int& particle2, double& length, double& k) const {
-    //~ ASSERT_VALID_INDEX(index, bonds);
-    //~ particle1 = bonds[index].particle1;
-    //~ particle2 = bonds[index].particle2;
-    //~ length = bonds[index].length;
-    //~ k = bonds[index].k;
-//~ }
+
 void KBForce::getBondParameters(int index, int& particle1, int& particle2, vector<double>* &potential, vector<double>* &derivative) const {
     ASSERT_VALID_INDEX(index, bonds);
     particle1 = bonds[index].particle1;
@@ -70,13 +60,6 @@ void KBForce::getBondParameters(int index, int& particle1, int& particle2, vecto
     derivative = bonds[index].derivative;
 }
 
-//~ void KBForce::setBondParameters(int index, int particle1, int particle2, double length, double k) {
-    //~ ASSERT_VALID_INDEX(index, bonds);
-    //~ bonds[index].particle1 = particle1;
-    //~ bonds[index].particle2 = particle2;
-    //~ bonds[index].length = length;
-    //~ bonds[index].k = k;
-//~ }
 void KBForce::setBondParameters(int index, int particle1, int particle2, vector<double>& potential, vector<double>& derivative) {
     ASSERT_VALID_INDEX(index, bonds);
     bonds[index].particle1 = particle1;

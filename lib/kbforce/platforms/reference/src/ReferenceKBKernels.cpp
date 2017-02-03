@@ -37,6 +37,11 @@
 #include "openmm/reference/ReferencePlatform.h"
 #include "helper/debug.hpp"
 #include <iostream>
+#include <openmm/cuda/CudaArray.h>
+#include <../cuda-8.0/include/vector_types.h>
+#include <../cuda-8.0/include/vector_functions.hpp>
+#include <openmm/cuda/CudaArray.h>
+#include <openmm/cuda/CudaArray.h>
 using namespace KBPlugin;
 using namespace OpenMM;
 using namespace std;
@@ -52,35 +57,58 @@ static vector<RealVec>& extractForces(ContextImpl& context) {
 }
 
 void ReferenceCalcKBForceKernel::initialize(const System& system, const KBForce& force) {
+    
     // Initialize bond parameters.
     dbgmsg("initializing bond parameters");
 
-    int numBonds = force.getNumBonds();
+    cu.setAsCurrent();
+    int numContexts = cu.getPlatformData().contexts.size();
+    int startIndex = cu.getContextIndex()*force.getNumBonds()/numContexts;
+    int endIndex = (cu.getContextIndex()+1)*force.getNumBonds()/numContexts;
+    numBonds = endIndex-startIndex;
+    params = CudaArray::create<double>(cu, numBonds, "bondParams");
+    //int numBonds = force.getNumBonds();
     particle1.resize(numBonds);
     particle2.resize(numBonds);
    
 	potential.resize(numBonds);
 	derivative.resize(numBonds);
-    for (int i = 0; i < numBonds; i++)
+     std::vector<std::vector<double>*> paramVector(numBonds);
+     std::vector<std::vector<double>*>  paramVector2(numBonds);
+    for (auto i = 0; i < numBonds; i++) {
         force.getBondParameters(i, particle1[i], particle2[i], potential[i], derivative[i]);
+  
+        paramVector[i] = potential[i];
+        paramVector2[i] = derivative[i];
+    }
+    
+    params->upload(paramVector);
+    params->upload(paramVector2);
     // initialize global parameters.
     step = force.getStep();
 }
 
 
+
 double ReferenceCalcKBForceKernel::execute(ContextImpl& context, bool includeForces, bool includeEnergy) {
-    dbgmsg("starting energy calculation (in execute) ");
+    
+    
+    //dbgmsg("starting energy calculation (in execute) ");
     vector<RealVec>& pos = extractPositions(context);
     vector<RealVec>& force = extractForces(context);
     int numBonds = particle1.size();
     double energy = 0;
 
-	dbgmsg("numBonds = " << numBonds);
+	//dbgmsg("numBonds = " << numBonds);
     // Compute the interactions.
-    
+ 
     for (int i = 0; i < numBonds; i++) {
         int p1 = particle1[i];
         int p2 = particle2[i];
+        cout << p1 << endl;
+        cout << p2 << endl;
+        cout << pos.size() << endl;
+        cout << pos[p1] << endl;
         RealVec delta = pos[p1] - pos[p2];
         RealOpenMM r2 = delta.dot(delta);
         RealOpenMM r = sqrt(r2);
@@ -90,6 +118,7 @@ double ReferenceCalcKBForceKernel::execute(ContextImpl& context, bool includeFor
 
         RealOpenMM dEdR = (*derivative[i])[dist];
         dEdR = (r > 0) ? (dEdR/r) : 0;
+        cout << force[p1] << endl;
         force[p1] -= delta*dEdR;
         force[p2] += delta*dEdR;
 

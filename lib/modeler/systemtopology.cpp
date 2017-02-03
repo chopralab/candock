@@ -12,11 +12,12 @@
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string.hpp>
 #include <boost/asio/ip/host_name.hpp>
-
+#include <stdexcept>
 
 using namespace std;
 
 namespace OMMIface {
+    
 	extern "C" OPENMM_EXPORT void registerKBReferenceKernelFactories();
 extern "C" OPENMM_EXPORT void loadPluginsFromDirectory();
     
@@ -26,6 +27,7 @@ extern "C" OPENMM_EXPORT void loadPluginsFromDirectory();
 	}
 
 	void SystemTopology::loadPlugins() {
+        try {
 		// Load all available OpenMM plugins from their default location.
 		
 		dbgmsg("before loading plugins");
@@ -35,6 +37,11 @@ extern "C" OPENMM_EXPORT void loadPluginsFromDirectory();
         //OpenMM::Platform::loadPluginLibrary();
 		registerKBReferenceKernelFactories();
 		dbgmsg("after loading plugins");
+        }
+        catch(const std::exception& e) {
+        
+            cout << "The crash is " << e.what() << endl;
+        }
 		
 	}
 
@@ -199,7 +206,7 @@ extern "C" OPENMM_EXPORT void loadPluginsFromDirectory();
 	}
 
 	void SystemTopology::update_knowledge_based_force(Topology &topology, const vector<OpenMM::Vec3> &positions, const double dist_cutoff) {
-
+try {
 		// we have to set new coordinates for atoms
 		AtomPoint::UPVec atompoints;
 		for (size_t i = 0; i < positions.size(); ++i) {
@@ -279,6 +286,11 @@ extern "C" OPENMM_EXPORT void loadPluginsFromDirectory();
 			throw Error("die : missing parameters detected");
 		}
 		dbgmsg("exiting update_knowledge_based_force");
+}
+catch(std::exception& e) {
+cout << e.what() << endl;
+    
+}
 	}
 	
 	void SystemTopology::init_physics_based_force(Topology &topology) {
@@ -534,5 +546,7 @@ extern "C" OPENMM_EXPORT void loadPluginsFromDirectory();
 	void SystemTopology::minimize(const double tolerance, const double max_iterations) {
 		OpenMM::LocalEnergyMinimizer::minimize(*context, tolerance, max_iterations);
 	}
+    
+  
 
 };

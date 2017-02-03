@@ -38,19 +38,29 @@
 
 using namespace KBPlugin;
 using namespace OpenMM;
+using namespace std;
 
 extern "C" OPENMM_EXPORT void registerPlatforms() {
 }
 
 extern "C" OPENMM_EXPORT void registerKernelFactories() {
 	//~ std::cout << "register kernel factories num = " << Platform::getNumPlatforms() << std::endl;
-    for (int i = 0; i < Platform::getNumPlatforms(); i++) {
+   for (int i = 0; i < Platform::getNumPlatforms(); i++) {
         Platform& platform = Platform::getPlatform(i);
-        if (dynamic_cast<ReferencePlatform*>(&platform) != NULL) {
+       if (platform.getName() == "CUDA") {
             ReferenceKBKernelFactory* factory = new ReferenceKBKernelFactory();
+            cout << platform.getName() << endl;
+            cout << platform.getNumPlatforms() << endl;
+            
             platform.registerKernelFactory(CalcKBForceKernel::Name(), factory);
-        }
+           // platform.createKernel(CalcKBForceKernel::Name());
+       }
     }
+    
+    
+      //  Platform& platform = Platform::getPlatformByName("CUDA");
+      //  ReferenceKBKernelFactory* factory = new ReferenceKBKernelFactory();
+      //  platform.registerKernelFactory(CalcKBForceKernel::Name(), factory);
 }
 
 extern "C" OPENMM_EXPORT void registerKBReferenceKernelFactories() {
@@ -59,7 +69,8 @@ extern "C" OPENMM_EXPORT void registerKBReferenceKernelFactories() {
 
 KernelImpl* ReferenceKBKernelFactory::createKernelImpl(std::string name, const Platform& platform, ContextImpl& context) const {
     //~ReferencePlatform::PlatformData& data = *static_cast<ReferencePlatform::PlatformData*>(context.getPlatformData());
+     CudaContext& cu = *static_cast<CudaPlatform::PlatformData*>(context.getPlatformData())->contexts[0];
     if (name == CalcKBForceKernel::Name())
-        return new ReferenceCalcKBForceKernel(name, platform);
+        return new ReferenceCalcKBForceKernel(name, platform, cu, context.getSystem());
     throw OpenMMException((std::string("Tried to create kernel with illegal kernel name '")+name+"'").c_str());
 }

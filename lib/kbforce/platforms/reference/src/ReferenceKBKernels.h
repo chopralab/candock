@@ -35,6 +35,9 @@
 #include "KBKernels.h"
 #include "openmm/Platform.h"
 #include <vector>
+#include "openmm/cuda/CudaContext.h"
+#include "openmm/cuda/CudaArray.h"
+
 
 namespace KBPlugin {
 
@@ -43,7 +46,8 @@ namespace KBPlugin {
  */
 class ReferenceCalcKBForceKernel : public CalcKBForceKernel {
 public:
-    ReferenceCalcKBForceKernel(std::string name, const OpenMM::Platform& platform) : CalcKBForceKernel(name, platform) {
+    ReferenceCalcKBForceKernel(std::string name, const OpenMM::Platform& platform, OpenMM::CudaContext& cu, const OpenMM::System& system) :
+            CalcKBForceKernel(name, platform), hasInitializedKernel(false), cu(cu), system(system), params(NULL) {
     }
     /**
      * Initialize the kernel.
@@ -74,6 +78,11 @@ private:
     //~ std::vector<double> length, k;
     std::vector<std::vector<double>*> potential, derivative;
     double step;
+    OpenMM::CudaContext& cu;
+    OpenMM::CudaArray* params;
+    const OpenMM::System& system;
+     bool hasInitializedKernel;
+    
 };
 
 } // namespace KBPlugin

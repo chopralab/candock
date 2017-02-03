@@ -29,12 +29,15 @@ set( additional_libraries
         dl
    )
 
+
+   
 set( all_needed_libraries
      ${candock_libraries}
      ${Boost_LIBRARIES}
      ${OPENMM_LIBRARY}
      ${GSL_LIBRARIES}
      ${additional_libraries}
+     /usr/local/openmm/lib/plugins/libOpenMMCUDA.so
    )
 
 # Original, to be deprecated programs
