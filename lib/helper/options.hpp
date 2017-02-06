@@ -10,6 +10,10 @@ namespace help {
                 static std::unique_ptr<Options> __current_options;
         public:
 
+                virtual ~Options() {
+                    // Prevent a double free
+                    __current_options.release();
+                }
                 static const Options* get_options();
                 static void  set_options(Options* opts);
 

@@ -2,7 +2,10 @@
 #include "ui_settings.h"
 #include "helper/error.hpp"
 
-settings::settings(QWidget *parent) :
+#include <QFileDialog>
+#include <QMessageBox>
+
+Settings::Settings(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::settings)
 {
@@ -10,44 +13,68 @@ settings::settings(QWidget *parent) :
     connect (ui->buttonBox, SIGNAL(accepted()), SLOT(update_interal_maps()));
 }
 
-settings::~settings()
+Settings::~Settings()
 {
     delete ui;
 }
 
-const std::string& settings::get_string_option(const std::string& option) const {
+const std::string& Settings::get_string_option(const std::string& option) const {
     return __option_to_string_map.at(option.c_str());
 }
 
-bool settings::get_bool_option(const std::string& option) const {
+bool Settings::get_bool_option(const std::string& option) const {
     return __option_to_value.at(option.c_str()).toBool();
 }
 
-int settings::get_int_option(const std::string& option) const {
+int Settings::get_int_option(const std::string& option) const {
     return __option_to_value.at(option.c_str()).toInt();
 }
 
-double settings::get_double_option(const std::string& option) const {
+double Settings::get_double_option(const std::string& option) const {
     return __option_to_value.at(option.c_str()).toDouble();
 }
 
-std::string settings::configuration_file() const {
+std::string Settings::configuration_file() const {
     return "";
 }
 
-int settings::ncpu() const {
+int Settings::ncpu() const {
     return 8;
 }
 
-std::string settings::program_name() const {
+std::string Settings::program_name() const {
     return "CANDOCK Gui";
 }
 
-const std::vector<std::string>& settings::get_string_vector (const std::string& option) const {
+const std::vector<std::string>& Settings::get_string_vector (const std::string& option) const {
     return __string_vector;
 }
 
-void settings::update_interal_maps() {
+void Settings::set_receptor() {
+    QString file = QFileDialog::getOpenFileName(this,
+                        tr("Select receptor"), QDir::currentPath());
+
+    if (! file.endsWith(".pdb")) {
+        QMessageBox::warning(qobject_cast<QWidget*>(sender()), "Invalid Receptor",
+                             "The file you selected is likely invalid. To silence this warning, make sure that the file's name ends in .pdb.");
+    }
+    __option_to_string_map["receptor"] = file.toStdString();
+}
+
+void Settings::set_ligand() {
+    QString file = QFileDialog::getOpenFileName(this,
+                        tr("Find Ligand(s)"), QDir::currentPath());
+    
+    if (! file.endsWith(".mol2")) {
+        QMessageBox::warning(qobject_cast<QWidget*>(sender()), "Invalid Ligand File",
+                             "The file you selected is likely invalid. To silence this warning, make sure that the file's name ends in .mol2.");
+    }
+    __option_to_string_map["ligand"] = file.toStdString();
+
+}
+
+
+void Settings::update_interal_maps() {
     for (auto w : findChildren<QCheckBox*>()) {
         __option_to_value[w->objectName()] = w->checkState();
     }

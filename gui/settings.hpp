@@ -11,13 +11,13 @@ namespace Ui {
 class settings;
 }
 
-class settings : public QDialog, public help::Options
+class Settings : public QDialog, public help::Options
 {
     Q_OBJECT
 
 public:
-    explicit settings(QWidget *parent = 0);
-    ~settings();
+    explicit Settings(QWidget *parent = 0);
+    ~Settings();
     
     virtual const std::string& get_string_option (const std::string& option) const;
     virtual bool        get_bool_option   (const std::string& option) const;
@@ -32,6 +32,8 @@ public:
     virtual std::string configuration_file() const;
 
 public slots:
+    void set_receptor();
+    void set_ligand();
     void update_interal_maps();
     
 private:

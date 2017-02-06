@@ -31,6 +31,7 @@ namespace Program {
 
 	public:
 		FragmentLigands( ) { }
+		virtual ~FragmentLigands() {}
 
 		void add_seeds_from_molecules(const Molib::Molecules& molecules);
 
