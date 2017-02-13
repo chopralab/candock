@@ -17,7 +17,8 @@ namespace Program {
 	}
 
 	void FindCentroids::__read_from_files( ) {
-		cout << "Reading " << cmdl.get_int_option("num_bsites") << " binding sites from " << __receptor.name() + "/" + cmdl.get_string_option("centroid") << endl;
+		cout << "Reading " << cmdl.get_int_option("num_bsites") << " binding sites from " <<
+		Path::join(__receptor.name(), cmdl.get_string_option("centroid")) << endl;
 		__result = Centro::set_centroids( Path::join(__receptor.name(), cmdl.get_string_option("centroid")), cmdl.get_int_option("num_bsites"));
 	}
 
@@ -28,10 +29,10 @@ namespace Program {
 		// Creates an empty nosql file
 		inout::output_file("", cmdl.get_string_option("nosql")); // probis local structural alignments
 
-		probis::compare_against_bslib(0, 0, __receptor.name() + ".pdb", 
+		probis::compare_against_bslib(__receptor.name() + ".pdb",
+			Path::join(__receptor.name(), cmdl.get_string_option("srf_file")),
 			__receptor.get_chain_ids(Molib::Residue::protein),
-			cmdl.get_string_option("bslib"),
-			cmdl.ncpu(),
+			cmdl.get_string_option("bslib"), cmdl.ncpu(),
 			Path::join(__receptor.name(), cmdl.get_string_option("nosql")),
 			Path::join(__receptor.name(), cmdl.get_string_option("json")));
 

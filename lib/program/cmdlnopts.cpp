@@ -67,6 +67,8 @@ namespace Program {
 			 "Allow only ligands that are in the similar regions according to REMARKs")
 			("num_bsites", po::value<int> ()->default_value (3),
 			 "Maximum number of predicted (or given) binding sites to consider for docking")
+                        ("srf_file", po::value<std::string> ()->default_value("probis.srf"),
+                         "File for storing the protein surface calculated by probis.")
 			;
 
 			po::options_description ligand_fragmention_options ("Ligand Fragmention Options");
