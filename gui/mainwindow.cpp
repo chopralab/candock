@@ -9,6 +9,7 @@
 #include "modeler/systemtopology.hpp"
 
 #include <QFile>
+#include <QMessageBox>
 
 MainWindow::MainWindow(QWidget* parent) :
     QMainWindow(parent),
@@ -53,6 +54,11 @@ MainWindow::~MainWindow() {
 void MainWindow::__bsite() {
     const std::string& receptor = cmdl.get_string_option("receptor");
 
+    if (! QFile::exists(receptor.c_str())) {
+        QMessageBox::critical(this, "Receptor file not found!", ("The file given (" + receptor + ") was not found! Please provide a receptor file using 'File->Open Receptor'").c_str() );
+        return;
+    }
+
     if ( __targets == nullptr ) {
         __targets = new Program::Target(receptor);
     }
@@ -61,10 +67,18 @@ void MainWindow::__bsite() {
 }
 
 void MainWindow::__prep_fragments() {
+
+    const std::string& ligand = cmdl.get_string_option("ligand");
+
+    if (! QFile::exists(ligand.c_str())) {
+        QMessageBox::critical(this, "Ligand file not found!", ("The file given (" + ligand + ") was not found! Please provide a ligand file using 'File->Open Ligand'").c_str() );
+        return;
+    }
+
     if ( __fragmented_ligands == nullptr ) {
         __fragmented_ligands = new Program::FragmentLigands;
     }
-    
+
     __fragmented_ligands->run_step();
 }
 

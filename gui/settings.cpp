@@ -11,6 +11,9 @@ Settings::Settings(QWidget *parent) :
 {
     ui->setupUi(this);
     connect (ui->buttonBox, SIGNAL(accepted()), SLOT(update_interal_maps()));
+
+    __option_to_string_map["receptor"] = "receptor.pdb";
+    __option_to_string_map["ligand"]   = "ligands.mol2";
 }
 
 Settings::~Settings()
