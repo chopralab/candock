@@ -175,87 +175,101 @@
          </property>
         </widget>
        </item>
-       <item row="10" column="0">
+       <item row="11" column="0">
         <widget class="QLabel" name="label_48">
          <property name="text">
           <string>NoSQL formatted alignments output</string>
          </property>
         </widget>
        </item>
-       <item row="10" column="1">
+       <item row="11" column="1">
         <widget class="QLineEdit" name="nosql">
          <property name="text">
           <string>probis.nosql</string>
          </property>
         </widget>
        </item>
-       <item row="11" column="0">
+       <item row="12" column="0">
         <widget class="QLabel" name="label_49">
          <property name="text">
           <string>Json formatted ProBis alignments output</string>
          </property>
         </widget>
        </item>
-       <item row="11" column="1">
+       <item row="12" column="1">
         <widget class="QLineEdit" name="json">
          <property name="text">
           <string>probis.json</string>
          </property>
         </widget>
        </item>
-       <item row="12" column="0">
+       <item row="13" column="0">
         <widget class="QLabel" name="label_53">
          <property name="text">
           <string>Binding Site Z-Scores file</string>
          </property>
         </widget>
        </item>
-       <item row="12" column="1">
+       <item row="13" column="1">
         <widget class="QLineEdit" name="z_scores_file">
          <property name="text">
           <string>z_scores.pdb</string>
          </property>
         </widget>
        </item>
-       <item row="13" column="0">
+       <item row="14" column="0">
         <widget class="QLabel" name="label_50">
          <property name="text">
           <string>Json formatted alignment with transposed ligands</string>
          </property>
         </widget>
        </item>
-       <item row="13" column="1">
+       <item row="14" column="1">
         <widget class="QLineEdit" name="jsonwl">
          <property name="text">
           <string>probis_with_ligands.json</string>
          </property>
         </widget>
        </item>
-       <item row="14" column="0">
+       <item row="15" column="0">
         <widget class="QLabel" name="label_51">
          <property name="text">
           <string>Ligand clusters found by ProBis</string>
          </property>
         </widget>
        </item>
-       <item row="14" column="1">
+       <item row="15" column="1">
         <widget class="QLineEdit" name="lig_clus_file">
          <property name="text">
           <string>ligand_clusters.pdb</string>
          </property>
         </widget>
        </item>
-       <item row="15" column="0">
+       <item row="16" column="0">
         <widget class="QLabel" name="label_54">
          <property name="text">
           <string>Final centroid binding site output</string>
          </property>
         </widget>
        </item>
-       <item row="15" column="1">
+       <item row="16" column="1">
         <widget class="QLineEdit" name="centroid">
          <property name="text">
           <string>site.cen</string>
+         </property>
+        </widget>
+       </item>
+       <item row="10" column="0">
+        <widget class="QLabel" name="label_67">
+         <property name="text">
+          <string>SRF File Name</string>
+         </property>
+        </widget>
+       </item>
+       <item row="10" column="1">
+        <widget class="QLineEdit" name="srf_file">
+         <property name="text">
+          <string>probis.srf</string>
          </property>
         </widget>
        </item>

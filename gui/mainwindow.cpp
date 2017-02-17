@@ -59,11 +59,15 @@ void MainWindow::__bsite() {
         return;
     }
 
+    statusBar()->showMessage("Determining Binding Site");
+
     if ( __targets == nullptr ) {
         __targets = new Program::Target(receptor);
     }
 
     __targets->find_centroids();
+
+    statusBar()->showMessage("Binding Site Loaded");
 }
 
 void MainWindow::__prep_fragments() {
@@ -75,23 +79,34 @@ void MainWindow::__prep_fragments() {
         return;
     }
 
+    statusBar()->showMessage("Fragmenting Ligands");
+
     if ( __fragmented_ligands == nullptr ) {
         __fragmented_ligands = new Program::FragmentLigands;
     }
 
     __fragmented_ligands->run_step();
+
+    statusBar()->showMessage("Ligands Prepared");
 }
 
 void MainWindow::__dock_fragments() {
     __bsite();
     __prep_fragments();
 
+    statusBar()->showMessage("Docking Ligand Fragments");
+
     __targets->dock_fragments(*__fragmented_ligands);
+
+    statusBar()->showMessage("All Fragments Docked");
 }
 
 void MainWindow::__link_fragments() {
     __dock_fragments();
 
     OMMIface::SystemTopology::loadPlugins();
+
+    statusBar()->showMessage("Linking Fragments");
     __targets->link_fragments();
+    statusBar()->showMessage("All Ligands Docked");
 }

@@ -5,6 +5,8 @@
 #include <QFileDialog>
 #include <QMessageBox>
 
+#include <iostream>
+
 Settings::Settings(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::settings)
@@ -14,6 +16,8 @@ Settings::Settings(QWidget *parent) :
 
     __option_to_string_map["receptor"] = "receptor.pdb";
     __option_to_string_map["ligand"]   = "ligands.mol2";
+
+    update_interal_maps();
 }
 
 Settings::~Settings()
