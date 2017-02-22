@@ -19,12 +19,10 @@ These scripts are designed to run various parts of candock in a modular fashion.
 
 The modules can be used several different ways and all of these ways are controlled by the same set of variables.
 
-### Important Variables
-
-###### Please note that these will be renamed in a future version to avoid variable name clashes and take advantage of the new command line processing availible in 0.2.0. It will also make the transition to the next version easier ( nicknamed candock_oo ).
+### Submission Script Variables
 
 #### **MCANDOCK_MOD_PATH** (*/depot/gchopra/apps/scripts/jonathan_fine/modules*)
-Path containing all of the the scripts, including this README! It's recommended that one exports this variable in their `.bash_profile` file. Otherwise, the script will attempt to determine this automatically, which may not work in all cases. You have been warned.
+Path containing all of the the scripts! It's recommended that one exports this variable in their `.bash_profile` file. Otherwise, the script will attempt to determine this automatically, which may not work in all cases. You have been warned.
 
 #### **MCANDOCK_PATH** (*/depot/gchopra/apps/bin/candock*)
 Path containing the candock directories.
@@ -32,34 +30,37 @@ Path containing the candock directories.
 #### **MCANDOCK_VER** (*current*)
 Version of candock to use. 
 
-#### **ncpu** (*All availible cores*)
+#### **MCANDOCK_NCPU** (*All availible cores*)
 Number of CPUs to use. 
 
-#### **receptor** (*receptor.pdb*)
+### Program Variables
+
+#### **CANDOCK_receptor** (*receptor.pdb*)
 File containing the protein that one wishes to dock to.
 
-#### **ligands** (*ligands.mol2*)
+#### **CANDOCK_ligands** (*ligands.mol2*)
 File containing all the ligands that one wishes to use.
 
-#### **centroid** (*site.cen*)
+#### **CANDOCK_centroid** (*site.cen*)
 File to read the binding site from. If this file is not present or is empty, then the binding site will be determined automatically and saved to this file.
 
-#### **prep** (*prepared_ligands.pdb*)
+#### **CANDOCK_prep** (*prepared_ligands.pdb*)
 File containing all the ligands that have been tagged with which fragments they consist of. If this file does not exist or is empty, then the ligands in `$ligands` will be tagged as such and saved to this file.
 
-#### **top_seeds_dir** (*top_seeds*)
+#### **CANDOCK_top_seeds_dir** (*top_seeds*)
 Directory containing the docked fragments. If it does not exist, then the fragments given in `$prep` will be docked to the binding site given in `$bsite`.
 
-#### **iterative** (*1*)
+#### **CANDOCK_iterative** (*0*)
 Flag controlling rigid vs flexible docking. If set to `0`, then rigid docking will occur. If set to any value greater than `0`, then flexible docking will occur.
 
-#### **top_percent** (*0.05*)
+#### **CANDOCK_top_percent** (*0.05*)
 Number (as a percentage) of each of the highest scored seeds to use. Default is `0.02` which means 2%.
 
-#### **max_iter** (*100*)
+#### **CANDOCK_max_iter** (*100*)
 Maximum number of iterations to preform while linking.
 
-#### **max_possible_conf** (*20*)
+#### **CANDOCK_max_possible_conf** (*20*)
+Maximum of clustered confirmations to link.
 
 ### All Variables
 
@@ -182,21 +183,21 @@ Fragment Docking Options:
 | clus_rad | 2.0 | Cluster radius for docked seeds |
 | grid | 0.375 | Grid spacing |
 
-### Calling the Modules
+### How to run CANDOCK Jobs
 
 There are three ways to use the modules. Each way has advantages and disadvantages and the correct
 
 #### Function Invocation
 
-Each module exists as both a Bash script and a Bash function. This method is the quickest and dirtiest way of using the modules. It should not be used for long jobs and is best for quickly checking the modules work properly with a given set of variables. To use, start by using the following to load the functions in to the Shell environment `source $CANDOCK_MOD_PATH/load_variables.sh`. Now you can invoke a module by simply typing the module name as you would a program name. For example, one could simply type `bsite` to do binding site identification. To change a variable, simply say `varname=varvalue`. To change the receptor, for example, use the following: `receptor=1aaq.pdb`.
+Each module exists as both a Bash script and a Bash function. This method is the quickest and dirtiest way of using the modules. It should not be used for long jobs and is best for quickly checking the modules work properly with a given set of variables. To use, start by using the following to load the functions in to the Shell environment `source $MCANDOCK_MOD_PATH/load_variables.sh`. Now you can invoke a module by simply typing the module name as you would a program name. For example, one could simply type `bsite` to do binding site identification. To change a variable, simply say `varname=varvalue`. To change the receptor, for example, use the following: `CANDOCK_receptor=1aaq.pdb`.
 
 #### Script Invocation
 
-This method is the recommended method for invoking a module when using a Lab or local machine. Do not use it for jobs that are to be run on the cluster. To invoke a module, simply add `$CANDOCK_MOD_PATH` to your `$PATH` and type the module name. For example, just type `prep_fragments.sh` and your off and running! To change a variable, you **must** export it first. Do so like the following example for ligands: `export ligands=new_drug.mol2`.
+This method is the recommended method for invoking a module when using a Lab or local machine. Do not use it for jobs that are to be run on the cluster. To invoke a module, simply add `$MCANDOCK_MOD_PATH` to your `$PATH` and type the module name. For example, just type `prep_fragments.sh` and your off and running! To change a variable, you **must** export it first. Do so like the following example for ligands: `export CANDOCK_ligands=new_drug.mol2`.
 
 #### PBS Submission
 
-If you're using the modules on an RCAC cluster, you **must** use this method if your jobs is to run for more than a few minutes. It is the most convoluted, but the most powerful. To start, jobs must be submitted using `qsub` and the full path to each module must be given. Variables are given to `qsub` as comma separated equalities using the `-v` option. For example: `qsub -v var1=value1,var2=value2`. Do not use spaces to separate values. Alternately, one can export variables and use `qsub -V`. If using a different `$CANDOCK_MOD_PATH` than the default, ensure that this variable is exported properly as PBS blocks the scripts ability to determine it's location. For an interactive job, export `$CANDOCK_MOD_PATH` before using the script.
+If you're using the modules on an RCAC cluster, you **must** use this method if your jobs is to run for more than a few minutes. It is the most convoluted, but the most powerful. To start, jobs must be submitted using `qsub` and the full path to each module must be given. Variables are given to `qsub` as comma separated equalities using the `-v` option. For example: `qsub -v var1=value1,var2=value2`. Do not use spaces to separate values. Alternately, one can export variables and use `qsub -V`. If using a different `$MCANDOCK_MOD_PATH` than the default, ensure that this variable is exported properly as PBS blocks the scripts ability to determine it's location. For an interactive job, export `$MCANDOCK_MOD_PATH` before using the script.
 
 So, the above was really confusing ~and badly written~ - so now there's an easier way! (tm). The `submit_candock_module.sh` command simplifies things by running qsub for you. To run `dock_fragments`, for example, use `submit_candock_module.sh dock_fragments`. You can pass `qsub` arguments as well, thus `submit_candock_module.sh dock_fragments -v var1=value1 -l myarg=whatever` is valid. Note that `-V` is passed automatically, so make sure your environment is setup properly!
 
