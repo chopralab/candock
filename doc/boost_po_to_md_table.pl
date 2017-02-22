@@ -21,6 +21,10 @@ while (<>) {
 		next;
 	}
 
+        if ( $current_variable eq "Generic options:" ) {
+		next;
+	}
+
         if ( $_ =~ m/^\s+\-\-(\S+)\s\[=arg\(=(\S+)\)\](?:\s+(\S.*))?/x ) {
                 $current_option = $1;
                 $variable_group{ $current_variable }->{$current_option} = {def_value=>$2.' (Implicit)', desc=>$3};

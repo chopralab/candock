@@ -20,6 +20,11 @@ namespace Program {
 		// FIXME: There's a better to design this, but this works for *now*
 		// TODO:  Consider using ProgramSteps instead of named things?
 		struct DockedReceptor {
+                        DockedReceptor( Molib::Molecule& my_protein ) : 
+                                protein(my_protein),
+                                score(nullptr), ffield(nullptr), gridrec(nullptr),
+                                centroids(nullptr), prepseeds(nullptr), dockedlig(nullptr)
+                                {}
 			Molib::Molecule& protein;
 			std::unique_ptr<Molib::Score>         score;
 			std::unique_ptr<OMMIface::ForceField> ffield;
