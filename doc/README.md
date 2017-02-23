@@ -21,19 +21,19 @@ The modules can be used several different ways and all of these ways are control
 
 ### Submission Script Variables
 
-#### **MCANDOCK_MOD_PATH** (*/depot/gchopra/apps/scripts/jonathan_fine/modules*)
-Path containing all of the the scripts! It's recommended that one exports this variable in their `.bash_profile` file. Otherwise, the script will attempt to determine this automatically, which may not work in all cases. You have been warned.
-
-#### **MCANDOCK_PATH** (*/depot/gchopra/apps/bin/candock*)
+#### **MCANDOCK_PATH** (*@CMAKE_INSTALL_PREFIX@*)
 Path containing the candock directories.
 
-#### **MCANDOCK_VER** (*current*)
+#### **MCANDOCK_MOD_PATH** (*@CMAKE_INSTALL_PREFIX@*)
+Path containing all of the the scripts! It's recommended that one exports this variable in their `.bash_profile` file. Otherwise, the script will attempt to determine this automatically, which may not work in all cases. You have been warned.
+
+#### **MCANDOCK_VER** (*v@CANDOCK_MAJOR_VERSION@.@CANDOCK_MINOR_VERSION@.@CANDOCK_TWEAK_VERSION@*)
 Version of candock to use. 
 
 #### **MCANDOCK_NCPU** (*All availible cores*)
 Number of CPUs to use. 
 
-### Program Variables
+### Important Program Variables
 
 #### **CANDOCK_receptor** (*receptor.pdb*)
 File containing the protein that one wishes to dock to.
@@ -61,127 +61,6 @@ Maximum number of iterations to preform while linking.
 
 #### **CANDOCK_max_possible_conf** (*20*)
 Maximum of clustered confirmations to link.
-
-### All Variables
-
-Automated Design Options:
-
-|Option Name | Default | Description |
-|------------|--------| ----------------------------- |
-| seeds_till_bad | -1 | Number of times a seed must be present in the top_seeds for antitargets until it is removed from the good list |
-| change_terminal_atom | ~None~ | Change non-hydrogen atoms that terminate chains to given atoms. Multiple atoms can be given. |
-| fragment_bag | fragment_bag.mol2 (Implicit) | Additional fragments to be added to seeds.pdb |
-| antitarget_dir | atargets (Implicit) | Directory containing PDB files. These are docked against and labeled as antitargets |
-| antitarget_linking | true | Shoutd the ligands be linked for antitargets |
-| add_single_atoms | ~None~ | Change hydrogens to given atoms. Multiple atoms can be given. |
-| fragment_mol | fragment_mol.mol2 (Implicit) | Additional fragments to be added to seeds.pdb without rotatable bonds beingcut. |
-| target_linking | true | Should the ligands be linked for target |
-| seeds_to_avoid | 50 | Number of seeds from seeds.pdb to be considered for removal from determined from seeds_to_add |
-| target_dir | targets (Implicit) | Directory containing PDB files. These are docked against and labeled as targets.  |
-| seeds_till_good | -1 | Number of times a seed must be present in the top_seeds for targets until it is considered for addition |
-| seeds_to_add | 50 | Number of seeds from seeds.pdb to be considered for addition to the ligands in prepared_ligands.pdb |
-| force_seed | ~None~ | Force addition of a certain seed from seeds.pdb. Multiple seeds can be given |
-
-Forcefield and Minimization Options:
-
-|Option Name | Default | Description |
-|------------|--------| ----------------------------- |
-| gaff_dat | data/gaff.dat | Gaff DAT forcefield input file |
-| max_iter_final | 100 | Maximum iterations for final minimization |
-| update_freq | 10 | Update non-bond frequency |
-| gaff_xml | data/gaff.xml | Gaff XML forcefield and ligand topologyoutput file |
-| pos_tol | 0.00000000001 | Minimization position tolerance in Angstroms - only for KB |
-| water_xml | data/tip3p.xml | Water XML parameters (and topology) input file |
-| amber_xml | data/amber10.xml | Receptor XML parameters (and topology) input file |
-| max_iter | 100 | Maximum iterations for minimization during linking |
-| fftype | kb | Forcefield to use 'kb' (knowledge-based) or 'phy' (physics-based) |
-| mini_tol | 0.0001 | Minimization tolerance |
-
-Ligand Fragmention Options:
-
-|Option Name | Default | Description |
-|------------|--------| ----------------------------- |
-| seeds_pdb | seeds.pdb | File to save full seeds into. |
-| max_num_ligands | 10 | Maximum number of ligands to read in one chunk |
-| prep | prepared_ligands.pdb | Prepared small molecule(s) are outputted to this filename |
-| seeds | seeds.txt | Read unique seeds from this file, if itexists, and append new unique seeds if found |
-
-Scoring Function Arguments:
-
-|Option Name | Default | Description |
-|------------|--------| ----------------------------- |
-| dist | data/csd_complete_distance_distributions.txt | Select one of the interatomic distance distribution file(s) provided with thisprogram |
-| func | radial | Function for calculating scores 'radial' or 'normalized_frequency' |
-| comp | reduced | Atom types used in calculating reference state 'reduced' or 'complete'('reduced' includes only those atom types present in the specified receptorand small molecule, whereas 'complete' includes all atom types) |
-| potential_file | potentials.txt | Output file for potentials and derivatives |
-| cutoff | 6 | Cutoff length [4-15]. |
-| ref | mean | Normalization method for the reference state ('mean' is averaged over all atomtype pairs, whereas 'cumulative' is a summation for atom type pairs) |
-| scale | 10.0 | Scale non-bonded forces and energy for knowledge-based potential [0.0-1000.0] |
-| obj_dir | obj | Output directory for objective functionand derivatives |
-| step | 0.01 | Step for spline generation of non-bonded knowledge-based potential [0.0-1.0] |
-
-Starting Input Files:
-
-|Option Name | Default | Description |
-|------------|--------| ----------------------------- |
-| receptor | receptor.pdb | Receptor filename |
-| ligand | ligands.mol2 | Ligand filename |
-
-Fragment Linking Options:
-
-|Option Name | Default | Description |
-|------------|--------| ----------------------------- |
-| spin | 60 | Spin degrees to rotate ligand. Allowed values are 5, 10, 15, 20, 30, 60, 90 |
-| link_iter | 1000 | Maximum iterations for linking procedure |
-| lower_tol_seed_dist | 2.0 | Lower tolerance on seed distance for getting initial conformations of dockedfragments |
-| cuda | 1 (Implicit) | (=false)            Enable cuda iterative linker during linking |
-| max_num_possibles | 200000 | Maximum number of possibles conformations considered for clustering |
-| clash_coeff | 0.75 | Clash coefficient for determining whether two atoms clash by eq. dist12 s< C * (vdw1 + vdw2) |
-| tol_seed_dist | 2.0 | Tolerance on seed distance in-between linking |
-| max_allow_energy | 0.0 | Maximum allowed energy for seed conformations |
-| max_clique_size | 3 | Maximum clique size for initial partialconformations generation |
-| iterative | 1 (Implicit) | (=false)       Enable iterative minimization during linking |
-| top_percent | 0.05 | Top percent of each docked seed to extend to full molecule |
-| docked_dir | docked | Docked ligands output directory |
-| max_possible_conf | 20 | Maximum number of possible conformations to link (-1 means unlimited) |
-| docked_clus_rad | 2.0 | Cluster radius between docked ligand conformations |
-| upper_tol_seed_dist | 2.0 | Upper tolerance on seed distance for getting initial conformations of dockedfragments |
-
-Probis (binding site indentification) Options:
-
-|Option Name | Default | Description |
-|------------|--------| ----------------------------- |
-| probis_min_pts | 10 | The minimum number of points (for predicted ligands) required to form a cluster |
-| num_bsites | 3 | Maximum number of predicted (or given) binding sites to consider for docking |
-| lig_clus_file | ligand_clusters.pdb | Ligand clusters found by ProBiS are outputted to this file |
-| json | probis.json | Json-formatted ProBiS alignments outputfile |
-| names | bslibdb/data/names | Directory with ligand names |
-| bslib | bslibdb/bslib.txt | Read binding sites library from this file |
-| probis_min_z_score | 2.5 | Minimium z-score of ligands to be considered in clustering |
-| neighb | false | Allow only ligands that are in the similar regions according to REMARKs |
-| probis_clus_rad | 3.0 | Cluster radius for predicted ligands byprobis |
-| centroid | site.cen | Filename for reading and writing centroids |
-| z_scores_file | z_scores.pdb | Binding site z-scores are outputted to this file |
-| nosql | probis.nosql | NoSql-formatted ProBiS alignments output file |
-| centro_clus_rad | 3.0 | Cluster radius for centroid centers |
-| jsonwl | probis_with_ligands.json | Json-formatted ProBiS alignments with transposed ligands output file |
-| bio | bslibdb/data/bio | Directory with ProBiS-ligands bio database |
-
-Fragment Docking Options:
-
-|Option Name | Default | Description |
-|------------|--------| ----------------------------- |
-| excluded | 0.8 | Excluded radius |
-| num_univec | 256 | Number of unit vectors evenly distributed on a sphere for conformation generation |
-| conf_spin | 10 | Spin degrees for conformation generation |
-| gridpdb_hcp | gridpdb_hcp.pdb | Grid pdb hcp file for output |
-| max_frag_radius | 16.0 | Maximum fragment radius for creating the initial rotamers |
-| top_seeds_dir | top_seeds | Directory for saving top docked seeds |
-| interatomic | 8.0 | Maximum interatomic distance |
-| clusterfile | clustered_seeds.txt | Clustered representative docked-seed conformations output file |
-| topseedsfile | top_seeds.pdb | Top seeds output file |
-| clus_rad | 2.0 | Cluster radius for docked seeds |
-| grid | 0.375 | Grid spacing |
 
 ### How to run CANDOCK Jobs
 
@@ -274,3 +153,124 @@ mkdir -p top_0.02/all_conf
 cd top_0.02/all_conf
 dock_multiple.sh link_fragments
 ```
+### All Variables
+
+Starting Input Files:
+
+|Option Name | Default | Description |
+|------------|--------| ----------------------------- |
+| receptor | receptor.pdb | Receptor filename |
+| ligand | ligands.mol2 | Ligand filename |
+
+
+Probis (binding site indentification) Options:
+
+|Option Name | Default | Description |
+|------------|--------| ----------------------------- |
+| probis_min_pts | 10 | The minimum number of points (for predicted ligands) required to form a cluster |
+| num_bsites | 3 | Maximum number of predicted (or given) binding sites to consider for docking |
+| lig_clus_file | ligand_clusters.pdb | Ligand clusters found by ProBiS are outputted to this file |
+| json | probis.json | Json-formatted ProBiS alignments outputfile |
+| names | bslibdb/data/names | Directory with ligand names |
+| bslib | bslibdb/bslib.txt | Read binding sites library from this file |
+| probis_min_z_score | 2.5 | Minimium z-score of ligands to be considered in clustering |
+| neighb | false | Allow only ligands that are in the similar regions according to REMARKs |
+| probis_clus_rad | 3.0 | Cluster radius for predicted ligands byprobis |
+| centroid | site.cen | Filename for reading and writing centroids |
+| z_scores_file | z_scores.pdb | Binding site z-scores are outputted to this file |
+| nosql | probis.nosql | NoSql-formatted ProBiS alignments output file |
+| centro_clus_rad | 3.0 | Cluster radius for centroid centers |
+| jsonwl | probis_with_ligands.json | Json-formatted ProBiS alignments with transposed ligands output file |
+| bio | bslibdb/data/bio | Directory with ProBiS-ligands bio database |
+
+Ligand Fragmention Options:
+
+|Option Name | Default | Description |
+|------------|--------| ----------------------------- |
+| seeds_pdb | seeds.pdb | File to save full seeds into. |
+| max_num_ligands | 10 | Maximum number of ligands to read in one chunk |
+| prep | prepared_ligands.pdb | Prepared small molecule(s) are outputted to this filename |
+| seeds | seeds.txt | Read unique seeds from this file, if itexists, and append new unique seeds if found |
+
+Fragment Docking Options:
+
+|Option Name | Default | Description |
+|------------|--------| ----------------------------- |
+| excluded | 0.8 | Excluded radius |
+| num_univec | 256 | Number of unit vectors evenly distributed on a sphere for conformation generation |
+| conf_spin | 10 | Spin degrees for conformation generation |
+| gridpdb_hcp | gridpdb_hcp.pdb | Grid pdb hcp file for output |
+| max_frag_radius | 16.0 | Maximum fragment radius for creating the initial rotamers |
+| top_seeds_dir | top_seeds | Directory for saving top docked seeds |
+| interatomic | 8.0 | Maximum interatomic distance |
+| clusterfile | clustered_seeds.txt | Clustered representative docked-seed conformations output file |
+| topseedsfile | top_seeds.pdb | Top seeds output file |
+| clus_rad | 2.0 | Cluster radius for docked seeds |
+| grid | 0.375 | Grid spacing |
+
+Forcefield and Minimization Options:
+
+|Option Name | Default | Description |
+|------------|--------| ----------------------------- |
+| gaff_dat | data/gaff.dat | Gaff DAT forcefield input file |
+| max_iter_final | 100 | Maximum iterations for final minimization |
+| update_freq | 10 | Update non-bond frequency |
+| gaff_xml | data/gaff.xml | Gaff XML forcefield and ligand topologyoutput file |
+| pos_tol | 0.00000000001 | Minimization position tolerance in Angstroms - only for KB |
+| water_xml | data/tip3p.xml | Water XML parameters (and topology) input file |
+| amber_xml | data/amber10.xml | Receptor XML parameters (and topology) input file |
+| max_iter | 100 | Maximum iterations for minimization during linking |
+| fftype | kb | Forcefield to use 'kb' (knowledge-based) or 'phy' (physics-based) |
+| mini_tol | 0.0001 | Minimization tolerance |
+
+Scoring Function Arguments:
+
+|Option Name | Default | Description |
+|------------|--------| ----------------------------- |
+| dist | data/csd_complete_distance_distributions.txt | Select one of the interatomic distance distribution file(s) provided with thisprogram |
+| func | radial | Function for calculating scores 'radial' or 'normalized_frequency' |
+| comp | reduced | Atom types used in calculating reference state 'reduced' or 'complete'('reduced' includes only those atom types present in the specified receptorand small molecule, whereas 'complete' includes all atom types) |
+| potential_file | potentials.txt | Output file for potentials and derivatives |
+| cutoff | 6 | Cutoff length [4-15]. |
+| ref | mean | Normalization method for the reference state ('mean' is averaged over all atomtype pairs, whereas 'cumulative' is a summation for atom type pairs) |
+| scale | 10.0 | Scale non-bonded forces and energy for knowledge-based potential [0.0-1000.0] |
+| obj_dir | obj | Output directory for objective functionand derivatives |
+| step | 0.01 | Step for spline generation of non-bonded knowledge-based potential [0.0-1.0] |
+
+Fragment Linking Options:
+
+|Option Name | Default | Description |
+|------------|--------| ----------------------------- |
+| spin | 60 | Spin degrees to rotate ligand. Allowed values are 5, 10, 15, 20, 30, 60, 90 |
+| link_iter | 1000 | Maximum iterations for linking procedure |
+| lower_tol_seed_dist | 2.0 | Lower tolerance on seed distance for getting initial conformations of dockedfragments |
+| cuda | 1 (Implicit) | (=false)            Enable cuda iterative linker during linking |
+| max_num_possibles | 200000 | Maximum number of possibles conformations considered for clustering |
+| clash_coeff | 0.75 | Clash coefficient for determining whether two atoms clash by eq. dist12 s< C * (vdw1 + vdw2) |
+| tol_seed_dist | 2.0 | Tolerance on seed distance in-between linking |
+| max_allow_energy | 0.0 | Maximum allowed energy for seed conformations |
+| max_clique_size | 3 | Maximum clique size for initial partialconformations generation |
+| iterative | 1 (Implicit) | (=false)       Enable iterative minimization during linking |
+| top_percent | 0.05 | Top percent of each docked seed to extend to full molecule |
+| docked_dir | docked | Docked ligands output directory |
+| max_possible_conf | 20 | Maximum number of possible conformations to link (-1 means unlimited) |
+| docked_clus_rad | 2.0 | Cluster radius between docked ligand conformations |
+| upper_tol_seed_dist | 2.0 | Upper tolerance on seed distance for getting initial conformations of dockedfragments |
+
+Automated Design Options:
+
+|Option Name | Default | Description |
+|------------|--------| ----------------------------- |
+| seeds_till_bad | -1 | Number of times a seed must be present in the top_seeds for antitargets until it is removed from the good list |
+| change_terminal_atom | ~None~ | Change non-hydrogen atoms that terminate chains to given atoms. Multiple atoms can be given. |
+| fragment_bag | fragment_bag.mol2 (Implicit) | Additional fragments to be added to seeds.pdb |
+| antitarget_dir | atargets (Implicit) | Directory containing PDB files. These are docked against and labeled as antitargets |
+| antitarget_linking | true | Shoutd the ligands be linked for antitargets |
+| add_single_atoms | ~None~ | Change hydrogens to given atoms. Multiple atoms can be given. |
+| fragment_mol | fragment_mol.mol2 (Implicit) | Additional fragments to be added to seeds.pdb without rotatable bonds beingcut. |
+| target_linking | true | Should the ligands be linked for target |
+| seeds_to_avoid | 50 | Number of seeds from seeds.pdb to be considered for removal from determined from seeds_to_add |
+| target_dir | targets (Implicit) | Directory containing PDB files. These are docked against and labeled as targets.  |
+| seeds_till_good | -1 | Number of times a seed must be present in the top_seeds for targets until it is considered for addition |
+| seeds_to_add | 50 | Number of seeds from seeds.pdb to be considered for addition to the ligands in prepared_ligands.pdb |
+| force_seed | ~None~ | Force addition of a certain seed from seeds.pdb. Multiple seeds can be given |

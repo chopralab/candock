@@ -61,4 +61,3 @@ while ( (my $key, my $value) = each %variable_group ) {
 
         print "\n";
 }
-
