@@ -245,9 +245,9 @@ namespace genlig {
 			const double z_score = d["alignment"][0]["scores"]["z_score"].asDouble();
 			const Json::Value &hetero = d["hetero"];
 			for (size_t i = 0; i < hetero.size(); ++i) { // go over the hetero ligands only
-				dbgmsg(hetero[i].asString());
+			//	dbgmsg(hetero[i].asString());
 				const vector<string> ligand = help::ssplit(hetero[ static_cast<int>(i)].asString(), ":");
-				dbgmsg(ligand.size());
+			//	dbgmsg(ligand.size());
 				const int cluster_number = stoi(ligand[0]);
 				const string resn = ligand[1];
 				const int resi = stoi(ligand[2]);
