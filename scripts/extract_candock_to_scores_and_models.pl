@@ -7,15 +7,29 @@ use Getopt::Long;
 
 my $number=10;
 my $no_make_files = 0;
+my $print_title = 0;
+my %variables = ();
 
 GetOptions("n|number=i" => \$number,
-           "f|nofiles"  => \$no_make_files);
+           "f|nofiles"  => \$no_make_files,
+           "t|title" => \$print_title,
+           "v|variables=s" => \%variables);
 
 my $currkey;
 my $currlig;
 my %poses = ();
 
-print "number, molecule, score\n";
+if ($print_title) {
+
+    print 'number, molecule, score';
+
+    foreach my $variable (keys %variables) {
+        print ", $variable";
+    }
+
+    print "\n";
+
+}
 
 while (my $line = <>) {
     if ( $line =~ /^REMARK.*COMPLEX OF (\S*).* SCORE OF (\S*)/) {
@@ -73,11 +87,17 @@ while ( my ($ligandkey, $ligand_hash) = each %poses ) {
             push @ordered_ligands, { ligand_name => $pymol_key, score => $ligand_hash->{$key}->{SCORE} };
         }
 
-      print "$count, $ligandkey, $ligand_hash->{$key}->{SCORE}\n";
+        print "$count, $ligandkey, $ligand_hash->{$key}->{SCORE}";
+      
+        foreach my $variable (values %variables ) {
+            print ", $variable"
+        }
 
-      $count++;
+        print "\n";
 
-      last if $count > $number;
+        $count++;
+
+        last if $count > $number;
     }
 
 }
