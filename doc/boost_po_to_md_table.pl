@@ -6,6 +6,7 @@ use strict;
 my %variable_group = ();
 my $current_variable;
 my $current_option;
+my @variable_list = ();
 
 while (<>) {
 
@@ -18,6 +19,7 @@ while (<>) {
         if ( $_ =~ m/^\S/ ) {
                 $current_variable = $_;
                 $variable_group{ $_ } = {};
+                push @variable_list, $_;
                 next;
         }
         
@@ -46,9 +48,11 @@ while (<>) {
 	}
 }
 
-while ( (my $key, my $value) = each %variable_group ) {
+for my $key (@variable_list) {
 
         next if $key eq "Generic options:";
+
+        my $value = $variable_group{ $key };
 
         print $key, "\n\n";
 
