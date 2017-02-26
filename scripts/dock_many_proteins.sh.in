@@ -1,0 +1,73 @@
+#!/usr/bin/env bash
+#PBS -l walltime=3:50:00
+#PBS -q standby
+#PBS -l nodes=1:ppn=8
+#PBS -l naccesspolicy=shared
+
+: ${MCANDOCK_MOD_PATH:=$([[ "$PBS_ENVIRONMENT" -eq "PBS_BATCH" ]] \
+    && echo @CMAKE_INSTALL_PREFIX@/modules/v@CANDOCK_MAJOR_VERSION@.@CANDOCK_MINOR_VERSION@.@CANDOCK_TWEAK_VERSION@ \
+    || echo $( cd $( dirname ${BASH_SOURCE[0]} ) && pwd ) )}
+
+echo "Using modules in $MCANDOCK_MOD_PATH"
+
+if [[ ! -s $MCANDOCK_MOD_PATH/load_variables.sh ]]
+then
+	echo "Modules not found in \$MCANDOCK_MOD_PATH!"
+	echo "Please set this variable!"
+	exit 1
+fi
+
+export CANDOCK_prep=$parent_working_dir/compounds/prepared_ligands.pdb
+export CANDOCK_seeds=$parent_working_dir/compounds/seeds.txt
+
+source $MCANDOCK_MOD_PATH/load_variables.sh
+
+cd $PBS_O_WORKDIR
+
+count=0
+current=1
+
+for i in `cat $prot_list`
+do
+
+    if [[ "$count" -ge "$p_limit" ]]
+    then
+        break
+    fi
+
+    if [[ "$current" -lt "$p_start" ]]
+    then
+        current=$((current+1))
+        continue
+    fi
+
+    if [[ -d $i ]]
+    then
+        echo "Skipping $i, directory already exists"
+        count=$((count+1))
+        continue
+    fi
+
+    export CANDOCK_receptor=$parent_working_dir/structures/$i.pdb
+    export CANDOCK_centroid=$parent_working_dir/structures/$i.cen
+    export CANDOCK_top_seeds_dir=$parent_working_dir/seeds_database/$i/top_seeds
+
+    mkdir -p $i
+
+    cd $i
+
+    echo "RUNNING" > state.lck
+
+    export MCANDOCK_working_dir=$PWD
+    link_fragments
+
+    rm state.lck
+
+    count=$((count+1))
+
+    cd ..
+done
+
+
+echo "All caclulations for $(basename $0) are complete"
+
