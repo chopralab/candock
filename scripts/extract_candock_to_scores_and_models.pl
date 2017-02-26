@@ -7,10 +7,8 @@ use Getopt::Long;
 
 my $number=10;
 my $no_make_files = 0;
-my @ligands = ();
 
 GetOptions("n|number=i" => \$number,
-           "l|ligand=s" => \@ligands,
            "f|nofiles"  => \$no_make_files);
 
 my $currkey;
@@ -24,10 +22,6 @@ while (my $line = <>) {
         $currkey = $.;
         $currlig = $1;
 
-        if ( $#ligands != -1 and not ($currlig ~~ @ligands) ) {
-                next;
-        }
-
         unless ( defined $poses{$currlig} ) {
             $poses{$currlig} = {};
         }
@@ -36,10 +30,6 @@ while (my $line = <>) {
         <>;
     }
 
-    if ( $#ligands != -1 and not ($currlig ~~ @ligands) ) {
-            next;
-    }
-    
     elsif ( $line =~ /^ATOM  / ) {
         push @{$poses{$currlig}->{$currkey}->{PROTEIN}}, substr( $line, 0, 80 );
     }
