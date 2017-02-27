@@ -12,41 +12,36 @@
 
 namespace Program {
 
-	class DockFragments : public ProgramStep
-	{
-		const FindCentroids& __found_centroids;
-		const FragmentLigands& __fragmented_ligands;
-		
-		const Molib::Score& __score;
-		const Molib::Atom::Grid& __gridrec;
-		
-		const std::string& __name;
+        class DockFragments : public ProgramStep
+        {
+                const FindCentroids& __found_centroids;
+                const FragmentLigands& __fragmented_ligands;
 
-		Molib::NRset __all_seeds;
+                const Molib::Score& __score;
+                const Molib::Atom::Grid& __gridrec;
 
-		void __dock_fragment(int start, const Docker::Gpoints& gpoints, const Docker::Gpoints& gpoints0);
-	protected:
-		virtual bool __can_read_from_files();
-		virtual void __read_from_files();
-		virtual void __continue_from_prev();
-		
-	public:
-		DockFragments ( const FindCentroids& found_centroids,
-						const FragmentLigands& fragmented_ligands,
-						const Molib::Score& score,
-						const Molib::Atom::Grid& gridrec,
-						const std::string& name
-					  ) :
-						__found_centroids(found_centroids),
-						__fragmented_ligands(fragmented_ligands),
-						__score(score),
-						__gridrec(gridrec),
-						__name(name)
-						{}
+                const std::string& __name;
+                std::string __top_seeds_location;
 
-		std::vector<std::pair<double, std::string>> get_best_seeds () const;
+                Molib::NRset __all_seeds;
 
-	};
+                void __dock_fragment(int start, const Docker::Gpoints& gpoints, const Docker::Gpoints& gpoints0);
+        protected:
+                virtual bool __can_read_from_files();
+                virtual void __read_from_files();
+                virtual void __continue_from_prev();
+
+        public:
+                DockFragments ( const FindCentroids& found_centroids,
+                                const FragmentLigands& fragmented_ligands,
+                                const Molib::Score& score,
+                                const Molib::Atom::Grid& gridrec,
+                                const std::string& name
+                              );
+
+                std::vector<std::pair<double, std::string>> get_best_seeds () const;
+
+        };
 
 }
 
