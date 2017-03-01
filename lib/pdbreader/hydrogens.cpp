@@ -46,7 +46,7 @@ namespace Molib {
 					int con = help::get_info_map(atom.idatm_type_unmask()).substituents;
 			
 					/* EXCEPTION for 3-substituted P */
-					if (atom.idatm_type_unmask() == "P" && atom.size() == 3) 
+					if ( (atom.idatm_type_unmask() == "P" || atom.idatm_type_unmask() == "PA") && atom.size() == 3) 
 						con = 3;
 					/* ***************************** */
 

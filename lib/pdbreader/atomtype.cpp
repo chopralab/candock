@@ -235,6 +235,28 @@ namespace Molib {
 					dbgmsg("pass 1.5  : " << a.idatm_type_unmask() << " " << a.atom_name() << " " << a.atom_number());
 				}
 			}
+                        auto ct = help::cofactor_residues.find(residue.resn());
+                        if (ct != help::cofactor_residues.end()) {
+                                for (auto &a : residue) {
+                                        if (!mapped[&a]) {
+                                                string idatm_type = "???";
+                                                // H on peptide N
+                                                if (a.atom_name() == "HN")
+                                                        idatm_type = "H";
+                                                // still not known? find it in the table!
+                                                if (idatm_type == "???") {
+                                                        auto it2 = ct->second.find(a.atom_name());
+                                                        if (it2 == ct->second.end())
+                                                                throw Error("die : cannot find atom name " 
+                                                                        + a.atom_name() + " of template residue "
+                                                                        + residue.resn());
+                                                        idatm_type = it2->second;
+                                                }
+                                                a.set_idatm_type(idatm_type);
+                                                mapped[&a] = true;
+                                        }
+                                }
+                        }
 		}
 
 		// "pass 2": elements that are typed only by element type
@@ -639,7 +661,7 @@ namespace Molib {
 		//		consistent with aromatic bond lengths
 		for (auto &presidue : residues) {
 			const Residue &residue = *presidue;
-			if (! help::standard_residues.count(residue.resn())) {
+			if ( !help::standard_residues.count(residue.resn()) && !help::cofactor_residues.count(residue.resn()) ) {
 				dbgmsg("here I am");
 				Fragmenter frag(residue.get_atoms());
 				Rings rings = frag.identify_rings();

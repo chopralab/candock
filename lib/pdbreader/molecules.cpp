@@ -179,17 +179,17 @@ namespace Molib {
 		}
 		return *this;
 	}
-	Molecules& Molecules::compute_rotatable_bonds() { 
-		for (auto &presidue : this->get_residues()) {
-			Residue &residue = *presidue;
-			if (!(help::standard_residues.count(residue.resn())
-			   || help::ions.count(residue.resn()))) {
-				BondOrder::compute_rotatable_bonds(residue.get_atoms());
-			}
-		}
-		return *this;
-	}
-
+        Molecules& Molecules::compute_rotatable_bonds() { 
+                for (auto &presidue : this->get_residues()) {
+                        Residue &residue = *presidue;
+                        if (!(help::standard_residues.count(residue.resn())
+                           || help::cofactor_residues.count(residue.resn())
+                           || help::ions.count(residue.resn()))) {
+                                BondOrder::compute_rotatable_bonds(residue.get_atoms());
+                        }
+                }
+                return *this;
+        }
 	Molecule::Vec Molecules::get_molecules(const Residue::res_type &rest) const {
 		Molecule::Vec molecules;
 		for (auto &molecule : *this) {
