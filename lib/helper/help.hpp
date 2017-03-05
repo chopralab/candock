@@ -508,6 +508,7 @@ namespace help {
 	        { "Ca", { Ion, 0, "calcium" } },
 	        { "Na", { Ion, 0, "sodium" } },
                 { "K",  { Ion, 0, "potassium" } },
+                { "Fe", { Ion, 0, "iron" } },
 	};
 
 	const IdatmEntry &get_info_map(const string &name);
