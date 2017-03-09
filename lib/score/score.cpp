@@ -340,7 +340,7 @@ namespace Molib {
 			}
 			
 			try {
-			
+
 				if (slope.size() <= 1) throw InterpolationError("warning : slope not found in data");
 
 				repulsion_idx = *slope.begin(); // correct repulsion_idx
@@ -365,8 +365,8 @@ namespace Molib {
 				}
 			
 				vector<double> potential = Interpolation::interpolate_bspline(dataX, dataY, __step_non_bond);
-	
-				// add repulsion term by fitting 1/x**12 function to slope points
+
+                                // add repulsion term by fitting 1/x**12 function to slope points
 				const double x1 = __get_lower_bound(*slope.begin());
 				const double x2 = __get_lower_bound(*slope.rbegin());
 				string datapoints("");
@@ -381,12 +381,12 @@ namespace Molib {
 				dbgmsg("x1 = " << x1);
 				dbgmsg("x2 = " << x2);
 				dbgmsg("datapoints = " << datapoints);
-	
-				// fit function to slope
+
+                                // fit function to slope
 				double coeffA, coeffB, WSSR;
 				std::tie(coeffA, coeffB, WSSR) = help::gnuplot(x1, x2, datapoints);
-	
-				if (WSSR == HUGE_VAL) throw InterpolationError("warning : could not fit repulsion term, zero everything");
+
+                                if (WSSR == HUGE_VAL) throw InterpolationError("warning : could not fit repulsion term, zero everything");
 	
 				dbgmsg("atom1 = " << idatm_type1
 					<< " atom2 = " << idatm_type2
@@ -422,8 +422,9 @@ namespace Molib {
 	
 				// add repulsion term before bsplined potential
 				potential.insert(potential.begin(), repulsion.begin(), repulsion.end());
-				
-				__energies[atom_pair].assign(potential.begin(), potential.end());
+
+                                __energies[atom_pair].assign(potential.begin(), potential.end());
+
 #ifndef NDEBUG
 				for (int i = 0; i < potential.size(); ++i) {
 					dbgmsg("interpolated " << help::idatm_unmask[atom_pair.first] 
