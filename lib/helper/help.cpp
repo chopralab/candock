@@ -292,7 +292,7 @@ namespace help {
                          {"C2B","Car"},
                          {"C3B","Car"},
                          {"C4B","Car"},
-                         {"CMB","???"},
+                         {"CMB","C3"},
                          {"CAB","C2"},
                          {"CBB","C2"},
                          {"NC" ,"Npl"},
