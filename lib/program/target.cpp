@@ -142,21 +142,21 @@ namespace Program {
 
                         ligand_fragments.add_seeds_from_molecules(designs, cmdl);
                         all_designs.add(designs);
-                }
-
-                for (auto &a : __preprecs) {
+                } else {
+                    for (auto &a : __preprecs) {
                         Molib::NRset nr = common::read_top_seeds_files(seeds_to_add, Path::join(a.protein.name(), cmdl.top_seeds_dir()),
                                                                                            cmdl.top_seeds_file(), cmdl.top_percent() );
                         for ( auto &molecules : nr ) {
                                 design::Design designer (molecules.first(), created_design);
                                 designer.change_original_name(molecules.name());
                                 designer.functionalize_hydrogens_with_fragments(nr, cmdl.tol_seed_dist(), cmdl.clash_coeff());
-//#ifndef NDEBUG
+#ifndef NDEBUG
                 inout::output_file(designer.get_internal_designs(), "internal_designs.pdb", ios_base::app);
-//#endif
+#endif
 
                                 all_designs.add( designer.prepare_designs() );
                         }
+                    }
                 }
 
                 if ( all_designs.size() == 0 ) {
