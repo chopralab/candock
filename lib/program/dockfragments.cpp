@@ -25,7 +25,7 @@ namespace Program {
                 p = p / "top_seeds";
                 __top_seeds_location = p.string();
         }
-    
+
         bool DockFragments::__can_read_from_files () {
                 bool all_seeds_are_present = true;
 
@@ -96,7 +96,7 @@ namespace Program {
 
         void DockFragments::__continue_from_prev () {
 
-                cout << "Docking fragments into: " << __name << "_" << cmdl.get_string_option("top_seeds_dir") << 
+                cout << "Docking fragments into: " << __top_seeds_location << 
                         ". Files will be named: " << cmdl.get_string_option("top_seeds_file") << endl;
 
                 /* Create gridpoints for ALL centroids representing one or more binding sites
