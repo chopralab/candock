@@ -121,7 +121,7 @@ namespace Program {
 
 		for ( auto &a : __preprecs ) {
 			a.ffield->insert_topology(a.protein);
-			std::unique_ptr<LinkFragments> plinkfragments(new LinkFragments(a.protein, *a.score, *a.ffield, *a.gridrec));
+			std::unique_ptr<LinkFragments> plinkfragments(new LinkFragments(a.protein, *a.score, *a.ffield, *a.prepseeds, *a.gridrec));
 			plinkfragments->run_step();
 			a.dockedlig = std::move(plinkfragments);
 		}
@@ -152,9 +152,7 @@ namespace Program {
 
 			std::unique_ptr<design::Design> designer( new design::Design( a.dockedlig->top_poses().first() ));
 			if (! seeds_to_add.empty() )
-                                designer->functionalize_hydrogens_with_fragments(common::read_top_seeds_files(seeds_to_add,
-                                                                                    Path::join(a.protein.name(), cmdl.get_string_option("top_seeds_dir")),
-                                                                                    cmdl.get_string_option("top_seeds_file"), cmdl.get_double_option("top_percent")),
+                                designer->functionalize_hydrogens_with_fragments(a.prepseeds->get_top_seeds(seeds_to_add, cmdl.get_double_option("top_percent")),
                                                                                     cmdl.get_double_option("tol_seed_dist"), cmdl.get_double_option("clash_coeff") );
 
 			const vector<string>& h_single_atoms = cmdl.get_string_vector("add_single_atoms");

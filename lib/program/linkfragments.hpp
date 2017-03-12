@@ -7,6 +7,7 @@
 #include "score/score.hpp"
 #include "modeler/forcefield.hpp"
 #include "pdbreader/pdbreader.hpp"
+#include "program/dockfragments.hpp"
 
 #include <mutex>
 
@@ -15,6 +16,7 @@ namespace Program {
 	class LinkFragments : public ProgramStep
 	{
 		Molib::Molecules __all_top_poses;
+                const DockFragments& __seeds_database;
 		
 		const Molib::Molecule& __receptor;
 		const Molib::Score& __score;
@@ -30,12 +32,14 @@ namespace Program {
 		virtual void __read_from_files ();
 		virtual void __continue_from_prev ();
 	public:
-		LinkFragments ( const Molib::Molecule& receptor,
-						const Molib::Score& score,
-						const OMMIface::ForceField& ffield,
-						const Molib::Atom::Grid& gridrec ) : 
-						__receptor(receptor), __score(score),
-						__ffield(ffield), __gridrec(gridrec) {};
+                LinkFragments ( const Molib::Molecule& receptor,
+                                const Molib::Score& score,
+                                const OMMIface::ForceField& ffield,
+                                const DockFragments& seeds_database,
+                                const Molib::Atom::Grid& gridrec ) :
+                                         __seeds_database(seeds_database),
+                                        __receptor(receptor), __score(score),
+                                        __ffield(ffield), __gridrec(gridrec) {};
 
 		void link_ligands (const Molib::Molecules& ligands);
 		const Molib::Molecules& top_poses() const { return __all_top_poses; }

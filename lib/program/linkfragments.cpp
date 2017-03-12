@@ -56,21 +56,19 @@ namespace Program {
 				throw Error("No seeds to link");
 			}
 
-			/** 
-				* Read top seeds for this ligand
-				*/
-			Molib::NRset top_seeds = common::read_top_seeds_files(ligand,
-					Path::join(__receptor.name(), cmdl.get_string_option("top_seeds_dir")),
-                                                   cmdl.get_string_option("top_seeds_file"), cmdl.get_double_option("top_percent"));
+                        /** 
+                          * Read top seeds for this ligand
+                          */
+                        Molib::NRset top_seeds = __seeds_database.get_top_seeds(ligand, cmdl.get_double_option("top_percent"));
 
-			ligand.erase_properties(); // required for graph matching
-			top_seeds.erase_properties(); // required for graph matching
+                        ligand.erase_properties(); // required for graph matching
+                        top_seeds.erase_properties(); // required for graph matching
 
-			/** 
-			 * Jiggle the coordinates by one-thousand'th of an Angstrom to avoid minimization failures
-			 * with initial bonded relaxation failed errors
-			*/
-			top_seeds.jiggle();
+                        /** 
+                         * Jiggle the coordinates by one-thousand'th of an Angstrom to avoid minimization failures
+                         * with initial bonded relaxation failed errors
+                        */
+                        top_seeds.jiggle();
 
                         /* Init minization options and constants, including ligand and receptor topology
                          *
