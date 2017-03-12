@@ -61,7 +61,7 @@ namespace Program {
 			 "Cluster radius for predicted ligands by probis")
 			("centro_clus_rad", po::value<double> ()->default_value (3.0, "3.0"),
 			 "Cluster radius for centroid centers")
-			("centroid", po::value<std::string> ()->default_value ("site.cen"),
+			("centroid", po::value<std::string> ()->default_value (""),
 			 "Filename for reading and writing centroids")
 			("neighb", po::value<bool> ()    ->default_value (false, "false"),
 			 "Allow only ligands that are in the similar regions according to REMARKs")

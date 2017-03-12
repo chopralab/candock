@@ -11,23 +11,32 @@
 #include "helper/options.hpp"
 
 namespace Program {
-	
-	bool FindCentroids::__can_read_from_files( ) {
-		return inout::Inout::file_size( Path::join(__receptor.name(), cmdl.get_string_option("centroid")) ) > 0;
-	}
 
-	void FindCentroids::__read_from_files( ) {
-		cout << "Reading " << cmdl.get_int_option("num_bsites") << " binding sites from " <<
-		Path::join(__receptor.name(), cmdl.get_string_option("centroid")) << endl;
-		__result = Centro::set_centroids( Path::join(__receptor.name(), cmdl.get_string_option("centroid")), cmdl.get_int_option("num_bsites"));
-	}
+        FindCentroids::FindCentroids(const Molib::Molecule& receptor) :
+                     __receptor( receptor ) {
+                if (cmdl.get_string_option("centroid").empty()) {
+                        __centroid_file = Path::join(__receptor.name(), "site.cen");
+                } else {
+                        __centroid_file = cmdl.get_string_option("centroid");
+                }
+        }
+
+        bool FindCentroids::__can_read_from_files( ) {
+                return inout::Inout::file_size( __centroid_file ) > 0;
+        }
+
+        void FindCentroids::__read_from_files( ) {
+                cout << "Reading " << cmdl.get_int_option("num_bsites") << 
+                    " binding sites from " << __centroid_file << endl;
+                __result = Centro::set_centroids( __centroid_file, cmdl.get_int_option("num_bsites"));
+        }
 
 	void FindCentroids::__continue_from_prev( ) {
 
 		cout << "Running PROBIS for receptor in file: " << __receptor.name() + ".pdb" << endl;
 
 		// Creates an empty nosql file
-		inout::output_file("", cmdl.get_string_option("nosql")); // probis local structural alignments
+		inout::output_file("", Path::join(__receptor.name(), cmdl.get_string_option("nosql"))); // probis local structural alignments
 
 		probis::compare_against_bslib(__receptor.name() + ".pdb",
 			Path::join(__receptor.name(), cmdl.get_string_option("srf_file")),
@@ -56,6 +65,6 @@ namespace Program {
 		inout::output_file(binding_sites.second, Path::join(__receptor.name(), cmdl.get_string_option("z_scores_file")));
 
 		__result = Centro::set_centroids(binding_sites.first, cmdl.get_double_option("centro_clus_rad"));
-		inout::output_file(__result, Path::join(__receptor.name(), cmdl.get_string_option("centroid"))); // probis local structural alignments
+		inout::output_file(__result, __centroid_file); // probis local structural alignments
 	}
 }
