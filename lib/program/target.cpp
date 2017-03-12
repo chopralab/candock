@@ -3,7 +3,6 @@
 #include "pdbreader/pdbreader.hpp"
 
 #include "helper/path.hpp"
-#include "common.hpp"
 
 namespace Program {
 	Target::Target(const std::string& input_name ) {

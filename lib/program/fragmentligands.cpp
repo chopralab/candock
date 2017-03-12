@@ -4,7 +4,6 @@
 #include <mutex>
 
 #include "helper/inout.hpp"
-#include "common.hpp"
 #include "pdbreader/molecules.hpp"
 #include "helper/options.hpp"
 
@@ -26,7 +25,7 @@ namespace Program {
 			Molib::Molecules ligands;
 			while(lpdb.parse_molecule(ligands)) {
 				__ligand_idatm_types = ligands.get_idatm_types(__ligand_idatm_types);
-				common::create_mols_from_seeds(__added, __seeds, ligands);
+				Molib::create_mols_from_seeds(__added, __seeds, ligands);
 				ligands.clear();
 			}
 
@@ -78,7 +77,7 @@ namespace Program {
 			ligands.compute_overlapping_rigid_segments(cmdl.get_string_option("seeds"));
 
 			__ligand_idatm_types = ligands.get_idatm_types(__ligand_idatm_types);
-			common::create_mols_from_seeds(__added, __seeds, ligands);
+			Molib::create_mols_from_seeds(__added, __seeds, ligands);
 
 			if (write_out_for_linking)
 				inout::output_file(ligands, cmdl.get_string_option("prep"), ios_base::app);
@@ -158,7 +157,7 @@ namespace Program {
 
 	void FragmentLigands::add_seeds_from_molecules(const Molib::Molecules& molecules) {
 		__ligand_idatm_types = molecules.get_idatm_types(__ligand_idatm_types);
-		common::create_mols_from_seeds(__added, __seeds, molecules);
+		Molib::create_mols_from_seeds(__added, __seeds, molecules);
 		__seeds.erase_properties();
 		inout::output_file(__seeds, cmdl.get_string_option("seeds_pdb"), ios_base::out);
 	}

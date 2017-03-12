@@ -7,6 +7,8 @@
 #include "residue.hpp"
 #include "assembly.hpp"
 
+#include <mutex>
+
 using namespace std;
 
 namespace OMMIface {
@@ -51,6 +53,8 @@ namespace Molib {
 
 		string get_chain_ids(const unsigned int hm) const;
 
+                void change_residue_name(const string &resn);
+                void change_residue_name(std::mutex &mtx, int &ligand_cnt);
 
 		Assembly& asym() { return this->first(); }
 		

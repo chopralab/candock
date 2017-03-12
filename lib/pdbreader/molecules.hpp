@@ -57,6 +57,8 @@ namespace Molib {
 	};
 
 
+        void create_mols_from_seeds(set<int> &added, Molib::Molecules &seeds, const Molib::Molecules &mols);
+
 } // Molib
 #endif
 	

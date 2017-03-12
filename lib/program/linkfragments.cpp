@@ -1,6 +1,5 @@
 #include "linkfragments.hpp"
 
-#include "common.hpp"
 #include "linker/linker.hpp"
 #include "modeler/modeler.hpp"
 #include "helper/path.hpp"
@@ -98,7 +97,7 @@ namespace Program {
 
 			int model = 0;
 			for (auto &docked : docks) {
-				common::change_residue_name(docked.get_ligand(), "CAN"); 
+				docked.get_ligand().change_residue_name("CAN"); 
 				inout::output_file(Molib::Molecule::print_complex(docked.get_ligand(), docked.get_receptor(), docked.get_energy(), ++model), 
 						p.string(), ios_base::app); // output docked molecule conformations
 			}
@@ -106,7 +105,7 @@ namespace Program {
 		} catch (exception& e) {
 			cerr << "Error: skipping ligand " << ligand.name() << " with " << __receptor.name() << " due to : " << e.what() << endl;
 			stringstream ss;
-			common::change_residue_name(ligand, "CAN");
+			ligand.change_residue_name("CAN");
 			ss << "REMARK  20 non-binder " << ligand.name() << " with " << __receptor.name() << " because " << e.what() << endl << ligand;
 			inout::Inout::file_open_put_stream(p.string(), ss, ios_base::app);
 		} 
@@ -132,7 +131,7 @@ namespace Program {
 					/**
 					 * Ligand's resn MUST BE UNIQUE for ffield
 					 */
-					common::change_residue_name(ligand, __concurrent_numbering, __ligand_cnt);
+					ligand.change_residue_name(__concurrent_numbering, __ligand_cnt);
 					ffcopy.insert_topology(ligand);
 					__link_ligand(ligand, ffcopy);
 					ffcopy.erase_topology(ligand); // he he
@@ -173,7 +172,7 @@ namespace Program {
 					/**
 					 * Ligand's resn MUST BE UNIQUE for ffield
 					 */
-					common::change_residue_name(ligand, __concurrent_numbering, __ligand_cnt);
+					ligand.change_residue_name(__concurrent_numbering, __ligand_cnt);
 					ffcopy.insert_topology(ligand);
 					__link_ligand(ligand, ffcopy);
 					ffcopy.erase_topology(ligand); // he he
