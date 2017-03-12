@@ -233,6 +233,11 @@ namespace Molib {
 				const bool hydrogen = (element == "H" || (atom_name.size() == 1 && atom_name.at(0) == 'H'));
 				dbgmsg("hydrogen = " << boolalpha << hydrogen);
 				if ((__hm & PDBreader::hydrogens) || !hydrogen) {
+                                        // FIXME: This is a temporary hack until I can find a way to place a bond between the Ns and the FE
+                                        if ( resn == "HEM" && element =="FE" ) {
+                                                resn = "FE2";
+                                                resi = 9999;
+                                        }
 					if (alt_loc == ' ' || alt_loc == 'A') {
 						if (!mols.last().is_modified(Residue::res_tuple2(chain_id, resn, resi, ins_code))) {
 							Residue::res_type rest;
