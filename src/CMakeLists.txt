@@ -67,6 +67,7 @@ install( TARGETS
     cd_check_options
     cd_bsite_probis
     cd_prep_fragments
+    cd_make_objective
     cd_dock_fragments
     cd_link_fragments
     cd_design_ligands
