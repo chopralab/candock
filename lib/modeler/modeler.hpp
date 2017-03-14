@@ -9,7 +9,7 @@
 #include "helper/help.hpp"
 #include "helper/benchmark.hpp"
 #include "OpenMM.h"
-#include "kbforce/openmmapi/include/KBForce.h"
+#include "/usr/local/openmm/include/KBForce.h"
 #include "topology.hpp"
 #include "systemtopology.hpp"
 

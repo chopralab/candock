@@ -36,20 +36,26 @@ else()
 	find_library(
 			OPENMM_LIBRARY
             NAMES libOpenMM.so
-            PATHS /usr/local/openmm/lib
+            PATHS /usr/local/openmm/lib/
 			DOC "openmm library"
 	)
 	find_library(
 			OPENMM_LIBRARY_CUDA
             NAMES libOpenMMCUDA.so
-            PATHS /usr/local/openmm/plugins
-			DOC "openmm library"
+            PATHS /usr/local/openmm/plugins/
+			DOC "openmm library cuda"
 	)
+    find_library(
+        OPENMM_PLUGIN
+        NAMES libKBPlugin.so
+        PATHS /usr/local/openmm/
+        Doc "openmm plugin"
+        )
 
 endif()
 
 set(OPENMM_INCLUDE_DIR ${OPENMM_INCLUDE_DIR} CACHE STRING INTERNAL)
-set(OPENMM_LIBRARY ${OPENMM_LIBRARY} ${OPENMM_LIBRARY_CUDA} CACHE STRING INTERNAL)
+set(OPENMM_LIBRARY ${OPENMM_LIBRARY} ${OPENMM_LIBRARY_CUDA} ${OPENMM_PLUGIN} CACHE STRING INTERNAL)
 
 IF(OPENMM_LIBRARY AND OPENMM_INCLUDE_DIR)
 

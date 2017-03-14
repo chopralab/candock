@@ -1,5 +1,6 @@
 include_directories($CMAKE_CURRENT_SOURCE_DIR)
 
+include_directories(/usr/local/openmm/include/)
 include_directories( ../foreign/tclap/include/ )
 include_directories( ../lib/modeler/ )
 
@@ -19,7 +20,6 @@ set( candock_libraries
         pdbreader
         probis
         fragmenter
-        kbforce
         geom3d
         helper
    )
@@ -37,7 +37,9 @@ set( all_needed_libraries
      ${OPENMM_LIBRARY}
      ${GSL_LIBRARIES}
      ${additional_libraries}
-     /usr/local/openmm/lib/plugins/libOpenMMCUDA.so
+     #     /usr/local/openmm/lib/plugins/libOpenMMCUDA.so
+     /usr/local/openmm/lib/libKBPlugin.so
+     /usr/local/openmm/lib/plugins/libKBPluginReference.so
    )
 
 # Original, to be deprecated programs
@@ -82,7 +84,7 @@ target_link_libraries( cd_link_fragments ${all_needed_libraries} )
 target_link_libraries( cd_design_ligands ${all_needed_libraries} )
 
 if(CUDA_FOUND)
-target_link_libraries( cuda_link_fragments ${all_needed_libraries} )
+    target_link_libraries( cuda_link_fragments ${all_needed_libraries} )
 endif(CUDA_FOUND)
 
 install( TARGETS
