@@ -471,6 +471,7 @@ namespace help {
 	        { "N1+", { Linear, 2, "sp-hybridized nitrogen bonded to 2 other atoms" } },
 	        { "N1", { Linear, 1, "sp-hybridized nitrogen bonded to 1 other atom" } },
 	        { "Ntr", { Planar, 3, "nitro nitrogen" } },
+                { "Nox", { Tetrahedral, 4, "N-oxide amine" } },
 	        { "Ng+", { Planar, 3, "guanidinium/amidinium nitrogen, partial positive charge" } },
 	        { "O3", { Tetrahedral, 2, "sp3-hybridized oxygen" } },
 	        { "O3-", { Tetrahedral, 1, "phosphate or sulfate oxygen sharing formal negative charge" } },
