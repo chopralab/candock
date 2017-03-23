@@ -18,6 +18,8 @@ add_subdirectory(probis)
 add_subdirectory(score)
 add_subdirectory(program)
 
+if (NOT ${CANDOCK_BUILD_STATIC_EXECUTABLE})
+
 add_library(
     candock SHARED 
         $<TARGET_OBJECTS:program>
@@ -39,15 +41,11 @@ add_library(
         $<TARGET_OBJECTS:helper>
 )
 
-set_target_properties(
-        candock
-        PROPERTIES
-        INSTALL_RPATH_USE_LINK_PATH TRUE
-)
-
 install(
     TARGETS
         candock
     LIBRARY DESTINATION
-        lib/v${CANDOCK_MAJOR_VERSION}.${CANDOCK_MINOR_VERSION}.${CANDOCK_TWEAK_VERSION}
+        lib
 )
+
+endif (NOT ${CANDOCK_BUILD_STATIC_EXECUTABLE})
