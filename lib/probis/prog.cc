@@ -3,7 +3,7 @@
 #include "states.h"
 
 
-int main(int argc, char *argv[]) {
+int main_probis(int argc, char *argv[]) {
   try {
     Args args;
     args.fill_args(argc, argv);

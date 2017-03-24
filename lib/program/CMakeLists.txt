@@ -15,4 +15,4 @@ set( program_SRC
         target.cpp
         target.hpp)
 
-add_library(program STATIC ${program_SRC})
+add_library(program OBJECT ${program_SRC})
