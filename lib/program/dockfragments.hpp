@@ -41,6 +41,8 @@ namespace Program {
 
                 std::vector<std::pair<double, std::string>> get_best_seeds () const;
 
+                Molib::NRset get_top_seeds(const std::set<std::string> &seeds, const double top_percent) const;
+                Molib::NRset get_top_seeds(const Molib::Molecule      &ligand, const double top_percent) const;
         };
 
 }

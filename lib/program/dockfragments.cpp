@@ -3,6 +3,7 @@
 #include "helper/path.hpp"
 #include "helper/inout.hpp"
 #include "helper/options.hpp"
+#include "helper/grep.hpp"
 
 namespace Program {
 
@@ -156,4 +157,49 @@ namespace Program {
                 return seed_score_map;
         }
 
+        Molib::NRset DockFragments::get_top_seeds(const std::set<std::string> &seeds, const double top_percent) const {
+                Molib::NRset top_seeds;
+                
+                boost::regex regex;
+                regex.assign("REMARK   5 MOLECULE ", boost::regex_constants::basic);
+
+                for ( auto &fragment : seeds ) {
+
+                        boost::filesystem::path file_to_read(__top_seeds_location);
+                        file_to_read /= fragment;
+                        file_to_read /= cmdl.get_string_option("top_seeds_file");
+                        std::ifstream file( file_to_read.c_str() );
+
+                        const size_t number_of_seeds = Grep::count_matches(file, regex);
+                        const int sz = static_cast<int> (number_of_seeds * top_percent);
+                        dbgmsg("taking " << sz << " top seeds for seed " << fragment);
+
+                        // Add one in case the user is silly enough to select a top_percent of 0.000
+                        Molib::PDBreader pdb( file_to_read.string(), Molib::PDBreader::all_models, sz + 1 );
+
+                        dbgmsg("reading top_seeds_file for seed id = " << fragment);
+                        Molib::Molecules all = pdb.parse_molecule();
+
+                        dbgmsg("number of top seeds left = " << all.size());
+
+                        Molib::Molecules &last = top_seeds.add(new Molib::Molecules(all));
+
+                        if (last.empty()) {
+                                throw Error("die : there are no docked conformations for seed " + fragment);
+                        }
+                }
+
+                return top_seeds;
+        }
+
+        Molib::NRset DockFragments::get_top_seeds(const Molib::Molecule &ligand, const double top_percent) const {
+                std::set<string> seeds_to_read;
+                const Molib::Model &model = ligand.first().first();
+                for (auto &fragment : model.get_rigid()) { // iterate over seeds
+                        if (fragment.is_seed()) {
+                                seeds_to_read.insert(std::to_string(fragment.get_seed_id()));
+                        }
+                }
+                return get_top_seeds(seeds_to_read, top_percent);
+        }
 }

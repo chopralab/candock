@@ -1,6 +1,5 @@
 #include "linkfragments.hpp"
 
-#include "common.hpp"
 #include "linker/linker.hpp"
 #include "modeler/modeler.hpp"
 #include "helper/path.hpp"
@@ -56,21 +55,19 @@ namespace Program {
 				throw Error("No seeds to link");
 			}
 
-			/** 
-				* Read top seeds for this ligand
-				*/
-			Molib::NRset top_seeds = common::read_top_seeds_files(ligand,
-					Path::join(__receptor.name(), cmdl.get_string_option("top_seeds_dir")),
-                                                   cmdl.get_string_option("top_seeds_file"), cmdl.get_double_option("top_percent"));
+                        /** 
+                          * Read top seeds for this ligand
+                          */
+                        Molib::NRset top_seeds = __seeds_database.get_top_seeds(ligand, cmdl.get_double_option("top_percent"));
 
-			ligand.erase_properties(); // required for graph matching
-			top_seeds.erase_properties(); // required for graph matching
+                        ligand.erase_properties(); // required for graph matching
+                        top_seeds.erase_properties(); // required for graph matching
 
-			/** 
-			 * Jiggle the coordinates by one-thousand'th of an Angstrom to avoid minimization failures
-			 * with initial bonded relaxation failed errors
-			*/
-			top_seeds.jiggle();
+                        /** 
+                         * Jiggle the coordinates by one-thousand'th of an Angstrom to avoid minimization failures
+                         * with initial bonded relaxation failed errors
+                        */
+                        top_seeds.jiggle();
 
                         /* Init minization options and constants, including ligand and receptor topology
                          *
@@ -100,7 +97,7 @@ namespace Program {
 
 			int model = 0;
 			for (auto &docked : docks) {
-				common::change_residue_name(docked.get_ligand(), "CAN"); 
+				docked.get_ligand().change_residue_name("CAN"); 
 				inout::output_file(Molib::Molecule::print_complex(docked.get_ligand(), docked.get_receptor(), docked.get_energy(), ++model), 
 						p.string(), ios_base::app); // output docked molecule conformations
 			}
@@ -108,7 +105,7 @@ namespace Program {
 		} catch (exception& e) {
 			cerr << "Error: skipping ligand " << ligand.name() << " with " << __receptor.name() << " due to : " << e.what() << endl;
 			stringstream ss;
-			common::change_residue_name(ligand, "CAN");
+			ligand.change_residue_name("CAN");
 			ss << "REMARK  20 non-binder " << ligand.name() << " with " << __receptor.name() << " because " << e.what() << endl << ligand;
 			inout::Inout::file_open_put_stream(p.string(), ss, ios_base::app);
 		} 
@@ -139,7 +136,7 @@ namespace Program {
 					/**
 					 * Ligand's resn MUST BE UNIQUE for ffield
 					 */
-					common::change_residue_name(ligand, __concurrent_numbering, __ligand_cnt);
+					ligand.change_residue_name(__concurrent_numbering, __ligand_cnt);
 					ffcopy.insert_topology(ligand);
 					__link_ligand(ligand, ffcopy);
 					ffcopy.erase_topology(ligand); // he he
@@ -180,7 +177,7 @@ namespace Program {
 					/**
 					 * Ligand's resn MUST BE UNIQUE for ffield
 					 */
-					common::change_residue_name(ligand, __concurrent_numbering, __ligand_cnt);
+					ligand.change_residue_name(__concurrent_numbering, __ligand_cnt);
 					ffcopy.insert_topology(ligand);
 					__link_ligand(ligand, ffcopy);
 					ffcopy.erase_topology(ligand); // he he

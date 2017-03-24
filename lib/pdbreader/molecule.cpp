@@ -40,7 +40,21 @@ namespace Molib {
 		for (auto &ch : chain_ids) chains += ch;
 		dbgmsg("these are protein chains in the receptor file = " << chains);
 		return chains;
-	}
+        }
+        
+        void Molecule::change_residue_name(const string &resn) {
+                for (auto &presidue : this->get_residues()) {
+                        presidue->set_resn(resn);
+                }
+        }
+
+        void Molecule::change_residue_name(std::mutex &mtx, int &ligand_cnt) {
+                lock_guard<std::mutex> guard(mtx);
+                ++ligand_cnt;
+                for (auto &presidue : this->get_residues()) {
+                        presidue->set_resn("ligand_" + std::to_string(ligand_cnt));
+                }
+        }
 
 	Atom* get_closest_atom_of(const Atom &atom1, const Atom::Vec &neighbors, const string &atom_name) {
 		double min_dist = HUGE_VAL;
