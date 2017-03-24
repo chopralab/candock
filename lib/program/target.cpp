@@ -80,8 +80,41 @@ namespace Program {
 		}
 	}
 
-	void Target::dock_fragments(const FragmentLigands& ligand_fragments) {
-		for ( auto &a : __preprecs ) {
+        void Target::score_complexi(const FragmentLigands& ligand_fragments) {
+                for ( auto &a : __preprecs ) {
+                        std::unique_ptr<Molib::Score> score (new Molib::Score(cmdl.get_string_option("ref"), cmdl.get_string_option("comp"),
+                                                                              cmdl.get_string_option("func"),cmdl.get_int_option("cutoff"),
+                                                                              cmdl.get_double_option("step")));
+
+                        score->define_composition(__receptors.get_idatm_types(),
+                                                   ligand_fragments.ligand_idatm_types())
+                                                 .process_distributions_file(cmdl.get_string_option("dist"))
+                                                 .compile_scoring_function()
+                                                 .parse_objective_function(cmdl.get_string_option("obj_dir"), cmdl.get_double_option("scale"));
+
+                                                cout << "here" << endl; 
+                        Molib::PDBreader lpdb(cmdl.get_string_option("prep"), 
+                        Molib::PDBreader::all_models|Molib::PDBreader::hydrogens, 
+                        cmdl.get_int_option("max_num_ligands"));
+
+                        Molib::Molecules ligands = lpdb.parse_molecule();
+
+                        set<int> ligand_idatm_types;
+                        ligand_idatm_types = ligands.get_idatm_types(ligand_idatm_types);
+
+                        for ( auto &ligand : ligands ) {
+                                const double energy = score->non_bonded_energy(*a.gridrec, ligand);
+
+                                inout::output_file(Molib::Molecule::print_complex(ligand, a.protein, energy), 
+                                Path::join( cmdl.get_string_option("docked_dir"), ligand.name() + ".pdb"),  ios_base::app);
+                        }
+
+                        a.score = std::move(score);
+                }
+        }
+
+        void Target::dock_fragments(const FragmentLigands& ligand_fragments) {
+                for ( auto &a : __preprecs ) {
 
                         /* Read distributions file and initialize scores
                         * 
