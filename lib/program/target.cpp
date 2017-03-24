@@ -66,7 +66,7 @@ namespace Program {
 		}
 	}
 
-	void Target::find_centroids(const CmdLnOpts& cmdl ) {
+	void Target::find_centroids( ) {
 		for ( auto &a : __preprecs ) {
 			std::unique_ptr<FindCentroids> pcen (new FindCentroids(a.protein));
 
@@ -76,59 +76,59 @@ namespace Program {
 			 *
 			 */
 
-			pcen->run_step(cmdl);
+			pcen->run_step();
 			a.centroids = std::move(pcen);
 		}
 	}
 
-	void Target::dock_fragments(const FragmentLigands& ligand_fragments, const CmdLnOpts& cmdl) {
+	void Target::dock_fragments(const FragmentLigands& ligand_fragments) {
 		for ( auto &a : __preprecs ) {
 
-			/* Read distributions file and initialize scores
-			* 
-			*/
+                        /* Read distributions file and initialize scores
+                        * 
+                        */
 
-			std::unique_ptr<Molib::Score> score (new Molib::Score(cmdl.ref_state(), cmdl.comp(),
-																  cmdl.rad_or_raw(), cmdl.dist_cutoff(),
-																  cmdl.step_non_bond()));
+                        std::unique_ptr<Molib::Score> score (new Molib::Score(cmdl.get_string_option("ref"), cmdl.get_string_option("comp"),
+                                                                              cmdl.get_string_option("func"),cmdl.get_int_option("cutoff"),
+                                                                              cmdl.get_double_option("step")));
 
-			score->define_composition(__receptors.get_idatm_types(),
-									ligand_fragments.ligand_idatm_types())
-									.process_distributions_file(cmdl.distributions_file())
-									.compile_scoring_function()
-									.parse_objective_function(cmdl.obj_dir(), cmdl.scale_non_bond());
+                        score->define_composition(__receptors.get_idatm_types(),
+                                                   ligand_fragments.ligand_idatm_types())
+                                                 .process_distributions_file(cmdl.get_string_option("dist"))
+                                                 .compile_scoring_function()
+                                                 .parse_objective_function(cmdl.get_string_option("obj_dir"), cmdl.get_double_option("scale"));
 
 			a.score = std::move(score);
 
 			// Prepare the receptor for docking to
 			std::unique_ptr<OMMIface::ForceField> ffield ( new OMMIface::ForceField);
 
-			ffield->parse_gaff_dat_file(cmdl.gaff_dat_file())
-				.add_kb_forcefield(*a.score, cmdl.step_non_bond())
-				.parse_forcefield_file(cmdl.amber_xml_file())
-				.parse_forcefield_file(cmdl.water_xml_file());
+			ffield->parse_gaff_dat_file(cmdl.get_string_option("gaff_dat"))
+				.add_kb_forcefield(*a.score, cmdl.get_double_option("step"))
+				.parse_forcefield_file(cmdl.get_string_option("amber_xml"))
+				.parse_forcefield_file(cmdl.get_string_option("water_xml"));
 
 			a.ffield = std::move(ffield);
 
 			a.protein.prepare_for_mm(*a.ffield, *a.gridrec);
 
-			std::unique_ptr<DockFragments> pdockfragments(new DockFragments(*a.centroids, ligand_fragments, *a.score, *a.gridrec, a.protein.name(), cmdl));
-			pdockfragments->run_step(cmdl);
+			std::unique_ptr<DockFragments> pdockfragments(new DockFragments(*a.centroids, ligand_fragments, *a.score, *a.gridrec, a.protein.name()));
+			pdockfragments->run_step();
 			a.prepseeds = std::move(pdockfragments);
 		}
 	}
 
-	void Target::link_fragments(const CmdLnOpts& cmdl) {
+	void Target::link_fragments() {
 
 		for ( auto &a : __preprecs ) {
 			a.ffield->insert_topology(a.protein);
 			std::unique_ptr<LinkFragments> plinkfragments(new LinkFragments(a.protein, *a.score, *a.ffield, *a.gridrec));
-			plinkfragments->run_step(cmdl);
+			plinkfragments->run_step();
 			a.dockedlig = std::move(plinkfragments);
 		}
 	}
 
-        void Target::make_scaffolds(const CmdLnOpts& cmdl, FragmentLigands& ligand_fragments, const std::set<std::string>& seeds_to_add ) {
+        void Target::make_scaffolds(FragmentLigands& ligand_fragments, const std::set<std::string>& seeds_to_add ) {
                 Molib::Unique created_design("designed.txt");
                 Molib::Molecules all_designs;
 
@@ -140,16 +140,16 @@ namespace Program {
                         Molib::Molecules designs;
                         dpdb.parse_molecule(designs);
 
-                        ligand_fragments.add_seeds_from_molecules(designs, cmdl);
+                        ligand_fragments.add_seeds_from_molecules(designs);
                         all_designs.add(designs);
                 } else {
                     for (auto &a : __preprecs) {
-                        Molib::NRset nr = common::read_top_seeds_files(seeds_to_add, Path::join(a.protein.name(), cmdl.top_seeds_dir()),
-                                                                                           cmdl.top_seeds_file(), cmdl.top_percent() );
+                        Molib::NRset nr = common::read_top_seeds_files(seeds_to_add, Path::join(a.protein.name(), cmdl.get_string_option("top_seeds_dir")),
+                                                                                     cmdl.get_string_option("top_seeds_file"), cmdl.get_double_option("top_percent") );
                         for ( auto &molecules : nr ) {
                                 design::Design designer (molecules.first(), created_design);
                                 designer.change_original_name(molecules.name());
-                                designer.functionalize_hydrogens_with_fragments(nr, cmdl.tol_seed_dist(), cmdl.clash_coeff());
+                                designer.functionalize_hydrogens_with_fragments(nr, cmdl.get_double_option("tol_seed_dist"), cmdl.get_double_option("clash_coeff"));
 #ifndef NDEBUG
                 inout::output_file(designer.get_internal_designs(), "internal_designs.pdb", ios_base::app);
 #endif
@@ -174,24 +174,25 @@ namespace Program {
                             .compute_gaff_type()
                             .compute_rotatable_bonds() // relies on hydrogens being assigned
                             .erase_hydrogen()
-                            .compute_overlapping_rigid_segments(cmdl.seeds_file());
+                            .compute_overlapping_rigid_segments(cmdl.get_string_option("seeds"));
 
                 inout::output_file(all_designs, design_file);
 
-                ligand_fragments.add_seeds_from_molecules(all_designs, cmdl);
+                ligand_fragments.add_seeds_from_molecules(all_designs);
                 for ( auto &b : __preprecs ) {
-                        b.prepseeds->run_step(cmdl);
+                        b.prepseeds->run_step();
                         b.dockedlig->clear_top_poses();
-                        b.dockedlig->link_ligands(all_designs, cmdl);
+                        b.dockedlig->link_ligands(all_designs);
                 }
         }
 
-	void Target::design_ligands(const CmdLnOpts& cmdl, FragmentLigands& ligand_fragments, const std::set<std::string>& seeds_to_add ) {
+        void Target::design_ligands(FragmentLigands& ligand_fragments, const std::set<std::string>& seeds_to_add ) {
 #ifndef NDEBUG
-		for (auto &s : seeds_to_add ) {
-			cout << s << endl;
-		}
+                for (auto &s : seeds_to_add ) {
+                        cout << s << endl;
+                }
 #endif
+
                 int n = 1;
                 Molib::Unique created_design("designed.txt");
                 while (true) { // Probably a bad idea
@@ -206,7 +207,7 @@ namespace Program {
                             Molib::Molecules designs;
                             dpdb.parse_molecule(designs);
 
-                            ligand_fragments.add_seeds_from_molecules(designs, cmdl);
+                            ligand_fragments.add_seeds_from_molecules(designs);
                             all_designs.add(designs);
                     } else {
                         for ( auto &a : __preprecs ) {
@@ -214,9 +215,9 @@ namespace Program {
                                 design::Design designer ( molecule, created_design);
                                 if (! seeds_to_add.empty() )
                                         designer.functionalize_hydrogens_with_fragments(common::read_top_seeds_files(seeds_to_add,
-                                                                                    Path::join(a.protein.name(), cmdl.top_seeds_dir()),
-                                                                                    cmdl.top_seeds_file(), cmdl.top_percent() ),
-                                                                                    cmdl.tol_seed_dist(), cmdl.clash_coeff() );
+                                                                                    Path::join(a.protein.name(), cmdl.get_string_option("top_seeds_dir")),
+                                                                                    cmdl.get_string_option("top_seeds_file"), cmdl.get_double_option("top_percent")),
+                                                                                    cmdl.get_double_option("tol_seed_dist"), cmdl.get_double_option("clash_coeff") );
 
                                 const vector<string>& h_single_atoms = cmdl.get_string_vector("add_single_atoms");
                                 const vector<string>& a_single_atoms = cmdl.get_string_vector("change_terminal_atom");
@@ -248,15 +249,15 @@ namespace Program {
                                .compute_gaff_type()
                                .compute_rotatable_bonds() // relies on hydrogens being assigned
                                .erase_hydrogen()
-                               .compute_overlapping_rigid_segments(cmdl.seeds_file());
+                               .compute_overlapping_rigid_segments(cmdl.get_string_option("seeds"));
 
                     inout::output_file(all_designs, design_file);
 
-                    ligand_fragments.add_seeds_from_molecules(all_designs, cmdl);
+                    ligand_fragments.add_seeds_from_molecules(all_designs);
                     for ( auto &b : __preprecs ) {
-                        b.prepseeds->run_step(cmdl);
+                        b.prepseeds->run_step();
                         b.dockedlig->clear_top_poses();
-                        b.dockedlig->link_ligands(all_designs, cmdl);
+                        b.dockedlig->link_ligands(all_designs);
                     }
                 }
 	}
@@ -286,7 +287,7 @@ namespace Program {
 		return good_seed_list;
 	}
 
-	std::set<std::string> Target::determine_non_overlapping_seeds( const Target& targets, const Target& antitargets, const CmdLnOpts& cmdl ) {
+	std::set<std::string> Target::determine_non_overlapping_seeds( const Target& targets, const Target& antitargets ) {
 		set<string> solo_target_seeds;
 		const vector<string>& forced_seeds = cmdl.get_string_vector("force_seed");
 

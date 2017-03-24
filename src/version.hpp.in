@@ -1,11 +1,41 @@
 #ifndef VERSION_H
 #define VERSION_H
 
-#define CANDOCK_MAJOR_VERSION @CANDOCK_MAJOR_VERSION@
-#define CANDOCK_MINOR_VERSION @CANDOCK_MINOR_VERSION@
-#define CANDOCK_TWEAK_VERSION @CANDOCK_TWEAK_VERSION@
+#include <boost/asio/ip/host_name.hpp>
+#include <thread>
+#include <string>
+#include "helper/options.hpp"
 
-#define CANDOCK_GIT_REFERENCE "@CANDOCK_GIT_REFERENCE@"
-#define CANDOCK_GIT_MYCBRANCH "@CANDOCK_GIT_MYCBRANCH@"
+namespace Version {
+        std::string get_banner() {
+                return  "-----------------------------------------------------------------------|\n"
+                        "|         CCCCC    AAA   NN   NN DDDDD    OOOOO   CCCCC  KK  KK        |\n"
+                        "|        CC       AAAAA  NNN  NN DD  DD  OO   OO CC      KK KK         |\n"
+                        "|        CC      AA   AA NN N NN DD   DD OO   OO CC      KKKK          |\n"
+                        "|        CC      AAAAAAA NN  NNN DD   DD OO   OO CC      KK KK         |\n"
+                        "|         CCCCC  AA   AA NN   NN DDDDDD   OOOO0   CCCCC  KK  KK        |\n"
+                        "|                                                                      |\n"
+                        "|                             It can-dock!                             |\n"
+                        "|                                                                      |\n" 
+                        "|              Copyright 2016  Chopra Lab (chopralab.org)              |\n"
+                        "|                          Purdue  University                          |\n"
+                        "|                                                                      |\n"
+                        "|                      Member of the CANDIY Suite                      |\n"
+                        "|______________________________________________________________________|\n";
+
+        }
+
+        std::string get_version() {
+                return "version @CANDOCK_MAJOR_VERSION@.@CANDOCK_MINOR_VERSION@.@CANDOCK_TWEAK_VERSION@\n"
+                       "@CANDOCK_GIT_REFERENCE@ on branch @CANDOCK_GIT_MYCBRANCH@\n";
+        }
+
+        std::string get_run_info() {
+                return std::string("running ") + cmdl.program_name() + " on hostname " + boost::asio::ip::host_name() + "\n" +
+                       "Detected support for " + std::to_string(std::thread::hardware_concurrency()) + " concurrent threads." + "\n\t" +
+                       " Using " + std::to_string(cmdl.ncpu()) + " threads.\n";
+        }
+
+};
 
 #endif

@@ -22,17 +22,17 @@ namespace Program {
 		std::mutex __prevent_re_read_mtx;
 		std::mutex __add_to_typing_mtx;
 
-		void __fragment_ligands ( Molib::PDBreader& lpdb, const CmdLnOpts& cmdl, const bool write_out_for_linking, const bool no_rotatable_bond);
+		void __fragment_ligands ( Molib::PDBreader& lpdb, const bool write_out_for_linking, const bool no_rotatable_bond);
 
 	protected:
-		virtual bool __can_read_from_files(const CmdLnOpts& cmdl);
-		virtual void __read_from_files    (const CmdLnOpts& cmdl);
-		virtual void __continue_from_prev (const CmdLnOpts& cmdl);
+		virtual bool __can_read_from_files();
+		virtual void __read_from_files    ();
+		virtual void __continue_from_prev ();
 
 	public:
 		FragmentLigands( ) { }
 
-		void add_seeds_from_molecules(const Molib::Molecules& molecules,  const Program::CmdLnOpts& cmdl);
+		void add_seeds_from_molecules(const Molib::Molecules& molecules);
 
 		const Molib::Molecules& seeds() const {
 			return __seeds;

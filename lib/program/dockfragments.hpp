@@ -6,52 +6,42 @@
 #include "findcentroids.hpp"
 #include "fragmentligands.hpp"
 
-#include "cmdlnopts.hpp"
 #include "score/score.hpp"
 #include "docker/dock.hpp"
 #include "pdbreader/nrset.hpp"
 
 namespace Program {
 
-	class DockFragments : public ProgramStep
-	{
-		const FindCentroids& __found_centroids;
-		const FragmentLigands& __fragmented_ligands;
-		
-		const Molib::Score& __score;
-		const Molib::Atom::Grid& __gridrec;
-		
-		const std::string& __name;
+        class DockFragments : public ProgramStep
+        {
+                const FindCentroids& __found_centroids;
+                const FragmentLigands& __fragmented_ligands;
 
-		Molib::NRset __all_seeds;
+                const Molib::Score& __score;
+                const Molib::Atom::Grid& __gridrec;
 
-		const CmdLnOpts& __cmdl; //TODO: remove this dependency
+                const std::string& __name;
+                std::string __top_seeds_location;
 
-		void __dock_fragment(int start, const Docker::Gpoints& gpoints, const Docker::Gpoints& gpoints0, const CmdLnOpts& cmdl);
-	protected:
-		virtual bool __can_read_from_files(const CmdLnOpts& cmdl);
-		virtual void __read_from_files(const CmdLnOpts& cmdl);
-		virtual void __continue_from_prev(const CmdLnOpts& cmdl);
-		
-	public:
-		DockFragments ( const FindCentroids& found_centroids,
-						const FragmentLigands& fragmented_ligands,
-						const Molib::Score& score,
-						const Molib::Atom::Grid& gridrec,
-						const std::string& name,
-						const CmdLnOpts& cmdl
-					  ) :
-						__found_centroids(found_centroids),
-						__fragmented_ligands(fragmented_ligands),
-						__score(score),
-						__gridrec(gridrec),
-						__name(name),
-						__cmdl(cmdl)
-						{}
+                Molib::NRset __all_seeds;
 
-		std::vector<std::pair<double, std::string>> get_best_seeds () const;
+                void __dock_fragment(int start, const Docker::Gpoints& gpoints, const Docker::Gpoints& gpoints0);
+        protected:
+                virtual bool __can_read_from_files();
+                virtual void __read_from_files();
+                virtual void __continue_from_prev();
 
-	};
+        public:
+                DockFragments ( const FindCentroids& found_centroids,
+                                const FragmentLigands& fragmented_ligands,
+                                const Molib::Score& score,
+                                const Molib::Atom::Grid& gridrec,
+                                const std::string& name
+                              );
+
+                std::vector<std::pair<double, std::string>> get_best_seeds () const;
+
+        };
 
 }
 
