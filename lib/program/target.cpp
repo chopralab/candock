@@ -88,19 +88,15 @@ namespace Program {
 
                         score->define_composition(__receptors.get_idatm_types(),
                                                    ligand_fragments.ligand_idatm_types())
-                                                 .process_distributions_file(cmdl.get_string_option("dist"))
-                                                 .compile_scoring_function()
-                                                 .parse_objective_function(cmdl.get_string_option("obj_dir"), cmdl.get_double_option("scale"));
+                              .process_distributions_file(cmdl.get_string_option("dist"))
+                              .compile_scoring_function()
+                              .parse_objective_function(cmdl.get_string_option("obj_dir"), cmdl.get_double_option("scale"));
 
-                                                cout << "here" << endl; 
                         Molib::PDBreader lpdb(cmdl.get_string_option("prep"), 
                         Molib::PDBreader::all_models|Molib::PDBreader::hydrogens, 
                         cmdl.get_int_option("max_num_ligands"));
 
                         Molib::Molecules ligands = lpdb.parse_molecule();
-
-                        set<int> ligand_idatm_types;
-                        ligand_idatm_types = ligands.get_idatm_types(ligand_idatm_types);
 
                         for ( auto &ligand : ligands ) {
                                 const double energy = score->non_bonded_energy(*a.gridrec, ligand);
