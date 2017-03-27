@@ -169,11 +169,10 @@ namespace Docker {
 							for (auto &centroid : kv.second) {
 								if (eval.distance(centroid.get_centroid()) <= centroid.get_radial_check()) {
 									is_within_r_of_c = true;
-									goto END_LOOP;
+									break;
 								}
 							}
-                            END_LOOP:
-							if (is_within_r_of_c) {
+                            if (is_within_r_of_c) {
                                 for (Molib::Atom *a : grid.get_neighbors(eval, dist_cutoff)) {
                                     Molib::Atom &atom = *a;
                                     //~ dbgmsg("before getting atom radius");

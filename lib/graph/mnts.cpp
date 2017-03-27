@@ -614,10 +614,9 @@ void MNTS::max_tabu(int ii) {
 	        }
 	        //~ verify();
 		}
-		if( l == Waim ) goto save_lbest;
+		if( l == Waim ) break;
 		//~ if( l == Waim ) return lbest;
 	}
-	save_lbest:
 	W_used[ ii ] = lbest;
 	len_used[ ii ] = len_W;
 	Iteration[ ii ] = Titer;
