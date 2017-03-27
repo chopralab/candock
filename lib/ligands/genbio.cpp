@@ -89,40 +89,44 @@ namespace genbio {
 			}
 		}
 	}
-	void remove_not_ligands(Molib::Molecule &molecule, Molib::Atom::Grid &grid) {
-		// find atoms in aligned molecules that are neighbors of query chains
-		for (auto &assembly : molecule) {
-			for (auto &model : assembly) {
-				for (auto &chain : model) {
-					// remove hetero, ion and water residues that are not close to the query
-					chain.remove_if([&grid](const Molib::Residue &r) {
-						if (r.rest() == Molib::Residue::hetero || r.rest() == Molib::Residue::ion || r.rest() == Molib::Residue::water) {
-							for (auto &atom : r) {
-								if (!grid.get_neighbors(atom.crd(), 4.0).empty()) {
-									return false; // close enough, don't delete
-								}
-							}
-							return true; 
-						}
-						return false; // don't delete protein or nucleic
-					}); // if atom is less than 4.0 A from some query atom, then this residue is a ligand of query, and is to keep
-					for (auto &residue : chain) {
-						if (residue.rest() == Molib::Residue::protein || residue.rest() == Molib::Residue::nucleic) {
-							for (auto &atom : residue) {
-								if (!grid.get_neighbors(atom.crd(), 4.0).empty()) { // if atom is less than 4.0 A from some query atom, then this chain is a ligand of query, and is to keep
-									goto KEEPCHAIN;
-								}
-							}
-						}
-					}
-					// if no protein or nucleic atom of this chain is a ligand of the query, delete this chain
-					model.erase(chain.chain_id());
-					KEEPCHAIN: 
-					; // null statement to get label to work
-				}
-			}
-		}
-	}
+        void remove_not_ligands(Molib::Molecule &molecule, Molib::Atom::Grid &grid) {
+                // find atoms in aligned molecules that are neighbors of query chains
+                for (auto &assembly : molecule) {
+                        for (auto &model : assembly) {
+                                for (auto &chain : model) {
+                                        // remove hetero, ion and water residues that are not close to the query
+                                        chain.remove_if([&grid](const Molib::Residue &r) {
+                                                if (r.rest() == Molib::Residue::hetero || r.rest() == Molib::Residue::ion || r.rest() == Molib::Residue::water) {
+                                                        for (auto &atom : r) {
+                                                                if (!grid.get_neighbors(atom.crd(), 4.0).empty()) {
+                                                                        return false; // close enough, don't delete
+                                                                }
+                                                        }
+                                                        return true; 
+                                                }
+                                                return false; // don't delete protein or nucleic
+                                        }); // if atom is less than 4.0 A from some query atom, then this residue is a ligand of query, and is to keep
+                                        bool keep_chain = false;
+                                        for (auto &residue : chain) {
+                                                if (residue.rest() == Molib::Residue::protein || residue.rest() == Molib::Residue::nucleic) {
+                                                        for (auto &atom : residue) {
+                                                                // if atom is less than 4.0 A from some query atom, then this chain is a ligand of query, and is to keep
+                                                                if (!grid.get_neighbors(atom.crd(), 4.0).empty()) {
+                                                                        keep_chain = true;
+                                                                        break;
+                                                                }
+                                                        }
+                                                        if (keep_chain)
+                                                                break;
+                                                }
+                                        }
+                                        // if no protein or nucleic atom of this chain is a ligand of the query, delete this chain
+                                        if ( ! keep_chain )
+                                                model.erase(chain.chain_id());
+                                }
+                        }
+                }
+        }
 	void generate_biological_assemblies(const string &models, const bool hydrogens,
 		const string &pdb_dirname, const string &qpdb_file, const string &qcid,
 		const bool neighb, const bool rnolig, const string &bio, const bool ralch,

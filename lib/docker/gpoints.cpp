@@ -183,14 +183,14 @@ namespace Docker {
                                     if (distance <= eval_dist) {
                                         okay_min = 0;
                                         dbgmsg("distance = " << distance << " eval_dist = " << eval_dist);
-                                        goto OUTER;
+                                        break;
                                     }
                                     else {
                                         okay_min = 1;
                                         if (distance < closest) closest = distance;
                                     }
                                 }
-                                OUTER:
+
                                 if (closest>max_interatomic_distance) okay_max = 0;
                                 if (okay_min*okay_max > 0) {
                                     dbgmsg("before adding to __gridpoints");
