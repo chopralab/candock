@@ -33,17 +33,17 @@ namespace Inout {
         int  __lock(const string &name) {
                 int fd = open(name.c_str(),O_RDWR|O_CREAT,S_IRUSR|S_IWUSR);
                 if (flock(fd,LOCK_EX) == -1) {
-                        throw Error("Could not lock file " + name);
+                        dbgmsg("Could not lock file " + name + " because " + strerror(errno));
                 } 
                 return fd;
         }
 
         void __unlock(int fd) {
             if (flock(fd,LOCK_UN)==-1) {
-                        throw Error("Could not unlock handle " + std::to_string(fd));
+                        dbgmsg("Could not unlock handle " + std::to_string(fd));
             }
             if (close(fd)==-1) {
-                        throw Error("Could not close handle " + std::to_string(fd));
+                        dbgmsg("Could not close handle " + std::to_string(fd));
             }
         }
 
