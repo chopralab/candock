@@ -3,6 +3,8 @@
 #include "pdbreader/molecule.hpp"
 #include "helper/inout.hpp"
 #include "helper/path.hpp"
+#include <boost/filesystem/path.hpp>
+#include <boost/filesystem/operations.hpp>
 #include <functional>
 #include <gsl/gsl_errno.h>
 #include <gsl/gsl_spline.h>
@@ -75,37 +77,58 @@ namespace Molib {
 		return *this;
 	}
 
-	Score& Score::parse_objective_function(const string &obj_dir, const double scale_non_bond) {
-		for (auto &atom_pair : __prot_lig_pairs) {
+        Score& Score::parse_objective_function(const string &obj_dir, const double scale_non_bond) {
+            
+                boost::filesystem::path path_to_objective_function(obj_dir);
+                std::string subdir = std::to_string(__step_non_bond);
 
-			const string idatm_type1 = help::idatm_unmask[atom_pair.first];
-			const string idatm_type2 = help::idatm_unmask[atom_pair.second];
-			
-			dbgmsg("parsing objective function for " << idatm_type1 << " and " << idatm_type2);
-			
-			const string &filename = idatm_type1 + "_" + idatm_type2 + ".txt";
+                // Some systems add trailing zeros to doubles, let's remove them
+                while ( ! boost::filesystem::exists(path_to_objective_function / subdir) && subdir.back() == '0' ) {
+                        subdir.erase(subdir.end() - 1);
+                }
 
-			vector<string> contents;
-			inout::Inout::read_file(Path::join(Path::join(obj_dir, std::to_string(__step_non_bond)), filename), contents);
-			
-			for (auto &line : contents) {
-				stringstream ss(line);
-				string str1;
-				ss >> str1;
-				__energies[atom_pair].push_back(stod(str1));
-			}
+                path_to_objective_function /= subdir;
 
-			__derivatives[atom_pair] = Interpolation::derivative(__energies[atom_pair], __step_non_bond);
+                if ( ! boost::filesystem::exists(path_to_objective_function) ) {
+                        throw Error( "Objective function not found! check 'obj_dir' and 'step'");
+                }
 
-			// scale derivatives ONLY not energies and don't do it in kbforce cause here is more efficient
-			for (auto &dEdt : __derivatives[atom_pair]) {
-				dEdt *= scale_non_bond;
-			}
+                for (auto &atom_pair : __prot_lig_pairs) {
 
-		}
-		dbgmsg("parsed objective function");
+                        const string idatm_type1 = help::idatm_unmask[atom_pair.first];
+                        const string idatm_type2 = help::idatm_unmask[atom_pair.second];
+
+                        dbgmsg("parsing objective function for " << idatm_type1 << " and " << idatm_type2);
+
+                        const string &filename = idatm_type1 + "_" + idatm_type2 + ".txt";
+
+                        // Check if the file exists on disk. Since we know that the directory exists on disk,
+                        // we can skip this pair as it is not part of the scoring function (ie not in the CSD).
+                        if ( ! inout::Inout::file_size( (path_to_objective_function / filename).string() )) {
+                                continue;
+                        }
+
+                        vector<string> contents;
+                        inout::Inout::read_file( (path_to_objective_function / filename).string(), contents);
+
+                        for (auto &line : contents) {
+                                stringstream ss(line);
+                                string str1;
+                                ss >> str1;
+                                __energies[atom_pair].push_back(stod(str1));
+                        }
+
+                        __derivatives[atom_pair] = Interpolation::derivative(__energies[atom_pair], __step_non_bond);
+
+                        // scale derivatives ONLY not energies and don't do it in kbforce cause here is more efficient
+                        for (auto &dEdt : __derivatives[atom_pair]) {
+                                dEdt *= scale_non_bond;
+                        }
+
+                }
+                dbgmsg("parsed objective function");
                 return *this;
-	}
+        }
 
 	Array1d<double> Score::compute_energy(const Atom::Grid &gridrec, const Geom3D::Coordinate &crd, const set<int> &ligand_atom_types) const {
 		dbgmsg("computing energy");
