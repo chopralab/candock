@@ -285,7 +285,7 @@ namespace OMMIface {
                         return improper_type.at("X").at("X").at(aclass3).at(aclass1);
 
                 if ( has_improper_type( "X", "X", aclass3, aclass2 ) )
-                        return improper_type.at("X").at(aclass4).at(aclass3).at(aclass2);
+                        return improper_type.at("X").at("X").at(aclass3).at(aclass2);
 
                 if ( has_improper_type( "X", "X", aclass3, aclass4 ) )
                         return improper_type.at("X").at("X").at(aclass3).at(aclass4);
