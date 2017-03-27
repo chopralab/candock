@@ -34,7 +34,7 @@ namespace Molib {
 			if (__seeds_file != "") { // output to seeds_file if given
 				stringstream ss;
 				ss << __unique_seeds;
-				inout::Inout::file_open_put_stream(__seeds_file, ss);
+				Inout::file_open_put_stream(__seeds_file, ss);
 			}
 		}
 		size_t get_seed_id(const Atom::Set &a) { return __unique(a); }

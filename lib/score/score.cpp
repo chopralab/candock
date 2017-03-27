@@ -72,7 +72,7 @@ namespace Molib {
 			}
 			const string &filename = idatm_type1 + "_" + idatm_type2 + ".txt";
 			
-			inout::Inout::file_open_put_stream(Path::join(Path::join(obj_dir, std::to_string(__step_non_bond)), filename), ss);
+			Inout::file_open_put_stream(Path::join(Path::join(obj_dir, std::to_string(__step_non_bond)), filename), ss);
 		}
 		return *this;
 	}
@@ -104,12 +104,12 @@ namespace Molib {
 
                         // Check if the file exists on disk. Since we know that the directory exists on disk,
                         // we can skip this pair as it is not part of the scoring function (ie not in the CSD).
-                        if ( ! inout::Inout::file_size( (path_to_objective_function / filename).string() )) {
+                        if ( ! Inout::file_size( (path_to_objective_function / filename).string() )) {
                                 continue;
                         }
 
                         vector<string> contents;
-                        inout::Inout::read_file( (path_to_objective_function / filename).string(), contents);
+                        Inout::read_file( (path_to_objective_function / filename).string(), contents);
 
                         for (auto &line : contents) {
                                 stringstream ss(line);
@@ -142,7 +142,7 @@ namespace Molib {
 #ifndef NDEBUG
 				if (!__energies_scoring.count(atom_pair))
 					throw Error("undefined atom_pair in __energies_scoring");
-				if (index >= __energies_scoring.at(atom_pair).size())
+				if (static_cast<size_t> (index) >= __energies_scoring.at(atom_pair).size())
 					throw Error("undefined index in __energies_scoring");
 				dbgmsg("atom pairs = " << help::idatm_unmask[atom_pair.first] << " " 
 					<< help::idatm_unmask[atom_pair.second] << " index = " << index
@@ -194,7 +194,7 @@ namespace Molib {
 		Benchmark bench;
 		cout << "processing combined histogram ...\n";
 		vector<string> distributions_file_raw;
-		inout::Inout::read_file(distributions_file, distributions_file_raw);
+		Inout::read_file(distributions_file, distributions_file_raw);
 		const bool rad_or_raw(__rad_or_raw == "normalized_frequency");
 
 		for (string &line : distributions_file_raw) {
@@ -425,7 +425,7 @@ namespace Molib {
 				}
 				dbgmsg("repulsion.size() = " << repulsion.size());
 #ifndef NDEBUG
-				for (int i = 0; i < repulsion.size(); ++i)
+				for (size_t i = 0; i < repulsion.size(); ++i)
 					dbgmsg("i = " << i << " repulsion = " << repulsion[i]);
 #endif
 				// if the repulsion term comes under the potential do a linear interpolation to get smooth joint
@@ -449,7 +449,7 @@ namespace Molib {
                                 __energies[atom_pair].assign(potential.begin(), potential.end());
 
 #ifndef NDEBUG
-				for (int i = 0; i < potential.size(); ++i) {
+				for (size_t i = 0; i < potential.size(); ++i) {
 					dbgmsg("interpolated " << help::idatm_unmask[atom_pair.first] 
 						<< " " << help::idatm_unmask[atom_pair.second]
 						<< " " << i * __step_non_bond
@@ -527,9 +527,9 @@ namespace Molib {
 #ifndef NDEBUG
 		if (!__gij_of_r_numerator.count(atom_pair))
 			throw Error("die : undefined __gij_of_r_numerator");
-		if (idx >= __gij_of_r_numerator.at(atom_pair).size())
+		if (static_cast<size_t>(idx) >= __gij_of_r_numerator.at(atom_pair).size())
 			throw Error("die : undefined __gij_of_r_numerator");
-		if (idx >= __gij_of_r_bin_range_sum.size())
+		if (static_cast<size_t>(idx) >= __gij_of_r_bin_range_sum.size())
 			throw Error("die : undefined __gij_of_r_bin_range_sum");
 #endif
 		double gij_of_r = __gij_of_r_numerator[atom_pair][idx] / __sum_gij_of_r_numerator[atom_pair];
@@ -545,9 +545,9 @@ namespace Molib {
 #ifndef NDEBUG
 		if (!__gij_of_r_numerator.count(atom_pair))
 			throw Error("die : undefined __gij_of_r_numerator");
-		if (idx >= __gij_of_r_numerator.at(atom_pair).size())
+		if (static_cast<size_t>(idx) >= __gij_of_r_numerator.at(atom_pair).size())
 			throw Error("die : undefined __gij_of_r_numerator");
-		if (idx >= __bin_range_sum.size())
+		if (static_cast<size_t>(idx) >= __bin_range_sum.size())
 			throw Error("die : undefined __bin_range_sum");
 #endif
 		double numerator = __gij_of_r_numerator[atom_pair][idx] / __sum_gij_of_r_numerator[atom_pair];

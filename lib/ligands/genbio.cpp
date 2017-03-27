@@ -196,6 +196,6 @@ namespace genbio {
 			}
 		}
 		// output bio file
-		if (!bio_file.empty()) inout::output_file(mols, bio_file); // output rotated bio assemblies (or asymmetric units if NO bioassembly)
+		if (!bio_file.empty()) Inout::output_file(mols, bio_file); // output rotated bio assemblies (or asymmetric units if NO bioassembly)
 	}
 };

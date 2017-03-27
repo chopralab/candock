@@ -68,7 +68,7 @@ void JsonReader::parse_JSON(const string JSON_file) {
 	if (boost::regex_search(JSON_file, boost::regex(".json$"))) {
 		Json::Reader reader;
 		vector<string> vec;
-		inout::Inout::read_file(JSON_file, vec);
+		Inout::read_file(JSON_file, vec);
 		ostringstream ss;
 		copy(vec.begin(), vec.end(), ostream_iterator<string>(ss, ""));
 		if (!reader.parse(ss.str(), __root)) {

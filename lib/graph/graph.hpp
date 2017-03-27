@@ -416,8 +416,8 @@ namespace Glib {
 				}
 			}
 			stream << "p " << g.size() << " " << edge_size << endl;
-			for (int i = 0; i < g.size(); i++) {
-				for (int j = i + 1; j <g.size(); j++) {
+			for (size_t i = 0; i < g.size(); i++) {
+				for (size_t j = i + 1; j <g.size(); j++) {
 					//~ if (g.__conn->size() > 0 && (*g.__conn)[i][j] == true) stream << "e " << i + 1 << " " << j + 1 << endl;
 					if (g.__conn[i][j] == true) stream << "e " << i + 1 << " " << j + 1 << endl;
 				}

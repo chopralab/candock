@@ -20,7 +20,7 @@ namespace Program {
 		 * the receptor molecule(s)
 		 * 
 		 */
-		if ( inout::Inout::file_size(input_name) > 0 ) {
+		if ( Inout::file_size(input_name) > 0 ) {
 			// If the option given is a regular file, act like previous versions
 			Molib::PDBreader rpdb(input_name, Molib::PDBreader::first_model);
 			Molib::Molecules receptors = rpdb.parse_molecule();
@@ -28,7 +28,7 @@ namespace Program {
 			current.set_name(boost::filesystem::basename(input_name.substr(0, input_name.length() - 4))); // Emulate the original version of candock
                         boost::filesystem::create_directory(current.name());
 			__preprecs.push_back(DockedReceptor {current, nullptr, nullptr, nullptr});
-		} else for ( const auto &a : inout::Inout::files_matching_pattern (input_name, ".pdb")) {
+		} else for ( const auto &a : Inout::files_matching_pattern (input_name, ".pdb")) {
 			// Otherwise we treat it like the new version intends.
 			Molib::PDBreader rpdb(a, Molib::PDBreader::first_model);
 			Molib::Molecules receptors = rpdb.parse_molecule();
@@ -101,7 +101,7 @@ namespace Program {
                         for ( auto &ligand : ligands ) {
                                 const double energy = score->non_bonded_energy(*a.gridrec, ligand);
 
-                                inout::output_file(Molib::Molecule::print_complex(ligand, a.protein, energy), 
+                                Inout::output_file(Molib::Molecule::print_complex(ligand, a.protein, energy), 
                                 Path::join( cmdl.get_string_option("docked_dir"), ligand.name() + ".pdb"),  ios_base::app);
                         }
 
@@ -162,7 +162,7 @@ namespace Program {
 
                 cout << "Starting iteration #0 (making a scaffold)" << endl;
                 const string design_file = "designed_0.pdb";
-                if ( inout::Inout::file_size(design_file) ) {
+                if ( Inout::file_size(design_file) ) {
                         cout << design_file << " found -- skipping generation of new designs this iteration" << endl;
                         Molib::PDBreader dpdb (design_file, Molib::PDBreader::all_models );
                         Molib::Molecules designs;
@@ -178,7 +178,7 @@ namespace Program {
                                 designer.change_original_name(molecules.name());
                                 designer.functionalize_hydrogens_with_fragments(nr, cmdl.get_double_option("tol_seed_dist"), cmdl.get_double_option("clash_coeff"));
 #ifndef NDEBUG
-                inout::output_file(designer.get_internal_designs(), "internal_designs.pdb", ios_base::app);
+                Inout::output_file(designer.get_internal_designs(), "internal_designs.pdb", ios_base::app);
 #endif
                                 all_designs.add( designer.prepare_designs() );
                         }
@@ -202,7 +202,7 @@ namespace Program {
                             .erase_hydrogen()
                             .compute_overlapping_rigid_segments(cmdl.get_string_option("seeds"));
 
-                inout::output_file(all_designs, design_file);
+                Inout::output_file(all_designs, design_file);
 
                 ligand_fragments.add_seeds_from_molecules(all_designs);
                 for ( auto &b : __preprecs ) {
@@ -227,7 +227,7 @@ namespace Program {
 
                     string design_file = "designed_" + std::to_string(n++) + ".pdb";
                     Molib::Molecules all_designs;
-                    if ( inout::Inout::file_size(design_file) ) {
+                    if ( Inout::file_size(design_file) ) {
                             cout << design_file << " found -- skipping generation of new designs this iteration" << endl;
                             Molib::PDBreader dpdb (design_file, Molib::PDBreader::all_models );
                             Molib::Molecules designs;
@@ -251,7 +251,7 @@ namespace Program {
                                 if (!h_single_atoms.empty())
                                         designer.functionalize_hydrogens_with_single_atoms(h_single_atoms);
 #ifndef NDEBUG
-                                inout::output_file(designer.get_internal_designs(), "internal_designs.pdb", ios_base::app);
+                                Inout::output_file(designer.get_internal_designs(), "internal_designs.pdb", ios_base::app);
 #endif
                                 all_designs.add( designer.prepare_designs() );
                             }
@@ -275,7 +275,7 @@ namespace Program {
                                .erase_hydrogen()
                                .compute_overlapping_rigid_segments(cmdl.get_string_option("seeds"));
 
-                    inout::output_file(all_designs, design_file);
+                    Inout::output_file(all_designs, design_file);
 
                     ligand_fragments.add_seeds_from_molecules(all_designs);
                     for ( auto &b : __preprecs ) {
@@ -284,7 +284,7 @@ namespace Program {
                         b.dockedlig->link_ligands(all_designs);
                     }
                 }
-	}
+        }
 
 	std::multiset<std::string> Target::determine_overlapping_seeds(const int max_seeds, const int number_of_occurances) const {
 

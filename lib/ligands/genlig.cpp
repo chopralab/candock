@@ -203,8 +203,8 @@ namespace genlig {
 					Molib::Molecules binding_sites;
 					binding_sites.add(new Molib::Molecule(mark(neighbor_residues, 
 						aligned_part_of_binding_site, lig_code)));
-					inout::output_file(ligands, lig_file);
-					inout::output_file(binding_sites, bsite_file);
+					Inout::output_file(ligands, lig_file);
+					Inout::output_file(binding_sites, bsite_file);
 					break; // the end
 				}
 			}
@@ -245,7 +245,7 @@ namespace genlig {
 			const double z_score = d["alignment"][0]["scores"]["z_score"].asDouble();
 			const Json::Value &hetero = d["hetero"];
 			for (size_t i = 0; i < hetero.size(); ++i) { // go over the hetero ligands only
-				dbgmsg(hetero[i].asString());
+				dbgmsg(hetero[static_cast<int>(i)].asString());
 				const vector<string> ligand = help::ssplit(hetero[ static_cast<int>(i)].asString(), ":");
 				dbgmsg(ligand.size());
 				const int cluster_number = stoi(ligand[0]);

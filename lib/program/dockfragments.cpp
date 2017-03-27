@@ -37,7 +37,7 @@ namespace Program {
                 for (const auto& seed : all_seeds) {
                         boost::filesystem::path p (__top_seeds_location);
                         p = p / seed.name() / top_seeds_file;
-                        all_seeds_are_present &= inout::Inout::file_size(p.string()) > 0;
+                        all_seeds_are_present &= Inout::file_size(p.string()) > 0;
                 }
 
                 return all_seeds_are_present;
@@ -56,7 +56,7 @@ namespace Program {
                                 boost::filesystem::path p (__top_seeds_location);
                                 p = p / __fragmented_ligands.seeds()[j].name() / top_seeds_file;
 
-                                if ( inout::Inout::file_size(p.string()) > 0 ) {
+                                if ( Inout::file_size(p.string()) > 0 ) {
                                         cout << "Skipping docking of seed: " << __fragmented_ligands.seeds()[j].name() << " because it is already docked!" << endl;
                                         continue;
                                 }
@@ -71,7 +71,7 @@ namespace Program {
                                                           );
 
 #ifndef NDEBUG
-                                inout::output_file(conf, "conf_" + __fragmented_ligands.seeds()[j].name() + ".pdb"); 
+                                Inout::output_file(conf, "conf_" + __fragmented_ligands.seeds()[j].name() + ".pdb"); 
 #endif
                                 /* Dock this seed's conformations to the entire grid by moving them 
                                  * over all gridpoints and probe where they clash with the receptor: 
@@ -87,7 +87,7 @@ namespace Program {
 
                                 dock.run();
 
-                                inout::output_file(dock.get_docked(), p.string()); // output docked & clustered seeds
+                                Inout::output_file(dock.get_docked(), p.string()); // output docked & clustered seeds
                         }
                         catch (exception& e) {
                                 cerr << "skipping seed due to : " << e.what() << endl;
@@ -107,7 +107,7 @@ namespace Program {
                                         __gridrec, cmdl.get_double_option("grid"), cmdl.get_int_option("cutoff"),
                                         cmdl.get_double_option("excluded"), 
                                         cmdl.get_double_option("interatomic"));
-                inout::output_file(gpoints, Path::join(__name, cmdl.get_string_option("gridpdb_hcp")));
+                Inout::output_file(gpoints, Path::join(__name, cmdl.get_string_option("gridpdb_hcp")));
 
                 /* Create a zero centered centroid with 10 A radius (max fragment 
                  * radius) for getting all conformations of each seed

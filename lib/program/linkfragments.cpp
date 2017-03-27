@@ -22,7 +22,7 @@ namespace Program {
 		
 		for (auto molec : all_names) {
 			boost::filesystem::path p2 = p / (molec + ".pdb");
-			if ( inout::Inout::file_size(p2.string()) <= 0) {
+			if ( Inout::file_size(p2.string()) <= 0) {
 				is_done = false;
 			} else {
 				Molib::PDBreader conf(p2.string(), Molib::PDBreader::skip_atom | Molib::PDBreader::first_model, 1);
@@ -42,7 +42,7 @@ namespace Program {
 	void LinkFragments::__link_ligand( Molib::Molecule& ligand, const OMMIface::ForceField& ffield ) {
 		boost::filesystem::path p(__receptor.name());
 		p = p / cmdl.get_string_option("docked_dir") / (ligand.name() + ".pdb");
-		if ( inout::Inout::file_size(p.string()) > 0) {
+		if ( Inout::file_size(p.string()) > 0) {
 			cout << ligand.name() << " is alread docked to " << __receptor.name() << ", reading from already docked file." << endl;
 			return;
 		}
@@ -98,7 +98,7 @@ namespace Program {
 			int model = 0;
 			for (auto &docked : docks) {
 				docked.get_ligand().change_residue_name("CAN"); 
-				inout::output_file(Molib::Molecule::print_complex(docked.get_ligand(), docked.get_receptor(), docked.get_energy(), ++model), 
+				Inout::output_file(Molib::Molecule::print_complex(docked.get_ligand(), docked.get_receptor(), docked.get_energy(), ++model), 
 						p.string(), ios_base::app); // output docked molecule conformations
 			}
 			__all_top_poses.add( new Molib::Molecule (docks[0].get_ligand()) );
@@ -107,7 +107,7 @@ namespace Program {
 			stringstream ss;
 			ligand.change_residue_name("CAN");
 			ss << "REMARK  20 non-binder " << ligand.name() << " with " << __receptor.name() << " because " << e.what() << endl << ligand;
-			inout::Inout::file_open_put_stream(p.string(), ss, ios_base::app);
+			Inout::file_open_put_stream(p.string(), ss, ios_base::app);
 		} 
 	}
 
@@ -116,7 +116,7 @@ namespace Program {
 
 		cout << "Starting to dock the fragments into originally given ligands" << endl;
 
-                if ( ! inout::Inout::file_size(cmdl.get_string_option("prep")) ) {
+                if ( ! Inout::file_size(cmdl.get_string_option("prep")) ) {
                         cout << cmdl.get_string_option("prep") << " is either blank or missing, no (initial) ligand docking will take place.";
                         return;
                 }

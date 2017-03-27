@@ -17,7 +17,7 @@ namespace Molib {
 		// Seed_Id   hash(Chemical_Formula)  Mol_Graph
 		// #seed_id   #hash(Car5 N1 ...)      Car#1_Car#2 #2_N2#3 ...
 		vector<string> v_seeds;
-		inout::Inout::read_file(__seeds_file, v_seeds, inout::Inout::no_panic);
+		Inout::read_file(__seeds_file, v_seeds, Inout::no_panic);
 		for (auto &s : v_seeds) {
 			dbgmsg("reading seed file " << s);
 			stringstream ss(s);

@@ -64,7 +64,7 @@ namespace Molib {
 		else
 			throw Error("die : could not determine the file type of the input molecule");
 
-		if (inout::Inout::file_size(molecule_file) <= 0)
+		if (Inout::file_size(molecule_file) <= 0)
 			throw Error(string("die : file not valid: ") + molecule_file + ". Check to see if it exists and has contents!");
 	}
 	void PDBreader::Parser::__generate_molecule(Molecules &mols, bool &found_molecule, const string &name) {
@@ -87,8 +87,8 @@ namespace Molib {
 	}
 	void PDBreader::Mol2Parser::parse_molecule(Molecules &mols) {
 		vector<string> mol2_raw;
-		inout::Inout::read_file(__molecule_file, mol2_raw, __pos,
-			inout::Inout::panic, __num_occur, "@<TRIPOS>MOLECULE");
+		Inout::read_file(__molecule_file, mol2_raw, __pos,
+			         Inout::panic, __num_occur, "@<TRIPOS>MOLECULE");
 		bool found_molecule = false, found_assembly = false, found_model = false;
 		map<const Model*, map<const int, Atom*>> atom_number_to_atom;
 		for (size_t i = 0; i < mol2_raw.size(); ++i) {
@@ -190,8 +190,8 @@ namespace Molib {
 	void PDBreader::PdbParser::parse_molecule(Molecules &mols) {
 		vector<string> pdb_raw;
 		dbgmsg("num_occur = " << __num_occur);
-		inout::Inout::read_file(__molecule_file, pdb_raw, __pos,
-			inout::Inout::panic, __num_occur, "REMARK   5 MOLECULE");
+		Inout::read_file(__molecule_file, pdb_raw, __pos,
+			         Inout::panic, __num_occur, "REMARK   5 MOLECULE");
 		boost::smatch m;
 		set<char> bio_chain;
 		int biomolecule_number = -1;
@@ -436,7 +436,7 @@ namespace Molib {
 				model.get_rigid().push_back(Fragmenter::Fragment(core, join, seed_id));
 #ifndef NDEBUG
 				dbgmsg("seed_id = " << seed_id);
-				for (int i = 1; i < vs.size(); i++) dbgmsg(vs[i]);
+				for (size_t i = 1; i < vs.size(); i++) dbgmsg(vs[i]);
 				for (auto &a : core) dbgmsg("CORE ATOM : " << *a);
 				for (auto &a : join) dbgmsg("JOIN ATOM : " << *a);
 				dbgmsg(model.get_rigid());

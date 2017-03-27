@@ -34,7 +34,7 @@ int main(int argc, char* argv[]) {
                      .compile_objective_function();
                 score.output_objective_function(cmdl.get_string_option("obj_dir"));
 
-                inout::output_file(score, cmdl.get_string_option("potential_file"));
+                Inout::output_file(score, cmdl.get_string_option("potential_file"));
 
                 main_timer.display_time("Finished");
         } catch (exception& e) {

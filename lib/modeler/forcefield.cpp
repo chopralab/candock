@@ -281,7 +281,7 @@ namespace OMMIface {
 		boost::smatch m;
 		vector<string> gdf;
 		dbgmsg("reading gaff file = " << gaff_dat_file);
-		inout::Inout::read_file(gaff_dat_file, gdf);
+		Inout::read_file(gaff_dat_file, gdf);
 		bool non_bonded = false;
 		int semaphore = 0;
 		int type = 10000; // start ligand types with 10000 to NOT overlap with receptor
@@ -594,12 +594,12 @@ namespace OMMIface {
 		// print XML to file
 		stringstream ss;
 		ss << doc;
-		inout::Inout::file_open_put_stream(fn, ss);
+		Inout::file_open_put_stream(fn, ss);
 	}
 	ForceField& ForceField::parse_forcefield_file(const string &fn) { // read XML forcefield & topology file
 		using namespace rapidxml;
 		string ff_file;
-		inout::Inout::read_file(fn, ff_file);
+		Inout::read_file(fn, ff_file);
 		char *c_ff_file = new char[ff_file.size() + 1];
 		strcpy(c_ff_file, ff_file.c_str());
 		xml_document<> doc; // character type defaults to char

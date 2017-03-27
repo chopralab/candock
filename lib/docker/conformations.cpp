@@ -83,7 +83,7 @@ namespace Docker {
 					<< "ATOM      1   U  UNI     2    "  << unitvec.pdb() << endl 
 					<< "ATOM      1   U  BON     3    "  << bondvec.pdb() << endl 
 					<< "ENDMDL" << endl;
-				inout::output_file(ss.str(), "unit_" + seed.name() + ".pdb", ios_base::app); 
+				Inout::output_file(ss.str(), "unit_" + seed.name() + ".pdb", ios_base::app); 
 #endif				
 
 				const Geom3D::Quaternion q(Geom3D::Vector3(unitvec)*sin(conf_spin_in_radians), cos(conf_spin_in_radians));
