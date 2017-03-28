@@ -55,6 +55,19 @@ add_executable( cd_link_fragments cd_link_fragments.cpp ${CANDOCK_SRC})
 add_executable( cd_rescore_docked cd_rescore_docked.cpp ${CANDOCK_SRC})
 add_executable( cd_design_ligands cd_design_ligands.cpp ${CANDOCK_SRC})
 
+add_executable( windows_test_exec windows_test_exec.cpp
+        $<TARGET_OBJECTS:docker>
+        $<TARGET_OBJECTS:score>
+        $<TARGET_OBJECTS:ligands>
+        $<TARGET_OBJECTS:graph>
+        $<TARGET_OBJECTS:fragmenter>
+        $<TARGET_OBJECTS:pdbreader>
+        $<TARGET_OBJECTS:geom3d>
+        $<TARGET_OBJECTS:helper>
+        ../lib/modeler/forcefield.cpp
+        ../lib/program/cmdlnopts.cpp
+)
+
 target_link_libraries( cd_check_options  ${all_needed_libraries} )
 target_link_libraries( cd_bsite_probis   ${all_needed_libraries} )
 target_link_libraries( cd_prep_fragments ${all_needed_libraries} )
@@ -64,6 +77,8 @@ target_link_libraries( cd_dock_fragments ${all_needed_libraries} )
 target_link_libraries( cd_link_fragments ${all_needed_libraries} )
 target_link_libraries( cd_rescore_docked ${all_needed_libraries} )
 target_link_libraries( cd_design_ligands ${all_needed_libraries} )
+
+target_link_libraries( windows_test_exec ${Boost_LIBRARIES} ${GSL_LIBRARIES} )
 
 set_target_properties(
         cd_check_options
