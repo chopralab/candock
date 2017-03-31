@@ -15,11 +15,11 @@ namespace Program {
 
 	// TODO: Implement as a templated_map<Molecule,Target,Target> ????? Or as a Molecules?????
 
-	class __declspec(dllexport) Target {
+	class CANDOCK_EXPORT Target {
 
 		// FIXME: There's a better to design this, but this works for *now*
 		// TODO:  Consider using ProgramSteps instead of named things?
-		struct __declspec(dllexport) DockedReceptor {
+		struct CANDOCK_EXPORT DockedReceptor {
 
 			DockedReceptor(Molib::Molecule& rec) : protein(rec) {}
 

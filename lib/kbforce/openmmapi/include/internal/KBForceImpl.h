@@ -47,7 +47,7 @@ class System;
  * This is the internal implementation of KBForce.
  */
 
-class KBForceImpl : public OpenMM::ForceImpl {
+class OPENMM_EXPORT_KB KBForceImpl : public OpenMM::ForceImpl {
 public:
     KBForceImpl(const KBForce& owner);
     ~KBForceImpl();

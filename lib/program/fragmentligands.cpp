@@ -5,7 +5,7 @@
 
 #include "helper/inout.hpp"
 #include "pdbreader/molecules.hpp"
-#include "helper/options.hpp"
+#include "options.hpp"
 
 namespace Program {
 

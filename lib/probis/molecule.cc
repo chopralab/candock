@@ -1060,7 +1060,7 @@ void Molecule::moves_from_centers(Atom *atm1, Atom *atm2, EElement *edge) {
           }
     }
     else {
-      fi[0] = 4 * acos(0);
+      fi[0] = 2 * M_PI;
       for (int i = 1; i < edge->size; i++)
         for (int j = i + 1; j < edge->size; j++)
           if (fi[j] > fi[i]) {

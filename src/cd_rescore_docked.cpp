@@ -25,12 +25,12 @@ int main(int argc, char* argv[]) {
                         help::Options::get_options()->configuration_file() << endl;
 
 
-				Program::FragmentLigands ligand_fragmenter;
-				ligand_fragmenter.run_step();
+                Program::FragmentLigands ligand_fragmenter;
+                ligand_fragmenter.run_step();
 
-				Program::Target targets(cmdl.get_string_option("receptor"));
+                Program::Target targets(cmdl.get_string_option("receptor"));
 
-				targets.rescore_docked(ligand_fragmenter);
+                targets.rescore_docked(ligand_fragmenter);
 
         } catch (exception& e) {
                 cerr << e.what() << endl;

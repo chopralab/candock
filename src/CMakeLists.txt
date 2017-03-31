@@ -40,6 +40,16 @@ else (${CANDOCK_BUILD_STATIC_EXECUTABLE})
 
 endif (${CANDOCK_BUILD_STATIC_EXECUTABLE})
 
+if (NOT WIN32)
+
+set ( all_needed_libraries
+    ${all_needed_libraries}
+    pthread
+    dl
+)
+
+endif(NOT WIN32)
+
 # New programs with new features that change functionality
 add_executable( cd_check_options  cd_check_options.cpp  ${CANDOCK_SRC})
 add_executable( cd_bsite_probis   cd_bsite_probis.cpp   ${CANDOCK_SRC})

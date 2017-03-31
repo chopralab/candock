@@ -8,7 +8,7 @@
 #include "pdbreader/molecules.hpp"
 
 #include "helper/path.hpp"
-#include "helper/options.hpp"
+#include "options.hpp"
 
 namespace Program {
 

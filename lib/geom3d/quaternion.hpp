@@ -205,7 +205,7 @@ namespace Geom3D {
 		*/
 		Vector3 euler(void) const {
 			Vector3 euler;
-			const static double PI_OVER_2 = acos(0);
+			const static double PI_OVER_2 = M_PI_2;
 			const static double EPSILON = 1e-10;
 			double sqw, sqx, sqy, sqz;
 			
@@ -238,7 +238,7 @@ namespace Geom3D {
 				//~ if (euler[1] < 0)
 				if (euler.y() < 0)
 				//~ euler[2] = M_PI - euler[2];
-				euler.set_z(acos(0) * 2 - euler.z());
+				euler.set_z(M_PI - euler.z());
 			}
 			return euler;
 		}

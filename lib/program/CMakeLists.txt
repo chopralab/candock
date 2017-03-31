@@ -10,6 +10,8 @@ set( program_SRC
         fragmentligands.hpp
         dockfragments.cpp
         dockfragments.hpp
+        options.cpp
+        options.hpp
         linkfragments.cpp
         linkfragments.hpp
         target.cpp

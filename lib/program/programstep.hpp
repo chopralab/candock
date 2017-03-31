@@ -6,7 +6,7 @@
 namespace Program {
 
 	// TODO: Possibly introduce an iterator function to iterator over results
-	class __declspec(dllexport) ProgramStep {
+	class CANDOCK_EXPORT ProgramStep {
 	protected:
 		virtual bool __can_read_from_files() = 0;
 		virtual void __read_from_files() = 0;

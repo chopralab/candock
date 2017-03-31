@@ -42,9 +42,10 @@
 #include <sstream>
 #include <iostream>
 
-using namespace KBPlugin;
 using namespace OpenMM;
 using namespace std;
+
+namespace KBPlugin {
 
 KBForceImpl::KBForceImpl(const KBForce& owner) : owner(owner) {
 	//~ std::cout << "calling constructor of KBForceImpl" << endl;
@@ -92,4 +93,6 @@ vector<pair<int, int> > KBForceImpl::getBondedParticles() const {
 
 void KBForceImpl::updateParametersInContext(ContextImpl& context) {
     kernel.getAs<CalcKBForceKernel>().copyParametersToContext(context, owner);
+}
+
 }

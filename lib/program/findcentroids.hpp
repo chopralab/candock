@@ -21,6 +21,7 @@ namespace Program {
 
 	public:
 		FindCentroids ( const Molib::Molecule& receptor );
+                virtual ~FindCentroids() {}
 
 		const Centro::Centroids& centroids() const {
 			return __result;

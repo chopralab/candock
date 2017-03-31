@@ -334,7 +334,7 @@ double angle(Coor a, Coor b, Coor n) {
   c = a % b;
   p = c * n;
   if (p < 0) {
-    double r = 4 * acos(0) - acos(s);
+    double r = 2 * M_PI - acos(s);
     return std::isnan(r) ? 1e-02 : r;
   }
   else {

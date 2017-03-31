@@ -23,7 +23,7 @@ int main(int argc, char* argv[]) {
                         Version::get_run_info() <<
                         help::Options::get_options()->configuration_file() << endl;
 
-				Program::Target::make_objective();
+                Program::Target::make_objective();
 
                 main_timer.display_time("Finished");
         } catch (exception& e) {

@@ -2,7 +2,7 @@
 
 #include "helper/path.hpp"
 #include "helper/inout.hpp"
-#include "helper/options.hpp"
+#include "options.hpp"
 #include "helper/grep.hpp"
 
 namespace Program {

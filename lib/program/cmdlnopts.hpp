@@ -3,15 +3,17 @@
 
 #include <boost/program_options.hpp>
 #include "helper/error.hpp"
-#include "helper/options.hpp"
+#include "options.hpp"
 #include <thread>
 #include <vector>
 #include <iostream>
 #include <iomanip>
 
+#include "candockexport.hpp"
+
 namespace Program {
 
-        class __declspec(dllexport) CmdLnOpts : public help::Options {
+        class CANDOCK_EXPORT CmdLnOpts : public help::Options {
                 boost::program_options::variables_map __vm;
                 
                 bool __quiet;
@@ -62,7 +64,7 @@ namespace Program {
                         return ss.str();
                 }
 
-                friend __declspec(dllexport) std::ostream &operator<< (std::ostream &stream, const CmdLnOpts &cmdl_);
+                friend CANDOCK_EXPORT std::ostream &operator<< (std::ostream &stream, const CmdLnOpts &cmdl_);
 
 	};
 }
