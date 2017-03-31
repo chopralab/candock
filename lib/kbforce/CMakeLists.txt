@@ -6,6 +6,7 @@ set( kbforce_SRC
         openmmapi/src/KBForceImpl.cpp
         openmmapi/include/KBKernels.h
         openmmapi/include/internal/KBForceImpl.h
+		openmmapi/include/internal/windowsExportKB.h
         platforms/reference/src/ReferenceKBKernelFactory.cpp 
         platforms/reference/include/ReferenceKBKernelFactory.h
         platforms/reference/src/ReferenceKBKernels.h

@@ -44,7 +44,7 @@ add_library(
 if (WIN32)
 
 target_link_libraries ( candock
-    ${OPENMM_LIBRARIES}
+    ${OPENMM_LIBRARY}
     ${Boost_LIBRARIES}
     ${GSL_LIBRARIES}
 )

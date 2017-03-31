@@ -5,7 +5,6 @@ set( helper_SRC
         array2d.cpp
         array2d.hpp
         array3d.hpp
-        benchmark.cpp
         benchmark.hpp
         debug.hpp
         error.hpp

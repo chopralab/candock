@@ -52,7 +52,11 @@ if (WIN32)
     set(Boost_USE_STATIC_RUNTIME     OFF)
     set(BOOST_ALL_DYN_LINK           ON)   # force dynamic linking for all libraries
 
-    add_definitions( /D__USE_MATH_DEFINES /DBOOST_ALL_NO_LIB /DBOOST_ALL_DYN_LINK)
+    add_definitions( /D_USE_MATH_DEFINES /DBOOST_ALL_NO_LIB /DBOOST_ALL_DYN_LINK)
+
+    if (NOT CANDOCK_BUILD_STATIC_EXECUTABLE)
+	    add_definitions( /DCANDOCK_SHARED_LIBRARY /DKB_USE_STATIC_LIBRARIES)
+    endif(NOT CANDOCK_BUILD_STATIC_EXECUTABLE)
 
 else(WIN32)
 

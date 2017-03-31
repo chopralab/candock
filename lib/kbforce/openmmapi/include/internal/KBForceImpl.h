@@ -35,6 +35,7 @@
 #include "KBForce.h"
 #include "openmm/internal/ForceImpl.h"
 #include "openmm/Kernel.h"
+#include "internal/windowsExportKB.h"
 #include <utility>
 #include <set>
 #include <string>
