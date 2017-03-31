@@ -1,6 +1,7 @@
 #include <iostream>
 #include <exception>
 #include <typeinfo>
+#include "pdbreader/grid.hpp"
 #include "jsonreader.hpp"
 #include "nosqlreader.hpp"
 #include "pdbreader/pdbreader.hpp"

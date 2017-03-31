@@ -44,16 +44,8 @@ namespace KBPlugin {
  * serve as an example of how to write plugins.
  */
 
-class OPENMM_EXPORT_KB KBForce : public OpenMM::Force {
+class KBForce : public OpenMM::Force {
 public:
-    /**
-     * Create an KBForce.
-     */
-    KBForce();
-    /**
-     * Destroy an KBForce.
-     */
-    ~KBForce();
     /**
      * Set global parameters
      */
@@ -118,22 +110,6 @@ private:
     double step;
 };
 
-/**
- * This is an internal class used to record information about a bond.
- * @private
- */
-//~ class KBForce::BondInfo {
-//~ public:
-    //~ int particle1, particle2;
-    //~ double length, k;
-    //~ BondInfo() {
-        //~ particle1 = particle2 = -1;
-        //~ length = k = 0.0;
-    //~ }
-    //~ BondInfo(int particle1, int particle2, double length, double k) :
-        //~ particle1(particle1), particle2(particle2), length(length), k(k) {
-    //~ }
-//~ };
 class KBForce::BondInfo {
 public:
     int particle1, particle2;

@@ -16,30 +16,19 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake/")
 
 set(CANDOCK_BUILD_STATIC_EXECUTABLE OFF CACHE BOOL "Build a version of candock without dynamic linking")
 
-if(${CANDOCK_BUILD_STATIC_EXECUTABLE})
-    if(WIN32)
-        set(CMAKE_FIND_LIBRARY_SUFFIXES .lib .a ${CMAKE_FIND_LIBRARY_SUFFIXES})
-    else(WIN32)
-        set(CMAKE_FIND_LIBRARY_SUFFIXES .a ${CMAKE_FIND_LIBRARY_SUFFIXES})
-    endif(WIN32)
-endif(${CANDOCK_BUILD_STATIC_EXECUTABLE})
-
 find_package(Boost   REQUIRED  COMPONENTS date_time filesystem system regex program_options)
 find_package(GSL     REQUIRED)
 find_package(OpenMM  REQUIRED)
 find_package(Git     REQUIRED)
-find_package(CUDA)
 
-if(CUDA_FOUND)
-    set(CUDA_PROPAGATE_HOST_FLAGS OFF)
-    set(CUDA_NVCC_FLAGS "${CUDA_NVCC_FLAGS} -std=c++11 -arch=compute_61 -code=sm_61" )
-    add_definitions(-DCOMPILE_CUDA)
-endif(CUDA_FOUND)
-
+set(Boost_USE_STATIC_LIBS        OFF)
+set(Boost_USE_MULTITHREADED      ON)
+set(Boost_USE_STATIC_RUNTIME     OFF)
+set(BOOST_ALL_DYN_LINK           ON)   # force dynamic linking for all libraries
 
 #Change to c++11 due to gnu specific extensions that break cuda
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wall -Werror -fPIC")
 set(JSONCPP_INCLUDE_DIR "foreign/jsoncpp/include" "foreign/jsoncpp/src" )
+add_definitions( /D__USE_MATH_DEFINES /DBOOST_ALL_NO_LIB /DBOOST_ALL_DYN_LINK)
 
 include_directories(${Boost_INCLUDE_DIRS})
 include_directories(${GSL_INCLUDE_DIRS})
@@ -67,6 +56,7 @@ configure_file(
 include_directories( ${PROJECT_BINARY_DIR} )
 
 include_directories( foreign )
+
 
 add_subdirectory(lib)
 add_subdirectory(src)

@@ -25,8 +25,6 @@ if(${CANDOCK_BUILD_STATIC_EXECUTABLE})
         ${Boost_LIBRARIES}
         ${OPENMM_LIBRARY}
         ${GSL_LIBRARIES}
-        pthread
-        dl
     )
 
 else (${CANDOCK_BUILD_STATIC_EXECUTABLE})
@@ -38,8 +36,6 @@ else (${CANDOCK_BUILD_STATIC_EXECUTABLE})
         ${Boost_LIBRARIES}
         ${OPENMM_LIBRARY}
         ${GSL_LIBRARIES}
-        pthread
-        dl
     )
 
 endif (${CANDOCK_BUILD_STATIC_EXECUTABLE})
@@ -49,36 +45,19 @@ add_executable( cd_check_options  cd_check_options.cpp  ${CANDOCK_SRC})
 add_executable( cd_bsite_probis   cd_bsite_probis.cpp   ${CANDOCK_SRC})
 add_executable( cd_prep_fragments cd_prep_fragments.cpp ${CANDOCK_SRC})
 add_executable( cd_make_objective cd_make_objective.cpp ${CANDOCK_SRC})
-add_executable( cd_score_complexi cd_score_complexi.cpp ${CANDOCK_SRC})
 add_executable( cd_dock_fragments cd_dock_fragments.cpp ${CANDOCK_SRC})
 add_executable( cd_link_fragments cd_link_fragments.cpp ${CANDOCK_SRC})
 add_executable( cd_rescore_docked cd_rescore_docked.cpp ${CANDOCK_SRC})
 add_executable( cd_design_ligands cd_design_ligands.cpp ${CANDOCK_SRC})
 
-add_executable( windows_test_exec windows_test_exec.cpp
-        $<TARGET_OBJECTS:docker>
-        $<TARGET_OBJECTS:score>
-        $<TARGET_OBJECTS:ligands>
-        $<TARGET_OBJECTS:graph>
-        $<TARGET_OBJECTS:fragmenter>
-        $<TARGET_OBJECTS:pdbreader>
-        $<TARGET_OBJECTS:geom3d>
-        $<TARGET_OBJECTS:helper>
-        ../lib/modeler/forcefield.cpp
-        ../lib/program/cmdlnopts.cpp
-)
-
 target_link_libraries( cd_check_options  ${all_needed_libraries} )
 target_link_libraries( cd_bsite_probis   ${all_needed_libraries} )
 target_link_libraries( cd_prep_fragments ${all_needed_libraries} )
 target_link_libraries( cd_make_objective ${all_needed_libraries} )
-target_link_libraries( cd_score_complexi ${all_needed_libraries} )
 target_link_libraries( cd_dock_fragments ${all_needed_libraries} )
 target_link_libraries( cd_link_fragments ${all_needed_libraries} )
 target_link_libraries( cd_rescore_docked ${all_needed_libraries} )
 target_link_libraries( cd_design_ligands ${all_needed_libraries} )
-
-target_link_libraries( windows_test_exec ${Boost_LIBRARIES} ${GSL_LIBRARIES} )
 
 set_target_properties(
         cd_check_options
@@ -88,6 +67,7 @@ set_target_properties(
         cd_dock_fragments
         cd_link_fragments
         cd_design_ligands
+		cd_rescore_docked
     PROPERTIES
     INSTALL_RPATH ${CMAKE_INSTALL_PREFIX}/lib
     INSTALL_RPATH_USE_LINK_PATH TRUE
@@ -114,6 +94,7 @@ install(
         cd_dock_fragments
         cd_link_fragments
         cd_design_ligands
+		cd_rescore_docked
 
     RUNTIME DESTINATION
         bin

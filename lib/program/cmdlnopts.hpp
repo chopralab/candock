@@ -11,7 +11,7 @@
 
 namespace Program {
 
-        class CmdLnOpts : public help::Options {
+        class __declspec(dllexport) CmdLnOpts : public help::Options {
                 boost::program_options::variables_map __vm;
                 
                 bool __quiet;
@@ -62,7 +62,7 @@ namespace Program {
                         return ss.str();
                 }
 
-                friend std::ostream &operator<< (std::ostream &stream, const CmdLnOpts &cmdl_);
+                friend __declspec(dllexport) std::ostream &operator<< (std::ostream &stream, const CmdLnOpts &cmdl_);
 
 	};
 }

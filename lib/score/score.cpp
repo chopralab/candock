@@ -214,7 +214,7 @@ namespace Molib {
 			if (upper_bound <= __dist_cutoff) {
 				pair_of_ints atom_pair = minmax(help::idatm_mask.at(atom_1), help::idatm_mask.at(atom_2));
 				if (__prot_lig_pairs.count(atom_pair)) {
-					double shell_volume = (rad_or_raw ? 1.0 : 4*M_PI*pow(upper_bound, 3)/3 - 4*M_PI*pow(lower_bound, 3)/3);
+					double shell_volume = (rad_or_raw ? 1.0 : 8*acos(0)*pow(upper_bound, 3)/3 - 8*acos(0)*pow(lower_bound, 3)/3);
 					__gij_of_r_numerator[atom_pair].push_back(quantity / shell_volume);
 					__sum_gij_of_r_numerator[atom_pair] += quantity / shell_volume;
 					// JANEZ : next two are for cumulative scoring function (compile_cumulative_scoring_function)

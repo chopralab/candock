@@ -48,6 +48,22 @@ namespace Molib {
 			}
 			regenerate_bonds(rhs);
 		}
+
+		Molecule& operator=(const Molecule &rhs) {
+			__modified = rhs.__modified;
+			__site = rhs.__site;
+			__name = rhs.__name;
+			__bio_rota = rhs.__bio_rota;
+			__bio_chain = rhs.__bio_chain;
+			this->clear();
+			for (auto &assembly : rhs) {
+				dbgmsg("Copy constructor : molecule");
+				add(new Assembly(assembly));
+			}
+			regenerate_bonds(rhs);
+			return *this;
+		}
+
 		Molecule(const Molib::Molecule &rhs, const Geom3D::Point::Vec &crds);
 		typedef enum {first_bio, all_bio} bio_how_many;
 

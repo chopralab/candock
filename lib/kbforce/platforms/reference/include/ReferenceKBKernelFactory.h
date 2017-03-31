@@ -47,4 +47,6 @@ public:
 
 } // namespace OpenMM
 
+extern "C" void registerKBReferenceKernelFactories();
+
 #endif /*OPENMM_REFERENCEKBKERNELFACTORY_H_*/

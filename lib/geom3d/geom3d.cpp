@@ -79,7 +79,7 @@ namespace Geom3D {
 		vector<double> z(n);
 		generate(z.begin(), z.end(), UniqueNumber);
 		
-		double golden_angle = M_PI * (3 - sqrt(5));
+		double golden_angle = acos(0) * 2 * (3 - sqrt(5));
 
 		vector<double> theta;
 		for (int i = 0; i < n; ++i) theta.push_back(golden_angle * i);

@@ -274,7 +274,7 @@ namespace Linker {
 				<< " by " << Geom3D::degrees(__spin_degrees) 
 				<< " degree increments");
 		const Geom3D::Quaternion q(Geom3D::Vector3(crd3 - crd2).norm()*sin(__spin_degrees), cos(__spin_degrees));
-		for (double angle = __spin_degrees; angle < M_PI; angle += __spin_degrees) {
+		for (double angle = __spin_degrees; angle < acos(0) * 2; angle += __spin_degrees) {
 			State &previous_rotated = *states.back();
 			states.push_back(unique_ptr<State>(new State(next, 
 				__rotate(q, crd2, previous_rotated.get_crds()))));

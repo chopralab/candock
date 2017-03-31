@@ -70,7 +70,7 @@ namespace Molib {
 		shared_ptr<Bond>& insert_bond(const Atom &other, const shared_ptr<Bond> &bond) { return __bonds.insert({&other, bond}).first->second; }
 		shared_ptr<Bond>& insert_bond(const Atom &other, Bond *bond) { return __bonds.insert({&other, shared_ptr<Bond>(bond)}).first->second; }
 		void erase_bond(const Atom &other) { __bonds.erase(&other); }
-		bool is_adjacent(const Atom &other) const { return __bonds.count(&other); }
+		bool is_adjacent(const Atom &other) const { return __bonds.count(&other) != 0; }
 		bool is_adjacent(const string &atom_name) const { for (auto &other : *this) if (other.atom_name() == atom_name) return true; return false; }
 		int get_num_hydrogens() const;
 		int atom_number() const { return __atom_number; }
@@ -82,7 +82,7 @@ namespace Molib {
 		Atom& add_property(const string &prop) { __smiles_prop[prop]++; return *this; }
 		Atom& erase_property(const string &prop) { __smiles_prop.erase(prop); return *this; }
 		Atom& erase_properties() { __smiles_prop.clear(); return *this; }
-		bool has_property(const string &prop) const { return __smiles_prop.count(prop); }
+		bool has_property(const string &prop) const { return __smiles_prop.count(prop) != 0; }
 		int get_num_property(const string &prop) const { 
 			dbgmsg("__smiles prop(" << prop << ") count = " << __smiles_prop.count(prop)); 
 			if (__smiles_prop.count(prop) == 0) return 0;

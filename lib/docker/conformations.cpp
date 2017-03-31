@@ -88,7 +88,7 @@ namespace Docker {
 
 				const Geom3D::Quaternion q(Geom3D::Vector3(unitvec)*sin(conf_spin_in_radians), cos(conf_spin_in_radians));
 	
-				for (double angle = 2 * conf_spin_in_radians; angle < M_PI; angle += conf_spin_in_radians) {
+				for (double angle = 2 * conf_spin_in_radians; angle < acos(0) * 2; angle += conf_spin_in_radians) {
 					Geom3D::Point::Vec rotated;
 					for (auto &crd : previous) {	
 						rotated.push_back(q.rotatedVector(crd)); 

@@ -348,33 +348,34 @@ namespace Molib {
 
 	Molecule& Molecule::filter(const unsigned int hm, const string &chain_ids) {
 
-		Molecule saved(*this);
-		
-		for (auto &assembly : *this)
-		for (auto &model : assembly)
-		for (auto &chain : model)
-			if (chain_ids == "" || chain_ids.find(chain.chain_id()) != string::npos) {
-				for (auto &residue : chain)
-                                        if ( ((hm & Residue::protein) && residue.rest() == Residue::protein)
-                                         ||  ((hm & Residue::nucleic) && residue.rest() == Residue::nucleic)
-                                         ||  ((hm & Residue::ion)     && residue.rest() == Residue::ion)
-                                         ||  ((hm & Residue::water)   && residue.rest() == Residue::water)
-                                         ||  ((hm & Residue::hetero)  && residue.rest() == Residue::hetero)) {
-                                        } else {
-                                                dbgmsg("erasing residue " << residue.resi() << " ins_code = " << residue.ins_code());
-                                                chain.erase(Residue::res_pair(residue.resi(), residue.ins_code()));
-                                        }
-			}
-			else {
-				dbgmsg("erasing chain " << chain.chain_id());
-				model.erase(chain.chain_id());
-			}
-			
-		regenerate_bonds(saved);
-		dbgmsg("out of filter");
-                return *this;
-	}
-	
+        Molecule saved(*this);
+
+        for (auto &assembly : *this)
+        for (auto &model : assembly)
+        for (auto &chain : model) {
+                if (chain_ids == "" || chain_ids.find(chain.chain_id()) != string::npos) {
+                        for (auto &residue : chain) {
+                                if ( ((hm & Residue::protein) && residue.rest() == Residue::protein)
+                                 ||  ((hm & Residue::nucleic) && residue.rest() == Residue::nucleic)
+                                 ||  ((hm & Residue::ion)     && residue.rest() == Residue::ion)
+                                 ||  ((hm & Residue::water)   && residue.rest() == Residue::water)
+                                 ||  ((hm & Residue::hetero)  && residue.rest() == Residue::hetero)) {
+                                } else {
+                                        dbgmsg("erasing residue " << residue.resi() << " ins_code = " << residue.ins_code());
+                                        chain.erase(Residue::res_pair(residue.resi(), residue.ins_code()));
+                                }
+                        }
+                } else {
+                        dbgmsg("erasing chain " << chain.chain_id());
+                        model.erase(chain.chain_id());
+                }
+        }
+
+        regenerate_bonds(saved);
+        dbgmsg("out of filter");
+        return *this;
+    }
+
 	ostream& operator<< (ostream& stream, const Molecule& m) {
 		stream << setw(6) << left << "REMARK   5 MOLECULE " << m.name() << endl;
 		for (auto &assembly : m) {

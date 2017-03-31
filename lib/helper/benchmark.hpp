@@ -4,7 +4,7 @@
 #include <ctime>
 #include <string>
 
-class Benchmark {
+class __declspec(dllexport) Benchmark {
         clock_t start;
 public:
         Benchmark() { reset(); }

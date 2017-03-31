@@ -44,12 +44,13 @@ private:
 			}
 		}
 	}
-	void __deallocate() {
+	// Windows defines a macro called __deallocate, thus I had to rename this
+	void __my_deallocate() {
 		for (int i = 0; i < szi; ++i) {
 			for (int j = 0; j < szj; ++j) {
 				for (int k = 0; k < szk; ++k)
 					storage[i][j][k].clear();
-				delete [] storage[i][j];
+				delete storage[i][j];
 			}
 			delete [] storage[i];
 		}
@@ -67,7 +68,7 @@ public:
 		dbgmsg("Grid assignment operator");
 		if (this != &rhs) {
 			// Deallocate, allocate new space, copy values...
-			this->__deallocate();
+			this->__my_deallocate();
 			this->__allocate(rhs.szi, rhs.szj, rhs.szk);
 			this->__min_crd = rhs.__min_crd;
 			this->szi = rhs.szi;
@@ -120,7 +121,7 @@ public:
 	
 	~Grid() {
 		dbgmsg("Grid destructor");
-		this->__deallocate();
+		this->__my_deallocate();
 	}
 
 	template<typename U>

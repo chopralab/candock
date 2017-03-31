@@ -5,7 +5,7 @@
 #include <vector>
 
 namespace help {
-        class Options {
+        class __declspec(dllexport) Options {
         private:
                 static std::unique_ptr<Options> __current_options;
         public:

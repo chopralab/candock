@@ -2,8 +2,10 @@
 
 #include "pdbreader/pdbreader.hpp"
 
+#include "modeler/systemtopology.hpp"
+
 #include "helper/path.hpp"
-#include <fragmenter/unique.hpp>
+#include "fragmenter/unique.hpp"
 
 namespace Program {
 	Target::Target(const std::string& input_name ) {
@@ -27,7 +29,7 @@ namespace Program {
 			Molib::Molecule& current = __receptors.add(new Molib::Molecule ( std::move (receptors[0]) ));
 			current.set_name(boost::filesystem::basename(input_name.substr(0, input_name.length() - 4))); // Emulate the original version of candock
                         boost::filesystem::create_directory(current.name());
-			__preprecs.push_back(DockedReceptor {current, nullptr, nullptr, nullptr});
+			__preprecs.push_back(DockedReceptor (current));
 		} else for ( const auto &a : Inout::files_matching_pattern (input_name, ".pdb")) {
 			// Otherwise we treat it like the new version intends.
 			Molib::PDBreader rpdb(a, Molib::PDBreader::first_model);
@@ -36,7 +38,7 @@ namespace Program {
 			current.set_name( a.substr(0, a.length() - 4 ) );
 			boost::filesystem::create_directory(current.name());
 
-			__preprecs.push_back(DockedReceptor {current, nullptr, nullptr, nullptr});
+			__preprecs.push_back(DockedReceptor (current));
 		}
 
 		/* Compute atom types for receptor and cofactor(s): gaff types for protein, 
@@ -60,14 +62,17 @@ namespace Program {
 		 * 
 		 */
 		for ( auto &a : __preprecs ) {
-			std::unique_ptr<Molib::Atom::Grid> pgridrec(new Molib::Atom::Grid(a.protein.get_atoms()));
-			a.gridrec = std::move(pgridrec);
+			a.gridrec = new Molib::Atom::Grid(a.protein.get_atoms());
 		}
+	}
+
+	std::set<int> Target::get_idatm_types(const std::set<int>& previous) {
+		return __receptors.get_idatm_types(previous);
 	}
 
 	void Target::find_centroids( ) {
 		for ( auto &a : __preprecs ) {
-			std::unique_ptr<FindCentroids> pcen (new FindCentroids(a.protein));
+			FindCentroids* pcen  = new FindCentroids(a.protein);
 
 			/* Run section of Candock designed to find binding site1s
 			 * Currently, this runs ProBIS and does not require any
@@ -76,15 +81,15 @@ namespace Program {
 			 */
 
 			pcen->run_step();
-			a.centroids = std::move(pcen);
+			a.centroids = pcen;
 		}
 	}
 
-        void Target::score_complexi(const FragmentLigands& ligand_fragments) {
+        void Target::rescore_docked(const FragmentLigands& ligand_fragments) {
                 for ( auto &a : __preprecs ) {
-                        std::unique_ptr<Molib::Score> score (new Molib::Score(cmdl.get_string_option("ref"), cmdl.get_string_option("comp"),
+                        Molib::Score* score = new Molib::Score(cmdl.get_string_option("ref"), cmdl.get_string_option("comp"),
                                                                               cmdl.get_string_option("func"),cmdl.get_int_option("cutoff"),
-                                                                              cmdl.get_double_option("step")));
+                                                                              cmdl.get_double_option("step"));
 
                         score->define_composition(__receptors.get_idatm_types(),
                                                    ligand_fragments.ligand_idatm_types())
@@ -103,9 +108,11 @@ namespace Program {
 
                                 Inout::output_file(Molib::Molecule::print_complex(ligand, a.protein, energy), 
                                 Path::join( cmdl.get_string_option("docked_dir"), ligand.name() + ".pdb"),  ios_base::app);
+
+								cout << "Energy is " << energy << " for " << ligand.name() << " in " << a.protein.name() << endl;
                         }
 
-                        a.score = std::move(score);
+                        a.score = score;
                 }
         }
 
@@ -116,9 +123,9 @@ namespace Program {
                         * 
                         */
 
-                        std::unique_ptr<Molib::Score> score (new Molib::Score(cmdl.get_string_option("ref"), cmdl.get_string_option("comp"),
+                        Molib::Score* score = new Molib::Score(cmdl.get_string_option("ref"), cmdl.get_string_option("comp"),
                                                                               cmdl.get_string_option("func"),cmdl.get_int_option("cutoff"),
-                                                                              cmdl.get_double_option("step")));
+                                                                              cmdl.get_double_option("step"));
 
                         score->define_composition(__receptors.get_idatm_types(),
                                                    ligand_fragments.ligand_idatm_types())
@@ -126,33 +133,35 @@ namespace Program {
                                                  .compile_scoring_function()
                                                  .parse_objective_function(cmdl.get_string_option("obj_dir"), cmdl.get_double_option("scale"));
 
-			a.score = std::move(score);
+			a.score = score;
 
 			// Prepare the receptor for docking to
-			std::unique_ptr<OMMIface::ForceField> ffield ( new OMMIface::ForceField);
+			OMMIface::ForceField* ffield = new OMMIface::ForceField;
 
 			ffield->parse_gaff_dat_file(cmdl.get_string_option("gaff_dat"))
 				.add_kb_forcefield(*a.score, cmdl.get_double_option("step"))
 				.parse_forcefield_file(cmdl.get_string_option("amber_xml"))
 				.parse_forcefield_file(cmdl.get_string_option("water_xml"));
 
-			a.ffield = std::move(ffield);
+			a.ffield = ffield;
 
 			a.protein.prepare_for_mm(*a.ffield, *a.gridrec);
 
-			std::unique_ptr<DockFragments> pdockfragments(new DockFragments(*a.centroids, ligand_fragments, *a.score, *a.gridrec, a.protein.name()));
+			DockFragments* pdockfragments = new DockFragments(*a.centroids, ligand_fragments, *a.score, *a.gridrec, a.protein.name());
 			pdockfragments->run_step();
-			a.prepseeds = std::move(pdockfragments);
+			a.prepseeds = pdockfragments;
 		}
 	}
 
 	void Target::link_fragments() {
 
+		OMMIface::SystemTopology::loadPlugins();
+
 		for ( auto &a : __preprecs ) {
 			a.ffield->insert_topology(a.protein);
-			std::unique_ptr<LinkFragments> plinkfragments(new LinkFragments(a.protein, *a.score, *a.ffield, *a.prepseeds, *a.gridrec));
+			LinkFragments* plinkfragments = new LinkFragments(a.protein, *a.score, *a.ffield, *a.prepseeds, *a.gridrec);
 			plinkfragments->run_step();
-			a.dockedlig = std::move(plinkfragments);
+			a.dockedlig = plinkfragments;
 		}
 	}
 
@@ -285,6 +294,20 @@ namespace Program {
                     }
                 }
         }
+
+		void Target::make_objective() {
+			Molib::Score score(cmdl.get_string_option("ref"), "complete",
+				cmdl.get_string_option("func"), cmdl.get_int_option("cutoff"),
+				cmdl.get_double_option("step"));
+
+			score.define_composition(set<int>(), set<int>())
+				.process_distributions_file(cmdl.get_string_option("dist"))
+				.compile_objective_function();
+			score.output_objective_function(cmdl.get_string_option("obj_dir"));
+
+			Inout::output_file(score, cmdl.get_string_option("potential_file"));
+
+		}
 
 	std::multiset<std::string> Target::determine_overlapping_seeds(const int max_seeds, const int number_of_occurances) const {
 

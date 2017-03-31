@@ -41,11 +41,10 @@ add_library(
         $<TARGET_OBJECTS:helper>
 )
 
-install(
-    TARGETS
-        candock
-    LIBRARY DESTINATION
-        lib
+target_link_libraries( candock         
+${OPENMM_LIBRARY}
+${Boost_LIBRARIES}
+        ${GSL_LIBRARIES}
 )
 
 endif (NOT ${CANDOCK_BUILD_STATIC_EXECUTABLE})

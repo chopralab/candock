@@ -5,7 +5,6 @@
 #include "program/cmdlnopts.hpp"
 #include "program/target.hpp"
 #include "program/fragmentligands.hpp"
-#include "modeler/systemtopology.hpp"
 
 #include "version.hpp"
 
@@ -54,8 +53,6 @@ int main(int argc, char* argv[]) {
                 Program::Target antitargets(cmdl.get_string_option("antitarget_dir"));
                 antitargets.find_centroids();
                 antitargets.dock_fragments(ligand_fragmenter);
-
-                OMMIface::SystemTopology::loadPlugins();
 
                 targets.link_fragments();
 

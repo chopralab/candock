@@ -35,61 +35,57 @@
 #include "openmm/internal/AssertionUtilities.h"
 #include <iostream>
 
-using namespace KBPlugin;
 using namespace OpenMM;
 using namespace std;
 
-KBForce::KBForce() {
-}
+namespace KBPlugin {
 
-KBForce::~KBForce() {
-	//~ std::cout << "calling destructor of KBForce" << endl;
-}
+	//~ int KBForce::addBond(int particle1, int particle2, double length, double k) {
+		//~ bonds.push_back(BondInfo(particle1, particle2, length, k));
+		//~ return bonds.size()-1;
+	//~ }
+	int KBForce::addBond(int particle1, int particle2, std::vector<double> &potential, std::vector<double> &derivative) {
+		bonds.push_back(BondInfo(particle1, particle2, potential, derivative));
+		return bonds.size() - 1;
+	}
 
-//~ int KBForce::addBond(int particle1, int particle2, double length, double k) {
-    //~ bonds.push_back(BondInfo(particle1, particle2, length, k));
-    //~ return bonds.size()-1;
-//~ }
-int KBForce::addBond(int particle1, int particle2, vector<double> &potential, vector<double> &derivative) {
-    bonds.push_back(BondInfo(particle1, particle2, potential, derivative));
-    return bonds.size()-1;
-}
+	//~ void KBForce::getBondParameters(int index, int& particle1, int& particle2, double& length, double& k) const {
+		//~ ASSERT_VALID_INDEX(index, bonds);
+		//~ particle1 = bonds[index].particle1;
+		//~ particle2 = bonds[index].particle2;
+		//~ length = bonds[index].length;
+		//~ k = bonds[index].k;
+	//~ }
+	void KBForce::getBondParameters(int index, int& particle1, int& particle2, vector<double>* &potential, vector<double>* &derivative) const {
+		ASSERT_VALID_INDEX(index, bonds);
+		particle1 = bonds[index].particle1;
+		particle2 = bonds[index].particle2;
+		potential = bonds[index].potential;
+		derivative = bonds[index].derivative;
+	}
 
-//~ void KBForce::getBondParameters(int index, int& particle1, int& particle2, double& length, double& k) const {
-    //~ ASSERT_VALID_INDEX(index, bonds);
-    //~ particle1 = bonds[index].particle1;
-    //~ particle2 = bonds[index].particle2;
-    //~ length = bonds[index].length;
-    //~ k = bonds[index].k;
-//~ }
-void KBForce::getBondParameters(int index, int& particle1, int& particle2, vector<double>* &potential, vector<double>* &derivative) const {
-    ASSERT_VALID_INDEX(index, bonds);
-    particle1 = bonds[index].particle1;
-    particle2 = bonds[index].particle2;
-    potential = bonds[index].potential;
-    derivative = bonds[index].derivative;
-}
+	//~ void KBForce::setBondParameters(int index, int particle1, int particle2, double length, double k) {
+		//~ ASSERT_VALID_INDEX(index, bonds);
+		//~ bonds[index].particle1 = particle1;
+		//~ bonds[index].particle2 = particle2;
+		//~ bonds[index].length = length;
+		//~ bonds[index].k = k;
+	//~ }
+	void KBForce::setBondParameters(int index, int particle1, int particle2, vector<double>& potential, vector<double>& derivative) {
+		ASSERT_VALID_INDEX(index, bonds);
+		bonds[index].particle1 = particle1;
+		bonds[index].particle2 = particle2;
+		bonds[index].potential = &potential;
+		bonds[index].derivative = &derivative;
+	}
 
-//~ void KBForce::setBondParameters(int index, int particle1, int particle2, double length, double k) {
-    //~ ASSERT_VALID_INDEX(index, bonds);
-    //~ bonds[index].particle1 = particle1;
-    //~ bonds[index].particle2 = particle2;
-    //~ bonds[index].length = length;
-    //~ bonds[index].k = k;
-//~ }
-void KBForce::setBondParameters(int index, int particle1, int particle2, vector<double>& potential, vector<double>& derivative) {
-    ASSERT_VALID_INDEX(index, bonds);
-    bonds[index].particle1 = particle1;
-    bonds[index].particle2 = particle2;
-    bonds[index].potential = &potential;
-    bonds[index].derivative = &derivative;
-}
+	ForceImpl* KBForce::createImpl() const {
+		//~ std::cout << "calling createImpl" << endl;
+		return new KBForceImpl(*this);
+	}
 
-ForceImpl* KBForce::createImpl() const {
-	//~ std::cout << "calling createImpl" << endl;
-    return new KBForceImpl(*this);
-}
+	void KBForce::updateParametersInContext(Context& context) {
+		dynamic_cast<KBForceImpl&>(getImplInContext(context)).updateParametersInContext(getContextImpl(context));
+	}
 
-void KBForce::updateParametersInContext(Context& context) {
-    dynamic_cast<KBForceImpl&>(getImplInContext(context)).updateParametersInContext(getContextImpl(context));
 }

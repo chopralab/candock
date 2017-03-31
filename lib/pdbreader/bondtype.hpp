@@ -32,7 +32,8 @@ namespace Molib {
 		static void __dfs(const int level, const int sum, const int tps, const vector<vector<AtomParams>> &V,
 			vector<AtomParams> &Q, vector<vector<AtomParams>> &valence_states, const int max_valence_states);
 		static bool __discrepancy(const ValenceState &valence_state);
-		static bool __success(const ValenceState &valence_state);
+        // Windows defines the macro __success !
+		static bool __my_success(const ValenceState &valence_state);
 		static bool __basic_rules(ValenceState &valence_state, BondToOrder &bond_orders);
 		static void __trial_error(ValenceState &valence_state, BondToOrder &bond_orders);
 		static Bond& __get_first_unassigned_bond(const ValenceState &valence_state, BondToOrder &bond_orders);

@@ -32,6 +32,13 @@ elseif(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
     	PATHS foreign/openmm/lib
 		DOC "openmm library"
     )
+elseif(WIN32)
+	find_library(
+		OPENMM_LIBRARY
+		NAMES OpenMM.lib
+    	PATHS foreign/openmm/lib
+		DOC "openmm library"
+	)
 else()
 	find_library(
 			OPENMM_LIBRARY

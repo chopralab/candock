@@ -200,7 +200,7 @@ namespace Molib {
 					AtomMatch m = __convert_to_atom_match(bond_match, reverse);
 					mvec.push_back(m);
 					dbgmsg("in grep : atom match (try " << reverse << ") is " << endl << m);
-				} catch(Error &e) {}
+				} catch(Error &) {}
 			}
 		}
 		return mvec;

@@ -5,12 +5,23 @@
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string.hpp>
 #include <boost/algorithm/string/join.hpp>
-#include <sys/file.h> /* for flock(2) */
 #include <sys/stat.h> /* for S_* constants */
 #include <string.h> /* for strerror(3) prototype */
 #include <stdio.h> /* for fprintf(3),printf(3),stderr protype */
 #include <errno.h> /* for errno prototype */
+
+#ifndef _WINDOWS
+
+#include <sys/file.h> /* for flock(2) */
 #include <unistd.h> /* for close(2) prototypes */
+
+#else
+
+#define WIN32_LEAN_AND_MEAN
+#include <Windows.h>
+
+#endif
+
 #include "error.hpp"
 #include "inout.hpp"
 #include "debug.hpp"
@@ -30,6 +41,8 @@ namespace Inout {
                 }
         }
 
+#ifndef _WINDOWS
+
         int  __lock(const string &name) {
                 int fd = open(name.c_str(),O_RDWR|O_CREAT,S_IRUSR|S_IWUSR);
                 if (flock(fd,LOCK_EX) == -1) {
@@ -39,14 +52,26 @@ namespace Inout {
         }
 
         void __unlock(int fd) {
-            if (flock(fd,LOCK_UN)==-1) {
+                if (flock(fd,LOCK_UN)==-1) {
                         dbgmsg("Could not unlock handle " + std::to_string(fd));
-            }
-            if (close(fd)==-1) {
+                }
+                if (close(fd)==-1) {
                         dbgmsg("Could not close handle " + std::to_string(fd));
-            }
+                }
+        }
+#else
+
+        HANDLE __lock(const string &name) {
+                HANDLE fd = CreateFile(name.c_str(), GENERIC_ALL, 0, NULL, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+                return fd;
         }
 
+        void __unlock(HANDLE fd) {
+                if (CloseHandle(fd) == -1) {
+                }
+        }
+
+#endif
         int file_size(const string &name) {
                 if ( boost::filesystem::exists(name) &&
                         boost::filesystem::is_regular_file(name) )
@@ -78,7 +103,11 @@ namespace Inout {
         void read_file(const string &name, vector<string> &s, streampos &pos_in_file, 
                 f_not_found w, const int num_occur, const string &pattern) {
                 dbgmsg(pos_in_file);
+#ifndef _WINDOWS
                 int fd = __lock(name);
+#else
+                HANDLE fd = __lock(name);
+#endif
                 ifstream in(name);
                 if (!in.is_open() && w == panic) {
                         __unlock(fd);
@@ -111,7 +140,11 @@ namespace Inout {
         void file_open_put_stream(const string &name, 
                 const stringstream &ss, ios_base::openmode mode) {
                 __mkdir(name);
+#ifndef _WINDOWS
                 int fd = __lock(name);
+#else
+                HANDLE fd = __lock(name);
+#endif
                 ofstream output_file(name, mode);
                 if (!output_file.is_open()) {
                         __unlock(fd);

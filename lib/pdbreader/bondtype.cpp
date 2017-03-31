@@ -205,7 +205,7 @@ namespace Molib {
 		return false;
 	}
 
-	bool BondOrder::__success(const ValenceState &valence_state) {
+	bool BondOrder::__my_success(const ValenceState &valence_state) {
 		// rule 4 : if all the bonds are successfully assigned, con and av 
 		// of every atom are both 0 (boaf returns 1 and stops)
 		for (auto &kv : valence_state) {
@@ -220,7 +220,7 @@ namespace Molib {
 	}
 
 	bool BondOrder::__basic_rules(ValenceState &valence_state, BondToOrder &bond_orders) {
-		while (!__success(valence_state)) {
+		while (!__my_success(valence_state)) {
 			bool bo_was_set = false;
 			for (auto &kv : valence_state) {
 				Atom &atom = *kv.first;
@@ -273,7 +273,7 @@ namespace Molib {
 			if (__discrepancy(valence_state))
 				return false;
 			// if non of the above rules can be applied do the trial-error test :
-			if (!bo_was_set && !__success(valence_state)) 
+			if (!bo_was_set && !__my_success(valence_state)) 
 				__trial_error(valence_state, bond_orders);
 		}
 		return true;

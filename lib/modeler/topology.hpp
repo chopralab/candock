@@ -17,7 +17,7 @@ namespace Molib {
 };
 
 namespace OMMIface {
-	class ForceField;
+	struct ForceField;
 
 	class Topology {
 	public:

@@ -10,7 +10,7 @@
 
 namespace Program {
 
-	class FragmentLigands : public ProgramStep
+	class __declspec(dllexport) FragmentLigands : public ProgramStep
 	{
 		Molib::Molecules __seeds;
 		std::set<int> __ligand_idatm_types;
