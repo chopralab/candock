@@ -1,6 +1,7 @@
 include_directories($CMAKE_CURRENT_SOURCE_DIR)
 
 set( program_SRC
+        candockexport.hpp
         cmdlnopts.cpp
         cmdlnopts.hpp
         programstep.hpp
@@ -10,6 +11,8 @@ set( program_SRC
         fragmentligands.hpp
         dockfragments.cpp
         dockfragments.hpp
+        options.cpp
+        options.hpp
         linkfragments.cpp
         linkfragments.hpp
         target.cpp

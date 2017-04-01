@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <stdlib.h>     /* srand, rand */
 #include <time.h>       /* time */
+#include "pdbreader/grid.hpp"
 #include "pdbreader/pdbreader.hpp"
 #include "pdbreader/nrset.hpp"
 #include "helper/help.hpp"

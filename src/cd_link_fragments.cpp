@@ -33,7 +33,7 @@ int main(int argc, char* argv[]) {
                 Program::Target targets (cmdl.get_string_option("receptor"));
                 targets.find_centroids();
                 targets.dock_fragments(ligand_fragmenter);
-                OMMIface::SystemTopology::loadPlugins();
+
                 targets.link_fragments();
 
                 main_timer.display_time("Finished");

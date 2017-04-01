@@ -4,8 +4,10 @@
 #include <memory>
 #include <vector>
 
+#include "candockexport.hpp"
+
 namespace help {
-        class Options {
+        class CANDOCK_EXPORT Options {
         private:
                 static std::unique_ptr<Options> __current_options;
         public:

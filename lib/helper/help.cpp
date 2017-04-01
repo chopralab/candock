@@ -17,7 +17,7 @@ namespace help {
 	
 
 	std::tuple<double, double, double> gnuplot(const double &x1, const double &x2, const string &datapoints) {
-
+#ifndef _WINDOWS
 		double coeffA = 0, coeffB = 0, WSSR = HUGE_VAL;
 		
 		// try a range of coefficients to get the best fit
@@ -66,9 +66,13 @@ namespace help {
 
 		}
 	    return std::make_tuple(coeffA, coeffB, WSSR);
+#else
+        throw Error( "gnuplot not supported on Windows");
+#endif
 	}
 
 	string memusage(const string &msg) {
+#ifndef _WINDOWS
 		const string cmd = "ps ax -o rss,command | sort -nr | head -n 10|grep test_link|cut -f1 -d' '";
 	    FILE* pipe = popen(cmd.c_str(), "r");
 	    if (!pipe) return "ERROR";
@@ -81,6 +85,9 @@ namespace help {
 	    pclose(pipe);
 	    cerr << "Memusage:"  << msg << ":" << result << endl;
 	    return result;
+#else
+        throw Error( "memusage not supported on Windows");
+#endif
 	}
 	
 	vector<vector<string>> get_replacement(const vector<string> &initial) {

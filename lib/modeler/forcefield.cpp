@@ -12,6 +12,7 @@
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string.hpp>
 #include <boost/asio/ip/host_name.hpp>
+#include <openmm/Units.h>
 #include <string>
 #include <sstream>
 using namespace std;

@@ -6,7 +6,6 @@
 #include <vector>
 #include "geom3d/coordinate.hpp"
 #include "helper/debug.hpp"
-#include "OpenMM.h"
 using namespace std;
 
 namespace Molib {

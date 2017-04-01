@@ -5,7 +5,6 @@
 #include "program/cmdlnopts.hpp"
 #include "program/target.hpp"
 #include "program/fragmentligands.hpp"
-#include "modeler/systemtopology.hpp"
 
 #include "version.hpp"
 
@@ -55,15 +54,13 @@ int main(int argc, char* argv[]) {
                 antitargets.find_centroids();
                 antitargets.dock_fragments(ligand_fragmenter);
 
-                OMMIface::SystemTopology::loadPlugins();
-
                 targets.link_fragments();
 
                 if (cmdl.get_bool_option("antitarget_linking"))
                         antitargets.link_fragments();
 
                 set<string> solo_target_seeds = Program::Target::determine_non_overlapping_seeds(targets, antitargets);
-                if (/*cmdl.get_bool_option("new_scaffold") || */ ! Inout::file_size(cmdl.get_string_option("prep"))) {
+                if (/*cmdl.get_bool_option("new_scaffold") || */ ! boost::filesystem::is_regular_file(cmdl.get_string_option("prep"))) {
                         targets.make_scaffolds(ligand_fragmenter, solo_target_seeds);
                 }
 

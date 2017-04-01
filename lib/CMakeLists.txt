@@ -21,7 +21,7 @@ add_subdirectory(program)
 if (NOT ${CANDOCK_BUILD_STATIC_EXECUTABLE})
 
 add_library(
-    candock SHARED 
+    candock SHARED
         $<TARGET_OBJECTS:program>
         $<TARGET_OBJECTS:design>
         $<TARGET_OBJECTS:docker>
@@ -41,11 +41,14 @@ add_library(
         $<TARGET_OBJECTS:helper>
 )
 
-install(
-    TARGETS
-        candock
-    LIBRARY DESTINATION
-        lib
+if (WIN32)
+
+target_link_libraries ( candock
+    ${OPENMM_LIBRARY}
+    ${Boost_LIBRARIES}
+    ${GSL_LIBRARIES}
 )
+
+endif(WIN32)
 
 endif (NOT ${CANDOCK_BUILD_STATIC_EXECUTABLE})

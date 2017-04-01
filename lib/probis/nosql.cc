@@ -10,12 +10,17 @@
 #include "atom.h"
 #include "debug.hpp"
 
+#ifndef _WINDOWS
+
 #include <sys/file.h> /* for flock(2) */
 #include <sys/stat.h> /* for S_* constants */
+#include <unistd.h> /* for close(2) prototypes */
+
+#endif
+
 #include <string.h> /* for strerror(3) prototype */
 #include <stdio.h> /* for fprintf(3),printf(3),stderr protype */
 #include <errno.h> /* for errno prototype */
-#include <unistd.h> /* for close(2) prototypes */
 
 
 //#include "kabsch.h"
@@ -51,7 +56,8 @@ void NoSql::append_file (string row) {
   /*
     Appendamo vrstico na konec baze.
   */
-
+//TODO: Fix later
+#ifndef _WINDOWS
 
   int fd;
   fd = open((add_end_slash(OUTDIR) + db_file).c_str(),O_RDWR|O_CREAT,S_IRUSR|S_IWUSR); 
@@ -60,21 +66,21 @@ void NoSql::append_file (string row) {
   if (flock(fd,LOCK_EX) == -1) {
   } 
 
-
+#endif
 
   ofstream fn ((add_end_slash(OUTDIR) + db_file).c_str() , ios_base::app);
   if (fn.is_open()) {
     fn << row;
     fn.close();
 
-
+#ifndef _WINDOWS
 
     if (flock(fd,LOCK_UN)==-1) {
     }
     if (close(fd)==-1) {
     }
 
-
+#endif
 
 
   }

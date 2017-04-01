@@ -12,6 +12,7 @@
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string.hpp>
 #include <boost/asio/ip/host_name.hpp>
+#include "grid.hpp"
 #include "molecule.hpp"
 #include "geom3d/geom3d.hpp"
 #include "fragmenter/fragmenter.hpp"

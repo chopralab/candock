@@ -5,7 +5,6 @@ set( helper_SRC
         array2d.cpp
         array2d.hpp
         array3d.hpp
-        benchmark.cpp
         benchmark.hpp
         debug.hpp
         error.hpp
@@ -15,8 +14,6 @@ set( helper_SRC
         help.hpp
         inout.cpp
         inout.hpp
-        options.cpp
-        options.hpp
         path.cpp
         path.hpp
         renamerules.hpp
