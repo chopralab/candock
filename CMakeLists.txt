@@ -4,9 +4,9 @@ cmake_minimum_required(VERSION 3.2 FATAL_ERROR)
 
 set( CANDOCK_MAJOR_VERSION 0 )
 set( CANDOCK_MINOR_VERSION 3 )
-set( CANDOCK_TWEAK_VERSION 0 )
+set( CANDOCK_TWEAK_VERSION 1 )
 
-set(CANDOCK_VERSION "v${CANDOCK_MAJOR_VERSION}.${CANDOCK_MINOR_VERSION}.${CANDOCK_BUILD_VERSION}"
+set(CANDOCK_VERSION "v${CANDOCK_MAJOR_VERSION}.${CANDOCK_MINOR_VERSION}.${CANDOCK_TWEAK_VERSION}"
      CACHE STRING "CANDOCK version." FORCE
 )
 
@@ -72,3 +72,4 @@ add_subdirectory(lib)
 add_subdirectory(src)
 add_subdirectory(scripts)
 add_subdirectory(doc)
+
