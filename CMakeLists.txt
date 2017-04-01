@@ -94,5 +94,11 @@ include_directories( foreign )
 add_subdirectory(lib)
 add_subdirectory(src)
 add_subdirectory(scripts)
-add_subdirectory(gui)
+
+set(CANDOCK_BUILD_GUI OFF CACHE BOOL "Build the CANDOCK gui")
+
+if (CANDOCK_BUILD_GUI)
+    add_subdirectory(gui)
+endif (CANDOCK_BUILD_GUI)
+
 add_subdirectory(doc)
