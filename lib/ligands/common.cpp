@@ -1,4 +1,4 @@
-#include "pdbreader/molecule.hpp"
+#include "molib/molecule.hpp"
 #include "pdbreader/pdbreader.hpp"
 #include "common.hpp"
 #include <json/json.h>

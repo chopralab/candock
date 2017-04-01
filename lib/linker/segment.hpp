@@ -1,11 +1,11 @@
 #ifndef SEGMENT_H
 #define SEGMENT_H
 #include "helper/debug.hpp"
-#include "pdbreader/it.hpp"
+#include "molib/it.hpp"
 #include "fragmenter/fragmenter.hpp"
 #include "geom3d/coordinate.hpp"
-#include "pdbreader/internal.hpp"
-#include "pdbreader/molecule.hpp"
+#include "molib/internal.hpp"
+#include "molib/molecule.hpp"
 #include "graph/graph.hpp"
 #include <tuple>
 #include <functional>

@@ -7,8 +7,8 @@
 #include <tuple>
 #include <functional>
 #include "fragmenter/fragmenter.hpp"
-#include "pdbreader/bond.hpp"
-#include "pdbreader/molecule.hpp"
+#include "molib/bond.hpp"
+#include "molib/molecule.hpp"
 
 
 namespace Molib {

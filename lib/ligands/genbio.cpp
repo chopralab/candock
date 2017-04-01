@@ -1,11 +1,11 @@
 #include <iostream>
 #include <exception>
 #include <typeinfo>
-#include "pdbreader/grid.hpp"
+#include "molib/grid.hpp"
 #include "jsonreader.hpp"
 #include "nosqlreader.hpp"
+#include "molib/molecules.hpp"
 #include "pdbreader/pdbreader.hpp"
-#include "pdbreader/molecules.hpp"
 #include "helper/help.hpp"
 #include "geom3d/matrix.hpp"
 #include "helper/error.hpp"

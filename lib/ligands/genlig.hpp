@@ -1,7 +1,7 @@
 #ifndef GENLIG_H
 #define GENLIG_H
 #include <iostream>
-#include "pdbreader/molecule.hpp"
+#include "molib/molecule.hpp"
 using namespace std;
 
 namespace genlig {

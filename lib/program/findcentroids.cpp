@@ -5,7 +5,7 @@
 #include "probis/probis.hpp"
 #include "helper/inout.hpp"
 #include "ligands/genclus.hpp"
-#include "pdbreader/molecules.hpp"
+#include "molib/molecules.hpp"
 
 #include "helper/path.hpp"
 #include "options.hpp"

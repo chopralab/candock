@@ -10,13 +10,14 @@
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string.hpp>
 #include <boost/asio/ip/host_name.hpp>
+
 #include "geom3d/coordinate.hpp"
 #include "helper/inout.hpp"
 #include "helper/help.hpp"
 #include "helper/debug.hpp"
-#include "nrset.hpp"
+#include "molib/nrset.hpp"
 #include "pdbreader.hpp"
-#include "bond.hpp"
+#include "molib/bond.hpp"
 #include "fragmenter/fragmenter.hpp"
 using namespace std;
 

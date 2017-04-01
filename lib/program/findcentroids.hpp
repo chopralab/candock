@@ -3,7 +3,7 @@
 
 #include "programstep.hpp"
 #include "centro/centroids.hpp"
-#include "pdbreader/molecule.hpp"
+#include "molib/molecule.hpp"
 
 namespace Program {
 

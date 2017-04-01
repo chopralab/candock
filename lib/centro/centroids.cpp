@@ -1,6 +1,6 @@
 #include "helper/inout.hpp"
-#include "pdbreader/grid.hpp"
-#include "pdbreader/molecules.hpp"
+#include "molib/grid.hpp"
+#include "molib/molecules.hpp"
 #include "helper/benchmark.hpp"
 #include "geom3d/geom3d.hpp"
 #include "kabsch/kabsch.hpp"

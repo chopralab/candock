@@ -1,4 +1,4 @@
-#include "pdbreader/molecule.hpp"
+#include "molib/molecule.hpp"
 #include "helper/help.hpp"
 
 namespace Molib {

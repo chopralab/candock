@@ -1,6 +1,6 @@
 #include "seed.hpp"
 #include "segment.hpp"
-#include "pdbreader/molecule.hpp"
+#include "molib/molecule.hpp"
 #include "helper/benchmark.hpp"
 #include "helper/help.hpp"
 

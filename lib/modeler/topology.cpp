@@ -1,6 +1,6 @@
 #include "topology.hpp"
 #include "forcefield.hpp"
-#include "pdbreader/molecule.hpp"
+#include "molib/molecule.hpp"
 #include "helper/inout.hpp"
 #include "helper/debug.hpp"
 #include "helper/error.hpp"

@@ -4,7 +4,7 @@
 #include <mutex>
 
 #include "helper/inout.hpp"
-#include "pdbreader/molecules.hpp"
+#include "molib/molecules.hpp"
 #include "options.hpp"
 
 namespace Program {

@@ -5,8 +5,8 @@
 #include <mutex>
 
 #include "programstep.hpp"
+#include "molib/molecules.hpp"
 #include "pdbreader/pdbreader.hpp"
-#include "pdbreader/molecules.hpp"
 
 namespace Program {
 

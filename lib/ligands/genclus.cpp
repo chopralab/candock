@@ -4,9 +4,9 @@
 #include <algorithm>
 #include <stdlib.h>     /* srand, rand */
 #include <time.h>       /* time */
-#include "pdbreader/grid.hpp"
+#include "molib/grid.hpp"
+#include "molib/nrset.hpp"
 #include "pdbreader/pdbreader.hpp"
-#include "pdbreader/nrset.hpp"
 #include "helper/help.hpp"
 #include "geom3d/matrix.hpp"
 #include "helper/error.hpp"

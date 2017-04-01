@@ -5,7 +5,7 @@
 #include <set>
 #include <vector>
 #include "geom3d/coordinate.hpp"
-#include "pdbreader/molecule.hpp"
+#include "molib/molecule.hpp"
 #include "helper/help.hpp"
 #include "helper/benchmark.hpp"
 #include "OpenMM.h"
