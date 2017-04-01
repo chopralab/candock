@@ -1,6 +1,8 @@
 #include "cmdlnopts.hpp"
-
+#include <boost/program_options/cmdline.hpp>
 #include <boost/program_options/errors.hpp>
+
+#include "modeler/systemtopology.hpp"
 
 #include <iostream>
 #include <fstream>
@@ -61,12 +63,14 @@ namespace Program {
 			 "Cluster radius for predicted ligands by probis")
 			("centro_clus_rad", po::value<double> ()->default_value (3.0, "3.0"),
 			 "Cluster radius for centroid centers")
-			("centroid", po::value<std::string> ()->default_value ("site.cen"),
+			("centroid", po::value<std::string> ()->default_value (""),
 			 "Filename for reading and writing centroids")
 			("neighb", po::value<bool> ()    ->default_value (false, "false"),
 			 "Allow only ligands that are in the similar regions according to REMARKs")
 			("num_bsites", po::value<int> ()->default_value (3),
 			 "Maximum number of predicted (or given) binding sites to consider for docking")
+                        ("srf_file", po::value<std::string> ()->default_value("probis.srf"),
+                         "File for storing the protein surface calculated by probis.")
 			;
 
 			po::options_description ligand_fragmention_options ("Ligand Fragmention Options");
@@ -83,7 +87,7 @@ namespace Program {
 
 			po::options_description frag_dock_options ("Fragment Docking Options");
 			frag_dock_options.add_options()
-			("top_seeds_dir",  po::value<std::string> ()->default_value ("top_seeds"),
+			("top_seeds_dir",  po::value<std::string> ()->default_value (""),
 			 "Directory for saving top docked seeds")
 			("top_seeds_file",   po::value<std::string> ()->default_value ("top_seeds.pdb"),
 			 "Top seeds output file")

@@ -112,7 +112,7 @@ public:
         int get_szj() const { return szj; }
 
         bool get(int i, int j) const {
-	  return data[i/WORD][j]&1<<(i%WORD);
+	  return (data[i/WORD][j]&1<<(i%WORD)) != 0;
 	}
 	
 	void set(int i, int j) {

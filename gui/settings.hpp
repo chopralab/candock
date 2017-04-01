@@ -4,7 +4,7 @@
 #include <QDialog>
 #include <map>
 
-#include "helper/options.hpp"
+#include "program/options.hpp"
 
 
 namespace Ui {

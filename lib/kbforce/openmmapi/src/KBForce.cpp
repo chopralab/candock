@@ -35,9 +35,10 @@
 #include "openmm/internal/AssertionUtilities.h"
 #include <iostream>
 
-using namespace KBPlugin;
 using namespace OpenMM;
 using namespace std;
+
+namespace KBPlugin {
 
 KBForce::KBForce() {
 }
@@ -92,4 +93,6 @@ ForceImpl* KBForce::createImpl() const {
 
 void KBForce::updateParametersInContext(Context& context) {
     dynamic_cast<KBForceImpl&>(getImplInContext(context)).updateParametersInContext(getContextImpl(context));
+}
+
 }

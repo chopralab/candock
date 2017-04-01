@@ -42,7 +42,7 @@ namespace Molib {
 			return symbols[as];
 		}
 		int	number() const { return int(as); }
-		float	mass() const;
+		double	mass() const;
 		long	hash() const { return number(); }
 		const Element& operator=(const Element &a) { this->as = a.as; return *this; }
 		bool	operator==(const Element &a) const { return as == a.as; }

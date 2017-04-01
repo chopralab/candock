@@ -40,7 +40,21 @@ namespace Molib {
 		for (auto &ch : chain_ids) chains += ch;
 		dbgmsg("these are protein chains in the receptor file = " << chains);
 		return chains;
-	}
+        }
+        
+        void Molecule::change_residue_name(const string &resn) {
+                for (auto &presidue : this->get_residues()) {
+                        presidue->set_resn(resn);
+                }
+        }
+
+        void Molecule::change_residue_name(std::mutex &mtx, int &ligand_cnt) {
+                lock_guard<std::mutex> guard(mtx);
+                ++ligand_cnt;
+                for (auto &presidue : this->get_residues()) {
+                        presidue->set_resn("ligand_" + std::to_string(ligand_cnt));
+                }
+        }
 
 	Atom* get_closest_atom_of(const Atom &atom1, const Atom::Vec &neighbors, const string &atom_name) {
 		double min_dist = HUGE_VAL;
@@ -334,33 +348,34 @@ namespace Molib {
 
 	Molecule& Molecule::filter(const unsigned int hm, const string &chain_ids) {
 
-		Molecule saved(*this);
-		
-		for (auto &assembly : *this)
-		for (auto &model : assembly)
-		for (auto &chain : model)
-			if (chain_ids == "" || chain_ids.find(chain.chain_id()) != string::npos) {
-				for (auto &residue : chain)
-                                        if ( ((hm & Residue::protein) && residue.rest() == Residue::protein)
-                                         ||  ((hm & Residue::nucleic) && residue.rest() == Residue::nucleic)
-                                         ||  ((hm & Residue::ion)     && residue.rest() == Residue::ion)
-                                         ||  ((hm & Residue::water)   && residue.rest() == Residue::water)
-                                         ||  ((hm & Residue::hetero)  && residue.rest() == Residue::hetero)) {
-                                        } else {
-                                                dbgmsg("erasing residue " << residue.resi() << " ins_code = " << residue.ins_code());
-                                                chain.erase(Residue::res_pair(residue.resi(), residue.ins_code()));
-                                        }
-			}
-			else {
-				dbgmsg("erasing chain " << chain.chain_id());
-				model.erase(chain.chain_id());
-			}
-			
-		regenerate_bonds(saved);
-		dbgmsg("out of filter");
-                return *this;
-	}
-	
+        Molecule saved(*this);
+
+        for (auto &assembly : *this)
+        for (auto &model : assembly)
+        for (auto &chain : model) {
+                if (chain_ids == "" || chain_ids.find(chain.chain_id()) != string::npos) {
+                        for (auto &residue : chain) {
+                                if ( ((hm & Residue::protein) && residue.rest() == Residue::protein)
+                                 ||  ((hm & Residue::nucleic) && residue.rest() == Residue::nucleic)
+                                 ||  ((hm & Residue::ion)     && residue.rest() == Residue::ion)
+                                 ||  ((hm & Residue::water)   && residue.rest() == Residue::water)
+                                 ||  ((hm & Residue::hetero)  && residue.rest() == Residue::hetero)) {
+                                } else {
+                                        dbgmsg("erasing residue " << residue.resi() << " ins_code = " << residue.ins_code());
+                                        chain.erase(Residue::res_pair(residue.resi(), residue.ins_code()));
+                                }
+                        }
+                } else {
+                        dbgmsg("erasing chain " << chain.chain_id());
+                        model.erase(chain.chain_id());
+                }
+        }
+
+        regenerate_bonds(saved);
+        dbgmsg("out of filter");
+        return *this;
+    }
+
 	ostream& operator<< (ostream& stream, const Molecule& m) {
 		stream << setw(6) << left << "REMARK   5 MOLECULE " << m.name() << endl;
 		for (auto &assembly : m) {
@@ -394,6 +409,14 @@ namespace Molib {
 		for (auto &patom : ligand.get_atoms()) {
 			patom->set_atom_number(++reenum);
 			ss << setw(66) << left << *patom;
+		}
+                for (auto &pbond : get_bonds_in(ligand.get_atoms())) {
+			Bond &bond = *pbond;
+			ss << "REMARK   8 BONDTYPE " << bond.get_bo() 
+				<< " " << bond.get_bond_gaff_type() 
+				<< " " << bond.atom1().atom_number() 
+				<< " " << bond.atom2().atom_number() 
+				<< endl;
 		}
 		for ( auto &b : get_bonds_in(ligand.get_atoms()) ) {
 			ss  << "CONECT" << setw(5) << right 

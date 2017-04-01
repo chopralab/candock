@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <stdlib.h>     /* srand, rand */
 #include <time.h>       /* time */
+#include "pdbreader/grid.hpp"
 #include "pdbreader/pdbreader.hpp"
 #include "pdbreader/nrset.hpp"
 #include "helper/help.hpp"
@@ -42,7 +43,7 @@ namespace genclus {
 			}
 			vector<string> lig_name;
 			try {
-				inout::Inout::read_file(Path::join(names_dir, 
+				Inout::read_file(Path::join(names_dir, 
 				(
 					(residue.rest() == Molib::Residue::protein || residue.rest() == Molib::Residue::nucleic) ? 
 						(molecule.name().substr(0,4) + molecule.name().substr(4,1)) 
@@ -316,7 +317,7 @@ namespace genclus {
 		add_to_json(jr, nucleic_clusters.first, "nucleic", names_dir, for_gclus);
 		add_to_json(jr, hetero_clusters.first, "hetero", names_dir, for_gclus);
 		add_to_json(jr, ion_clusters.first, "ion", names_dir, for_gclus);
-		inout::Inout::file_open_put_stream(json_with_ligs_file, stringstream(jr.output_json()));
+		Inout::file_open_put_stream(json_with_ligs_file, stringstream(jr.output_json()));
 	}
 }
 

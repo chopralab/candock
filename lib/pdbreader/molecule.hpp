@@ -7,6 +7,8 @@
 #include "residue.hpp"
 #include "assembly.hpp"
 
+#include <mutex>
+
 using namespace std;
 
 namespace OMMIface {
@@ -46,11 +48,29 @@ namespace Molib {
 			}
 			regenerate_bonds(rhs);
 		}
+
+		Molecule& operator=(const Molecule &rhs) {
+			__modified = rhs.__modified;
+			__site = rhs.__site;
+			__name = rhs.__name;
+			__bio_rota = rhs.__bio_rota;
+			__bio_chain = rhs.__bio_chain;
+			this->clear();
+			for (auto &assembly : rhs) {
+				dbgmsg("Copy constructor : molecule");
+				add(new Assembly(assembly));
+			}
+			regenerate_bonds(rhs);
+			return *this;
+		}
+
 		Molecule(const Molib::Molecule &rhs, const Geom3D::Point::Vec &crds);
 		typedef enum {first_bio, all_bio} bio_how_many;
 
 		string get_chain_ids(const unsigned int hm) const;
 
+                void change_residue_name(const string &resn);
+                void change_residue_name(std::mutex &mtx, int &ligand_cnt);
 
 		Assembly& asym() { return this->first(); }
 		

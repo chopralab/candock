@@ -13,24 +13,7 @@ add_executable(candock_gui ${CANDOCK_GUI_CPP} ${CANDOCK_GUI_UIS})
 
 # Use the Widgets module from Qt 5.
 target_link_libraries(candock_gui Qt5::Widgets        
-        program
-        design
-        docker
-        score
-        centro
-        kabsch
-        ligands
-        cluster   # Ugly GCC hack to fix interdependency issue
-        linker
-        cluster
-        graph
-        modeler
-        pdbreader
-        probis
-        fragmenter
-        kbforce
-        geom3d
-        helper
+        candock
         ${Boost_LIBRARIES}
         ${OPENMM_LIBRARY}
         ${GSL_LIBRARIES}

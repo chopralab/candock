@@ -4,19 +4,20 @@
 #include <mutex>
 
 #include "helper/inout.hpp"
-#include "common.hpp"
 #include "pdbreader/molecules.hpp"
-#include "helper/options.hpp"
+#include "options.hpp"
 
 namespace Program {
-	
+
 	bool FragmentLigands::__can_read_from_files() {
-		return inout::Inout::file_size( cmdl.get_string_option("prep") ) > 0 && inout::Inout::file_size( cmdl.get_string_option("seeds") ) > 0;
+		return (Inout::file_size( cmdl.get_string_option("seeds_pdb") ) > 0 
+		     || Inout::file_size( cmdl.get_string_option("prep") ) > 0 )
+                     && Inout::file_size( cmdl.get_string_option("seeds") ) > 0;
 	}
 
 	void FragmentLigands::__read_from_files() {
 
-		if ( inout::Inout::file_size( cmdl.get_string_option("seeds_pdb") ) <= 0 ) {
+		if ( Inout::file_size( cmdl.get_string_option("seeds_pdb") ) <= 0 ) {
 
 			cout << "Could not read seeds from " << cmdl.get_string_option("seeds_pdb") << endl;
 			cout << "Reading fragmented files from " << cmdl.get_string_option("prep") << endl;
@@ -26,13 +27,13 @@ namespace Program {
 			Molib::Molecules ligands;
 			while(lpdb.parse_molecule(ligands)) {
 				__ligand_idatm_types = ligands.get_idatm_types(__ligand_idatm_types);
-				common::create_mols_from_seeds(__added, __seeds, ligands);
+				Molib::create_mols_from_seeds(__added, __seeds, ligands);
 				ligands.clear();
 			}
 
 			__seeds.erase_properties();
 
-			inout::output_file(__seeds, cmdl.get_string_option("seeds_pdb"), ios_base::out);
+			Inout::output_file(__seeds, cmdl.get_string_option("seeds_pdb"), ios_base::out);
 		} else {
 
 			cout << "Reading seeds from: " << cmdl.get_string_option("seeds_pdb") << endl;
@@ -78,10 +79,10 @@ namespace Program {
 			ligands.compute_overlapping_rigid_segments(cmdl.get_string_option("seeds"));
 
 			__ligand_idatm_types = ligands.get_idatm_types(__ligand_idatm_types);
-			common::create_mols_from_seeds(__added, __seeds, ligands);
+			Molib::create_mols_from_seeds(__added, __seeds, ligands);
 
 			if (write_out_for_linking)
-				inout::output_file(ligands, cmdl.get_string_option("prep"), ios_base::app);
+				Inout::output_file(ligands, cmdl.get_string_option("prep"), ios_base::app);
 
 			ligands.clear();
 			thread_is_not_done = lpdb.parse_molecule(ligands);
@@ -90,7 +91,7 @@ namespace Program {
 
 	void FragmentLigands::__continue_from_prev() {
 
-		if (inout::Inout::file_size(cmdl.get_string_option("ligand")) > 0) {
+		if (Inout::file_size(cmdl.get_string_option("ligand")) > 0) {
 			cout << "Fragmenting files in " << cmdl.get_string_option("ligand") << endl;
 
 			Molib::PDBreader lpdb(cmdl.get_string_option("ligand"), 
@@ -109,7 +110,7 @@ namespace Program {
 
 		const string& fragment_bag = cmdl.get_string_option("fragment_bag");
 
-		if (inout::Inout::file_size(fragment_bag) > 0) {
+		if (Inout::file_size(fragment_bag) > 0) {
 
 			cout << "Adding fragments from " << fragment_bag << endl;
 
@@ -129,7 +130,7 @@ namespace Program {
 
 		const string& molecular_fragments = cmdl.get_string_option("fragment_mol");
 
-		if (inout::Inout::file_size(molecular_fragments) > 0 ) {
+		if (Inout::file_size(molecular_fragments) > 0 ) {
 			cout << "Adding molecular fragments from " << molecular_fragments << endl;
 
 			Molib::PDBreader lpdb_additional(molecular_fragments, 
@@ -153,13 +154,13 @@ namespace Program {
 		 */
 		__seeds.erase_properties();
 
-		inout::output_file(__seeds, cmdl.get_string_option("seeds_pdb"), ios_base::out);
+		Inout::output_file(__seeds, cmdl.get_string_option("seeds_pdb"), ios_base::out);
 	}
 
 	void FragmentLigands::add_seeds_from_molecules(const Molib::Molecules& molecules) {
 		__ligand_idatm_types = molecules.get_idatm_types(__ligand_idatm_types);
-		common::create_mols_from_seeds(__added, __seeds, molecules);
+		Molib::create_mols_from_seeds(__added, __seeds, molecules);
 		__seeds.erase_properties();
-		inout::output_file(__seeds, cmdl.get_string_option("seeds_pdb"), ios_base::out);
+            Inout::output_file(__seeds, cmdl.get_string_option("seeds_pdb"), ios_base::out);
 	}
 }

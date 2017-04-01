@@ -38,10 +38,8 @@ namespace Glib {
 		bool IsDead() { if (n1>n2) return true;
 			for(int i=core_len; i<n1; i++) { 
 				for(int j=0; j<n2; j++)
-					if (M[i][j]!=0) goto next_row;
+					if (M[i][j]!=0) continue;
 					return true;
-					next_row: 
-					;
 			}
 			return false;
 		};

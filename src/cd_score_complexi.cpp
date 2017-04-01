@@ -1,26 +1,23 @@
-#include <iostream>
 #include "program/cmdlnopts.hpp"
 #include "program/fragmentligands.hpp"
 #include "program/target.hpp"
-#include "modeler/systemtopology.hpp"
+
 #include "version.hpp"
-
-
-////////////////// LINKING OF FRAGMENTS ///////////////////////////
-
 using namespace std;
+using namespace Program;
+
+////////////////// TEST SINGLEPOINT ENERGY CALCULATION OF COMPLEX ///////////////////////////
 
 int main(int argc, char* argv[]) {
         try {
 
-                help::Options::set_options( new Program::CmdLnOpts(
+                help::Options::set_options(new Program::CmdLnOpts(
                     argc, argv, Program::CmdLnOpts::STARTING |
-                                Program::CmdLnOpts::FORCE_FIELD |
-                                Program::CmdLnOpts::SCORING |
-                                Program::CmdLnOpts::LINKING ));
+                                Program::CmdLnOpts::LIG_FRAMGENT| 
+                                Program::CmdLnOpts::SCORING));
 
                 Benchmark main_timer;
-                main_timer.display_time("started");
+                main_timer.display_time("Starting");
 
                 cout << Version::get_banner()   <<
                         Version::get_version()  <<
@@ -29,18 +26,13 @@ int main(int argc, char* argv[]) {
 
                 Program::FragmentLigands ligand_fragmenter;
                 ligand_fragmenter.run_step();
-
+                
                 Program::Target targets (cmdl.get_string_option("receptor"));
-                targets.find_centroids();
-                targets.dock_fragments(ligand_fragmenter);
-
-                targets.link_fragments();
-
-                main_timer.display_time("Finished");
+                
+                targets.score_complexi(ligand_fragmenter);
 
         } catch (exception& e) {
                 cerr << e.what() << endl;
-                return 1;
         }
         return 0;
 }

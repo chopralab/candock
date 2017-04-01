@@ -63,6 +63,7 @@ namespace Molib {
 		for(auto &chain : m)
 		for(auto &residue : chain) {
 			// don't write conect for standard residues
+                        // TODO: There's a way to fix PyMOL visualization issues by printing proper CONECT records....
 			if (!help::standard_residues.count(residue.resn())) {
 				for(auto &atom : residue) {
 					for (auto &adj_a : atom) {
@@ -126,7 +127,10 @@ namespace Molib {
 				if (atom1_to_copy1.count(&atom2)) {
 					// copying of bonds does not preserve bond properties !!!
 					Atom &copy2 = *atom1_to_copy1.at(&atom2);
-					copy1.connect(copy2);
+					Bond &new_bond =copy1.connect(copy2);
+                                        Bond &old_bond =atom2.get_bond(atom1);
+                                        new_bond.set_bo( old_bond.get_bo() );
+                                        new_bond.set_bond_gaff_type( old_bond.get_bond_gaff_type() );
 				}
 			}
 		}

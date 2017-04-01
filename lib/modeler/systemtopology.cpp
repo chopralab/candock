@@ -5,6 +5,8 @@
 #include "helper/inout.hpp"
 #include "helper/debug.hpp"
 #include "helper/error.hpp"
+#include "kbforce/openmmapi/include/KBForce.h"
+#include "kbforce/platforms/reference/include/ReferenceKBKernelFactory.h"
 #include <boost/regex.hpp>
 #include <boost/algorithm/string.hpp>
 #include <boost/filesystem.hpp>
@@ -15,7 +17,6 @@
 using namespace std;
 
 namespace OMMIface {
-	extern "C" OPENMM_EXPORT void registerKBReferenceKernelFactories();
 
     SystemTopology::~SystemTopology() {
 		dbgmsg("calling destructor of SystemTopology");
@@ -28,7 +29,7 @@ namespace OMMIface {
 		dbgmsg("before loading plugins");
 		OpenMM::Platform::loadPluginsFromDirectory
 			(OpenMM::Platform::getDefaultPluginsDirectory());
-		registerKBReferenceKernelFactories();
+		//registerKBReferenceKernelFactories();
 		dbgmsg("after loading plugins");
 		
 	}

@@ -11,7 +11,7 @@
 void NosqlReader::parse_NOSQL(const string NOSQL_file) {
 	vector<string> vec;
 	boost::smatch m;
-	inout::Inout::read_file(NOSQL_file, vec);
+	Inout::read_file(NOSQL_file, vec);
 	string bname = boost::filesystem::basename(NOSQL_file);
 	const unsigned int num1 = __hash_num(bname);
 	for (string &line : vec) {
@@ -26,7 +26,7 @@ void NosqlReader::parse_NOSQL(const string NOSQL_file) {
 
 void NosqlReader::parse_dir_of_NOSQL(const string NOSQL_dir) {
 	//~ cout << NOSQL_dir << endl;
-	vector<string> files = inout::Inout::files_matching_pattern(NOSQL_dir, ".nosql$");
+	vector<string> files = Inout::files_matching_pattern(NOSQL_dir, ".nosql$");
 	for (string &f : files) {
 		//~ cout << f << endl;
 		parse_NOSQL(f);

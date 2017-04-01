@@ -17,10 +17,11 @@ namespace Program {
 		const Molib::Molecule& __receptor;
 
 		Centro::Centroids __result;
+                std::string __centroid_file;
 
 	public:
-		FindCentroids ( const Molib::Molecule& receptor ) :
-			__receptor( receptor ) { }
+		FindCentroids ( const Molib::Molecule& receptor );
+                virtual ~FindCentroids() {}
 
 		const Centro::Centroids& centroids() const {
 			return __result;

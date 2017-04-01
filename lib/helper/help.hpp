@@ -449,11 +449,13 @@ namespace help {
 		{"No"},
 		{"Lr"}
 	};
-	
-	extern const map<const string, const pair<string,string>> non_specific_binders;
-	
-	extern const map<const string, const map<string,string>> standard_residues;
-	
+
+        extern const map<const string, const pair<string,string>> non_specific_binders;
+
+        extern const map<const string, const map<string,string>> standard_residues;
+
+        extern const map<const string, const map<string,string>> cofactor_residues;
+
 	const IdatmInfoMap infoMap {
 	        { "Car", { Planar, 3, "aromatic carbon" } },
 	        { "C3", { Tetrahedral, 4, "sp3-hybridized carbon" } },
@@ -469,6 +471,7 @@ namespace help {
 	        { "N1+", { Linear, 2, "sp-hybridized nitrogen bonded to 2 other atoms" } },
 	        { "N1", { Linear, 1, "sp-hybridized nitrogen bonded to 1 other atom" } },
 	        { "Ntr", { Planar, 3, "nitro nitrogen" } },
+                { "Nox", { Tetrahedral, 4, "N-oxide amine" } },
 	        { "Ng+", { Planar, 3, "guanidinium/amidinium nitrogen, partial positive charge" } },
 	        { "O3", { Tetrahedral, 2, "sp3-hybridized oxygen" } },
 	        { "O3-", { Tetrahedral, 1, "phosphate or sulfate oxygen sharing formal negative charge" } },
@@ -506,6 +509,7 @@ namespace help {
 	        { "Ca", { Ion, 0, "calcium" } },
 	        { "Na", { Ion, 0, "sodium" } },
                 { "K",  { Ion, 0, "potassium" } },
+                { "Fe", { Ion, 0, "iron" } },
 	};
 
 	const IdatmEntry &get_info_map(const string &name);

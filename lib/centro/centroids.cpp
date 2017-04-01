@@ -56,7 +56,7 @@ namespace Centro {
 	Centroids set_centroids(const string &centroid_file, const int num_bsites) {
 		Centroids centroids;
 		vector<string> data;
-		inout::Inout::read_file(centroid_file, data);
+		Inout::read_file(centroid_file, data);
 		for (string &line : data) {
 			stringstream ss(line);
 			int bsite_id;

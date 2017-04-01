@@ -2,7 +2,7 @@
 #include "ui_mainwindow.h"
 
 #include "settings.hpp"
-#include "helper/options.hpp"
+#include "program/options.hpp"
 
 #include "program/target.hpp"
 #include "program/fragmentligands.hpp"

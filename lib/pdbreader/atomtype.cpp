@@ -12,6 +12,7 @@
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string.hpp>
 #include <boost/asio/ip/host_name.hpp>
+#include "grid.hpp"
 #include "molecule.hpp"
 #include "geom3d/geom3d.hpp"
 #include "fragmenter/fragmenter.hpp"
@@ -22,6 +23,7 @@
 using namespace std;
 
 namespace Molib {
+namespace AtomType {
 	int freeOxygens(const Atom &a, map<const Atom*, int> &heavys) {
 		int freeOxygens = 0;
 		for (auto &bondee : a) {
@@ -104,7 +106,7 @@ namespace Molib {
 		}
 		return is_aromatic;
 	}
-	void AtomType::compute_idatm_type(const Atom::Vec &atoms) {
+	void compute_idatm_type(const Atom::Vec &atoms) {
 		// angle values used to discriminate between hybridization states
 		const double angle23val1 = 115.0;
 		const double angle23val2 = 122.0;
@@ -235,6 +237,28 @@ namespace Molib {
 					dbgmsg("pass 1.5  : " << a.idatm_type_unmask() << " " << a.atom_name() << " " << a.atom_number());
 				}
 			}
+                        auto ct = help::cofactor_residues.find(residue.resn());
+                        if (ct != help::cofactor_residues.end()) {
+                                for (auto &a : residue) {
+                                        if (!mapped[&a]) {
+                                                string idatm_type = "???";
+                                                // H on peptide N
+                                                if (a.atom_name() == "HN")
+                                                        idatm_type = "H";
+                                                // still not known? find it in the table!
+                                                if (idatm_type == "???") {
+                                                        auto it2 = ct->second.find(a.atom_name());
+                                                        if (it2 == ct->second.end())
+                                                                throw Error("die : cannot find atom name " 
+                                                                        + a.atom_name() + " of template residue "
+                                                                        + residue.resn());
+                                                        idatm_type = it2->second;
+                                                }
+                                                a.set_idatm_type(idatm_type);
+                                                mapped[&a] = true;
+                                        }
+                                }
+                        }
 		}
 
 		// "pass 2": elements that are typed only by element type
@@ -639,7 +663,7 @@ namespace Molib {
 		//		consistent with aromatic bond lengths
 		for (auto &presidue : residues) {
 			const Residue &residue = *presidue;
-			if (! help::standard_residues.count(residue.resn())) {
+			if ( !help::standard_residues.count(residue.resn()) && !help::cofactor_residues.count(residue.resn()) ) {
 				dbgmsg("here I am");
 				Fragmenter frag(residue.get_atoms());
 				Rings rings = frag.identify_rings();
@@ -802,13 +826,13 @@ namespace Molib {
 		// no longer missing : Sar,Oar+,N1+,N2+
 		dbgmsg("MOLECULE AFTER IDATM TYPING" << endl << atoms);
 	}	
-	void AtomType::refine_idatm_type(const Atom::Vec &atoms) {
+	void refine_idatm_type(const Atom::Vec &atoms) {
 		// "pass 11": refined idatm typing relying on bond orders... 
 		Fragmenter(atoms).substitute_atoms(help::refine);
 		dbgmsg("pass 11 (refining idatm atom types) : " << endl << atoms);
 	}
 	
-	void AtomType::compute_gaff_type(const Atom::Vec &atoms) {
+	void compute_gaff_type(const Atom::Vec &atoms) {
 		Fragmenter f(atoms);
 		f.substitute_atoms(help::gaff);
 		dbgmsg("pass 1 (gaff applying basic rules) : " << endl << atoms);
@@ -845,7 +869,7 @@ namespace Molib {
 	 * (as atoms argument) then it should be checked before calling this function whether
 	 * it is not a standard_residue...in which case, ring typing is unneccessary.
 	 */
-	void AtomType::compute_ring_type(const Atom::Vec &atoms) {
+	void compute_ring_type(const Atom::Vec &atoms) {
 		dbgmsg("Computing ring types");
 		for (auto &patom : atoms)
 				patom->insert_property("NG", 1); // atom belongs to chain
@@ -909,4 +933,20 @@ namespace Molib {
 		}
 		dbgmsg("MOLECULE AFTER RING TYPING" << endl << atoms);
 	}
+	
+	std::tuple<double, int, int> determine_lipinski(const Atom::Vec &atoms) {
+                double molar_mass = 0.0;
+                int h_bond_acceptors = 0;
+                int h_bond_donors = 0;
+                for (auto atom : atoms) {
+                        molar_mass += atom->element().mass();
+                        if ( atom->element() == Element::N || atom->element() == Element::O ) {
+                                ++h_bond_acceptors;
+                                h_bond_donors += atom->get_num_hydrogens();
+                                
+                        }
+                }
+                return std::make_tuple(molar_mass, h_bond_acceptors, h_bond_donors);
+        }
+}
 };

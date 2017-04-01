@@ -1,7 +1,6 @@
 #ifndef RESIDUE_H
 #define RESIDUE_H
 #include "geom3d/geom3d.hpp"
-#include "geom3d/matrix.hpp"
 #include "it.hpp"
 #include "atom.hpp"
 

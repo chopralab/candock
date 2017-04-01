@@ -9,7 +9,7 @@
 using namespace std;
 
 namespace probis {
-	void compare_against_bslib(int argc, char* argv[], const string &receptor_file, 
+	void compare_against_bslib(const string &receptor_file, const string &surface_file,
 		const string &receptor_chain_id, const string &bslib_file, const int ncpu, 
 		const string &nosql_file, const string &json_file) {
 		try {
@@ -20,8 +20,7 @@ namespace probis {
 		    _local = true;
 		    //~ args.fill_args(argc, argv);
 			NCPU = ncpu;
-			size_t found = receptor_file.find_last_of(".");
-			SRF_FILE = receptor_file.substr(0, found) + ".srf";
+			SRF_FILE = surface_file;
 			PROTEIN1 = receptor_file;
 			CHAIN1 = receptor_chain_id;
 			//~ strcpy(SURF_FILE, bslib_file.c_str());
