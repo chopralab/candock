@@ -17,7 +17,7 @@ class Settings : public QDialog, public help::Options
 
 public:
     explicit Settings(QWidget *parent = 0);
-    ~Settings();
+    virtual ~Settings();
     
     virtual const std::string& get_string_option (const std::string& option) const;
     virtual bool        get_bool_option   (const std::string& option) const;

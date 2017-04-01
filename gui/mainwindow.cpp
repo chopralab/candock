@@ -6,7 +6,6 @@
 
 #include "program/target.hpp"
 #include "program/fragmentligands.hpp"
-#include "modeler/systemtopology.hpp"
 
 #include <QFile>
 #include <QMessageBox>
@@ -103,8 +102,6 @@ void MainWindow::__dock_fragments() {
 
 void MainWindow::__link_fragments() {
     __dock_fragments();
-
-    OMMIface::SystemTopology::loadPlugins();
 
     statusBar()->showMessage("Linking Fragments");
     __targets->link_fragments();
