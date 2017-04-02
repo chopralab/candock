@@ -6,7 +6,7 @@
 #include <time.h>       /* time */
 #include "molib/grid.hpp"
 #include "molib/nrset.hpp"
-#include "pdbreader/pdbreader.hpp"
+#include "pdbreader/fileparser.hpp"
 #include "helper/help.hpp"
 #include "geom3d/matrix.hpp"
 #include "helper/error.hpp"
@@ -249,7 +249,7 @@ namespace genclus {
 
 				dbgmsg(pdb_id + " " + chain_ids);
 
-				Parser::PDBreader pr(pdb_file, Parser::all_models|Parser::sparse_macromol);
+				Parser::FileParser pr(pdb_file, Parser::all_models|Parser::sparse_macromol);
 				Molib::Molecules &mols = nrset.add(new Molib::Molecules(pr.parse_molecule()));
 
 				squeeze_proteins_nucleic(mols);

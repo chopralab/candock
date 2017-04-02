@@ -6,7 +6,7 @@
 #include "molib/molecules.hpp"
 #include "score/score.hpp"
 #include "modeler/forcefield.hpp"
-#include "pdbreader/pdbreader.hpp"
+#include "pdbreader/fileparser.hpp"
 #include "program/dockfragments.hpp"
 
 #include <mutex>

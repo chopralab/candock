@@ -5,7 +5,7 @@
 #include "jsonreader.hpp"
 #include "nosqlreader.hpp"
 #include "molib/nrset.hpp"
-#include "pdbreader/pdbreader.hpp"
+#include "pdbreader/fileparser.hpp"
 #include "helper/help.hpp"
 #include "geom3d/matrix.hpp"
 #include "helper/error.hpp"
@@ -150,7 +150,7 @@ namespace genlig {
 		//~ const string &bsite_file) {
 
 		// read query PDB protein
-		Parser::PDBreader qpdb(receptor_file, 
+		Parser::FileParser qpdb(receptor_file, 
 			Parser::first_model|Parser::hydrogens);
 		Molib::Molecules query_mols = qpdb.parse_molecule();
 		Molib::Atom::Grid gridrec(query_mols[0].get_atoms(receptor_chain_id, 
@@ -175,7 +175,7 @@ namespace genlig {
 					//~ Molib::Molecules &mols = nrset.add(new Molib::Molecules());
 					//~ biopdb.parse_PDB(mols, pdb_file);
 					//~ biopdb.rewind();
-					Parser::PDBreader biopdb(pdb_file, 
+					Parser::FileParser biopdb(pdb_file, 
 						Parser::all_models|Parser::hydrogens);
 					Molib::Molecules &mols = 
 						nrset.add(new Molib::Molecules(biopdb.parse_molecule()));
@@ -278,7 +278,7 @@ namespace genlig {
 			const Geom3D::Matrix &mx = bio_file_to_matrix[bio_file];
 			try { // if something goes wrong, e.g., pdb file is not found, don't exit..
 				//~ biopdb.rewind();
-				Parser::PDBreader biopdb(bio_file, 
+				Parser::FileParser biopdb(bio_file, 
 					Parser::all_models);
 				Molib::Molecules mols = biopdb.parse_molecule();
 				mols.rotate(mx, true); // inverse rotation

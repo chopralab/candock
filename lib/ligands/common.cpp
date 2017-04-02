@@ -1,5 +1,5 @@
 #include "molib/molecule.hpp"
-#include "pdbreader/pdbreader.hpp"
+#include "pdbreader/fileparser.hpp"
 #include "common.hpp"
 #include <json/json.h>
 

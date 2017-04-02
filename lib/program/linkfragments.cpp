@@ -1,5 +1,7 @@
 #include "linkfragments.hpp"
 
+#include <boost/filesystem.hpp>
+
 #include "linker/linker.hpp"
 #include "modeler/modeler.hpp"
 #include "helper/path.hpp"
@@ -25,7 +27,7 @@ namespace Program {
 			if ( Inout::file_size(p2.string()) <= 0) {
 				is_done = false;
 			} else {
-				Parser::PDBreader conf(p2.string(), Parser::skip_atom | Parser::first_model, 1);
+				Parser::FileParser conf(p2.string(), Parser::skip_atom | Parser::first_model, 1);
 				conf.parse_molecule(__all_top_poses);
 				__all_top_poses.last().set_name(molec);
 			}
@@ -121,7 +123,7 @@ namespace Program {
                         return;
                 }
 
-		Parser::PDBreader lpdb2(cmdl.get_string_option("prep"), Parser::all_models, 1);
+		Parser::FileParser lpdb2(cmdl.get_string_option("prep"), Parser::all_models, 1);
 
 		std::vector<std::thread> threads;
 

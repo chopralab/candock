@@ -5,7 +5,7 @@
 #include "jsonreader.hpp"
 #include "nosqlreader.hpp"
 #include "molib/molecules.hpp"
-#include "pdbreader/pdbreader.hpp"
+#include "pdbreader/fileparser.hpp"
 #include "helper/help.hpp"
 #include "geom3d/matrix.hpp"
 #include "helper/error.hpp"
@@ -142,7 +142,7 @@ namespace genbio {
 		vector<string> aligned_chains;
 		if (!qpdb_file.empty()) {
 
-                        Parser::PDBreader pr(Path::join(pdb_dirname, qpdb_file), 
+                        Parser::FileParser pr(Path::join(pdb_dirname, qpdb_file), 
 				(models == "all" ? Parser::all_models : Parser::first_model)
 				|(hydrogens ? Parser::hydrogens : 0));
 
@@ -169,7 +169,7 @@ namespace genbio {
 
 					dbgmsg(pdb_file << " "  << chain_ids);
 
-					Parser::PDBreader pr(pdb_file, 
+					Parser::FileParser pr(pdb_file, 
 						(models == "all" ? Parser::all_models : Parser::first_model)
 						|(hydrogens ? Parser::hydrogens : 0));
 					pr.parse_molecule(mols);

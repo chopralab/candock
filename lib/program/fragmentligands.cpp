@@ -22,7 +22,7 @@ namespace Program {
 			cout << "Could not read seeds from " << cmdl.get_string_option("seeds_pdb") << endl;
 			cout << "Reading fragmented files from " << cmdl.get_string_option("prep") << endl;
 
-			Parser::PDBreader lpdb(cmdl.get_string_option("prep"), Parser::all_models, cmdl.get_int_option("max_num_ligands"));
+			Parser::FileParser lpdb(cmdl.get_string_option("prep"), Parser::all_models, cmdl.get_int_option("max_num_ligands"));
 
 			Molib::Molecules ligands;
 			while(lpdb.parse_molecule(ligands)) {
@@ -38,7 +38,7 @@ namespace Program {
 
 			cout << "Reading seeds from: " << cmdl.get_string_option("seeds_pdb") << endl;
 
-			Parser::PDBreader lpdb(cmdl.get_string_option("seeds_pdb"), Parser::all_models);
+			Parser::FileParser lpdb(cmdl.get_string_option("seeds_pdb"), Parser::all_models);
 			lpdb.parse_molecule(__seeds);
 			__ligand_idatm_types = __seeds.get_idatm_types(__ligand_idatm_types);
 			for (const auto& mol : __seeds) {
@@ -47,7 +47,7 @@ namespace Program {
 		}
 	}
 
-	void FragmentLigands::__fragment_ligands( Parser::PDBreader& lpdb, const bool write_out_for_linking, const bool no_rotatable_bond) {
+	void FragmentLigands::__fragment_ligands( Parser::FileParser& lpdb, const bool write_out_for_linking, const bool no_rotatable_bond) {
 		bool thread_is_not_done;
 		Molib::Molecules ligands;
 		{
@@ -94,7 +94,7 @@ namespace Program {
 		if (Inout::file_size(cmdl.get_string_option("ligand")) > 0) {
 			cout << "Fragmenting files in " << cmdl.get_string_option("ligand") << endl;
 
-			Parser::PDBreader lpdb(cmdl.get_string_option("ligand"), 
+			Parser::FileParser lpdb(cmdl.get_string_option("ligand"), 
 				Parser::all_models|Parser::hydrogens, 
 				cmdl.get_int_option("max_num_ligands"));
 
@@ -114,7 +114,7 @@ namespace Program {
 
 			cout << "Adding fragments from " << fragment_bag << endl;
 
-			Parser::PDBreader lpdb_additional(fragment_bag, 
+			Parser::FileParser lpdb_additional(fragment_bag, 
 				Parser::all_models|Parser::hydrogens, 
 				cmdl.get_int_option("max_num_ligands"));
 
@@ -133,7 +133,7 @@ namespace Program {
 		if (Inout::file_size(molecular_fragments) > 0 ) {
 			cout << "Adding molecular fragments from " << molecular_fragments << endl;
 
-			Parser::PDBreader lpdb_additional(molecular_fragments, 
+			Parser::FileParser lpdb_additional(molecular_fragments, 
 				Parser::all_models|Parser::hydrogens, 
 				cmdl.get_int_option("max_num_ligands"));
 

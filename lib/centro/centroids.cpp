@@ -5,7 +5,7 @@
 #include "geom3d/geom3d.hpp"
 #include "kabsch/kabsch.hpp"
 #include "score/score.hpp"
-#include "pdbreader/pdbreader.hpp"
+#include "pdbreader/fileparser.hpp"
 #include "cluster/greedy.hpp"
 #include "centroids.hpp"
 #include <iostream>
