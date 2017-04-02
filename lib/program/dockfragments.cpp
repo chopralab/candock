@@ -30,8 +30,6 @@ namespace Program {
         }
 
         bool DockFragments::__can_read_from_files () {
-                bool all_seeds_are_present = true;
-
                 const Molib::Molecules& all_seeds = __fragmented_ligands.seeds();
 
                 // No early return so that we have the ability to redock missing seeds
@@ -39,10 +37,11 @@ namespace Program {
                 for (const auto& seed : all_seeds) {
                         boost::filesystem::path p (__top_seeds_location);
                         p = p / seed.name() / top_seeds_file;
-                        all_seeds_are_present &= Inout::file_size(p.string()) > 0;
+                        if (Inout::file_size(p.string()) <= 0)
+                                return false;
                 }
 
-                return all_seeds_are_present;
+                return true;
         }
 
         void DockFragments::__read_from_files () {
