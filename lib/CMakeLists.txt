@@ -14,7 +14,7 @@ add_subdirectory(ligands)
 add_subdirectory(linker)
 add_subdirectory(modeler)
 add_subdirectory(molib)
-add_subdirectory(pdbreader)
+add_subdirectory(parser)
 add_subdirectory(probis)
 add_subdirectory(score)
 add_subdirectory(program)
@@ -34,7 +34,7 @@ add_library(
         $<TARGET_OBJECTS:cluster>
         $<TARGET_OBJECTS:graph>
         $<TARGET_OBJECTS:modeler>
-        $<TARGET_OBJECTS:pdbreader>
+        $<TARGET_OBJECTS:parser>
         $<TARGET_OBJECTS:molib>
         $<TARGET_OBJECTS:probis>
         $<TARGET_OBJECTS:fragmenter>

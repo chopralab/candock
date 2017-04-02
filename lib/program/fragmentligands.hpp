@@ -6,7 +6,7 @@
 
 #include "programstep.hpp"
 #include "molib/molecules.hpp"
-#include "pdbreader/fileparser.hpp"
+#include "parser/fileparser.hpp"
 
 namespace Program {
 

@@ -2,7 +2,7 @@
 
 #include <boost/filesystem.hpp>
 
-#include "pdbreader/fileparser.hpp"
+#include "parser/fileparser.hpp"
 
 #include "modeler/systemtopology.hpp"
 

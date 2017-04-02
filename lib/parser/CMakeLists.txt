@@ -1,6 +1,6 @@
 include_directories($CMAKE_CURRENT_SOURCE_DIR)
 
-set( pdbreader_SRC
+set( parser_SRC
      parser.cpp
      parser.hpp
      fileparser.cpp
@@ -9,4 +9,4 @@ set( pdbreader_SRC
      mol2parser.cpp
 )
 
-add_library(pdbreader OBJECT ${pdbreader_SRC})
+add_library(parser OBJECT ${parser_SRC})

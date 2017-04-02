@@ -6,7 +6,7 @@
 #include <time.h>       /* time */
 #include "molib/grid.hpp"
 #include "molib/nrset.hpp"
-#include "pdbreader/fileparser.hpp"
+#include "parser/fileparser.hpp"
 #include "helper/help.hpp"
 #include "geom3d/matrix.hpp"
 #include "helper/error.hpp"
