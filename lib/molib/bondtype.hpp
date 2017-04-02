@@ -10,9 +10,7 @@
 #include <cstdlib>
 #include "it.hpp"
 
-using namespace std;
-
-namespace Molib {	
+namespace Molib {
 	class Atom;
 	struct AtomParams {
 		int val;
@@ -26,7 +24,7 @@ namespace Molib {
 	class BondOrder {
 		class BondOrderError : public Error {
 		public: 
-			BondOrderError(const string &msg) : Error(msg) {}
+			BondOrderError(const std::string &msg) : Error(msg) {}
 		};
 		static ValenceStateVec __create_valence_states(const Atom::Vec &atoms, const int max_valence_states);
 		static void __dfs(const int level, const int sum, const int tps, const vector<vector<AtomParams>> &V,

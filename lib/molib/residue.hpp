@@ -4,8 +4,6 @@
 #include "it.hpp"
 #include "atom.hpp"
 
-using namespace std;
-
 namespace Molib {
 	class Atom;
 	class Chain;
@@ -13,12 +11,12 @@ namespace Molib {
 	class Residue : public template_map_container<Atom, Residue, Chain, int> {
 	public:
 		typedef enum {notassigned=1, protein=2, nucleic=4, ion=8, water=16, hetero=32} res_type;
-		typedef tuple<char, string, int, char> res_tuple2;
+		typedef tuple<char,std::string, int, char> res_tuple2;
 		typedef pair<int, char> res_pair;
 		typedef vector<Residue*> Vec;
 		typedef set<Residue*> Set;
 	private:
-		string __resn;
+	std::string __resn;
 		int __resi;
 		char __ins_code;
 		Residue::res_type __rest;
@@ -41,8 +39,8 @@ namespace Molib {
 		void set_crd() { for (auto &atom : *this) { __crd = __crd + atom.crd(); } 
 			__crd = __crd / this->size(); } // calculate geom center
 		Atom& add(Atom *a) { return this->aadd(a->atom_number(), a, this); }
-		string resn() const { return __resn; }
-		void set_resn(const string &resn) { __resn = resn; }
+	std::string resn() const { return __resn; }
+		void set_resn(const std::string &resn) { __resn = resn; }
 		void set_resi(int resi) { __resi = resi; }
 		int resi() const { return __resi; }
 		char ins_code() const { return __ins_code; }

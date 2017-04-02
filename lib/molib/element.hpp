@@ -2,12 +2,11 @@
 #define ELEMENT_H
 #include <iostream>
 #include <vector>
-using namespace std;
 
 namespace Molib {
 	class Element {
 	public:
-		static const vector<string> symbols;
+		static const std::vector<std::string> symbols;
 		// Atomic Symbols:
 		enum AS {
 			LonePair, H, D = 1, T = 1, He,
@@ -29,29 +28,29 @@ namespace Molib {
 		static double bondRadius(Element);
 		static double bondLength(Element, Element);
 	private:
-		AS atomicNumber(const string &name);		
-		AS as;		// atomic number
+		AS atomicNumber(const std::string &name);
+		AS as; // atomic number
 	public:
-		Element(const string &name) : as(atomicNumber(name)) {}
+		Element(const std::string &name) : as(atomicNumber(name)) {}
 		Element(int i) : as(AS(i)) {}
 		Element(AS a) : as(a) {}
 		Element(const Element &other) { as = other.as; }
-		const string name() const {
+		const std::string name() const {
 			if (as >= NumSymbols)
 				return "??";
 			return symbols[as];
 		}
-		int	number() const { return int(as); }
-		double	mass() const;
-		long	hash() const { return number(); }
+		int     number() const { return int(as); }
+		double  mass() const;
+		long    hash() const { return number(); }
 		const Element& operator=(const Element &a) { this->as = a.as; return *this; }
-		bool	operator==(const Element &a) const { return as == a.as; }
-		bool	operator!=(const Element &a) const { return as != a.as; }
-		bool	operator<(const Element &a) const { return as < a.as; }
-		bool	operator<=(const Element &a) const { return as <= a.as; }
-		bool	operator>(const Element &a) const { return as > a.as; }
-		bool	operator>=(const Element &a) const { return as >= a.as; }
-		friend ostream& operator<< (ostream&, const Element&);
+		bool    operator==(const Element &a) const { return as == a.as; }
+		bool    operator!=(const Element &a) const { return as != a.as; }
+		bool    operator<(const Element &a) const { return as < a.as; }
+		bool    operator<=(const Element &a) const { return as <= a.as; }
+		bool    operator>(const Element &a) const { return as > a.as; }
+		bool    operator>=(const Element &a) const { return as >= a.as; }
+		friend std::ostream& operator<< (std::ostream&, const Element&);
 	};
 }  // namespace Molib
 #endif

@@ -10,8 +10,6 @@
 #include "it.hpp"
 #include "atom.hpp"
 
-using namespace std;
-
 namespace Molib {
 	class Atom;
 	class Molecule;

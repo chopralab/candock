@@ -9,8 +9,6 @@
 
 #include <mutex>
 
-using namespace std;
-
 namespace OMMIface {
 	struct ForceField;
 };
@@ -33,13 +31,13 @@ namespace Molib {
 	private:
 		set<Residue::res_tuple2> __modified;
 		multimap<string, Residue::res_tuple2> __site;
-		string __name; // usually pdb file
+	std::string __name; // usually pdb file
 		typedef map<int, Geom3D::Matrix> M0;
 		typedef map<int, M0> M1;
 		M1 __bio_rota;
 		map<int, set<char> > __bio_chain;
 	public:
-		Molecule(const string name) : __name(name) {}
+		Molecule(const std::string name) : __name(name) {}
 		Molecule(const Molecule &rhs) : __modified(rhs.__modified), 
 			__site(rhs.__site), __name(rhs.__name), __bio_rota(rhs.__bio_rota), __bio_chain(rhs.__bio_chain) { 
 			for (auto &assembly : rhs) { 
@@ -67,17 +65,17 @@ namespace Molib {
 		Molecule(const Molib::Molecule &rhs, const Geom3D::Point::Vec &crds);
 		typedef enum {first_bio, all_bio} bio_how_many;
 
-		string get_chain_ids(const unsigned int hm) const;
+                std::string get_chain_ids(const unsigned int hm) const;
 
-                void change_residue_name(const string &resn);
+                void change_residue_name(const std::string &resn);
                 void change_residue_name(std::mutex &mtx, int &ligand_cnt);
 
 		Assembly& asym() { return this->first(); }
 		
-		Atom::Vec get_atoms(const string &chain_ids="", const Residue::res_type &rest=Residue::res_type::notassigned, const int model_number=-1) const;
+		Atom::Vec get_atoms(const std::string &chain_ids="", const Residue::res_type &rest=Residue::res_type::notassigned, const int model_number=-1) const;
 		Residue::Vec get_residues() const;
 
-		Geom3D::Point::Vec get_crds(const string &chain_ids="", const Residue::res_type &rest=Residue::res_type::notassigned, const int model_number=-1) const;
+		Geom3D::Point::Vec get_crds(const std::string &chain_ids="", const Residue::res_type &rest=Residue::res_type::notassigned, const int model_number=-1) const;
 		
 		double max_dist() const;
 		double max_dist(const Atom &atom) const;
@@ -85,11 +83,11 @@ namespace Molib {
 		void undo_mm_specific();
 		void add_modified(Residue::res_tuple2 t) { __modified.insert(t); }
 		bool is_modified(Residue::res_tuple2 t2) const { return (__modified.find(t2) != __modified.end()); }
-		void add_site(const string &name, Residue::res_tuple2 t) { __site.insert(make_pair(name, t)); }
-		void set_name(const string &name) { __name = name; }
-		const string& name() const { return __name; }
+		void add_site(const std::string &name, Residue::res_tuple2 t) { __site.insert(make_pair(name, t)); }
+		void set_name(const std::string &name) { __name = name; }
+		const std::string& name() const { return __name; }
 		
-		Molecule& filter(const unsigned int hm=Residue::notassigned, const string &chain_ids="");
+		Molecule& filter(const unsigned int hm=Residue::notassigned, const std::string &chain_ids="");
 		Molecule& regenerate_bonds(const Molecule&);
 		Molecule& compute_overlapping_rigid_segments(Unique&);
 
@@ -110,7 +108,7 @@ namespace Molib {
 		}
 		Molecule& erase_properties() { for (auto &assembly : *this) assembly.erase_properties(); return *this; }
 		friend ostream& operator<< (ostream& stream, const Molecule& m);
-		static string print_complex(Molecule &ligand, Molecule &receptor, const double energy, const int model = 1);
+		static std::string print_complex(Molecule &ligand, Molecule &receptor, const double energy, const int model = 1);
 	};
 	
 } // Molib

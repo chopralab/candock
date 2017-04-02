@@ -22,8 +22,8 @@ namespace Molib {
 	class Bond : public template_vector_container<Bond*, Bond> {
 		Atom *__atom1, *__atom2;
 		int __idx1, __idx2;
-		string __rotatable;
-		string __bond_gaff_type;
+	std::string __rotatable;
+	std::string __bond_gaff_type;
 		int __bo;
 		bool __ring;
 		bool __owns_atoms;
@@ -40,17 +40,17 @@ namespace Molib {
 			 __owns_atoms(owns_atoms), __angles(set<int>()), __drive_id(0) {}
 		~Bond();
 		bool is_set() const { return __atom1 != nullptr; }
-		void set_members(const string &str);
+		void set_members(const std::string &str);
 		bool is_adjacent(const Bond &other);
 		void set_angle(int angle) { __angles.insert(angle); }
 		void set_drive_id(int drive_id) { __drive_id = drive_id; }
-		void set_rotatable(const string &rotatable) { __rotatable = rotatable; }
-		const string& get_rotatable() const { return __rotatable; }
+		void set_rotatable(const std::string &rotatable) { __rotatable = rotatable; }
+		const std::string& get_rotatable() const { return __rotatable; }
 		void set_ring(bool ring) { __ring = ring; }
 		bool is_ring() const { return __ring; }
 		bool is_rotatable() const { return !__rotatable.empty() && __rotatable != "amide"; }
-		void set_bond_gaff_type(const string &bond_gaff_type) { __bond_gaff_type = bond_gaff_type; }
-		const string& get_bond_gaff_type() const { return __bond_gaff_type; }
+		void set_bond_gaff_type(const std::string &bond_gaff_type) { __bond_gaff_type = bond_gaff_type; }
+		const std::string& get_bond_gaff_type() const { return __bond_gaff_type; }
 		void set_bo(const int &bo) { __bo = bo; }
 		int get_bo() const { return __bo; }
 		bool is_single() const { return __bo == 1; }
@@ -69,7 +69,7 @@ namespace Molib {
 		friend ostream& operator<< (ostream& stream, const Bond& b);
 		// the following are required for BondGraph :-)
 		bool compatible(const Bond &other) const;
-		string get_label() const;
+                std::string get_label() const;
 		int weight() const { return 0; } // dummy for graph ostream operator
 	};
 	
