@@ -17,32 +17,43 @@ namespace Program {
 
 	class CANDOCK_EXPORT Target {
 
-		// FIXME: There's a better to design this, but this works for *now*
-		// TODO:  Consider using ProgramSteps instead of named things?
-		struct CANDOCK_EXPORT DockedReceptor {
+                // FIXME: There's a better to design this, but this works for *now*
+                // TODO:  Consider using ProgramSteps instead of named things?
+                struct CANDOCK_EXPORT DockedReceptor {
 
-			DockedReceptor(Molib::Molecule& rec) : protein(rec) {}
+                        DockedReceptor(Molib::Molecule& rec) :
+                                protein(rec), score(nullptr), ffield(nullptr),
+                                gridrec(nullptr), centroids(nullptr),
+                                prepseeds(nullptr), dockedlig(nullptr)
+                        {
+                        }
 
-			virtual ~DockedReceptor() {
-				delete score;
-				delete ffield;
-				delete gridrec;
-				delete centroids;
-				delete prepseeds;
-				delete dockedlig;
-			}
+                        virtual ~DockedReceptor() {
+                                if (score)
+                                        delete score;
+                                if (ffield)
+                                        delete ffield;
+                                if (gridrec)
+                                        delete gridrec;
+                                if (centroids)
+                                        delete centroids;
+                                if (prepseeds)
+                                        delete prepseeds;
+                                if (dockedlig)
+                                        delete dockedlig;
+                        }
 
-			DockedReceptor(const DockedReceptor& rhs) = default;
-			DockedReceptor& operator= (const DockedReceptor& rhs) = delete;
+                        DockedReceptor(const DockedReceptor& rhs) = default;
+                        DockedReceptor& operator= (const DockedReceptor& rhs) = default;
 
-			Molib::Molecule&      protein;
-			Molib::Score*         score;
-			OMMIface::ForceField* ffield;
-			Molib::Atom::Grid*    gridrec;
-			FindCentroids*        centroids;
-			DockFragments*        prepseeds;
-			LinkFragments*        dockedlig;
-		};
+                        Molib::Molecule&      protein;
+                        Molib::Score*         score;
+                        OMMIface::ForceField* ffield;
+                        Molib::Atom::Grid*    gridrec;
+                        FindCentroids*        centroids;
+                        DockFragments*        prepseeds;
+                        LinkFragments*        dockedlig;
+                };
 
 		Molib::Molecules            __receptors;
 		std::vector<DockedReceptor> __preprecs;

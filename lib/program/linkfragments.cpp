@@ -42,20 +42,20 @@ namespace Program {
 	}
 
 	void LinkFragments::__link_ligand( Molib::Molecule& ligand, const OMMIface::ForceField& ffield ) {
-		boost::filesystem::path p(__receptor.name());
-		p = p / cmdl.get_string_option("docked_dir") / (ligand.name() + ".pdb");
-		if ( Inout::file_size(p.string()) > 0) {
-			cout << ligand.name() << " is alread docked to " << __receptor.name() << ", reading from already docked file." << endl;
-			return;
-		}
+                boost::filesystem::path p(__receptor.name());
+                p = p / cmdl.get_string_option("docked_dir") / (ligand.name() + ".pdb");
+                if ( Inout::file_size(p.string()) > 0) {
+                        cout << ligand.name() << " is alread docked to " << __receptor.name() << ", reading from already docked file." << endl;
+                        return;
+                }
 
-		// if docking of one ligand fails, docking of others shall continue...
-		try { 
-			dbgmsg("LINKING LIGAND : " << endl << ligand);
+                // if docking of one ligand fails, docking of others shall continue...
+                try { 
+                        dbgmsg("LINKING LIGAND : " << endl << ligand);
 
-			if ( ligand.first().first().get_rigid().size() < 1 ) {
-				throw Error("No seeds to link");
-			}
+                        if ( ligand.first().first().get_rigid().size() < 1 ) {
+                                throw Error("No seeds to link");
+                        }
 
                         /** 
                           * Read top seeds for this ligand

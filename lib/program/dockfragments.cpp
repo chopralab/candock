@@ -61,6 +61,8 @@ namespace Program {
                                 if ( Inout::file_size(p.string()) > 0 ) {
                                         cout << "Skipping docking of seed: " << __fragmented_ligands.seeds()[j].name() << " because it is already docked!" << endl;
                                         continue;
+                                } else {
+                                        cout << "Docking seed: " << __fragmented_ligands.seeds()[j].name() << endl;
                                 }
                                 dbgmsg(__fragmented_ligands.seeds()[j]);
                                 /* Compute all conformations of this seed with the center
