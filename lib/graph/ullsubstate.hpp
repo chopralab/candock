@@ -35,11 +35,14 @@ namespace Glib {
 		bool IsFeasiblePair(node_id n1, node_id n2);
 		void AddPair(node_id n1, node_id n2);
 		bool IsGoal() { return core_len==n1; };
-		bool IsDead() { if (n1>n2) return true;
-			for(int i=core_len; i<n1; i++) { 
+		bool IsDead() {
+                        if (n1>n2) return true;
+			for(int i=core_len; i<n1; i++) {
+                                bool dead = true;
 				for(int j=0; j<n2; j++)
-					if (M[i][j]!=0) continue;
-					return true;
+					if (M[i][j]!=0) dead = false;
+                                if (dead)
+                                        return true;
 			}
 			return false;
 		};
