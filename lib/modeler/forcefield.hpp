@@ -60,8 +60,7 @@ namespace OMMIface {
                 bool has_angle_type(     const string &aclass1, const string &aclass2, const string &aclass3) const;
                 bool has_dihedral_type(  const string &aclass1, const string &aclass2, const string &aclass3, const string &aclass4) const;
                 bool has_improper_type(  const string &aclass1, const string &aclass2, const string &aclass3, const string &aclass4) const;
-                const KBType& get_kb_force_type(const Molib::Atom &atom1, 
-                        const Molib::Atom &atom2, const int type1, const int type2) const;
+                const KBType& get_kb_force_type(const Molib::Atom &atom1, const Molib::Atom &atom2) const;
                 const AtomType& get_atom_type(const int type) const;
                 const BondType& get_bond_type(const int type1, const int type2) const;
                 const AngleType& get_angle_type(const int type1, const int type2, const int type3) const;

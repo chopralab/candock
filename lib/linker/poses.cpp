@@ -19,7 +19,7 @@ namespace Linker {
 				for (auto &pstate : segment.get_states()) {
 					auto &state = *pstate;
 					for (size_t i = 0; i < state.get_crds().size(); ++i) {
-						if (segment.is_join_atom(i))
+						if (segment.is_join_atom(i)) //FIXME What is meant here? Technically only the debug statement is run, but is this check supposed to run __atompoints too?
 							dbgmsg("pushing to atompoints crd = " << state.get_crd(i) << " atom = " << segment.get_atom(i) << " for STATE = " << state);
 							__atompoints[segment.get_id()].push_back(unique_ptr<AtomPoint>(new AtomPoint(state.get_crd(i), segment.get_atom(i), state)));
 					}

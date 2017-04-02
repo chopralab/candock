@@ -100,7 +100,7 @@ namespace Molib {
 		const Geom3D::Coordinate& crd() const { return __crd; }
 		friend ostream& operator<< (ostream& stream, const Atom& a);
 		double distance() const { return 0.0; } // just dummy : needed by grid
-		void distance(double d) const {} // just dummy : needed by grid
+		void distance(double) const {} // just dummy : needed by grid
 		const map<int, int>& get_aps() const { return __aps; }
 		void set_members(const std::string &str);
 		const Residue& br() const { return *static_cast<const Residue*>(__br); }

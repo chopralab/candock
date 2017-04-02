@@ -56,7 +56,7 @@ public:
     const KBForce& getOwner() const {
         return owner;
     }
-    void updateContextState(OpenMM::ContextImpl& context) {
+    void updateContextState(OpenMM::ContextImpl&) {
         // This force field doesn't update the state directly.
     }
     double calcForcesAndEnergy(OpenMM::ContextImpl& context, bool includeForces, bool includeEnergy, int groups);
