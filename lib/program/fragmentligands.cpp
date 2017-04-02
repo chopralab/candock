@@ -4,7 +4,7 @@
 #include <mutex>
 
 #include "helper/inout.hpp"
-#include "pdbreader/molecules.hpp"
+#include "molib/molecules.hpp"
 #include "options.hpp"
 
 namespace Program {
@@ -22,7 +22,7 @@ namespace Program {
 			cout << "Could not read seeds from " << cmdl.get_string_option("seeds_pdb") << endl;
 			cout << "Reading fragmented files from " << cmdl.get_string_option("prep") << endl;
 
-			Molib::PDBreader lpdb(cmdl.get_string_option("prep"), Molib::PDBreader::all_models, cmdl.get_int_option("max_num_ligands"));
+			Parser::FileParser lpdb(cmdl.get_string_option("prep"), Parser::all_models, cmdl.get_int_option("max_num_ligands"));
 
 			Molib::Molecules ligands;
 			while(lpdb.parse_molecule(ligands)) {
@@ -38,7 +38,7 @@ namespace Program {
 
 			cout << "Reading seeds from: " << cmdl.get_string_option("seeds_pdb") << endl;
 
-			Molib::PDBreader lpdb(cmdl.get_string_option("seeds_pdb"), Molib::PDBreader::all_models);
+			Parser::FileParser lpdb(cmdl.get_string_option("seeds_pdb"), Parser::all_models);
 			lpdb.parse_molecule(__seeds);
 			__ligand_idatm_types = __seeds.get_idatm_types(__ligand_idatm_types);
 			for (const auto& mol : __seeds) {
@@ -47,7 +47,7 @@ namespace Program {
 		}
 	}
 
-	void FragmentLigands::__fragment_ligands( Molib::PDBreader& lpdb, const bool write_out_for_linking, const bool no_rotatable_bond) {
+	void FragmentLigands::__fragment_ligands( Parser::FileParser& lpdb, const bool write_out_for_linking, const bool no_rotatable_bond) {
 		bool thread_is_not_done;
 		Molib::Molecules ligands;
 		{
@@ -94,8 +94,8 @@ namespace Program {
 		if (Inout::file_size(cmdl.get_string_option("ligand")) > 0) {
 			cout << "Fragmenting files in " << cmdl.get_string_option("ligand") << endl;
 
-			Molib::PDBreader lpdb(cmdl.get_string_option("ligand"), 
-				Molib::PDBreader::all_models|Molib::PDBreader::hydrogens, 
+			Parser::FileParser lpdb(cmdl.get_string_option("ligand"), 
+				Parser::all_models|Parser::hydrogens, 
 				cmdl.get_int_option("max_num_ligands"));
 
 			std::vector<std::thread> threads1;
@@ -114,8 +114,8 @@ namespace Program {
 
 			cout << "Adding fragments from " << fragment_bag << endl;
 
-			Molib::PDBreader lpdb_additional(fragment_bag, 
-				Molib::PDBreader::all_models|Molib::PDBreader::hydrogens, 
+			Parser::FileParser lpdb_additional(fragment_bag, 
+				Parser::all_models|Parser::hydrogens, 
 				cmdl.get_int_option("max_num_ligands"));
 
 			std::vector<std::thread> threads2;
@@ -133,8 +133,8 @@ namespace Program {
 		if (Inout::file_size(molecular_fragments) > 0 ) {
 			cout << "Adding molecular fragments from " << molecular_fragments << endl;
 
-			Molib::PDBreader lpdb_additional(molecular_fragments, 
-				Molib::PDBreader::all_models|Molib::PDBreader::hydrogens, 
+			Parser::FileParser lpdb_additional(molecular_fragments, 
+				Parser::all_models|Parser::hydrogens, 
 				cmdl.get_int_option("max_num_ligands"));
 
 			std::vector<std::thread> threads3;

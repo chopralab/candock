@@ -7,7 +7,7 @@
 #include "geom3d/coordinate.hpp"
 #include "helper/debug.hpp"
 #include "helper/help.hpp"
-#include "pdbreader/molecule.hpp"
+#include "molib/molecule.hpp"
 #include "OpenMM.h"
 using namespace std;
 

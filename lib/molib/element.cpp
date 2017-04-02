@@ -1,6 +1,7 @@
 #include "element.hpp"
 #include "helper/debug.hpp"
 #include <algorithm>
+
 using namespace std;
 
 namespace Molib {
@@ -85,12 +86,12 @@ namespace Molib {
 	double Element::bondLength(Element a0, Element a1) {
 		return bondRadius(a0) + bondRadius(a1);
 	}
-	Element::AS Element::atomicNumber(const string &name) {
-		string symbol;
+	Element::AS Element::atomicNumber(const std::string &name) {
+	std::string symbol;
 		dbgmsg(name);
 		if (name == "")
 			return LonePair;
-		//~ string n;
+		//~std::string n;
 		//~ std::remove_copy_if(name.begin(), name.end(), std::back_inserter( n ), [](const char &c){ return isdigit(c)||c=='\''; });
 		//~ dbgmsg(n << " " << n.size());
 		//~ symbol.push_back(n[0]);
@@ -103,7 +104,7 @@ namespace Molib {
 		//~ }
 		//~ dbgmsg(symbol);
 		
-		//~ string n;
+		//~std::string n;
 		//~ std::remove_copy_if(name.begin(), name.end(), std::back_inserter( n ), [](const char &c){ return isdigit(c)||c=='\''; });
 		//~ dbgmsg(n << " " << n.size());
 		symbol.push_back(name[0]);
@@ -136,7 +137,7 @@ namespace Molib {
 			if (*e == symbol)
 				return AS(e - symbols.begin());
 		for (vector<string>::const_iterator e = symbols.begin() + 1; e != symbols.end(); e++)
-			if (symbol.find(*e) != string::npos)
+			if (symbol.find(*e) !=std::string::npos)
 				return AS(e - symbols.begin());
 		return LonePair;
 	}

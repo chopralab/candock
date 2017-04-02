@@ -2,11 +2,11 @@
 #define LINKFRAGMENTS_H
 
 #include "programstep.hpp"
-#include "pdbreader/molecule.hpp"
-#include "pdbreader/molecules.hpp"
+#include "molib/molecule.hpp"
+#include "molib/molecules.hpp"
 #include "score/score.hpp"
 #include "modeler/forcefield.hpp"
-#include "pdbreader/pdbreader.hpp"
+#include "parser/fileparser.hpp"
 #include "program/dockfragments.hpp"
 
 #include <mutex>

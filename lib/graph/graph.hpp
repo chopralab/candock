@@ -2,7 +2,7 @@
 #define GRAPH_H
 #include "mnts.hpp"
 #include "ullsubstate.hpp"
-#include "pdbreader/it.hpp"
+#include "molib/it.hpp"
 #include "helper/error.hpp"
 #include "helper/smiles.hpp"
 #include "helper/debug.hpp"

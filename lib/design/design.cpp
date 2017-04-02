@@ -1,10 +1,11 @@
 #include "design.hpp"
 
 #include <set>
-#include <pdbreader/hydrogens.hpp>
-#include <pdbreader/bondtype.hpp>
-#include <pdbreader/atomtype.hpp>
-#include <fragmenter/unique.hpp>
+
+#include "molib/hydrogens.hpp"
+#include "molib/bondtype.hpp"
+#include "molib/atomtype.hpp"
+#include "fragmenter/unique.hpp"
 
 namespace design {
 

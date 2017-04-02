@@ -7,7 +7,7 @@
 #include "design/design.hpp"
 
 #include "docker/gpoints.hpp"
-#include "pdbreader/molecules.hpp"
+#include "molib/molecules.hpp"
 
 #include <string>
 

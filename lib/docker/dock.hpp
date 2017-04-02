@@ -3,7 +3,7 @@
 
 #include "gpoints.hpp"
 #include "conformations.hpp"
-#include "pdbreader/molecules.hpp"
+#include "molib/molecules.hpp"
 
 namespace Molib {
 	class Molecule;

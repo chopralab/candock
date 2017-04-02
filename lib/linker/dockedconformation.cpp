@@ -1,5 +1,5 @@
 #include "dockedconformation.hpp"
-#include "pdbreader/molecule.hpp"
+#include "molib/molecule.hpp"
 
 using namespace std;
 

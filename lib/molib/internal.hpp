@@ -9,7 +9,6 @@
 #include <queue>
 #include <algorithm>
 
-
 namespace Molib {
 	class Atom;
 	struct Torsion {

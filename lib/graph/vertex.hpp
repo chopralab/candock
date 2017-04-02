@@ -1,6 +1,6 @@
 #ifndef VERTEX_H
 #define VERTEX_H
-#include "pdbreader/it.hpp"
+#include "molib/it.hpp"
 #include "helper/error.hpp"
 #include "helper/debug.hpp"
 #include <memory>

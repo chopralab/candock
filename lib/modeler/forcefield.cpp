@@ -1,5 +1,5 @@
 #include "forcefield.hpp"
-#include "pdbreader/molecule.hpp"
+#include "molib/molecule.hpp"
 #include "score/score.hpp"
 #include "helper/inout.hpp"
 #include "helper/error.hpp"

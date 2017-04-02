@@ -1,7 +1,7 @@
 #ifndef DESIGN_DESIGN_H
 #define DESIGN_DESIGN_H
 
-#include "pdbreader/nrset.hpp"
+#include "molib/nrset.hpp"
 
 namespace design {
 

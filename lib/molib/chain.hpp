@@ -6,8 +6,6 @@
 #include "atom.hpp"
 #include "residue.hpp"
 
-using namespace std;
-
 namespace Molib {
 	class Residue;
 	class Atom;

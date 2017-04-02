@@ -1,6 +1,6 @@
 #include "helper/inout.hpp"
-#include "pdbreader/grid.hpp"
-#include "pdbreader/molecule.hpp"
+#include "molib/grid.hpp"
+#include "molib/molecule.hpp"
 #include "helper/benchmark.hpp"
 #include "geom3d/geom3d.hpp"
 #include "centro/centroids.hpp"

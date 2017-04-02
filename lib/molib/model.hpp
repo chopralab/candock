@@ -10,8 +10,6 @@
 #include "residue.hpp"
 #include "chain.hpp"
 
-using namespace std;
-
 namespace Molib {
 	class Chain;
 	class Residue;
@@ -53,7 +51,7 @@ namespace Molib {
 			return true;
 		}
 		
-		Atom::Vec get_atoms(const string &chain_ids="", const Residue::res_type &rest=Residue::res_type::notassigned) const;
+		Atom::Vec get_atoms(const std::string &chain_ids="", const Residue::res_type &rest=Residue::res_type::notassigned) const;
 		Model& erase_properties() { for (auto &chain : *this) chain.erase_properties(); return *this; }
 		friend ostream& operator<< (ostream& stream, const Model& m);
 	};

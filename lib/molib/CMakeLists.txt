@@ -1,6 +1,6 @@
 include_directories($CMAKE_CURRENT_SOURCE_DIR)
 
-set( pdbreader_SRC
+set( molib_SRC
         assembly.cpp
         assembly.hpp
         atom.cpp
@@ -29,12 +29,10 @@ set( pdbreader_SRC
         molecules.hpp
         nrset.cpp
         nrset.hpp
-        pdbreader.cpp
-        pdbreader.hpp
         residue.cpp
         residue.hpp
 )
 
 include_directories( ../modeler )
 
-add_library(pdbreader OBJECT ${pdbreader_SRC})
+add_library(molib OBJECT ${molib_SRC})

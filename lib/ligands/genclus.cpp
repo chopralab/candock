@@ -4,9 +4,9 @@
 #include <algorithm>
 #include <stdlib.h>     /* srand, rand */
 #include <time.h>       /* time */
-#include "pdbreader/grid.hpp"
-#include "pdbreader/pdbreader.hpp"
-#include "pdbreader/nrset.hpp"
+#include "molib/grid.hpp"
+#include "molib/nrset.hpp"
+#include "parser/fileparser.hpp"
 #include "helper/help.hpp"
 #include "geom3d/matrix.hpp"
 #include "helper/error.hpp"
@@ -249,7 +249,7 @@ namespace genclus {
 
 				dbgmsg(pdb_id + " " + chain_ids);
 
-				Molib::PDBreader pr(pdb_file, Molib::PDBreader::all_models|Molib::PDBreader::sparse_macromol);
+				Parser::FileParser pr(pdb_file, Parser::all_models|Parser::sparse_macromol);
 				Molib::Molecules &mols = nrset.add(new Molib::Molecules(pr.parse_molecule()));
 
 				squeeze_proteins_nucleic(mols);

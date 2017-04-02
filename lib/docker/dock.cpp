@@ -1,5 +1,5 @@
 #include "helper/inout.hpp"
-#include "pdbreader/grid.hpp"
+#include "molib/grid.hpp"
 #include "score/score.hpp"
 #include "helper/benchmark.hpp"
 #include "helper/debug.hpp"

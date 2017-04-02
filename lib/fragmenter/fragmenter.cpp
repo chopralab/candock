@@ -3,7 +3,7 @@
 #include "helper/renamerules.hpp"
 #include <queue>
 #include <iterator>
-#include "pdbreader/molecule.hpp"
+#include "molib/molecule.hpp"
 #include "helper/help.hpp"
 #include "graph/graph.hpp"
 

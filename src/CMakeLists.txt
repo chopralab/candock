@@ -13,7 +13,8 @@ if(${CANDOCK_BUILD_STATIC_EXECUTABLE})
         $<TARGET_OBJECTS:cluster>
         $<TARGET_OBJECTS:graph>
         $<TARGET_OBJECTS:modeler>
-        $<TARGET_OBJECTS:pdbreader>
+        $<TARGET_OBJECTS:parser>
+        $<TARGET_OBJECTS:molib>
         $<TARGET_OBJECTS:probis>
         $<TARGET_OBJECTS:fragmenter>
         $<TARGET_OBJECTS:kbforce>

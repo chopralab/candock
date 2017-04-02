@@ -1,5 +1,5 @@
-#include "pdbreader/grid.hpp"
-#include "pdbreader/molecules.hpp"
+#include "molib/grid.hpp"
+#include "molib/molecules.hpp"
 #include "score/score.hpp"
 #include "helper/benchmark.hpp"
 #include "helper/debug.hpp"

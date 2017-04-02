@@ -1,5 +1,5 @@
 #include "unique.hpp"
-#include "pdbreader/molecule.hpp"
+#include "molib/molecule.hpp"
 #include "fragmenter/fragmenter.hpp"
 
 namespace Molib {

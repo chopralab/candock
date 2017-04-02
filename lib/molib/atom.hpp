@@ -9,14 +9,12 @@
 #include "bond.hpp"
 #include "graph/graph.hpp"
 
-using namespace std;
-
 namespace Molib {
 	class Residue;
 	
 	class Atom : public template_vector_container<Atom*, Atom> {
 	public:
-		typedef tuple<int, string, unique_ptr<Geom3D::Coordinate>, double> atom_tuple;
+		typedef tuple<int,std::string, unique_ptr<Geom3D::Coordinate>, double> atom_tuple;
 		typedef pair<Atom*, Atom*> Pair;
 		typedef vector<Atom*> Vec;
                 typedef vector<const Atom*> ConstVec;
@@ -26,13 +24,13 @@ namespace Molib {
 
 	private:
 		int __atom_number;
-		string __atom_name;
+	std::string __atom_name;
 		Geom3D::Coordinate __crd;
 		int __idatm_type;
-		string __sybyl_type;
-		string __gaff_type;
+	std::string __sybyl_type;
+	std::string __gaff_type;
 		Element __element;
-		string __smiles_label;
+	std::string __smiles_label;
 		map<string, int> __smiles_prop;
 		map<int, int> __aps;
 		void *__br; // back reference
@@ -48,7 +46,7 @@ namespace Molib {
 			dbgmsg("Copy constructor : atom");
 		}
 
-		Atom(const int atom_number, const string &smiles_label, 
+		Atom(const int atom_number, const std::string &smiles_label, 
 			const map<string, int> smiles_prop) : __atom_number(atom_number), 
 			 __element(""), __smiles_label(smiles_label), __smiles_prop(smiles_prop),
 			__br(nullptr) {}
@@ -56,8 +54,8 @@ namespace Molib {
 		Atom(const Geom3D::Coordinate &crd, const int &idatm_type) : __crd(crd), 
 			__idatm_type(idatm_type), __element("") {}
 		// if element is missing, try to guess it from atom name
-		Atom(int atom_number, const string &atom_name, const Geom3D::Coordinate &crd, 
-			const int idatm_type, const string &element="", const string &sybyl_type="") 
+		Atom(int atom_number, const std::string &atom_name, const Geom3D::Coordinate &crd, 
+			const int idatm_type, const std::string &element="", const std::string &sybyl_type="") 
 			: __atom_number(atom_number), __atom_name(atom_name), __crd(crd), 
 			__idatm_type(idatm_type), __sybyl_type(sybyl_type), __gaff_type("???"), 
                         __element(element.empty() ? atom_name : element) {}
@@ -71,31 +69,31 @@ namespace Molib {
 		shared_ptr<Bond>& insert_bond(const Atom &other, Bond *bond) { return __bonds.insert({&other, shared_ptr<Bond>(bond)}).first->second; }
 		void erase_bond(const Atom &other) { __bonds.erase(&other); }
 		bool is_adjacent(const Atom &other) const { return __bonds.count(&other) != 0; }
-		bool is_adjacent(const string &atom_name) const { for (auto &other : *this) if (other.atom_name() == atom_name) return true; return false; }
+		bool is_adjacent(const std::string &atom_name) const { for (auto &other : *this) if (other.atom_name() == atom_name) return true; return false; }
 		int get_num_hydrogens() const;
 		int atom_number() const { return __atom_number; }
-		void set_atom_name(const string &atom_name) { __atom_name = atom_name; }
+		void set_atom_name(const std::string &atom_name) { __atom_name = atom_name; }
 		void set_atom_number(int atom_number) { __atom_number = atom_number; }
-		void set_idatm_type(const string &idatm_type) { __idatm_type = help::idatm_mask.at(idatm_type); }
-		void set_gaff_type(const string &gaff_type) { __gaff_type = gaff_type; }
-		Atom& insert_property(const string &prop, const int count) { __smiles_prop.insert({prop, count}); return *this; }
-		Atom& add_property(const string &prop) { __smiles_prop[prop]++; return *this; }
-		Atom& erase_property(const string &prop) { __smiles_prop.erase(prop); return *this; }
+		void set_idatm_type(const std::string &idatm_type) { __idatm_type = help::idatm_mask.at(idatm_type); }
+		void set_gaff_type(const std::string &gaff_type) { __gaff_type = gaff_type; }
+		Atom& insert_property(const std::string &prop, const int count) { __smiles_prop.insert({prop, count}); return *this; }
+		Atom& add_property(const std::string &prop) { __smiles_prop[prop]++; return *this; }
+		Atom& erase_property(const std::string &prop) { __smiles_prop.erase(prop); return *this; }
 		Atom& erase_properties() { __smiles_prop.clear(); return *this; }
-		bool has_property(const string &prop) const { return __smiles_prop.count(prop) != 0; }
-		int get_num_property(const string &prop) const { 
+		bool has_property(const std::string &prop) const { return __smiles_prop.count(prop) != 0; }
+		int get_num_property(const std::string &prop) const { 
 			dbgmsg("__smiles prop(" << prop << ") count = " << __smiles_prop.count(prop)); 
 			if (__smiles_prop.count(prop) == 0) return 0;
 			return __smiles_prop.at(prop); }
-		int get_num_bond_with_bond_gaff_type(const string &prop) const;
-		int compute_num_property(const string &prop) const;
+		int get_num_bond_with_bond_gaff_type(const std::string &prop) const;
+		int compute_num_property(const std::string &prop) const;
 		void set_crd(const Geom3D::Coordinate &crd) { __crd = crd; }
-		string idatm_type_unmask() const { return help::idatm_unmask[__idatm_type]; }
+	std::string idatm_type_unmask() const { return help::idatm_unmask[__idatm_type]; }
 		int idatm_type() const { return __idatm_type; }
-		const string& sybyl_type() const { return __sybyl_type; }
+		const std::string& sybyl_type() const { return __sybyl_type; }
 		double radius() const { return help::vdw_radius[__idatm_type]; }
-		const string& gaff_type() const { return __gaff_type; }
-		const string& atom_name() const { return __atom_name; }
+		const std::string& gaff_type() const { return __gaff_type; }
+		const std::string& atom_name() const { return __atom_name; }
 		Element element() const { return __element; }
 		void set_element(const Element& e) { __element = e; };
 		Geom3D::Coordinate& crd() { return __crd; }
@@ -104,12 +102,12 @@ namespace Molib {
 		double distance() const { return 0.0; } // just dummy : needed by grid
 		void distance(double d) const {} // just dummy : needed by grid
 		const map<int, int>& get_aps() const { return __aps; }
-		void set_members(const string &str);
+		void set_members(const std::string &str);
 		const Residue& br() const { return *static_cast<const Residue*>(__br); }
 		void set_br(void *br) { __br = br; }
 		// the following are required for Atom::Graph :-)
 		bool compatible(const Atom &atom) const;
-		string get_label() const { return (__smiles_label.empty() 
+	std::string get_label() const { return (__smiles_label.empty() 
 			? help::idatm_unmask[__idatm_type] : __smiles_label); }
                 int weight() const { return 0; } // dummy for graph ostream operator
 

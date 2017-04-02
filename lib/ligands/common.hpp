@@ -1,5 +1,5 @@
-//~ #include "pdbreader/molecule.hpp"
-//~ #include "pdbreader/pdbreader.hpp"
+//~ #include "molib/molecule.hpp"
+//~ #include "molib/pdbreader.hpp"
 //~ using namespace Molib;
 
 namespace Molib {

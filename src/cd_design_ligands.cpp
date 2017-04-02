@@ -2,6 +2,8 @@
 #include <exception>
 #include <typeinfo>
 
+#include <boost/filesystem.hpp>
+
 #include "program/cmdlnopts.hpp"
 #include "program/target.hpp"
 #include "program/fragmentligands.hpp"

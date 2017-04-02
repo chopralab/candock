@@ -1,6 +1,6 @@
 #include "score.hpp"
 #include "interpolation.hpp"
-#include "pdbreader/molecule.hpp"
+#include "molib/molecule.hpp"
 #include "helper/inout.hpp"
 #include "helper/path.hpp"
 #include <boost/filesystem/path.hpp>

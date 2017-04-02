@@ -8,7 +8,7 @@
 
 #include "score/score.hpp"
 #include "docker/dock.hpp"
-#include "pdbreader/nrset.hpp"
+#include "molib/nrset.hpp"
 
 namespace Program {
 

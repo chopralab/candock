@@ -10,7 +10,6 @@
 #include "geom3d/coordinate.hpp"
 #include "helper/debug.hpp"
 #include "helper/help.hpp"
-using namespace std;
 
 template<class T> // T needs crd(), distance(), and distance(double) interface
 class Grid {

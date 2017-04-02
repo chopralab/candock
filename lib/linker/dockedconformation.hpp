@@ -1,6 +1,6 @@
 #ifndef DOCKEDCONFORMATION_H
 #define DOCKEDCONFORMATION_H
-#include "pdbreader/molecule.hpp"
+#include "molib/molecule.hpp"
 #include <memory>
 
 namespace Linker {
