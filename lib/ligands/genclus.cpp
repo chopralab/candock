@@ -249,7 +249,7 @@ namespace genclus {
 
 				dbgmsg(pdb_id + " " + chain_ids);
 
-				Molib::PDBreader pr(pdb_file, Molib::PDBreader::all_models|Molib::PDBreader::sparse_macromol);
+				Parser::PDBreader pr(pdb_file, Parser::all_models|Parser::sparse_macromol);
 				Molib::Molecules &mols = nrset.add(new Molib::Molecules(pr.parse_molecule()));
 
 				squeeze_proteins_nucleic(mols);

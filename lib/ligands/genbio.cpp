@@ -142,9 +142,9 @@ namespace genbio {
 		vector<string> aligned_chains;
 		if (!qpdb_file.empty()) {
 
-			Molib::PDBreader pr(Path::join(pdb_dirname, qpdb_file), 
-				(models == "all" ? Molib::PDBreader::all_models : Molib::PDBreader::first_model)
-				|(hydrogens ? Molib::PDBreader::hydrogens : 0));
+                        Parser::PDBreader pr(Path::join(pdb_dirname, qpdb_file), 
+				(models == "all" ? Parser::all_models : Parser::first_model)
+				|(hydrogens ? Parser::hydrogens : 0));
 
 			pr.parse_molecule(mols);
 
@@ -169,9 +169,9 @@ namespace genbio {
 
 					dbgmsg(pdb_file << " "  << chain_ids);
 
-					Molib::PDBreader pr(pdb_file, 
-						(models == "all" ? Molib::PDBreader::all_models : Molib::PDBreader::first_model)
-						|(hydrogens ? Molib::PDBreader::hydrogens : 0));
+					Parser::PDBreader pr(pdb_file, 
+						(models == "all" ? Parser::all_models : Parser::first_model)
+						|(hydrogens ? Parser::hydrogens : 0));
 					pr.parse_molecule(mols);
 					// distinguish between two use-cases
 					if (pdb_id.size() == 4)

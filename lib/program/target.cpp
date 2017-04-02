@@ -24,7 +24,7 @@ namespace Program {
 		 */
 		if ( Inout::file_size(input_name) > 0 ) {
 			// If the option given is a regular file, act like previous versions
-			Molib::PDBreader rpdb(input_name, Molib::PDBreader::first_model);
+			Parser::PDBreader rpdb(input_name, Parser::first_model);
 			Molib::Molecules receptors = rpdb.parse_molecule();
 			Molib::Molecule& current = __receptors.add(new Molib::Molecule ( std::move (receptors[0]) ));
 			current.set_name(boost::filesystem::basename(input_name.substr(0, input_name.length() - 4))); // Emulate the original version of candock
@@ -32,7 +32,7 @@ namespace Program {
 			__preprecs.push_back(DockedReceptor (current));
 		} else for ( const auto &a : Inout::files_matching_pattern (input_name, ".pdb")) {
 			// Otherwise we treat it like the new version intends.
-			Molib::PDBreader rpdb(a, Molib::PDBreader::first_model);
+			Parser::PDBreader rpdb(a, Parser::first_model);
 			Molib::Molecules receptors = rpdb.parse_molecule();
 			Molib::Molecule& current = __receptors.add(new Molib::Molecule ( std::move (receptors[0]) ));
 			current.set_name( a.substr(0, a.length() - 4 ) );
@@ -97,8 +97,8 @@ namespace Program {
                               .compile_scoring_function()
                               .parse_objective_function(cmdl.get_string_option("obj_dir"), cmdl.get_double_option("scale"));
 
-                        Molib::PDBreader lpdb(cmdl.get_string_option("prep"), 
-                        Molib::PDBreader::all_models|Molib::PDBreader::hydrogens, 
+                        Parser::PDBreader lpdb(cmdl.get_string_option("prep"), 
+                        Parser::all_models|Parser::hydrogens, 
                         cmdl.get_int_option("max_num_ligands"));
 
                         Molib::Molecules ligands = lpdb.parse_molecule();
@@ -109,7 +109,7 @@ namespace Program {
                                 Inout::output_file(Molib::Molecule::print_complex(ligand, a.protein, energy), 
                                 Path::join( cmdl.get_string_option("docked_dir"), ligand.name() + ".pdb"),  ios_base::app);
 
-								cout << "Energy is " << energy << " for " << ligand.name() << " in " << a.protein.name() << endl;
+                                cout << "Energy is " << energy << " for " << ligand.name() << " in " << a.protein.name() << endl;
                         }
 
                         a.score = score;
@@ -173,7 +173,7 @@ namespace Program {
                 const string design_file = "designed_0.pdb";
                 if ( Inout::file_size(design_file) ) {
                         cout << design_file << " found -- skipping generation of new designs this iteration" << endl;
-                        Molib::PDBreader dpdb (design_file, Molib::PDBreader::all_models );
+                        Parser::PDBreader dpdb (design_file, Parser::all_models );
                         Molib::Molecules designs;
                         dpdb.parse_molecule(designs);
 
@@ -238,7 +238,7 @@ namespace Program {
                     Molib::Molecules all_designs;
                     if ( Inout::file_size(design_file) ) {
                             cout << design_file << " found -- skipping generation of new designs this iteration" << endl;
-                            Molib::PDBreader dpdb (design_file, Molib::PDBreader::all_models );
+                            Parser::PDBreader dpdb (design_file, Parser::all_models );
                             Molib::Molecules designs;
                             dpdb.parse_molecule(designs);
 

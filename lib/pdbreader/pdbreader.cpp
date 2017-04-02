@@ -20,8 +20,9 @@
 #include "molib/bond.hpp"
 #include "fragmenter/fragmenter.hpp"
 using namespace std;
+using namespace Molib;
 
-namespace Molib {
+namespace Parser {
 	void PDBreader::rewind() { p->set_pos(0); }
 	void PDBreader::set_flags(unsigned int hm) { p->set_hm(hm); }
 	bool PDBreader::parse_molecule(Molecules &mols) { 
@@ -68,24 +69,6 @@ namespace Molib {
 		if (Inout::file_size(molecule_file) <= 0)
 			throw Error(string("die : file not valid: ") + molecule_file + ". Check to see if it exists and has contents!");
 	}
-	void PDBreader::Parser::__generate_molecule(Molecules &mols, bool &found_molecule, const string &name) {
-		if(!found_molecule) { // if there were no REMARK or BIOMOLECULE...
-			mols.add(new Molecule(name));
-			found_molecule = true;
-		}
-	}
-	void PDBreader::Parser::__generate_assembly(Molecules &mols, bool &found_assembly, int assembly_number, const string &name) {
-		if(!found_assembly) { // if there were no REMARK or BIOMOLECULE...
-			mols.last().add(new Assembly(assembly_number, name));
-			found_assembly = true;
-		}
-	}	
-	void PDBreader::Parser::__generate_model(Molecules &mols, bool &found_model, int model_number) {
-		if(!found_model) { // if there were no REMARK or BIOMOLECULE...
-			mols.last().last().add(new Model(model_number));
-			found_model = true;
-		}
-	}
 	void PDBreader::Mol2Parser::parse_molecule(Molecules &mols) {
 		vector<string> mol2_raw;
 		Inout::read_file(__molecule_file, mol2_raw, __pos,
@@ -127,7 +110,7 @@ namespace Molib {
 						<< " element = " << element << " hydrogen = " << hydrogen);
 					Geom3D::Coordinate crd(x, y, z);
 					
-					if ((__hm & PDBreader::hydrogens) || !hydrogen) {					
+					if ((__hm & hydrogens) || !hydrogen) {					
 						Residue::res_type rest(Residue::hetero);
 						if (!__giant_molecule || rest != Residue::protein || atom_name == "CA") {
 							Model &model = mols.last().last().last();
@@ -201,8 +184,8 @@ namespace Molib {
 		Chain *chain = nullptr;
 		Residue *residue = nullptr;
 		for (string &line : pdb_raw) {
-			if ((__hm & PDBreader::skip_hetatm) && line.compare(0, 6, "HETATM") == 0) continue;
-			if ((__hm & PDBreader::skip_atom  ) && line.compare(0, 4, "ATOM")   == 0) continue;
+			if ((__hm & skip_hetatm) && line.compare(0, 6, "HETATM") == 0) continue;
+			if ((__hm & skip_atom  ) && line.compare(0, 4, "ATOM")   == 0) continue;
 			if (line.compare(0, 4, "ATOM") == 0 || line.compare(0, 6, "HETATM") == 0) {
 				__generate_molecule(mols, found_molecule, "");
 				__generate_assembly(mols, found_assembly, 0, "ASYMMETRIC UNIT");
@@ -233,7 +216,7 @@ namespace Molib {
 				string rest_of_line = line.size() > 90 ? boost::algorithm::trim_copy(line.substr(90)) : "";
 				const bool hydrogen = (element == "H" || (atom_name.size() == 1 && atom_name.at(0) == 'H'));
 				dbgmsg("hydrogen = " << boolalpha << hydrogen);
-				if ((__hm & PDBreader::hydrogens) || !hydrogen) {
+				if ((__hm & hydrogens) || !hydrogen) {
                                         // FIXME: This is a temporary hack until I can find a way to place a bond between the Ns and the FE
                                         if ( resn == "HEM" && element =="FE" ) {
                                                 resn = "FE2";
@@ -248,9 +231,9 @@ namespace Molib {
 							else if (resn == "HOH") rest = Residue::water;
 							else rest = Residue::hetero;  // if nothing known then hetero...
 
-							if ( rest == Residue::water && __hm & PDBreader::skip_atom ) continue;
+							if ( rest == Residue::water && __hm & skip_atom ) continue;
 
-							if ((__hm & PDBreader::sparse_macromol) && 
+							if ((__hm & sparse_macromol) && 
                                                              ((rest == Residue::protein && atom_name != "CA")
                                                            || (rest == Residue::nucleic && atom_name != "P")))
                                                             continue;
@@ -317,13 +300,13 @@ namespace Molib {
 					if (m[1].matched) {
 						__generate_molecule(mols, found_molecule, "");
 						__generate_assembly(mols, found_assembly, 0, "ASYMMETRIC UNIT");
-						if (__hm & PDBreader::all_models) found_model = false;
+						if (__hm & all_models) found_model = false;
 						__generate_model(mols, found_model, stoi(m[1].str()));
 					}
 				} else throw Error("die : model number not found in pdb");
 			}
 			else if (line.compare(0, 6, "ENDMDL") == 0) {
-				if (__hm & PDBreader::first_model) return;
+				if (__hm & first_model) return;
 			}
 			else if(line.compare(0, 10, "REMARK 350") == 0) { 
 				if (boost::regex_search(line, m, boost::regex("REMARK 350 BIOMOLECULE:\\s*(\\d+)"))) {

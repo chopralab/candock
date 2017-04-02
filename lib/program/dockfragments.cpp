@@ -144,7 +144,7 @@ namespace Program {
                         try {
                                 boost::filesystem::path p (__top_seeds_location);
                                 p = p / seed.name() / cmdl.get_string_option("top_seeds_file");
-                                Molib::PDBreader spdb (p.string(), Molib::PDBreader::first_model, 1);
+                                Parser::PDBreader spdb (p.string(), Parser::first_model, 1);
 
                                 Molib::Molecules seed_molec = spdb.parse_molecule();
                                 seed_score_map.push_back( {std::stod( seed_molec.first().name()), seed.name()} );
@@ -175,7 +175,7 @@ namespace Program {
                         dbgmsg("taking " << sz << " top seeds for seed " << fragment);
 
                         // Add one in case the user is silly enough to select a top_percent of 0.000
-                        Molib::PDBreader pdb( file_to_read.string(), Molib::PDBreader::all_models, sz + 1 );
+                        Parser::PDBreader pdb( file_to_read.string(), Parser::all_models, sz + 1 );
 
                         dbgmsg("reading top_seeds_file for seed id = " << fragment);
                         Molib::Molecules all = pdb.parse_molecule();
