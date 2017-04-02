@@ -12,6 +12,7 @@
 find_path(RAPIDXML_DIR 
           NAMES rapidxml/rapidxml.hpp
           DOC "RapidXML include dir"
+          HINTS ${RAPIDXML_ROOT}
          )
 
 if (NOT RAPIDXML_DIR)

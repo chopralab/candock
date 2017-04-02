@@ -24,10 +24,16 @@ if(${CANDOCK_BUILD_STATIC_EXECUTABLE})
     endif(WIN32)
 endif(${CANDOCK_BUILD_STATIC_EXECUTABLE})
 
-find_package(Boost   REQUIRED  COMPONENTS date_time filesystem system regex program_options)
-find_package(GSL     REQUIRED)
-find_package(OpenMM  REQUIRED)
-find_package(Git     REQUIRED)
+#Use included version if not installed on compile machine
+if ( NOT RAPIDXML_ROOT )
+    set( RAPIDXML_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/foreign/ )
+endif( NOT RAPIDXML_ROOT )
+
+find_package(Boost    REQUIRED  COMPONENTS date_time filesystem system regex program_options)
+find_package(GSL      REQUIRED)
+find_package(RapidXML REQUIRED)
+find_package(OpenMM   REQUIRED)
+find_package(Git      REQUIRED)
 
 set(CANDOCK_CUDA_SUPPORT OFF CACHE BOOL "Build CUDA support")
 
@@ -67,6 +73,7 @@ endif(WIN32)
 include_directories(${Boost_INCLUDE_DIRS})
 include_directories(${GSL_INCLUDE_DIRS})
 include_directories(${JSONCPP_INCLUDE_DIR})
+include_directories(${RAPIDXML_DIR})
 include_directories(${OPENMM_INCLUDE_DIR})
 include_directories(lib)
 
@@ -88,8 +95,6 @@ configure_file(
 )
 
 include_directories( ${PROJECT_BINARY_DIR} )
-
-include_directories( foreign )
 
 add_subdirectory(lib)
 add_subdirectory(src)
