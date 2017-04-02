@@ -57,7 +57,7 @@ extern "C" void registerKBReferenceKernelFactories() {
     registerKernelFactories();
 }
 
-namespace OpenMM {
+namespace KBPlugin {
 
 KernelImpl* ReferenceKBKernelFactory::createKernelImpl(std::string name, const Platform& platform, ContextImpl& context) const {
     //~ReferencePlatform::PlatformData& data = *static_cast<ReferencePlatform::PlatformData*>(context.getPlatformData());

@@ -34,7 +34,11 @@
 
 #include "openmm/KernelFactory.h"
 
-namespace OpenMM {
+extern "C" void registerKBReferenceKernelFactories();
+
+using namespace OpenMM;
+
+namespace KBPlugin {
 
 /**
  * This KernelFactory creates kernels for the reference implementation of the KB plugin.

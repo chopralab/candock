@@ -29,7 +29,7 @@ namespace OMMIface {
 		dbgmsg("before loading plugins");
 		OpenMM::Platform::loadPluginsFromDirectory
 			(OpenMM::Platform::getDefaultPluginsDirectory());
-		//registerKBReferenceKernelFactories();
+		registerKBReferenceKernelFactories();
 		dbgmsg("after loading plugins");
 		
 	}
