@@ -30,21 +30,17 @@ function find_centroids() {
 
     if [[ -s `get_option centroid` ]]
     then
-        echo "Existing binding site found in `get_option bsite`"
+        echo "Existing binding site found in `get_option centroid`"
         return
     fi
 
     ln -s $MCANDOCK_SUP_PATH/bslibdb  bslibdb
 
-    module load gcc/5.2.0
-
     SECONDS=0
 
-    $MCANDOCK_PATH/$MCANDOCK_VER/test_bsite
+    $MCANDOCK_PATH/$MCANDOCK_VER/cd_bsite_probis
 
-    echo "bsite took $SECONDS seconds to complete"
-
-    module unload gcc
+    echo "find_centroids took $SECONDS seconds to complete"
 
     unlink bslibdb
 
@@ -68,29 +64,14 @@ function prep_fragments() {
     cd $MCANDOCK_working_dir
     echo "Running fragment in $PWD"
 
-    module load gcc/5.2.0
-
     SECONDS=0
 
-    $MCANDOCK_PATH/$MCANDOCK_VER/test_fragmenting
+    $MCANDOCK_PATH/$MCANDOCK_VER/cd_prep_fragments
 
     echo "Fragmenting took $SECONDS seconds to complete"
 
-    module unload gcc
-
     chmod g+r `get_option prep`
     chmod g+r `get_option seeds`
-}
-
-function make_fragments() {
-    cd $MCANDOCK_working_dir
-    echo "Running make_fragments in $PWD"
-
-    prep_fragments
-
-    perl $frag_separator $prep > separated_fragments.pdb
-
-    chmod g+r separated_fragments.pdb	
 }
 
 function dock_fragments() {
@@ -104,25 +85,18 @@ function dock_fragments() {
     cd $MCANDOCK_working_dir
     echo "Running dock in $PWD"
 
-    bsite
-    prep_fragments
-
     ln -s $MCANDOCK_SUP_PATH/obj   obj
     ln -s $MCANDOCK_SUP_PATH/data  data
 
-    module load gcc/5.2.0
-
     SECONDS=0
 
-    $MCANDOCK_PATH/$MCANDOCK_VER/test_clq
+    $MCANDOCK_PATH/$MCANDOCK_VER/cd_dock_fragments
 
     echo "Docking of fragments took $SECONDS seconds to complete"
 
-    module unload gcc
-
     unlink obj
     unlink data
-    
+
     chmod -R g+r `get_option top_seeds_dir`
 }
 
@@ -137,32 +111,14 @@ function link_fragments() {
     cd $MCANDOCK_working_dir
     echo "Running link in $PWD"
 
-    dock_fragments
-
-    if [[ -s `get_option seeds` ]]
-    then
-        numseeds=$(wc -l `get_option seeds` | awk '{print $1}')
-        numdockd=$(ls `get_option top_seeds_dir`/*/top_seeds.pdb | wc -w)
-        if [[ "$numseeds" -ne "$numdockd" ]]
-        then
-            echo "Warning: inconsistant seeds.txt($numseeds) and seeds data_base($numdockd)"
-        fi
-    else
-        echo "Warning: no seeds.txt file, cannot check consistancy"
-    fi
-
     ln -s $MCANDOCK_SUP_PATH/obj   obj
     ln -s $MCANDOCK_SUP_PATH/data  data
 
-    module load gcc/5.2.0
-
     SECONDS=0
 
-    $MCANDOCK_PATH/$MCANDOCK_VER/test_link
+    $MCANDOCK_PATH/$MCANDOCK_VER/cd_link_fragments
 
     echo "Linking of fragments took $SECONDS seconds to complete"
-
-    module unload gcc
 
     unlink obj
     unlink data
@@ -173,14 +129,16 @@ function link_fragments() {
 function extract_result() {
     cd $MCANDOCK_working_dir
     echo "Running extract in $PWD"
-    
+
     mkdir extract
     cd extract
 
-    perl $eMCANDOCK_xtractor $([[ "$MCANDOCK_MAKE_PYMOL" -eq 0 ]] && echo -f) -n $MCANDOCK_poses ../docked/*.pdb > ../scores.csv
+    perl $MCANDOCK_extractor $([[ "$MCANDOCK_MAKE_PYMOL" -eq 0 ]] && echo -f) -n $MCANDOCK_poses ../docked/*.pdb > ../scores.csv
 
-    $MCANDOCK_pymol -c create_pse.py
-    mv all.pse ..
+    if [[ "$MCANDOCK_MAKE_PYMOL" -ne 0 ]]
+        $MCANDOCK_pymol -c create_pse.py
+        mv all.pse ..
+    fi
 
     cd ..
     rm -fr extract
