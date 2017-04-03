@@ -61,6 +61,10 @@ namespace Program {
 
                 Molib::Molecules            __receptors;
                 std::vector<DockedReceptor> __preprecs;
+
+                void __initialize_score(const FragmentLigands &ligand_fragments);
+                void __initialize_ffield();
+
         public:
                 Target (const std::string &input_name);
                 Target (const Target &) = delete;

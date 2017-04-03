@@ -69,6 +69,44 @@ namespace Program {
 		}
 	}
 
+        /* Read distributions file and initialize scores
+         * 
+         */
+
+        void Target::__initialize_score(const FragmentLigands &ligand_fragments) {
+                for ( auto& a : __preprecs ) {
+                        if ( a.score != nullptr) {
+                                continue;
+                        }
+
+                        a.score = new Molib::Score(cmdl.get_string_option("ref"), cmdl.get_string_option("comp"),
+                                                   cmdl.get_string_option("func"),cmdl.get_int_option("cutoff"),
+                                                   cmdl.get_double_option("step"));
+
+                        a.score->define_composition(__receptors.get_idatm_types(),
+                                                   ligand_fragments.ligand_idatm_types())
+                              .process_distributions_file(cmdl.get_string_option("dist"))
+                              .compile_scoring_function()
+                              .parse_objective_function(cmdl.get_string_option("obj_dir"), cmdl.get_double_option("scale"));
+                }
+        }
+
+        void Target::__initialize_ffield() {
+                for (auto& a : __preprecs) {
+                        // Prepare the receptor for docking to
+                        OMMIface::ForceField* ffield = new OMMIface::ForceField;
+
+                        ffield->parse_gaff_dat_file(cmdl.get_string_option("gaff_dat"))
+                                .add_kb_forcefield(*a.score, cmdl.get_double_option("step"))
+                                .parse_forcefield_file(cmdl.get_string_option("amber_xml"))
+                                .parse_forcefield_file(cmdl.get_string_option("water_xml"));
+
+                        a.ffield = ffield;
+
+                        a.protein.prepare_for_mm(*a.ffield, *a.gridrec);
+                }
+        }
+
 	std::set<int> Target::get_idatm_types(const std::set<int>& previous) {
 		return __receptors.get_idatm_types(previous);
 	}
@@ -89,16 +127,10 @@ namespace Program {
 	}
 
         void Target::rescore_docked(const FragmentLigands& ligand_fragments) {
-                for ( auto &a : __preprecs ) {
-                        Molib::Score* score = new Molib::Score(cmdl.get_string_option("ref"), cmdl.get_string_option("comp"),
-                                                                              cmdl.get_string_option("func"),cmdl.get_int_option("cutoff"),
-                                                                              cmdl.get_double_option("step"));
 
-                        score->define_composition(__receptors.get_idatm_types(),
-                                                   ligand_fragments.ligand_idatm_types())
-                              .process_distributions_file(cmdl.get_string_option("dist"))
-                              .compile_scoring_function()
-                              .parse_objective_function(cmdl.get_string_option("obj_dir"), cmdl.get_double_option("scale"));
+                __initialize_score(ligand_fragments);
+
+                for ( auto &a : __preprecs ) {
 
                         Parser::FileParser lpdb(cmdl.get_string_option("prep"), 
                         Parser::all_models|Parser::hydrogens, 
@@ -107,49 +139,21 @@ namespace Program {
                         Molib::Molecules ligands = lpdb.parse_molecule();
 
                         for ( auto &ligand : ligands ) {
-                                const double energy = score->non_bonded_energy(*a.gridrec, ligand);
+                                const double energy = a.score->non_bonded_energy(*a.gridrec, ligand);
 
                                 Inout::output_file(Molib::Molecule::print_complex(ligand, a.protein, energy), 
                                 Path::join( cmdl.get_string_option("docked_dir"), ligand.name() + ".pdb"),  ios_base::app);
 
                                 cout << "Energy is " << energy << " for " << ligand.name() << " in " << a.protein.name() << endl;
                         }
-
-                        a.score = score;
                 }
         }
 
         void Target::dock_fragments(const FragmentLigands& ligand_fragments) {
+                __initialize_score(ligand_fragments);
+                __initialize_ffield();
+
                 for ( auto &a : __preprecs ) {
-
-                        /* Read distributions file and initialize scores
-                        * 
-                        */
-
-                        Molib::Score* score = new Molib::Score(cmdl.get_string_option("ref"), cmdl.get_string_option("comp"),
-                                                                              cmdl.get_string_option("func"),cmdl.get_int_option("cutoff"),
-                                                                              cmdl.get_double_option("step"));
-
-                        score->define_composition(__receptors.get_idatm_types(),
-                                                   ligand_fragments.ligand_idatm_types())
-                                                 .process_distributions_file(cmdl.get_string_option("dist"))
-                                                 .compile_scoring_function()
-                                                 .parse_objective_function(cmdl.get_string_option("obj_dir"), cmdl.get_double_option("scale"));
-
-			a.score = score;
-
-			// Prepare the receptor for docking to
-			OMMIface::ForceField* ffield = new OMMIface::ForceField;
-
-			ffield->parse_gaff_dat_file(cmdl.get_string_option("gaff_dat"))
-				.add_kb_forcefield(*a.score, cmdl.get_double_option("step"))
-				.parse_forcefield_file(cmdl.get_string_option("amber_xml"))
-				.parse_forcefield_file(cmdl.get_string_option("water_xml"));
-
-			a.ffield = ffield;
-
-			a.protein.prepare_for_mm(*a.ffield, *a.gridrec);
-
 			DockFragments* pdockfragments = new DockFragments(*a.centroids, ligand_fragments, *a.score, *a.gridrec, a.protein.name());
 			pdockfragments->run_step();
 			a.prepseeds = pdockfragments;
@@ -169,30 +173,12 @@ namespace Program {
 	}
 
         void Target::minimize_force(const FragmentLigands &ligand_fragments) {
+
+                __initialize_score(ligand_fragments);
+                __initialize_ffield();
+
                 for ( auto &a : __preprecs ) {
-                        Molib::Score* score = new Molib::Score(cmdl.get_string_option("ref"), cmdl.get_string_option("comp"),
-                                                                              cmdl.get_string_option("func"),cmdl.get_int_option("cutoff"),
-                                                                              cmdl.get_double_option("step"));
 
-                        score->define_composition( __receptors.get_idatm_types(),
-                                                   ligand_fragments.ligand_idatm_types())
-                              .process_distributions_file(cmdl.get_string_option("dist"))
-                              .compile_scoring_function()
-                              .parse_objective_function(cmdl.get_string_option("obj_dir"), cmdl.get_double_option("scale"));
-
-                        // Prepare the receptor for docking to
-                        OMMIface::ForceField* ffield = new OMMIface::ForceField;
-
-                        ffield->parse_gaff_dat_file(cmdl.get_string_option("gaff_dat"))
-                                .add_kb_forcefield(*a.score, cmdl.get_double_option("step"))
-                                .parse_forcefield_file(cmdl.get_string_option("amber_xml"))
-                                .parse_forcefield_file(cmdl.get_string_option("water_xml"));
-
-                        a.ffield = ffield;
-
-                        a.protein.prepare_for_mm(*a.ffield, *a.gridrec);
-
-                              
                         Parser::FileParser lpdb(cmdl.get_string_option("prep"), Parser::all_models|Parser::hydrogens, -1);
 
                         Molib::Molecules ligands = lpdb.parse_molecule();
@@ -380,19 +366,20 @@ namespace Program {
                 }
         }
 
-		void Target::make_objective() {
-			Molib::Score score(cmdl.get_string_option("ref"), "complete",
-				cmdl.get_string_option("func"), cmdl.get_int_option("cutoff"),
-				cmdl.get_double_option("step"));
+        void Target::make_objective() {
+                Molib::Score score(cmdl.get_string_option("ref"), "complete",
+                                   cmdl.get_string_option("func"), cmdl.get_int_option("cutoff"),
+                                   cmdl.get_double_option("step"));
 
-			score.define_composition(set<int>(), set<int>())
-				.process_distributions_file(cmdl.get_string_option("dist"))
-				.compile_objective_function();
-			score.output_objective_function(cmdl.get_string_option("obj_dir"));
+                score.define_composition(set<int>(), set<int>())
+                     .process_distributions_file(cmdl.get_string_option("dist"))
+                     .compile_objective_function();
 
-			Inout::output_file(score, cmdl.get_string_option("potential_file"));
+                score.output_objective_function(cmdl.get_string_option("obj_dir"));
 
-		}
+                Inout::output_file(score, cmdl.get_string_option("potential_file"));
+
+        }
 
 	std::multiset<std::string> Target::determine_overlapping_seeds(const int max_seeds, const int number_of_occurances) const {
 
