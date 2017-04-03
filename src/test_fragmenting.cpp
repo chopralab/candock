@@ -7,9 +7,9 @@
 #include "helper/benchmark.hpp"
 #include "helper/inout.hpp"
 #include "helper/error.hpp"
-#include "pdbreader/grid.hpp"
-#include "pdbreader/molecules.hpp"
-#include "pdbreader/pdbreader.hpp"
+#include "molib/grid.hpp"
+#include "molib/molecules.hpp"
+#include "molib/pdbreader.hpp"
 
 using namespace std;
 using namespace Program;

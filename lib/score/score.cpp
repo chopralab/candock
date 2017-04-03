@@ -1,8 +1,10 @@
 #include "score.hpp"
 #include "interpolation.hpp"
-#include "pdbreader/molecule.hpp"
+#include "molib/molecule.hpp"
 #include "helper/inout.hpp"
 #include "helper/path.hpp"
+#include <boost/filesystem/path.hpp>
+#include <boost/filesystem/operations.hpp>
 #include <functional>
 #include <gsl/gsl_errno.h>
 #include <gsl/gsl_spline.h>
@@ -70,42 +72,63 @@ namespace Molib {
 			}
 			const string &filename = idatm_type1 + "_" + idatm_type2 + ".txt";
 			
-			inout::Inout::file_open_put_stream(Path::join(Path::join(obj_dir, std::to_string(__step_non_bond)), filename), ss);
+			Inout::file_open_put_stream(Path::join(Path::join(obj_dir, std::to_string(__step_non_bond)), filename), ss);
 		}
 		return *this;
 	}
 
-	Score& Score::parse_objective_function(const string &obj_dir, const double scale_non_bond) {
-		for (auto &atom_pair : __prot_lig_pairs) {
+        Score& Score::parse_objective_function(const string &obj_dir, const double scale_non_bond) {
+            
+                boost::filesystem::path path_to_objective_function(obj_dir);
+                std::string subdir = std::to_string(__step_non_bond);
 
-			const string idatm_type1 = help::idatm_unmask[atom_pair.first];
-			const string idatm_type2 = help::idatm_unmask[atom_pair.second];
-			
-			dbgmsg("parsing objective function for " << idatm_type1 << " and " << idatm_type2);
-			
-			const string &filename = idatm_type1 + "_" + idatm_type2 + ".txt";
+                // Some systems add trailing zeros to doubles, let's remove them
+                while ( ! boost::filesystem::exists(path_to_objective_function / subdir) && subdir.back() == '0' ) {
+                        subdir.erase(subdir.end() - 1);
+                }
 
-			vector<string> contents;
-			inout::Inout::read_file(Path::join(Path::join(obj_dir, std::to_string(__step_non_bond)), filename), contents);
-			
-			for (auto &line : contents) {
-				stringstream ss(line);
-				string str1;
-				ss >> str1;
-				__energies[atom_pair].push_back(stod(str1));
-			}
+                path_to_objective_function /= subdir;
 
-			__derivatives[atom_pair] = Interpolation::derivative(__energies[atom_pair], __step_non_bond);
+                if ( ! boost::filesystem::exists(path_to_objective_function) ) {
+                        throw Error( "Objective function not found! check 'obj_dir' and 'step'");
+                }
 
-			// scale derivatives ONLY not energies and don't do it in kbforce cause here is more efficient
-			for (auto &dEdt : __derivatives[atom_pair]) {
-				dEdt *= scale_non_bond;
-			}
+                for (auto &atom_pair : __prot_lig_pairs) {
 
-		}
-		dbgmsg("parsed objective function");
+                        const string idatm_type1 = help::idatm_unmask[atom_pair.first];
+                        const string idatm_type2 = help::idatm_unmask[atom_pair.second];
+
+                        dbgmsg("parsing objective function for " << idatm_type1 << " and " << idatm_type2);
+
+                        const string &filename = idatm_type1 + "_" + idatm_type2 + ".txt";
+
+                        // Check if the file exists on disk. Since we know that the directory exists on disk,
+                        // we can skip this pair as it is not part of the scoring function (ie not in the CSD).
+                        if ( ! Inout::file_size( (path_to_objective_function / filename).string() )) {
+                                continue;
+                        }
+
+                        vector<string> contents;
+                        Inout::read_file( (path_to_objective_function / filename).string(), contents);
+
+                        for (auto &line : contents) {
+                                stringstream ss(line);
+                                string str1;
+                                ss >> str1;
+                                __energies[atom_pair].push_back(stod(str1));
+                        }
+
+                        __derivatives[atom_pair] = Interpolation::derivative(__energies[atom_pair], __step_non_bond);
+
+                        // scale derivatives ONLY not energies and don't do it in kbforce cause here is more efficient
+                        for (auto &dEdt : __derivatives[atom_pair]) {
+                                dEdt *= scale_non_bond;
+                        }
+
+                }
+                dbgmsg("parsed objective function");
                 return *this;
-	}
+        }
 
 	Array1d<double> Score::compute_energy(const Atom::Grid &gridrec, const Geom3D::Coordinate &crd, const set<int> &ligand_atom_types) const {
 		dbgmsg("computing energy");
@@ -119,7 +142,7 @@ namespace Molib {
 #ifndef NDEBUG
 				if (!__energies_scoring.count(atom_pair))
 					throw Error("undefined atom_pair in __energies_scoring");
-				if (index >= __energies_scoring.at(atom_pair).size())
+				if (static_cast<size_t> (index) >= __energies_scoring.at(atom_pair).size())
 					throw Error("undefined index in __energies_scoring");
 				dbgmsg("atom pairs = " << help::idatm_unmask[atom_pair.first] << " " 
 					<< help::idatm_unmask[atom_pair.second] << " index = " << index
@@ -171,7 +194,7 @@ namespace Molib {
 		Benchmark bench;
 		cout << "processing combined histogram ...\n";
 		vector<string> distributions_file_raw;
-		inout::Inout::read_file(distributions_file, distributions_file_raw);
+		Inout::read_file(distributions_file, distributions_file_raw);
 		const bool rad_or_raw(__rad_or_raw == "normalized_frequency");
 
 		for (string &line : distributions_file_raw) {
@@ -340,7 +363,7 @@ namespace Molib {
 			}
 			
 			try {
-			
+
 				if (slope.size() <= 1) throw InterpolationError("warning : slope not found in data");
 
 				repulsion_idx = *slope.begin(); // correct repulsion_idx
@@ -365,8 +388,8 @@ namespace Molib {
 				}
 			
 				vector<double> potential = Interpolation::interpolate_bspline(dataX, dataY, __step_non_bond);
-	
-				// add repulsion term by fitting 1/x**12 function to slope points
+
+                                // add repulsion term by fitting 1/x**12 function to slope points
 				const double x1 = __get_lower_bound(*slope.begin());
 				const double x2 = __get_lower_bound(*slope.rbegin());
 				string datapoints("");
@@ -381,12 +404,12 @@ namespace Molib {
 				dbgmsg("x1 = " << x1);
 				dbgmsg("x2 = " << x2);
 				dbgmsg("datapoints = " << datapoints);
-	
-				// fit function to slope
+
+                                // fit function to slope
 				double coeffA, coeffB, WSSR;
 				std::tie(coeffA, coeffB, WSSR) = help::gnuplot(x1, x2, datapoints);
-	
-				if (WSSR == HUGE_VAL) throw InterpolationError("warning : could not fit repulsion term, zero everything");
+
+                                if (WSSR == HUGE_VAL) throw InterpolationError("warning : could not fit repulsion term, zero everything");
 	
 				dbgmsg("atom1 = " << idatm_type1
 					<< " atom2 = " << idatm_type2
@@ -402,7 +425,7 @@ namespace Molib {
 				}
 				dbgmsg("repulsion.size() = " << repulsion.size());
 #ifndef NDEBUG
-				for (int i = 0; i < repulsion.size(); ++i)
+				for (size_t i = 0; i < repulsion.size(); ++i)
 					dbgmsg("i = " << i << " repulsion = " << repulsion[i]);
 #endif
 				// if the repulsion term comes under the potential do a linear interpolation to get smooth joint
@@ -422,10 +445,11 @@ namespace Molib {
 	
 				// add repulsion term before bsplined potential
 				potential.insert(potential.begin(), repulsion.begin(), repulsion.end());
-				
-				__energies[atom_pair].assign(potential.begin(), potential.end());
+
+                                __energies[atom_pair].assign(potential.begin(), potential.end());
+
 #ifndef NDEBUG
-				for (int i = 0; i < potential.size(); ++i) {
+				for (size_t i = 0; i < potential.size(); ++i) {
 					dbgmsg("interpolated " << help::idatm_unmask[atom_pair.first] 
 						<< " " << help::idatm_unmask[atom_pair.second]
 						<< " " << i * __step_non_bond
@@ -503,9 +527,9 @@ namespace Molib {
 #ifndef NDEBUG
 		if (!__gij_of_r_numerator.count(atom_pair))
 			throw Error("die : undefined __gij_of_r_numerator");
-		if (idx >= __gij_of_r_numerator.at(atom_pair).size())
+		if (static_cast<size_t>(idx) >= __gij_of_r_numerator.at(atom_pair).size())
 			throw Error("die : undefined __gij_of_r_numerator");
-		if (idx >= __gij_of_r_bin_range_sum.size())
+		if (static_cast<size_t>(idx) >= __gij_of_r_bin_range_sum.size())
 			throw Error("die : undefined __gij_of_r_bin_range_sum");
 #endif
 		double gij_of_r = __gij_of_r_numerator[atom_pair][idx] / __sum_gij_of_r_numerator[atom_pair];
@@ -521,9 +545,9 @@ namespace Molib {
 #ifndef NDEBUG
 		if (!__gij_of_r_numerator.count(atom_pair))
 			throw Error("die : undefined __gij_of_r_numerator");
-		if (idx >= __gij_of_r_numerator.at(atom_pair).size())
+		if (static_cast<size_t>(idx) >= __gij_of_r_numerator.at(atom_pair).size())
 			throw Error("die : undefined __gij_of_r_numerator");
-		if (idx >= __bin_range_sum.size())
+		if (static_cast<size_t>(idx) >= __bin_range_sum.size())
 			throw Error("die : undefined __bin_range_sum");
 #endif
 		double numerator = __gij_of_r_numerator[atom_pair][idx] / __sum_gij_of_r_numerator[atom_pair];

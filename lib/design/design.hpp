@@ -1,16 +1,17 @@
 #ifndef DESIGN_DESIGN_H
 #define DESIGN_DESIGN_H
 
-#include "pdbreader/nrset.hpp"
+#include "molib/nrset.hpp"
 
 namespace design {
 
 	class Design {
 		Molib::Molecules __designs;
 		Molib::Molecule  __original;
+                Molib::Unique &__existing;
 	public:
 		
-		Design( const Molib::Molecule &start );
+		Design( const Molib::Molecule &start, Molib::Unique &existing );
 		
 		void functionalize_hydrogens_with_fragments(const Molib::NRset& nr, const double cutoff, const double clash_coeff);
 		void functionalize_hydrogens_with_single_atoms( const std::vector< std::string >& idatms );
@@ -20,7 +21,9 @@ namespace design {
 			return __designs;
 		}
 		
-		const Molib::Molecules& prepare_designs( const std::string& seeds_file );
+                void change_original_name( const std::string& name );
+		
+		const Molib::Molecules& prepare_designs();
 		const Molib::Molecules& designs() const { return __designs; }
 	};
 }

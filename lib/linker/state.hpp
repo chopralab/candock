@@ -3,8 +3,8 @@
 #include "helper/debug.hpp"
 #include "helper/help.hpp"
 #include "geom3d/geom3d.hpp"
-#include "pdbreader/bond.hpp"
-#include "pdbreader/atom.hpp"
+#include "molib/bond.hpp"
+#include "molib/atom.hpp"
 #include <tuple>
 #include <functional>
 

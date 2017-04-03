@@ -620,11 +620,6 @@ void Product::init_product(Score *s) {
         /* ce se ujemata v mnsp -- ce sta oba deskriptorja iz peptidne vezi, potem preverimo, ce je blosum score > 0 */
         if (d1->s->compare_single( d2->s ) && (!d1->bb || !d2->bb || s->score_blosum(one_letter_code( d1->atom->resn ), one_letter_code( d2->atom->resn ) ) > 0) ) {
 //        if (d1->s->compare_single( d2->s ) ) {
-          
-#ifndef NDEBUG
-          float dist1 = dist_fast(init_crd, neighb_crd);
-          float dist2 = dist_fast(r->desc2->crd, (d2)->crd);
-#endif          
 
           float dist0 = dist(neighb_crd, d2->crd);
 

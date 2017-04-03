@@ -1,5 +1,5 @@
-#include "pdbreader/grid.hpp"
-#include "pdbreader/molecules.hpp"
+#include "molib/grid.hpp"
+#include "molib/molecules.hpp"
 #include "score/score.hpp"
 #include "helper/benchmark.hpp"
 #include "helper/debug.hpp"
@@ -112,7 +112,7 @@ namespace Molib {
 						dbgmsg("conformation2 " << pconf->get_molecule());
 						confs.erase(pconf);
 					}
-				} catch(const Error &e) {
+				} catch(const Error &) {
 					// if calculation of rmsd didn't succeed don't do nothing
 					// consequently all conformations will be representative
 				}

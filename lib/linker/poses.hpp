@@ -1,7 +1,7 @@
 #ifndef POSES_H
 #define POSES_H
 
-#include "pdbreader/grid.hpp"
+#include "molib/grid.hpp"
 #include "geom3d/geom3d.hpp"
 #include "segment.hpp"
 #include "seed.hpp"

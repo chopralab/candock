@@ -10,6 +10,7 @@
 #include <string>
 #include <sstream>
 #include <memory>
+#include <tuple>
 #include "helper/error.hpp"
 using namespace std;
 
@@ -35,10 +36,10 @@ namespace Geom3D {
 		void set_row(const int &row, const matrix_tuple &t) {
 			//~ cout << "set_row"<<endl;
 			//~ exit(1);
-		    gsl_matrix_set(__matrix.first, row, 0, get<0>(t));
-		    gsl_matrix_set(__matrix.first, row, 1, get<1>(t));
-		    gsl_matrix_set(__matrix.first, row, 2, get<2>(t));
-			gsl_vector_set(__matrix.second, row,   get<3>(t));
+		    gsl_matrix_set(__matrix.first, row, 0, std::get<0>(t));
+		    gsl_matrix_set(__matrix.first, row, 1, std::get<1>(t));
+		    gsl_matrix_set(__matrix.first, row, 2, std::get<2>(t));
+			gsl_vector_set(__matrix.second, row,   std::get<3>(t));
 		}
 		friend ostream& operator<< (ostream& stream, const Matrix& m) {
 			gsl_matrix *r = m.rota();

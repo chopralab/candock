@@ -17,7 +17,7 @@ namespace help {
 	
 
 	std::tuple<double, double, double> gnuplot(const double &x1, const double &x2, const string &datapoints) {
-
+#ifndef _WINDOWS
 		double coeffA = 0, coeffB = 0, WSSR = HUGE_VAL;
 		
 		// try a range of coefficients to get the best fit
@@ -66,9 +66,13 @@ namespace help {
 
 		}
 	    return std::make_tuple(coeffA, coeffB, WSSR);
+#else
+        throw Error( "gnuplot not supported on Windows");
+#endif
 	}
 
 	string memusage(const string &msg) {
+#ifndef _WINDOWS
 		const string cmd = "ps ax -o rss,command | sort -nr | head -n 10|grep test_link|cut -f1 -d' '";
 	    FILE* pipe = popen(cmd.c_str(), "r");
 	    if (!pipe) return "ERROR";
@@ -81,6 +85,9 @@ namespace help {
 	    pclose(pipe);
 	    cerr << "Memusage:"  << msg << ":" << result << endl;
 	    return result;
+#else
+        throw Error( "memusage not supported on Windows");
+#endif
 	}
 	
 	vector<vector<string>> get_replacement(const vector<string> &initial) {
@@ -168,10 +175,155 @@ namespace help {
 		{"TRP",{{"OXT","O2-"},{"CA","C3"},{"CB","C3"},{"C","C2"},{"CD1","Car"},{"CD2","Car"},{"CE2","Car"},{"CE3","Car"},{"CG","Car"},{"CH2","Car"},{"CZ2","Car"},{"CZ3","Car"},{"NE1","Npl"},{"N","Npl"},{"O","O2"},{"H","H"},{"HA","HC"},{"HB2","HC"},{"HB3","HC"},{"HD1","HC"},{"HE1","H"},{"HZ2","HC"},{"HH2","HC"},{"HZ3","HC"},{"HE3","HC"}}},
 		{"TYR",{{"OXT","O2-"},{"CA","C3"},{"CB","C3"},{"C","C2"},{"CD1","Car"},{"CD2","Car"},{"CE1","Car"},{"CE2","Car"},{"CG","Car"},{"CZ","Car"},{"N","Npl"},{"OH","O3"},{"O","O2"},{"H","H"},{"HA","HC"},{"HB2","HC"},{"HB3","HC"},{"HD1","HC"},{"HE1","HC"},{"HH","H"},{"HE2","HC"},{"HD2","HC"}}},
 		{"VAL",{{"OXT","O2-"},{"CA","C3"},{"CB","C3"},{"C","C2"},{"CG1","C3"},{"CG2","C3"},{"N","Npl"},{"O","O2"},{"H","H"},{"HA","HC"},{"HB","HC"},{"HG11","HC"},{"HG12","HC"},{"HG13","HC"},{"HG21","HC"},{"HG22","HC"},{"HG23","HC"}}},
-
 		{"HOH",{{"O","O3"},{"H1","H"},{"H2","H"}}},
 	};
 
+        const map<const string, const map<string,string>> cofactor_residues {
+                {"FAD", {{"PA" ,"Pac"},
+                         {"O1A","O3-"},
+                         {"O2A","O3-"},
+                         {"O5B","O3"},
+                         {"C5B","C3"},
+                         {"C4B","C3"},
+                         {"O4B","O3"},
+                         {"C3B","C3"},
+                         {"O3B","O3"},
+                         {"C2B","C3"},
+                         {"O2B","O3"},
+                         {"C1B","C3"},
+                         {"N9A","Npl"},
+                         {"C8A","Car"},
+                         {"N7A","N2"},
+                         {"C5A","Car"},
+                         {"C6A","Car"},
+                         {"N6A","Npl"},
+                         {"N1A","N2"},
+                         {"C2A","Car"},
+                         {"N3A","N2"},
+                         {"C4A","Car"},
+                         {"N1" ,"N2"},
+                         {"C2" ,"Car"},
+                         {"O2" ,"O2"},
+                         {"N3" ,"Npl"},
+                         {"C4" ,"Car"},
+                         {"O4" ,"O2"},
+                         {"C4X","Car"},
+                         {"N5" ,"N2"},
+                         {"C5X","Car"},
+                         {"C6" ,"Car"},
+                         {"C7" ,"Car"},
+                         {"C7M","C3"},
+                         {"C8" ,"Car"},
+                         {"C8M","C3"},
+                         {"C9" ,"Car"},
+                         {"C9A","Car"},
+                         {"N10","Npl"},
+                         {"C10","Car"},
+                         {"C1'","C3"},
+                         {"C2'","C3"},
+                         {"O2'","O3"},
+                         {"C3'","C3"},
+                         {"O3'","O3"},
+                         {"C4'","C3"},
+                         {"O4'","O3"},
+                         {"C5'","C3"},
+                         {"O5'","O3"},
+                         {"P"  , "Pac"},
+                         {"O1P","O3-"},
+                         {"O2P","O3-"},
+                         {"O3P","O3"}}
+                },
+                {"NAD", {{"PA" ,"Pac"},
+                         {"O1A","O3-"},
+                         {"O2A","O3-"},
+                         {"O5B","O3"},
+                         {"C5B","C3"},
+                         {"C4B","C3"},
+                         {"O4B","O3"},
+                         {"C3B","C3"},
+                         {"O3B","O3"},
+                         {"C2B","C3"},
+                         {"O2B","O3"},
+                         {"C1B","C3"},
+                         {"N9A","Npl"},
+                         {"C8A","Car"},
+                         {"N7A","N2"},
+                         {"C5A","Car"},
+                         {"C6A","Car"},
+                         {"N6A","Npl"},
+                         {"N1A","N2"},
+                         {"C2A","Car"},
+                         {"N3A","N2"},
+                         {"C4A","Car"},
+                         {"O3" ,"O3"},
+                         {"PN" ,"Pac"},
+                         {"O1N","O3-"},
+                         {"O2N","O3-"},
+                         {"O5D","O3"},
+                         {"C5D","C3"},
+                         {"C4D","C3"},
+                         {"O4D","O3"},
+                         {"C3D","C3"},
+                         {"O3D","O3"},
+                         {"C2D","C3"},
+                         {"O2D","O3"},
+                         {"C1D","C3"},
+                         {"N1N","Ng+"},
+                         {"C2N","Car"},
+                         {"C3N","Car"},
+                         {"C7N","C2"},
+                         {"O7N","O2"},
+                         {"N7N","Npl"},
+                         {"C4N","Car"},
+                         {"C5N","Car"},
+                         {"C6N","Car"}}
+                },
+                {"HEM", {{"FE" , "Fe"},
+                         {"CHA","C2"},
+                         {"CHB","C2"},
+                         {"CHC","C2"},
+                         {"CHD","C2"},
+                         {"NA" ,"Npl"},
+                         {"C1A","Car"},
+                         {"C2A","Car"},
+                         {"C3A","Car"},
+                         {"C4A","Car"},
+                         {"CMA","C3"},
+                         {"CAA","C3"},
+                         {"CBA","C3"},
+                         {"CGA","Cac"},
+                         {"O1A","O2-"},
+                         {"O2A","O2-"},
+                         {"NB" ,"N2"},
+                         {"C1B","Car"},
+                         {"C2B","Car"},
+                         {"C3B","Car"},
+                         {"C4B","Car"},
+                         {"CMB","C3"},
+                         {"CAB","C2"},
+                         {"CBB","C2"},
+                         {"NC" ,"Npl"},
+                         {"C1C","Car"},
+                         {"C2C","Car"},
+                         {"C3C","Car"},
+                         {"C4C","Car"},
+                         {"CMC","C3"},
+                         {"CAC","C2"},
+                         {"CBC","C2"},
+                         {"ND" ,"N2"},
+                         {"C1D","Car"},
+                         {"C2D","Car"},
+                         {"C3D","Car"},
+                         {"C4D","Car"},
+                         {"CMD","C3"},
+                         {"CAD","C3"},
+                         {"CBD","C3"},
+                         {"CGD","Cac"},
+                         {"O1D","O2-"},
+                         {"O2D","O2-"}}
+                }
+        };
+        
 	const map<const string, const pair<string,string>> non_specific_binders {
 		{"BE7", {"(4-CARBOXYPHENYL)(CHLORO)MERCURY", "C7 H5 O2 CL1 HG1"}},
 		{"MRD", {"(4R)-2-METHYLPENTANE-2,4-DIOL", "C6 H14 O2"}},

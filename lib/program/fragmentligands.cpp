@@ -4,162 +4,177 @@
 #include <mutex>
 
 #include "helper/inout.hpp"
-#include "common.hpp"
-#include "cmdlnopts.hpp"
-#include "pdbreader/molecules.hpp"
+#include "molib/molecules.hpp"
+#include "options.hpp"
 
 namespace Program {
-	
-	bool FragmentLigands::__can_read_from_files( const CmdLnOpts& cmdl ) {
-		return inout::Inout::file_size( cmdl.prep_file() ) > 0 && inout::Inout::file_size( cmdl.seeds_file() ) > 0;
-	}
 
-	void FragmentLigands::__read_from_files( const CmdLnOpts& cmdl) {
+        bool FragmentLigands::__can_read_from_files() {
+                return (Inout::file_size (cmdl.get_string_option ("seeds_pdb")) > 0
+                        || Inout::file_size (cmdl.get_string_option ("prep")) > 0)
+                       && Inout::file_size (cmdl.get_string_option ("seeds")) > 0;
+        }
 
-		if ( inout::Inout::file_size( cmdl.seeds_pdb_file() ) <= 0 ) {
+        void FragmentLigands::__read_from_files() {
 
-			cout << "Could not read seeds from " << cmdl.seeds_pdb_file() << endl;
-			cout << "Reading fragmented files from " << cmdl.prep_file() << endl;
+                if (Inout::file_size (cmdl.get_string_option ("seeds_pdb")) <= 0) {
 
-			Molib::PDBreader lpdb(cmdl.prep_file(), Molib::PDBreader::all_models, cmdl.max_num_ligands());
+                        cout << "Could not read seeds from " << cmdl.get_string_option ("seeds_pdb") << endl;
+                        cout << "Reading fragmented files from " << cmdl.get_string_option ("prep") << endl;
 
-			Molib::Molecules ligands;
-			while(lpdb.parse_molecule(ligands)) {
-				__ligand_idatm_types = ligands.get_idatm_types(__ligand_idatm_types);
-				common::create_mols_from_seeds(__added, __seeds, ligands);
-				ligands.clear();
-			}
+                        Parser::FileParser lpdb (cmdl.get_string_option ("prep"), Parser::all_models, cmdl.get_int_option ("max_num_ligands"));
 
-			__seeds.erase_properties();
+                        Molib::Molecules ligands;
 
-			inout::output_file(__seeds, cmdl.seeds_pdb_file(), ios_base::out);
-		} else {
+                        while (lpdb.parse_molecule (ligands)) {
+                                __ligand_idatm_types = ligands.get_idatm_types (__ligand_idatm_types);
+                                Molib::create_mols_from_seeds (__added, __seeds, ligands);
+                                ligands.clear();
+                        }
 
-			cout << "Reading seeds from: " << cmdl.seeds_pdb_file() << endl;
+                        __seeds.erase_properties();
 
-			Molib::PDBreader lpdb(cmdl.seeds_pdb_file(), Molib::PDBreader::all_models);
-			lpdb.parse_molecule(__seeds);
-			__ligand_idatm_types = __seeds.get_idatm_types(__ligand_idatm_types);
-			for (const auto& mol : __seeds) {
-				__added.insert( stoi(mol.name()) );
-            }
-		}
-	}
+                        Inout::output_file (__seeds, cmdl.get_string_option ("seeds_pdb"), ios_base::out);
+                } else {
 
-	void FragmentLigands::__fragment_ligands( Molib::PDBreader& lpdb, const CmdLnOpts& cmdl, const bool write_out_for_linking, const bool no_rotatable_bond) {
-		bool thread_is_not_done;
-		Molib::Molecules ligands;
-		{
-			lock_guard<std::mutex> guard(__prevent_re_read_mtx);
-			thread_is_not_done = lpdb.parse_molecule(ligands);
-		}
-		while(thread_is_not_done) {
-			// Compute properties, such as idatm atom types, fragments, seeds,
-			// rotatable bonds etc.
-			ligands.compute_idatm_type()
-				   .compute_hydrogen()
-				   .compute_bond_order()
-				   .compute_bond_gaff_type()
-				   .refine_idatm_type()
-				   .erase_hydrogen()  // needed because refine changes connectivities
-				   .compute_hydrogen()   // needed because refine changes connectivities
-				   .compute_ring_type()
-				   .compute_gaff_type()
-				   .compute_rotatable_bonds() // relies on hydrogens being assigned
-				   .erase_hydrogen();
+                        cout << "Reading seeds from: " << cmdl.get_string_option ("seeds_pdb") << endl;
 
-			if ( no_rotatable_bond ) {
-				for (auto atom : ligands.get_atoms())
-				for (auto bond : atom->get_bonds())
-					bond->set_rotatable(""); // We still want other properties assigned with rotatable bonds to be assigned
-			}
+                        Parser::FileParser lpdb (cmdl.get_string_option ("seeds_pdb"), Parser::all_models);
+                        lpdb.parse_molecule (__seeds);
+                        __ligand_idatm_types = __seeds.get_idatm_types (__ligand_idatm_types);
 
-			lock_guard<std::mutex> guard(__add_to_typing_mtx);
-			ligands.compute_overlapping_rigid_segments(cmdl.seeds_file());
+                        for (const auto &mol : __seeds) {
+                                __added.insert (stoi (mol.name()));
+                        }
+                }
 
-			__ligand_idatm_types = ligands.get_idatm_types(__ligand_idatm_types);
-			common::create_mols_from_seeds(__added, __seeds, ligands);
+                if (__seeds.size() == 0) {
+                        throw Error ("You have no seeds, cannot procede! Make sure you've supplied the proper seeds_pdb or prep file!");
+                }
+        }
 
-			if (write_out_for_linking)
-				inout::output_file(ligands, cmdl.prep_file(), ios_base::app);
+        void FragmentLigands::__fragment_ligands (Parser::FileParser &lpdb, const bool write_out_for_linking, const bool no_rotatable_bond) {
+                bool thread_is_not_done;
+                Molib::Molecules ligands;
+                {
+                        lock_guard<std::mutex> guard (__prevent_re_read_mtx);
+                        thread_is_not_done = lpdb.parse_molecule (ligands);
+                }
 
-			ligands.clear();
-			thread_is_not_done = lpdb.parse_molecule(ligands);
-		}
-	}
+                while (thread_is_not_done) {
+                        // Compute properties, such as idatm atom types, fragments, seeds,
+                        // rotatable bonds etc.
+                        ligands .compute_idatm_type()
+                                .compute_hydrogen()
+                                .compute_bond_order()
+                                .compute_bond_gaff_type()
+                                .refine_idatm_type()
+                                .erase_hydrogen()  // needed because refine changes connectivities
+                                .compute_hydrogen()   // needed because refine changes connectivities
+                                .compute_ring_type()
+                                .compute_gaff_type()
+                                .compute_rotatable_bonds() // relies on hydrogens being assigned
+                                .erase_hydrogen();
 
-	void FragmentLigands::__continue_from_prev( const CmdLnOpts& cmdl) {
+                        if (no_rotatable_bond) {
+                                for (auto atom : ligands.get_atoms())
+                                        for (auto bond : atom->get_bonds())
+                                                bond->set_rotatable (""); // We still want other properties assigned with rotatable bonds to be assigned
+                        }
 
-		if (inout::Inout::file_size(cmdl.ligand_file()) > 0) {
-			cout << "Fragmenting files in " << cmdl.ligand_file() << endl;
+                        lock_guard<std::mutex> guard (__add_to_typing_mtx);
+                        ligands.compute_overlapping_rigid_segments (cmdl.get_string_option ("seeds"));
 
-			Molib::PDBreader lpdb(cmdl.ligand_file(), 
-				Molib::PDBreader::all_models|Molib::PDBreader::hydrogens, 
-				cmdl.max_num_ligands());
+                        __ligand_idatm_types = ligands.get_idatm_types (__ligand_idatm_types);
+                        Molib::create_mols_from_seeds (__added, __seeds, ligands);
 
-			std::vector<std::thread> threads1;
+                        if (write_out_for_linking)
+                                Inout::output_file (ligands, cmdl.get_string_option ("prep"), ios_base::app);
 
-			for(int i = 0; i < cmdl.ncpu(); ++i) {
-				threads1.push_back( std::thread([&,this] {__fragment_ligands(lpdb, cmdl, true, false);} ) );
-			}
-			for(auto& thread : threads1) {
-				thread.join();
-			}
-		}
+                        ligands.clear();
+                        thread_is_not_done = lpdb.parse_molecule (ligands);
+                }
+        }
 
-		const string& fragment_bag = cmdl.get_string_option("fragment_bag");
+        void FragmentLigands::__continue_from_prev() {
 
-		if (inout::Inout::file_size(fragment_bag) > 0) {
+                if (Inout::file_size (cmdl.get_string_option ("ligand")) > 0) {
+                        cout << "Fragmenting files in " << cmdl.get_string_option ("ligand") << endl;
 
-			cout << "Adding fragments from " << fragment_bag << endl;
+                        Parser::FileParser lpdb (cmdl.get_string_option ("ligand"),
+                                                 Parser::all_models|Parser::hydrogens,
+                                                 cmdl.get_int_option ("max_num_ligands"));
 
-			Molib::PDBreader lpdb_additional(fragment_bag, 
-				Molib::PDBreader::all_models|Molib::PDBreader::hydrogens, 
-				cmdl.max_num_ligands());
+                        std::vector<std::thread> threads1;
 
-			std::vector<std::thread> threads2;
+                        for (int i = 0; i < cmdl.ncpu(); ++i) {
+                                threads1.push_back (std::thread ([ &,this] {__fragment_ligands (lpdb, true, false);}));
+                        }
 
-			for(int i = 0; i < cmdl.ncpu(); ++i) {
-				threads2.push_back( std::thread([&,this] {__fragment_ligands(lpdb_additional, cmdl, false, false);} ) );
-			}
-			for(auto& thread : threads2) {
-				thread.join();
-			}
-		}
+                        for (auto &thread : threads1) {
+                                thread.join();
+                        }
+                }
 
-		const string& molecular_fragments = cmdl.get_string_option("fragment_mol");
+                const string &fragment_bag = cmdl.get_string_option ("fragment_bag");
 
-		if (inout::Inout::file_size(molecular_fragments) > 0 ) {
-			cout << "Adding molecular fragments from " << molecular_fragments << endl;
+                if (Inout::file_size (fragment_bag) > 0) {
 
-			Molib::PDBreader lpdb_additional(molecular_fragments, 
-				Molib::PDBreader::all_models|Molib::PDBreader::hydrogens, 
-				cmdl.max_num_ligands());
+                        cout << "Adding fragments from " << fragment_bag << endl;
 
-			std::vector<std::thread> threads3;
+                        Parser::FileParser lpdb_additional (fragment_bag,
+                                                            Parser::all_models|Parser::hydrogens,
+                                                            cmdl.get_int_option ("max_num_ligands"));
 
-			for(int i = 0; i < cmdl.ncpu(); ++i) {
-				threads3.push_back( std::thread([&,this] {__fragment_ligands(lpdb_additional, cmdl, false, true);} ) );
-			}
-			for(auto& thread : threads3) {
-				thread.join();
-			}
-		}
+                        std::vector<std::thread> threads2;
 
-		dbgmsg(__seeds);
+                        for (int i = 0; i < cmdl.ncpu(); ++i) {
+                                threads2.push_back (std::thread ([ &,this] {__fragment_ligands (lpdb_additional, false, false);}));
+                        }
 
-		/* Erase atom properties since they make the graph matching incorrect
-		 *
-		 */
-		__seeds.erase_properties();
+                        for (auto &thread : threads2) {
+                                thread.join();
+                        }
+                }
 
-		inout::output_file(__seeds, cmdl.seeds_pdb_file(), ios_base::out);
-	}
+                const string &molecular_fragments = cmdl.get_string_option ("fragment_mol");
 
-	void FragmentLigands::add_seeds_from_molecules(const Molib::Molecules& molecules, const Program::CmdLnOpts& cmdl) {
-		__ligand_idatm_types = molecules.get_idatm_types(__ligand_idatm_types);
-		common::create_mols_from_seeds(__added, __seeds, molecules);
-		__seeds.erase_properties();
-		inout::output_file(__seeds, cmdl.seeds_pdb_file(), ios_base::out);
-	}
+                if (Inout::file_size (molecular_fragments) > 0) {
+                        cout << "Adding molecular fragments from " << molecular_fragments << endl;
+
+                        Parser::FileParser lpdb_additional (molecular_fragments,
+                                                            Parser::all_models|Parser::hydrogens,
+                                                            cmdl.get_int_option ("max_num_ligands"));
+
+                        std::vector<std::thread> threads3;
+
+                        for (int i = 0; i < cmdl.ncpu(); ++i) {
+                                threads3.push_back (std::thread ([ &,this] {__fragment_ligands (lpdb_additional, false, true);}));
+                        }
+
+                        for (auto &thread : threads3) {
+                                thread.join();
+                        }
+                }
+
+                dbgmsg (__seeds);
+
+                /* Erase atom properties since they make the graph matching incorrect
+                 *
+                 */
+                __seeds.erase_properties();
+
+                if (__seeds.size() == 0) {
+                        throw Error ("You have no seeds, cannot procede!");
+                }
+
+                Inout::output_file (__seeds, cmdl.get_string_option ("seeds_pdb"), ios_base::out);
+        }
+
+        void FragmentLigands::add_seeds_from_molecules (const Molib::Molecules &molecules) {
+                __ligand_idatm_types = molecules.get_idatm_types (__ligand_idatm_types);
+                Molib::create_mols_from_seeds (__added, __seeds, molecules);
+                __seeds.erase_properties();
+                Inout::output_file (__seeds, cmdl.get_string_option ("seeds_pdb"), ios_base::out);
+        }
 }

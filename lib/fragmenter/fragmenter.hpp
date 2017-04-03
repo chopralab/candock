@@ -1,24 +1,19 @@
 #ifndef FRAGMENTER_H
 #define FRAGMENTER_H
-#include "helper/debug.hpp"
-#include "graph/graph.hpp"
 #include "helper/smiles.hpp"
-#include "pdbreader/bond.hpp"
-#include "pdbreader/atom.hpp"
-#include <tuple>
-#include <vector>
+#include "molib/bond.hpp"
+#include "molib/atom.hpp"
 #include <map>
+#include <vector>
 #include <set>
-#include <functional>
-using namespace std;
 
 namespace Molib {
 	class Unique;
 
-	typedef map<int, Atom*> AtomMatch;
-	typedef vector<AtomMatch> AtomMatchVec;
+	typedef std::map<int, Atom*> AtomMatch;
+	typedef std::vector<AtomMatch> AtomMatchVec;
 	typedef Atom::Set Ring;
-	typedef set<Ring> Rings;
+	typedef std::set<Ring> Rings;
 
 	class Fragmenter {
 	public:
@@ -38,13 +33,13 @@ namespace Molib {
 			int get_seed_id() const { return __seed_id; }
 			int size() const { return __core.size() + __join.size(); }
 
-			typedef vector<Fragment> Vec;
+			typedef std::vector<Fragment> Vec;
 			friend ostream& operator<<(ostream& os, const Vec& fragments);
 		};
 	
 	private:
 		Atom::Vec __atoms;
-		AtomMatch __convert_to_atom_match(const map<Bond*, Bond*> &bond_match, 
+		AtomMatch __convert_to_atom_match(const std::map<Bond*, Bond*> &bond_match, 
 			bool reverse=false);
 	public:
 		Fragmenter(const Atom::Vec &atoms);
@@ -52,9 +47,9 @@ namespace Molib {
 		Rings identify_fused_rings();
 		AtomMatchVec grep(const help::smiles &smi);
 		void apply_rule(const AtomMatch &m, 
-			const vector<string> &rules, Atom::Set &visited); // atom rule
+			const std::vector<std::string> &rules, Atom::Set &visited); // atom rule
 		void apply_rule(const AtomMatch &m, 
-			const vector<string> &rules, BondSet &visited); // bond rule
+			const std::vector<std::string> &rules, BondSet &visited); // bond rule
 		void substitute_bonds(const help::rename_rules &rrules);
 		void substitute_atoms(const help::rename_rules &rrules);
 		Fragment::Vec identify_overlapping_rigid_segments(const Atom::Vec &atoms, Unique &u);
@@ -62,6 +57,6 @@ namespace Molib {
 	};
 	ostream& operator<<(ostream& os, const AtomMatchVec& atom_match_vec);
 	ostream& operator<<(ostream& os, const AtomMatch& atom_match);
-	ostream& operator<<(ostream& os, const map<Bond*, Bond*>& bond_match);
+	ostream& operator<<(ostream& os, const std::map<Bond*, Bond*>& bond_match);
 }
 #endif

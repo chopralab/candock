@@ -8,9 +8,9 @@
 #include "helper/inout.hpp"
 #include "helper/path.hpp"
 #include "helper/error.hpp"
-#include "pdbreader/grid.hpp"
-#include "pdbreader/molecules.hpp"
-#include "pdbreader/pdbreader.hpp"
+#include "molib/grid.hpp"
+#include "molib/molecules.hpp"
+#include "molib/pdbreader.hpp"
 #include "score/score.hpp"
 
 using namespace std;

@@ -39,10 +39,10 @@
 using namespace KBPlugin;
 using namespace OpenMM;
 
-extern "C" OPENMM_EXPORT void registerPlatforms() {
+extern "C" void registerPlatforms() {
 }
 
-extern "C" OPENMM_EXPORT void registerKernelFactories() {
+extern "C" void registerKernelFactories() {
 	//~ std::cout << "register kernel factories num = " << Platform::getNumPlatforms() << std::endl;
     for (int i = 0; i < Platform::getNumPlatforms(); i++) {
         Platform& platform = Platform::getPlatform(i);
@@ -53,13 +53,17 @@ extern "C" OPENMM_EXPORT void registerKernelFactories() {
     }
 }
 
-extern "C" OPENMM_EXPORT void registerKBReferenceKernelFactories() {
+extern "C" void registerKBReferenceKernelFactories() {
     registerKernelFactories();
 }
+
+namespace KBPlugin {
 
 KernelImpl* ReferenceKBKernelFactory::createKernelImpl(std::string name, const Platform& platform, ContextImpl& context) const {
     //~ReferencePlatform::PlatformData& data = *static_cast<ReferencePlatform::PlatformData*>(context.getPlatformData());
     if (name == CalcKBForceKernel::Name())
         return new ReferenceCalcKBForceKernel(name, platform);
     throw OpenMMException((std::string("Tried to create kernel with illegal kernel name '")+name+"'").c_str());
+}
+
 }

@@ -1,12 +1,15 @@
 #include "design.hpp"
 
 #include <set>
-#include <pdbreader/hydrogens.hpp>
-#include <pdbreader/bondtype.hpp>
+
+#include "molib/hydrogens.hpp"
+#include "molib/bondtype.hpp"
+#include "molib/atomtype.hpp"
+#include "fragmenter/unique.hpp"
 
 namespace design {
 
-	Design::Design(const Molib::Molecule &start) : __original(start) {
+	Design::Design(const Molib::Molecule &start, Molib::Unique &existing) : __original(start), __existing(existing) {
 		if (__original.empty()) {
 			throw Error("Invalid molecule given for modificatiton");
 		}
@@ -17,7 +20,7 @@ namespace design {
 		__original.first().first().first().first().renumber_atoms(1);
 	}
 
-	const Molib::Molecules& Design::prepare_designs( const std::string& seeds_file ) {
+	const Molib::Molecules& Design::prepare_designs() {
 		for ( auto &molecule : __designs ) {
 
 			Molib::Chain   &first_chain  = molecule.first().first().first();
@@ -89,19 +92,25 @@ namespace design {
 				
 				first_chain.erase( Molib::Residue::res_pair(residue->resi(), residue->ins_code()) );
 			}
+			
+                        // Find terminal atoms that have invalid atom types for terminal atoms.
+                        // These checks need to be changed (improved) when dealing with correct bond typing
+                        for ( auto atom : molecule.get_atoms() ) {
+                                if ( (atom->idatm_type_unmask() == "Car"
+                                   || atom->idatm_type_unmask() == "C2")
+                                   && atom->get_bonds().size() == 1 
+                                   && atom->get_bonds().at(0)->second_atom(*atom).idatm_type_unmask().back() != '2'  ) {
+                                    atom->set_idatm_type("C3");
+                                } else if ( (atom->idatm_type_unmask() == "Nar"
+                                   || atom->idatm_type_unmask() == "N2")
+                                   && atom->get_bonds().size() == 1
+                                   && atom->get_bonds().at(0)->second_atom(*atom).idatm_type_unmask().back() != '2'  ) {
+                                    atom->set_idatm_type("N3");
+                                }
+                        }
 		}
 
-		return __designs.compute_hydrogen()
-				        .compute_bond_order()
-				        .compute_bond_gaff_type()
-				        .refine_idatm_type()
-				        .erase_hydrogen()  // needed because refine changes connectivities
-				        .compute_hydrogen()   // needed because refine changes connectivities
-				        .compute_ring_type()
-				        .compute_gaff_type()
-				        .compute_rotatable_bonds() // relies on hydrogens being assigned
-				        .erase_hydrogen()
-				        .compute_overlapping_rigid_segments(seeds_file);
+		return __designs;
 	}
 
 	
@@ -125,6 +134,8 @@ namespace design {
 			throw Error("No seeds given for modificatiton");
 		}
 
+		std::tuple<double,int,int> original_lipinski = Molib::AtomType::determine_lipinski(__original.get_atoms());
+
 		for ( auto &start_atom : __original.get_atoms() ) {
 
 			// Make sure the ligand atom has an open valency
@@ -133,6 +144,17 @@ namespace design {
 			}
 
 			for ( const auto &fragment : nr )  {
+                            
+			Molib::Hydrogens::compute_hydrogen(fragment.first().first().first().first().first());
+                        std::tuple<double,int,int> frag_lipinski = Molib::AtomType::determine_lipinski(
+                            fragment.first().first().first().first().first().get_atoms());
+                        Molib::Hydrogens::erase_hydrogen(fragment.first().first().first().first().first());
+                        
+                        if ( std::get<0>(original_lipinski) + std::get<0>(frag_lipinski) > 500.0 ||
+                             std::get<1>(original_lipinski) + std::get<1>(frag_lipinski) > 10    ||
+                             std::get<2>(original_lipinski) + std::get<2>(frag_lipinski) > 5     ) {
+                                continue;
+                        }
 
 			std::set< std::pair<int, int> > already_added;
 
@@ -161,39 +183,53 @@ namespace design {
 						continue;
 					}
 
+//                                        // Find terminal atoms that have invalid atom types for terminal atoms.
+//                                        // These test should never complete for non-fragments
+//                                         if ( (start_atom->idatm_type_unmask() == "Car"
+//                                             || start_atom->idatm_type_unmask() == "C2")
+//                                             && start_atom->get_bonds().size() == 1 
+//                                             && start_atom->get_bonds().at(0)->second_atom(*start_atom).idatm_type_unmask().back() != '2'  ) {
+//                                                     continue;
+//                                         } else if ( (start_atom->idatm_type_unmask() == "Nar"
+//                                             || start_atom->idatm_type_unmask() == "N2")
+//                                             && start_atom->get_bonds().size() == 1
+//                                             && start_atom->get_bonds().at(0)->second_atom(*start_atom).idatm_type_unmask().back() != '2'  ) {
+//                                                     continue;
+//                                         }
+// 
+
 					// Ensure the fragment is close enough to the original ligand in the pocket
 					if (start_atom->crd().distance( search_atom.crd() ) > cutoff ) {
 						continue;
 					}
 
-					if ( check_clash_for_design(__original.get_atoms(), seed.get_atoms(), clash_coeff, search_atom.atom_number()) )
+					if ( check_clash_for_design(__original.get_atoms(), seed.get_atoms(), clash_coeff, search_atom.atom_number()) ) {
 						continue;
+                                        }
 
 					already_added.insert( test_already_added );
-					Molib::Molecule modificatiton(__original);
 
 					// Copy the new molecule into the returnable object
-					__designs.add( new Molib::Molecule(modificatiton) );
+					Molib::Molecule &new_design = __designs.add( new Molib::Molecule(__original) );
 
 					// Remove all hydrogens from the original ligand (they are not needed anymore)
-					Molib::Hydrogens::erase_hydrogen(__designs.last().first().first().first().first());
+					Molib::Hydrogens::erase_hydrogen(new_design.first().first().first().first());
 
 					// Add new fragment as a "residue" of the molecule
-					Molib::Chain &chain = __designs.last().first().first().first();
+					Molib::Chain &chain = new_design.first().first().first();
 					Molib::Residue* new_res = new Molib::Residue(r);
 					new_res->regenerate_bonds(r);
 					new_res->set_resi(__original.first().first().first().size() + 1);
-					chain.add(new_res);
-					Molib::Residue& add_res = chain.element( Molib::Residue::res_pair(new_res->resi(), new_res->ins_code()) );
+					Molib::Residue& add_res = chain.add(new_res);
 
 					// Create the relevent bond between the ligand and fragment, remove the "search atom"
 					Molib::Atom &atom2  = add_res      .element( search_atom.atom_number() );
 					Molib::Atom &start2 = chain.first().element( start_atom->atom_number() );
 					Molib::Atom &mod_atom = atom2.get_bonds().front()->second_atom(atom2);
-					add_res.renumber_atoms(__original.get_atoms().size());
+					add_res.renumber_atoms(new_design.get_atoms().size());
 					mod_atom.connect( start2 ).set_bo(1);
 
-					__designs.last().set_name( __original.name() +"_design_with_" + fragment.name() + 
+					new_design.set_name( __original.name() +"_design_with_" + fragment.name() + 
 						"_on_" + std::to_string(start_atom->atom_number()) +
 						"_to_" + std::to_string(mod_atom.atom_number()) );
 
@@ -207,13 +243,23 @@ namespace design {
 
 					mod_atom.erase_bond(atom2);
 					add_res.erase(search_atom.atom_number());
-					
-					cout << "Created: " << __designs.last().name() << endl;
+                                        Molib::Atom::Vec test = new_design.get_atoms();
+                                        Molib::Atom::Set set_of_new_atoms ( test.begin(), test.end() );
+                                        if ( ! __existing.is_seed_unique(set_of_new_atoms) ) {
+                                                cout << new_design.name() << " already has been designed!" << endl;
+                                                __designs.erase(__designs.size() - 1);
+                                                continue;
+                                        }
+                                        
+                                        __existing.get_seed_id(set_of_new_atoms);
+                                        
+					cout << "Created: " << new_design.name() << endl;
+                                        cout << "Lipsinki is " << std::get<0>(original_lipinski) + std::get<0>(frag_lipinski) << " "
+                                                               << std::get<1>(original_lipinski) + std::get<1>(frag_lipinski) << " "
+                                                               << std::get<2>(original_lipinski) + std::get<2>(frag_lipinski)
+                                             << endl;
 				}
 			}
-			
-			//if (success)
-			//	break;
 			
 			}
 		}
@@ -292,5 +338,10 @@ namespace design {
 		}
 
 	}
+
+        void design::Design::change_original_name(const std::string& name) {
+                __original.set_name(name);
+        }
+
 
 }

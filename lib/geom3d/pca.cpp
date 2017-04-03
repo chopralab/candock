@@ -19,8 +19,8 @@ namespace Geom3D {
 	string print_matrix(const string &msg, const gsl_matrix *data) {
 		stringstream ss;
 		ss << msg << endl;
-		for (int i = 0; i < data->size1; ++i) {
-			for (int j = 0; j < data->size2; ++j) {
+		for (size_t i = 0; i < data->size1; ++i) {
+			for (size_t j = 0; j < data->size2; ++j) {
 				ss << gsl_matrix_get(data, i, j) << " ";
 			}
 			ss << endl;
@@ -30,7 +30,7 @@ namespace Geom3D {
 	string print_vector(const string &msg, const gsl_vector *vec) {
 		stringstream ss;
 		ss << msg << endl;
-		for (int i = 0; i < vec->size; ++i) {
+		for (size_t i = 0; i < vec->size; ++i) {
 			ss << gsl_vector_get(vec, i) << " ";
 			ss << endl;
 		}
@@ -42,7 +42,7 @@ namespace Geom3D {
 		const Geom3D::Vector3 unit_vector = gsl_matrix_column(eigenmatrix, 0).vector;
 		dbgmsg(unit_vector);
 		vector<double> projected_points;
-		for (int i = 0; i < projection->size2; ++i) 
+		for (size_t i = 0; i < projection->size2; ++i) 
 			projected_points.push_back(gsl_matrix_get(projection, 0, i)); 
 		const Geom3D::Point geom_center = *mean;
 		dbgmsg(geom_center);

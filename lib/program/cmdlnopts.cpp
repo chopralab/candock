@@ -1,6 +1,8 @@
 #include "cmdlnopts.hpp"
-
+#include <boost/program_options/cmdline.hpp>
 #include <boost/program_options/errors.hpp>
+
+#include "modeler/systemtopology.hpp"
 
 #include <iostream>
 #include <fstream>
@@ -10,7 +12,7 @@ namespace po = boost::program_options;
 
 namespace Program {
 
-	void CmdLnOpts::init (int argc, char *argv[], int opts_to_parse) {
+	void CmdLnOpts::__init (int argc, char *argv[], int opts_to_parse) {
  
 		__program_name = argv[0];
 
@@ -21,7 +23,6 @@ namespace Program {
 			po::options_description generic ("Generic options");
 			generic.add_options()
 			("help,h", "Show this help")
-			("version,v", "Print the program version")
 			("quiet,q", "Quiet mode (default is verbose)")
 			("conifg,c", po::value<std::string> (&config_file)->default_value (""), "Configuration File")
 			("ncpu",     po::value<int> (&__ncpu)             ->default_value(-1),
@@ -30,161 +31,163 @@ namespace Program {
 
 			po::options_description starting_inputs ("Starting Input Files");
 			starting_inputs.add_options()
-			("receptor", po::value<std::string> (&__receptor_file)->default_value("receptor.pdb"),
+			("receptor", po::value<std::string> ()->default_value("receptor.pdb"),
 			 "Receptor filename")
-			("ligand",   po::value<std::string> (&__ligand_file)  ->default_value("ligands.mol2"),
+			("ligand",   po::value<std::string> ()  ->default_value("ligands.mol2"),
 			 "Ligand filename")
 			;
 
 			po::options_description probis_options ("Probis (binding site indentification) Options");
 			probis_options.add_options()
-			("bslib", po::value<std::string> (&__bslib_file)->default_value ("bslibdb/bslib.txt"),
+			("bslib", po::value<std::string> ()->default_value ("bslibdb/bslib.txt"),
 			 "Read binding sites library from this file")
-			("names", po::value<std::string> (&__names_dir) ->default_value ("bslibdb/data/names"),
+			("names", po::value<std::string> () ->default_value ("bslibdb/data/names"),
 			 "Directory with ligand names")
-			("bio",   po::value<std::string> (&__bio_dir)   ->default_value ("bslibdb/data/bio"),
+			("bio",   po::value<std::string> ()   ->default_value ("bslibdb/data/bio"),
 			 "Directory with ProBiS-ligands bio database")
-			("nosql", po::value<std::string> (&__nosql_file)->default_value ("probis.nosql"),
+			("nosql", po::value<std::string> ()->default_value ("probis.nosql"),
 			 "NoSql-formatted ProBiS alignments output file")
-			("json",  po::value<std::string> (&__json_file) ->default_value ("probis.json"),
+			("json",  po::value<std::string> () ->default_value ("probis.json"),
 			 "Json-formatted ProBiS alignments output file")
-			("jsonwl", po::value<std::string> (&__json_with_ligs_file)->default_value ("probis_with_ligands.json"),
+			("jsonwl", po::value<std::string> ()->default_value ("probis_with_ligands.json"),
 			 "Json-formatted ProBiS alignments with transposed ligands output file")
-			("lig_clus_file", po::value<std::string> (&__lig_clus_file)->default_value ("ligand_clusters.pdb"),
+			("lig_clus_file", po::value<std::string> ()->default_value ("ligand_clusters.pdb"),
 			 "Ligand clusters found by ProBiS are outputted to this file")
-			("z_scores_file", po::value<std::string> (&__z_scores_file)->default_value ("z_scores.pdb"),
+			("z_scores_file", po::value<std::string> ()->default_value ("z_scores.pdb"),
 			 "Binding site z-scores are outputted to this file")
-			("probis_min_z_score", po::value<double> (&__probis_min_z_score)->default_value (2.5, "2.5"),
+			("probis_min_z_score", po::value<double> ()->default_value (2.5, "2.5"),
 			 "Minimium z-score of ligands to be considered in clustering")
-			("probis_min_pts", po::value<int> (&__probis_min_pts)->default_value (10),
+			("probis_min_pts", po::value<int> ()->default_value (10),
 			 "The minimum number of points (for predicted ligands) required to form a cluster")
-			("probis_clus_rad", po::value<double> (&__probis_clus_rad)->default_value (3.0, "3.0"),
+			("probis_clus_rad", po::value<double> ()->default_value (3.0, "3.0"),
 			 "Cluster radius for predicted ligands by probis")
-			("centro_clus_rad", po::value<double> (&__centro_clus_rad)->default_value (3.0, "3.0"),
+			("centro_clus_rad", po::value<double> ()->default_value (3.0, "3.0"),
 			 "Cluster radius for centroid centers")
-			("centroid", po::value<std::string> (&__centroid_file)->default_value ("site.cen"),
+			("centroid", po::value<std::string> ()->default_value (""),
 			 "Filename for reading and writing centroids")
-			("neighb", po::value<bool> (&__neighb)    ->default_value (false, "false"),
+			("neighb", po::value<bool> ()    ->default_value (false, "false"),
 			 "Allow only ligands that are in the similar regions according to REMARKs")
-			("num_bsites", po::value<int> (&__num_bsites)->default_value (3),
+			("num_bsites", po::value<int> ()->default_value (3),
 			 "Maximum number of predicted (or given) binding sites to consider for docking")
+                        ("srf_file", po::value<std::string> ()->default_value("probis.srf"),
+                         "File for storing the protein surface calculated by probis.")
 			;
 
 			po::options_description ligand_fragmention_options ("Ligand Fragmention Options");
 			ligand_fragmention_options.add_options()
-			("seeds", po::value<std::string> (&__seeds_file)->default_value ("seeds.txt"),
+			("seeds", po::value<std::string> ()->default_value ("seeds.txt"),
 			 "Read unique seeds from this file, if it exists, and append new unique seeds if found")
-			("prep",  po::value<std::string> (&__prep_file) ->default_value ("prepared_ligands.pdb"),
+			("prep",  po::value<std::string> () ->default_value ("prepared_ligands.pdb"),
 			 "Prepared small molecule(s) are outputted to this filename")
-			("seeds_pdb", po::value<std::string> (&__seeds_pdb_file)->default_value("seeds.pdb"),
+			("seeds_pdb", po::value<std::string> ()->default_value("seeds.pdb"),
 			 "File to save full seeds into.")
-			("max_num_ligands", po::value<int> (&__max_num_ligands)->default_value (10),
+			("max_num_ligands", po::value<int> ()->default_value (10),
 			 "Maximum number of ligands to read in one chunk")
 			;
 
 			po::options_description frag_dock_options ("Fragment Docking Options");
 			frag_dock_options.add_options()
-			("top_seeds_dir",  po::value<std::string> (&__top_seeds_dir)->default_value ("top_seeds"),
+			("top_seeds_dir",  po::value<std::string> ()->default_value (""),
 			 "Directory for saving top docked seeds")
-			("topseedsfile",   po::value<std::string> (&__top_seeds_file)->default_value ("top_seeds.pdb"),
+			("top_seeds_file",   po::value<std::string> ()->default_value ("top_seeds.pdb"),
 			 "Top seeds output file")
-			("gridpdb_hcp",    po::value<std::string> (&__gridpdb_hcp_file)->default_value ("gridpdb_hcp.pdb"),
+			("gridpdb_hcp",    po::value<std::string> ()->default_value ("gridpdb_hcp.pdb"),
 			 "Grid pdb hcp file for output")
-			("max_frag_radius", po::value<double> (&__max_frag_radius)->default_value (16.0, "16.0"),
+			("max_frag_radius", po::value<double> ()->default_value (16.0, "16.0"),
 			 "Maximum fragment radius for creating the initial rotamers")
-			("grid",           po::value<double> (&__grid_spacing)->default_value (0.375, "0.375"),
+			("grid",           po::value<double> ()->default_value (0.375, "0.375"),
 			 "Grid spacing")
-			("num_univec",     po::value<int> (&__num_univec)->default_value (256),
+			("num_univec",     po::value<int> ()->default_value (256),
 			 "Number of unit vectors evenly distributed on a sphere for conformation generation")
-			("conf_spin",      po::value<double> (&__conf_spin)->default_value (10, "10"),
+			("conf_spin",      po::value<double> ()->default_value (10, "10"),
 			 "Spin degrees for conformation generation")
-			("excluded",       po::value<double> (&__excluded_radius)->default_value (0.8, "0.8"),
+			("excluded",       po::value<double> ()->default_value (0.8, "0.8"),
 			 "Excluded radius")
-			("interatomic",    po::value<double> (&__max_interatomic_distance)->default_value (8.0, "8.0"),
+			("interatomic",    po::value<double> ()->default_value (8.0, "8.0"),
 			 "Maximum interatomic distance")
-			("clus_rad",       po::value<double> (&__clus_rad)->default_value (2.0, "2.0"),
+			("clus_rad",       po::value<double> ()->default_value (2.0, "2.0"),
 			 "Cluster radius for docked seeds")
-			("clusterfile",    po::value<std::string> (&__cluster_file)->default_value ("clustered_seeds.txt"),
+			("clusterfile",    po::value<std::string> ()->default_value ("clustered_seeds.txt"),
 			 "Clustered representative docked-seed conformations output file")
 			;
 
 			po::options_description scoring_options ("Scoring Function Arguments");
 			scoring_options.add_options()
-			("dist",    po::value<std::string> (&__distributions_file)->default_value ("data/csd_complete_distance_distributions.txt"),
+			("dist",    po::value<std::string> ()->default_value ("data/csd_complete_distance_distributions.txt"),
 			 "Select one of the interatomic distance distribution file(s) provided with this program")
-			("ref",     po::value<std::string> (&__ref_state)->default_value ("mean"),
+			("ref",     po::value<std::string> ()->default_value ("mean"),
 			 "Normalization method for the reference state ('mean' is averaged over all atom type pairs, whereas 'cumulative' is a summation for atom type pairs)")
-			("comp",    po::value<std::string> (&__comp)->default_value ("reduced"),
+			("comp",    po::value<std::string> ()->default_value ("reduced"),
 			 "Atom types used in calculating reference state 'reduced' or 'complete' ('reduced' includes only those atom types present in the specified receptor and small molecule, whereas 'complete' includes all atom types)")
-			("func",    po::value<std::string> (&__rad_or_raw)->default_value ("radial"),
+			("func",    po::value<std::string> ()->default_value ("radial"),
 			 "Function for calculating scores 'radial' or 'normalized_frequency'")
-			("cutoff",  po::value<int> (&__dist_cutoff)->default_value (6),
+			("cutoff",  po::value<int> ()->default_value (6),
 			 "Cutoff length [4-15].")
-			("step",    po::value<double> (&__step_non_bond)->default_value (0.01, "0.01"),
+			("step",    po::value<double> ()->default_value (0.01, "0.01"),
 			 "Step for spline generation of non-bonded knowledge-based potential [0.0-1.0]")
-			("scale",   po::value<double> (&__scale_non_bond)->default_value (10.0, "10.0"),
+			("scale",   po::value<double> ()->default_value (10.0, "10.0"),
 			 "Scale non-bonded forces and energy for knowledge-based potential [0.0-1000.0]")
-			("obj_dir", po::value<std::string> (&__obj_dir)->default_value ("obj"),
+			("obj_dir", po::value<std::string> ()->default_value ("obj"),
 			 "Output directory for objective function and derivatives")
-			("potential_file", po::value<std::string> (&__potential_file)->default_value ("potentials.txt"),
+			("potential_file", po::value<std::string> ()->default_value ("potentials.txt"),
 			 "Output file for potentials and derivatives")
 			;
 
 			po::options_description force_field_min ("Forcefield and Minimization Options");
 			force_field_min.add_options()
-			("amber_xml", po::value<std::string> (&__amber_xml_file)->default_value ("data/amber10.xml"),
+			("amber_xml", po::value<std::string> ()->default_value ("data/amber10.xml"),
 			 "Receptor XML parameters (and topology) input file")
-			("water_xml", po::value<std::string> (&__water_xml_file)->default_value ("data/tip3p.xml"),
+			("water_xml", po::value<std::string> ()->default_value ("data/tip3p.xml"),
 			 "Water XML parameters (and topology) input file")
-			("gaff_dat",  po::value<std::string> (&__gaff_dat_file) ->default_value ("data/gaff.dat"),
+			("gaff_dat",  po::value<std::string> () ->default_value ("data/gaff.dat"),
 			 "Gaff DAT forcefield input file")
-			("gaff_xml",  po::value<std::string> (&__gaff_xml_file) ->default_value ("data/gaff.xml"),
+			("gaff_xml",  po::value<std::string> () ->default_value ("data/gaff.xml"),
 			 "Gaff XML forcefield and ligand topology output file")
-			("fftype"   , po::value<std::string> (&__fftype)->default_value ("kb"),
+			("fftype"   , po::value<std::string> ()->default_value ("kb"),
 			 "Forcefield to use 'kb' (knowledge-based) or 'phy' (physics-based)")
-			("pos_tol",   po::value<double> (&__position_tolerance)->default_value (0.00000000001, "0.00000000001"),
+			("pos_tol",   po::value<double> ()->default_value (0.00000000001, "0.00000000001"),
 			 "Minimization position tolerance in Angstroms - only for KB")
-			("mini_tol",  po::value<double> (&__tolerance)->default_value (0.0001),
+			("mini_tol",  po::value<double> ()->default_value (0.0001),
 			 "Minimization tolerance")
-			("max_iter",  po::value<int> (&__max_iterations)->default_value (10),
+			("max_iter",  po::value<int> ()->default_value (10),
 			 "Maximum iterations for minimization during linking")
-			("max_iter_final", po::value<int> (&__max_iterations_final)->default_value (100),
+			("max_iter_final", po::value<int> ()->default_value (100),
 			 "Maximum iterations for final minimization")
-			("update_freq", po::value<int> (&__update_freq)->default_value (10),
+			("update_freq", po::value<int> ()->default_value (10),
 			 "Update non-bond frequency")
 			;
 
 			po::options_description linking_step ("Fragment Linking Options");
 			linking_step.add_options()
-			("docked_dir",      po::value<std::string> (&__docked_dir)->default_value("docked"),
+			("docked_dir",      po::value<std::string> ()->default_value("docked"),
 			 "Docked ligands output directory")
-			("iterative",       po::value<bool> (&__iterative)->default_value (false, "false")->implicit_value(true),
+			("iterative",       po::value<bool> ()->default_value (false, "false")->implicit_value(true),
 			 "Enable iterative minimization during linking")
-			("cuda",       po::value<bool> (&__cuda)->default_value (false, "false")->implicit_value(true),
+			("cuda",       po::value<bool> ()->default_value (false, "false")->implicit_value(true),
 			 "Enable cuda iterative linker during linking")
-			("top_percent",     po::value<double> (&__top_percent)->default_value (0.05, "0.05"),
+			("top_percent",     po::value<double> ()->default_value (0.05, "0.05"),
 			 "Top percent of each docked seed to extend to full molecule")
-			("max_clique_size", po::value<int> (&__max_clique_size)->default_value (3),
+			("max_clique_size", po::value<int> ()->default_value (3),
 			 "Maximum clique size for initial partial conformations generation")
-			("spin",            po::value<int> (&__spin_degrees)->default_value (60),
+			("spin",            po::value<int> ()->default_value (60),
 			 "Spin degrees to rotate ligand. Allowed values are 5, 10, 15, 20, 30, 60, 90")
-			("clash_coeff",     po::value<double> (&__clash_coeff)->default_value (0.75, "0.75"),
+			("clash_coeff",     po::value<double> ()->default_value (0.75, "0.75"),
 			 "Clash coefficient for determining whether two atoms clash by eq. dist12 s< C * (vdw1 + vdw2)")
-			("tol_seed_dist",   po::value<double> (&__tol_seed_dist)->default_value (2.0, "2.0"),
+			("tol_seed_dist",   po::value<double> ()->default_value (2.0, "2.0"),
 			 "Tolerance on seed distance in-between linking")
-			("lower_tol_seed_dist", po::value<double> (&__lower_tol_seed_dist)->default_value (2.0, "2.0"),
+			("lower_tol_seed_dist", po::value<double> ()->default_value (2.0, "2.0"),
 			 "Lower tolerance on seed distance for getting initial conformations of docked fragments")
-			("upper_tol_seed_dist", po::value<double> (&__upper_tol_seed_dist)->default_value (2.0, "2.0"),
+			("upper_tol_seed_dist", po::value<double> ()->default_value (2.0, "2.0"),
 			 "Upper tolerance on seed distance for getting initial conformations of docked fragments")
-			("max_possible_conf",   po::value<int> (&__max_possible_conf)->default_value (-1),
+			("max_possible_conf",   po::value<int> ()->default_value (-1),
 			 "Maximum number of possible conformations to link (-1 means unlimited)")
-			("link_iter",           po::value<int> (&__link_iter)->default_value (1000),
+			("link_iter",           po::value<int> ()->default_value (1000),
 			 "Maximum iterations for linking procedure")
-			("docked_clus_rad",     po::value<double> (&__docked_clus_rad)->default_value (2.0, "2.0"),
+			("docked_clus_rad",     po::value<double> ()->default_value (2.0, "2.0"),
 			 "Cluster radius between docked ligand conformations")
-			("max_allow_energy",    po::value<double> (&__max_allow_energy)->default_value (0.0, "0.0"),
+			("max_allow_energy",    po::value<double> ()->default_value (0.0, "0.0"),
 			 "Maximum allowed energy for seed conformations")
-			("max_num_possibles",   po::value<int> (&__max_num_possibles)->default_value (200000),
+			("max_num_possibles",   po::value<int> ()->default_value (200000),
 			 "Maximum number of possibles conformations considered for clustering")
 			;
 
@@ -272,13 +275,7 @@ namespace Program {
 					print_options.add (design_step);
 				}
 
-				
 				std::cout << print_options << std::endl;
-				exit (0);
-			}
-
-			if (__vm.count ("version")) {
-				print_version();
 				exit (0);
 			}
 
@@ -300,42 +297,50 @@ namespace Program {
 				__ncpu = thread::hardware_concurrency();
 			}
 
-			if (__fftype != "kb" && __fftype != "phy") {
+			const string &fftype = get_string_option("fftype");
+			if (fftype != "kb" && fftype != "phy") {
 				throw po::validation_error (po::validation_error::invalid_option_value,
-				                            "fftype", __fftype);
+				                            "fftype", fftype);
 			}
 
-			if (__ref_state != "mean" && __ref_state != "cumulative") {
+			const string &ref_state = get_string_option("ref");
+			if (ref_state != "mean" && ref_state != "cumulative") {
 				throw po::validation_error (po::validation_error::invalid_option_value,
-				                            "ref", __ref_state);
+				                            "ref", ref_state);
 			}
 
-			if (__comp != "reduced" && __comp != "complete") {
+			const string &comp = get_string_option("comp");
+			if (comp != "reduced" && comp != "complete") {
 				throw po::validation_error (po::validation_error::invalid_option_value,
-				                            "comp", __comp);
+				                            "comp", comp);
 			}
 
-			if (__rad_or_raw != "radial" && __rad_or_raw != "normalized_frequency") {
+			const string &func = get_string_option("func");
+			if (func != "radial" && func != "normalized_frequency") {
 				throw po::validation_error (po::validation_error::invalid_option_value,
-				                            "func", __rad_or_raw);
+				                            "func", func);
 			}
 
-			if (__dist_cutoff < 4 || __dist_cutoff > 15) {
+			const int cutoff = get_int_option("cutoff");
+			if (cutoff < 4 || cutoff > 15) {
 				throw po::validation_error (po::validation_error::invalid_option_value,
-				                            "cutoff", std::to_string (__dist_cutoff));
+				                            "cutoff", std::to_string (cutoff));
 			}
 
-			if (__step_non_bond < 0.0 || __step_non_bond > 1.0) {
+			const double step = get_double_option("step");
+			if (step < 0.0 || step > 1.0) {
 				throw po::validation_error (po::validation_error::invalid_option_value,
-				                            "step", std::to_string (__step_non_bond));
+				                            "step", std::to_string (step));
 			}
 
-			if (__scale_non_bond < 0.0 || __scale_non_bond > 1000.0) {
+			const double scale = get_double_option("scale");
+			if (scale < 0.0 || scale > 1000.0) {
 				throw po::validation_error (po::validation_error::invalid_option_value,
-				                            "scale", std::to_string (__scale_non_bond));
+				                            "scale", std::to_string (scale));
 			}
 
-			switch (__spin_degrees) {
+			const int spin_degrees = get_int_option("spin");
+			switch (spin_degrees) {
 			case  5:
 			case 10:
 			case 15:
@@ -347,7 +352,7 @@ namespace Program {
 
 			default:
 				throw po::validation_error (po::validation_error::invalid_option_value,
-				                            "spin", std::to_string (__spin_degrees));
+				                            "spin", std::to_string (spin_degrees));
 			}
 
 		} catch (po::error &e) {
@@ -357,29 +362,49 @@ namespace Program {
 		}
 	}
 
-	const std::string& CmdLnOpts::get_string_option(const std::string& option) const
-	{
-		return __vm[option].as<std::string>();
-	}
+        const std::string& CmdLnOpts::get_string_option(const std::string& option) const {
+                return __vm[option].as<std::string>();
+        }
 
-	int CmdLnOpts::get_int_option           (const std::string& option) const
-	{
-		return __vm[option].as<int>();
-	}
+        int CmdLnOpts::get_int_option           (const std::string& option) const {
+                return __vm[option].as<int>();
+        }
 
-	double CmdLnOpts::get_double_option     (const std::string& option) const
-	{
-		return __vm[option].as<double>();
-	}
+        double CmdLnOpts::get_double_option     (const std::string& option) const {
+                return __vm[option].as<double>();
+        }
 
-	bool CmdLnOpts::get_bool_option         (const std::string& option) const
-	{
-		return __vm[option].as<bool>();
-	}
+        bool CmdLnOpts::get_bool_option         (const std::string& option) const {
+                return __vm[option].as<bool>();
+        }
 
-	const std::vector<std::string>& CmdLnOpts::get_string_vector (const std::string& option) const
-	{
-		return __vm[option].as<std::vector<std::string>>();
-	}
+        const std::vector<std::string>& CmdLnOpts::get_string_vector (const std::string& option) const {
+                return __vm[option].as<std::vector<std::string>>();
+        }
 
+        std::ostream & operator<<(std::ostream &stream, const CmdLnOpts &cmdl_) {
+                for ( const auto& a : cmdl_.__vm ) {
+                        stream << std::setw(22)<< a.first << " = ";
+                        if        ( auto v = boost::any_cast<std::string>(&a.second.value()) ) {
+                                stream << std::setw(47) << *v;
+                        } else if ( auto v = boost::any_cast<int>(&a.second.value()) ) {
+                                stream << std::setw(47) << *v;
+                        } else if ( auto v = boost::any_cast<double>(&a.second.value()) ) {
+                                stream << std::setw(47) << *v;
+                        } else if ( auto v = boost::any_cast<bool>(&a.second.value()) ) {
+                                stream << std::setw(47) << *v;
+                        } else if ( auto v = boost::any_cast<std::vector<std::string>>(&a.second.value()) ) {
+                                std::string combination("");
+                                for ( const auto& s : *v ) {
+                                        combination += s;
+                                        combination += ", ";
+                                }
+                                stream << std::setw(47) << combination;
+                        }
+
+                        stream << std::endl;
+                }
+
+                return stream;
+        }
 }

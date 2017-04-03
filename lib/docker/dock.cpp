@@ -1,5 +1,5 @@
 #include "helper/inout.hpp"
-#include "pdbreader/grid.hpp"
+#include "molib/grid.hpp"
 #include "score/score.hpp"
 #include "helper/benchmark.hpp"
 #include "helper/debug.hpp"
@@ -96,7 +96,7 @@ namespace Docker {
 							Molib::Atom::Vec seed_atoms = __seed.get_atoms();
 							const Gpoints::PGpointVec &points = accepted_tmp.back().get_conf0();
 
-							for (int i = 0; i < points.size(); ++i) {
+							for (size_t i = 0; i < points.size(); ++i) {
 								
 								Molib::Atom &atom = *seed_atoms[i];
 								Docker::Gpoints::Gpoint &gpoint0 = *points[i];

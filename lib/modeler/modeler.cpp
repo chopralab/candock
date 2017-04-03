@@ -140,7 +140,7 @@ namespace OMMIface {
 			const double energy = score.non_bonded_energy(gridrec, minimized_ligand);
 
 
-			inout::output_file(Molib::Molecule::print_complex(minimized_ligand, minimized_receptor, energy), 
+			Inout::output_file(Molib::Molecule::print_complex(minimized_ligand, minimized_receptor, energy), 
 				ligand.name() + "_frame_" + std::to_string(iter) + ".pdb");
 #endif
 

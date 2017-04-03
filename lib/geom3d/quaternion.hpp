@@ -5,6 +5,7 @@
 #include "matrix.hpp"
 #include <tuple>
 #include <functional>
+
 #include <cmath>
 
 /*
@@ -204,7 +205,7 @@ namespace Geom3D {
 		*/
 		Vector3 euler(void) const {
 			Vector3 euler;
-			const static double PI_OVER_2 = M_PI * 0.5;
+			const static double PI_OVER_2 = M_PI_2;
 			const static double EPSILON = 1e-10;
 			double sqw, sqx, sqy, sqz;
 			
