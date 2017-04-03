@@ -34,7 +34,7 @@ int main(int argc, char* argv[]) {
                 targets.find_centroids();
                 targets.dock_fragments(ligand_fragmenter);
 
-                targets.link_fragments();
+                targets.link_fragments(ligand_fragmenter);
 
                 main_timer.display_time("Finished");
 
