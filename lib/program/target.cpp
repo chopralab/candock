@@ -1,17 +1,17 @@
-#include <modeler/modeler.hpp>
 #include "target.hpp"
 
 #include <boost/filesystem.hpp>
 
+#include "helper/path.hpp"
+#include "fragmenter/unique.hpp"
+#include "molib/molecule.hpp"
 #include "parser/fileparser.hpp"
 
 #include "modeler/systemtopology.hpp"
-
-#include "helper/path.hpp"
-#include "fragmenter/unique.hpp"
+#include "modeler/modeler.hpp"
 
 namespace Program {
-	Target::Target(const std::string& input_name ) {
+	Target::Target(const std::string& input_name, bool re_type ) {
 
 		// If the user doesn't want to use this feature
 		if (input_name == "")
@@ -49,6 +49,7 @@ namespace Program {
 		 * gaff types for cofactors (ADP, POB, etc.) are calculated de-novo here
 		 * 
 		 */
+		if (re_type)
 		__receptors.compute_idatm_type()
 			.compute_hydrogen()
 			.compute_bond_order()
@@ -83,7 +84,7 @@ namespace Program {
                                                    cmdl.get_string_option("func"),cmdl.get_int_option("cutoff"),
                                                    cmdl.get_double_option("step"));
 
-                        a.score->define_composition(__receptors.get_idatm_types(),
+                        a.score->define_composition(a.protein.get_idatm_types(),
                                                    ligand_fragments.ligand_idatm_types())
                               .process_distributions_file(cmdl.get_string_option("dist"))
                               .compile_scoring_function()

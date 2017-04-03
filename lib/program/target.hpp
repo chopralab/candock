@@ -66,7 +66,7 @@ namespace Program {
                 void __initialize_ffield();
 
         public:
-                Target (const std::string &input_name);
+                Target (const std::string &input_name, bool re_type=true);
                 Target (const Target &) = delete;
                 Target &operator= (const Target &) = delete;
 

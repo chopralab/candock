@@ -20,10 +20,18 @@
 using namespace std;
 
 namespace Molib {
-	
-	string Molecule::get_chain_ids(const unsigned int hm) const {
 
-		set<char> chain_ids;
+        set<int> Molecule::get_idatm_types(set<int> previous) const {
+                for (auto &pa : get_atoms()) {
+                        previous.insert(pa->idatm_type());
+                }
+                return previous;
+        }
+
+        
+        string Molecule::get_chain_ids(const unsigned int hm) const {
+
+                set<char> chain_ids;
 
                 for (auto &presidue : this->get_residues()) {
                         if ( ((hm & Residue::protein) && presidue->rest() == Residue::protein)
