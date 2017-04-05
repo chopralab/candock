@@ -11,7 +11,7 @@
 #include "modeler/modeler.hpp"
 
 namespace Program {
-	Target::Target(const std::string& input_name, bool re_type ) {
+	Target::Target(const std::string& input_name) {
 
 		// If the user doesn't want to use this feature
 		if (input_name == "")
@@ -49,7 +49,6 @@ namespace Program {
 		 * gaff types for cofactors (ADP, POB, etc.) are calculated de-novo here
 		 * 
 		 */
-		if (re_type)
 		__receptors.compute_idatm_type()
 			.compute_hydrogen()
 			.compute_bond_order()
@@ -94,6 +93,10 @@ namespace Program {
 
         void Target::__initialize_ffield() {
                 for (auto& a : __preprecs) {
+                        if ( a.ffield != nullptr) {
+                                continue;
+                        }
+
                         // Prepare the receptor for docking to
                         OMMIface::ForceField* ffield = new OMMIface::ForceField;
 
@@ -130,6 +133,7 @@ namespace Program {
         void Target::rescore_docked(const FragmentLigands& ligand_fragments) {
 
                 __initialize_score(ligand_fragments);
+                __initialize_ffield();
 
                 for ( auto &a : __preprecs ) {
 
@@ -155,23 +159,23 @@ namespace Program {
                 __initialize_ffield();
 
                 for ( auto &a : __preprecs ) {
-			DockFragments* pdockfragments = new DockFragments(*a.centroids, ligand_fragments, *a.score, *a.gridrec, a.protein.name());
-			pdockfragments->run_step();
-			a.prepseeds = pdockfragments;
-		}
-	}
+                        DockFragments* pdockfragments = new DockFragments(*a.centroids, ligand_fragments, *a.score, *a.gridrec, a.protein.name());
+                        pdockfragments->run_step();
+                        a.prepseeds = pdockfragments;
+                }
+        }
 
-	void Target::link_fragments(const FragmentLigands &) {
+        void Target::link_fragments(const FragmentLigands &) {
 
-		OMMIface::SystemTopology::loadPlugins();
+                OMMIface::SystemTopology::loadPlugins();
 
-		for ( auto &a : __preprecs ) {
-			a.ffield->insert_topology(a.protein);
-			LinkFragments* plinkfragments = new LinkFragments(a.protein, *a.score, *a.ffield, *a.prepseeds, *a.gridrec);
-			plinkfragments->run_step();
-			a.dockedlig = plinkfragments;
-		}
-	}
+                for ( auto &a : __preprecs ) {
+                        a.ffield->insert_topology(a.protein);
+                        LinkFragments* plinkfragments = new LinkFragments(a.protein, *a.score, *a.ffield, *a.prepseeds, *a.gridrec);
+                        plinkfragments->run_step();
+                        a.dockedlig = plinkfragments;
+                }
+        }
 
         void Target::minimize_force(const FragmentLigands &ligand_fragments) {
 

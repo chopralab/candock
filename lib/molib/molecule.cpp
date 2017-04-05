@@ -98,17 +98,18 @@ namespace Molib {
 		}
 	}
 
-	void Molecule::undo_mm_specific() {
-		for (auto &assembly : *this)
-		for (auto &model : assembly)
-		for (auto &chain : model) {
-			for (auto &residue : chain) {
-				if (residue.resn() == "HIP") residue.set_resn("HIS");
-				if (residue.resn() == "CYX") residue.set_resn("CYS");
-				if (residue.resn().size() == 4) residue.set_resn(residue.resn().substr(1)); // NALA -> ALA
-			}
-		}
-	}
+        void Molecule::undo_mm_specific() {
+                for (auto &assembly : *this)
+                for (auto &model : assembly)
+                for (auto &chain : model) {
+                        for (auto &residue : chain) {
+                                if (residue.resn() == "HIP") residue.set_resn("HIS");
+                                if (residue.resn() == "CYX") residue.set_resn("CYS");
+                                if (residue.resn().size() == 2) residue.set_resn(residue.resn().substr(0,1)); // U3 -> U
+                                if (residue.resn().size() == 4) residue.set_resn(residue.resn().substr(1)); // NALA -> ALA
+                        }
+                }
+        }
 
 	Atom::Vec Molecule::get_atoms(const string &chain_ids, const Residue::res_type &rest,
 		const int model_number) const {
@@ -326,9 +327,9 @@ namespace Molib {
 				}
 			} else if (residue.resn().size() == 1) {
 				if (atom.atom_name() == "O3'" && !atom.is_adjacent("P")) {
-					residue.set_resn(residue.resn() + "3");
+					residue.set_resn(residue.resn() + "3"); // last residue is renamed to U3, A3, etc,
 				} else if (atom.atom_name() == "O5'" && !atom.is_adjacent("P")) {
-					residue.set_resn(residue.resn() + "5");
+					residue.set_resn(residue.resn() + "5"); // first residue is renamed to U5, A5, etc
 				}
 			}
 		}

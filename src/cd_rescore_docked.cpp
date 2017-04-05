@@ -28,7 +28,7 @@ int main(int argc, char* argv[]) {
                 Program::FragmentLigands ligand_fragmenter;
                 ligand_fragmenter.run_step();
 
-                Program::Target targets(cmdl.get_string_option("receptor"), false);
+                Program::Target targets(cmdl.get_string_option("receptor"));
                 targets.rescore_docked(ligand_fragmenter);
 
         } catch (exception& e) {
