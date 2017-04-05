@@ -49,7 +49,7 @@ namespace Program {
                 }
 
                 if (__seeds.size() == 0) {
-                        throw Error ("You have no seeds, cannot procede! Make sure you've supplied the proper seeds_pdb or prep file!");
+                        throw Error ("You have no seeds, cannot proceed! Make sure you've supplied the proper seeds_pdb or prep file!");
                 }
         }
 
@@ -165,7 +165,7 @@ namespace Program {
                 __seeds.erase_properties();
 
                 if (__seeds.size() == 0) {
-                        throw Error ("You have no seeds, cannot procede!");
+                        throw Error ("You have no seeds, cannot proceed!");
                 }
 
                 Inout::output_file (__seeds, cmdl.get_string_option ("seeds_pdb"), ios_base::out);
