@@ -13,7 +13,7 @@ int main(int argc, char* argv[]) {
 
                 help::Options::set_options(new Program::CmdLnOpts(
                     argc, argv, Program::CmdLnOpts::STARTING |
-                                Program::CmdLnOpts::LIG_FRAMGENT| 
+                                Program::CmdLnOpts::FORCE_FIELD| 
                                 Program::CmdLnOpts::SCORING));
 
                 Benchmark main_timer;
@@ -29,11 +29,13 @@ int main(int argc, char* argv[]) {
                 ligand_fragmenter.run_step();
 
                 Program::Target targets(cmdl.get_string_option("receptor"));
-                targets.rescore_docked(ligand_fragmenter);
+
+                targets.minimize_force(ligand_fragmenter);
 
         } catch (exception& e) {
                 cerr << e.what() << endl;
         }
         return 0;
 }
+
 

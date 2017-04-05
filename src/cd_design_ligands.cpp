@@ -56,10 +56,10 @@ int main(int argc, char* argv[]) {
                 antitargets.find_centroids();
                 antitargets.dock_fragments(ligand_fragmenter);
 
-                targets.link_fragments();
+                targets.link_fragments(ligand_fragmenter);
 
                 if (cmdl.get_bool_option("antitarget_linking"))
-                        antitargets.link_fragments();
+                        antitargets.link_fragments(ligand_fragmenter);
 
                 set<string> solo_target_seeds = Program::Target::determine_non_overlapping_seeds(targets, antitargets);
                 if (/*cmdl.get_bool_option("new_scaffold") || */ ! boost::filesystem::is_regular_file(cmdl.get_string_option("prep"))) {

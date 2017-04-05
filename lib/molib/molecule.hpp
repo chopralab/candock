@@ -71,7 +71,7 @@ namespace Molib {
                 void change_residue_name(std::mutex &mtx, int &ligand_cnt);
 
 		Assembly& asym() { return this->first(); }
-		
+		set<int> get_idatm_types(std::set<int> previous = std::set<int>()) const;
 		Atom::Vec get_atoms(const std::string &chain_ids="", const Residue::res_type &rest=Residue::res_type::notassigned, const int model_number=-1) const;
 		Residue::Vec get_residues() const;
 
