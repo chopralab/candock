@@ -13,6 +13,18 @@
 : ${MCANDOCK_poses:=1}
 : ${MCANDOCK_pymol:=/depot/gchopra/apps/pymol/pymol}
 
+: ${CANDOCK_bslib:=$MCANDOCK_SUP_PATH/bslibdb/bslib.txt}
+: ${CANDOCK_names:=$MCANDOCK_SUP_PATH/bslibdb/data/names}
+: ${CANDOCK_bio:=$MCANDOCK_SUP_PATH/bslibdb/data/bio}
+
+: ${CANDOCK_amber_xml:=$MCANDOCK_SUP_PATH/data/amber10.xml}
+: ${CANDOCK_water_xml:=$MCANDOCK_SUP_PATH/data/tip3p.xml}
+: ${CANDOCK_gaff_xml:=$MCANDOCK_SUP_PATH/data/gaff.xml}
+: ${CANDOCK_gaff_dat:=$MCANDOCK_SUP_PATH/data/gaff.dat}
+
+: ${CANDOCK_dist:=$MCANDOCK_SUP_PATH/data/csd_complete_distance_distributions.txt}
+: ${CANDOCK_obj_dir:=$MCANDOCK_SUP_PATH/obj}
+
 # Check if were running in a PBS environment
 
 if [[ ! -z $PBS_O_WORKDIR ]]
@@ -34,15 +46,13 @@ function find_centroids() {
         return
     fi
 
-    ln -s $MCANDOCK_SUP_PATH/bslibdb  bslibdb
-
+    touch find_centroids.lck
     SECONDS=0
 
     $MCANDOCK_PATH/$MCANDOCK_VER/cd_bsite_probis
 
     echo "find_centroids took $SECONDS seconds to complete"
-
-    unlink bslibdb
+    rm find_centroids.lck
 
     chmod g+r `get_option centroid`
     chmod g+r `get_option gridpdb_hcp`
@@ -64,11 +74,13 @@ function prep_fragments() {
     cd $MCANDOCK_working_dir
     echo "Running fragment in $PWD"
 
+    touch prep_fragments.lck
     SECONDS=0
 
     $MCANDOCK_PATH/$MCANDOCK_VER/cd_prep_fragments
 
     echo "Fragmenting took $SECONDS seconds to complete"
+    rm prep_fragments.lck
 
     chmod g+r `get_option prep`
     chmod g+r `get_option seeds`
@@ -85,17 +97,13 @@ function dock_fragments() {
     cd $MCANDOCK_working_dir
     echo "Running dock in $PWD"
 
-    ln -s $MCANDOCK_SUP_PATH/obj   obj
-    ln -s $MCANDOCK_SUP_PATH/data  data
-
+    touch dock_fragments.lck
     SECONDS=0
 
     $MCANDOCK_PATH/$MCANDOCK_VER/cd_dock_fragments
 
     echo "Docking of fragments took $SECONDS seconds to complete"
-
-    unlink obj
-    unlink data
+    rm dock_fragments.lck
 
     chmod -R g+r `get_option top_seeds_dir`
 }
@@ -111,17 +119,13 @@ function link_fragments() {
     cd $MCANDOCK_working_dir
     echo "Running link in $PWD"
 
-    ln -s $MCANDOCK_SUP_PATH/obj   obj
-    ln -s $MCANDOCK_SUP_PATH/data  data
-
+    touch link_fragments.lck
     SECONDS=0
 
     $MCANDOCK_PATH/$MCANDOCK_VER/cd_link_fragments
 
     echo "Linking of fragments took $SECONDS seconds to complete"
-
-    unlink obj
-    unlink data
+    rm link_fragments.lck
 
     chmod -R g+r docked/
 }
