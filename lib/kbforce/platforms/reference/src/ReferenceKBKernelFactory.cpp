@@ -59,7 +59,7 @@ extern "C" void registerKBReferenceKernelFactories() {
 
 namespace KBPlugin {
 
-KernelImpl* ReferenceKBKernelFactory::createKernelImpl(std::string name, const Platform& platform, ContextImpl& context) const {
+KernelImpl* ReferenceKBKernelFactory::createKernelImpl(std::string name, const Platform& platform, ContextImpl&) const {
     //~ReferencePlatform::PlatformData& data = *static_cast<ReferencePlatform::PlatformData*>(context.getPlatformData());
     if (name == CalcKBForceKernel::Name())
         return new ReferenceCalcKBForceKernel(name, platform);

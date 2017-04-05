@@ -196,7 +196,7 @@ namespace Linker {
 	}
 	
 	bool Linker::GenericLinker::__clashes_ligand(const State &current, 
-		const Partial &conformation, const State &prev) const {
+		const Partial &conformation, const State &) const {
 
 		// clashes between current segment and previous segments
 		for (auto &pstate : conformation.get_states()) {

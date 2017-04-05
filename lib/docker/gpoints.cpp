@@ -279,8 +279,9 @@ namespace Docker {
 						
 						// if the point is within the radial_check of ANY of the centroids... 
 						if (eval.distance(center) <= radial_check) {
+                                                        // Coordinare, IJK, Energy
 							__gridpoints[0].push_back(Gpoint{eval, IJK{column, 
-								row, layer}});
+								row, layer}, 0.0});
 							dbgmsg("lastcolumn = " << last_column << " lastrow = " << last_row << " lastlayer = " << last_layer);
 							dbgmsg("column = " << column << " row = " << row << " layer = " << layer);
 							dbgmsg("gridpoint0 = " << __gridpoints[0].back().ijk());

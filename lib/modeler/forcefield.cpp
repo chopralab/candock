@@ -56,14 +56,13 @@ namespace OMMIface {
 	}
 
         const ForceField::KBType& ForceField::get_kb_force_type(const Molib::Atom &atom1, 
-                const Molib::Atom &atom2, const int type1, const int type2) const {
+                const Molib::Atom &atom2) const {
                 const int &aclass1 = atom1.idatm_type(); 
                 const int &aclass2 = atom2.idatm_type();
 #ifndef NDEBUG
                 const AtomType &atype1 = atom_type.at(type1);
                 const AtomType &atype2 = atom_type.at(type2);
-                dbgmsg("add kb force type1 = " << type1 << " type2 = " 
-                        << type2 << " atype1.cl = " << atype1.cl << " atype2.cl = " << atype2.cl 
+                dbgmsg("add kb force atype1.cl = " << atype1.cl << " atype2.cl = " << atype2.cl 
                         << " aclass1 = " << help::idatm_unmask[aclass1] 
                         << " aclass2 = " << help::idatm_unmask[aclass2]);
 #endif

@@ -34,7 +34,7 @@ namespace Docker {
 			const Geom3D::Point& crd() const { return __crd; }
 			IJK& ijk() { return __ijk; }
 			const IJK& ijk() const { return __ijk; }
-			void distance(double d) const {} // just dummy : needed by grid
+			void distance(double) const {} // just dummy : needed by grid
 		};
 
 		typedef vector<Gpoint> GpointVec;

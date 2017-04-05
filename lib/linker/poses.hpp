@@ -23,7 +23,7 @@ namespace Linker {
 			const Geom3D::Point& crd() const { return __crd; }
 			State& get_state() { return __state; }
 			const Molib::Atom& get_atom() const { return __atom; }
-			void distance(double d) const {} // just dummy : needed by grid
+			void distance(double) const {} // just dummy : needed by grid
 			double radius() const { return __atom.radius(); }
 			
 			typedef vector<unique_ptr<AtomPoint>> UPVec;

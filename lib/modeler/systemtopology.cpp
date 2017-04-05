@@ -246,12 +246,9 @@ namespace OMMIface {
 			const Molib::Atom &atom2 = *bond.second;
 			const int idx1 = topology.get_index(atom1);
 			const int idx2 = topology.get_index(atom2);
-			const int type1 = topology.get_type(atom1);
-			const int type2 = topology.get_type(atom2);
 			if (!masked[idx1] && !masked[idx2]) { // don't make the force if one or both atoms are masked
 				try {
-					const ForceField::KBType& kbtype = 
-						__ffield->get_kb_force_type(atom1, atom2, type1, type2);
+					const ForceField::KBType& kbtype = __ffield->get_kb_force_type(atom1, atom2);
 					kbforce->addBond(idx1, idx2, 
 						const_cast<vector<double>&>(kbtype.potential), 
 						const_cast<vector<double>&>(kbtype.derivative));

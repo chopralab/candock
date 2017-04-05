@@ -8,7 +8,6 @@
 #include "helper/debug.hpp"
 #include "helper/help.hpp"
 #include "molib/molecule.hpp"
-#include "OpenMM.h"
 using namespace std;
 
 namespace Molib {

@@ -60,7 +60,7 @@ namespace Geom3D {
 		double distance(const Coordinate &c) const { return sqrt(pow(__x-c.x(), 2) + pow(__y-c.y(), 2) + pow(__z-c.z(), 2)); }
 		double distance_sq(const Coordinate &c) const { return pow(__x-c.x(), 2) + pow(__y-c.y(), 2) + pow(__z-c.z(), 2); }
 		
-		void distance(double d) const {} // just dummy : needed by grid
+		void distance(double) const {} // just dummy : needed by grid
 		
 		void normalize() { const double length = this->distance(Coordinate(0.0, 0.0, 0.0)); if (length == 0) throw Error("Coordinate::operator/  division by zero\n"); this->__x /= length; this->__y /= length; this->__z /= length; }
 		Coordinate norm() { Coordinate c = *this; c.normalize(); return c; }

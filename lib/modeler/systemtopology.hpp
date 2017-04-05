@@ -46,7 +46,7 @@ namespace OMMIface {
 			AtomPoint(const Geom3D::Point &crd, Molib::Atom &atom) : __crd(crd), __atom(atom) {}
 			const Geom3D::Point& crd() const { return __crd; }
 			Molib::Atom& get_atom() { return __atom; }
-			void distance(double d) const {} // just dummy : needed by grid
+			void distance(double) const {} // just dummy : needed by grid
 			
 			typedef vector<unique_ptr<AtomPoint>> UPVec;
 			typedef vector<AtomPoint*> PVec;
