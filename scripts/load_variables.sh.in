@@ -13,17 +13,21 @@
 : ${MCANDOCK_poses:=1}
 : ${MCANDOCK_pymol:=/depot/gchopra/apps/pymol/pymol}
 
-: ${CANDOCK_bslib:=$MCANDOCK_SUP_PATH/bslibdb/bslib.txt}
-: ${CANDOCK_names:=$MCANDOCK_SUP_PATH/bslibdb/data/names}
-: ${CANDOCK_bio:=$MCANDOCK_SUP_PATH/bslibdb/data/bio}
-
 : ${CANDOCK_amber_xml:=$MCANDOCK_SUP_PATH/data/amber10.xml}
 : ${CANDOCK_water_xml:=$MCANDOCK_SUP_PATH/data/tip3p.xml}
 : ${CANDOCK_gaff_xml:=$MCANDOCK_SUP_PATH/data/gaff.xml}
 : ${CANDOCK_gaff_dat:=$MCANDOCK_SUP_PATH/data/gaff.dat}
 
+export CANDOCK_amber_xml
+export CANDOCK_water_xml
+export CANDOCK_gaff_xml
+export CANDOCK_gaff_dat
+
 : ${CANDOCK_dist:=$MCANDOCK_SUP_PATH/data/csd_complete_distance_distributions.txt}
 : ${CANDOCK_obj_dir:=$MCANDOCK_SUP_PATH/obj}
+
+export CANDOCK_dist
+export CANDOCK_obj_dir
 
 # Check if were running in a PBS environment
 
@@ -34,17 +38,9 @@ else
         : ${MCANDOCK_working_dir:=$PWD}
 fi
 
-function get_option() {
-        $MCANDOCK_PATH/$MCANDOCK_VER/cd_check_options | grep '=' | grep -w $1 | awk -F '=' '{ print $2}' | sed -e 's/\s*//'
-}
-
 function find_centroids() {
 
-    if [[ -s `get_option centroid` ]]
-    then
-        echo "Existing binding site found in `get_option centroid`"
-        return
-    fi
+    ln -s $MCANDOCK_SUP_PATH/bslibdb bslibdb
 
     touch find_centroids.lck
     SECONDS=0
@@ -54,22 +50,10 @@ function find_centroids() {
     echo "find_centroids took $SECONDS seconds to complete"
     rm find_centroids.lck
 
-    chmod g+r `get_option centroid`
-    chmod g+r `get_option gridpdb_hcp`
-    chmod g+r `get_option json`
-    chmod g+r `get_option nosql`
-    chmod g+r `get_option jsonwl`
-    chmod g+r `get_option lig_clus_file`
-    chmod g+r `get_option z_scores_file`
+    rm bslibdb
 }
 
 function prep_fragments() {
-
-    if [[ -s `get_option prep` ]]
-    then
-        echo "Existing fragmentation found in `get_option prep`"
-        return
-    fi
 
     cd $MCANDOCK_working_dir
     echo "Running fragment in $PWD"
@@ -81,18 +65,9 @@ function prep_fragments() {
 
     echo "Fragmenting took $SECONDS seconds to complete"
     rm prep_fragments.lck
-
-    chmod g+r `get_option prep`
-    chmod g+r `get_option seeds`
 }
 
 function dock_fragments() {
-
-    if [[ -d `get_option top_seeds_dir` ]]
-    then
-        echo "Seeds database found at `get_option top_seeds_dir`"
-        return
-    fi
 
     cd $MCANDOCK_working_dir
     echo "Running dock in $PWD"
@@ -104,17 +79,9 @@ function dock_fragments() {
 
     echo "Docking of fragments took $SECONDS seconds to complete"
     rm dock_fragments.lck
-
-    chmod -R g+r `get_option top_seeds_dir`
 }
 
 function link_fragments() {
-
-    if [[ -d `get_option docked_dir` ]]
-    then
-        echo "Seeds database found at `get_option top_seeds_dir`"
-        return
-    fi
 
     cd $MCANDOCK_working_dir
     echo "Running link in $PWD"
@@ -126,8 +93,6 @@ function link_fragments() {
 
     echo "Linking of fragments took $SECONDS seconds to complete"
     rm link_fragments.lck
-
-    chmod -R g+r docked/
 }
 
 function extract_result() {
@@ -146,7 +111,4 @@ function extract_result() {
 
     cd ..
     rm -fr extract
-
-    chmod g+r scores.csv
-    chmod g+r all.pse
 }
