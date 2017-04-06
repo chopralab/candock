@@ -45,7 +45,7 @@ function find_centroids() {
     touch find_centroids.lck
     SECONDS=0
 
-    $MCANDOCK_PATH/$MCANDOCK_VER/cd_bsite_probis
+    $MCANDOCK_PATH/$MCANDOCK_VER/cd_find_centroids
 
     echo "find_centroids took $SECONDS seconds to complete"
     rm find_centroids.lck

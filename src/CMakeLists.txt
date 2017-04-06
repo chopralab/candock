@@ -53,7 +53,7 @@ endif(NOT WIN32)
 
 # New programs with new features that change functionality
 add_executable( cd_check_options  cd_check_options.cpp  ${CANDOCK_SRC})
-add_executable( cd_bsite_probis   cd_bsite_probis.cpp   ${CANDOCK_SRC})
+add_executable( cd_find_centroids cd_find_centroids.cpp ${CANDOCK_SRC})
 add_executable( cd_prep_fragments cd_prep_fragments.cpp ${CANDOCK_SRC})
 add_executable( cd_make_objective cd_make_objective.cpp ${CANDOCK_SRC})
 add_executable( cd_dock_fragments cd_dock_fragments.cpp ${CANDOCK_SRC})
@@ -63,7 +63,7 @@ add_executable( cd_rescore_docked cd_rescore_docked.cpp ${CANDOCK_SRC})
 add_executable( cd_design_ligands cd_design_ligands.cpp ${CANDOCK_SRC})
 
 target_link_libraries( cd_check_options  ${all_needed_libraries} )
-target_link_libraries( cd_bsite_probis   ${all_needed_libraries} )
+target_link_libraries( cd_find_centroids   ${all_needed_libraries} )
 target_link_libraries( cd_prep_fragments ${all_needed_libraries} )
 target_link_libraries( cd_make_objective ${all_needed_libraries} )
 target_link_libraries( cd_dock_fragments ${all_needed_libraries} )
@@ -74,13 +74,13 @@ target_link_libraries( cd_design_ligands ${all_needed_libraries} )
 
 set_target_properties(
         cd_check_options
-        cd_bsite_probis
+        cd_find_centroids
         cd_prep_fragments
         cd_make_objective
         cd_dock_fragments
         cd_link_fragments
         cd_design_ligands
-		cd_rescore_docked
+        cd_rescore_docked
     PROPERTIES
     INSTALL_RPATH ${CMAKE_INSTALL_PREFIX}/lib
     INSTALL_RPATH_USE_LINK_PATH TRUE
@@ -101,13 +101,13 @@ endif(CUDA_FOUND)
 install(
     TARGETS    
         cd_check_options
-        cd_bsite_probis
+        cd_find_centroids
         cd_prep_fragments
         cd_make_objective
         cd_dock_fragments
         cd_link_fragments
         cd_design_ligands
-		cd_rescore_docked
+        cd_rescore_docked
 
     RUNTIME DESTINATION
         bin
