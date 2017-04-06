@@ -49,14 +49,11 @@ int main(int argc, char* argv[]) {
 
                 //TODO: Combine into one class?????
                 Program::Target targets (cmdl.get_string_option("target_dir"));
-                targets.find_centroids();
-                targets.dock_fragments(ligand_fragmenter);
+                targets.link_fragments(ligand_fragmenter);
 
                 Program::Target antitargets(cmdl.get_string_option("antitarget_dir"));
                 antitargets.find_centroids();
                 antitargets.dock_fragments(ligand_fragmenter);
-
-                targets.link_fragments(ligand_fragmenter);
 
                 if (cmdl.get_bool_option("antitarget_linking"))
                         antitargets.link_fragments(ligand_fragmenter);

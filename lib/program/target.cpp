@@ -111,24 +111,27 @@ namespace Program {
                 }
         }
 
-	std::set<int> Target::get_idatm_types(const std::set<int>& previous) {
-		return __receptors.get_idatm_types(previous);
-	}
+        std::set<int> Target::get_idatm_types(const std::set<int>& previous) {
+                return __receptors.get_idatm_types(previous);
+        }
 
-	void Target::find_centroids( ) {
-		for ( auto &a : __preprecs ) {
-			FindCentroids* pcen  = new FindCentroids(a.protein);
+        void Target::find_centroids( ) {
+                for ( auto &a : __preprecs ) {
+                        
+                        if ( a.centroids != nullptr ) {
+                                continue;
+                        }
+                        
+                        /* Run section of Candock designed to find binding site1s
+                         * Currently, this runs ProBIS and does not require any
+                         * previous step to be competed.
+                         *
+                         */
 
-			/* Run section of Candock designed to find binding site1s
-			 * Currently, this runs ProBIS and does not require any
-			 * previous step to be competed.
-			 *
-			 */
-
-			pcen->run_step();
-			a.centroids = pcen;
-		}
-	}
+                        a.centroids = new FindCentroids(a.protein);
+                        a.centroids->run_step();
+                }
+        }
 
         void Target::rescore_docked(const FragmentLigands& ligand_fragments) {
 
@@ -155,29 +158,44 @@ namespace Program {
         }
 
         void Target::dock_fragments(const FragmentLigands& ligand_fragments) {
+
+                find_centroids();
+
                 __initialize_score(ligand_fragments);
                 __initialize_ffield();
 
                 for ( auto &a : __preprecs ) {
-                        DockFragments* pdockfragments = new DockFragments(*a.centroids, ligand_fragments, *a.score, *a.gridrec, a.protein.name());
-                        pdockfragments->run_step();
-                        a.prepseeds = pdockfragments;
+
+                        if (a.prepseeds != nullptr) {
+                                continue;
+                        }
+
+                        a.prepseeds = new DockFragments(*a.centroids, ligand_fragments, *a.score, *a.gridrec, a.protein.name());
+                        a.prepseeds->run_step();
                 }
         }
 
-        void Target::link_fragments(const FragmentLigands &) {
+        void Target::link_fragments(const FragmentLigands &ligand_fragments) {
+
+                dock_fragments(ligand_fragments);
 
                 OMMIface::SystemTopology::loadPlugins();
 
                 for ( auto &a : __preprecs ) {
+
+                        if ( a.dockedlig != nullptr ) {
+                                continue;
+                        }
+
                         a.ffield->insert_topology(a.protein);
-                        LinkFragments* plinkfragments = new LinkFragments(a.protein, *a.score, *a.ffield, *a.prepseeds, *a.gridrec);
-                        plinkfragments->run_step();
-                        a.dockedlig = plinkfragments;
+                        a.dockedlig = new LinkFragments(a.protein, *a.score, *a.ffield, *a.prepseeds, *a.gridrec);
+                        a.dockedlig->run_step();
                 }
         }
 
         void Target::minimize_force(const FragmentLigands &ligand_fragments) {
+
+                OMMIface::SystemTopology::loadPlugins();
 
                 __initialize_score(ligand_fragments);
                 __initialize_ffield();
@@ -196,7 +214,6 @@ namespace Program {
                                          */
 
                                         a.ffield->insert_topology (ligand);
-                                        //~ ligand.set_name("org");
 
                                         OMMIface::Modeler modeler (*a.ffield, cmdl.get_string_option("fftype"), cmdl.get_int_option("cutoff"),
                                                   cmdl.get_double_option("mini_tol"), cmdl.get_int_option("max_iter"), cmdl.get_int_option("update_freq"), 

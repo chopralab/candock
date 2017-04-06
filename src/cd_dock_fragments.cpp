@@ -29,7 +29,6 @@ int main(int argc, char* argv[]) {
                 ligand_fragmenter.run_step();
 
                 Program::Target targets (cmdl.get_string_option("receptor"));
-                targets.find_centroids();
                 targets.dock_fragments(ligand_fragmenter);
 
                 main_timer.display_time("Finished");

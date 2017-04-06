@@ -4,7 +4,7 @@
 #PBS -l nodes=1:ppn=8
 #PBS -l naccesspolicy=shared
 
-: ${MCANDOCK_MOD_PATH:=$([[ "$PBS_ENVIRONMENT" -eq "PBS_BATCH" ]] \
+: ${MCANDOCK_MOD_PATH:=$([[ $PBS_ENVIRONMENT == PBS_BATCH ]] \
 	&& echo @CMAKE_INSTALL_PREFIX@/modules/v@CANDOCK_MAJOR_VERSION@.@CANDOCK_MINOR_VERSION@.@CANDOCK_TWEAK_VERSION@ \
 	|| echo $( cd $( dirname ${BASH_SOURCE[0]} ) && pwd ) )}
 
@@ -22,7 +22,7 @@ fi
 
 source $MCANDOCK_MOD_PATH/load_variables.sh
 
-if [[ ! -z $PBS_ENVIRONMENT && "$PBS_ENVIRONMENT" -eq "PBS_BATCH" ]]
+if [[ $PBS_ENVIRONMENT == PBS_BATCH ]]
 then
 	$(basename $module_to_run .sh)
 else
