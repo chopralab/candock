@@ -39,7 +39,7 @@ export CANDOCK_obj_dir
 
 # Check if were running in a PBS environment
 
-if [[ ! -z $PBS_O_WORKDIR ]]
+if [[ $PBS_ENVIRONMENT == BATCH ]]
 then
         : ${MCANDOCK_working_dir:=$PBS_O_WORKDIR}
 else
