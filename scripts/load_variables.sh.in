@@ -103,6 +103,21 @@ function link_fragments() {
     rm link_fragments.lck
 }
 
+function design_ligands() {
+
+    cd $MCANDOCK_working_dir
+    echo "Running link in $PWD"
+
+    touch design_ligands.lck
+    SECONDS=0
+
+    $MCANDOCK_PATH/$MCANDOCK_VER/cd_design_ligands
+
+    echo "Design of ligands took $SECONDS seconds to complete"
+    rm design_ligands.lck
+
+}
+
 function extract_result() {
     cd $MCANDOCK_working_dir
     echo "Running extract in $PWD"
