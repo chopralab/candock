@@ -7,11 +7,13 @@
 #include "molib/molecules.hpp"
 #include "options.hpp"
 
+using namespace std;
+
 namespace Program {
 
         bool FragmentLigands::__can_read_from_files() {
-                return (Inout::file_size (cmdl.get_string_option ("seeds_pdb")) > 0
-                        || Inout::file_size (cmdl.get_string_option ("prep")) > 0)
+                return (  Inout::file_size (cmdl.get_string_option ("seeds_pdb")) > 0
+                       || Inout::file_size (cmdl.get_string_option ("prep")) > 0)
                        && Inout::file_size (cmdl.get_string_option ("seeds")) > 0;
         }
 
@@ -98,10 +100,12 @@ namespace Program {
 
         void FragmentLigands::__continue_from_prev() {
 
-                if (Inout::file_size (cmdl.get_string_option ("ligand")) > 0) {
-                        cout << "Fragmenting files in " << cmdl.get_string_option ("ligand") << endl;
+                const string &ligand = cmdl.get_string_option ("ligand");
 
-                        Parser::FileParser lpdb (cmdl.get_string_option ("ligand"),
+                if (Inout::file_size (ligand) > 0) {
+                        cout << "Fragmenting files in " << ligand << endl;
+
+                        Parser::FileParser lpdb (ligand,
                                                  Parser::all_models|Parser::hydrogens,
                                                  cmdl.get_int_option ("max_num_ligands"));
 
