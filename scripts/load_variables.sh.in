@@ -113,6 +113,7 @@ function extract_result() {
     perl $MCANDOCK_extractor $([[ "$MCANDOCK_MAKE_PYMOL" -eq 0 ]] && echo -f) -n $MCANDOCK_poses ../docked/*.pdb > ../scores.csv
 
     if [[ "$MCANDOCK_MAKE_PYMOL" -ne 0 ]]
+    then
         $MCANDOCK_pymol -c create_pse.py
         mv all.pse ..
     fi
