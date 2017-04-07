@@ -15,12 +15,13 @@ namespace Program {
 		virtual void __continue_from_prev();
 		
 		const Molib::Molecule& __receptor;
+                const std::string&     __filename;
 
 		Centro::Centroids __result;
                 std::string __centroid_file;
 
 	public:
-		FindCentroids ( const Molib::Molecule& receptor );
+		FindCentroids ( const Molib::Molecule& receptor, const std::string& filename );
                 virtual ~FindCentroids() {}
 
 		const Centro::Centroids& centroids() const {

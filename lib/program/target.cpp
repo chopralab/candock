@@ -32,7 +32,7 @@ namespace Program {
 			Molib::Molecule& current = __receptors.add(new Molib::Molecule ( std::move (receptors[0]) ));
 			current.set_name(boost::filesystem::basename(input_name.substr(0, input_name.length() - 4))); // Emulate the original version of candock
                         boost::filesystem::create_directory(current.name());
-                        __preprecs.push_back(DockedReceptor (current));
+                        __preprecs.push_back(DockedReceptor (current, input_name));
                 } else for ( const auto &a : Inout::files_matching_pattern (input_name, ".pdb")) {
 			// Otherwise we treat it like the new version intends.
 			Parser::FileParser rpdb(a, Parser::first_model);
@@ -41,7 +41,7 @@ namespace Program {
 			current.set_name( a.substr(0, a.length() - 4 ) );
 			boost::filesystem::create_directory(current.name());
 
-			__preprecs.push_back(DockedReceptor (current));
+			__preprecs.push_back(DockedReceptor (current, a));
 		}
 
 		/* Compute atom types for receptor and cofactor(s): gaff types for protein, 
@@ -128,7 +128,7 @@ namespace Program {
                          *
                          */
 
-                        a.centroids = new FindCentroids(a.protein);
+                        a.centroids = new FindCentroids(a.protein, a.filename);
                         a.centroids->run_step();
                 }
         }

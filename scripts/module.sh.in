@@ -30,4 +30,3 @@ else
 fi
 
 echo "All caclulations for $(basename $0) are complete"
-

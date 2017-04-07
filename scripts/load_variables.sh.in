@@ -13,6 +13,14 @@
 : ${MCANDOCK_poses:=1}
 : ${MCANDOCK_pymol:=/depot/gchopra/apps/pymol/pymol}
 
+: ${CANDOCK_bslib:=$MCANDOCK_SUP_PATH/bslibdb}
+: ${CANDOCK_names:=$MCANDOCK_SUP_PATH/bslibdb/data/names}
+: ${CANDOCK_bio:=$MCANDOCK_SUP_PATH/bslibdb/data/bio}
+
+export CANDOCK_bslib
+export CANDOCK_names
+export CANDOCK_bio
+
 : ${CANDOCK_amber_xml:=$MCANDOCK_SUP_PATH/data/amber10.xml}
 : ${CANDOCK_water_xml:=$MCANDOCK_SUP_PATH/data/tip3p.xml}
 : ${CANDOCK_gaff_xml:=$MCANDOCK_SUP_PATH/data/gaff.xml}

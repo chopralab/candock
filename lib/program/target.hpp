@@ -21,8 +21,9 @@ namespace Program {
                 // TODO:  Consider using ProgramSteps instead of named things?
                 struct CANDOCK_EXPORT DockedReceptor {
 
-                        DockedReceptor (Molib::Molecule &rec) :
-                                protein (rec), score (nullptr), ffield (nullptr),
+                        DockedReceptor (Molib::Molecule &rec, const std::string &file) :
+                                filename(file), protein (rec),
+                                score (nullptr), ffield (nullptr),
                                 gridrec (nullptr), centroids (nullptr),
                                 prepseeds (nullptr), dockedlig (nullptr) {
                         }
@@ -50,6 +51,7 @@ namespace Program {
                         DockedReceptor (const DockedReceptor &rhs) = default;
                         DockedReceptor &operator= (const DockedReceptor &rhs) = default;
 
+                        std::string          filename;
                         Molib::Molecule      &protein;
                         Molib::Score         *score;
                         OMMIface::ForceField *ffield;

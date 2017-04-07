@@ -12,8 +12,8 @@
 
 namespace Program {
 
-        FindCentroids::FindCentroids(const Molib::Molecule& receptor) :
-                     __receptor( receptor ) {
+        FindCentroids::FindCentroids(const Molib::Molecule& receptor, const std::string &filename) :
+                     __receptor( receptor ), __filename(filename) {
                 if (cmdl.get_string_option("centroid").empty()) {
                         __centroid_file = Path::join(__receptor.name(), "site.cen");
                 } else {
@@ -31,40 +31,69 @@ namespace Program {
                 __result = Centro::set_centroids( __centroid_file, cmdl.get_int_option("num_bsites"));
         }
 
-	void FindCentroids::__continue_from_prev( ) {
+        void FindCentroids::__continue_from_prev( ) {
 
-		cout << "Running PROBIS for receptor in file: " << __receptor.name() + ".pdb" << endl;
+                cout << "Running PROBIS for receptor in file: " << __receptor.name() + ".pdb" << endl;
 
-		// Creates an empty nosql file
-		Inout::output_file("", Path::join(__receptor.name(), cmdl.get_string_option("nosql"))); // probis local structural alignments
+                // Creates an empty nosql file for probis local structural alignments
+                Inout::output_file("", Path::join(__receptor.name(), cmdl.get_string_option("nosql")));
 
-		probis::compare_against_bslib(__receptor.name() + ".pdb",
-			Path::join(__receptor.name(), cmdl.get_string_option("srf_file")),
-			__receptor.get_chain_ids(Molib::Residue::protein),
-			cmdl.get_string_option("bslib"), cmdl.ncpu(),
-			Path::join(__receptor.name(), cmdl.get_string_option("nosql")),
-			Path::join(__receptor.name(), cmdl.get_string_option("json")));
+                // PROBIS is a bit needy and requires the directory 'bslibdb' to be in the current path
+                // To make this work properly, we change directories to the directory with this directory
+                // and change back. This is effectively a dirty hack around a probis problem...
+                boost::filesystem::path original_file(__filename);
 
-		genclus::generate_clusters_of_ligands(
-			Path::join(__receptor.name(), cmdl.get_string_option("json")),
-			Path::join(__receptor.name(), cmdl.get_string_option("jsonwl")),
-			cmdl.get_string_option("bio"),
-			cmdl.get_string_option("names"),
-			cmdl.get_bool_option("neighb"),
-			cmdl.get_double_option("probis_clus_rad"),
-			cmdl.get_int_option("probis_min_pts"),
-			cmdl.get_double_option("probis_min_z_score"));
+                boost::filesystem::path cwd = boost::filesystem::current_path();
+                original_file = absolute(original_file);
 
-		auto binding_sites = 
-			genlig::generate_binding_site_prediction(
-				Path::join(__receptor.name(), cmdl.get_string_option("jsonwl")), 
-				cmdl.get_string_option("bio"),
-				cmdl.get_int_option("num_bsites"));
+                boost::filesystem::path bslibdb (cmdl.get_string_option("bslib"));
+                bslibdb = bslibdb.parent_path();
 
-		Inout::output_file(binding_sites.first,  Path::join(__receptor.name(), cmdl.get_string_option("lig_clus_file")));
-		Inout::output_file(binding_sites.second, Path::join(__receptor.name(), cmdl.get_string_option("z_scores_file")));
+#ifdef _WINDOWS
+                int chdir_error = _chdir( bslibdb.c_str() );
+#else
+                int chdir_error = chdir( bslibdb.c_str() );
+#endif
+                if ( chdir_error != 0) {
+                        throw Error ("Unable to change into bslibdb dir: " + bslibdb.string() + " because " + strerror(chdir_error)) ;
+                }
 
-		__result = Centro::set_centroids(binding_sites.first, cmdl.get_double_option("centro_clus_rad"));
-		Inout::output_file(__result, __centroid_file); // probis local structural alignments
-	}
+                probis::compare_against_bslib(original_file.string(),
+                        (cwd / __receptor.name() / cmdl.get_string_option("srf_file")).string(),
+                        __receptor.get_chain_ids(Molib::Residue::protein),
+                        "bslibdb/bslib.txt", cmdl.ncpu(),
+                        (cwd / __receptor.name() / cmdl.get_string_option("nosql")).string(),
+                        (cwd / __receptor.name() / cmdl.get_string_option("json")).string() );
+
+#ifdef _WINDOWS
+                chdir_error = _chdir( cwd.c_str() );
+#else
+                chdir_error = chdir( cwd.c_str() );
+#endif
+                if ( chdir_error != 0) {
+                        throw Error ("Unable to change into original dir: " + bslibdb.string() + " because " + strerror(chdir_error)) ;
+                }
+
+                genclus::generate_clusters_of_ligands(
+                        Path::join(__receptor.name(), cmdl.get_string_option("json")),
+                        Path::join(__receptor.name(), cmdl.get_string_option("jsonwl")),
+                        cmdl.get_string_option("bio"),
+                        cmdl.get_string_option("names"),
+                        cmdl.get_bool_option("neighb"),
+                        cmdl.get_double_option("probis_clus_rad"),
+                        cmdl.get_int_option("probis_min_pts"),
+                        cmdl.get_double_option("probis_min_z_score"));
+
+                auto binding_sites = 
+                        genlig::generate_binding_site_prediction(
+                                Path::join(__receptor.name(), cmdl.get_string_option("jsonwl")), 
+                                cmdl.get_string_option("bio"),
+                                cmdl.get_int_option("num_bsites"));
+
+                Inout::output_file(binding_sites.first,  Path::join(__receptor.name(), cmdl.get_string_option("lig_clus_file")));
+                Inout::output_file(binding_sites.second, Path::join(__receptor.name(), cmdl.get_string_option("z_scores_file")));
+
+                __result = Centro::set_centroids(binding_sites.first, cmdl.get_double_option("centro_clus_rad"));
+                Inout::output_file(__result, __centroid_file); // probis local structural alignments
+        }
 }
