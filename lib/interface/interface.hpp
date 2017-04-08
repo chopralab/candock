@@ -9,7 +9,9 @@ extern "C" {
 
 const char* CANDOCK_EXPORT initialize_receptor(const char* filename);
 const char* CANDOCK_EXPORT initialize_ligand(const char* filename);
-      void  CANDOCK_EXPORT initialize_scoring(const char* filename);
+      void  CANDOCK_EXPORT initialize_scoring(const char* obj_dir);
+      void  CANDOCK_EXPORT initialize_ffield(const char* data_dir);
+      float CANDOCK_EXPORT calculate_score();
 
 #ifdef __cplusplus
 }

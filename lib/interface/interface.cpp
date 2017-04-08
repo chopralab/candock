@@ -4,13 +4,16 @@
 #include "molib/molecule.hpp"
 #include "parser/fileparser.hpp"
 #include "score/score.hpp"
+#include "modeler/forcefield.hpp"
 
+#include <boost/filesystem/path.hpp>
 #include <memory>
 
 std::unique_ptr <Molib::Molecules> __receptor;
 std::unique_ptr <Molib::Molecules> __ligand;
 std::unique_ptr <Molib::Score> __score;
 std::unique_ptr <Molib::Atom::Grid> __gridrec;
+std::unique_ptr <OMMIface::ForceField> __ffield;
 
 extern "C" const char* initialize_receptor(const char* filename) {
         Parser::FileParser rpdb(filename, Parser::first_model);
@@ -64,14 +67,31 @@ extern "C" const char*  initialize_ligand(const char* filename) {
         return ss.str().c_str();
 }
 
-extern "C" void   initialize_scoring(const char* filename) {
+void   initialize_scoring(const char* filename) {
+
         __score = std::unique_ptr<Molib::Score> (
-                        new  Molib::Score( "reduced", "mean", "radial", 6, 0.10));
+                        new  Molib::Score( "mean", "reduced", "radial", 6.0, 0.01));
 
         __score->define_composition(__receptor->get_idatm_types(),
                                     __ligand->get_idatm_types())
                 .process_distributions_file("data/csd_complete_distance_distributions.txt")
                 .compile_scoring_function()
                 .parse_objective_function(filename, 10.0 );
-        
+}
+
+extern "C" void   initialize_ffield(const char* data_dir) {
+        boost::filesystem::path p(data_dir);
+
+        __ffield = std::unique_ptr<OMMIface::ForceField>(new OMMIface::ForceField);
+
+        __ffield->parse_gaff_dat_file( (p / "gaff.dat").string() )
+              .add_kb_forcefield(*__score, 0.01)
+              .parse_forcefield_file( (p / "amber10.xml").string() )
+              .parse_forcefield_file( (p / "tip3p.xml").string() );
+
+        (*__receptor)[0].prepare_for_mm(*__ffield, *__gridrec);
+}
+
+extern "C" float  calculate_score() {
+        return __score->non_bonded_energy(*__gridrec, (*__ligand)[0]);
 }
