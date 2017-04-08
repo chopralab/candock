@@ -8,6 +8,7 @@ add_subdirectory(fragmenter)
 add_subdirectory(geom3d)
 add_subdirectory(graph)
 add_subdirectory(helper)
+add_subdirectory(interface)
 add_subdirectory(kabsch)
 add_subdirectory(kbforce)
 add_subdirectory(ligands)
@@ -23,6 +24,7 @@ if (NOT ${CANDOCK_BUILD_STATIC_EXECUTABLE})
 
 add_library(
     candock SHARED
+        $<TARGET_OBJECTS:interface>
         $<TARGET_OBJECTS:program>
         $<TARGET_OBJECTS:design>
         $<TARGET_OBJECTS:docker>
