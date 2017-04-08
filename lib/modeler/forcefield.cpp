@@ -60,9 +60,7 @@ namespace OMMIface {
                 const int &aclass1 = atom1.idatm_type(); 
                 const int &aclass2 = atom2.idatm_type();
 #ifndef NDEBUG
-                const AtomType &atype1 = atom_type.at(type1);
-                const AtomType &atype2 = atom_type.at(type2);
-                dbgmsg("add kb force atype1.cl = " << atype1.cl << " atype2.cl = " << atype2.cl 
+                dbgmsg("add kb force"
                         << " aclass1 = " << help::idatm_unmask[aclass1] 
                         << " aclass2 = " << help::idatm_unmask[aclass2]);
 #endif
