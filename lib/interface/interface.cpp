@@ -15,8 +15,8 @@ std::unique_ptr <Molib::Score> __score;
 std::unique_ptr <Molib::Atom::Grid> __gridrec;
 std::unique_ptr <OMMIface::ForceField> __ffield;
 
-extern "C" const char* initialize_receptor(const char* filename) {
-        Parser::FileParser rpdb(filename, Parser::first_model);
+const char* initialize_receptor(const char* filename) {
+        Parser::FileParser rpdb(filename, Parser::first_model, 1);
         
         __receptor = std::unique_ptr<Molib::Molecules>(new Molib::Molecules);
 
@@ -37,12 +37,12 @@ extern "C" const char* initialize_receptor(const char* filename) {
         __gridrec = std::unique_ptr<Molib::Atom::Grid>(new Molib::Atom::Grid(__receptor->get_atoms()));
 
         std::stringstream ss;
-        ss << (*__receptor)[0];
+        ss << __receptor->element(0);
 
         return ss.str().c_str();
 }
 
-extern "C" const char*  initialize_ligand(const char* filename) {
+const char*  initialize_ligand(const char* filename) {
         Parser::FileParser rpdb(filename, Parser::first_model, 1);
         
         __ligand = std::unique_ptr<Molib::Molecules>(new Molib::Molecules);
@@ -62,7 +62,7 @@ extern "C" const char*  initialize_ligand(const char* filename) {
                 .erase_hydrogen();
 
         std::stringstream ss;
-        ss << (*__ligand)[0];
+        ss << __ligand->element(0);
 
         return ss.str().c_str();
 }
@@ -79,7 +79,7 @@ void   initialize_scoring(const char* filename) {
                 .parse_objective_function(filename, 10.0 );
 }
 
-extern "C" void   initialize_ffield(const char* data_dir) {
+void   initialize_ffield(const char* data_dir) {
         boost::filesystem::path p(data_dir);
 
         __ffield = std::unique_ptr<OMMIface::ForceField>(new OMMIface::ForceField);
@@ -89,9 +89,20 @@ extern "C" void   initialize_ffield(const char* data_dir) {
               .parse_forcefield_file( (p / "amber10.xml").string() )
               .parse_forcefield_file( (p / "tip3p.xml").string() );
 
-        (*__receptor)[0].prepare_for_mm(*__ffield, *__gridrec);
+        __receptor->element(0).prepare_for_mm(*__ffield, *__gridrec);
 }
 
-extern "C" float  calculate_score() {
+float  calculate_score() {
         return __score->non_bonded_energy(*__gridrec, (*__ligand)[0]);
+}
+
+void   set_positions_ligand(const unsigned long* atoms, const float* positions, unsigned long size) {
+        Molib::Residue* residue = __ligand->element(0).get_residues().at(0);
+
+        for ( unsigned long i = 0; i < size; ++i) {
+                residue->element(atoms[i]).set_crd( Geom3D::Point(positions[i * 3 + 0],
+                                                                  positions[i * 3 + 1],
+                                                                  positions[i * 3 + 2]
+                                                                 ) );
+        }
 }
