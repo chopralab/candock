@@ -106,3 +106,28 @@ void   set_positions_ligand(const unsigned long* atoms, const float* positions, 
                                                                  ) );
         }
 }
+
+void  set_positions_receptor(const unsigned long* atoms, const float* positions, unsigned long size) {
+        unsigned long resi = 0;
+        Molib::Residue* residue = __receptor->element(0).get_residues().at(resi++);
+
+        for ( unsigned long i = 0; i < size; ++i) {
+                
+                while ( ! residue->has_element(atoms[i]) ) {
+                        residue = __receptor->element(0).get_residues().at(resi++);
+                }
+
+                if ( ! residue->has_element(atoms[i]) ) {
+                        cout << "Error: could not atom = " << atoms[i] << endl;
+                        break;
+                }
+
+                residue->element(atoms[i]).set_crd( Geom3D::Point(positions[i * 3 + 0],
+                                                                  positions[i * 3 + 1],
+                                                                  positions[i * 3 + 2]
+                                                                 ) );
+        }
+
+        __gridrec.release();
+        __gridrec = std::unique_ptr<Molib::Atom::Grid>(new Molib::Atom::Grid(__receptor->get_atoms()));
+}
