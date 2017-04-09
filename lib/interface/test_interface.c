@@ -12,8 +12,11 @@ int main( int argc, char **argv) {
         }
 
         clock_t start = clock();
-        const char* my_recetor = initialize_receptor(argv[1]);
-        const char* ligand = initialize_ligand(argv[2]);
+        char my_recetor[1000000];
+        initialize_receptor(argv[1], my_recetor);
+
+        char ligand[1000000];
+        initialize_ligand(argv[2], ligand);
 
         initialize_scoring(argv[3]);
         initialize_ffield(argv[4]);
@@ -35,7 +38,7 @@ int main( int argc, char **argv) {
         }
 
         start = clock();
-        set_positions_ligand( idx, positions, 24 );
+        
         printf("Time to set ligand: %f\n", (double) ( clock() - start) / CLOCKS_PER_SEC );
 
         start = clock();

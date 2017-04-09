@@ -45,15 +45,11 @@ add_library(
         $<TARGET_OBJECTS:helper>
 )
 
-if (WIN32)
-
 target_link_libraries ( candock
     ${OPENMM_LIBRARY}
     ${Boost_LIBRARIES}
     ${GSL_LIBRARIES}
 )
-
-endif(WIN32)
 
 endif (NOT ${CANDOCK_BUILD_STATIC_EXECUTABLE})
 

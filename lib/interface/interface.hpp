@@ -7,13 +7,13 @@
 extern "C" {
 #endif
 
-CANDOCK_EXPORT const char* initialize_receptor(const char* filename);
-CANDOCK_EXPORT const char* initialize_ligand(const char* filename);
-CANDOCK_EXPORT       void  initialize_scoring(const char* obj_dir);
-CANDOCK_EXPORT       void  initialize_ffield(const char* data_dir);
-CANDOCK_EXPORT       float calculate_score();
-CANDOCK_EXPORT       void  set_positions_ligand(const unsigned long* atoms, const float* positions, unsigned long size);
-CANDOCK_EXPORT       void  set_positions_receptor(const unsigned long* atoms, const float* positions, unsigned long size);
+CANDOCK_EXPORT int initialize_receptor(const char* filename, char* receptor);
+CANDOCK_EXPORT int initialize_ligand(const char* filename, char* ligand);
+CANDOCK_EXPORT int initialize_scoring(const char* obj_dir);
+CANDOCK_EXPORT int initialize_ffield(const char* data_dir);
+CANDOCK_EXPORT float calculate_score();
+CANDOCK_EXPORT int set_positions_ligand(const unsigned long* atoms, const float* positions, unsigned long size);
+CANDOCK_EXPORT int set_positions_receptor(const unsigned long* atoms, const float* positions, unsigned long size);
 
 #ifdef __cplusplus
 }
