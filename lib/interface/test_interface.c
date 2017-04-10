@@ -1,5 +1,6 @@
 #include "interface.hpp"
 
+#include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 #include <time.h>
@@ -12,11 +13,14 @@ int main( int argc, char **argv) {
         }
 
         clock_t start = clock();
-        char my_recetor[1000000];
-        initialize_receptor(argv[1], my_recetor);
 
-        char ligand[1000000];
-        initialize_ligand(argv[2], ligand);
+        initialize_receptor(argv[1]);
+        char* recetor = (char*)malloc( receptor_string_size() * sizeof(char) );
+        copy_receptor_string(recetor);
+
+        initialize_ligand(argv[2]);
+        char* ligand  = (char*)malloc( receptor_string_size() * sizeof(char) );
+        copy_ligand_string(ligand);
 
         initialize_scoring(argv[3]);
         initialize_ffield(argv[4]);

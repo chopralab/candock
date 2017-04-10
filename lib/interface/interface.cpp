@@ -15,7 +15,7 @@ std::unique_ptr <Molib::Score> __score;
 std::unique_ptr <Molib::Atom::Grid> __gridrec;
 std::unique_ptr <OMMIface::ForceField> __ffield;
 
-int  initialize_receptor(const char* filename, char* receptor) {
+int  initialize_receptor(const char* filename) {
         try {
                 Parser::FileParser rpdb (filename, Parser::first_model, 1);
 
@@ -37,12 +37,6 @@ int  initialize_receptor(const char* filename, char* receptor) {
 
                 __gridrec = std::unique_ptr<Molib::Atom::Grid> (new Molib::Atom::Grid (__receptor->get_atoms()));
 
-                std::stringstream ss;
-                ss << __receptor->element (0);
-                const std::string& str = ss.str();
-
-                str.copy( receptor, str.length() );
-
                 return 0;
         } catch ( std::exception &e ) {
                 cout << "Error in loading receptor " << e.what() << endl;
@@ -50,7 +44,46 @@ int  initialize_receptor(const char* filename, char* receptor) {
         }
 }
 
-int  initialize_ligand(const char* filename, char* ligand) {
+size_t receptor_string_size() {
+        if ( __receptor == nullptr ) {
+                cout << "You must run initialize_receptor first" << endl;
+                return 0;
+        }
+
+        try {
+                std::stringstream ss;
+                ss << __receptor->element (0);
+
+                const std::string& str = ss.str();
+
+                return str.size();
+        } catch ( std::exception &e ) {
+                cout << "Error getting receptor string length: " << e.what() << endl;
+                return 0;
+        }
+}
+
+int copy_receptor_string( char* buffer ) {
+        if ( __receptor == nullptr ) {
+                cout << "You must run initialize_receptor first" << endl;
+                return -1;
+        }
+
+        try {
+                std::stringstream ss;
+                ss << __receptor->element (0);
+
+                const std::string& str = ss.str();
+
+                return str.copy(buffer, str.length());
+
+        } catch ( std::exception &e ) {
+                cout << "Error getting receptor string length: " << e.what() << endl;
+                return -1;
+        }
+}
+
+int  initialize_ligand(const char* filename) {
         try {
                 Parser::FileParser rpdb (filename, Parser::first_model, 1);
 
@@ -70,16 +103,49 @@ int  initialize_ligand(const char* filename, char* ligand) {
                 .compute_rotatable_bonds() // relies on hydrogens being assigned
                 .erase_hydrogen();
 
-                std::stringstream ss;
-                ss << __ligand->element (0);
-                const std::string& str = ss.str();
-
-                str.copy( ligand, str.length() );
-
                 return 0;
         
         } catch ( std::exception &e ) {
                 cout << "Error in loading ligand " << e.what() << endl;
+                return -1;
+        }
+}
+
+size_t ligand_string_size() {
+        if ( __ligand == nullptr ) {
+                cout << "You must run initialize_ligand first" << endl;
+                return 0;
+        }
+
+        try {
+                std::stringstream ss;
+                ss << __ligand->element (0);
+
+                const std::string& str = ss.str();
+
+                return str.size();
+        } catch ( std::exception &e ) {
+                cout << "Error getting ligand string length: " << e.what() << endl;
+                return 0;
+        }
+}
+
+int copy_ligand_string( char* buffer ) {
+        if ( __ligand == nullptr ) {
+                cout << "You must run initialize_ligand first" << endl;
+                return -1;
+        }
+
+        try {
+                std::stringstream ss;
+                ss << __ligand->element (0);
+
+                const std::string& str = ss.str();
+
+                return str.copy(buffer, str.length());
+
+        } catch ( std::exception &e ) {
+                cout << "Error getting ligand string length: " << e.what() << endl;
                 return -1;
         }
 }
