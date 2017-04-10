@@ -44,6 +44,15 @@ int  initialize_receptor(const char* filename) {
         }
 }
 
+size_t receptor_atom_count() {
+        if ( __receptor == nullptr ) {
+                cout << "You must run initialize_receptor first" << endl;
+                return 0;
+        }
+
+        return __receptor->element(0).get_atoms().size();
+}
+
 size_t receptor_string_size() {
         if ( __receptor == nullptr ) {
                 cout << "You must run initialize_receptor first" << endl;
@@ -109,6 +118,15 @@ int  initialize_ligand(const char* filename) {
                 cout << "Error in loading ligand " << e.what() << endl;
                 return -1;
         }
+}
+
+size_t ligand_atom_count() {
+        if ( __ligand == nullptr ) {
+                cout << "You must run initialize_ligand first" << endl;
+                return 0;
+        }
+
+        return __ligand->element(0).get_atoms().size();
 }
 
 size_t ligand_string_size() {
