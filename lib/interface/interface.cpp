@@ -53,6 +53,30 @@ size_t receptor_atom_count() {
         return __receptor->element(0).get_atoms().size();
 }
 
+size_t receptor_atoms(size_t* idx, float* pos) {
+        if ( __receptor == nullptr ) {
+                cout << "You must run initialize_receptor first" << endl;
+                return 0;
+        }
+        
+        try {
+                Molib::Atom::Vec atoms = __receptor->element(0).get_atoms();
+                for ( size_t i=0; i < atoms.size(); ++i ) {
+                        idx[ i ] = atoms[i]->atom_number();
+                        
+                        Geom3D::Point& crd = atoms[i]->crd();
+                        pos[ i * 3 + 0] = crd.x();
+                        pos[ i * 3 + 1] = crd.y();
+                        pos[ i * 3 + 2] = crd.z();
+                }
+
+                return atoms.size();
+        } catch( std::exception &e ) {
+                cout << "Error creating atom arrays" << endl;
+                return 0;
+        }
+}
+
 size_t receptor_string_size() {
         if ( __receptor == nullptr ) {
                 cout << "You must run initialize_receptor first" << endl;
@@ -127,6 +151,30 @@ size_t ligand_atom_count() {
         }
 
         return __ligand->element(0).get_atoms().size();
+}
+
+size_t ligand_atoms(size_t* idx, float* pos) {
+        if ( __ligand == nullptr ) {
+                cout << "You must run initialize_receptor first" << endl;
+                return 0;
+        }
+        
+        try {
+                Molib::Atom::Vec atoms = __ligand->element(0).get_atoms();
+                for ( size_t i=0; i < atoms.size(); ++i ) {
+                        idx[ i ] = atoms[i]->atom_number();
+                        
+                        Geom3D::Point& crd = atoms[i]->crd();
+                        pos[ i * 3 + 0] = crd.x();
+                        pos[ i * 3 + 1] = crd.y();
+                        pos[ i * 3 + 2] = crd.z();
+                }
+
+                return atoms.size();
+        } catch( std::exception &e ) {
+                cout << "Error creating atom arrays" << endl;
+                return 0;
+        }
 }
 
 size_t ligand_string_size() {
@@ -227,7 +275,7 @@ int   set_positions_ligand(const unsigned long* atoms, const float* positions, u
                                                                             positions[i * 3 + 2]
                                                                            ));
                 }
-                
+
                 return 0;
         
         } catch ( std::exception &e ) {
@@ -255,8 +303,8 @@ int  set_positions_receptor(const unsigned long* atoms, const float* positions, 
                         }
 
                         residue->element (atoms[i]).set_crd (Geom3D::Point (positions[i * 3 + 0],
-                                                             positions[i * 3 + 1],
-                                                             positions[i * 3 + 2]
+                                                                            positions[i * 3 + 1],
+                                                                            positions[i * 3 + 2]
                                                                            ));
                 }
 

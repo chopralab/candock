@@ -34,12 +34,12 @@ int main( int argc, char **argv) {
         size_t  ligand_atom = ligand_atom_count();
         size_t* idx = (size_t*)malloc( ligand_atom * sizeof(size_t) );
         float * positions = (float*)malloc( ligand_atom * sizeof(float) * 3 );
+        ligand_atoms(idx, positions);
 
         for (int i = 0; i < ligand_atom; ++i) {
-                idx[ i ] = i + 2153;
-                positions[ i * 3 + 0 ] = 0.0f;
-                positions[ i * 3 + 1 ] = 0.0f;
-                positions[ i * 3 + 2 ] = 0.0f;
+                positions[ i * 3 + 0 ] = positions[ i * 3 + 0 ] + 0.5f;
+                positions[ i * 3 + 1 ] = positions[ i * 3 + 1 ] + 0.5f;
+                positions[ i * 3 + 2 ] = positions[ i * 3 + 2 ] + 0.5f;
         }
 
         start = clock();
@@ -55,12 +55,12 @@ int main( int argc, char **argv) {
         size_t receptor_atom = receptor_atom_count();
         size_t* idx_rec = (size_t*)malloc(receptor_atom * sizeof(size_t));
         float * positions_rec = (float*)malloc(receptor_atom * sizeof(float) * 3);
+        receptor_atoms(idx_rec, positions_rec);
 
         for (int j = 0; j < receptor_atom; ++j) {
-                idx_rec[ j ] = j + 1;
-                positions_rec[ j * 3 + 0 ] = 0.0f;
-                positions_rec[ j * 3 + 1 ] = 0.0f;
-                positions_rec[ j * 3 + 2 ] = 0.0f;
+                positions_rec[ j * 3 + 0 ] = positions_rec[ j * 3 + 0 ] + 0.5f;
+                positions_rec[ j * 3 + 1 ] = positions_rec[ j * 3 + 1 ] + 0.5f;
+                positions_rec[ j * 3 + 2 ] = positions_rec[ j * 3 + 2 ] + 0.5f;
         }
 
         start = clock();
