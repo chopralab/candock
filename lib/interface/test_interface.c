@@ -31,12 +31,12 @@ int main( int argc, char **argv) {
         printf("Score before setting: %f\n", calculate_score());
         printf("Time to do one scoring: %f\n", (double) ( clock() - start) / CLOCKS_PER_SEC );
 
-        size_t  ligand_atom = ligand_atom_count();
-        size_t* idx = (size_t*)malloc( ligand_atom * sizeof(size_t) );
-        float * positions = (float*)malloc( ligand_atom * sizeof(float) * 3 );
+        size_t  lig_atom_count = ligand_atom_count();
+        size_t* idx = (size_t*)malloc( lig_atom_count * sizeof(size_t) );
+        float * positions = (float*)malloc( lig_atom_count * sizeof(float) * 3 );
         ligand_atoms(idx, positions);
 
-        for (int i = 0; i < ligand_atom; ++i) {
+        for (int i = 0; i < lig_atom_count; ++i) {
                 positions[ i * 3 + 0 ] = positions[ i * 3 + 0 ] + 0.5f;
                 positions[ i * 3 + 1 ] = positions[ i * 3 + 1 ] + 0.5f;
                 positions[ i * 3 + 2 ] = positions[ i * 3 + 2 ] + 0.5f;
@@ -44,7 +44,7 @@ int main( int argc, char **argv) {
 
         start = clock();
 
-        set_positions_ligand( idx, positions, ligand_atom );
+        set_positions_ligand( idx, positions, lig_atom_count );
         
         printf("Time to set ligand: %f\n", (double) ( clock() - start) / CLOCKS_PER_SEC );
 
@@ -52,19 +52,19 @@ int main( int argc, char **argv) {
         printf("Score after setting ligand: %f\n", calculate_score());
         printf("Time to score again: %f\n", (double) ( clock() - start) / CLOCKS_PER_SEC );
 
-        size_t receptor_atom = receptor_atom_count();
-        size_t* idx_rec = (size_t*)malloc(receptor_atom * sizeof(size_t));
-        float * positions_rec = (float*)malloc(receptor_atom * sizeof(float) * 3);
+        size_t rec_atom_count = receptor_atom_count();
+        size_t* idx_rec = (size_t*)malloc(rec_atom_count * sizeof(size_t));
+        float * positions_rec = (float*)malloc(rec_atom_count * sizeof(float) * 3);
         receptor_atoms(idx_rec, positions_rec);
 
-        for (int j = 0; j < receptor_atom; ++j) {
+        for (int j = 0; j < rec_atom_count; ++j) {
                 positions_rec[ j * 3 + 0 ] = positions_rec[ j * 3 + 0 ] + 0.5f;
                 positions_rec[ j * 3 + 1 ] = positions_rec[ j * 3 + 1 ] + 0.5f;
                 positions_rec[ j * 3 + 2 ] = positions_rec[ j * 3 + 2 ] + 0.5f;
         }
 
         start = clock();
-        set_positions_receptor(idx_rec, positions_rec, receptor_atom);
+        set_positions_receptor(idx_rec, positions_rec, rec_atom_count);
         printf("Time to set receptor: %f\n", (double) ( clock() - start) / CLOCKS_PER_SEC );
 
         start = clock();
