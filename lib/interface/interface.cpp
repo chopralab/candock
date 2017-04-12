@@ -219,6 +219,11 @@ int copy_ligand_string( char* buffer ) {
 
 int  initialize_scoring(const char* obj_dir) {
 
+        if ( __ligand == nullptr  || __receptor == nullptr ) {
+                cout << "You must run initialize_ligand and initialize_receptor first" << endl;
+                return -1;
+        }
+
         try {
                 __score = std::unique_ptr<Molib::Score> (
                                   new  Molib::Score ("mean", "reduced", "radial", 6.0, 0.01));
@@ -238,6 +243,11 @@ int  initialize_scoring(const char* obj_dir) {
 }
 
 int  initialize_ffield(const char* data_dir) {
+
+        if ( __score == nullptr ) {
+                cout << "You must run initialize_score first" << endl;
+                return -1;
+        }
 
         try {
 
@@ -270,7 +280,12 @@ float calculate_score() {
 }
 
 int   set_positions_ligand(const unsigned long* atoms, const float* positions, unsigned long size) {
-        
+
+        if ( __ligand == nullptr ) {
+                cout << "You must run initialize_ligand first" << endl;
+                return -1;
+        }
+
         try { 
         
                 Molib::Residue *residue = __ligand->element (0).get_residues().at (0);
@@ -291,6 +306,11 @@ int   set_positions_ligand(const unsigned long* atoms, const float* positions, u
 }
 
 int  set_positions_receptor(const unsigned long* atoms, const float* positions, unsigned long size) {
+
+        if ( __receptor == nullptr ) {
+                cout << "You must run initialize_receptor first" << endl;
+                return -1;
+        }
 
         try {
 
@@ -324,7 +344,12 @@ int  set_positions_receptor(const unsigned long* atoms, const float* positions, 
         }
 }
 
-void minimize_complex(size_t max_iter, size_t update_freq) {
+int minimize_complex(size_t max_iter, size_t update_freq) {
+
+        if ( __ffield == nullptr ) {
+                cout << "You must run initialize_ffield first" << endl;
+                return -1;
+        }
 
         OMMIface::Modeler modeler (*__ffield, "kb", 6,
                                    0.0001, max_iter,
@@ -357,4 +382,6 @@ void minimize_complex(size_t max_iter, size_t update_freq) {
                 lig_atoms[j]->set_crd(lig_coords[j]);
 
         __gridrec.reset (new Molib::Atom::Grid (__receptor->get_atoms()));
+
+        return 0;
 }
