@@ -16,7 +16,7 @@ std::unique_ptr <Molib::Score> __score;
 std::unique_ptr <Molib::Atom::Grid> __gridrec;
 std::unique_ptr <OMMIface::ForceField> __ffield;
 
-int  initialize_receptor(const char* filename) {
+size_t initialize_receptor(const char* filename) {
         try {
                 Parser::FileParser rpdb (filename, Parser::first_model, 1);
 
@@ -38,10 +38,10 @@ int  initialize_receptor(const char* filename) {
 
                 __gridrec = std::unique_ptr<Molib::Atom::Grid> (new Molib::Atom::Grid (__receptor->get_atoms()));
 
-                return 0;
+                return 1;
         } catch ( std::exception &e ) {
                 cout << "Error in loading receptor " << e.what() << endl;
-                return -1;
+                return 0;
         }
 }
 
@@ -97,10 +97,10 @@ size_t receptor_string_size() {
         }
 }
 
-int copy_receptor_string( char* buffer ) {
+size_t copy_receptor_string( char* buffer ) {
         if ( __receptor == nullptr ) {
                 cout << "You must run initialize_receptor first" << endl;
-                return -1;
+                return 0;
         }
 
         try {
@@ -113,11 +113,11 @@ int copy_receptor_string( char* buffer ) {
 
         } catch ( std::exception &e ) {
                 cout << "Error getting receptor string length: " << e.what() << endl;
-                return -1;
+                return 0;
         }
 }
 
-int  initialize_ligand(const char* filename) {
+size_t initialize_ligand(const char* filename) {
         try {
                 Parser::FileParser rpdb (filename, Parser::first_model, 1);
 
@@ -137,11 +137,11 @@ int  initialize_ligand(const char* filename) {
                 .compute_rotatable_bonds() // relies on hydrogens being assigned
                 .erase_hydrogen();
 
-                return 0;
+                return 1;
         
         } catch ( std::exception &e ) {
                 cout << "Error in loading ligand " << e.what() << endl;
-                return -1;
+                return 0;
         }
 }
 
@@ -197,10 +197,10 @@ size_t ligand_string_size() {
         }
 }
 
-int copy_ligand_string( char* buffer ) {
+size_t copy_ligand_string( char* buffer ) {
         if ( __ligand == nullptr ) {
                 cout << "You must run initialize_ligand first" << endl;
-                return -1;
+                return 0;
         }
 
         try {
@@ -213,15 +213,15 @@ int copy_ligand_string( char* buffer ) {
 
         } catch ( std::exception &e ) {
                 cout << "Error getting ligand string length: " << e.what() << endl;
-                return -1;
+                return 0;
         }
 }
 
-int  initialize_scoring(const char* obj_dir) {
+size_t initialize_scoring(const char* obj_dir) {
 
         if ( __ligand == nullptr  || __receptor == nullptr ) {
                 cout << "You must run initialize_ligand and initialize_receptor first" << endl;
-                return -1;
+                return 0;
         }
 
         try {
@@ -234,19 +234,19 @@ int  initialize_scoring(const char* obj_dir) {
                 .compile_scoring_function()
                 .parse_objective_function (obj_dir, 10.0);
 
-                return 0;
+                return 1;
 
         } catch ( std::exception &e) {
                 cout << "Error in creating scoring function: " << e.what() << endl;
-                return -1;
+                return 0;
         }
 }
 
-int  initialize_ffield(const char* data_dir) {
+size_t initialize_ffield(const char* data_dir) {
 
         if ( __score == nullptr ) {
                 cout << "You must run initialize_score first" << endl;
-                return -1;
+                return 0;
         }
 
         try {
@@ -267,23 +267,33 @@ int  initialize_ffield(const char* data_dir) {
                 __ffield->insert_topology(__receptor->element (0));
                 __ffield->insert_topology(__ligand->element(0));
 
-                return 0;
+                return 1;
 
         } catch( std::exception& e ) {
                 cout << "Error in creating forcefield: " << e.what() << endl;
-                return -1;
+                return 0;
         }
 }
 
 float calculate_score() {
-        return __score->non_bonded_energy(*__gridrec, (*__ligand)[0]);
+        if ( __ffield == nullptr ) {
+                cout << "You must run initialize_ffield first" << endl;
+                return 0;
+        }
+
+        try {
+                return __score->non_bonded_energy(*__gridrec, (*__ligand)[0]);
+        } catch( std::exception& e) {
+                cout << "Error in scoring: " << e.what() << endl;
+                return 0;
+        }
 }
 
-int   set_positions_ligand(const unsigned long* atoms, const float* positions, unsigned long size) {
+size_t set_positions_ligand(const unsigned long* atoms, const float* positions, unsigned long size) {
 
         if ( __ligand == nullptr ) {
                 cout << "You must run initialize_ligand first" << endl;
-                return -1;
+                return 0;
         }
 
         try { 
@@ -297,19 +307,19 @@ int   set_positions_ligand(const unsigned long* atoms, const float* positions, u
                                                                            ));
                 }
 
-                return 0;
+                return 1;
         
         } catch ( std::exception &e ) {
                 cout << "Error in setting ligand coordinates: " << e.what() << endl;
-                return -1;
+                return 0;
         }
 }
 
-int  set_positions_receptor(const unsigned long* atoms, const float* positions, unsigned long size) {
+size_t set_positions_receptor(const unsigned long* atoms, const float* positions, unsigned long size) {
 
         if ( __receptor == nullptr ) {
                 cout << "You must run initialize_receptor first" << endl;
-                return -1;
+                return 0;
         }
 
         try {
@@ -336,52 +346,59 @@ int  set_positions_receptor(const unsigned long* atoms, const float* positions, 
 
                 __gridrec.reset (new Molib::Atom::Grid (__receptor->get_atoms()));
                 
-                return 0;
+                return 1;
                 
         } catch (std::exception &e) {
                 cout << "Error in setting receptor coordinates: " << e.what() << endl;
-                return -1;
+                return 0;
         }
 }
 
-int minimize_complex(size_t max_iter, size_t update_freq) {
+size_t minimize_complex (size_t max_iter, size_t update_freq) {
 
         if ( __ffield == nullptr ) {
                 cout << "You must run initialize_ffield first" << endl;
-                return -1;
+                return 0;
         }
 
-        OMMIface::Modeler modeler (*__ffield, "kb", 6,
-                                   0.0001, max_iter,
-                                   update_freq, 0.00000000001, false, 2.0);
+        try {
 
-        Molib::Atom::Vec rec_atoms = __receptor->get_atoms();
-        Molib::Atom::Vec lig_atoms = __ligand->get_atoms();
+                OMMIface::Modeler modeler (*__ffield, "kb", 6,
+                                           0.0001, max_iter,
+                                           update_freq, 0.00000000001, false, 2.0);
 
-        modeler.add_topology (rec_atoms);
-        modeler.add_topology (lig_atoms);
+                Molib::Atom::Vec rec_atoms = __receptor->get_atoms();
+                Molib::Atom::Vec lig_atoms = __ligand->get_atoms();
 
-        modeler.init_openmm();
+                modeler.add_topology (rec_atoms);
+                modeler.add_topology (lig_atoms);
 
-        modeler.add_crds (rec_atoms, __receptor->get_crds());
-        modeler.add_crds (lig_atoms, __ligand->get_crds());
+                modeler.init_openmm();
 
-        modeler.init_openmm_positions();
+                modeler.add_crds (rec_atoms, __receptor->get_crds());
+                modeler.add_crds (lig_atoms, __ligand->get_crds());
 
-        modeler.minimize_state (__ligand->element(0), __receptor->element(0), *__score);
+                modeler.init_openmm_positions();
 
-        // init with minimized coordinates
-        Geom3D::Point::Vec rec_coords = modeler.get_state (rec_atoms);
+                modeler.minimize_state (__ligand->element (0), __receptor->element (0), *__score);
 
-        for (size_t i = 0; i < rec_atoms.size(); ++i)
-                rec_atoms[i]->set_crd(rec_coords[i]);
+                // init with minimized coordinates
+                Geom3D::Point::Vec rec_coords = modeler.get_state (rec_atoms);
 
-        Geom3D::Point::Vec lig_coords = modeler.get_state (lig_atoms);
+                for (size_t i = 0; i < rec_atoms.size(); ++i)
+                        rec_atoms[i]->set_crd (rec_coords[i]);
 
-        for (size_t j = 0; j < lig_atoms.size(); ++j)
-                lig_atoms[j]->set_crd(lig_coords[j]);
+                Geom3D::Point::Vec lig_coords = modeler.get_state (lig_atoms);
 
-        __gridrec.reset (new Molib::Atom::Grid (__receptor->get_atoms()));
+                for (size_t j = 0; j < lig_atoms.size(); ++j)
+                        lig_atoms[j]->set_crd (lig_coords[j]);
 
-        return 0;
+                __gridrec.reset (new Molib::Atom::Grid (__receptor->get_atoms()));
+
+                return 1;
+
+        } catch (std::exception &e) {
+                cout << "Error in setting receptor coordinates: " << e.what() << endl;
+                return 0;
+        }
 }
