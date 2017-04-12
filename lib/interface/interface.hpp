@@ -30,6 +30,8 @@ CANDOCK_EXPORT float calculate_score();
 CANDOCK_EXPORT int set_positions_ligand  (const size_t* atoms, const float* positions, size_t size);
 CANDOCK_EXPORT int set_positions_receptor(const size_t* atoms, const float* positions, size_t size);
 
+CANDOCK_EXPORT void minimize_complex(size_t max_iter, size_t update_freq);
+
 #ifdef __cplusplus
 }
 #endif

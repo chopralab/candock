@@ -71,6 +71,13 @@ int main( int argc, char **argv) {
         printf("Score after setting receptor: %f\n", calculate_score());
         printf("Time to score again: %f\n", (double) ( clock() - start) / CLOCKS_PER_SEC );
 
+        start = clock();
+        minimize_complex(10000,10);
+        printf("Time to minimize complex: %f\n", (double) ( clock() - start) / CLOCKS_PER_SEC );
+        start = clock();
+        printf("Score after minimize: %f\n", calculate_score());
+        
+
         return 0;
 }
 

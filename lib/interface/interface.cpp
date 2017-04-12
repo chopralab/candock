@@ -5,6 +5,7 @@
 #include "parser/fileparser.hpp"
 #include "score/score.hpp"
 #include "modeler/forcefield.hpp"
+#include "modeler/modeler.hpp"
 
 #include <boost/filesystem/path.hpp>
 #include <memory>
@@ -240,6 +241,8 @@ int  initialize_ffield(const char* data_dir) {
 
         try {
 
+                OMMIface::SystemTopology::loadPlugins();
+
                 boost::filesystem::path p (data_dir);
 
                 __ffield = std::unique_ptr<OMMIface::ForceField> (new OMMIface::ForceField);
@@ -250,6 +253,9 @@ int  initialize_ffield(const char* data_dir) {
                 .parse_forcefield_file ( (p / "tip3p.xml").string());
 
                 __receptor->element (0).prepare_for_mm (*__ffield, *__gridrec);
+
+                __ffield->insert_topology(__receptor->element (0));
+                __ffield->insert_topology(__ligand->element(0));
 
                 return 0;
 
@@ -308,8 +314,7 @@ int  set_positions_receptor(const unsigned long* atoms, const float* positions, 
                                                                            ));
                 }
 
-                __gridrec.release();
-                __gridrec = std::unique_ptr<Molib::Atom::Grid> (new Molib::Atom::Grid (__receptor->get_atoms()));
+                __gridrec.reset (new Molib::Atom::Grid (__receptor->get_atoms()));
                 
                 return 0;
                 
@@ -317,4 +322,39 @@ int  set_positions_receptor(const unsigned long* atoms, const float* positions, 
                 cout << "Error in setting receptor coordinates: " << e.what() << endl;
                 return -1;
         }
+}
+
+void minimize_complex(size_t max_iter, size_t update_freq) {
+
+        OMMIface::Modeler modeler (*__ffield, "kb", 6,
+                                   0.0001, max_iter,
+                                   update_freq, 0.00000000001, false, 2.0);
+
+        Molib::Atom::Vec rec_atoms = __receptor->get_atoms();
+        Molib::Atom::Vec lig_atoms = __ligand->get_atoms();
+
+        modeler.add_topology (rec_atoms);
+        modeler.add_topology (lig_atoms);
+
+        modeler.init_openmm();
+
+        modeler.add_crds (rec_atoms, __receptor->get_crds());
+        modeler.add_crds (lig_atoms, __ligand->get_crds());
+
+        modeler.init_openmm_positions();
+
+        modeler.minimize_state (__ligand->element(0), __receptor->element(0), *__score);
+
+        // init with minimized coordinates
+        Geom3D::Point::Vec rec_coords = modeler.get_state (rec_atoms);
+
+        for (size_t i = 0; i < rec_atoms.size(); ++i)
+                rec_atoms[i]->set_crd(rec_coords[i]);
+
+        Geom3D::Point::Vec lig_coords = modeler.get_state (lig_atoms);
+
+        for (size_t j = 0; j < lig_atoms.size(); ++j)
+                lig_atoms[j]->set_crd(lig_coords[j]);
+
+        __gridrec.reset (new Molib::Atom::Grid (__receptor->get_atoms()));
 }
