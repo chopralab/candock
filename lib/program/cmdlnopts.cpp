@@ -39,11 +39,11 @@ namespace Program {
 
 			po::options_description probis_options ("Probis (binding site indentification) Options");
 			probis_options.add_options()
-			("bslib", po::value<std::string> ()->default_value ("bslibdb"),
+			("bslib", po::value<std::string> ()->default_value ("./bslibdb"),
 			 "Read binding sites library from this directory")
-			("names", po::value<std::string> () ->default_value ("bslibdb/data/names"),
+			("names", po::value<std::string> () ->default_value ("./bslibdb/data/names"),
 			 "Directory with ligand names")
-			("bio",   po::value<std::string> ()   ->default_value ("bslibdb/data/bio"),
+			("bio",   po::value<std::string> ()   ->default_value ("./bslibdb/data/bio"),
 			 "Directory with ProBiS-ligands bio database")
 			("nosql", po::value<std::string> ()->default_value ("probis.nosql"),
 			 "NoSql-formatted ProBiS alignments output file")
