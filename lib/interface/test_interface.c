@@ -14,16 +14,31 @@ int main( int argc, char **argv) {
 
         clock_t start = clock();
 
-        initialize_receptor(argv[1]);
+        if (! initialize_receptor(argv[1])) {
+                printf("%s\n", get_error());
+                return 1;
+        }
+
         char* recetor = (char*)malloc( receptor_string_size() * sizeof(char) );
         copy_receptor_string(recetor);
 
-        initialize_ligand(argv[2]);
+        if (! initialize_ligand(argv[2])) {
+                printf("%s\n", get_error());
+                return 1;
+        }
+
         char* ligand  = (char*)malloc( receptor_string_size() * sizeof(char) );
         copy_ligand_string(ligand);
 
-        initialize_scoring(argv[3]);
-        initialize_ffield(argv[4]);
+        if (! initialize_scoring(argv[3])) {
+                printf("%s\n", get_error());
+                return 1;
+        }
+
+        if (! initialize_ffield(argv[4])) {
+                printf("%s\n", get_error());
+                return 1;
+        }
 
         printf("Time to initialize: %f\n", (double) ( clock() - start) / CLOCKS_PER_SEC );
 
@@ -72,11 +87,14 @@ int main( int argc, char **argv) {
         printf("Time to score again: %f\n", (double) ( clock() - start) / CLOCKS_PER_SEC );
 
         start = clock();
-        minimize_complex(10000,10);
+        if (! minimize_complex(100,10)) {
+                printf("%s\n", get_error());
+                return 1;
+        }
+
         printf("Time to minimize complex: %f\n", (double) ( clock() - start) / CLOCKS_PER_SEC );
         start = clock();
         printf("Score after minimize: %f\n", calculate_score());
-        
 
         return 0;
 }

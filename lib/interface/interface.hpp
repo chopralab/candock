@@ -8,6 +8,8 @@
 extern "C" {
 #endif
 
+const char* get_error();
+
 /*
  * All functions return 0 upon failure and a non-zero number upon success
  */

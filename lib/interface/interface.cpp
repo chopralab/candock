@@ -15,6 +15,11 @@ std::unique_ptr <Molib::Molecules> __ligand;
 std::unique_ptr <Molib::Score> __score;
 std::unique_ptr <Molib::Atom::Grid> __gridrec;
 std::unique_ptr <OMMIface::ForceField> __ffield;
+std::string __error_string = "";
+
+const char* get_error() {
+        return __error_string.c_str();
+}
 
 size_t initialize_receptor(const char* filename) {
         try {
@@ -40,14 +45,14 @@ size_t initialize_receptor(const char* filename) {
 
                 return 1;
         } catch ( std::exception &e ) {
-                cout << "Error in loading receptor " << e.what() << endl;
+                __error_string = std::string("Error in loading receptor ") + e.what();
                 return 0;
         }
 }
 
 size_t receptor_atom_count() {
         if ( __receptor == nullptr ) {
-                cout << "You must run initialize_receptor first" << endl;
+                __error_string = std::string("You must run initialize_receptor first");
                 return 0;
         }
 
@@ -56,7 +61,7 @@ size_t receptor_atom_count() {
 
 size_t receptor_atoms(size_t* idx, float* pos) {
         if ( __receptor == nullptr ) {
-                cout << "You must run initialize_receptor first" << endl;
+                __error_string = std::string("You must run initialize_receptor first");
                 return 0;
         }
         
@@ -73,14 +78,14 @@ size_t receptor_atoms(size_t* idx, float* pos) {
 
                 return atoms.size();
         } catch( std::exception &e ) {
-                cout << "Error creating atom arrays" << endl;
+                __error_string = std::string("Error creating receptor atom arrays: ") + e.what();
                 return 0;
         }
 }
 
 size_t receptor_string_size() {
         if ( __receptor == nullptr ) {
-                cout << "You must run initialize_receptor first" << endl;
+                __error_string = std::string("You must run initialize_receptor first");
                 return 0;
         }
 
@@ -92,14 +97,14 @@ size_t receptor_string_size() {
 
                 return str.size();
         } catch ( std::exception &e ) {
-                cout << "Error getting receptor string length: " << e.what() << endl;
+                __error_string = std::string("Error getting receptor string length: ") + e.what();
                 return 0;
         }
 }
 
 size_t copy_receptor_string( char* buffer ) {
         if ( __receptor == nullptr ) {
-                cout << "You must run initialize_receptor first" << endl;
+                __error_string = std::string("You must run initialize_receptor first");
                 return 0;
         }
 
@@ -112,7 +117,7 @@ size_t copy_receptor_string( char* buffer ) {
                 return str.copy(buffer, str.length());
 
         } catch ( std::exception &e ) {
-                cout << "Error getting receptor string length: " << e.what() << endl;
+                __error_string = std::string("Error getting receptor string length: ") + e.what();
                 return 0;
         }
 }
@@ -140,14 +145,14 @@ size_t initialize_ligand(const char* filename) {
                 return 1;
         
         } catch ( std::exception &e ) {
-                cout << "Error in loading ligand " << e.what() << endl;
+                __error_string = std::string("Error in loading ligand ") + e.what();
                 return 0;
         }
 }
 
 size_t ligand_atom_count() {
         if ( __ligand == nullptr ) {
-                cout << "You must run initialize_ligand first" << endl;
+                __error_string = std::string("You must run initialize_ligand first");
                 return 0;
         }
 
@@ -156,7 +161,7 @@ size_t ligand_atom_count() {
 
 size_t ligand_atoms(size_t* idx, float* pos) {
         if ( __ligand == nullptr ) {
-                cout << "You must run initialize_receptor first" << endl;
+                __error_string = std::string("You must run initialize_ligand first");
                 return 0;
         }
         
@@ -173,14 +178,14 @@ size_t ligand_atoms(size_t* idx, float* pos) {
 
                 return atoms.size();
         } catch( std::exception &e ) {
-                cout << "Error creating atom arrays" << endl;
+                __error_string = std::string("Error creating atom arrays");
                 return 0;
         }
 }
 
 size_t ligand_string_size() {
         if ( __ligand == nullptr ) {
-                cout << "You must run initialize_ligand first" << endl;
+                __error_string = std::string("You must run initialize_ligand first");
                 return 0;
         }
 
@@ -192,14 +197,14 @@ size_t ligand_string_size() {
 
                 return str.size();
         } catch ( std::exception &e ) {
-                cout << "Error getting ligand string length: " << e.what() << endl;
+                __error_string = std::string("Error getting ligand string length: ") + e.what();
                 return 0;
         }
 }
 
 size_t copy_ligand_string( char* buffer ) {
         if ( __ligand == nullptr ) {
-                cout << "You must run initialize_ligand first" << endl;
+                __error_string = std::string("You must run initialize_ligand first");
                 return 0;
         }
 
@@ -212,7 +217,7 @@ size_t copy_ligand_string( char* buffer ) {
                 return str.copy(buffer, str.length());
 
         } catch ( std::exception &e ) {
-                cout << "Error getting ligand string length: " << e.what() << endl;
+                __error_string = std::string("Error getting ligand string length: ") + e.what();
                 return 0;
         }
 }
@@ -220,7 +225,7 @@ size_t copy_ligand_string( char* buffer ) {
 size_t initialize_scoring(const char* obj_dir) {
 
         if ( __ligand == nullptr  || __receptor == nullptr ) {
-                cout << "You must run initialize_ligand and initialize_receptor first" << endl;
+                __error_string = std::string("You must run initialize_ligand and initialize_receptor first");
                 return 0;
         }
 
@@ -237,7 +242,7 @@ size_t initialize_scoring(const char* obj_dir) {
                 return 1;
 
         } catch ( std::exception &e) {
-                cout << "Error in creating scoring function: " << e.what() << endl;
+                __error_string = std::string("Error in creating scoring function: ") + e.what();
                 return 0;
         }
 }
@@ -245,7 +250,7 @@ size_t initialize_scoring(const char* obj_dir) {
 size_t initialize_ffield(const char* data_dir) {
 
         if ( __score == nullptr ) {
-                cout << "You must run initialize_score first" << endl;
+                __error_string = std::string("You must run initialize_score first");
                 return 0;
         }
 
@@ -270,21 +275,21 @@ size_t initialize_ffield(const char* data_dir) {
                 return 1;
 
         } catch( std::exception& e ) {
-                cout << "Error in creating forcefield: " << e.what() << endl;
+                __error_string = std::string("Error in creating forcefield: ") + e.what();
                 return 0;
         }
 }
 
 float calculate_score() {
         if ( __ffield == nullptr ) {
-                cout << "You must run initialize_ffield first" << endl;
+                __error_string = std::string("You must run initialize_ffield first");
                 return 0;
         }
 
         try {
                 return __score->non_bonded_energy(*__gridrec, (*__ligand)[0]);
         } catch( std::exception& e) {
-                cout << "Error in scoring: " << e.what() << endl;
+                __error_string = std::string("Error in scoring: ") + e.what();
                 return 0;
         }
 }
@@ -292,7 +297,7 @@ float calculate_score() {
 size_t set_positions_ligand(const unsigned long* atoms, const float* positions, unsigned long size) {
 
         if ( __ligand == nullptr ) {
-                cout << "You must run initialize_ligand first" << endl;
+                __error_string = std::string("You must run initialize_ligand first");
                 return 0;
         }
 
@@ -310,7 +315,7 @@ size_t set_positions_ligand(const unsigned long* atoms, const float* positions, 
                 return 1;
         
         } catch ( std::exception &e ) {
-                cout << "Error in setting ligand coordinates: " << e.what() << endl;
+                __error_string = std::string("Error in setting ligand coordinates: ") + e.what();
                 return 0;
         }
 }
@@ -318,7 +323,7 @@ size_t set_positions_ligand(const unsigned long* atoms, const float* positions, 
 size_t set_positions_receptor(const unsigned long* atoms, const float* positions, unsigned long size) {
 
         if ( __receptor == nullptr ) {
-                cout << "You must run initialize_receptor first" << endl;
+                __error_string = std::string("You must run initialize_receptor first");
                 return 0;
         }
 
@@ -334,7 +339,7 @@ size_t set_positions_receptor(const unsigned long* atoms, const float* positions
                         }
 
                         if (! residue->has_element (atoms[i])) {
-                                cout << "Error: could not atom = " << atoms[i] << endl;
+                                __error_string = std::string("Error: could not atom = ") + std::to_string(atoms[i]);
                                 break;
                         }
 
@@ -349,7 +354,7 @@ size_t set_positions_receptor(const unsigned long* atoms, const float* positions
                 return 1;
                 
         } catch (std::exception &e) {
-                cout << "Error in setting receptor coordinates: " << e.what() << endl;
+                __error_string = std::string("Error in setting receptor coordinates: ") + e.what();
                 return 0;
         }
 }
@@ -357,7 +362,7 @@ size_t set_positions_receptor(const unsigned long* atoms, const float* positions
 size_t minimize_complex (size_t max_iter, size_t update_freq) {
 
         if ( __ffield == nullptr ) {
-                cout << "You must run initialize_ffield first" << endl;
+                __error_string = std::string("You must run initialize_ffield first");
                 return 0;
         }
 
@@ -398,7 +403,7 @@ size_t minimize_complex (size_t max_iter, size_t update_freq) {
                 return 1;
 
         } catch (std::exception &e) {
-                cout << "Error in setting receptor coordinates: " << e.what() << endl;
+                __error_string = std::string("Error in setting receptor coordinates: ") + e.what();
                 return 0;
         }
 }
