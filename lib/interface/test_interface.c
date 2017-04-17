@@ -15,7 +15,7 @@ int main( int argc, char **argv) {
         clock_t start = clock();
 
         if (! initialize_receptor(argv[1])) {
-                printf("%s\n", get_error());
+                printf("%s\n", cd_get_error());
                 return 1;
         }
 
@@ -23,7 +23,7 @@ int main( int argc, char **argv) {
         copy_receptor_string(recetor);
 
         if (! initialize_ligand(argv[2])) {
-                printf("%s\n", get_error());
+                printf("%s\n", cd_get_error());
                 return 1;
         }
 
@@ -31,12 +31,12 @@ int main( int argc, char **argv) {
         copy_ligand_string(ligand);
 
         if (! initialize_scoring(argv[3])) {
-                printf("%s\n", get_error());
+                printf("%s\n", cd_get_error());
                 return 1;
         }
 
         if (! initialize_ffield(argv[4])) {
-                printf("%s\n", get_error());
+                printf("%s\n", cd_get_error());
                 return 1;
         }
 
@@ -88,7 +88,7 @@ int main( int argc, char **argv) {
 
         start = clock();
         if (! minimize_complex(100,10)) {
-                printf("%s\n", get_error());
+                printf("%s\n", cd_get_error());
                 return 1;
         }
 
