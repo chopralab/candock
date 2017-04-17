@@ -19,16 +19,10 @@ int main( int argc, char **argv) {
                 return 1;
         }
 
-        char* recetor = (char*)malloc( receptor_string_size() * sizeof(char) );
-        copy_receptor_string(recetor);
-
         if (! initialize_ligand(argv[2])) {
                 printf("%s\n", cd_get_error());
                 return 1;
         }
-
-        char* ligand  = (char*)malloc( receptor_string_size() * sizeof(char) );
-        copy_ligand_string(ligand);
 
         if (! initialize_scoring(argv[3])) {
                 printf("%s\n", cd_get_error());

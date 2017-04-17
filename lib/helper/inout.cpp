@@ -17,7 +17,6 @@
 
 #else
 
-#define WIN32_LEAN_AND_MEAN
 #include <Windows.h>
 
 #endif
@@ -59,19 +58,8 @@ namespace Inout {
                         dbgmsg("Could not close handle " + std::to_string(fd));
                 }
         }
-#else
-
-        HANDLE __lock(const string &name) {
-                HANDLE fd = CreateFile(name.c_str(), GENERIC_ALL, 0, NULL, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
-                return fd;
-        }
-
-        void __unlock(HANDLE fd) {
-                if (CloseHandle(fd) == -1) {
-                }
-        }
-
 #endif
+
         int file_size(const string &name) {
                 if ( boost::filesystem::exists(name) &&
                         boost::filesystem::is_regular_file(name) )
@@ -105,12 +93,15 @@ namespace Inout {
                 dbgmsg(pos_in_file);
 #ifndef _WINDOWS
                 int fd = __lock(name);
+                ifstream in(name, ios::in);
 #else
                 HANDLE fd = __lock(name);
+                ifstream in(name, ios::in, _SH_DENYRW);
 #endif
-                ifstream in(name);
                 if (!in.is_open() && w == panic) {
+#ifndef _WINDOWS
                         __unlock(fd);
+#endif
                         throw Error("Cannot read " + name);
                 }
                 in.seekg(pos_in_file);
@@ -127,7 +118,9 @@ namespace Inout {
                 }
                 pos_in_file = pos;
                 in.close();
+#ifndef _WINDOWS
                 __unlock(fd);
+#endif
         }
 
         void file_open_put_contents(const string &name, 
@@ -142,17 +135,22 @@ namespace Inout {
                 __mkdir(name);
 #ifndef _WINDOWS
                 int fd = __lock(name);
+                ofstream output_file(name, mode);
 #else
                 HANDLE fd = __lock(name);
+                ofstream output_file(name, mode, _SH_DENYRW);
 #endif
-                ofstream output_file(name, mode);
                 if (!output_file.is_open()) {
+#ifndef _WINDOWS
                         __unlock(fd);
+#endif
                         throw Error("Cannot open output file: " + name);  // how to emulate $! ?
                 }
                 output_file << ss.str();
                 output_file.close();
+#ifndef _WINDOWS
                 __unlock(fd);
+#endif
         }
 
         vector<string> files_matching_pattern(const string &file_or_dir, 

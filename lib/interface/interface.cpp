@@ -17,7 +17,7 @@ std::unique_ptr <Molib::Atom::Grid> __gridrec;
 std::unique_ptr <OMMIface::ForceField> __ffield;
 std::string __error_string = "";
 
-const char* get_error() {
+const char* cd_get_error() {
         return __error_string.c_str();
 }
 
@@ -83,45 +83,6 @@ size_t receptor_atoms(size_t* idx, float* pos) {
         }
 }
 
-size_t receptor_string_size() {
-        if ( __receptor == nullptr ) {
-                __error_string = std::string("You must run initialize_receptor first");
-                return 0;
-        }
-
-        try {
-                std::stringstream ss;
-                ss << __receptor->element (0);
-
-                const std::string& str = ss.str();
-
-                return str.size();
-        } catch ( std::exception &e ) {
-                __error_string = std::string("Error getting receptor string length: ") + e.what();
-                return 0;
-        }
-}
-
-size_t copy_receptor_string( char* buffer ) {
-        if ( __receptor == nullptr ) {
-                __error_string = std::string("You must run initialize_receptor first");
-                return 0;
-        }
-
-        try {
-                std::stringstream ss;
-                ss << __receptor->element (0);
-
-                const std::string& str = ss.str();
-
-                return str.copy(buffer, str.length());
-
-        } catch ( std::exception &e ) {
-                __error_string = std::string("Error getting receptor string length: ") + e.what();
-                return 0;
-        }
-}
-
 size_t initialize_ligand(const char* filename) {
         try {
                 Parser::FileParser rpdb (filename, Parser::first_model, 1);
@@ -143,7 +104,7 @@ size_t initialize_ligand(const char* filename) {
                 .erase_hydrogen();
 
                 return 1;
-        
+
         } catch ( std::exception &e ) {
                 __error_string = std::string("Error in loading ligand ") + e.what();
                 return 0;
@@ -179,45 +140,6 @@ size_t ligand_atoms(size_t* idx, float* pos) {
                 return atoms.size();
         } catch( std::exception &e ) {
                 __error_string = std::string("Error creating atom arrays");
-                return 0;
-        }
-}
-
-size_t ligand_string_size() {
-        if ( __ligand == nullptr ) {
-                __error_string = std::string("You must run initialize_ligand first");
-                return 0;
-        }
-
-        try {
-                std::stringstream ss;
-                ss << __ligand->element (0);
-
-                const std::string& str = ss.str();
-
-                return str.size();
-        } catch ( std::exception &e ) {
-                __error_string = std::string("Error getting ligand string length: ") + e.what();
-                return 0;
-        }
-}
-
-size_t copy_ligand_string( char* buffer ) {
-        if ( __ligand == nullptr ) {
-                __error_string = std::string("You must run initialize_ligand first");
-                return 0;
-        }
-
-        try {
-                std::stringstream ss;
-                ss << __ligand->element (0);
-
-                const std::string& str = ss.str();
-
-                return str.copy(buffer, str.length());
-
-        } catch ( std::exception &e ) {
-                __error_string = std::string("Error getting ligand string length: ") + e.what();
                 return 0;
         }
 }
