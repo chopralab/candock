@@ -95,7 +95,6 @@ namespace Inout {
                 int fd = __lock(name);
                 ifstream in(name, ios::in);
 #else
-                HANDLE fd = __lock(name);
                 ifstream in(name, ios::in, _SH_DENYRW);
 #endif
                 if (!in.is_open() && w == panic) {
@@ -137,7 +136,6 @@ namespace Inout {
                 int fd = __lock(name);
                 ofstream output_file(name, mode);
 #else
-                HANDLE fd = __lock(name);
                 ofstream output_file(name, mode, _SH_DENYRW);
 #endif
                 if (!output_file.is_open()) {
