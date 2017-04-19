@@ -83,6 +83,54 @@ size_t receptor_atoms(size_t* idx, float* pos) {
         }
 }
 
+size_t receptor_bond_count() {
+        if ( __receptor == nullptr ) {
+                __error_string = std::string("You must run initialize_receptor first");
+                return 0;
+        }
+
+        try {
+                Molib::BondSet bondset = Molib::get_bonds_in(__receptor->get_atoms());
+                return bondset.size();
+        } catch (std::exception &e) {
+                __error_string = std::string("Error creating receptor bond arrays: ") + e.what();
+                return 0;
+        }
+}
+
+size_t receptor_bonds( size_t* bonds ) {
+        if ( __receptor == nullptr ) {
+                __error_string = std::string("You must run initialize_receptor first");
+                return 0;
+        }
+
+        try {
+                Molib::BondSet bondset = Molib::get_bonds_in(__receptor->get_atoms());
+
+                size_t i = 0;
+
+                for ( const auto a : bondset) {
+                        bonds[ i * 3 + 0 ] = a->atom1().atom_number();
+                        bonds[ i * 3 + 1 ] = a->atom2().atom_number();
+
+                        bonds[ i * 3 + 2 ]  = 0;
+                        bonds[ i * 3 + 2 ] |= a->is_single()   ? SINGLE_BOND : 0;
+                        bonds[ i * 3 + 2 ] |= a->is_double()   ? DOUBLE_BOND : 0;
+                        bonds[ i * 3 + 2 ] |= a->is_triple()   ? TRIPLE_BOND : 0;
+                        bonds[ i * 3 + 2 ] |= a->is_ring()     ? INRING_BOND : 0;
+                        bonds[ i * 3 + 2 ] |= a->is_rotatable()? ROTATE_BOND : 0;
+                        bonds[ i * 3 + 2 ] |= a->is_aromatic() ? AROMAT_BOND : 0;
+
+                        ++i;
+                }
+
+                return i;
+        } catch (std::exception &e) {
+                __error_string = std::string("Error creating receptor bond arrays: ") + e.what();
+                return 0;
+        }
+}
+
 size_t initialize_ligand(const char* filename) {
         try {
                 Parser::FileParser rpdb (filename, Parser::first_model, 1);
@@ -140,6 +188,55 @@ size_t ligand_atoms(size_t* idx, float* pos) {
                 return atoms.size();
         } catch( std::exception &e ) {
                 __error_string = std::string("Error creating atom arrays");
+                return 0;
+        }
+}
+
+size_t ligand_bond_count() {
+        if ( __ligand == nullptr ) {
+                __error_string = std::string("You must run initialize_ligand first");
+                return 0;
+        }
+
+        try {
+                Molib::BondSet bondset = Molib::get_bonds_in(__ligand->get_atoms());
+                return bondset.size();
+        } catch (std::exception &e) {
+                __error_string = std::string("Error creating ligand bond arrays: ") + e.what();
+                return 0;
+        }
+}
+
+size_t ligand_bonds( size_t* bonds ) {
+        if ( __ligand == nullptr ) {
+                __error_string = std::string("You must run initialize_ligand first");
+                return 0;
+        }
+
+        try {
+                Molib::BondSet bondset = Molib::get_bonds_in(__ligand->get_atoms());
+
+                size_t i = 0;
+
+                for ( const auto a : bondset) {
+                        bonds[ i * 3 + 0 ] = a->atom1().atom_number();
+                        bonds[ i * 3 + 1 ] = a->atom2().atom_number();
+
+                        bonds[ i * 3 + 2 ]  = 0;
+                        bonds[ i * 3 + 2 ] |= a->is_single()   ? SINGLE_BOND : 0;
+                        bonds[ i * 3 + 2 ] |= a->is_double()   ? DOUBLE_BOND : 0;
+                        bonds[ i * 3 + 2 ] |= a->is_triple()   ? TRIPLE_BOND : 0;
+                        bonds[ i * 3 + 2 ] |= a->is_ring()     ? INRING_BOND : 0;
+                        bonds[ i * 3 + 2 ] |= a->is_rotatable()? ROTATE_BOND : 0;
+
+                        bonds[ i * 3 + 2 ] |= a->is_aromatic() ? AROMAT_BOND : 0;
+
+                        ++i;
+                }
+        
+                return i;
+        } catch (std::exception &e) {
+                __error_string = std::string("Error creating ligand bond arrays: ") + e.what();
                 return 0;
         }
 }
@@ -216,7 +313,7 @@ float calculate_score() {
         }
 }
 
-size_t set_positions_ligand(const unsigned long* atoms, const float* positions, unsigned long size) {
+size_t set_positions_ligand(const size_t* atoms, const float* positions, size_t size) {
 
         if ( __ligand == nullptr ) {
                 __error_string = std::string("You must run initialize_ligand first");
@@ -227,7 +324,7 @@ size_t set_positions_ligand(const unsigned long* atoms, const float* positions, 
         
                 Molib::Residue *residue = __ligand->element (0).get_residues().at (0);
 
-                for (unsigned long i = 0; i < size; ++i) {
+                for (size_t i = 0; i < size; ++i) {
                         residue->element (atoms[i]).set_crd (Geom3D::Point (positions[i * 3 + 0],
                                                                             positions[i * 3 + 1],
                                                                             positions[i * 3 + 2]
@@ -242,7 +339,7 @@ size_t set_positions_ligand(const unsigned long* atoms, const float* positions, 
         }
 }
 
-size_t set_positions_receptor(const unsigned long* atoms, const float* positions, unsigned long size) {
+size_t set_positions_receptor(const size_t* atoms, const float* positions, size_t size) {
 
         if ( __receptor == nullptr ) {
                 __error_string = std::string("You must run initialize_receptor first");
@@ -251,10 +348,10 @@ size_t set_positions_receptor(const unsigned long* atoms, const float* positions
 
         try {
 
-                unsigned long resi = 0;
+                size_t resi = 0;
                 Molib::Residue *residue = __receptor->element (0).get_residues().at (resi++);
 
-                for (unsigned long i = 0; i < size; ++i) {
+                for (size_t i = 0; i < size; ++i) {
 
                         while (! residue->has_element (atoms[i])) {
                                 residue = __receptor->element (0).get_residues().at (resi++);

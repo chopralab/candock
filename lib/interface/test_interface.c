@@ -90,6 +90,18 @@ int main( int argc, char **argv) {
         start = clock();
         printf("Score after minimize: %f\n", calculate_score());
 
+        start = clock();
+        size_t lig_bond_count = ligand_bond_count();
+        size_t* lig_bonds = (size_t*)malloc(lig_bond_count * sizeof(size_t) * 3);
+        ligand_bonds(lig_bonds);
+        printf("Time to get ligand bonds: %f\n", (double) ( clock() - start) / CLOCKS_PER_SEC );
+
+        for ( size_t k = 0; k < lig_bond_count; ++k ) {
+                printf ("BOND: %zu %zu %zX\n", lig_bonds[ k * 3 + 0 ],
+                                               lig_bonds[ k * 3 + 1 ],
+                                               lig_bonds[ k * 3 + 2 ] );
+        }
+
         return 0;
 }
 
