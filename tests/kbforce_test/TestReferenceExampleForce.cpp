@@ -33,8 +33,8 @@
  * This tests the Reference implementation of ExampleForce.
  */
 
-#include "ReferenceKBKernelFactory.h"
-#include "KBForce.h"
+#include "kbforce/platforms/reference/include/ReferenceKBKernelFactory.h"
+#include "kbforce/openmmapi/include/KBForce.h"
 #include "openmm/internal/AssertionUtilities.h"
 #include "openmm/Context.h"
 #include "openmm/Platform.h"

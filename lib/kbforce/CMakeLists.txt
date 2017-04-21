@@ -17,11 +17,3 @@ include_directories( platforms/reference/include )
 include_directories( openmmapi/include )
 
 add_library(kbforce OBJECT ${kbforce_SRC})
-
-add_executable(test_kbforce platforms/reference/tests/TestReferenceExampleForce.cpp)
-
-target_link_libraries(test_kbforce
-candock ${Boost_LIBRARIES}
-        ${OPENMM_LIBRARY}
-        ${GSL_LIBRARIES}
-        )

@@ -60,10 +60,6 @@ if (WIN32)
 
     add_definitions( /D_USE_MATH_DEFINES /DBOOST_ALL_NO_LIB /DBOOST_ALL_DYN_LINK /DWIN32_LEAN_AND_MEAN)
 
-    if (NOT CANDOCK_BUILD_STATIC_EXECUTABLE)
-	    add_definitions( /DCANDOCK_SHARED_LIBRARY /DKB_USE_STATIC_LIBRARIES)
-    endif(NOT CANDOCK_BUILD_STATIC_EXECUTABLE)
-
 else(WIN32)
 
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wall -Werror -fPIC")
@@ -98,6 +94,7 @@ include_directories( ${PROJECT_BINARY_DIR} )
 
 add_subdirectory(lib)
 add_subdirectory(src)
+add_subdirectory(tests)
 add_subdirectory(scripts)
 
 set(CANDOCK_BUILD_GUI OFF CACHE BOOL "Build the CANDOCK gui")

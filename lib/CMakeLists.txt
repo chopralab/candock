@@ -1,5 +1,14 @@
 include_directories($CMAKE_CURRENT_SOURCE_DIR)
 
+if (WIN32)
+    if   (NOT ${CANDOCK_BUILD_STATIC_EXECUTABLE})
+            add_definitions( /DCANDOCK_SHARED_LIBRARY)
+    else (NOT ${CANDOCK_BUILD_STATIC_EXECUTABLE})
+            add_definitions( /DCANDOCK_STATIC_LIBRARY)
+    endif(NOT ${CANDOCK_BUILD_STATIC_EXECUTABLE})
+
+endif(WIN32)
+
 add_subdirectory(centro)
 add_subdirectory(cluster)
 add_subdirectory(docker)

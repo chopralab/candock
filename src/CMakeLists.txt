@@ -1,6 +1,10 @@
 
 if(${CANDOCK_BUILD_STATIC_EXECUTABLE})
 
+    if (WIN32)
+            add_definitions( /DCANDOCK_USE_STATIC_LIBRARIES)
+    endif(WIN32)
+
     set( CANDOCK_SRC
         $<TARGET_OBJECTS:program>
         $<TARGET_OBJECTS:design>
