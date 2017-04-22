@@ -7,8 +7,7 @@
 #include "geom3d/coordinate.hpp"
 #include "helper/debug.hpp"
 #include "helper/help.hpp"
-#include "pdbreader/molecule.hpp"
-#include "OpenMM.h"
+#include "molib/molecule.hpp"
 using namespace std;
 
 namespace Molib {
@@ -17,7 +16,7 @@ namespace Molib {
 };
 
 namespace OMMIface {
-	class ForceField;
+	struct ForceField;
 
 	class Topology {
 	public:

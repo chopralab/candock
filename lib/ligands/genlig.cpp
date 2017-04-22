@@ -1,10 +1,11 @@
 #include <iostream>
 #include <exception>
 #include <typeinfo>
+#include "molib/grid.hpp"
 #include "jsonreader.hpp"
 #include "nosqlreader.hpp"
-#include "pdbreader/pdbreader.hpp"
-#include "pdbreader/nrset.hpp"
+#include "molib/nrset.hpp"
+#include "parser/fileparser.hpp"
 #include "helper/help.hpp"
 #include "geom3d/matrix.hpp"
 #include "helper/error.hpp"
@@ -149,8 +150,8 @@ namespace genlig {
 		//~ const string &bsite_file) {
 
 		// read query PDB protein
-		Molib::PDBreader qpdb(receptor_file, 
-			Molib::PDBreader::first_model|Molib::PDBreader::hydrogens);
+		Parser::FileParser qpdb(receptor_file, 
+			Parser::first_model|Parser::hydrogens);
 		Molib::Molecules query_mols = qpdb.parse_molecule();
 		Molib::Atom::Grid gridrec(query_mols[0].get_atoms(receptor_chain_id, 
 			Molib::Residue::protein));
@@ -174,8 +175,8 @@ namespace genlig {
 					//~ Molib::Molecules &mols = nrset.add(new Molib::Molecules());
 					//~ biopdb.parse_PDB(mols, pdb_file);
 					//~ biopdb.rewind();
-					Molib::PDBreader biopdb(pdb_file, 
-						Molib::PDBreader::all_models|Molib::PDBreader::hydrogens);
+					Parser::FileParser biopdb(pdb_file, 
+						Parser::all_models|Parser::hydrogens);
 					Molib::Molecules &mols = 
 						nrset.add(new Molib::Molecules(biopdb.parse_molecule()));
 					dbgmsg(Geom3D::Matrix(d["alignment"][0]["rotation_matrix"], 
@@ -203,8 +204,8 @@ namespace genlig {
 					Molib::Molecules binding_sites;
 					binding_sites.add(new Molib::Molecule(mark(neighbor_residues, 
 						aligned_part_of_binding_site, lig_code)));
-					inout::output_file(ligands, lig_file);
-					inout::output_file(binding_sites, bsite_file);
+					Inout::output_file(ligands, lig_file);
+					Inout::output_file(binding_sites, bsite_file);
 					break; // the end
 				}
 			}
@@ -245,7 +246,7 @@ namespace genlig {
 			const double z_score = d["alignment"][0]["scores"]["z_score"].asDouble();
 			const Json::Value &hetero = d["hetero"];
 			for (size_t i = 0; i < hetero.size(); ++i) { // go over the hetero ligands only
-			//	dbgmsg(hetero[i].asString());
+				dbgmsg(hetero[static_cast<int>(i)].asString());
 				const vector<string> ligand = help::ssplit(hetero[ static_cast<int>(i)].asString(), ":");
 			//	dbgmsg(ligand.size());
 				const int cluster_number = stoi(ligand[0]);
@@ -277,8 +278,8 @@ namespace genlig {
 			const Geom3D::Matrix &mx = bio_file_to_matrix[bio_file];
 			try { // if something goes wrong, e.g., pdb file is not found, don't exit..
 				//~ biopdb.rewind();
-				Molib::PDBreader biopdb(bio_file, 
-					Molib::PDBreader::all_models);
+				Parser::FileParser biopdb(bio_file, 
+					Parser::all_models);
 				Molib::Molecules mols = biopdb.parse_molecule();
 				mols.rotate(mx, true); // inverse rotation
 				for (auto &linf : kv1.second) {

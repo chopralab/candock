@@ -2,25 +2,23 @@
 #define PROGRAMSTEP_H
 
 #include "cmdlnopts.hpp"
-#include <boost/filesystem.hpp>
 
 namespace Program {
 
 	// TODO: Possibly introduce an iterator function to iterator over results
-	// TODO: Rework subclasses to create public functions that do not need CMDLs
-	class ProgramStep {
+	class CANDOCK_EXPORT ProgramStep {
 	protected:
-		virtual bool __can_read_from_files(const CmdLnOpts& cmdl) = 0;
-		virtual void __read_from_files(const CmdLnOpts& cmdl) = 0;
-		virtual void __continue_from_prev(const CmdLnOpts& cmdl) = 0;
+		virtual bool __can_read_from_files() = 0;
+		virtual void __read_from_files() = 0;
+		virtual void __continue_from_prev() = 0;
 
 	public:
 
-		void run_step(const CmdLnOpts& cmdl) {
-			if ( __can_read_from_files(cmdl) ) {
-				__read_from_files(cmdl);
+		void run_step() {
+			if ( __can_read_from_files() ) {
+				__read_from_files();
 			} else {
-				__continue_from_prev(cmdl);
+				__continue_from_prev();
 			}
 		}
 

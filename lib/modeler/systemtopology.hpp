@@ -7,7 +7,7 @@
 #include "geom3d/geom3d.hpp"
 #include "helper/debug.hpp"
 #include "helper/help.hpp"
-#include "pdbreader/molecule.hpp"
+#include "molib/molecule.hpp"
 #include "modeler/topology.hpp"
 #include "OpenMM.h"
 using namespace std;
@@ -18,7 +18,7 @@ namespace Molib {
 };
 
 namespace OMMIface {
-	class ForceField;
+	struct ForceField;
 
 	class SystemTopology {
 	public:
@@ -46,7 +46,7 @@ namespace OMMIface {
 			AtomPoint(const Geom3D::Point &crd, Molib::Atom &atom) : __crd(crd), __atom(atom) {}
 			const Geom3D::Point& crd() const { return __crd; }
 			Molib::Atom& get_atom() { return __atom; }
-			void distance(double d) const {} // just dummy : needed by grid
+			void distance(double) const {} // just dummy : needed by grid
 			
 			typedef vector<unique_ptr<AtomPoint>> UPVec;
 			typedef vector<AtomPoint*> PVec;

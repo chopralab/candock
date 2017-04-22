@@ -1,8 +1,8 @@
 #include "helper/inout.hpp"
 #include "helper/debug.hpp"
 #include "helper/benchmark.hpp"
-#include "pdbreader/grid.hpp"
-#include "pdbreader/molecule.hpp"
+#include "molib/grid.hpp"
+#include "molib/molecule.hpp"
 #include "geom3d/geom3d.hpp"
 #include "geom3d/quaternion.hpp"
 #include "graph/mcqd.hpp"
@@ -83,7 +83,7 @@ namespace Docker {
 					<< "ATOM      1   U  UNI     2    "  << unitvec.pdb() << endl 
 					<< "ATOM      1   U  BON     3    "  << bondvec.pdb() << endl 
 					<< "ENDMDL" << endl;
-				inout::output_file(ss.str(), "unit_" + seed.name() + ".pdb", ios_base::app); 
+				Inout::output_file(ss.str(), "unit_" + seed.name() + ".pdb", ios_base::app); 
 #endif				
 
 				const Geom3D::Quaternion q(Geom3D::Vector3(unitvec)*sin(conf_spin_in_radians), cos(conf_spin_in_radians));

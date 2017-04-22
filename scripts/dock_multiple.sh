@@ -50,11 +50,8 @@ do
         continue
     fi
 
-    cd $i
-
     $MCANDOCK_MOD_PATH/submit_candock_module.sh $command -N $(basename $working_dir)_$i $([[ ! -z "$@" ]] && echo "$@")
 
     count=$((count+1))
 
-    cd ..
 done

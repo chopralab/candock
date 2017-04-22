@@ -1,5 +1,5 @@
 #include "forcefield.hpp"
-#include "pdbreader/molecule.hpp"
+#include "molib/molecule.hpp"
 #include "score/score.hpp"
 #include "helper/inout.hpp"
 #include "helper/error.hpp"
@@ -12,6 +12,7 @@
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string.hpp>
 #include <boost/asio/ip/host_name.hpp>
+#include <openmm/Units.h>
 #include <string>
 #include <sstream>
 using namespace std;
@@ -53,159 +54,243 @@ namespace OMMIface {
 		}
 		return os;
 	}
-	const ForceField::KBType& ForceField::get_kb_force_type(const Molib::Atom &atom1, 
-		const Molib::Atom &atom2, const int type1, const int type2) const {
-		const int &aclass1 = atom1.idatm_type(); 
-		const int &aclass2 = atom2.idatm_type();
+
+        const ForceField::KBType& ForceField::get_kb_force_type(const Molib::Atom &atom1, 
+                const Molib::Atom &atom2) const {
+                const int &aclass1 = atom1.idatm_type(); 
+                const int &aclass2 = atom2.idatm_type();
 #ifndef NDEBUG
-                const AtomType &atype1 = atom_type.at(type1);
-		const AtomType &atype2 = atom_type.at(type2);
-		dbgmsg("add kb force type1 = " << type1 << " type2 = " 
-			<< type2 << " atype1.cl = " << atype1.cl << " atype2.cl = " << atype2.cl 
-			<< " aclass1 = " << help::idatm_unmask[aclass1] 
-			<< " aclass2 = " << help::idatm_unmask[aclass2]);
+                dbgmsg("add kb force"
+                        << " aclass1 = " << help::idatm_unmask[aclass1] 
+                        << " aclass2 = " << help::idatm_unmask[aclass2]);
 #endif
-                try { return kb_force_type.at(aclass1).at(aclass2); } catch(const out_of_range&) {}
-		try { return kb_force_type.at(aclass2).at(aclass1); } catch(const out_of_range&) {}
-		stringstream ss;
-		ss << "warning : missing kb force type " << help::idatm_unmask[aclass1] 
-			<< "-" << help::idatm_unmask[aclass2];
-		throw ParameterError(ss.str());
-		
-	}
-	const ForceField::AtomType& ForceField::get_atom_type(const int type) const {
-		try { return atom_type.at(type); } catch(const out_of_range&) {}
-		throw ParameterError("warning : missing atom type " 
-			+ std::to_string(type));
-	}
-	const ForceField::BondType& ForceField::get_bond_type(const int type1, 
-		const int type2) const {
-		
-		const AtomType &atype1 = atom_type.at(type1);
-		dbgmsg(atype1.cl);
-		const AtomType &atype2 = atom_type.at(type2);
-		dbgmsg(atype2.cl);
-		const string &aclass1 = atype1.cl;
-		const string &aclass2 = atype2.cl;
-		dbgmsg("add bond type1 = " << type1 << " type2 = " << type2 << " aclass1 = " 
-			<< aclass1 << " aclass2 = " << aclass2);
-		try { return bond_type.at(aclass1).at(aclass2); } catch(const out_of_range&) {}
-		try { return bond_type.at(aclass2).at(aclass1); } catch(const out_of_range&) {}
-		// if this fails, we try finding a similar bond parameter
-		for (auto &sclass : help::get_replacement({aclass1, aclass2})) {
-			try { return bond_type.at(sclass[0]).at(sclass[1]); } catch(const out_of_range&) {}
-			try { return bond_type.at(sclass[1]).at(sclass[0]); } catch(const out_of_range&) {}
-		}
-		throw ParameterError("warning : missing bond type " + aclass1 
-			+ "-" + aclass2);
-	}
+                if ( kb_force_type.count(aclass1) != 0 && kb_force_type.at(aclass1).count(aclass2) != 0) {
+                        return kb_force_type.at(aclass1).at(aclass2);
+                }
 
-	const ForceField::AngleType& ForceField::get_angle_type(const int type1, 
-		const int type2, const int type3) const {
+                if ( kb_force_type.count(aclass2) != 0 && kb_force_type.at(aclass2).count(aclass1) != 0) {
+                        return kb_force_type.at(aclass2).at(aclass1);
+                }
 
-		const AtomType &atype1 = atom_type.at(type1);
-		const AtomType &atype2 = atom_type.at(type2);
-		const AtomType &atype3 = atom_type.at(type3);
-		const string &aclass1 = atype1.cl;
-		const string &aclass2 = atype2.cl;
-		const string &aclass3 = atype3.cl;
-		dbgmsg("add angle type1 = " << type1 << " type2 = " << type2 
-			<< " type3 = " << type3 << " aclass1 = " << aclass1 
-			<< " aclass2 = " << aclass2 << " aclass3 = " << aclass3);
-		// See note under bond stretch above regarding the factor of 2 here.
-		try { return angle_type.at(aclass1).at(aclass2).at(aclass3); } catch(const out_of_range&) {}
-		try { return angle_type.at(aclass3).at(aclass2).at(aclass1); } catch(const out_of_range&) {}
-		// if this fails, we try finding a similar angle parameter
-		for (auto &sclass : help::get_replacement({aclass1, aclass2, aclass3})) {
-			try { return angle_type.at(sclass[0]).at(sclass[1]).at(sclass[2]); } catch(const out_of_range&) {}
-			try { return angle_type.at(sclass[2]).at(sclass[1]).at(sclass[0]); } catch(const out_of_range&) {}
-		}
-		throw ParameterError("warning : missing angle type " + aclass1 
-			+ "-" + aclass2 + "-" + aclass3);
-	}
+                stringstream ss;
+                ss << "warning : missing kb force type " << help::idatm_unmask[aclass1] 
+                   << "-" << help::idatm_unmask[aclass2];
+                throw ParameterError(ss.str());
 
-	const ForceField::TorsionTypeVec& ForceField::get_dihedral_type(const int type1, 
-		const int type2, const int type3, const int type4) const {
+        }
 
-		const AtomType &atype1 = atom_type.at(type1);
-		const AtomType &atype2 = atom_type.at(type2);
-		const AtomType &atype3 = atom_type.at(type3);
-		const AtomType &atype4 = atom_type.at(type4);
-		const string &aclass1 = atype1.cl;
-		const string &aclass2 = atype2.cl;
-		const string &aclass3 = atype3.cl;
-		const string &aclass4 = atype4.cl;
-		dbgmsg("add dihedral type1 = " << type1 << " type2 = " << type2 
-			<< " type3 = " << type3 << " type4 = " << type4 << " aclass1 = " << aclass1 
-			<< " aclass2 = " << aclass2 << " aclass3 = " << aclass3 << " aclass4 = " << aclass4);
-		try { return torsion_type.at(aclass1).at(aclass2).at(aclass3).at(aclass4); } 
-		catch(const out_of_range&) {}
-		try { return torsion_type.at(aclass4).at(aclass3).at(aclass2).at(aclass1); } 
-		catch(const out_of_range&) {}
-		try { return torsion_type.at("X").at(aclass2).at(aclass3).at("X"); } 
-		catch(const out_of_range&) {}
-		try { return torsion_type.at("X").at(aclass3).at(aclass2).at("X"); } 
-		catch(const out_of_range&) {}
-		// if this fails, we try finding a similar dihedral parameter
-		for (auto &sclass : help::get_replacement({aclass1, aclass2, aclass3, aclass4})) {
-			try { return torsion_type.at(sclass[0]).at(sclass[1]).at(sclass[2]).at(sclass[3]); } catch(const out_of_range&) {}
-			try { return torsion_type.at(sclass[3]).at(sclass[2]).at(sclass[1]).at(sclass[0]); } catch(const out_of_range&) {}
-			try { return torsion_type.at("X").at(sclass[1]).at(sclass[2]).at("X"); } catch(const out_of_range&) {}
-			try { return torsion_type.at("X").at(sclass[2]).at(sclass[1]).at("X"); } catch(const out_of_range&) {}
-		}
-		throw ParameterError("warning : missing dihedral type " + aclass1 
-			+ "-" + aclass2 + "-" + aclass3 + "-" + aclass4);
-	}
-	const ForceField::TorsionTypeVec& ForceField::get_improper_type(const int type1, 
-		const int type2, const int type3, const int type4) const {
+        bool ForceField::has_atom_type(const int aclass1) const {
+                return (atom_type.count(aclass1) != 0);
+        }
 
-		const AtomType &atype1 = atom_type.at(type1);
-		const AtomType &atype2 = atom_type.at(type2);
-		const AtomType &atype3 = atom_type.at(type3);
-		const AtomType &atype4 = atom_type.at(type4);
-		const string &aclass1 = atype1.cl;
-		const string &aclass2 = atype2.cl;
-		const string &aclass3 = atype3.cl;
-		const string &aclass4 = atype4.cl;
-		dbgmsg("add improper (third atom is central) type1 = " << type1 << " type2 = " << type2 
-			<< " type3 = " << type3 << " type4 = " << type4 << " aclass1 = " << aclass1 
-			<< " aclass2 = " << aclass2 << " aclass3 = " << aclass3 << " aclass4 = " << aclass4);
-		try { return improper_type.at(aclass1).at(aclass2).at(aclass3).at(aclass4); } 
-		catch(const out_of_range&) {}
-		try { return improper_type.at(aclass2).at(aclass1).at(aclass3).at(aclass4); } 
-		catch(const out_of_range&) {}
-		try { return improper_type.at(aclass2).at(aclass4).at(aclass3).at(aclass1); } 
-		catch(const out_of_range&) {}
-		try { return improper_type.at(aclass4).at(aclass2).at(aclass3).at(aclass1); } 
-		catch(const out_of_range&) {}
-		try { return improper_type.at(aclass4).at(aclass1).at(aclass3).at(aclass2); } 
-		catch(const out_of_range&) {}
-		try { return improper_type.at(aclass1).at(aclass4).at(aclass3).at(aclass2); } 
-		catch(const out_of_range&) {}
 
-		try { return improper_type.at("X").at(aclass1).at(aclass3).at(aclass2); } 
-		catch(const out_of_range&) {}
-		try { return improper_type.at("X").at(aclass1).at(aclass3).at(aclass4); } 
-		catch(const out_of_range&) {}
-		try { return improper_type.at("X").at(aclass2).at(aclass3).at(aclass1); } 
-		catch(const out_of_range&) {}
-		try { return improper_type.at("X").at(aclass2).at(aclass3).at(aclass4); } 
-		catch(const out_of_range&) {}
-		try { return improper_type.at("X").at(aclass4).at(aclass3).at(aclass1); } 
-		catch(const out_of_range&) {}
-		try { return improper_type.at("X").at(aclass4).at(aclass3).at(aclass2); } 
-		catch(const out_of_range&) {}
+        const ForceField::AtomType& ForceField::get_atom_type(const int type) const {
+                if (has_atom_type(type) != 0)
+                        return atom_type.at(type);
+                throw ParameterError("warning : missing atom type " 
+                       + std::to_string(type));
+        }
 
-		try { return improper_type.at("X").at("X").at(aclass3).at(aclass1); } 
-		catch(const out_of_range&) {}
-		try { return improper_type.at("X").at("X").at(aclass3).at(aclass2); } 
-		catch(const out_of_range&) {}
-		try { return improper_type.at("X").at("X").at(aclass3).at(aclass4); } 
-		catch(const out_of_range&) {}
+        bool ForceField::has_bond_type(const string& aclass1, const string& aclass2) const {
+                return ( bond_type.count(aclass1) != 0 &&
+                         bond_type.at(aclass1).count(aclass2) != 0 );
+        }
 
-		throw ParameterError("warning : missing improper type " + aclass1 
-			+ "-" + aclass2 + "-" + aclass3 + "-" + aclass4);
-	}
+        const ForceField::BondType& ForceField::get_bond_type(const int type1, const int type2) const {
+
+                const AtomType &atype1 = atom_type.at(type1);
+                dbgmsg(atype1.cl);
+                const AtomType &atype2 = atom_type.at(type2);
+                dbgmsg(atype2.cl);
+                const string &aclass1 = atype1.cl;
+                const string &aclass2 = atype2.cl;
+                dbgmsg("add bond type1 = " << type1 << " type2 = " << type2 << " aclass1 = " 
+                       << aclass1 << " aclass2 = " << aclass2);
+                
+                if ( has_bond_type(aclass1, aclass2) ) {
+                        return bond_type.at(aclass1).at(aclass2);
+                }
+
+                if ( has_bond_type(aclass2, aclass1) ) {
+                        return bond_type.at(aclass2).at(aclass1);
+                }
+
+                // if this fails, we try finding a similar bond parameter
+                for (auto &sclass : help::get_replacement({aclass1, aclass2})) {
+                    
+                        if ( has_bond_type(sclass[0], sclass[1]) ) {
+                            return bond_type.at(sclass[0]).at(sclass[1]);
+                        }
+
+                        if ( has_bond_type(sclass[1], sclass[0]) ) {
+                            return bond_type.at(sclass[1]).at(sclass[0]);
+                        }
+                }
+                throw ParameterError("warning : missing bond type " + aclass1 
+                        + "-" + aclass2);
+        }
+
+        bool ForceField::has_angle_type( const string &aclass1, const string &aclass2, const string &aclass3 ) const {
+                return ( angle_type.count(aclass1) !=0 &&
+                         angle_type.at(aclass1).count(aclass2) != 0 &&
+                         angle_type.at(aclass1).at(aclass2).count(aclass3) );
+        }
+
+        const ForceField::AngleType& ForceField::get_angle_type(const int type1, 
+                const int type2, const int type3) const {
+
+                const AtomType &atype1 = atom_type.at(type1);
+                const AtomType &atype2 = atom_type.at(type2);
+                const AtomType &atype3 = atom_type.at(type3);
+                const string &aclass1 = atype1.cl;
+                const string &aclass2 = atype2.cl;
+                const string &aclass3 = atype3.cl;
+                dbgmsg("add angle type1 = " << type1 << " type2 = " << type2 
+                        << " type3 = " << type3 << " aclass1 = " << aclass1 
+                        << " aclass2 = " << aclass2 << " aclass3 = " << aclass3);
+                // See note under bond stretch above regarding the factor of 2 here.
+                if ( has_angle_type(aclass1, aclass2, aclass3) ) return angle_type.at(aclass1).at(aclass2).at(aclass3);
+                if ( has_angle_type(aclass3, aclass2, aclass1) ) return angle_type.at(aclass3).at(aclass2).at(aclass1);
+                // if this fails, we try finding a similar angle parameter
+                for (auto &sclass : help::get_replacement({aclass1, aclass2, aclass3})) {
+                        if ( has_angle_type(sclass[0], sclass[1], sclass[2]) )
+                            return angle_type.at(sclass[0]).at(sclass[1]).at(sclass[2]);
+                        if ( has_angle_type(sclass[2], sclass[1], sclass[0]) )
+                            return angle_type.at(sclass[2]).at(sclass[1]).at(sclass[0]);
+                }
+                throw ParameterError("warning : missing angle type " + aclass1 
+                                     + "-" + aclass2 + "-" + aclass3);
+        }
+
+        bool ForceField::has_dihedral_type( const string &aclass1, const string &aclass2,
+                                            const string &aclass3, const string &aclass4 ) const {
+                return ( torsion_type.count(aclass1) !=0 &&
+                         torsion_type.at(aclass1).count(aclass2) != 0 &&
+                         torsion_type.at(aclass1).at(aclass2).count(aclass3) !=0 &&
+                         torsion_type.at(aclass1).at(aclass2).at(aclass3).count(aclass4) != 0 );
+        }
+
+        const ForceField::TorsionTypeVec& ForceField::get_dihedral_type(const int type1, 
+                const int type2, const int type3, const int type4) const {
+
+                const AtomType &atype1 = atom_type.at(type1);
+                const AtomType &atype2 = atom_type.at(type2);
+                const AtomType &atype3 = atom_type.at(type3);
+                const AtomType &atype4 = atom_type.at(type4);
+                const string &aclass1 = atype1.cl;
+                const string &aclass2 = atype2.cl;
+                const string &aclass3 = atype3.cl;
+                const string &aclass4 = atype4.cl;
+
+                dbgmsg("add dihedral type1 = " << type1 << " type2 = " << type2 
+                        << " type3 = " << type3 << " type4 = " << type4 << " aclass1 = " << aclass1 
+                        << " aclass2 = " << aclass2 << " aclass3 = " << aclass3 << " aclass4 = " << aclass4);
+
+                if ( has_dihedral_type(aclass1, aclass2, aclass3, aclass4) )
+                        return torsion_type.at(aclass1).at(aclass2).at(aclass3).at(aclass4);
+
+                if ( has_dihedral_type(aclass4, aclass3, aclass2, aclass1) )
+                        return torsion_type.at(aclass4).at(aclass3).at(aclass2).at(aclass1);
+
+                if ( has_dihedral_type("X",aclass2,aclass3,"X") )
+                        return torsion_type.at("X").at(aclass2).at(aclass3).at("X");
+
+                if ( has_dihedral_type("X",aclass3,aclass2,"X") )
+                        return torsion_type.at("X").at(aclass3).at(aclass2).at("X");
+                
+                // if this fails, we try finding a similar dihedral parameter
+                for (auto &sclass : help::get_replacement({aclass1, aclass2, aclass3, aclass4})) {
+
+                        if ( has_dihedral_type(sclass[0], sclass[1], sclass[2], sclass[3]) )
+                                return torsion_type.at(sclass[0]).at(sclass[1]).at(sclass[2]).at(sclass[3]);
+
+                        if ( has_dihedral_type(sclass[3], sclass[2], sclass[1], sclass[0]) )
+                                return torsion_type.at(sclass[3]).at(sclass[2]).at(sclass[1]).at(sclass[0]);
+
+                        if ( has_dihedral_type("X", sclass[1], sclass[2], "X") )
+                                return torsion_type.at("X").at(sclass[1]).at(sclass[2]).at("X");
+
+                        if ( has_dihedral_type("X", sclass[2], sclass[1], "X") )
+                                return torsion_type.at("X").at(sclass[2]).at(sclass[1]).at("X");
+                }
+                throw ParameterError("warning : missing dihedral type " + aclass1 
+                                     + "-" + aclass2 + "-" + aclass3 + "-" + aclass4);
+        }
+
+        bool ForceField::has_improper_type( const string &aclass1, const string &aclass2,
+                                            const string &aclass3, const string &aclass4 ) const {
+                return ( improper_type.count(aclass1) !=0 &&
+                         improper_type.at(aclass1).count(aclass2) != 0 &&
+                         improper_type.at(aclass1).at(aclass2).count(aclass3) !=0 &&
+                         improper_type.at(aclass1).at(aclass2).at(aclass3).count(aclass4) != 0 );
+        }
+
+        const ForceField::TorsionTypeVec& ForceField::get_improper_type(const int type1, 
+                const int type2, const int type3, const int type4) const {
+
+                const AtomType &atype1 = atom_type.at(type1);
+                const AtomType &atype2 = atom_type.at(type2);
+                const AtomType &atype3 = atom_type.at(type3);
+                const AtomType &atype4 = atom_type.at(type4);
+                const string &aclass1 = atype1.cl;
+                const string &aclass2 = atype2.cl;
+                const string &aclass3 = atype3.cl;
+                const string &aclass4 = atype4.cl;
+
+                dbgmsg("add improper (third atom is central) type1 = " << type1 << " type2 = " << type2 
+                        << " type3 = " << type3 << " type4 = " << type4 << " aclass1 = " << aclass1 
+                        << " aclass2 = " << aclass2 << " aclass3 = " << aclass3 << " aclass4 = " << aclass4);
+
+                if ( has_improper_type( aclass1, aclass2, aclass3, aclass4 ) )
+                        return improper_type.at(aclass1).at(aclass2).at(aclass3).at(aclass4);
+
+                if ( has_improper_type( aclass2, aclass1, aclass3, aclass4 ) )
+                        return improper_type.at(aclass2).at(aclass1).at(aclass3).at(aclass4);
+
+                if ( has_improper_type( aclass2, aclass4, aclass3, aclass1 ) )
+                        return improper_type.at(aclass2).at(aclass4).at(aclass3).at(aclass1);
+
+                if ( has_improper_type( aclass4, aclass2, aclass3, aclass1 ) )
+                        return improper_type.at(aclass4).at(aclass2).at(aclass3).at(aclass1);
+
+                if ( has_improper_type( aclass4, aclass1, aclass3, aclass2 ) )
+                        return improper_type.at(aclass4).at(aclass1).at(aclass3).at(aclass2);
+
+                if ( has_improper_type( aclass1, aclass4, aclass3, aclass2 ) )
+                        return improper_type.at(aclass1).at(aclass4).at(aclass3).at(aclass2);
+
+                // Missing one atom
+                if ( has_improper_type( "X", aclass1, aclass3, aclass2 ) )
+                        return improper_type.at("X").at(aclass1).at(aclass3).at(aclass2);
+
+                if ( has_improper_type( "X", aclass1, aclass3, aclass4 ) )
+                        return improper_type.at("X").at(aclass1).at(aclass3).at(aclass4);
+
+                if ( has_improper_type( "X", aclass2, aclass3, aclass1 ) )
+                        return improper_type.at("X").at(aclass2).at(aclass3).at(aclass1);
+
+                if ( has_improper_type( "X", aclass2, aclass3, aclass4 ) )
+                        return improper_type.at("X").at(aclass2).at(aclass3).at(aclass4);
+
+                if ( has_improper_type( "X", aclass4, aclass3, aclass1 ) )
+                        return improper_type.at("X").at(aclass4).at(aclass3).at(aclass1);
+
+                if ( has_improper_type( "X", aclass4, aclass3, aclass2 ) )
+                        return improper_type.at("X").at(aclass4).at(aclass3).at(aclass2);
+
+                // Missing two atoms
+                if ( has_improper_type( "X", "X", aclass3, aclass1 ) )
+                        return improper_type.at("X").at("X").at(aclass3).at(aclass1);
+
+                if ( has_improper_type( "X", "X", aclass3, aclass2 ) )
+                        return improper_type.at("X").at("X").at(aclass3).at(aclass2);
+
+                if ( has_improper_type( "X", "X", aclass3, aclass4 ) )
+                        return improper_type.at("X").at("X").at(aclass3).at(aclass4);
+
+                throw ParameterError("warning : missing improper type " + aclass1 
+                                     + "-" + aclass2 + "-" + aclass3 + "-" + aclass4);
+        }
 
 	ForceField& ForceField::insert_topology(const Molib::Molecule &molecule) {
 		map<const string, const int> atom_name_to_type;
@@ -281,7 +366,7 @@ namespace OMMIface {
 		boost::smatch m;
 		vector<string> gdf;
 		dbgmsg("reading gaff file = " << gaff_dat_file);
-		inout::Inout::read_file(gaff_dat_file, gdf);
+		Inout::read_file(gaff_dat_file, gdf);
 		bool non_bonded = false;
 		int semaphore = 0;
 		int type = 10000; // start ligand types with 10000 to NOT overlap with receptor
@@ -594,12 +679,12 @@ namespace OMMIface {
 		// print XML to file
 		stringstream ss;
 		ss << doc;
-		inout::Inout::file_open_put_stream(fn, ss);
+		Inout::file_open_put_stream(fn, ss);
 	}
 	ForceField& ForceField::parse_forcefield_file(const string &fn) { // read XML forcefield & topology file
 		using namespace rapidxml;
 		string ff_file;
-		inout::Inout::read_file(fn, ff_file);
+		Inout::read_file(fn, ff_file);
 		char *c_ff_file = new char[ff_file.size() + 1];
 		strcpy(c_ff_file, ff_file.c_str());
 		xml_document<> doc; // character type defaults to char

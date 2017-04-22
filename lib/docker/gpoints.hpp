@@ -34,7 +34,7 @@ namespace Docker {
 			const Geom3D::Point& crd() const { return __crd; }
 			IJK& ijk() { return __ijk; }
 			const IJK& ijk() const { return __ijk; }
-			void distance(double d) const {} // just dummy : needed by grid
+			void distance(double) const {} // just dummy : needed by grid
 		};
 
 		typedef vector<Gpoint> GpointVec;
@@ -62,13 +62,27 @@ namespace Docker {
 		Gpoints(const Centro::Centroids &centroids, Molib::Atom::Grid &grid, 
 			const double &grid_spacing, const int &dist_cutoff, 
 			const double &excluded_radius, const double &max_interatomic_distance);
-		GpointVec& get_gridpoints0() { try { return __gridpoints.at(0); } catch (const std::out_of_range& oor) { throw Error("die : no gridpoints0 ?"); } }
-		const GpointVec& get_gridpoints0() const { try { return __gridpoints.at(0); } catch (const std::out_of_range& oor) { throw Error("die : no gridpoints0 ?"); } }
-		//~ const GpointVec& get_gridpoints0() const { return const_cast<const GpointVec&>(get_gridpoints0()); }
+        GpointVec& get_gridpoints0() {
+                if (__gridpoints.count(0) != 0 ) {
+                        return __gridpoints.at(0);
+                }
+                throw Error("die : no gridpoints0 ?");
+        }
+        const GpointVec& get_gridpoints0() const {
+                if (__gridpoints.count(0) != 0 ) {
+                        return __gridpoints.at(0);
+                }
+                throw Error("die : no gridpoints0 ?");
+        }
 		const map<int, GpointVec>& get_gridpoints() const { return __gridpoints; }
 		const Gpoint& get_center_point() const;
-		const Array3d<Gpoint*>& get_gmap(const int bsite_id) const { try { return __gmap.at(bsite_id); } catch (const std::out_of_range& oor) { throw Error("die : cannot get gmap for bsite #" + std::to_string(bsite_id)); } }
-		
+		const Array3d<Gpoint*>& get_gmap(const int bsite_id) const {
+                if (__gmap.count(bsite_id) != 0 ) {
+                        return __gmap.at(bsite_id);
+                }
+                throw Error("die : cannot get gmap for bsite #" + std::to_string(bsite_id));
+            
+        }
 		friend ostream& operator<<(ostream& os, const Gpoints &gpoints);
 	};
 

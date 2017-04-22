@@ -1,108 +1,122 @@
-include_directories($CMAKE_CURRENT_SOURCE_DIR)
 
-include_directories(/usr/local/openmm/include/)
-include_directories( ../foreign/tclap/include/ )
-include_directories( ../lib/modeler/ )
+if(${CANDOCK_BUILD_STATIC_EXECUTABLE})
 
-set( candock_libraries 
-        program
-        design
-        docker
-        score
-        centro
-        kabsch
-        ligands
-        cluster   # Ugly GCC hack to fix interdependency issue
-        linker
-        cluster
-        graph
-        modeler
-        pdbreader
-        probis
-        fragmenter
-        geom3d
-        helper
-   )
+    if (WIN32)
+            add_definitions( /DCANDOCK_USE_STATIC_LIBRARIES)
+    endif(WIN32)
 
-set( additional_libraries 
-        pthread   # Required for GCC
-        dl
-   )
+    set( CANDOCK_SRC
+        $<TARGET_OBJECTS:program>
+        $<TARGET_OBJECTS:design>
+        $<TARGET_OBJECTS:docker>
+        $<TARGET_OBJECTS:score>
+        $<TARGET_OBJECTS:centro>
+        $<TARGET_OBJECTS:kabsch>
+        $<TARGET_OBJECTS:ligands>
+        $<TARGET_OBJECTS:linker>
+        $<TARGET_OBJECTS:cluster>
+        $<TARGET_OBJECTS:graph>
+        $<TARGET_OBJECTS:modeler>
+        $<TARGET_OBJECTS:parser>
+        $<TARGET_OBJECTS:molib>
+        $<TARGET_OBJECTS:probis>
+        $<TARGET_OBJECTS:fragmenter>
+        $<TARGET_OBJECTS:kbforce>
+        $<TARGET_OBJECTS:geom3d>
+        $<TARGET_OBJECTS:helper>
+    )
+    
+    set( all_needed_libraries
+        ${Boost_LIBRARIES}
+        ${OPENMM_LIBRARY}
+        ${GSL_LIBRARIES}
+        /usr/local/openmm/lib/libKBPlugin.so
+        /usr/local/openmm/lib/plugins/libKBPluginReference.so
+    )
 
+else (${CANDOCK_BUILD_STATIC_EXECUTABLE})
 
-   
-set( all_needed_libraries
-     ${candock_libraries}
-     ${Boost_LIBRARIES}
-     ${OPENMM_LIBRARY}
-     ${GSL_LIBRARIES}
-     ${additional_libraries}
-     #     /usr/local/openmm/lib/plugins/libOpenMMCUDA.so
-     /usr/local/openmm/lib/libKBPlugin.so
-     /usr/local/openmm/lib/plugins/libKBPluginReference.so
-   )
+    set( CANDOCK_SRC )
+    
+    set( all_needed_libraries
+        candock
+        ${Boost_LIBRARIES}
+        ${OPENMM_LIBRARY}
+        ${GSL_LIBRARIES}
+        /usr/local/openmm/lib/libKBPlugin.so
+        /usr/local/openmm/lib/plugins/libKBPluginReference.so
+    )
 
-# Original, to be deprecated programs
-add_executable( candock candock.cpp )
-add_executable( genpot  genpot.cpp )
-add_executable( test_minimization test_minimization.cpp )
-add_executable( test_fragmenting test_fragmenting.cpp )
-add_executable( test_bsite test_bsite.cpp )
-add_executable( test_clq test_clq.cpp )
-add_executable( test_link test_link.cpp )
-add_executable( test_singlepoint test_singlepoint.cpp )
-add_executable( test_cofactor test_cofactor.cpp )
+endif (${CANDOCK_BUILD_STATIC_EXECUTABLE})
+
+if (NOT WIN32)
+
+set ( all_needed_libraries
+    ${all_needed_libraries}
+    pthread
+    dl
+)
+
+endif(NOT WIN32)
 
 # New programs with new features that change functionality
-add_executable( cd_check_options  cd_check_options.cpp )
-add_executable( cd_bsite_probis   cd_bsite_probis.cpp )
-add_executable( cd_prep_fragments cd_prep_fragments.cpp )
-add_executable( cd_dock_fragments cd_dock_fragments.cpp )
-add_executable( cd_link_fragments cd_link_fragments.cpp )
-add_executable( cd_design_ligands cd_design_ligands.cpp )
-
-if(CUDA_FOUND)
-#CUDA programs
-cuda_add_executable( cuda_link_fragments cd_link_fragments.cpp )
-endif(CUDA_FOUND)
-
-target_link_libraries( candock ${all_needed_libraries} )
-target_link_libraries( genpot ${all_needed_libraries} )
-target_link_libraries( test_minimization ${all_needed_libraries} )
-target_link_libraries( test_fragmenting ${all_needed_libraries} )
-target_link_libraries( test_bsite ${all_needed_libraries} )
-target_link_libraries( test_clq ${all_needed_libraries} )
-target_link_libraries( test_link ${all_needed_libraries} )
-target_link_libraries( test_singlepoint ${all_needed_libraries} )
-target_link_libraries( test_cofactor ${all_needed_libraries} )
+add_executable( cd_check_options  cd_check_options.cpp  ${CANDOCK_SRC})
+add_executable( cd_find_centroids cd_find_centroids.cpp ${CANDOCK_SRC})
+add_executable( cd_prep_fragments cd_prep_fragments.cpp ${CANDOCK_SRC})
+add_executable( cd_make_objective cd_make_objective.cpp ${CANDOCK_SRC})
+add_executable( cd_dock_fragments cd_dock_fragments.cpp ${CANDOCK_SRC})
+add_executable( cd_link_fragments cd_link_fragments.cpp ${CANDOCK_SRC})
+add_executable( cd_minimize_force cd_minimize_force.cpp ${CANDOCK_SRC})
+add_executable( cd_rescore_docked cd_rescore_docked.cpp ${CANDOCK_SRC})
+add_executable( cd_design_ligands cd_design_ligands.cpp ${CANDOCK_SRC})
 
 target_link_libraries( cd_check_options  ${all_needed_libraries} )
-target_link_libraries( cd_bsite_probis   ${all_needed_libraries} )
+target_link_libraries( cd_find_centroids   ${all_needed_libraries} )
 target_link_libraries( cd_prep_fragments ${all_needed_libraries} )
+target_link_libraries( cd_make_objective ${all_needed_libraries} )
 target_link_libraries( cd_dock_fragments ${all_needed_libraries} )
 target_link_libraries( cd_link_fragments ${all_needed_libraries} )
+target_link_libraries( cd_minimize_force ${all_needed_libraries} )
+target_link_libraries( cd_rescore_docked ${all_needed_libraries} )
 target_link_libraries( cd_design_ligands ${all_needed_libraries} )
 
+set_target_properties(
+        cd_check_options
+        cd_find_centroids
+        cd_prep_fragments
+        cd_make_objective
+        cd_dock_fragments
+        cd_link_fragments
+        cd_design_ligands
+        cd_rescore_docked
+    PROPERTIES
+    INSTALL_RPATH ${CMAKE_INSTALL_PREFIX}/lib
+    INSTALL_RPATH_USE_LINK_PATH TRUE
+)
+
+
 if(CUDA_FOUND)
+    cuda_add_executable( cuda_link_fragments cd_link_fragments.cpp )
     target_link_libraries( cuda_link_fragments ${all_needed_libraries} )
+    set_target_properties(
+        cuda_link_fragments
+        PROPERTIES
+        INSTALL_RPATH ${CMAKE_INSTALL_PREFIX}/lib
+        INSTALL_RPATH_USE_LINK_PATH TRUE
+    )
 endif(CUDA_FOUND)
 
-install( TARGETS
-    candock genpot
-    test_minimization
-    test_fragmenting
-    test_bsite
-    test_clq
-    test_link
-    test_singlepoint
-    test_cofactor
-    
-    cd_check_options
-    cd_bsite_probis
-    cd_prep_fragments
-    cd_dock_fragments
-    cd_link_fragments
-    cd_design_ligands
-    
-    RUNTIME DESTINATION v${CANDOCK_MAJOR_VERSION}.${CANDOCK_MINOR_VERSION}.${CANDOCK_TWEAK_VERSION}
+install(
+    TARGETS    
+        cd_check_options
+        cd_find_centroids
+        cd_prep_fragments
+        cd_make_objective
+        cd_dock_fragments
+        cd_link_fragments
+        cd_design_ligands
+        cd_rescore_docked
+
+    RUNTIME DESTINATION
+        bin
 )

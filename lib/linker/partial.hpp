@@ -1,11 +1,11 @@
 #ifndef CONFORMATION_H
 #define CONFORMATION_H
 #include "helper/debug.hpp"
-#include "pdbreader/it.hpp"
+#include "molib/it.hpp"
 #include "fragmenter/fragmenter.hpp"
 #include "geom3d/coordinate.hpp"
-#include "pdbreader/internal.hpp"
-#include "pdbreader/grid.hpp"
+#include "molib/internal.hpp"
+#include "molib/grid.hpp"
 #include <tuple>
 #include <functional>
 #include "segment.hpp"

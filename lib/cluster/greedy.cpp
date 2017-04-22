@@ -1,5 +1,5 @@
-#include "pdbreader/grid.hpp"
-#include "pdbreader/molecules.hpp"
+#include "molib/grid.hpp"
+#include "molib/molecules.hpp"
 #include "score/score.hpp"
 #include "helper/benchmark.hpp"
 #include "helper/debug.hpp"
@@ -78,7 +78,7 @@ namespace Molib {
 		return reps;
 	}
 
-	Linker::Partial::Vec Cluster::greedy(const Linker::Partial::Vec &initial, const Molib::Atom::Grid &gridrec, const double clus_rad) {
+	Linker::Partial::Vec Cluster::greedy(const Linker::Partial::Vec &initial, const Molib::Atom::Grid&, const double clus_rad) {
 
 		Benchmark bench;
 
@@ -112,7 +112,7 @@ namespace Molib {
 						dbgmsg("conformation2 " << pconf->get_molecule());
 						confs.erase(pconf);
 					}
-				} catch(const Error &e) {
+				} catch(const Error &) {
 					// if calculation of rmsd didn't succeed don't do nothing
 					// consequently all conformations will be representative
 				}

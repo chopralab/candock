@@ -3,7 +3,7 @@
 
 #include "gpoints.hpp"
 #include "conformations.hpp"
-#include "pdbreader/molecules.hpp"
+#include "molib/molecules.hpp"
 
 namespace Molib {
 	class Molecule;
@@ -62,7 +62,7 @@ namespace Docker {
 #ifndef NDEBUG
 		Dock(const Gpoints &gpoints, Conformations &conformations, const Molib::Molecule &seed, const Molib::Score &score, 
 			 const Molib::Atom::Grid &gridrec, const double rmsd_tol=2.0) : __gpoints(gpoints), __conformations(conformations), 
-			__seed(seed), __score(score), __gridrec(gridrec), __rmsd_tol(rmsd_tol) {}
+			__seed(seed),  __rmsd_tol(rmsd_tol), __score(score),  __gridrec(gridrec) {}
 #else
 		Dock(const Gpoints &gpoints, Conformations &conformations, Molib::Molecule &seed, const double rmsd_tol=2.0) 
 			: __gpoints(gpoints), __conformations(conformations), __seed(seed), __rmsd_tol(rmsd_tol) {}

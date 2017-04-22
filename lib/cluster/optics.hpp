@@ -60,18 +60,8 @@ namespace cluster {
 			}
 		}
 
-#ifndef NDEBUG
-		void __print_neighbors(T &p) {
-				//~ dbgmsg("neighbors of " << p << " are:");
-			for (auto pp : __neighbors[&p]) {
-				//~ dbgmsg("\t" << *pp << "\tdistance="<< __distance[&p][pp]);
-			}
-		}
-#endif
-
 		void __expand_cluster_order(T &p) {
 #ifndef NDEBUG
-			__print_neighbors(p);
 			assert(__processed[&p] == false);
 #endif
 			__processed[&p] = true;
@@ -116,7 +106,6 @@ namespace cluster {
 							//~ << "\treachability_distance="<< __reachability_distance[pp]);
 //~ #endif
 //~ #ifndef NDEBUG
-					//~ __print_neighbors(q);
 					//~ assert(__processed[&q] == false);
 //~ #endif
 					__processed[&q] = true;

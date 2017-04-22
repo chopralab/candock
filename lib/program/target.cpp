@@ -1,12 +1,17 @@
 #include "target.hpp"
 
-#include "pdbreader/pdbreader.hpp"
+#include <boost/filesystem.hpp>
 
 #include "helper/path.hpp"
-#include "common.hpp"
+#include "fragmenter/unique.hpp"
+#include "molib/molecule.hpp"
+#include "parser/fileparser.hpp"
+
+#include "modeler/systemtopology.hpp"
+#include "modeler/modeler.hpp"
 
 namespace Program {
-	Target::Target(const std::string& input_name ) {
+	Target::Target(const std::string& input_name) {
 
 		// If the user doesn't want to use this feature
 		if (input_name == "")
@@ -20,23 +25,23 @@ namespace Program {
 		 * the receptor molecule(s)
 		 * 
 		 */
-		if ( inout::Inout::file_size(input_name) > 0 ) {
+		if ( Inout::file_size(input_name) > 0 ) {
 			// If the option given is a regular file, act like previous versions
-			Molib::PDBreader rpdb(input_name, Molib::PDBreader::first_model);
+			Parser::FileParser rpdb(input_name, Parser::first_model);
 			Molib::Molecules receptors = rpdb.parse_molecule();
 			Molib::Molecule& current = __receptors.add(new Molib::Molecule ( std::move (receptors[0]) ));
 			current.set_name(boost::filesystem::basename(input_name.substr(0, input_name.length() - 4))); // Emulate the original version of candock
                         boost::filesystem::create_directory(current.name());
-			__preprecs.push_back(DockedReceptor {current, nullptr, nullptr, nullptr});
-		} else for ( const auto &a : inout::Inout::files_matching_pattern (input_name, ".pdb")) {
+                        __preprecs.push_back(DockedReceptor (current, input_name));
+                } else for ( const auto &a : Inout::files_matching_pattern (input_name, ".pdb")) {
 			// Otherwise we treat it like the new version intends.
-			Molib::PDBreader rpdb(a, Molib::PDBreader::first_model);
+			Parser::FileParser rpdb(a, Parser::first_model);
 			Molib::Molecules receptors = rpdb.parse_molecule();
 			Molib::Molecule& current = __receptors.add(new Molib::Molecule ( std::move (receptors[0]) ));
 			current.set_name( a.substr(0, a.length() - 4 ) );
 			boost::filesystem::create_directory(current.name());
 
-			__preprecs.push_back(DockedReceptor {current, nullptr, nullptr, nullptr});
+			__preprecs.push_back(DockedReceptor (current, a));
 		}
 
 		/* Compute atom types for receptor and cofactor(s): gaff types for protein, 
@@ -60,119 +65,343 @@ namespace Program {
 		 * 
 		 */
 		for ( auto &a : __preprecs ) {
-			std::unique_ptr<Molib::Atom::Grid> pgridrec(new Molib::Atom::Grid(a.protein.get_atoms()));
-			a.gridrec = std::move(pgridrec);
+			a.gridrec = new Molib::Atom::Grid(a.protein.get_atoms());
 		}
 	}
 
-	void Target::find_centroids(const CmdLnOpts& cmdl ) {
-		for ( auto &a : __preprecs ) {
-			std::unique_ptr<FindCentroids> pcen (new FindCentroids(a.protein));
+        /* Read distributions file and initialize scores
+         * 
+         */
 
-			/* Run section of Candock designed to find binding site1s
-			 * Currently, this runs ProBIS and does not require any
-			 * previous step to be competed.
-			 *
-			 */
+        void Target::__initialize_score(const FragmentLigands &ligand_fragments) {
+                for ( auto& a : __preprecs ) {
+                        if ( a.score != nullptr) {
+                                continue;
+                        }
 
-			pcen->run_step(cmdl);
-			a.centroids = std::move(pcen);
-		}
-	}
+                        a.score = new Molib::Score(cmdl.get_string_option("ref"), cmdl.get_string_option("comp"),
+                                                   cmdl.get_string_option("func"),cmdl.get_int_option("cutoff"),
+                                                   cmdl.get_double_option("step"));
 
-	void Target::dock_fragments(const FragmentLigands& ligand_fragments, const CmdLnOpts& cmdl) {
-		for ( auto &a : __preprecs ) {
+                        a.score->define_composition(a.protein.get_idatm_types(),
+                                                   ligand_fragments.ligand_idatm_types())
+                              .process_distributions_file(cmdl.get_string_option("dist"))
+                              .compile_scoring_function()
+                              .parse_objective_function(cmdl.get_string_option("obj_dir"), cmdl.get_double_option("scale"));
+                }
+        }
 
-			/* Read distributions file and initialize scores
-			* 
-			*/
+        void Target::__initialize_ffield() {
+                for (auto& a : __preprecs) {
+                        if ( a.ffield != nullptr) {
+                                continue;
+                        }
 
-			std::unique_ptr<Molib::Score> score (new Molib::Score(cmdl.ref_state(), cmdl.comp(),
-																  cmdl.rad_or_raw(), cmdl.dist_cutoff(),
-																  cmdl.step_non_bond()));
+                        // Prepare the receptor for docking to
+                        OMMIface::ForceField* ffield = new OMMIface::ForceField;
 
-			score->define_composition(__receptors.get_idatm_types(),
-									ligand_fragments.ligand_idatm_types())
-									.process_distributions_file(cmdl.distributions_file())
-									.compile_scoring_function()
-									.parse_objective_function(cmdl.obj_dir(), cmdl.scale_non_bond());
+                        ffield->parse_gaff_dat_file(cmdl.get_string_option("gaff_dat"))
+                                .add_kb_forcefield(*a.score, cmdl.get_double_option("step"))
+                                .parse_forcefield_file(cmdl.get_string_option("amber_xml"))
+                                .parse_forcefield_file(cmdl.get_string_option("water_xml"));
 
-			a.score = std::move(score);
+                        a.ffield = ffield;
 
-			// Prepare the receptor for docking to
-			std::unique_ptr<OMMIface::ForceField> ffield ( new OMMIface::ForceField);
+                        a.protein.prepare_for_mm(*a.ffield, *a.gridrec);
+                }
+        }
 
-			ffield->parse_gaff_dat_file(cmdl.gaff_dat_file())
-				.add_kb_forcefield(*a.score, cmdl.step_non_bond())
-				.parse_forcefield_file(cmdl.amber_xml_file())
-				.parse_forcefield_file(cmdl.water_xml_file());
+        std::set<int> Target::get_idatm_types(const std::set<int>& previous) {
+                return __receptors.get_idatm_types(previous);
+        }
 
-			a.ffield = std::move(ffield);
+        void Target::find_centroids( ) {
+                for ( auto &a : __preprecs ) {
+                        
+                        if ( a.centroids != nullptr ) {
+                                continue;
+                        }
+                        
+                        /* Run section of Candock designed to find binding site1s
+                         * Currently, this runs ProBIS and does not require any
+                         * previous step to be competed.
+                         *
+                         */
 
-			a.protein.prepare_for_mm(*a.ffield, *a.gridrec);
+                        a.centroids = new FindCentroids(a.protein, a.filename);
+                        a.centroids->run_step();
+                }
+        }
 
-			std::unique_ptr<DockFragments> pdockfragments(new DockFragments(*a.centroids, ligand_fragments, *a.score, *a.gridrec, a.protein.name(), cmdl));
-			pdockfragments->run_step(cmdl);
-			a.prepseeds = std::move(pdockfragments);
-		}
-	}
+        void Target::rescore_docked(const FragmentLigands& ligand_fragments) {
 
-	void Target::link_fragments(const CmdLnOpts& cmdl) {
+                __initialize_score(ligand_fragments);
+                __initialize_ffield();
 
-		for ( auto &a : __preprecs ) {
-			a.ffield->insert_topology(a.protein);
-			std::unique_ptr<LinkFragments> plinkfragments(new LinkFragments(a.protein, *a.score, *a.ffield, *a.gridrec));
-			plinkfragments->run_step(cmdl);
-			a.dockedlig = std::move(plinkfragments);
-		}
-	}
+                for ( auto &a : __preprecs ) {
 
-	void Target::design_ligands(const CmdLnOpts& cmdl, FragmentLigands& ligand_fragments, const std::set<std::string>& seeds_to_add ) {
+                        Parser::FileParser lpdb(cmdl.get_string_option("prep"), 
+                        Parser::all_models|Parser::hydrogens, 
+                        cmdl.get_int_option("max_num_ligands"));
+
+                        Molib::Molecules ligands = lpdb.parse_molecule();
+
+                        for ( auto &ligand : ligands ) {
+                                const double energy = a.score->non_bonded_energy(*a.gridrec, ligand);
+
+                                Inout::output_file(Molib::Molecule::print_complex(ligand, a.protein, energy), 
+                                Path::join( cmdl.get_string_option("docked_dir"), ligand.name() + ".pdb"),  ios_base::app);
+
+                                cout << "Energy is " << energy << " for " << ligand.name() << " in " << a.protein.name() << endl;
+                        }
+                }
+        }
+
+        void Target::dock_fragments(const FragmentLigands& ligand_fragments) {
+
+                find_centroids();
+
+                __initialize_score(ligand_fragments);
+                __initialize_ffield();
+
+                for ( auto &a : __preprecs ) {
+
+                        if (a.prepseeds != nullptr) {
+                                continue;
+                        }
+
+                        a.prepseeds = new DockFragments(*a.centroids, ligand_fragments, *a.score, *a.gridrec, a.protein.name());
+                        a.prepseeds->run_step();
+                }
+        }
+
+        void Target::link_fragments(const FragmentLigands &ligand_fragments) {
+
+                dock_fragments(ligand_fragments);
+
+                OMMIface::SystemTopology::loadPlugins();
+
+                for ( auto &a : __preprecs ) {
+
+                        if ( a.dockedlig != nullptr ) {
+                                continue;
+                        }
+
+                        a.ffield->insert_topology(a.protein);
+                        a.dockedlig = new LinkFragments(a.protein, *a.score, *a.ffield, *a.prepseeds, *a.gridrec);
+                        a.dockedlig->run_step();
+                }
+        }
+
+        void Target::minimize_force(const FragmentLigands &ligand_fragments) {
+
+                OMMIface::SystemTopology::loadPlugins();
+
+                __initialize_score(ligand_fragments);
+                __initialize_ffield();
+
+                for ( auto &a : __preprecs ) {
+
+                        Parser::FileParser lpdb(cmdl.get_string_option("prep"), Parser::all_models|Parser::hydrogens, -1);
+
+                        Molib::Molecules ligands = lpdb.parse_molecule();
+
+                        for (auto &ligand : ligands) {
+                                try {
+
+                                        /**
+                                         * Minimize system
+                                         */
+
+                                        a.ffield->insert_topology (ligand);
+
+                                        OMMIface::Modeler modeler (*a.ffield, cmdl.get_string_option("fftype"), cmdl.get_int_option("cutoff"),
+                                                  cmdl.get_double_option("mini_tol"), cmdl.get_int_option("max_iter"), cmdl.get_int_option("update_freq"), 
+                                                  cmdl.get_double_option("pos_tol"), false, 2.0);
+
+                                        modeler.add_topology (a.protein.get_atoms());
+                                        modeler.add_topology (ligand.get_atoms());
+
+                                        modeler.init_openmm();
+
+                                        modeler.add_crds (a.protein.get_atoms(), a.protein.get_crds());
+                                        modeler.add_crds (ligand.get_atoms(), ligand.get_crds());
+
+                                        modeler.init_openmm_positions();
+
+                                        cout << "Initial energy for " << a.protein.name() << " and " << ligand.name() 
+                                             << " = " << a.score->non_bonded_energy (*a.gridrec, ligand) << endl;
+
+                                        modeler.minimize_state (ligand, a.protein, *a.score);
+
+                                        // init with minimized coordinates
+                                        Molib::Molecule minimized_receptor (a.protein, modeler.get_state (a.protein.get_atoms()));
+                                        Molib::Molecule minimized_ligand (ligand, modeler.get_state (ligand.get_atoms()));
+
+                                        minimized_receptor.undo_mm_specific();
+
+                                        Molib::Atom::Grid gridrec (minimized_receptor.get_atoms());
+                                        const double energy = a.score->non_bonded_energy (gridrec, minimized_ligand);
+
+                                        cout << "Minimized energy = " << energy << endl;
+
+                                        Inout::output_file (Molib::Molecule::print_complex (minimized_ligand, minimized_receptor, energy),
+                                                            Path::join (cmdl.get_string_option("docked_dir"), minimized_ligand.name() + ".pdb"), ios_base::app);
+
+                                } catch (exception &e) {
+                                        cerr << "MINIMIZATION FAILED FOR LIGAND " << ligand.name()
+                                             << " because of " << e.what() << endl;
+                                }
+
+                                a.ffield->erase_topology (ligand);
+                        }
+                }
+        }
+
+        void Target::make_scaffolds(FragmentLigands& ligand_fragments, const std::set<std::string>& seeds_to_add ) {
+                Molib::Unique created_design("designed.txt");
+                Molib::Molecules all_designs;
+
+                cout << "Starting iteration #0 (making a scaffold)" << endl;
+                const string design_file = "designed_0.pdb";
+                if ( Inout::file_size(design_file) ) {
+                        cout << design_file << " found -- skipping generation of new designs this iteration" << endl;
+                        Parser::FileParser dpdb (design_file, Parser::all_models );
+                        Molib::Molecules designs;
+                        dpdb.parse_molecule(designs);
+
+                        ligand_fragments.add_seeds_from_molecules(designs);
+                        all_designs.add(designs);
+                } else {
+                    for (auto &a : __preprecs) {
+                        Molib::NRset nr = a.prepseeds->get_top_seeds(seeds_to_add, cmdl.get_double_option("top_percent") );
+                        for ( auto &molecules : nr ) {
+                                design::Design designer (molecules.first(), created_design);
+                                designer.change_original_name(molecules.name());
+                                designer.functionalize_hydrogens_with_fragments(nr, cmdl.get_double_option("tol_seed_dist"), cmdl.get_double_option("clash_coeff"));
 #ifndef NDEBUG
-		for (auto &s : seeds_to_add ) {
-			cout << s << endl;
-		}
+                Inout::output_file(designer.get_internal_designs(), "internal_designs.pdb", ios_base::app);
 #endif
-		for ( auto &a : __preprecs ) {
-			
-			if ( inout::Inout::file_size("designed.pdb") ) {
-				
-				cout << "designed.pdb found -- skipping generation of new designs" << endl;
-				
-				Molib::PDBreader dpdb ("designed.pdb", Molib::PDBreader::all_models );
-				Molib::Molecules designs;
-				dpdb.parse_molecule(designs);
+                                all_designs.add( designer.prepare_designs() );
+                        }
+                    }
+                }
 
-				ligand_fragments.add_seeds_from_molecules(designs, cmdl);
-				a.prepseeds->run_step(cmdl);
-				a.dockedlig->link_ligands(designs, cmdl);
+                if ( all_designs.size() == 0 ) {
+                        cout << "No new designs, exiting" << endl;
+                        return;
+                }
 
-				continue;
-			}
+                all_designs .compute_hydrogen()
+                            .compute_bond_order()
+                            .compute_bond_gaff_type()
+                            .refine_idatm_type()
+                            .erase_hydrogen()  // needed because refine changes connectivities
+                            .compute_hydrogen()   // needed because refine changes connectivities
+                            .compute_ring_type()
+                            .compute_gaff_type()
+                            .compute_rotatable_bonds() // relies on hydrogens being assigned
+                            .erase_hydrogen()
+                            .compute_overlapping_rigid_segments(cmdl.get_string_option("seeds"));
 
-			std::unique_ptr<design::Design> designer( new design::Design( a.dockedlig->top_poses().first() ));
-			if (! seeds_to_add.empty() )
-				designer->functionalize_hydrogens_with_fragments(common::read_top_seeds_files(seeds_to_add,
-																 Path::join(a.protein.name(), cmdl.top_seeds_dir()),
-																 cmdl.top_seeds_file(), cmdl.top_percent() ),
-																 cmdl.tol_seed_dist(), cmdl.clash_coeff() );
+                Inout::output_file(all_designs, design_file);
 
-			const vector<string>& h_single_atoms = cmdl.get_string_vector("add_single_atoms");
-			const vector<string>& a_single_atoms = cmdl.get_string_vector("change_terminal_atom");
+                ligand_fragments.add_seeds_from_molecules(all_designs);
+                for ( auto &b : __preprecs ) {
+                        b.prepseeds->run_step();
+                        b.dockedlig->clear_top_poses();
+                        b.dockedlig->link_ligands(all_designs);
+                }
+        }
 
-			if (!a_single_atoms.empty())
-				designer->functionalize_extremes_with_single_atoms(a_single_atoms);
-			if (!h_single_atoms.empty())
-				designer->functionalize_hydrogens_with_single_atoms(h_single_atoms);
+        void Target::design_ligands(FragmentLigands& ligand_fragments, const std::set<std::string>& seeds_to_add ) {
 #ifndef NDEBUG
-			inout::output_file(designer->get_internal_designs(), "internal_designs.pdb");
+                for (auto &s : seeds_to_add ) {
+                        cout << s << endl;
+                }
 #endif
-			inout::output_file(designer->prepare_designs(cmdl.seeds_file()), "designed.pdb");
-			ligand_fragments.add_seeds_from_molecules(designer->designs(), cmdl);
-			a.prepseeds->run_step(cmdl);
-			a.dockedlig->link_ligands(designer->designs(), cmdl);
-		}
-	}
+
+                int n = 1;
+                Molib::Unique created_design("designed.txt");
+                while (true) { // Probably a bad idea
+
+                    cout << "Starting design iteration #" << n << endl;
+
+                    string design_file = "designed_" + std::to_string(n++) + ".pdb";
+                    Molib::Molecules all_designs;
+                    if ( Inout::file_size(design_file) ) {
+                            cout << design_file << " found -- skipping generation of new designs this iteration" << endl;
+                            Parser::FileParser dpdb (design_file, Parser::all_models );
+                            Molib::Molecules designs;
+                            dpdb.parse_molecule(designs);
+
+                            ligand_fragments.add_seeds_from_molecules(designs);
+                            all_designs.add(designs);
+                    } else {
+                        for ( auto &a : __preprecs ) {
+                            for ( auto &molecule : a.dockedlig->top_poses() ) {
+                                design::Design designer ( molecule, created_design);
+                                if (! seeds_to_add.empty() )
+                                        designer.functionalize_hydrogens_with_fragments(a.prepseeds->get_top_seeds(seeds_to_add,cmdl.get_double_option("top_percent")),
+                                                                                        cmdl.get_double_option("tol_seed_dist"), cmdl.get_double_option("clash_coeff") );
+
+                                const vector<string>& h_single_atoms = cmdl.get_string_vector("add_single_atoms");
+                                const vector<string>& a_single_atoms = cmdl.get_string_vector("change_terminal_atom");
+
+                                if (!a_single_atoms.empty())
+                                        designer.functionalize_extremes_with_single_atoms(a_single_atoms);
+                                if (!h_single_atoms.empty())
+                                        designer.functionalize_hydrogens_with_single_atoms(h_single_atoms);
+#ifndef NDEBUG
+                                Inout::output_file(designer.get_internal_designs(), "internal_designs.pdb", ios_base::app);
+#endif
+                                all_designs.add( designer.prepare_designs() );
+                            }
+                        }
+                    }
+
+                    if ( all_designs.size() == 0 ) {
+                            cout << "No new designs, exiting" << endl;
+                            return;
+                    }
+
+                    all_designs.compute_hydrogen()
+                               .compute_bond_order()
+                               .compute_bond_gaff_type()
+                               .refine_idatm_type()
+                               .erase_hydrogen()  // needed because refine changes connectivities
+                               .compute_hydrogen()   // needed because refine changes connectivities
+                               .compute_ring_type()
+                               .compute_gaff_type()
+                               .compute_rotatable_bonds() // relies on hydrogens being assigned
+                               .erase_hydrogen()
+                               .compute_overlapping_rigid_segments(cmdl.get_string_option("seeds"));
+
+                    Inout::output_file(all_designs, design_file);
+
+                    ligand_fragments.add_seeds_from_molecules(all_designs);
+                    for ( auto &b : __preprecs ) {
+                        b.prepseeds->run_step();
+                        b.dockedlig->clear_top_poses();
+                        b.dockedlig->link_ligands(all_designs);
+                    }
+                }
+        }
+
+        void Target::make_objective() {
+                Molib::Score score(cmdl.get_string_option("ref"), "complete",
+                                   cmdl.get_string_option("func"), cmdl.get_int_option("cutoff"),
+                                   cmdl.get_double_option("step"));
+
+                score.define_composition(set<int>(), set<int>())
+                     .process_distributions_file(cmdl.get_string_option("dist"))
+                     .compile_objective_function();
+
+                score.output_objective_function(cmdl.get_string_option("obj_dir"));
+
+                Inout::output_file(score, cmdl.get_string_option("potential_file"));
+
+        }
 
 	std::multiset<std::string> Target::determine_overlapping_seeds(const int max_seeds, const int number_of_occurances) const {
 
@@ -199,7 +428,7 @@ namespace Program {
 		return good_seed_list;
 	}
 
-	std::set<std::string> Target::determine_non_overlapping_seeds( const Target& targets, const Target& antitargets, const CmdLnOpts& cmdl ) {
+	std::set<std::string> Target::determine_non_overlapping_seeds( const Target& targets, const Target& antitargets ) {
 		set<string> solo_target_seeds;
 		const vector<string>& forced_seeds = cmdl.get_string_vector("force_seed");
 

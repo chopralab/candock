@@ -1,11 +1,11 @@
 #ifndef SEGMENT_H
 #define SEGMENT_H
 #include "helper/debug.hpp"
-#include "pdbreader/it.hpp"
+#include "molib/it.hpp"
 #include "fragmenter/fragmenter.hpp"
 #include "geom3d/coordinate.hpp"
-#include "pdbreader/internal.hpp"
-#include "pdbreader/molecule.hpp"
+#include "molib/internal.hpp"
+#include "molib/molecule.hpp"
 #include "graph/graph.hpp"
 #include <tuple>
 #include <functional>
@@ -45,15 +45,15 @@ namespace Linker {
 	public:
 
 		int get_seed_id() const { return __seed_id; }
-		bool has_next(const Segment &goal) const { return __next.count(&goal); }
+		bool has_next(const Segment &goal) const { return __next.count(&goal) != 0; }
 		Segment &get_next(const Segment &goal) const { return *__next.at(&goal); } // get next seg in the direction of goal
 		void set_next(Segment &goal, Segment &next) { __next.insert({&goal, &next}); }
 		const ConstSet& get_adjacent_seed_segments() const { return __adjacent_seed_segments; }
 		void set_adjacent_seed_segments(Segment &seed_seg) { __adjacent_seed_segments.insert(&seed_seg); }
-		bool is_seed_adjacent(const Segment &other) const { return __adjacent_seed_segments.count(&other); }
+		bool is_seed_adjacent(const Segment &other) const { return __adjacent_seed_segments.count(&other) != 0; }
 		const Molib::Atom::Vec& get_atoms() const { return __atoms; }
 		const Molib::Atom& get_atom(const int i) const { return *__atoms[i]; }
-		bool has_atom(const Molib::Atom &atom) const { return __amap.count(&atom); }
+		bool has_atom(const Molib::Atom &atom) const { return __amap.count(&atom) != 0; }
                 int get_idx(const Molib::Atom &atom) const { return __amap.at(&atom); }
 		string get_label() const { stringstream ss; ss << *this; return ss.str(); } // graph ostream operator
 		int weight() const { return 0; } // dummy for graph ostream operator

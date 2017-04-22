@@ -1,13 +1,13 @@
 #include "linker.hpp"
 #include "score/score.hpp"
-#include "pdbreader/nrset.hpp"
+#include "molib/nrset.hpp"
 #include "helper/benchmark.hpp"
 #include "helper/help.hpp"
 #include "helper/array2d.hpp"
 #include "modeler/modeler.hpp"
 #include "geom3d/quaternion.hpp"
 #include "poses.hpp"
-#include "pdbreader/internal.hpp"
+#include "molib/internal.hpp"
 #include <queue>
 
 using namespace std;
@@ -196,7 +196,7 @@ namespace Linker {
 	}
 	
 	bool Linker::GenericLinker::__clashes_ligand(const State &current, 
-		const Partial &conformation, const State &prev) const {
+		const Partial &conformation, const State &) const {
 
 		// clashes between current segment and previous segments
 		for (auto &pstate : conformation.get_states()) {

@@ -10,4 +10,4 @@ external/
 .idea/
 .kdev4/
 *.kdev4
-.*swp
+*.swp

@@ -1,6 +1,6 @@
 #ifndef DOCKEDCONFORMATION_H
 #define DOCKEDCONFORMATION_H
-#include "pdbreader/molecule.hpp"
+#include "molib/molecule.hpp"
 #include <memory>
 
 namespace Linker {
@@ -24,9 +24,9 @@ namespace Linker {
 		double get_energy() { return __energy; }
 		double get_energy() const { return __energy; }
 
+		friend bool operator<( const DockedConformation& other, const DockedConformation& other2) { return other.get_energy() < other2.get_energy(); }
 		static void sort(DockedConformation::Vec &v);
 
-        friend bool operator<( const DockedConformation& first, const DockedConformation& second ) { return first.get_energy() < second.get_energy(); }
 		friend ostream& operator<<(ostream& os, const DockedConformation &conf);
 	};
 	

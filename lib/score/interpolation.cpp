@@ -63,21 +63,22 @@ namespace Molib {
 	vector<double> Interpolation::interpolate_bspline(const vector<double> &dataX, const vector<double> &dataY, const double step, const size_t k, const size_t ncoeffs) {
 
 		assert(dataX.size() > 0 && dataX.size() == dataY.size());
-
+                
 		vector<double> pot;
 
 		const size_t n = dataX.size();
-		const size_t nbreak = ncoeffs + 2 - k; // nbreak = ncoeffs + 2 - k
+                const size_t ncoeffs2 = (ncoeffs < n)? ncoeffs : n;
+		const size_t nbreak = ncoeffs2 + 2 - k; // nbreak = ncoeffs2 + 2 - k
 
 		gsl_rng_env_setup();
 
 		gsl_bspline_workspace *bw = gsl_bspline_alloc(k, nbreak); // allocate a cubic bspline workspace (k = 4)
-		gsl_vector *B = gsl_vector_alloc(ncoeffs);
+		gsl_vector *B = gsl_vector_alloc(ncoeffs2);
 		gsl_rng *r = gsl_rng_alloc(gsl_rng_default);
-		gsl_vector *c = gsl_vector_alloc(ncoeffs), *w = gsl_vector_alloc(n);
+		gsl_vector *c = gsl_vector_alloc(ncoeffs2), *w = gsl_vector_alloc(n);
 		gsl_vector *x = gsl_vector_alloc(n), *y = gsl_vector_alloc(n);
-		gsl_matrix *X = gsl_matrix_alloc(n, ncoeffs), *cov = gsl_matrix_alloc(ncoeffs, ncoeffs);
-		gsl_multifit_linear_workspace *mw = gsl_multifit_linear_alloc(n, ncoeffs);
+		gsl_matrix *X = gsl_matrix_alloc(n, ncoeffs2), *cov = gsl_matrix_alloc(ncoeffs2, ncoeffs2);
+		gsl_multifit_linear_workspace *mw = gsl_multifit_linear_alloc(n, ncoeffs2);
 		double chisq;
 	
 		for (size_t i = 0; i < dataX.size(); ++i) {
@@ -101,7 +102,7 @@ namespace Molib {
 			gsl_bspline_eval(xi, B, bw);
 			
 			/* fill in row i of X */
-			for (size_t j = 0; j < ncoeffs; ++j) {
+			for (size_t j = 0; j < ncoeffs2; ++j) {
 				double Bj = gsl_vector_get(B, j);
 				gsl_matrix_set(X, i, j, Bj);
 			}

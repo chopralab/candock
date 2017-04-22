@@ -1,15 +1,11 @@
+#include "centroids.hpp"
 #include "helper/inout.hpp"
-#include "pdbreader/grid.hpp"
-#include "pdbreader/molecules.hpp"
+#include "molib/grid.hpp"
+#include "molib/molecules.hpp"
 #include "helper/benchmark.hpp"
 #include "geom3d/geom3d.hpp"
-#include "kabsch/kabsch.hpp"
-#include "score/score.hpp"
-#include "pdbreader/pdbreader.hpp"
+#include "parser/fileparser.hpp"
 #include "cluster/greedy.hpp"
-#include "centroids.hpp"
-#include <iostream>
-#include <exception>
 
 namespace Centro {
 
@@ -56,7 +52,7 @@ namespace Centro {
 	Centroids set_centroids(const string &centroid_file, const int num_bsites) {
 		Centroids centroids;
 		vector<string> data;
-		inout::Inout::read_file(centroid_file, data);
+		Inout::read_file(centroid_file, data);
 		for (string &line : data) {
 			stringstream ss(line);
 			int bsite_id;

@@ -2,7 +2,7 @@
 #define SCORE_H
 #include "helper/benchmark.hpp"
 #include "helper/error.hpp"
-#include "pdbreader/atom.hpp"
+#include "molib/atom.hpp"
 #include "cluster/optics.hpp"
 #include "geom3d/geom3d.hpp"
 #include <iostream>

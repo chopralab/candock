@@ -7,26 +7,34 @@ use Getopt::Long;
 
 my $number=10;
 my $no_make_files = 0;
-my @ligands = ();
+my $print_title = 0;
+my %variables = ();
 
 GetOptions("n|number=i" => \$number,
-           "l|ligand=s" => \@ligands,
-           "f|nofiles"  => \$no_make_files);
+           "f|nofiles"  => \$no_make_files,
+           "t|title" => \$print_title,
+           "v|variables=s" => \%variables);
 
 my $currkey;
 my $currlig;
 my %poses = ();
 
-print "number, molecule, score\n";
+if ($print_title) {
+
+    print 'number, molecule, score';
+
+    foreach my $variable (keys %variables) {
+        print ", $variable";
+    }
+
+    print "\n";
+
+}
 
 while (my $line = <>) {
     if ( $line =~ /^REMARK.*COMPLEX OF (\S*).* SCORE OF (\S*)/) {
         $currkey = $.;
         $currlig = $1;
-
-        if ( $#ligands != -1 and not ($currlig ~~ @ligands) ) {
-                next;
-        }
 
         unless ( defined $poses{$currlig} ) {
             $poses{$currlig} = {};
@@ -36,10 +44,6 @@ while (my $line = <>) {
         <>;
     }
 
-    if ( $#ligands != -1 and not ($currlig ~~ @ligands) ) {
-            next;
-    }
-    
     elsif ( $line =~ /^ATOM  / ) {
         push @{$poses{$currlig}->{$currkey}->{PROTEIN}}, substr( $line, 0, 80 );
     }
@@ -83,11 +87,17 @@ while ( my ($ligandkey, $ligand_hash) = each %poses ) {
             push @ordered_ligands, { ligand_name => $pymol_key, score => $ligand_hash->{$key}->{SCORE} };
         }
 
-      print "$count, $ligandkey, $ligand_hash->{$key}->{SCORE}\n";
+        print "$count, $ligandkey, $ligand_hash->{$key}->{SCORE}";
+      
+        foreach my $variable (values %variables ) {
+            print ", $variable"
+        }
 
-      $count++;
+        print "\n";
 
-      last if $count > $number;
+        $count++;
+
+        last if $count > $number;
     }
 
 }
