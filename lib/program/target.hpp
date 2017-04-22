@@ -1,9 +1,7 @@
 #ifndef TARGET_H
 #define TARGET_H
 
-#include "findcentroids.hpp"
-#include "dockfragments.hpp"
-#include "linkfragments.hpp"
+#include "fragmentligands.hpp"
 #include "design/design.hpp"
 
 #include "docker/gpoints.hpp"
@@ -14,6 +12,10 @@
 namespace Program {
 
         // TODO: Implement as a templated_map<Molecule,Target,Target> ????? Or as a Molecules?????
+
+        class FindCentroids;
+        class DockFragments;
+        class LinkFragments;
 
         class CANDOCK_EXPORT Target {
 
@@ -28,25 +30,7 @@ namespace Program {
                                 prepseeds (nullptr), dockedlig (nullptr) {
                         }
 
-                        virtual ~DockedReceptor() {
-                                if (score)
-                                        delete score;
-
-                                if (ffield)
-                                        delete ffield;
-
-                                if (gridrec)
-                                        delete gridrec;
-
-                                if (centroids)
-                                        delete centroids;
-
-                                if (prepseeds)
-                                        delete prepseeds;
-
-                                if (dockedlig)
-                                        delete dockedlig;
-                        }
+                        virtual ~DockedReceptor();
 
                         DockedReceptor (const DockedReceptor &rhs) = default;
                         DockedReceptor &operator= (const DockedReceptor &rhs) = default;
