@@ -2,7 +2,7 @@
 #include "program/cmdlnopts.hpp"
 #include "version.hpp"
 
-////////////////// BINDING SITE DETECTION USING PROBIS ///////////////////////////
+////////////////// PRINT OUT CANDOCK CONFIGURATION FILE ///////////////////////////
 
 using namespace std;
 
