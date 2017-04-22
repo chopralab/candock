@@ -69,7 +69,7 @@ namespace Docker {
 
 
 							if (confijk.i < 0 || confijk.j < 0 || confijk.k < 0 ||
-								confijk.i >= gmap.szi || confijk.j >= gmap.szj || confijk.k >= gmap.szk
+								(size_t)confijk.i >= gmap.szi || (size_t)confijk.j >= gmap.szj || (size_t)confijk.k >= gmap.szk
 								|| gmap.data[confijk.i][confijk.j][confijk.k] == nullptr) {
 								// mark as rejected all conformations that have this point
 								for (auto &r : __conformations.get_confs_at(gpoint0.ijk())) {

@@ -131,7 +131,7 @@ namespace Docker {
                         const int last_column = ceil(max_d/r);
                         const int last_row = ceil(max_d/(sqrt(3)*r));
                         const int last_layer = ceil(max_d/(2*r*sqrt(6)/3));
-        
+
                         // initialize mapping between gridpoints and discretized 3D space
                         __gmap[bsite_id].init(last_column + 1, last_row + 1, last_layer + 1);
                         //dbgmsg("gmap szi = " << __gmap.szi << " szj = " << __gmap.szj << " szk = " << __gmap.szk);
