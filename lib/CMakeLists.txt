@@ -57,7 +57,6 @@ target_link_libraries ( candock
     ${Boost_LIBRARIES}
     ${GSL_LIBRARIES}
     /usr/local/openmm/lib/libKBPlugin.so
-    /usr/local/openmm/lib/plugins/libKBPluginReference.so
 )
 
 endif (NOT ${CANDOCK_BUILD_STATIC_EXECUTABLE})

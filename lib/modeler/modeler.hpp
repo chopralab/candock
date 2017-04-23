@@ -4,12 +4,14 @@
 #include <map>
 #include <set>
 #include <vector>
+
+#include <openmm/Units.h>
+
 #include "geom3d/coordinate.hpp"
 #include "molib/molecule.hpp"
 #include "helper/help.hpp"
 #include "helper/benchmark.hpp"
-#include "OpenMM.h"
-#include "/usr/local/openmm/include/KBForce.h"
+#include "KBForce.h"
 #include "topology.hpp"
 #include "systemtopology.hpp"
 

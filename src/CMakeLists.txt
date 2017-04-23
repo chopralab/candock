@@ -31,7 +31,6 @@ if(${CANDOCK_BUILD_STATIC_EXECUTABLE})
         ${OPENMM_LIBRARY}
         ${GSL_LIBRARIES}
         /usr/local/openmm/lib/libKBPlugin.so
-        /usr/local/openmm/lib/plugins/libKBPluginReference.so
     )
 
 else (${CANDOCK_BUILD_STATIC_EXECUTABLE})
@@ -44,7 +43,6 @@ else (${CANDOCK_BUILD_STATIC_EXECUTABLE})
         ${OPENMM_LIBRARY}
         ${GSL_LIBRARIES}
         /usr/local/openmm/lib/libKBPlugin.so
-        /usr/local/openmm/lib/plugins/libKBPluginReference.so
     )
 
 endif (${CANDOCK_BUILD_STATIC_EXECUTABLE})

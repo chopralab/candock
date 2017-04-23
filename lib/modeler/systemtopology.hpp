@@ -9,12 +9,22 @@
 #include "helper/help.hpp"
 #include "molib/molecule.hpp"
 #include "modeler/topology.hpp"
-#include "OpenMM.h"
+#include "openmm/Vec3.h"
+
 using namespace std;
 
 namespace Molib {
 	class Atom;
 	class Molecule;
+};
+
+namespace OpenMM {
+        class System;
+        class Integrator;
+        class Context;
+        class HarmonicAngleForce;
+        class HarmonicBondForce;
+        class PeriodicTorsionForce;
 };
 
 namespace OMMIface {
