@@ -41,11 +41,11 @@ namespace Program {
 		cout << "Linking for all molecules in " << cmdl.get_string_option("prep") << " for " << __receptor.name() << " is complete, skipping." << endl;
 	}
 
-	void LinkFragments::__link_ligand( Molib::Molecule& ligand, const OMMIface::ForceField& ffield ) {
+        void LinkFragments::__link_ligand( Molib::Molecule& ligand, const OMMIface::ForceField& ffield ) {
                 boost::filesystem::path p(__receptor.name());
                 p = p / cmdl.get_string_option("docked_dir") / (ligand.name() + ".pdb");
                 if ( Inout::file_size(p.string()) > 0) {
-                        cout << ligand.name() << " is alread docked to " << __receptor.name() << ", reading from already docked file." << endl;
+                        cout << ligand.name() << " is alread docked to " << __receptor.name() << ", skipping." << endl;
                         return;
                 }
 
@@ -94,65 +94,70 @@ namespace Program {
                                         cmdl.get_double_option("max_allow_energy"), cmdl.get_int_option("max_num_possibles"),
                                         cmdl.get_int_option("max_clique_size"), cmdl.get_int_option("max_iter_final"));
 
-			Linker::DockedConformation::Vec docks = linker.link();
-			Linker::DockedConformation::sort(docks);
+                Linker::DockedConformation::Vec docks = linker.link();
+                        Linker::DockedConformation::sort (docks);
 
-			int model = 0;
-			for (auto &docked : docks) {
-				docked.get_ligand().change_residue_name("CAN"); 
-				Inout::output_file(Molib::Molecule::print_complex(docked.get_ligand(), docked.get_receptor(), docked.get_energy(), ++model), 
-						p.string(), ios_base::app); // output docked molecule conformations
-			}
-			__all_top_poses.add( new Molib::Molecule (docks[0].get_ligand()) );
-		} catch (exception& e) {
-			cerr << "Error: skipping ligand " << ligand.name() << " with " << __receptor.name() << " due to : " << e.what() << endl;
-			stringstream ss;
-			ligand.change_residue_name("CAN");
-			ss << "REMARK  20 non-binder " << ligand.name() << " with " << __receptor.name() << " because " << e.what() << endl << ligand;
-			Inout::file_open_put_stream(p.string(), ss, ios_base::app);
-		} 
-	}
+                        int model = 0;
 
-	void LinkFragments::__continue_from_prev ( )
-	{
+                        for (auto &docked : docks) {
+                                docked.get_ligand().change_residue_name ("CAN");
+                                Inout::output_file (Molib::Molecule::print_complex (docked.get_ligand(), docked.get_receptor(), docked.get_energy(), ++model),
+                                                    p.string(), ios_base::app); // output docked molecule conformations
+                        }
 
-		cout << "Starting to dock the fragments into originally given ligands" << endl;
+                        __all_top_poses.add (new Molib::Molecule (docks[0].get_ligand()));
+                } catch (exception &e) {
+                        cerr << "Error: skipping ligand " << ligand.name() << " with " << __receptor.name() << " due to : " << e.what() << endl;
+                        stringstream ss;
+                        ligand.change_residue_name ("CAN");
+                        ss << "REMARK  20 non-binder " << ligand.name() << " with " << __receptor.name() << " because " << e.what() << endl << ligand;
+                        Inout::file_open_put_stream (p.string(), ss, ios_base::app);
+                }
+        }
 
-                if ( ! Inout::file_size(cmdl.get_string_option("prep")) ) {
-                        cout << cmdl.get_string_option("prep") << " is either blank or missing, no (initial) ligand docking will take place.";
+        void LinkFragments::__continue_from_prev () {
+
+                cout << "Starting to dock the fragments into originally given ligands" << endl;
+
+                if (! Inout::file_size (cmdl.get_string_option ("prep"))) {
+                        cout << cmdl.get_string_option ("prep") << " is either blank or missing, no (initial) ligand docking will take place.";
                         return;
                 }
 
-		Parser::FileParser lpdb2(cmdl.get_string_option("prep"), Parser::all_models, 1);
+                Parser::FileParser lpdb2 (cmdl.get_string_option ("prep"), Parser::all_models, 1);
 
-		std::vector<std::thread> threads;
+                std::vector<std::thread> threads;
 
-		for(int i = 0; i < cmdl.ncpu(); ++i) {
-			threads.push_back( std::thread([&,this] {
-				OMMIface::ForceField ffcopy(__ffield);
-				Molib::Molecules ligands;
+                for (int i = 0; i < cmdl.ncpu(); ++i) {
+                        threads.push_back (std::thread ([ &,this] {
+                                OMMIface::ForceField ffcopy (__ffield);
+                                Molib::Molecules ligands;
 
-				while (lpdb2.parse_molecule(ligands)) {
-					Molib::Molecule &ligand = ligands.first();
+                                while (lpdb2.parse_molecule (ligands)) {
 
-					/**
-					 * Ligand's resn MUST BE UNIQUE for ffield
-					 */
-					ligand.change_residue_name(__concurrent_numbering, __ligand_cnt);
-					ffcopy.insert_topology(ligand);
-					__link_ligand(ligand, ffcopy);
-					ffcopy.erase_topology(ligand); // he he
-					ligands.clear();
-				}
-			} ) );
-		}
+                                        Molib::Molecule &ligand = ligands.first();
+                                        /**
+                                         * Ligand's resn MUST BE UNIQUE for ffield
+                                         */
+                                        ligand.change_residue_name (__concurrent_numbering, __ligand_cnt);
+                                        try {
+                                                ffcopy.insert_topology (ligand);
+                                                __link_ligand (ligand, ffcopy);
+                                                ffcopy.erase_topology (ligand); // he he
+                                                ligands.clear();
+                                        } catch(exception &e) {
+                                                cerr << "Error: problem with ligand " << ligand.name() << " due to : " << e.what() << endl;
+                                        }
+                                }
+                        }));
+                }
 
-		for(auto& thread : threads) {
-			thread.join();
-		}
+                for (auto &thread : threads) {
+                        thread.join();
+                }
 
-		cout << "Linking of fragments is complete" << endl;
-	}
+                cout << "Linking of fragments is complete" << endl;
+        }
 
 	void LinkFragments::link_ligands(const Molib::Molecules& ligands) {
 		size_t j = 0;
