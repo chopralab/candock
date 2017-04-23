@@ -39,10 +39,6 @@ else (${CANDOCK_BUILD_STATIC_EXECUTABLE})
     
     set( all_needed_libraries
         candock
-        ${OPENMM_LIBRARY}
-        ${OPENMM_KBPLUGIN}
-        ${Boost_LIBRARIES}
-        ${GSL_LIBRARIES}
     )
 
 endif (${CANDOCK_BUILD_STATIC_EXECUTABLE})
@@ -69,7 +65,7 @@ add_executable( cd_rescore_docked cd_rescore_docked.cpp ${CANDOCK_SRC})
 add_executable( cd_design_ligands cd_design_ligands.cpp ${CANDOCK_SRC})
 
 target_link_libraries( cd_check_options  ${all_needed_libraries} )
-target_link_libraries( cd_find_centroids   ${all_needed_libraries} )
+target_link_libraries( cd_find_centroids ${all_needed_libraries} )
 target_link_libraries( cd_prep_fragments ${all_needed_libraries} )
 target_link_libraries( cd_make_objective ${all_needed_libraries} )
 target_link_libraries( cd_dock_fragments ${all_needed_libraries} )
