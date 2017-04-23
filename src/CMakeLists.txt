@@ -27,8 +27,9 @@ if(${CANDOCK_BUILD_STATIC_EXECUTABLE})
     )
     
     set( all_needed_libraries
-        ${Boost_LIBRARIES}
         ${OPENMM_LIBRARY}
+        ${OPENMM_KBPLUGIN}
+        ${Boost_LIBRARIES}
         ${GSL_LIBRARIES}
     )
 
@@ -38,10 +39,10 @@ else (${CANDOCK_BUILD_STATIC_EXECUTABLE})
     
     set( all_needed_libraries
         candock
-        ${Boost_LIBRARIES}
         ${OPENMM_LIBRARY}
+        ${OPENMM_KBPLUGIN}
+        ${Boost_LIBRARIES}
         ${GSL_LIBRARIES}
-        /usr/local/openmm/lib/libKBPlugin.so
     )
 
 endif (${CANDOCK_BUILD_STATIC_EXECUTABLE})
