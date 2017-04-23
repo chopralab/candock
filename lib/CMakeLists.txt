@@ -54,9 +54,9 @@ add_library(
 
 target_link_libraries ( candock
     ${OPENMM_LIBRARY}
+    ${OPENMM_KBPLUGIN}
     ${Boost_LIBRARIES}
     ${GSL_LIBRARIES}
-    /usr/local/openmm/lib/libKBPlugin.so
 )
 
 endif (NOT ${CANDOCK_BUILD_STATIC_EXECUTABLE})

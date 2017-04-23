@@ -30,7 +30,6 @@ if(${CANDOCK_BUILD_STATIC_EXECUTABLE})
         ${Boost_LIBRARIES}
         ${OPENMM_LIBRARY}
         ${GSL_LIBRARIES}
-        /usr/local/openmm/lib/libKBPlugin.so
     )
 
 else (${CANDOCK_BUILD_STATIC_EXECUTABLE})
