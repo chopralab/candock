@@ -58,7 +58,7 @@ if (WIN32)
     set(Boost_USE_STATIC_RUNTIME     OFF)
     set(BOOST_ALL_DYN_LINK           ON)   # force dynamic linking for all libraries
 
-    add_definitions( /D_USE_MATH_DEFINES /DBOOST_ALL_NO_LIB /DBOOST_ALL_DYN_LINK /DWIN32_LEAN_AND_MEAN)
+    add_definitions( /D_USE_MATH_DEFINES /DBOOST_ALL_NO_LIB /DBOOST_ALL_DYN_LINK /DWIN32_LEAN_AND_MEAN /DWINVER=0x0A00 /D_WIN32_WINNT=0x0A00)
 
 else(WIN32)
 
