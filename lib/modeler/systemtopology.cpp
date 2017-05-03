@@ -34,13 +34,18 @@ namespace OMMIface {
                 delete system;
         }
 
-        void SystemTopology::loadPlugins() {
+        void SystemTopology::loadPlugins(const std::string& extra_dir) {
                 try {
                         // Load all available OpenMM plugins from their default location.
 
                         dbgmsg ("before loading plugins");
                         OpenMM::Platform::loadPluginsFromDirectory
                         (OpenMM::Platform::getDefaultPluginsDirectory());
+
+                        if ( !extra_dir.empty() ) {
+                                OpenMM::Platform::loadPluginsFromDirectory(extra_dir);
+                        }
+
                         dbgmsg ("after loading plugins");
                 } catch (const std::exception &e) {
                         cout << "The crash is " << e.what() << endl;

@@ -266,6 +266,20 @@ size_t initialize_scoring(const char* obj_dir) {
         }
 }
 
+size_t initialize_plugins(const char* plugin_dir) {
+
+        try {
+
+                OMMIface::SystemTopology::loadPlugins(plugin_dir);
+
+                return 1;
+
+        } catch( std::exception& e ) {
+                __error_string = std::string("Error in creating KBPlugin: ") + e.what();
+                return 0;
+        }
+}
+
 size_t initialize_ffield(const char* data_dir) {
 
         if ( __score == nullptr ) {
@@ -274,8 +288,6 @@ size_t initialize_ffield(const char* data_dir) {
         }
 
         try {
-
-                OMMIface::SystemTopology::loadPlugins();
 
                 boost::filesystem::path p (data_dir);
 

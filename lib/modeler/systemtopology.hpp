@@ -74,7 +74,7 @@ namespace OMMIface {
 	public:
 		SystemTopology() : system(nullptr), integrator(nullptr), context(nullptr), __kbforce_idx(-1) {}
 		~SystemTopology();
-		static void loadPlugins();
+		static void loadPlugins(const std::string& extra_dir = "" );
 		void mask(Topology &topology, const Molib::Atom::Vec &atoms);
 		void unmask(Topology &topology, const Molib::Atom::Vec &atoms);
 
