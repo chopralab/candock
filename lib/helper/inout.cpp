@@ -24,8 +24,11 @@
 #include "error.hpp"
 #include "inout.hpp"
 #include "debug.hpp"
+#include "logger.hpp"
 
 namespace Inout {
+
+        Severity Logger::__application_setting = WARNING;
 
         void __mkdir(const string &dir_path) {
                 // makes a path "janez/aska/mia from e.g. "janez/aska/mia/test.txt"

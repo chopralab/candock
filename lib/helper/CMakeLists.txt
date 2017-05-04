@@ -13,6 +13,7 @@ set( helper_SRC
         help.hpp
         inout.cpp
         inout.hpp
+        logger.hpp
         path.cpp
         path.hpp
         renamerules.hpp
