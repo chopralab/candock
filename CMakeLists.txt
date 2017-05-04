@@ -29,7 +29,7 @@ if ( NOT RAPIDXML_ROOT )
     set( RAPIDXML_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/foreign/ )
 endif( NOT RAPIDXML_ROOT )
 
-find_package(Boost    REQUIRED  COMPONENTS date_time filesystem system regex program_options)
+find_package(Boost    REQUIRED  COMPONENTS filesystem system regex program_options)
 find_package(GSL      REQUIRED)
 find_package(RapidXML REQUIRED)
 find_package(OpenMM   REQUIRED)
