@@ -189,7 +189,9 @@ namespace Program {
 			 "Maximum allowed energy for seed conformations")
 			("max_num_possibles",   po::value<int> ()->default_value (200000),
 			 "Maximum number of possibles conformations considered for clustering")
-			;
+                        ("rmsd_crystal", po::value<bool> ()->default_value (false, "false")->implicit_value(true),
+                         "If the crystal ligand's pose was given, calculate RMSDs for each pose")
+                        ;
 
 			po::options_description design_step ("Automated Design Options");
 			design_step.add_options()

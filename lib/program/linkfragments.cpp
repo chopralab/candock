@@ -9,63 +9,63 @@
 
 namespace Program {
 
-	bool LinkFragments::__can_read_from_files ()
-	{
-		boost::regex regex;
-		regex.assign("REMARK   5 MOLECULE (\\w*)");
-		std::ifstream file( cmdl.get_string_option("prep") );
-		
-		std::vector<std::string> all_names = Grep::search_stream(file, regex);
-		
-		boost::filesystem::path p ( __receptor.name());
-		p /= cmdl.get_string_option("docked_dir");
-		
-		bool is_done = true;
-		
-		for (auto molec : all_names) {
-			boost::filesystem::path p2 = p / (molec + ".pdb");
-			if ( Inout::file_size(p2.string()) <= 0) {
-				is_done = false;
-			} else {
-				Parser::FileParser conf(p2.string(), Parser::skip_atom | Parser::first_model, 1);
-				conf.parse_molecule(__all_top_poses);
-				__all_top_poses.last().set_name(molec);
-			}
-		}
-		
-		return is_done;
-	}
+        bool LinkFragments::__can_read_from_files () {
+                boost::regex regex;
+                regex.assign ("REMARK   5 MOLECULE (\\w*)");
+                std::ifstream file (cmdl.get_string_option ("prep"));
 
-	void LinkFragments::__read_from_files ()
-	{
-		cout << "Linking for all molecules in " << cmdl.get_string_option("prep") << " for " << __receptor.name() << " is complete, skipping." << endl;
-	}
+                std::vector<std::string> all_names = Grep::search_stream (file, regex);
 
-        void LinkFragments::__link_ligand( Molib::Molecule& ligand, const OMMIface::ForceField& ffield ) {
-                boost::filesystem::path p(__receptor.name());
-                p = p / cmdl.get_string_option("docked_dir") / (ligand.name() + ".pdb");
-                if ( Inout::file_size(p.string()) > 0) {
+                boost::filesystem::path p (__receptor.name());
+                p /= cmdl.get_string_option ("docked_dir");
+
+                bool is_done = true;
+
+                for (auto molec : all_names) {
+                        boost::filesystem::path p2 = p / (molec + ".pdb");
+
+                        if (Inout::file_size (p2.string()) <= 0) {
+                                is_done = false;
+                        } else {
+                                Parser::FileParser conf (p2.string(), Parser::skip_atom | Parser::first_model, 1);
+                                conf.parse_molecule (__all_top_poses);
+                                __all_top_poses.last().set_name (molec);
+                        }
+                }
+
+                return is_done;
+        }
+
+        void LinkFragments::__read_from_files () {
+                cout << "Linking for all molecules in " << cmdl.get_string_option ("prep") << " for " << __receptor.name() << " is complete, skipping." << endl;
+        }
+
+        void LinkFragments::__link_ligand (Molib::Molecule &ligand, const OMMIface::ForceField &ffield) {
+                boost::filesystem::path p (__receptor.name());
+                p = p / cmdl.get_string_option ("docked_dir") / (ligand.name() + ".pdb");
+
+                if (Inout::file_size (p.string()) > 0) {
                         cout << ligand.name() << " is alread docked to " << __receptor.name() << ", skipping." << endl;
                         return;
                 }
 
                 // if docking of one ligand fails, docking of others shall continue...
-                try { 
-                        dbgmsg("LINKING LIGAND : " << endl << ligand);
+                try {
+                        dbgmsg ("LINKING LIGAND : " << endl << ligand);
 
-                        if ( ligand.first().first().get_rigid().size() < 1 ) {
-                                throw Error("No seeds to link");
+                        if (ligand.first().first().get_rigid().size() < 1) {
+                                throw Error ("No seeds to link");
                         }
 
-                        /** 
+                        /**
                           * Read top seeds for this ligand
                           */
-                        Molib::NRset top_seeds = __seeds_database.get_top_seeds(ligand, cmdl.get_double_option("top_percent"));
+                        Molib::NRset top_seeds = __seeds_database.get_top_seeds (ligand, cmdl.get_double_option ("top_percent"));
 
                         ligand.erase_properties(); // required for graph matching
                         top_seeds.erase_properties(); // required for graph matching
 
-                        /** 
+                        /**
                          * Jiggle the coordinates by one-thousand'th of an Angstrom to avoid minimization failures
                          * with initial bonded relaxation failed errors
                         */
@@ -74,34 +74,35 @@ namespace Program {
                         /* Init minization options and constants, including ligand and receptor topology
                          *
                          */
-                        OMMIface::Modeler modeler(ffield, cmdl.get_string_option("fftype"), cmdl.get_int_option("cutoff"),
-                                                  cmdl.get_double_option("mini_tol"), cmdl.get_int_option("max_iter"), cmdl.get_int_option("update_freq"), 
-                                                  cmdl.get_double_option("pos_tol"), false, 2.0);
+                        OMMIface::Modeler modeler (ffield, cmdl.get_string_option ("fftype"), cmdl.get_int_option ("cutoff"),
+                                                   cmdl.get_double_option ("mini_tol"), cmdl.get_int_option ("max_iter"), cmdl.get_int_option ("update_freq"),
+                                                   cmdl.get_double_option ("pos_tol"), false, 2.0);
 
                         /**
-                         * Connect seeds with rotatable linkers, account for symmetry, optimize 
+                         * Connect seeds with rotatable linkers, account for symmetry, optimize
                          * seeds with appendices, minimize partial conformations between linking.
-                         * 
+                         *
                          */
-                        Linker::Linker linker(modeler, __receptor, ligand, top_seeds, __gridrec, __score, 
-                                        cmdl.get_bool_option("cuda"), cmdl.get_bool_option("iterative"),
-                                        cmdl.get_int_option("cutoff"), cmdl.get_int_option("spin"), 
-                                        cmdl.get_double_option("tol_seed_dist"), cmdl.get_double_option("lower_tol_seed_dist"), 
-                                        cmdl.get_double_option("upper_tol_seed_dist"),
-                                        cmdl.get_int_option("max_possible_conf"),
-                                        cmdl.get_int_option("link_iter"),
-                                        cmdl.get_double_option("clash_coeff"), cmdl.get_double_option("docked_clus_rad"), 
-                                        cmdl.get_double_option("max_allow_energy"), cmdl.get_int_option("max_num_possibles"),
-                                        cmdl.get_int_option("max_clique_size"), cmdl.get_int_option("max_iter_final"));
+                        Linker::Linker linker (modeler, __receptor, ligand, top_seeds, __gridrec, __score,
+                                               cmdl.get_bool_option ("cuda"), cmdl.get_bool_option ("iterative"),
+                                               cmdl.get_int_option ("cutoff"), cmdl.get_int_option ("spin"),
+                                               cmdl.get_double_option ("tol_seed_dist"), cmdl.get_double_option ("lower_tol_seed_dist"),
+                                               cmdl.get_double_option ("upper_tol_seed_dist"),
+                                               cmdl.get_int_option ("max_possible_conf"),
+                                               cmdl.get_int_option ("link_iter"),
+                                               cmdl.get_double_option ("clash_coeff"), cmdl.get_double_option ("docked_clus_rad"),
+                                               cmdl.get_double_option ("max_allow_energy"), cmdl.get_int_option ("max_num_possibles"),
+                                               cmdl.get_int_option ("max_clique_size"), cmdl.get_int_option ("max_iter_final"));
 
-                Linker::DockedConformation::Vec docks = linker.link();
+                        Linker::DockedConformation::Vec docks = linker.link();
                         Linker::DockedConformation::sort (docks);
 
                         int model = 0;
 
                         for (auto &docked : docks) {
                                 docked.get_ligand().change_residue_name ("CAN");
-                                Inout::output_file (Molib::Molecule::print_complex (docked.get_ligand(), docked.get_receptor(), docked.get_energy(), ++model),
+                                double rmsd = cmdl.get_bool_option ("rmsd_crystal") ? docked.get_ligand().compute_rmsd_ord (ligand) : std::nan ("");
+                                Inout::output_file (Molib::Molecule::print_complex (docked.get_ligand(), docked.get_receptor(), docked.get_energy(), ++model, rmsd),
                                                     p.string(), ios_base::app); // output docked molecule conformations
                         }
 
@@ -140,12 +141,13 @@ namespace Program {
                                          * Ligand's resn MUST BE UNIQUE for ffield
                                          */
                                         ligand.change_residue_name (__concurrent_numbering, __ligand_cnt);
+
                                         try {
                                                 ffcopy.insert_topology (ligand);
                                                 __link_ligand (ligand, ffcopy);
                                                 ffcopy.erase_topology (ligand); // he he
                                                 ligands.clear();
-                                        } catch(exception &e) {
+                                        } catch (exception &e) {
                                                 cerr << "Error: problem with ligand " << ligand.name() << " due to : " << e.what() << endl;
                                         }
                                 }
@@ -159,41 +161,40 @@ namespace Program {
                 cout << "Linking of fragments is complete" << endl;
         }
 
-	void LinkFragments::link_ligands(const Molib::Molecules& ligands) {
-		size_t j = 0;
+        void LinkFragments::link_ligands (const Molib::Molecules &ligands) {
+                size_t j = 0;
 
-		std::vector<std::thread> threads;
-		std::mutex counter_protect;
+                std::vector<std::thread> threads;
+                std::mutex counter_protect;
 
-		for(int i = 0; i < cmdl.ncpu(); ++i) {
-			threads.push_back( std::thread([&,this] {
-				OMMIface::ForceField ffcopy(__ffield);
+                for (int i = 0; i < cmdl.ncpu(); ++i) {
+                        threads.push_back (std::thread ([ &,this] {
+                                OMMIface::ForceField ffcopy (__ffield);
 
-				while (true)
-				{
-					unique_lock<std::mutex> guard(counter_protect, std::defer_lock);
-					guard.lock();
+                                while (true) {
+                                        unique_lock<std::mutex> guard (counter_protect, std::defer_lock);
+                                        guard.lock();
 
-					if( j >= ligands.size() )
-						return;
+                                        if (j >= ligands.size())
+                                                return;
 
-					Molib::Molecule &ligand = ligands[j++];
-					
-					guard.unlock();
+                                        Molib::Molecule &ligand = ligands[j++];
 
-					/**
-					 * Ligand's resn MUST BE UNIQUE for ffield
-					 */
-					ligand.change_residue_name(__concurrent_numbering, __ligand_cnt);
-					ffcopy.insert_topology(ligand);
-					__link_ligand(ligand, ffcopy);
-					ffcopy.erase_topology(ligand); // he he
-				}
-			} ) );
-		}
+                                        guard.unlock();
 
-		for(auto& thread : threads) {
-			thread.join();
-		}
-	}
+                                        /**
+                                         * Ligand's resn MUST BE UNIQUE for ffield
+                                         */
+                                        ligand.change_residue_name (__concurrent_numbering, __ligand_cnt);
+                                        ffcopy.insert_topology (ligand);
+                                        __link_ligand (ligand, ffcopy);
+                                        ffcopy.erase_topology (ligand); // he he
+                                }
+                        }));
+                }
+
+                for (auto &thread : threads) {
+                        thread.join();
+                }
+        }
 }
