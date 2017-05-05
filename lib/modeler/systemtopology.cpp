@@ -218,7 +218,7 @@ namespace OMMIface {
                                         << " epsilon = " << atype.epsilon << " representing atom = "
                                         << atom << " at index = " << topology.get_index (atom));
                         } catch (ParameterError &e) {
-                                cerr << e.what() << " (" << ++warn << ")" << endl;
+                                log_error << e.what() << " (" << ++warn << ")" << endl;
                         }
                 }
 
@@ -292,7 +292,7 @@ namespace OMMIface {
                                                                   const_cast<vector<double>&> (kbtype.derivative));
                                                 dbgmsg ("adding kbforce between idx1 = " << idx1 << " and idx2 = " << idx2);
                                         } catch (ParameterError &e) {
-                                                cerr << e.what() << " (" << ++warn << ")" << endl;
+                                                log_error << e.what() << " (" << ++warn << ")" << endl;
                                         }
                                 }
                         }
@@ -340,7 +340,7 @@ namespace OMMIface {
                                         << atom << " at index = " << topology.get_index (atom));
 
                         } catch (ParameterError &e) {
-                                cerr << e.what() << " (" << ++warn << ")" << endl;
+                                log_error << e.what() << " (" << ++warn << ")" << endl;
                         }
                 }
 
@@ -416,7 +416,7 @@ namespace OMMIface {
                         try {
                                 btype = __ffield->get_bond_type (type1, type2);
                         } catch (ParameterError &e) {
-                                cerr << e.what() << " (WARNINGS ARE NOT INCREASED) (using default parameters for this bond)" << endl;
+                                log_warning << e.what() << " (WARNINGS ARE NOT INCREASED) (using default parameters for this bond)" << endl;
                                 // if everything else fails just constrain at something reasonable
                                 btype = ForceField::BondType {atom1.get_bond (atom2).length(), 250000, false};
                         }
@@ -462,7 +462,7 @@ namespace OMMIface {
                                         << atom1 << endl << atom2 << endl << atom3);
                                 atype = __ffield->get_angle_type (type1, type2, type3);
                         } catch (ParameterError &e) {
-                                cerr << e.what() << " (WARNINGS ARE NOT INCREASED) (using default parameters for this angle)" << endl;
+                                log_warning << e.what() << " (WARNINGS ARE NOT INCREASED) (using default parameters for this angle)" << endl;
                                 // if everything else fails just constrain at something reasonable
                                 atype = ForceField::AngleType {Geom3D::angle (atom1.crd(), atom2.crd(), atom3.crd()), 500};
                         }
@@ -515,7 +515,7 @@ namespace OMMIface {
 
                                 }
                         } catch (ParameterError &e) {
-                                cerr << e.what() << " (" << ++warn << ")" << endl;
+                                log_error << e.what() << " (" << ++warn << ")" << endl;
                         }
                 }
 

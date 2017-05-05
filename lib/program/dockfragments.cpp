@@ -53,10 +53,10 @@ namespace Program {
                 const string &top_seeds_file= cmdl.get_string_option("top_seeds_file");
 
                 for (size_t j = start; j < __fragmented_ligands.seeds().size(); j+= cmdl.ncpu()) {
-                        try {
-                                boost::filesystem::path p (__top_seeds_location);
-                                p = p / __fragmented_ligands.seeds()[j].name() / top_seeds_file;
+                        boost::filesystem::path p (__top_seeds_location);
+                        p = p / __fragmented_ligands.seeds() [j].name() / top_seeds_file;
 
+                        try {
                                 if ( Inout::file_size(p.string()) > 0 ) {
                                         log_note << "Skipping docking of seed: " << __fragmented_ligands.seeds()[j].name() << " because it is already docked!" << endl;
                                         continue;
@@ -93,7 +93,8 @@ namespace Program {
                                 Inout::output_file(dock.get_docked(), p.string()); // output docked & clustered seeds
                         }
                         catch (exception& e) {
-                                cerr << "skipping seed due to : " << e.what() << endl;
+                                log_warning << "skipping seed due to : " << e.what() << endl;
+                                Inout::output_file(e.what(), p.string());
                         }
                 }
         }
@@ -152,7 +153,7 @@ namespace Program {
                                 Molib::Molecules seed_molec = spdb.parse_molecule();
                                 seed_score_map.push_back( {std::stod( seed_molec.first().name()), seed.name()} );
                         } catch ( Error e) {
-                                        cerr << "Skipping seed " << seed.name() << " in " << __name << " because " << e.what() << endl;
+                                log_warning << "Skipping seed " << seed.name() << " in " << __name << " because " << e.what() << endl;
                         }
                 }
 

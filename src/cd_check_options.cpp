@@ -1,6 +1,7 @@
 #include <iostream>
 #include "program/cmdlnopts.hpp"
 #include "version.hpp"
+#include "helper/logger.hpp"
 
 ////////////////// PRINT OUT CANDOCK CONFIGURATION FILE ///////////////////////////
 
@@ -14,7 +15,7 @@ int main(int argc, char* argv[]) {
                 cout << help::Options::get_options()->configuration_file() << endl;
                 
         } catch (exception& e) {
-                cerr << e.what() << endl;
+                log_error << e.what() << endl;
                 return 1;
         }
         return 0;

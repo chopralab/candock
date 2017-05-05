@@ -274,8 +274,8 @@ namespace Program {
                                                             Path::join (cmdl.get_string_option("docked_dir"), minimized_ligand.name() + ".pdb"), ios_base::app);
 
                                 } catch (exception &e) {
-                                        cerr << "MINIMIZATION FAILED FOR LIGAND " << ligand.name()
-                                             << " because of " << e.what() << endl;
+                                        log_error << "MINIMIZATION FAILED FOR LIGAND " << ligand.name()
+                                                  << " because of " << e.what() << endl;
                                 }
 
                                 a.ffield->erase_topology (ligand);

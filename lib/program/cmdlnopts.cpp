@@ -315,8 +315,11 @@ namespace Program {
                         }
 
                         if (__vm.count("benchmark")) {
-                                cout << "here" << endl;
                                 Inout::Logger::flip_mode(Inout::Severity::BENCHMARK);
+                        }
+
+                        if (__vm.count("warnings")) {
+                                Inout::Logger::flip_mode(Inout::Severity::WARNING);
                         }
 
 			if (__ncpu == -1) {
@@ -382,8 +385,8 @@ namespace Program {
 			}
 
 		} catch (po::error &e) {
-			std::cerr << "error: " << e.what() << std::endl;
-			std::cerr << "Please see the help (-h) for more information" << std::endl;
+			log_error << "error: " << e.what() << std::endl;
+			log_error << "Please see the help (-h) for more information" << std::endl;
 			throw Error ("die: arguments error");
 		}
 	}

@@ -178,7 +178,7 @@ namespace Linker {
 					__score.non_bonded_energy(gridrec, minimized_ligand)));
 		
 			} catch(OMMIface::Modeler::MinimizationError &e) {
-				cerr << "MinimizationError: skipping minimization of one conformation of ligand " 
+				log_error << "MinimizationError: skipping minimization of one conformation of ligand " 
 					<< __ligand.name() << " due to : " << e.what() << endl;								
 			}
 		}

@@ -187,7 +187,7 @@ namespace genbio {
 					aligned_chains.push_back(chain_ids);
 				}
 				catch (exception& e) {
-					cerr << e.what() << " ... skipping ... " << endl;
+					log_warning << e.what() << " ... skipping ... " << endl;
 				}
 			}
 		}

@@ -28,7 +28,7 @@ int main(int argc, char* argv[]) {
                 main_timer.display_time("Finished");
 
         } catch (exception& e) {
-                cerr << e.what() << endl;
+                log_error << e.what() << endl;
                 return 1;
         }
         return 0;

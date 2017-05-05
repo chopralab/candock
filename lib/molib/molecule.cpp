@@ -271,7 +271,7 @@ namespace Molib {
 					}
 				}
 			} else {
-				cerr << "note : cannot find topology for residue " << residue.resn() 
+				log_warning << "warning : cannot find topology for residue " << residue.resn() 
 					<< " (this is normal if receptor file contains water, cofactors etc.)" << endl;
 			}
 		}

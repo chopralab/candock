@@ -57,10 +57,10 @@ namespace Inout {
         };
 }
 
-#define log_note Inout::Logger::log<Inout::NOTE>()
-#define log_step Inout::Logger::log<Inout::STEP>()
-#define log_benchmark Inout::Logger::log<Inout::BENCHMARK>()
-#define log_warning Inout::Logger::log<Inout::WARNING>()
-#define log_error Inout::Logger::log<Inout::ERROR>()
+#define log_note      Inout::Logger::log<Inout::Severity::NOTE>()
+#define log_step      Inout::Logger::log<Inout::Severity::STEP>()
+#define log_benchmark Inout::Logger::log<Inout::Severity::BENCHMARK>()
+#define log_warning   Inout::Logger::log<Inout::Severity::WARNING>()
+#define log_error     Inout::Logger::log<Inout::Severity::ERROR>()
 
 #endif // HELP_LOGGER_H

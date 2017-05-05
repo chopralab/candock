@@ -33,7 +33,7 @@ int main(int argc, char* argv[]) {
                 targets.minimize_force(ligand_fragmenter);
 
         } catch (exception& e) {
-                cerr << e.what() << endl;
+                log_error << e.what() << endl;
         }
         return 0;
 }

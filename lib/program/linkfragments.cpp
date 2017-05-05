@@ -108,7 +108,7 @@ namespace Program {
 
                         __all_top_poses.add (new Molib::Molecule (docks[0].get_ligand()));
                 } catch (exception &e) {
-                        cerr << "Error: skipping ligand " << ligand.name() << " with " << __receptor.name() << " due to : " << e.what() << endl;
+                        log_error << "Error: skipping ligand " << ligand.name() << " with " << __receptor.name() << " due to : " << e.what() << endl;
                         stringstream ss;
                         ligand.change_residue_name ("CAN");
                         ss << "REMARK  20 non-binder " << ligand.name() << " with " << __receptor.name() << " because " << e.what() << endl << ligand;
@@ -148,7 +148,7 @@ namespace Program {
                                                 ffcopy.erase_topology (ligand); // he he
                                                 ligands.clear();
                                         } catch (exception &e) {
-                                                cerr << "Error: problem with ligand " << ligand.name() << " due to : " << e.what() << endl;
+                                                log_error << "Error: problem with ligand " << ligand.name() << " due to : " << e.what() << endl;
                                         }
                                 }
                         }));

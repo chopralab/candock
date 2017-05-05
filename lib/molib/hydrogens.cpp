@@ -116,7 +116,7 @@ namespace Molib {
 			dbgmsg("MOLECULE AFTER COMPUTING HYDROGENS " << endl << all_atoms);
 			dbgmsg("BONDS AFTER COMPUTING HYDROGENS " << endl << get_bonds_in(all_atoms));
 		} catch (exception& e) {
-			cerr << "errmesg : " << e.what() << endl;
+			log_error << "errmesg : " << e.what() << endl;
 			throw e;
 		}
 	}

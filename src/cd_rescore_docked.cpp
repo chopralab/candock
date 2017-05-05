@@ -32,7 +32,7 @@ int main(int argc, char* argv[]) {
                 targets.rescore_docked(ligand_fragmenter);
 
         } catch (exception& e) {
-                cerr << e.what() << endl;
+                log_error << e.what() << endl;
         }
         return 0;
 }

@@ -73,7 +73,7 @@ namespace Molib {
 			try {
 				AtomType::compute_idatm_type(molecule.get_atoms());
 			} catch (exception &e) {
-				cerr << "errmesg : deleting molecule " << molecule.name() 
+				log_error << "errmesg : deleting molecule " << molecule.name() 
 					<< " (computing idatm types failed) due to " << e.what() << endl;
 				mols.erase_shrink(i--);
 			}
@@ -94,7 +94,7 @@ namespace Molib {
 					}
 				}
 			} catch (exception &e) {
-				cerr << "errmesg : deleting molecule " << molecule.name() 
+				log_error << "errmesg : deleting molecule " << molecule.name() 
 					<< " (computing hydrogens failed)" << endl;
 				mols.erase_shrink(i--);
 			}
@@ -115,7 +115,7 @@ namespace Molib {
 					}
 				}
 			} catch (exception &e) {
-				cerr << "errmesg : deleting molecule " << molecule.name() 
+				log_error << "errmesg : deleting molecule " << molecule.name() 
 					<< " (bond order assignment failed) because " << e.what() << endl;
 				mols.erase_shrink(i--);
 			}
