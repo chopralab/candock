@@ -74,6 +74,8 @@ namespace OMMIface {
 		
 		void set_max_iterations(const int max_iterations) { __max_iterations = max_iterations; }
 
+                double potential_energy();
+
 	};
 	
 }

@@ -583,6 +583,10 @@ namespace OMMIface {
                 return context->getState (OpenMM::State::Forces).getForces();
         }
 
+        double SystemTopology::get_potential_energy() {
+                return context->getState (OpenMM::State::Energy).getPotentialEnergy(); 
+        }
+
         void SystemTopology::minimize (const double tolerance, const double max_iterations) {
                 OpenMM::LocalEnergyMinimizer::minimize (*context, tolerance, max_iterations);
         }

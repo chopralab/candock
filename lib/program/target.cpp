@@ -174,7 +174,7 @@ namespace Program {
                         for ( auto &ligand : ligands ) {
                                 const double energy = a.score->non_bonded_energy(*a.gridrec, ligand);
 
-                                Inout::output_file(Molib::Molecule::print_complex(ligand, a.protein, energy), 
+                                Inout::output_file(Molib::Molecule::print_complex(ligand, a.protein, energy, std::nan("")), 
                                 Path::join( cmdl.get_string_option("docked_dir"), ligand.name() + ".pdb"),  ios_base::app);
 
                                 cout << "Energy is " << energy << " for " << ligand.name() << " in " << a.protein.name() << endl;
@@ -270,7 +270,7 @@ namespace Program {
 
                                         cout << "Minimized energy = " << energy << endl;
 
-                                        Inout::output_file (Molib::Molecule::print_complex (minimized_ligand, minimized_receptor, energy),
+                                        Inout::output_file (Molib::Molecule::print_complex (minimized_ligand, minimized_receptor, energy, std::nan("")),
                                                             Path::join (cmdl.get_string_option("docked_dir"), minimized_ligand.name() + ".pdb"), ios_base::app);
 
                                 } catch (exception &e) {

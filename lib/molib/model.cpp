@@ -60,24 +60,6 @@ namespace Molib {
 				<< " " << bond.atom2().atom_number() 
 				<< endl;
 		}
-		for(auto &chain : m)
-		for(auto &residue : chain) {
-			// don't write conect for standard residues
-                        // TODO: There's a way to fix PyMOL visualization issues by printing proper CONECT records....
-			if (!help::standard_residues.count(residue.resn())) {
-				for(auto &atom : residue) {
-					for (auto &adj_a : atom) {
-						int bond_order = atom.get_bond(adj_a).get_bo();
-						if (bond_order == 0) bond_order = 1;
-						for (int bo = 0; bo < bond_order; ++bo) {
-							stream << "CONECT" << setw(5) << right 
-								<< atom.atom_number() << setw(5) 
-								<< right << adj_a.atom_number() << endl;
-						}
-					}
-				}
-			}
-		}
 		stream << "ENDMDL" << endl;
 		return stream;
 	}

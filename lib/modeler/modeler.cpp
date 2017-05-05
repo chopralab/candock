@@ -214,4 +214,8 @@ namespace OMMIface {
 		
 	}
 
+        double Modeler::potential_energy() {
+                return __system_topology.get_potential_energy();
+        }
+
 };

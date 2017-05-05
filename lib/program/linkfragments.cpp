@@ -100,9 +100,12 @@ namespace Program {
                         int model = 0;
 
                         for (auto &docked : docks) {
+
                                 docked.get_ligand().change_residue_name ("CAN");
                                 double rmsd = cmdl.get_bool_option ("rmsd_crystal") ? docked.get_ligand().compute_rmsd_ord (ligand) : std::nan ("");
-                                Inout::output_file (Molib::Molecule::print_complex (docked.get_ligand(), docked.get_receptor(), docked.get_energy(), ++model, rmsd),
+                                Inout::output_file (Molib::Molecule::print_complex (docked.get_ligand(), docked.get_receptor(),
+                                                                                    docked.get_energy(), docked.get_potential_energy(),
+                                                                                    ++model, rmsd),
                                                     p.string(), ios_base::app); // output docked molecule conformations
                         }
 

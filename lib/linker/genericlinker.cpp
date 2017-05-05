@@ -135,7 +135,8 @@ namespace Linker {
 
 		if (__max_iterations_final > 0)
 			return __minimize_final(docked_conformations);
-		
+
+                // Potenital energy will never be set, and that's ok
 		for (auto &docked : docked_conformations)
 			docked.get_receptor().undo_mm_specific();
 		
@@ -165,7 +166,10 @@ namespace Linker {
 		
 				__modeler.set_max_iterations(__max_iterations_final); // until converged
 				__modeler.minimize_state(__ligand, __receptor, __score);
-		
+
+                                __modeler.mask(__receptor.get_atoms());
+                                const double potential_energy = __modeler.potential_energy();
+
 				// init with minimized coordinates
 				Molib::Molecule minimized_receptor(__receptor, __modeler.get_state(__receptor.get_atoms()));
 				Molib::Molecule minimized_ligand(__ligand, __modeler.get_state(__ligand.get_atoms()));
@@ -175,11 +179,11 @@ namespace Linker {
 				Molib::Atom::Grid gridrec(minimized_receptor.get_atoms());
 		
 				minimized_conformations.push_back(DockedConformation(minimized_ligand, minimized_receptor,
-					__score.non_bonded_energy(gridrec, minimized_ligand)));
+					__score.non_bonded_energy(gridrec, minimized_ligand), potential_energy));
 		
 			} catch(OMMIface::Modeler::MinimizationError &e) {
 				log_error << "MinimizationError: skipping minimization of one conformation of ligand " 
-					<< __ligand.name() << " due to : " << e.what() << endl;								
+					<< __ligand.name() << " due to : " << e.what() << endl;
 			}
 		}
 		return minimized_conformations;
