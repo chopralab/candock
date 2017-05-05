@@ -7,6 +7,7 @@
 #include "helper/smiles.hpp"
 #include "helper/debug.hpp"
 #include "helper/benchmark.hpp"
+#include "helper/logger.hpp"
 #include <memory>
 #include <queue>
 #include <algorithm>
@@ -238,7 +239,7 @@ namespace Glib {
 				dbgmsg("clique push vertex = " << vnum);
 			}
 		}
-		cout << "time to find max.weight clique " << bench.seconds_from_start() << " wallclock seconds" << endl;
+		log_benchmark << "time to find max.weight clique " << bench.seconds_from_start() << " wallclock seconds" << endl;
 		return clique;
 	}
 

@@ -7,7 +7,17 @@ namespace Parser {
         void Parser::__generate_molecule(Molecules &mols, bool &found_molecule, const std::string &name) {
                 // if there were no REMARK or BIOMOLECULE...
                 if(!found_molecule) {
-                        mols.add(new Molecule(name));
+
+                        Molecule* mol = nullptr;
+
+                        if (name.empty()) {
+                                log_warning << "Warning: unlabled molecule. Naming: unlabeled_" << mols.size() << endl;
+                                mol = new Molecule(std::string("unlabled_") + std::to_string(mols.size()) );
+                        } else {
+                                mol = new Molecule(name);
+                        }
+
+                        mols.add(mol);
                         found_molecule = true;
                 }
         }

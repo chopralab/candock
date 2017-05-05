@@ -7,6 +7,7 @@
 #include "greedy.hpp"
 #include <iostream>
 #include <exception>
+#include "helper/logger.hpp"
 
 namespace Molib {
 
@@ -37,7 +38,7 @@ namespace Molib {
 				confs.erase(pconf);
 			}
 		}
-		cout << "Clustering " << initial.size() << " accepted conformations resulted in "
+		log_benchmark << "Clustering " << initial.size() << " accepted conformations resulted in "
 			<< reps.size() << " clusters took " << bench.seconds_from_start() 
 			<< " seconds" << endl;
 		return reps;
@@ -72,7 +73,7 @@ namespace Molib {
 				}
 			}
 		}
-		cout << "Clustering " << initial.size() << " accepted conformations resulted in "
+		log_benchmark << "Clustering " << initial.size() << " accepted conformations resulted in "
 			<< reps.size() << " clusters took " << bench.seconds_from_start() 
 			<< " seconds" << endl;
 		return reps;
@@ -118,7 +119,7 @@ namespace Molib {
 				}
 			}
 		}
-		cout << "Clustering " << initial.size() << " accepted conformations resulted in "
+		log_benchmark << "Clustering " << initial.size() << " accepted conformations resulted in "
 			<< reps.size() << " clusters took " << bench.seconds_from_start() 
 			<< " seconds" << endl;
 		return reps;

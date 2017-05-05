@@ -1,15 +1,11 @@
+#include "centroids.hpp"
 #include "helper/inout.hpp"
 #include "molib/grid.hpp"
 #include "molib/molecules.hpp"
 #include "helper/benchmark.hpp"
 #include "geom3d/geom3d.hpp"
-#include "kabsch/kabsch.hpp"
-#include "score/score.hpp"
 #include "parser/fileparser.hpp"
 #include "cluster/greedy.hpp"
-#include "centroids.hpp"
-#include <iostream>
-#include <exception>
 
 namespace Centro {
 

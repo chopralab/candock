@@ -10,64 +10,89 @@
 #include "modeler/systemtopology.hpp"
 #include "modeler/modeler.hpp"
 
+#include "findcentroids.hpp"
+#include "dockfragments.hpp"
+#include "linkfragments.hpp"
+
 namespace Program {
-	Target::Target(const std::string& input_name) {
 
-		// If the user doesn't want to use this feature
-		if (input_name == "")
-			return;
+        Target::DockedReceptor::~DockedReceptor() {
+                if (score)
+                        delete score;
 
-		if (!boost::filesystem::exists(input_name)) {
-			throw Error("Provided file or directory does not exist: " + input_name);
-		}
+                if (ffield)
+                        delete ffield;
 
-		/* Initialize parsers for receptor and read
-		 * the receptor molecule(s)
-		 * 
-		 */
-		if ( Inout::file_size(input_name) > 0 ) {
-			// If the option given is a regular file, act like previous versions
-			Parser::FileParser rpdb(input_name, Parser::first_model);
-			Molib::Molecules receptors = rpdb.parse_molecule();
-			Molib::Molecule& current = __receptors.add(new Molib::Molecule ( std::move (receptors[0]) ));
-			current.set_name(boost::filesystem::basename(input_name.substr(0, input_name.length() - 4))); // Emulate the original version of candock
-                        boost::filesystem::create_directory(current.name());
-                        __preprecs.push_back(DockedReceptor (current, input_name));
-                } else for ( const auto &a : Inout::files_matching_pattern (input_name, ".pdb")) {
-			// Otherwise we treat it like the new version intends.
-			Parser::FileParser rpdb(a, Parser::first_model);
-			Molib::Molecules receptors = rpdb.parse_molecule();
-			Molib::Molecule& current = __receptors.add(new Molib::Molecule ( std::move (receptors[0]) ));
-			current.set_name( a.substr(0, a.length() - 4 ) );
-			boost::filesystem::create_directory(current.name());
+                if (gridrec)
+                        delete gridrec;
 
-			__preprecs.push_back(DockedReceptor (current, a));
-		}
+                if (centroids)
+                        delete centroids;
 
-		/* Compute atom types for receptor and cofactor(s): gaff types for protein, 
-		 * Mg ions, and water are read from the forcefield xml file later on while 
-		 * gaff types for cofactors (ADP, POB, etc.) are calculated de-novo here
-		 * 
-		 */
-		__receptors.compute_idatm_type()
-			.compute_hydrogen()
-			.compute_bond_order()
-			.compute_bond_gaff_type()
-			.refine_idatm_type()
-			.erase_hydrogen()  // needed because refine changes connectivities
-			.compute_hydrogen()   // needed because refine changes connectivities
-			.compute_ring_type()
-			.compute_gaff_type()
-			.compute_rotatable_bonds() // relies on hydrogens being assigned
-			.erase_hydrogen();
+                if (prepseeds)
+                        delete prepseeds;
 
-		/* Create receptor grid
-		 * 
-		 */
-		for ( auto &a : __preprecs ) {
-			a.gridrec = new Molib::Atom::Grid(a.protein.get_atoms());
-		}
-	}
+                if (dockedlig)
+                        delete dockedlig;
+        }
+
+        Target::Target (const std::string &input_name) {
+
+                // If the user doesn't want to use this feature
+                if (input_name == "")
+                        return;
+
+                if (!boost::filesystem::exists (input_name)) {
+                        throw Error ("Provided file or directory does not exist: " + input_name);
+                }
+
+                /* Initialize parsers for receptor and read
+                 * the receptor molecule(s)
+                 *
+                 */
+                if (Inout::file_size (input_name) > 0) {
+                        // If the option given is a regular file, act like previous versions
+                        Parser::FileParser rpdb (input_name, Parser::first_model);
+                        Molib::Molecules receptors = rpdb.parse_molecule();
+                        Molib::Molecule &current = __receptors.add (new Molib::Molecule (std::move (receptors[0])));
+                        current.set_name (boost::filesystem::basename (input_name.substr (0, input_name.length() - 4))); // Emulate the original version of candock
+                        boost::filesystem::create_directory (current.name());
+                        __preprecs.push_back (DockedReceptor (current, input_name));
+                } else for (const auto &a : Inout::files_matching_pattern (input_name, ".pdb")) {
+                                // Otherwise we treat it like the new version intends.
+                                Parser::FileParser rpdb (a, Parser::first_model);
+                                Molib::Molecules receptors = rpdb.parse_molecule();
+                                Molib::Molecule &current = __receptors.add (new Molib::Molecule (std::move (receptors[0])));
+                                current.set_name (a.substr (0, a.length() - 4));
+                                boost::filesystem::create_directory (current.name());
+
+                                __preprecs.push_back (DockedReceptor (current, a));
+                        }
+
+                /* Compute atom types for receptor and cofactor(s): gaff types for protein,
+                 * Mg ions, and water are read from the forcefield xml file later on while
+                 * gaff types for cofactors (ADP, POB, etc.) are calculated de-novo here
+                 *
+                 */
+                __receptors.compute_idatm_type()
+                .compute_hydrogen()
+                .compute_bond_order()
+                .compute_bond_gaff_type()
+                .refine_idatm_type()
+                .erase_hydrogen()  // needed because refine changes connectivities
+                .compute_hydrogen()   // needed because refine changes connectivities
+                .compute_ring_type()
+                .compute_gaff_type()
+                .compute_rotatable_bonds() // relies on hydrogens being assigned
+                .erase_hydrogen();
+
+                /* Create receptor grid
+                 *
+                 */
+                for (auto &a : __preprecs) {
+                        a.gridrec = new Molib::Atom::Grid (a.protein.get_atoms());
+                }
+        }
 
         /* Read distributions file and initialize scores
          * 
@@ -249,8 +274,8 @@ namespace Program {
                                                             Path::join (cmdl.get_string_option("docked_dir"), minimized_ligand.name() + ".pdb"), ios_base::app);
 
                                 } catch (exception &e) {
-                                        cerr << "MINIMIZATION FAILED FOR LIGAND " << ligand.name()
-                                             << " because of " << e.what() << endl;
+                                        log_error << "MINIMIZATION FAILED FOR LIGAND " << ligand.name()
+                                                  << " because of " << e.what() << endl;
                                 }
 
                                 a.ffield->erase_topology (ligand);
@@ -262,10 +287,10 @@ namespace Program {
                 Molib::Unique created_design("designed.txt");
                 Molib::Molecules all_designs;
 
-                cout << "Starting iteration #0 (making a scaffold)" << endl;
+                log_step << "Starting iteration #0 (making a scaffold)" << endl;
                 const string design_file = "designed_0.pdb";
                 if ( Inout::file_size(design_file) ) {
-                        cout << design_file << " found -- skipping generation of new designs this iteration" << endl;
+                        log_note << design_file << " found -- skipping generation of new designs this iteration" << endl;
                         Parser::FileParser dpdb (design_file, Parser::all_models );
                         Molib::Molecules designs;
                         dpdb.parse_molecule(designs);
@@ -288,7 +313,7 @@ namespace Program {
                 }
 
                 if ( all_designs.size() == 0 ) {
-                        cout << "No new designs, exiting" << endl;
+                        log_step << "No new designs, exiting" << endl;
                         return;
                 }
 
@@ -325,12 +350,12 @@ namespace Program {
                 Molib::Unique created_design("designed.txt");
                 while (true) { // Probably a bad idea
 
-                    cout << "Starting design iteration #" << n << endl;
+                    log_step << "Starting design iteration #" << n << endl;
 
                     string design_file = "designed_" + std::to_string(n++) + ".pdb";
                     Molib::Molecules all_designs;
                     if ( Inout::file_size(design_file) ) {
-                            cout << design_file << " found -- skipping generation of new designs this iteration" << endl;
+                            log_note << design_file << " found -- skipping generation of new designs this iteration" << endl;
                             Parser::FileParser dpdb (design_file, Parser::all_models );
                             Molib::Molecules designs;
                             dpdb.parse_molecule(designs);
@@ -361,7 +386,7 @@ namespace Program {
                     }
 
                     if ( all_designs.size() == 0 ) {
-                            cout << "No new designs, exiting" << endl;
+                            log_step << "No new designs, exiting" << endl;
                             return;
                     }
 
@@ -403,48 +428,48 @@ namespace Program {
 
         }
 
-	std::multiset<std::string> Target::determine_overlapping_seeds(const int max_seeds, const int number_of_occurances) const {
+        std::multiset<std::string> Target::determine_overlapping_seeds (const int max_seeds, const int number_of_occurances) const {
 
-		std::multiset<std::string> good_seed_list;
+                std::multiset<std::string> good_seed_list;
 
-		for ( auto &a : __preprecs ) {
-			auto result = a.prepseeds->get_best_seeds();
+                for (auto &a : __preprecs) {
+                        auto result = a.prepseeds->get_best_seeds();
 
-			if ( max_seeds != -1 && static_cast<size_t>(max_seeds) < result.size()) 
-				result.resize( max_seeds );
+                        if (max_seeds != -1 && static_cast<size_t> (max_seeds) < result.size())
+                                result.resize (max_seeds);
 
-			for ( auto &b : result )
-				good_seed_list.insert(b.second);
-		}
+                        for (auto &b : result)
+                                good_seed_list.insert (b.second);
+                }
 
-		for ( auto c = good_seed_list.cbegin(); c != good_seed_list.cend(); ) {
-			if (static_cast<int>(good_seed_list.count(*c)) < number_of_occurances) {
-				c = good_seed_list.erase(c);
-			} else {
-				++c;
-			}
-		}
+                for (auto c = good_seed_list.cbegin(); c != good_seed_list.cend();) {
+                        if (static_cast<int> (good_seed_list.count (*c)) < number_of_occurances) {
+                                c = good_seed_list.erase (c);
+                        } else {
+                                ++c;
+                        }
+                }
 
-		return good_seed_list;
-	}
+                return good_seed_list;
+        }
 
-	std::set<std::string> Target::determine_non_overlapping_seeds( const Target& targets, const Target& antitargets ) {
-		set<string> solo_target_seeds;
-		const vector<string>& forced_seeds = cmdl.get_string_vector("force_seed");
+        std::set<std::string> Target::determine_non_overlapping_seeds (const Target &targets, const Target &antitargets) {
+                set<string> solo_target_seeds;
+                const vector<string> &forced_seeds = cmdl.get_string_vector ("force_seed");
 
-		if (forced_seeds.size() != 0 && forced_seeds[0] != "off") {
-			std::copy( forced_seeds.begin(), forced_seeds.end(), std::inserter(solo_target_seeds, solo_target_seeds.end()));
-		} else {
-			cout << "Determining the best seeds to add" << endl;
-			multiset<string>  target_seeds =     targets.determine_overlapping_seeds(cmdl.get_int_option("seeds_to_add"),   cmdl.get_int_option("seeds_till_good"));
-			multiset<string> atarget_seeds = antitargets.determine_overlapping_seeds(cmdl.get_int_option("seeds_to_avoid"), cmdl.get_int_option("seeds_till_bad"));
+                if (forced_seeds.size() != 0 && forced_seeds[0] != "off") {
+                        std::copy (forced_seeds.begin(), forced_seeds.end(), std::inserter (solo_target_seeds, solo_target_seeds.end()));
+                } else {
+                        log_step << "Determining the best seeds to add" << endl;
+                        multiset<string>  target_seeds =     targets.determine_overlapping_seeds (cmdl.get_int_option ("seeds_to_add"),   cmdl.get_int_option ("seeds_till_good"));
+                        multiset<string> atarget_seeds = antitargets.determine_overlapping_seeds (cmdl.get_int_option ("seeds_to_avoid"), cmdl.get_int_option ("seeds_till_bad"));
 
-			std::set_difference( target_seeds.begin(),  target_seeds.end(),
-							    atarget_seeds.begin(), atarget_seeds.end(),
-							    std::inserter(solo_target_seeds, solo_target_seeds.end())
-			);
-		}
+                        std::set_difference (target_seeds.begin(),  target_seeds.end(),
+                                             atarget_seeds.begin(), atarget_seeds.end(),
+                                             std::inserter (solo_target_seeds, solo_target_seeds.end())
+                                            );
+                }
 
-		return solo_target_seeds;
-	}
+                return solo_target_seeds;
+        }
 }

@@ -8,6 +8,8 @@
 #include "gpoints.hpp"
 #include <iostream>
 #include <exception>
+#include "helper/logger.hpp"
+
 using namespace std;
 
 namespace Docker {
@@ -122,7 +124,7 @@ namespace Docker {
                         const int total_gridpoints = 3*ceil((max.x()-min.x())/grid_spacing)
                                         *ceil((max.y()-min.y())/grid_spacing)
                                         *ceil((max.z()-min.z())/grid_spacing);
-                        cout <<  "approximately " << total_gridpoints << " gridpoints to evaluate\n\n";
+                        log_note <<  "approximately " << total_gridpoints << " gridpoints to evaluate\n\n";
                         int model_number = 1;
                         int points_kept = 0;
                         int gridpoint_counter = 0;
@@ -131,7 +133,7 @@ namespace Docker {
                         const int last_column = ceil(max_d/r);
                         const int last_row = ceil(max_d/(sqrt(3)*r));
                         const int last_layer = ceil(max_d/(2*r*sqrt(6)/3));
-        
+
                         // initialize mapping between gridpoints and discretized 3D space
                         __gmap[bsite_id].init(last_column + 1, last_row + 1, last_layer + 1);
                         //dbgmsg("gmap szi = " << __gmap.szi << " szj = " << __gmap.szj << " szk = " << __gmap.szk);
@@ -221,7 +223,7 @@ namespace Docker {
                                 }
                         }
                         // the last ones that did not get to the next mod==0
-                        cout << points_kept << " points kept out of " << gridpoint_counter 
+                        log_note << points_kept << " points kept out of " << gridpoint_counter 
                              << " total gridpoints\n";
                 }
                 // initialize gmap data here, because push_back can invalidate pointers...
@@ -249,7 +251,7 @@ namespace Docker {
 		const int total_gridpoints = 3*ceil((max.x()-min.x())/grid_spacing)
 									*ceil((max.y()-min.y())/grid_spacing)
 									*ceil((max.z()-min.z())/grid_spacing);
-		cout <<  "approximately " << total_gridpoints << " gridpoints to evaluate\n\n";
+		log_note <<  "approximately " << total_gridpoints << " gridpoints to evaluate\n\n";
 		int points_kept = 0;
 		int gridpoint_counter = 0;
 		const double r = grid_spacing/2;
@@ -281,7 +283,7 @@ namespace Docker {
 						if (eval.distance(center) <= radial_check) {
                                                         // Coordinare, IJK, Energy
 							__gridpoints[0].push_back(Gpoint{eval, IJK{column, 
-								row, layer}, 0.0});
+								row, layer}, Array1d<double> (0.0) });
 							dbgmsg("lastcolumn = " << last_column << " lastrow = " << last_row << " lastlayer = " << last_layer);
 							dbgmsg("column = " << column << " row = " << row << " layer = " << layer);
 							dbgmsg("gridpoint0 = " << __gridpoints[0].back().ijk());
@@ -314,7 +316,7 @@ namespace Docker {
 		}
 
 		// the last ones that did not get to the next mod==0
-		cout << points_kept << " points kept out of " << gridpoint_counter 
+		log_note << points_kept << " points kept out of " << gridpoint_counter 
 			<< " total gridpoints\n";
 	}
 

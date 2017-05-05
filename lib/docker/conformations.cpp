@@ -1,6 +1,7 @@
 #include "helper/inout.hpp"
 #include "helper/debug.hpp"
 #include "helper/benchmark.hpp"
+#include "helper/logger.hpp"
 #include "molib/grid.hpp"
 #include "molib/molecule.hpp"
 #include "geom3d/geom3d.hpp"
@@ -11,8 +12,8 @@
 #include "conformations.hpp"
 #include <iostream>
 #include <exception>
-using namespace std;
 
+using namespace std;
 
 namespace Docker {
 
@@ -139,10 +140,10 @@ namespace Docker {
 				// save conformations
 				__conf_vec.push_back(points);
 			}
-			
-			cout << "time to find " << __conf_vec.size() << " conformations of seed " 
-				<< seed.name() << " took " << bench.seconds_from_start() 
-				<< " wallclock seconds" << endl;
+
+                        log_benchmark << "time to find " << __conf_vec.size() << " conformations of seed " 
+                                      << seed.name() << " took " << bench.seconds_from_start() 
+                                      << " wallclock seconds" << endl;
 	
 	
 		} catch(...) {

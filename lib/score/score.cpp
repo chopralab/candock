@@ -192,7 +192,7 @@ namespace Molib {
 	
 	Score& Score::process_distributions_file(const string &distributions_file) {
 		Benchmark bench;
-		cout << "processing combined histogram ...\n";
+		log_step << "processing combined histogram ...\n";
 		vector<string> distributions_file_raw;
 		Inout::read_file(distributions_file, distributions_file_raw);
 		const bool rad_or_raw(__rad_or_raw == "normalized_frequency");
@@ -239,13 +239,13 @@ namespace Molib {
 				}
 			}
 		}
-		cout << "time to process distributions file " << bench.seconds_from_start() 
+		log_benchmark << "time to process distributions file " << bench.seconds_from_start() 
 			<< " wallclock seconds" << endl;
 		return *this;
 	}
 
 	Score& Score::compile_objective_function() {
-		cout << "Compiling objective function for minimization...\n";
+		log_step << "Compiling objective function for minimization...\n";
 		auto energy_function = __ref_state == "mean" ? 
 			mem_fn(&Score::__energy_mean) : mem_fn(&Score::__energy_cumulative);
 		for (auto &el1 : __gij_of_r_numerator) {
@@ -469,7 +469,7 @@ namespace Molib {
 	}
 	
 	Score& Score::compile_scoring_function() {
-		cout << "Compiling scoring function...\n";
+		log_step << "Compiling scoring function...\n";
 		auto energy_function = __ref_state == "mean" ? 
 			mem_fn(&Score::__energy_mean) : mem_fn(&Score::__energy_cumulative);
 		for (auto &el1 : __gij_of_r_numerator) {

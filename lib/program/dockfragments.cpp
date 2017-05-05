@@ -45,7 +45,7 @@ namespace Program {
         }
 
         void DockFragments::__read_from_files () {
-                cout << "All seeds are present in " << cmdl.get_string_option("top_seeds_dir") << " for " << __name << ". Docking of fragments skipped." << endl;
+                log_step << "All seeds are present in " << cmdl.get_string_option("top_seeds_dir") << " for " << __name << ". Docking of fragments skipped." << endl;
         }
 
         void DockFragments::__dock_fragment ( int start, const Docker::Gpoints& gpoints, const Docker::Gpoints& gpoints0 ) {
@@ -53,15 +53,15 @@ namespace Program {
                 const string &top_seeds_file= cmdl.get_string_option("top_seeds_file");
 
                 for (size_t j = start; j < __fragmented_ligands.seeds().size(); j+= cmdl.ncpu()) {
-                        try {
-                                boost::filesystem::path p (__top_seeds_location);
-                                p = p / __fragmented_ligands.seeds()[j].name() / top_seeds_file;
+                        boost::filesystem::path p (__top_seeds_location);
+                        p = p / __fragmented_ligands.seeds() [j].name() / top_seeds_file;
 
+                        try {
                                 if ( Inout::file_size(p.string()) > 0 ) {
-                                        cout << "Skipping docking of seed: " << __fragmented_ligands.seeds()[j].name() << " because it is already docked!" << endl;
+                                        log_note << "Skipping docking of seed: " << __fragmented_ligands.seeds()[j].name() << " because it is already docked!" << endl;
                                         continue;
                                 } else {
-                                        cout << "Docking seed: " << __fragmented_ligands.seeds()[j].name() << endl;
+                                        log_note << "Docking seed: " << __fragmented_ligands.seeds()[j].name() << endl;
                                 }
                                 dbgmsg(__fragmented_ligands.seeds()[j]);
                                 /* Compute all conformations of this seed with the center
@@ -93,14 +93,15 @@ namespace Program {
                                 Inout::output_file(dock.get_docked(), p.string()); // output docked & clustered seeds
                         }
                         catch (exception& e) {
-                                cerr << "skipping seed due to : " << e.what() << endl;
+                                log_warning << "skipping seed due to : " << e.what() << endl;
+                                Inout::output_file(e.what(), p.string());
                         }
                 }
         }
 
         void DockFragments::__continue_from_prev () {
 
-                cout << "Docking fragments into: " << __top_seeds_location << 
+                log_step << "Docking fragments into: " << __top_seeds_location << 
                         ". Files will be named: " << cmdl.get_string_option("top_seeds_file") << endl;
 
                 /* Create gridpoints for ALL centroids representing one or more binding sites
@@ -132,7 +133,7 @@ namespace Program {
                         thread.join();
                 }
                 
-                cout << "Done with fragment docking" << std::endl;
+                log_step << "Done with fragment docking" << std::endl;
 
         }
 
@@ -152,7 +153,7 @@ namespace Program {
                                 Molib::Molecules seed_molec = spdb.parse_molecule();
                                 seed_score_map.push_back( {std::stod( seed_molec.first().name()), seed.name()} );
                         } catch ( Error e) {
-                                        cerr << "Skipping seed " << seed.name() << " in " << __name << " because " << e.what() << endl;
+                                log_warning << "Skipping seed " << seed.name() << " in " << __name << " because " << e.what() << endl;
                         }
                 }
 

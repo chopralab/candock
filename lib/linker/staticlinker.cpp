@@ -138,7 +138,7 @@ namespace Linker {
 	
 	Partial::Vec Linker::StaticLinker::__generate_rigid_conformations(const Seed::Graph &seed_graph) {
 		Benchmark bench;
-		cout << "Generating rigid conformations of states for " << __ligand.name() << "..." << endl;
+		log_note << "Generating rigid conformations of states for " << __ligand.name() << "..." << endl;
 
 		State::Vec states;
 		State::Id id = 0;
@@ -165,7 +165,7 @@ namespace Linker {
 		dbgmsg("conn = " << conn);
 		//help::memusage("before max.clique.search");
 		
-		cout << "find_compatible_state_pairs took " << bench.seconds_from_start() 
+		log_note << "find_compatible_state_pairs took " << bench.seconds_from_start() 
 			<< " wallclock seconds for " << __ligand.name() << endl;
 		
 		Partial::Vec possibles_w_energy;
@@ -181,7 +181,7 @@ namespace Linker {
 	
 			//help::memusage("after max.clique.search");
 	
-			cout << "found " << qmaxes.size() << " maximum cliques, which took " 
+			log_benchmark << "found " << qmaxes.size() << " maximum cliques, which took " 
 				<< bench.seconds_from_start() << " wallclock seconds for " << __ligand.name() << endl;
 	
 			if (qmaxes.empty())
@@ -247,7 +247,7 @@ namespace Linker {
 		dbgmsg("RIGID CONFORMATIONS FOR LIGAND " << __ligand.name() 
 			<< " : " << endl << clustered_possibles_w_energy);
 
-		cout << "Generated " << clustered_possibles_w_energy.size() 
+		log_benchmark << "Generated " << clustered_possibles_w_energy.size() 
 			<< " possible conformations for ligand " << __ligand.name()
 			<< ", which took " << bench.seconds_from_start() 
 			<< " wallclock seconds" << endl;
@@ -256,7 +256,7 @@ namespace Linker {
 	
 	DockedConformation Linker::StaticLinker::__reconstruct(const Partial &conformation) {
 		Benchmark bench;
-		cout << "Reconstructing docked ligands for " << __ligand.name() << "..." << endl;
+		log_note << "Reconstructing docked ligands for " << __ligand.name() << "..." << endl;
 		int conf_number = 0;
 		
 		// ligand
@@ -281,7 +281,7 @@ namespace Linker {
 		Molib::Molecule ligand(__ligand);
 		ligand.set_name(__ligand.name() + "_" + std::to_string(++conf_number));
 		
-		cout << "Reconstruction of molecules took " << bench.seconds_from_start() 
+		log_benchmark << "Reconstruction of molecules took " << bench.seconds_from_start() 
 			<< " wallclock seconds for " << __ligand.name() << endl;
 		return DockedConformation(ligand, __receptor, conformation.get_energy());
 	}

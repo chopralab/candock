@@ -4,6 +4,8 @@
 
 #include "modeler/systemtopology.hpp"
 
+#include "helper/logger.hpp"
+
 #include <iostream>
 #include <fstream>
 #include <string>
@@ -23,11 +25,18 @@ namespace Program {
 			po::options_description generic ("Generic options");
 			generic.add_options()
 			("help,h", "Show this help")
-			("quiet,q", "Quiet mode (default is verbose)")
 			("conifg,c", po::value<std::string> (&config_file)->default_value (""), "Configuration File")
 			("ncpu",     po::value<int> (&__ncpu)             ->default_value(-1),
 			 "Number of CPUs to use concurrently (use -1 to use all CPUs)")
 			;
+
+                        po::options_description logging ("Logging options");
+                        logging.add_options()
+                        ("verbose,v", "Show extra information")
+                        ("quiet,q", "Quiet mode (suppress everything but warnings and errors)")
+                        ("warnings,w", "Display warnings")
+                        ("benchmark", "Show timings for benchmarking purposes")
+                        ;
 
 			po::options_description starting_inputs ("Starting Input Files");
 			starting_inputs.add_options()
@@ -189,7 +198,9 @@ namespace Program {
 			 "Maximum allowed energy for seed conformations")
 			("max_num_possibles",   po::value<int> ()->default_value (200000),
 			 "Maximum number of possibles conformations considered for clustering")
-			;
+                        ("rmsd_crystal", po::value<bool> ()->default_value (false, "false")->implicit_value(true),
+                         "If the crystal ligand's pose was given, calculate RMSDs for each pose")
+                        ;
 
 			po::options_description design_step ("Automated Design Options");
 			design_step.add_options()
@@ -223,6 +234,7 @@ namespace Program {
 
 			po::options_description config_options;
 			config_options.add(starting_inputs)
+                                      .add(logging)
 			              .add(probis_options)
 			              .add(ligand_fragmention_options)
 			              .add(frag_dock_options)
@@ -242,6 +254,7 @@ namespace Program {
 
 				po::options_description print_options;
 				print_options.add(generic);
+                                print_options.add(logging);
 
 				if (opts_to_parse & STARTING ) {
 					print_options.add(starting_inputs);
@@ -292,6 +305,22 @@ namespace Program {
 
 			po::store(po::parse_environment(config_options,"CANDOCK_"), __vm);
 			po::notify(__vm);
+
+                        if (__vm.count("verbose")) {
+                                Inout::Logger::flip_mode(Inout::Severity::NOTE);
+                        }
+
+                        if (! __vm.count("quiet")) {
+                                Inout::Logger::flip_mode(Inout::Severity::STEP);
+                        }
+
+                        if (__vm.count("benchmark")) {
+                                Inout::Logger::flip_mode(Inout::Severity::BENCHMARK);
+                        }
+
+                        if (__vm.count("warnings")) {
+                                Inout::Logger::flip_mode(Inout::Severity::WARNING);
+                        }
 
 			if (__ncpu == -1) {
 				__ncpu = thread::hardware_concurrency();
@@ -356,8 +385,8 @@ namespace Program {
 			}
 
 		} catch (po::error &e) {
-			std::cerr << "error: " << e.what() << std::endl;
-			std::cerr << "Please see the help (-h) for more information" << std::endl;
+			log_error << "error: " << e.what() << std::endl;
+			log_error << "Please see the help (-h) for more information" << std::endl;
 			throw Error ("die: arguments error");
 		}
 	}

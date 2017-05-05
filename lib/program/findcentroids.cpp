@@ -10,6 +10,10 @@
 #include "helper/path.hpp"
 #include "options.hpp"
 
+#ifdef _WINDOWS
+#include <direct.h>
+#endif
+
 namespace Program {
 
         FindCentroids::FindCentroids(const Molib::Molecule& receptor, const std::string &filename) :
@@ -26,14 +30,14 @@ namespace Program {
         }
 
         void FindCentroids::__read_from_files( ) {
-                cout << "Reading " << cmdl.get_int_option("num_bsites") << 
+                log_note << "Reading " << cmdl.get_int_option("num_bsites") << 
                     " binding sites from " << __centroid_file << endl;
                 __result = Centro::set_centroids( __centroid_file, cmdl.get_int_option("num_bsites"));
         }
 
         void FindCentroids::__continue_from_prev( ) {
 
-                cout << "Running PROBIS for receptor in file: " << __receptor.name() + ".pdb" << endl;
+                log_step << "Running PROBIS for receptor in file: " << __receptor.name() + ".pdb" << endl;
 
                 // Creates an empty nosql file for probis local structural alignments
                 Inout::output_file("", Path::join(__receptor.name(), cmdl.get_string_option("nosql")));
@@ -50,7 +54,7 @@ namespace Program {
                 bslibdb = bslibdb.parent_path();
 
 #ifdef _WINDOWS
-                int chdir_error = _chdir( bslibdb.c_str() );
+                int chdir_error = _wchdir( bslibdb.c_str() );
 #else
                 int chdir_error = chdir( bslibdb.c_str() );
 #endif
@@ -66,7 +70,7 @@ namespace Program {
                         (cwd / __receptor.name() / cmdl.get_string_option("json")).string() );
 
 #ifdef _WINDOWS
-                chdir_error = _chdir( cwd.c_str() );
+                chdir_error = _wchdir( cwd.c_str() );
 #else
                 chdir_error = chdir( cwd.c_str() );
 #endif

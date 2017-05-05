@@ -15,14 +15,16 @@
 #include "geom3d/geom3d.hpp"
 #include "cluster/greedy.hpp"
 #include <queue>
-#include "partial.hpp"
+#include <iostream>
 
+#include "partial.hpp"
+using namespace std;
 namespace Linker {
 
 class cuda_linker {
 public:
     
-    void setup(const int segment_graph_size, const Partial &start_conformation, vector<unique_ptr<State>> &states, int iter);
+    void setup(const int segment_graph_size, vector<unique_ptr<State>> &states, int iter, int num_states, int num_docked_seeds);
 };
 
 }

@@ -266,7 +266,7 @@ namespace genclus {
 			}
 			catch (exception& e) {
 				nrset.erase(nrset.size() - 1); // delete the last mols which is empty
-				cerr << e.what() << " ... skipping ... " << endl;
+				log_warning << e.what() << " ... skipping ... " << endl;
 			}
 		}
 #ifndef NDEBUG

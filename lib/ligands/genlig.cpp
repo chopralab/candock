@@ -211,7 +211,7 @@ namespace genlig {
 			}
 			catch (exception& e) {
 				nrset.erase(nrset.size() - 1); // delete the last mols which is empty
-				cerr << e.what() << " ... skipping ... " << endl;
+				log_warning << e.what() << " ... skipping ... " << endl;
 			}
 		}
 	}
@@ -248,7 +248,7 @@ namespace genlig {
 			for (size_t i = 0; i < hetero.size(); ++i) { // go over the hetero ligands only
 				dbgmsg(hetero[static_cast<int>(i)].asString());
 				const vector<string> ligand = help::ssplit(hetero[ static_cast<int>(i)].asString(), ":");
-				dbgmsg(ligand.size());
+			//	dbgmsg(ligand.size());
 				const int cluster_number = stoi(ligand[0]);
 				const string resn = ligand[1];
 				const int resi = stoi(ligand[2]);
@@ -290,7 +290,7 @@ namespace genlig {
 				}
 			}
 			catch (exception& e) {
-				cerr << e.what() << " ... skipping ... " << endl;
+				log_warning << e.what() << " ... skipping ... " << endl;
 			}
 		}
 		return {bsites, bscores};

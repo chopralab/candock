@@ -6,6 +6,7 @@
 #include "molib/bondtype.hpp"
 #include "molib/atomtype.hpp"
 #include "fragmenter/unique.hpp"
+#include "helper/logger.hpp"
 
 namespace design {
 
@@ -246,18 +247,18 @@ namespace design {
                                         Molib::Atom::Vec test = new_design.get_atoms();
                                         Molib::Atom::Set set_of_new_atoms ( test.begin(), test.end() );
                                         if ( ! __existing.is_seed_unique(set_of_new_atoms) ) {
-                                                cout << new_design.name() << " already has been designed!" << endl;
+                                                log_note << new_design.name() << " already has been designed!" << endl;
                                                 __designs.erase(__designs.size() - 1);
                                                 continue;
                                         }
                                         
                                         __existing.get_seed_id(set_of_new_atoms);
                                         
-					cout << "Created: " << new_design.name() << endl;
-                                        cout << "Lipsinki is " << std::get<0>(original_lipinski) + std::get<0>(frag_lipinski) << " "
-                                                               << std::get<1>(original_lipinski) + std::get<1>(frag_lipinski) << " "
-                                                               << std::get<2>(original_lipinski) + std::get<2>(frag_lipinski)
-                                             << endl;
+                                        log_note << "Created: " << new_design.name() << endl;
+                                        log_note << "Lipsinki is " << std::get<0>(original_lipinski) + std::get<0>(frag_lipinski) << " "
+                                                                   << std::get<1>(original_lipinski) + std::get<1>(frag_lipinski) << " "
+                                                                   << std::get<2>(original_lipinski) + std::get<2>(frag_lipinski)
+                                                 << endl;
 				}
 			}
 			

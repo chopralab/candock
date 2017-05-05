@@ -1,5 +1,14 @@
 include_directories($CMAKE_CURRENT_SOURCE_DIR)
 
+if (WIN32)
+    if   (NOT ${CANDOCK_BUILD_STATIC_EXECUTABLE})
+            add_definitions( /DCANDOCK_SHARED_LIBRARY)
+    else (NOT ${CANDOCK_BUILD_STATIC_EXECUTABLE})
+            add_definitions( /DCANDOCK_STATIC_LIBRARY)
+    endif(NOT ${CANDOCK_BUILD_STATIC_EXECUTABLE})
+
+endif(WIN32)
+
 add_subdirectory(centro)
 add_subdirectory(cluster)
 add_subdirectory(docker)
@@ -8,8 +17,8 @@ add_subdirectory(fragmenter)
 add_subdirectory(geom3d)
 add_subdirectory(graph)
 add_subdirectory(helper)
+add_subdirectory(interface)
 add_subdirectory(kabsch)
-add_subdirectory(kbforce)
 add_subdirectory(ligands)
 add_subdirectory(linker)
 add_subdirectory(modeler)
@@ -23,6 +32,7 @@ if (NOT ${CANDOCK_BUILD_STATIC_EXECUTABLE})
 
 add_library(
     candock SHARED
+        $<TARGET_OBJECTS:interface>
         $<TARGET_OBJECTS:program>
         $<TARGET_OBJECTS:design>
         $<TARGET_OBJECTS:docker>
@@ -38,20 +48,15 @@ add_library(
         $<TARGET_OBJECTS:molib>
         $<TARGET_OBJECTS:probis>
         $<TARGET_OBJECTS:fragmenter>
-        $<TARGET_OBJECTS:kbforce>
         $<TARGET_OBJECTS:geom3d>
         $<TARGET_OBJECTS:helper>
 )
 
-if (WIN32)
-
 target_link_libraries ( candock
     ${OPENMM_LIBRARY}
+    ${OPENMM_KBPLUGIN}
     ${Boost_LIBRARIES}
     ${GSL_LIBRARIES}
 )
 
-endif(WIN32)
-
 endif (NOT ${CANDOCK_BUILD_STATIC_EXECUTABLE})
-

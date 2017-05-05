@@ -4,19 +4,25 @@
 #include <ctime>
 #include <string>
 
-#include <boost/date_time/posix_time/posix_time.hpp>
+#include <chrono>
 #include <iostream>
 
 class Benchmark {
-        clock_t start;
+        std::chrono::time_point<std::chrono::system_clock> start;
 public:
         Benchmark() { reset(); }
-        void reset() { start = std::clock(); }
-        double seconds_from_start() const { return ((double) (std::clock() - start)) / CLOCKS_PER_SEC; }
-		void display_time(const std::string& what) const {
-			std::cout << what << " on " << boost::posix_time::to_simple_string(boost::posix_time::second_clock::local_time()) << std::endl;
-			std::cout << "Clock is at " << seconds_from_start() << std::endl;
-		}
+        void reset() { start = std::chrono::system_clock::now(); }
+        double seconds_from_start() const {
+                std::chrono::duration<double> elapsed_seconds = std::chrono::system_clock::now() - start;
+                return elapsed_seconds.count();
+                
+        }
+
+        void display_time(const std::string& what) const {
+                std::time_t my_time = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
+                std::cout << what << " on " <<  std::ctime(&my_time) << std::endl;
+                std::cout << "Clock is at " << seconds_from_start() << std::endl;
+        }
 };
 
 #endif

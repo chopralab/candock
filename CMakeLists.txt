@@ -29,7 +29,7 @@ if ( NOT RAPIDXML_ROOT )
     set( RAPIDXML_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/foreign/ )
 endif( NOT RAPIDXML_ROOT )
 
-find_package(Boost    REQUIRED  COMPONENTS date_time filesystem system regex program_options)
+find_package(Boost    REQUIRED  COMPONENTS filesystem system regex program_options)
 find_package(GSL      REQUIRED)
 find_package(RapidXML REQUIRED)
 find_package(OpenMM   REQUIRED)
@@ -58,15 +58,12 @@ if (WIN32)
     set(Boost_USE_STATIC_RUNTIME     OFF)
     set(BOOST_ALL_DYN_LINK           ON)   # force dynamic linking for all libraries
 
-    add_definitions( /D_USE_MATH_DEFINES /DBOOST_ALL_NO_LIB /DBOOST_ALL_DYN_LINK /DWIN32_LEAN_AND_MEAN)
-
-    if (NOT CANDOCK_BUILD_STATIC_EXECUTABLE)
-	    add_definitions( /DCANDOCK_SHARED_LIBRARY /DKB_USE_STATIC_LIBRARIES)
-    endif(NOT CANDOCK_BUILD_STATIC_EXECUTABLE)
+    add_definitions( /D_USE_MATH_DEFINES /DBOOST_ALL_NO_LIB /DBOOST_ALL_DYN_LINK /DWIN32_LEAN_AND_MEAN /DWINVER=0x0A00 /D_WIN32_WINNT=0x0A00)
 
 else(WIN32)
 
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wall -Werror -fPIC")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -fPIC -Wall")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c11 -fPIC -Wall")
 
 endif(WIN32)
 
@@ -98,6 +95,7 @@ include_directories( ${PROJECT_BINARY_DIR} )
 
 add_subdirectory(lib)
 add_subdirectory(src)
+add_subdirectory(tests)
 add_subdirectory(scripts)
 
 set(CANDOCK_BUILD_GUI OFF CACHE BOOL "Build the CANDOCK gui")

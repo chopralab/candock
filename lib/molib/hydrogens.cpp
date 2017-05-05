@@ -104,7 +104,7 @@ namespace Molib {
 							}
 						}
 						if (h_excess > 0) {
-                                                        cout << atom << endl << h_excess << endl;
+                                                        log_error << atom << endl << h_excess << endl;
 							throw Error("die : deleting of excess hydrogens failed");
                                                 }
 					}
@@ -116,7 +116,7 @@ namespace Molib {
 			dbgmsg("MOLECULE AFTER COMPUTING HYDROGENS " << endl << all_atoms);
 			dbgmsg("BONDS AFTER COMPUTING HYDROGENS " << endl << get_bonds_in(all_atoms));
 		} catch (exception& e) {
-			cerr << "errmesg : " << e.what() << endl;
+			log_error << "errmesg : " << e.what() << endl;
 			throw e;
 		}
 	}
