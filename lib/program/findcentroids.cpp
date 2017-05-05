@@ -30,14 +30,14 @@ namespace Program {
         }
 
         void FindCentroids::__read_from_files( ) {
-                cout << "Reading " << cmdl.get_int_option("num_bsites") << 
+                log_note << "Reading " << cmdl.get_int_option("num_bsites") << 
                     " binding sites from " << __centroid_file << endl;
                 __result = Centro::set_centroids( __centroid_file, cmdl.get_int_option("num_bsites"));
         }
 
         void FindCentroids::__continue_from_prev( ) {
 
-                cout << "Running PROBIS for receptor in file: " << __receptor.name() + ".pdb" << endl;
+                log_step << "Running PROBIS for receptor in file: " << __receptor.name() + ".pdb" << endl;
 
                 // Creates an empty nosql file for probis local structural alignments
                 Inout::output_file("", Path::join(__receptor.name(), cmdl.get_string_option("nosql")));

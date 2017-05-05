@@ -90,11 +90,11 @@ namespace OMMIface {
 	
 	void Modeler::minimize_physical() {
 		Benchmark bench;
-		cout << "Doing energy minimization using physical forcefield" << endl;
+		log_step << "Doing energy minimization using physical forcefield" << endl;
 
 		__system_topology.minimize(__tolerance, __max_iterations);
 
-		cout << "time to minimize took " << bench.seconds_from_start() 
+		log_benchmark << "time to minimize took " << bench.seconds_from_start() 
 			<< " wallclock seconds" << endl;
 	}
 

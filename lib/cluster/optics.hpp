@@ -15,6 +15,7 @@
 #include <helper/debug.hpp>
 #include <helper/benchmark.hpp>
 #include <assert.h>
+#include "helper/logger.hpp"
 using namespace std;
 
 /* OPTICS clustering algorithm C++ implementation
@@ -195,7 +196,7 @@ namespace cluster {
 			__scores(scores), __eps(eps), __min_pts(min_pts) {
 
 			Benchmark bench;
-			cout << "starting clustering ..." << endl;
+			log_step << "starting clustering ..." << endl;
 
 			__JANEZ_HV = (CompareDistanceLess()(-1.0, 1.0) ? HUGE_VAL : -HUGE_VAL);
 			// make inverse pairs of pairwise distances if missing
@@ -242,7 +243,7 @@ namespace cluster {
 				if(!__processed[p])
 					__expand_cluster_order(*p);
 			}
-			cout << "total time required for clustering was " 
+			log_benchmark << "total time required for clustering was " 
 				<< bench.seconds_from_start() << " wallclock seconds\n";
 		}
 

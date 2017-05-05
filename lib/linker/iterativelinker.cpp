@@ -137,7 +137,7 @@ namespace Linker {
 
 	Partial::Vec Linker::IterativeLinker::__generate_rigid_conformations(const Seed::Graph &seed_graph) {
 		Benchmark bench;
-		cout << "Generating rigid conformations of states for " << __ligand.name() << "..." << endl;
+		log_note << "Generating rigid conformations of states for " << __ligand.name() << "..." << endl;
 
 		State::Vec states;
 		State::Id id = 0;
@@ -158,7 +158,7 @@ namespace Linker {
 
 		//help::memusage("before max.clique.search");
 		
-		cout << "find_compatible_state_pairs took " << bench.seconds_from_start() 
+		log_benchmark << "find_compatible_state_pairs took " << bench.seconds_from_start() 
 			<< " wallclock seconds for " << __ligand.name() << endl;
 		
 		Partial::Vec possibles_w_energy;
@@ -171,7 +171,7 @@ namespace Linker {
 	
 			//help::memusage("after max.clique.search");
 	
-			cout << "found " << qmaxes.size() << " maximum cliques, which took " 
+			log_benchmark << "found " << qmaxes.size() << " maximum cliques, which took " 
 				<< bench.seconds_from_start() << " wallclock seconds for " << __ligand.name() << endl;
 	
 			if (qmaxes.empty())
@@ -220,7 +220,7 @@ namespace Linker {
         	dbgmsg("RIGID CONFORMATIONS FOR LIGAND " << __ligand.name()
         	        << " : " << endl << clustered_possibles_w_energy);
 
-		cout << "Generated " << clustered_possibles_w_energy.size() 
+		log_benchmark << "Generated " << clustered_possibles_w_energy.size() 
 			<< " possible top percent docked seeds that will serve as starting points for reconstruction of ligand " << __ligand.name()
 			<< ", which took " << bench.seconds_from_start() 
 			<< " wallclock seconds" << endl;
@@ -230,7 +230,7 @@ namespace Linker {
 
 	DockedConformation Linker::IterativeLinker::__reconstruct(const Partial &conformation) {
 		Benchmark bench;
-		cout << "Reconstructing docked ligands for " << __ligand.name() << "..." << endl;
+		log_note << "Reconstructing docked ligands for " << __ligand.name() << "..." << endl;
 		int conf_number = 0;
 		
 		// ligand
@@ -262,7 +262,7 @@ namespace Linker {
 		for (auto &patom : receptor.get_atoms()) {
 			patom->set_crd(crds[i++]);
 		}
-		cout << "Reconstruction of molecules took " << bench.seconds_from_start() 
+		log_benchmark << "Reconstruction of molecules took " << bench.seconds_from_start() 
 			<< " wallclock seconds for " << __ligand.name() << endl;
 		return DockedConformation(ligand, receptor, conformation.get_energy());
 	}

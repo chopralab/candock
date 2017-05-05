@@ -21,8 +21,8 @@ namespace Program {
 
                 if (Inout::file_size (cmdl.get_string_option ("seeds_pdb")) <= 0) {
 
-                        cout << "Could not read seeds from " << cmdl.get_string_option ("seeds_pdb") << endl;
-                        cout << "Reading fragmented files from " << cmdl.get_string_option ("prep") << endl;
+                        log_warning << "Could not read seeds from " << cmdl.get_string_option ("seeds_pdb") << endl;
+                        log_note << "Reading fragmented files from " << cmdl.get_string_option ("prep") << endl;
 
                         Parser::FileParser lpdb (cmdl.get_string_option ("prep"), Parser::all_models, cmdl.get_int_option ("max_num_ligands"));
 
@@ -39,7 +39,7 @@ namespace Program {
                         Inout::output_file (__seeds, cmdl.get_string_option ("seeds_pdb"), ios_base::out);
                 } else {
 
-                        cout << "Reading seeds from: " << cmdl.get_string_option ("seeds_pdb") << endl;
+                        log_note << "Reading seeds from: " << cmdl.get_string_option ("seeds_pdb") << endl;
 
                         Parser::FileParser lpdb (cmdl.get_string_option ("seeds_pdb"), Parser::all_models);
                         lpdb.parse_molecule (__seeds);
@@ -103,7 +103,7 @@ namespace Program {
                 const string &ligand = cmdl.get_string_option ("ligand");
 
                 if (Inout::file_size (ligand) > 0) {
-                        cout << "Fragmenting files in " << ligand << endl;
+                        log_step << "Fragmenting files in " << ligand << endl;
 
                         Parser::FileParser lpdb (ligand,
                                                  Parser::all_models|Parser::hydrogens,
@@ -124,7 +124,7 @@ namespace Program {
 
                 if (Inout::file_size (fragment_bag) > 0) {
 
-                        cout << "Adding fragments from " << fragment_bag << endl;
+                        log_note << "Adding fragments from " << fragment_bag << endl;
 
                         Parser::FileParser lpdb_additional (fragment_bag,
                                                             Parser::all_models|Parser::hydrogens,
@@ -144,7 +144,7 @@ namespace Program {
                 const string &molecular_fragments = cmdl.get_string_option ("fragment_mol");
 
                 if (Inout::file_size (molecular_fragments) > 0) {
-                        cout << "Adding molecular fragments from " << molecular_fragments << endl;
+                        log_note << "Adding molecular fragments from " << molecular_fragments << endl;
 
                         Parser::FileParser lpdb_additional (molecular_fragments,
                                                             Parser::all_models|Parser::hydrogens,

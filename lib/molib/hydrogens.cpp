@@ -104,7 +104,7 @@ namespace Molib {
 							}
 						}
 						if (h_excess > 0) {
-                                                        cout << atom << endl << h_excess << endl;
+                                                        log_error << atom << endl << h_excess << endl;
 							throw Error("die : deleting of excess hydrogens failed");
                                                 }
 					}

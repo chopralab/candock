@@ -81,7 +81,7 @@ namespace Linker {
 	}
 	
 	Partial::Vec Linker::GenericLinker::init_conformations() {
-		cout << "Starting connection of seeds for ligand " << __ligand.name() << endl;
+		log_step << "Starting connection of seeds for ligand " << __ligand.name() << endl;
 		
 		// A graph of segments is constructed in which each rigid segment is 
 		// a vertex & segments that are part of seeds are identified.		

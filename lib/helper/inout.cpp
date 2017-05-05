@@ -28,7 +28,7 @@
 
 namespace Inout {
 
-        Severity Logger::__application_setting = WARNING;
+        int Logger::__application_setting = Severity::ERROR;
 
         void __mkdir(const string &dir_path) {
                 // makes a path "janez/aska/mia from e.g. "janez/aska/mia/test.txt"

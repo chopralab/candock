@@ -8,6 +8,8 @@
 #include "gpoints.hpp"
 #include <iostream>
 #include <exception>
+#include "helper/logger.hpp"
+
 using namespace std;
 
 namespace Docker {
@@ -122,7 +124,7 @@ namespace Docker {
                         const int total_gridpoints = 3*ceil((max.x()-min.x())/grid_spacing)
                                         *ceil((max.y()-min.y())/grid_spacing)
                                         *ceil((max.z()-min.z())/grid_spacing);
-                        cout <<  "approximately " << total_gridpoints << " gridpoints to evaluate\n\n";
+                        log_note <<  "approximately " << total_gridpoints << " gridpoints to evaluate\n\n";
                         int model_number = 1;
                         int points_kept = 0;
                         int gridpoint_counter = 0;
@@ -221,7 +223,7 @@ namespace Docker {
                                 }
                         }
                         // the last ones that did not get to the next mod==0
-                        cout << points_kept << " points kept out of " << gridpoint_counter 
+                        log_note << points_kept << " points kept out of " << gridpoint_counter 
                              << " total gridpoints\n";
                 }
                 // initialize gmap data here, because push_back can invalidate pointers...
@@ -249,7 +251,7 @@ namespace Docker {
 		const int total_gridpoints = 3*ceil((max.x()-min.x())/grid_spacing)
 									*ceil((max.y()-min.y())/grid_spacing)
 									*ceil((max.z()-min.z())/grid_spacing);
-		cout <<  "approximately " << total_gridpoints << " gridpoints to evaluate\n\n";
+		log_note <<  "approximately " << total_gridpoints << " gridpoints to evaluate\n\n";
 		int points_kept = 0;
 		int gridpoint_counter = 0;
 		const double r = grid_spacing/2;
@@ -314,7 +316,7 @@ namespace Docker {
 		}
 
 		// the last ones that did not get to the next mod==0
-		cout << points_kept << " points kept out of " << gridpoint_counter 
+		log_note << points_kept << " points kept out of " << gridpoint_counter 
 			<< " total gridpoints\n";
 	}
 

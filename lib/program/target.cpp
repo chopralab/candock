@@ -287,10 +287,10 @@ namespace Program {
                 Molib::Unique created_design("designed.txt");
                 Molib::Molecules all_designs;
 
-                cout << "Starting iteration #0 (making a scaffold)" << endl;
+                log_step << "Starting iteration #0 (making a scaffold)" << endl;
                 const string design_file = "designed_0.pdb";
                 if ( Inout::file_size(design_file) ) {
-                        cout << design_file << " found -- skipping generation of new designs this iteration" << endl;
+                        log_note << design_file << " found -- skipping generation of new designs this iteration" << endl;
                         Parser::FileParser dpdb (design_file, Parser::all_models );
                         Molib::Molecules designs;
                         dpdb.parse_molecule(designs);
@@ -313,7 +313,7 @@ namespace Program {
                 }
 
                 if ( all_designs.size() == 0 ) {
-                        cout << "No new designs, exiting" << endl;
+                        log_step << "No new designs, exiting" << endl;
                         return;
                 }
 
@@ -350,12 +350,12 @@ namespace Program {
                 Molib::Unique created_design("designed.txt");
                 while (true) { // Probably a bad idea
 
-                    cout << "Starting design iteration #" << n << endl;
+                    log_step << "Starting design iteration #" << n << endl;
 
                     string design_file = "designed_" + std::to_string(n++) + ".pdb";
                     Molib::Molecules all_designs;
                     if ( Inout::file_size(design_file) ) {
-                            cout << design_file << " found -- skipping generation of new designs this iteration" << endl;
+                            log_note << design_file << " found -- skipping generation of new designs this iteration" << endl;
                             Parser::FileParser dpdb (design_file, Parser::all_models );
                             Molib::Molecules designs;
                             dpdb.parse_molecule(designs);
@@ -386,7 +386,7 @@ namespace Program {
                     }
 
                     if ( all_designs.size() == 0 ) {
-                            cout << "No new designs, exiting" << endl;
+                            log_step << "No new designs, exiting" << endl;
                             return;
                     }
 
@@ -460,7 +460,7 @@ namespace Program {
                 if (forced_seeds.size() != 0 && forced_seeds[0] != "off") {
                         std::copy (forced_seeds.begin(), forced_seeds.end(), std::inserter (solo_target_seeds, solo_target_seeds.end()));
                 } else {
-                        cout << "Determining the best seeds to add" << endl;
+                        log_step << "Determining the best seeds to add" << endl;
                         multiset<string>  target_seeds =     targets.determine_overlapping_seeds (cmdl.get_int_option ("seeds_to_add"),   cmdl.get_int_option ("seeds_till_good"));
                         multiset<string> atarget_seeds = antitargets.determine_overlapping_seeds (cmdl.get_int_option ("seeds_to_avoid"), cmdl.get_int_option ("seeds_till_bad"));
 

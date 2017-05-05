@@ -45,7 +45,7 @@ namespace Program {
         }
 
         void DockFragments::__read_from_files () {
-                cout << "All seeds are present in " << cmdl.get_string_option("top_seeds_dir") << " for " << __name << ". Docking of fragments skipped." << endl;
+                log_step << "All seeds are present in " << cmdl.get_string_option("top_seeds_dir") << " for " << __name << ". Docking of fragments skipped." << endl;
         }
 
         void DockFragments::__dock_fragment ( int start, const Docker::Gpoints& gpoints, const Docker::Gpoints& gpoints0 ) {
@@ -58,10 +58,10 @@ namespace Program {
                                 p = p / __fragmented_ligands.seeds()[j].name() / top_seeds_file;
 
                                 if ( Inout::file_size(p.string()) > 0 ) {
-                                        cout << "Skipping docking of seed: " << __fragmented_ligands.seeds()[j].name() << " because it is already docked!" << endl;
+                                        log_note << "Skipping docking of seed: " << __fragmented_ligands.seeds()[j].name() << " because it is already docked!" << endl;
                                         continue;
                                 } else {
-                                        cout << "Docking seed: " << __fragmented_ligands.seeds()[j].name() << endl;
+                                        log_note << "Docking seed: " << __fragmented_ligands.seeds()[j].name() << endl;
                                 }
                                 dbgmsg(__fragmented_ligands.seeds()[j]);
                                 /* Compute all conformations of this seed with the center
@@ -100,7 +100,7 @@ namespace Program {
 
         void DockFragments::__continue_from_prev () {
 
-                cout << "Docking fragments into: " << __top_seeds_location << 
+                log_step << "Docking fragments into: " << __top_seeds_location << 
                         ". Files will be named: " << cmdl.get_string_option("top_seeds_file") << endl;
 
                 /* Create gridpoints for ALL centroids representing one or more binding sites
@@ -132,7 +132,7 @@ namespace Program {
                         thread.join();
                 }
                 
-                cout << "Done with fragment docking" << std::endl;
+                log_step << "Done with fragment docking" << std::endl;
 
         }
 

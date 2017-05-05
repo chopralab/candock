@@ -48,7 +48,7 @@ namespace OMMIface {
 
                         dbgmsg ("after loading plugins");
                 } catch (const std::exception &e) {
-                        cout << "The crash is " << e.what() << endl;
+                        log_error << "The crash is " << e.what() << endl;
                 }
 
         }
@@ -313,7 +313,7 @@ namespace OMMIface {
 
                         dbgmsg ("exiting update_knowledge_based_force");
                 } catch (std::exception &e) {
-                        cout << e.what() << endl;
+                        log_error << e.what() << endl;
 
                 }
         }

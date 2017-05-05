@@ -37,7 +37,7 @@ namespace Program {
         }
 
         void LinkFragments::__read_from_files () {
-                cout << "Linking for all molecules in " << cmdl.get_string_option ("prep") << " for " << __receptor.name() << " is complete, skipping." << endl;
+                log_note << "Linking for all molecules in " << cmdl.get_string_option ("prep") << " for " << __receptor.name() << " is complete, skipping." << endl;
         }
 
         void LinkFragments::__link_ligand (Molib::Molecule &ligand, const OMMIface::ForceField &ffield) {
@@ -45,7 +45,7 @@ namespace Program {
                 p = p / cmdl.get_string_option ("docked_dir") / (ligand.name() + ".pdb");
 
                 if (Inout::file_size (p.string()) > 0) {
-                        cout << ligand.name() << " is alread docked to " << __receptor.name() << ", skipping." << endl;
+                        log_note << ligand.name() << " is alread docked to " << __receptor.name() << ", skipping." << endl;
                         return;
                 }
 
@@ -118,10 +118,10 @@ namespace Program {
 
         void LinkFragments::__continue_from_prev () {
 
-                cout << "Starting to dock the fragments into originally given ligands" << endl;
+                log_step << "Starting to dock the fragments into originally given ligands" << endl;
 
                 if (! Inout::file_size (cmdl.get_string_option ("prep"))) {
-                        cout << cmdl.get_string_option ("prep") << " is either blank or missing, no (initial) ligand docking will take place.";
+                        log_warning << cmdl.get_string_option ("prep") << " is either blank or missing, no (initial) ligand docking will take place.";
                         return;
                 }
 
@@ -158,7 +158,7 @@ namespace Program {
                         thread.join();
                 }
 
-                cout << "Linking of fragments is complete" << endl;
+                log_step << "Linking of fragments is complete" << endl;
         }
 
         void LinkFragments::link_ligands (const Molib::Molecules &ligands) {

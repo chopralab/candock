@@ -17,7 +17,7 @@ namespace Inout {
 
         class Logger {
 
-                static Severity __application_setting;
+                static int __application_setting;
 
                 template <Severity s>
                 class LoggerImpl {
@@ -36,15 +36,17 @@ namespace Inout {
                         }
 
                         LoggerImpl const &operator<< (std::ostream& (*F) (std::ostream &)) const {
-                                F (__out);
+                                if (__application_setting & s) {
+                                        F(__out);
+                                }
                                 return *this;
                         }
                 };
 
         public:
 
-                static void flip_mode ( Severity s1 ) {
-                        __application_setting = static_cast<Severity>(__application_setting^s1);
+                static void flip_mode ( int s1 ) {
+                        __application_setting = __application_setting^s1;
                 }
 
                 template<Severity log_type>
@@ -55,10 +57,10 @@ namespace Inout {
         };
 }
 
-#define log_note Inout::Logger::log<NOTE>()
-#define log_step Inout::Logger::log<STEP>()
-#define log_benchmark Inout::Logger::log<BENCHMARK>()
-#define log_warning Inout::Logger::log<WARNING>()
-#define log_error Inout::Logger::log<ERROR>()
+#define log_note Inout::Logger::log<Inout::NOTE>()
+#define log_step Inout::Logger::log<Inout::STEP>()
+#define log_benchmark Inout::Logger::log<Inout::BENCHMARK>()
+#define log_warning Inout::Logger::log<Inout::WARNING>()
+#define log_error Inout::Logger::log<Inout::ERROR>()
 
 #endif // HELP_LOGGER_H
