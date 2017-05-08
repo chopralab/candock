@@ -4,6 +4,7 @@
 #include "program/target.hpp"
 #include "modeler/systemtopology.hpp"
 #include "version.hpp"
+#include "drm/drm.hpp"
 
 
 ////////////////// LINKING OF FRAGMENTS ///////////////////////////
@@ -12,6 +13,13 @@ using namespace std;
 
 int main(int argc, char* argv[]) {
         try {
+
+                if(!drm::check_drm()) {
+                    cout << "DRM FAILED" << endl;
+                }
+                else {
+                    cout << "DRM PASSED" << endl;
+                }
 
                 help::Options::set_options( new Program::CmdLnOpts(
                     argc, argv, Program::CmdLnOpts::STARTING |

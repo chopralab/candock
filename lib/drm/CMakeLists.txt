@@ -5,4 +5,4 @@ set( drm_SRC
         drm.hpp
 )
 
-add_library(drm OBJECT ${docker_SRC})
+add_library(drm OBJECT ${drm_SRC})
