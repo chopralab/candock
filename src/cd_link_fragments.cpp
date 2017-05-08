@@ -16,6 +16,7 @@ int main(int argc, char* argv[]) {
 
                 if(!drm::check_drm()) {
                     cout << "DRM FAILED" << endl;
+                    throw logic_error("DRM FAILED!!!");
                 }
                 else {
                     cout << "DRM PASSED" << endl;
