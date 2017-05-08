@@ -9,6 +9,7 @@ if(${CANDOCK_BUILD_STATIC_EXECUTABLE})
         $<TARGET_OBJECTS:program>
         $<TARGET_OBJECTS:design>
         $<TARGET_OBJECTS:docker>
+        $<TARGET_OBJECTS:drm>
         $<TARGET_OBJECTS:score>
         $<TARGET_OBJECTS:centro>
         $<TARGET_OBJECTS:kabsch>
