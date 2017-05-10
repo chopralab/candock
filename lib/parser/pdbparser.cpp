@@ -176,6 +176,12 @@ namespace Parser {
                         } else if (line.compare (0, 5, "MODEL") == 0) {
                                 if (boost::regex_search (line, m, boost::regex ("MODEL\\s+(\\d+)"))) {
                                         if (m[1].matched) {
+                                                
+                                                if ( __hm & skip_atom ) {
+                                                        found_molecule = false;
+                                                        found_assembly = false;
+                                                }
+                                                
                                                 __generate_molecule (mols, found_molecule, "");
                                                 __generate_assembly (mols, found_assembly, 0, "ASYMMETRIC UNIT");
 
