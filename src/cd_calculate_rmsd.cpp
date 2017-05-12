@@ -11,13 +11,18 @@ int main(int argc, char* argv[]) {
                 Benchmark main_timer;
                 main_timer.display_time("Starting");
 
-                Parser::FileParser mol1(argv[1], Parser::pdb_read_options::all_models | Parser::pdb_read_options::skip_atom);
+                if ( argc <= 1 ) {
+                        cerr << "You MUST supply an argument!" << endl;
+                        return 1;
+                }
+
+                Parser::FileParser mol1(argv[1], Parser::pdb_read_options::docked_poses_only);
 
                 Molib::Molecules mols1;
 
                 mol1.parse_molecule(mols1);
 
-                std::ofstream output_matrix("outmaxtrix.tbl");
+                std::ofstream output_matrix("outmatrix.tbl");
 
                 if (mols1.size() <= 1) {
                         output_matrix << 0 << endl;
@@ -31,8 +36,6 @@ int main(int argc, char* argv[]) {
                 for ( const Molib::Molecule& mol : mols1 ) {
                         atom_graphs.push_back( Molib::Atom::create_graph(mol.get_atoms()) );
                 }
-
-                //mols1.clear();
 
                 for (size_t i = 0; i < atom_graphs.size(); ++i) {
 

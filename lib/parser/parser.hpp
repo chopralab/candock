@@ -12,7 +12,8 @@ namespace Parser {
                 hydrogens=4,
                 skip_hetatm=8,
                 skip_atom=16,
-                sparse_macromol=32
+                sparse_macromol=32,
+                docked_poses_only=64+skip_atom + all_models,
         };
 
         class Parser {

@@ -25,6 +25,7 @@ namespace Parser {
                 map<const Model *, map<const int, Atom *>> atom_number_to_atom;
                 Chain *chain = nullptr;
                 Residue *residue = nullptr;
+                bool ter_found=false;
 
                 for (string &line : pdb_raw) {
                         if ( (__hm & skip_hetatm) && line.compare (0, 6, "HETATM") == 0) {
@@ -36,6 +37,11 @@ namespace Parser {
                         }
 
                         if (line.compare (0, 4, "ATOM") == 0 || line.compare (0, 6, "HETATM") == 0) {
+
+                                if ( (__hm & docked_poses_only) && (! ter_found)) {
+                                        return;
+                                }
+
                                 __generate_molecule (mols, found_molecule, "");
                                 __generate_assembly (mols, found_assembly, 0, "ASYMMETRIC UNIT");
                                 __generate_model (mols, found_model, 1);
@@ -181,6 +187,8 @@ namespace Parser {
                                                         found_molecule = false;
                                                         found_assembly = false;
                                                 }
+
+                                                ter_found = false;
                                                 
                                                 __generate_molecule (mols, found_molecule, "");
                                                 __generate_assembly (mols, found_assembly, 0, "ASYMMETRIC UNIT");
@@ -198,6 +206,8 @@ namespace Parser {
                                 if (__hm & first_model) {
                                         return;
                                 }
+                        } else if (line.compare (0, 3, "TER") == 0) {
+                                ter_found = true;
                         } else if (line.compare (0, 10, "REMARK 350") == 0) {
                                 if (boost::regex_search (line, m, boost::regex ("REMARK 350 BIOMOLECULE:\\s*(\\d+)"))) {
                                         if (m[1].matched) {
