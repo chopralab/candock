@@ -19,20 +19,20 @@ namespace Glib {
                 int core_len;
                 vector<node_id> core_1;
                 vector<node_id> core_2;
-                Graph1 &g1;
-                Graph2 &g2;
+                const Graph1 &g1;
+                const Graph2 &g2;
                 const int n1, n2;
                 //~ typedef unsigned char byte;
                 typedef unsigned int byte;
                 unique_ptr<unique_ptr<byte[]>[]> M;   // Matrix encoding the compatibility of the nodes
                 void __refine();
         public:
-                UllSubState (Graph1 &g1, Graph2 &g2);
+                UllSubState (const Graph1 &g1,  const Graph2 &g2);
                 UllSubState (const UllSubState &state);
-                Graph1 &GetGraph1() {
+                const Graph1 &GetGraph1() {
                         return g1;
                 }
-                Graph2 &GetGraph() {
+                const Graph2 &GetGraph() {
                         return g2;
                 }
                 bool NextPair (node_id &pn1, node_id &pn2, node_id prev_n1=NULL_NODE, node_id prev_n2=NULL_NODE);
@@ -72,7 +72,7 @@ namespace Glib {
          * Constructor. Makes an empty state.
          ---------------------------------------------------------*/
         template<class Graph1, class Graph2>
-        UllSubState<Graph1, Graph2>::UllSubState (Graph1 &ag1, Graph2 &ag2) : core_len (0), core_1 (ag1.size(), NULL_NODE), core_2 (ag2.size(), NULL_NODE), g1 (ag1), g2 (ag2), n1 (ag1.size()), n2 (ag2.size()) {
+        UllSubState<Graph1, Graph2>::UllSubState (const Graph1 &ag1, const Graph2 &ag2) : core_len (0), core_1 (ag1.size(), NULL_NODE), core_2 (ag2.size(), NULL_NODE), g1 (ag1), g2 (ag2), n1 (ag1.size()), n2 (ag2.size()) {
                 dbgmsg (core_1.size());
                 dbgmsg (core_2.size());
 #ifndef NDEBUG

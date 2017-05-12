@@ -199,4 +199,30 @@ namespace Molib {
 				num_bwp++;
 		return num_bwp;
 	}
+
+        double Molib::Atom::compute_rmsd(const Graph& g1, const Graph& g2) {
+                Atom::Graph::Matches m = g1.match(g2);
+
+                // try calculating rmsd of each mapping of molecule to molecule ...
+                double min_sum_squared = HUGE_VAL;
+
+                for (auto &mv : m) {
+                        auto &vertices1 = mv.first;
+                        auto &vertices2 = mv.second;
+                        // match must stretch over the whole graph g1 (and g2)
+                        if (vertices2.size() != g1.size()) 
+                                throw Error("die : RMSD calculation aborted due to imperfect match"); 
+                        double sum_squared = 0;
+                        for (size_t i = 0; i < vertices2.size(); ++i) {
+                                Atom &a1 = g1[vertices1[i]];
+                                Atom &a2 = g2[vertices2[i]];
+                                sum_squared += a1.crd().distance_sq(a2.crd());
+                        }
+                        if (sum_squared < min_sum_squared)
+                                min_sum_squared = sum_squared;
+                }
+
+                return sqrt(min_sum_squared / g1.size());	
+        }
+
 };

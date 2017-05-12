@@ -35,7 +35,7 @@ namespace Glib {
 		void __expand(Vertex&, Path&, Cycles&, VertexSet&);
 		template<class Vertex2>
 		bool __match(vector<node_id>&, vector<node_id>&, Matches&, 
-			UllSubState<Graph<Vertex>, Graph<Vertex2>>*);
+			UllSubState<Graph<Vertex>, Graph<Vertex2>>*) const;
 		template<typename T>
 		void __init(const T&, const bool);
 	public:
@@ -60,7 +60,7 @@ namespace Glib {
 		Cycles find_rings();
 		Cliques max_weight_clique(const int);
 		template<class Vertex2>
-		Matches match(Graph<Vertex2>&);
+		Matches match(const Graph<Vertex2>&) const;
 		bool isomorphic(Graph &g) { Matches m = match(g); if (m.size() > 0 
 			&& m[0].first.size() == g.size() && this->size() == g.size()) 
 			return true; return false; }
@@ -156,7 +156,7 @@ namespace Glib {
 	template<class Vertex>
 	template<class Vertex2>
 	bool Graph<Vertex>::__match(vector<node_id> &c1, vector<node_id> &c2, 
-		Matches &m, UllSubState<Graph<Vertex>, Graph<Vertex2>> *s) {
+		Matches &m, UllSubState<Graph<Vertex>, Graph<Vertex2>> *s) const {
 		if (s->IsGoal()) {
 			int n=s->CoreLen();
 			s->GetCoreSet(c1, c2);
@@ -203,10 +203,10 @@ namespace Glib {
 	
 	template<class Vertex>
 	template<class Vertex2>
-	typename Graph<Vertex>::Matches Graph<Vertex>::match(Graph<Vertex2> &other) {
+	typename Graph<Vertex>::Matches Graph<Vertex>::match(const Graph<Vertex2> &other) const {
 		UllSubState<Graph<Vertex>, Graph<Vertex2>> s0(*this, other);
-		Graph<Vertex> &g1=s0.GetGraph1();
-		Graph<Vertex2> &g2=s0.GetGraph();
+		const Graph<Vertex> &g1=s0.GetGraph1();
+		const Graph<Vertex2> &g2=s0.GetGraph();
 		/* Choose a conservative dimension for the arrays */
 		int n;
 		if (g1.size()<g2.size())

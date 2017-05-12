@@ -113,6 +113,7 @@ namespace Molib {
 
 		static Graph create_graph(const Vec &atoms);
 		static Graph create_graph(const Set &atoms);
+                static double compute_rmsd(const Graph& g1, const Graph& g2);
 
 	};
 
