@@ -28,6 +28,7 @@ namespace Parser {
                 bool ter_found=false;
 
                 for (string &line : pdb_raw) {
+
                         if ( (__hm & skip_hetatm) && line.compare (0, 6, "HETATM") == 0) {
                                 continue;
                         }
@@ -39,7 +40,7 @@ namespace Parser {
                         if (line.compare (0, 4, "ATOM") == 0 || line.compare (0, 6, "HETATM") == 0) {
 
                                 if ( (__hm & docked_poses_only) && (! ter_found)) {
-                                        return;
+                                        continue;
                                 }
 
                                 __generate_molecule (mols, found_molecule, "");
@@ -370,6 +371,7 @@ namespace Parser {
                                 Atom &a2 = *atom_number_to_atom[&model][stoi (vs[2])];
                                 a1.connect (a2).set_rotatable (vs[0]);
                         } else if (line.compare (0, 19, "REMARK   8 BONDTYPE") == 0) {
+
                                 vector<string> vs = help::ssplit (line.substr (20), " ");
 
                                  // to avoid when bond_gaff_type is undefined
@@ -441,6 +443,8 @@ namespace Parser {
                                 }
 
                                 connect_bonds (get_bonds_in (molecule.get_atoms()));
+                        } else if (line.compare (0, 22, "REMARK  20 non-binder") == 0 && (__hm & docked_poses_only)) {
+                                return;
                         }
                 }
         }

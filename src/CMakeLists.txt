@@ -61,6 +61,7 @@ add_executable( cd_make_objective cd_make_objective.cpp ${CANDOCK_SRC})
 add_executable( cd_dock_fragments cd_dock_fragments.cpp ${CANDOCK_SRC})
 add_executable( cd_link_fragments cd_link_fragments.cpp ${CANDOCK_SRC})
 add_executable( cd_calculate_rmsd cd_calculate_rmsd.cpp ${CANDOCK_SRC})
+add_executable( cd_cacrystal_rmsd cd_cacrystal_rmsd.cpp ${CANDOCK_SRC})
 add_executable( cd_minimize_force cd_minimize_force.cpp ${CANDOCK_SRC})
 add_executable( cd_rescore_docked cd_rescore_docked.cpp ${CANDOCK_SRC})
 add_executable( cd_design_ligands cd_design_ligands.cpp ${CANDOCK_SRC})
@@ -72,6 +73,7 @@ target_link_libraries( cd_make_objective ${all_needed_libraries} )
 target_link_libraries( cd_dock_fragments ${all_needed_libraries} )
 target_link_libraries( cd_link_fragments ${all_needed_libraries} )
 target_link_libraries( cd_calculate_rmsd ${all_needed_libraries} )
+target_link_libraries( cd_cacrystal_rmsd ${all_needed_libraries} )
 target_link_libraries( cd_minimize_force ${all_needed_libraries} )
 target_link_libraries( cd_rescore_docked ${all_needed_libraries} )
 target_link_libraries( cd_design_ligands ${all_needed_libraries} )
@@ -84,6 +86,7 @@ set_target_properties(
         cd_dock_fragments
         cd_link_fragments
         cd_calculate_rmsd
+        cd_cacrystal_rmsd
         cd_minimize_force
         cd_rescore_docked
         cd_design_ligands
@@ -113,6 +116,7 @@ install(
         cd_dock_fragments
         cd_link_fragments
         cd_calculate_rmsd
+        cd_cacrystal_rmsd
         cd_minimize_force
         cd_rescore_docked
         cd_design_ligands

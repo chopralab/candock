@@ -33,6 +33,7 @@ int main(int argc, char* argv[]) {
                 std::vector< std::vector<double> > previous(mols1.size());
                 std::vector< Molib::Atom::Graph > atom_graphs;
 
+                mols1.erase_properties();
                 for ( const Molib::Molecule& mol : mols1 ) {
                         atom_graphs.push_back( Molib::Atom::create_graph(mol.get_atoms()) );
                 }
@@ -50,7 +51,7 @@ int main(int argc, char* argv[]) {
                                 output_matrix << setw (12) << setprecision (8) << rmsd;
                         }
 
-                        output_matrix<< endl;
+                        output_matrix << '\n';
                 }
 
                 output_matrix.close();

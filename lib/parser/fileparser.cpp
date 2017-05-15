@@ -71,9 +71,8 @@ namespace Parser {
                         throw Error ("die : could not determine the file type of the input molecule");
                 }
 
-                if (Inout::file_size (molecule_file) <= 0) {
+                if (Inout::file_size (molecule_file) == 0) {
                         throw Error (string ("die : file not valid: ") + molecule_file + ". Check to see if it exists and has contents!");
                 }
         }
 };
-
