@@ -11,3 +11,4 @@ external/
 .kdev4/
 *.kdev4
 *.swp
+.vscode/
