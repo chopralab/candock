@@ -117,6 +117,8 @@ int encrypt(unsigned char *plaintext, int plaintext_len, unsigned char *key,
 //Failed DRM if returns false
  bool drm::check_drm() {
 
+  bool passed_drm = true;
+
   /* Initialise the library */
   ERR_load_crypto_strings();
   OpenSSL_add_all_algorithms();
@@ -156,66 +158,36 @@ int encrypt(unsigned char *plaintext, int plaintext_len, unsigned char *key,
 
 
 /* Do something useful with the ciphertext here */
-  printf("Ciphertext is:\n");
-  BIO_dump_fp (stdout, (const char *)decryptedtext, decryptedtext_len);
+ // printf("Ciphertext is:\n");
+ // BIO_dump_fp (stdout, (const char *)decryptedtext, decryptedtext_len);
 
 
     /* Add a NULL terminator. We are expecting printable text */
     //decryptedtext[decryptedtext_len] = '\0';
 
-    cout << "Number " << decryptedtext << endl;
+    //cout << "Number " << decryptedtext << endl;
     //unsigned int num =  static_cast<unsigned int>(decryptedtext);
     
-    unsigned int i, k = 0;
-    for (i = 0; i < 10; i++) {
-      cout << decryptedtext[i] << endl;
-      k = 10 * k + decryptedtext[i];
-    }
-    cout << "Real number real " << k << endl;
+    const char* end_date = "1504936752";
+    const char* start_date = "1494809088";
 
-    cout << "string compare " << strncmp( (const char*) decryptedtext, "1494809088", 10 ) << endl;
-
-    if((long long int) decryptedtext > 1504936752 || (long long int) std::time(NULL) < 1494809088) {
-        /* Clean up */
-        EVP_cleanup();
-        ERR_free_strings();
-        return false;
+    if(strncmp( (const char*) decryptedtext, start_date, 10 ) < 0 || strncmp( (const char*) decryptedtext, end_date, 10 ) > 0) {
+        passed_drm = false;
     }
 
   }
   else {
     //This is what happens if the file does not exist
-      log_error << "Error: No Key Found!";
-    /* Clean up */
-    
-    EVP_cleanup();
-    ERR_free_strings();
-    return false;
+    log_error << "Error: No Key Found!";
+    passed_drm = false;
      
   }
-
-  /* Buffer for the decrypted text */
-  unsigned char ciphertext[128];
-  unsigned char plaintext[128];
-  
-  plaintext = static_cast<unsigned char*> std::time(NULL);
-
-
-  /* Encrypt the plaintext */
-  int ciphertext_len = encrypt (plaintext, strlen ((char *)plaintext), key, iv,
-                            ciphertext);
-
-  ofstream writeEncrypted;
-  writeEncrypted.open ("/home/brandon_stewart/.candock");
-  writeEncrypted << ciphertext;
-  writeEncrypted.close();
-
 
   /* Clean up */
   EVP_cleanup();
   ERR_free_strings();
 
-  return true;
+  return passed_drm;
 }
 
 
