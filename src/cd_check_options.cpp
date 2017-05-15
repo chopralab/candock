@@ -9,7 +9,10 @@ using namespace std;
 
 int main(int argc, char* argv[]) {
         try {
-
+                if(!drm::check_drm()) {
+                    throw logic_error("CANDOCK has expired. Please contact your CANDOCK distributor to get a new version.");
+                }
+                
                 help::Options::set_options(new Program::CmdLnOpts(argc, argv));
 
                 cout << help::Options::get_options()->configuration_file() << endl;

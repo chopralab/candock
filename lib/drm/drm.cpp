@@ -10,6 +10,8 @@
 #include <openssl/err.h>
 #include "drm.hpp"
 
+#include "helper/logger.hpp"
+
 using namespace std;
 static const unsigned int KEY_SIZE = 32;
 static const unsigned int BLOCK_SIZE = 16;
@@ -109,10 +111,9 @@ static const unsigned int BLOCK_SIZE = 16;
 
 
     /* Decrypt the ciphertext */
-    int decryptedtext_len = decrypt(encrypted, 16, key, iv,
-    decryptedtext);
+    int decryptedtext_len = decrypt(encrypted, 16, key, iv, decryptedtext);
 
-    if((long long int) decryptedtext > 1504936752 || (long long int) std::time(NULL) < 1494226769) {
+    if((long long int) decryptedtext > 1504936752 || (long long int) std::time(NULL) < 1494809088) {
         /* Clean up */
         EVP_cleanup();
         ERR_free_strings();
@@ -125,20 +126,22 @@ static const unsigned int BLOCK_SIZE = 16;
 
 
     /* Add a NULL terminator. We are expecting printable text */
-    decryptedtext[decryptedtext_len] = '\0';
+    //decryptedtext[decryptedtext_len] = '\0';
 
     cout << "Number " << decryptedtext << endl;
 
 
   }
   else {
-      cout << "Hello" << endl;
-     if(std::time(NULL) < 1494226769 || std::time(NULL) > 1504936752) {
-        /* Clean up */
-        EVP_cleanup();
-        ERR_free_strings();
-        return false;
-     }
+    //This is what happens if the file does not exist
+      log_error << "Error: No Key Found!";
+
+    /* Clean up */
+    
+    EVP_cleanup();
+    ERR_free_strings();
+    return false;
+     
   }
 
   /* Buffer for the decrypted text */
