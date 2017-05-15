@@ -12,6 +12,7 @@
 #include "drm.hpp"
 
 #include "helper/logger.hpp"
+#include "version.hpp"
 
 using namespace std;
 static const unsigned int KEY_SIZE = 32;
@@ -134,12 +135,12 @@ int encrypt(unsigned char *plaintext, int plaintext_len, unsigned char *key,
     Check to see if the encrypted file exists.
     If it does decrypt it.
   */
-  if(boost::filesystem::exists("/home/brandon_stewart/.candock")) {
+
+  if(boost::filesystem::exists(Version::get_install_path() + "/" + ".candock")) {
 
     string readEncrypted;
-    ifstream readEncryptedFile ("/home/brandon_stewart/.candock");
+    ifstream readEncryptedFile (Version::get_install_path() + "/" + ".candock");
     getline (readEncryptedFile,readEncrypted);
-    cout << readEncrypted << '\n';
     readEncryptedFile.close();
     
     /* Message to be encrypted */
