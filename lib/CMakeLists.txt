@@ -11,6 +11,7 @@ endif(WIN32)
 
 add_subdirectory(centro)
 add_subdirectory(cluster)
+add_subdirectory(drm)
 add_subdirectory(docker)
 add_subdirectory(design)
 add_subdirectory(fragmenter)
@@ -36,6 +37,7 @@ add_library(
         $<TARGET_OBJECTS:program>
         $<TARGET_OBJECTS:design>
         $<TARGET_OBJECTS:docker>
+        $<TARGET_OBJECTS:drm>
         $<TARGET_OBJECTS:score>
         $<TARGET_OBJECTS:centro>
         $<TARGET_OBJECTS:kabsch>

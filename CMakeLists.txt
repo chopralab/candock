@@ -34,6 +34,11 @@ find_package(GSL      REQUIRED)
 find_package(RapidXML REQUIRED)
 find_package(OpenMM   REQUIRED)
 find_package(Git      REQUIRED)
+find_package(OpenSSL      REQUIRED)
+
+#DRM Module
+set( SETDRM 0)
+
 
 set(CANDOCK_CUDA_SUPPORT OFF CACHE BOOL "Build CUDA support")
 
@@ -62,8 +67,8 @@ if (WIN32)
 
 else(WIN32)
 
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -fPIC -Wall")
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c11 -fPIC -Wall")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -fPIC -Wall -lcrypto")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c11 -fPIC -Wall -lcrypto")
 
 endif(WIN32)
 

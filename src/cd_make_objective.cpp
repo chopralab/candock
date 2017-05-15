@@ -4,7 +4,7 @@
 #include "program/target.hpp"
 
 #include "version.hpp"
-
+#include "drm/drm.hpp"
 
 using namespace std;
 
@@ -12,6 +12,10 @@ using namespace std;
 
 int main(int argc, char* argv[]) {
         try {
+                if(Version::drm_active() && !drm::check_drm()) {
+                    throw logic_error("CANDOCK has expired. Please contact your CANDOCK distributor to get a new version.");
+                }
+
                 help::Options::set_options( new Program::CmdLnOpts( 
                     argc, argv, Program::CmdLnOpts::SCORING));
 
