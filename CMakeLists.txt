@@ -34,10 +34,10 @@ find_package(GSL      REQUIRED)
 find_package(RapidXML REQUIRED)
 find_package(OpenMM   REQUIRED)
 find_package(Git      REQUIRED)
-find_package(OpenSSL      REQUIRED)
+find_package(OpenSSL  REQUIRED)
 
 #DRM Module
-set( SETDRM 0)
+set(CANDOCK_SETDRM 0 CACHE OFF "Build DRM into Candock")
 
 
 set(CANDOCK_CUDA_SUPPORT OFF CACHE BOOL "Build CUDA support")

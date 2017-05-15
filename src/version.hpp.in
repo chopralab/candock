@@ -7,6 +7,10 @@
 #include "program/options.hpp"
 
 namespace Version {
+
+        const bool OFF = false;
+        const bool ON  = true;
+
         std::string get_banner() {
                 return  "-----------------------------------------------------------------------|\n"
                         "|         CCCCC    AAA   NN   NN DDDDD    OOOOO   CCCCC  KK  KK        |\n"
@@ -41,7 +45,7 @@ namespace Version {
         }
         
         int drm_active() {
-            return @SETDRM@;
+            return @CANDOCK_SETDRM@;
         }
 
 };

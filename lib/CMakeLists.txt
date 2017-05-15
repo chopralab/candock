@@ -59,6 +59,7 @@ target_link_libraries ( candock
     ${OPENMM_KBPLUGIN}
     ${Boost_LIBRARIES}
     ${GSL_LIBRARIES}
+    ${OPENSSL_LIBRARIES}
 )
 
 endif (NOT ${CANDOCK_BUILD_STATIC_EXECUTABLE})
