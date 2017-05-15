@@ -108,10 +108,10 @@ namespace Docker {
 			dbgmsg("conformation size = " << confs.size());
 	
 			// pre-compute rmsd between ALL conformations
-			__rmsd.init(confs.size(), confs.size());
+			__rmsd_sq.init(confs.size(), confs.size());
 			for (size_t i = 0; i < confs.size(); ++i) {
 				for (size_t j = i + 1; j < confs.size(); ++j) {
-					__rmsd.data[i][j] = __rmsd.data[j][i] = (float) Geom3D::compute_rmsd(confs[i], confs[j]);
+					__rmsd_sq.data[i][j] = __rmsd_sq.data[j][i] = (float) Geom3D::compute_rmsd_sq(confs[i], confs[j]);
 				}
 			}
 			dbgmsg("after rmsd calculation");

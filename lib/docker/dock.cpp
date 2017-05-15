@@ -13,15 +13,19 @@
 
 namespace Docker {
 
-	double Dock::DockedConf::compute_rmsd(const Dock::DockedConf &other) const {
-		
-		const Gpoints::PGpointVec &points1 = this->get_conf0();
-		const Gpoints::PGpointVec &points2 = other.get_conf0();
-		Geom3D::Point::Vec crds1, crds2;
-		for (auto &pp : points1) crds1.push_back(pp->crd());
-		for (auto &pp : points2) crds2.push_back(pp->crd());
-		return Geom3D::compute_rmsd(crds1, crds2);
-	}
+        double Dock::DockedConf::compute_rmsd_sq(const Dock::DockedConf &other) const {
+        
+                const Gpoints::PGpointVec &points1 = this->get_conf0();
+                const Gpoints::PGpointVec &points2 = other.get_conf0();
+
+                double rmsd = 0.0;
+
+                for ( size_t i = 0; i < points1.size(); ++i ) {
+                        rmsd += points1[i]->crd().distance_sq(points2[i]->crd());
+                }
+
+                return rmsd / points1.size();
+        }
 
 	void Dock::run() {
 		DockedConf::Vec docked = __dock();
@@ -134,7 +138,7 @@ namespace Docker {
 			confs.erase(confs.begin());
 			// delete all conformations within RMSD tolerance of this lowest energy conformation
 			for (auto it = confs.begin(); it != confs.end(); ++it) {
-				if (__conformations.get_rmsd(lowest_point.get_i(), (*it)->get_i()) < __rmsd_tol) {
+				if (__conformations.get_rmsd_sq(lowest_point.get_i(), (*it)->get_i()) < __rmsd_tol_sq) {
 					confs.erase(it);
 				}
 			}
@@ -158,7 +162,7 @@ namespace Docker {
 			confs.erase(confs.begin());
 			// delete all conformations within RMSD tolerance of this lowest energy yconformation
 			for (auto &pconf : cgrid.get_neighbors(lowest_point.crd(), __rmsd_tol)) {
-				if (pconf->compute_rmsd(lowest_point) < __rmsd_tol) {
+				if (pconf->compute_rmsd_sq(lowest_point) < __rmsd_tol_sq) {
 					confs.erase(pconf);
 				}
 			}

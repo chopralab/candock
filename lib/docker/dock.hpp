@@ -39,13 +39,14 @@ namespace Docker {
 					return lhs->__energy < rhs->__energy;
 				}
 			};			
-			double compute_rmsd(const DockedConf &other) const;
+			double compute_rmsd_sq(const DockedConf &other) const;
 		};
 
 		const Gpoints &__gpoints;
 		Conformations &__conformations;
 		const Molib::Molecule &__seed;
-		double __rmsd_tol;
+		double __rmsd_tol_sq;
+                double __rmsd_tol;
 
 		Molib::Molecules __docked;
 
@@ -62,10 +63,10 @@ namespace Docker {
 #ifndef NDEBUG
 		Dock(const Gpoints &gpoints, Conformations &conformations, const Molib::Molecule &seed, const Molib::Score &score, 
 			 const Molib::Atom::Grid &gridrec, const double rmsd_tol=2.0) : __gpoints(gpoints), __conformations(conformations), 
-			__seed(seed),  __rmsd_tol(rmsd_tol), __score(score),  __gridrec(gridrec) {}
+			__seed(seed), __rmsd_tol_sq(rmsd_tol * rmsd_tol), __rmsd_tol(rmsd_tol), __score(score), __gridrec(gridrec) {}
 #else
 		Dock(const Gpoints &gpoints, Conformations &conformations, Molib::Molecule &seed, const double rmsd_tol=2.0) 
-			: __gpoints(gpoints), __conformations(conformations), __seed(seed), __rmsd_tol(rmsd_tol) {}
+			: __gpoints(gpoints), __conformations(conformations), __seed(seed), __rmsd_tol_sq(rmsd_tol * rmsd_tol), __rmsd_tol(rmsd_tol) {}
 #endif
 		void run();
 		Molib::Molecules& get_docked() { return __docked; };
