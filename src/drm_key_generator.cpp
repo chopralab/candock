@@ -1,31 +1,14 @@
+#include <openssl/conf.h>
+#include <openssl/evp.h>
+#include <openssl/err.h>
 #include <string.h>
 #include <iostream>
 #include <fstream>
 #include <ctime>
 #include <chrono>
-#include <string.h>
-
-#include <boost/filesystem.hpp>
-#include <openssl/conf.h>
-#include <openssl/evp.h>
-#include <openssl/err.h>
-#include "drm.hpp"
-
-#include "helper/logger.hpp"
-#include "version.hpp"
-
 using namespace std;
-static const unsigned int KEY_SIZE = 32;
-static const unsigned int BLOCK_SIZE = 16;
 
-/*
- *Encrypted file
- *
- *Unix Time
- *
- */
-
- void handleErrors()
+void handleErrors(void)
 {
   ERR_print_errors_fp(stderr);
   abort();
@@ -70,9 +53,8 @@ int encrypt(unsigned char *plaintext, int plaintext_len, unsigned char *key,
   return ciphertext_len;
 }
 
-
-
- int decrypt(unsigned char *ciphertext, int ciphertext_len, unsigned char *key, unsigned char *iv, unsigned char *plaintext)
+int decrypt(unsigned char *ciphertext, int ciphertext_len, unsigned char *key,
+  unsigned char *iv, unsigned char *plaintext)
 {
   EVP_CIPHER_CTX *ctx;
 
@@ -112,83 +94,65 @@ int encrypt(unsigned char *plaintext, int plaintext_len, unsigned char *key,
 
 
 
-//Check DRM is designed to make sure the drm passes and if it does then
-//create a new file with a later time stamp to prevent further tampering
-//Passed DRM if returns true
-//Failed DRM if returns false
- bool drm::check_drm() {
+int main (void)
+{
+  /* Set up the key and iv. Do I need to say to not hard code these in a
+   * real application? :-)
+   */
 
-  bool passed_drm = true;
+  /* A 256 bit key */
+  unsigned char *key = (unsigned char *)"25280559686690074811771763602098";
+
+  /* A 128 bit IV */
+  unsigned char *iv = (unsigned char *)"1226610434284021";
+
+  string line = "1494809089";
+
+  /* Message to be encrypted */
+  unsigned char plaintext[128];
+
+  /* Buffer for ciphertext. Ensure the buffer is long enough for the
+   * ciphertext which may be longer than the plaintext, dependant on the
+   * algorithm and mode
+   */
+  unsigned char ciphertext[128];
+   strcpy( (char*) plaintext, line.c_str()); 
+
+  /* Buffer for the decrypted text */
+  unsigned char decryptedtext[128];
+
+  int decryptedtext_len, ciphertext_len;
 
   /* Initialise the library */
   ERR_load_crypto_strings();
   OpenSSL_add_all_algorithms();
   OPENSSL_config(NULL);
 
-   /* A 256 bit key */
-  unsigned char *key = (unsigned char *)"25280559686690074811771763602098";
+  /* Encrypt the plaintext */
+  ciphertext_len = encrypt (plaintext, strlen ((char *)plaintext), key, iv,
+                            ciphertext);
+                          
+  /* Do something useful with the ciphertext here */
+  printf("Ciphertext is:\n");
+  BIO_dump_fp (stdout, (const char *)ciphertext, ciphertext_len);
+  cout << " ciphertext_len " << ciphertext_len << endl;
 
-  /* A 128 bit IV */
-  unsigned char *iv = (unsigned char *)"1226610434284021";
+  ofstream myfile3;
+  myfile3.open (".candock");
+  myfile3 << ciphertext;
+  myfile3.close();
 
-  /*
-    Check to see if the encrypted file exists.
-    If it does decrypt it.
-  */
+  decrypt(ciphertext, 16, key, iv,
+                            decryptedtext);
+  
 
-  if(boost::filesystem::exists(Version::get_install_path() + "/" + ".candock")) {
-
-    string readEncrypted;
-    ifstream readEncryptedFile (Version::get_install_path() + "/" + ".candock");
-    getline (readEncryptedFile,readEncrypted);
-    readEncryptedFile.close();
-    
-    /* Message to be encrypted */
-    unsigned char encrypted[128];
-    strcpy( (char*) encrypted, readEncrypted.c_str()); 
-
-    /* Buffer for decryptedtext. Ensure the buffer is long enough for the
-     * decryptedtext which may be longer than the plaintext, dependant on the
-     * algorithm and mode
-     */
-    unsigned char decryptedtext[128];
-
-
-    /* Decrypt the ciphertext */
-    int decryptedtext_len = decrypt(encrypted, 16, key, iv, decryptedtext);
-
-
-/* Do something useful with the ciphertext here */
- // printf("Ciphertext is:\n");
- // BIO_dump_fp (stdout, (const char *)decryptedtext, decryptedtext_len);
-
-
-    /* Add a NULL terminator. We are expecting printable text */
-    //decryptedtext[decryptedtext_len] = '\0';
-
-    //cout << "Number " << decryptedtext << endl;
-    //unsigned int num =  static_cast<unsigned int>(decryptedtext);
-    
-    const char* end_date = "1504936752";
-    const char* start_date = "1494809088";
-
-    if(strncmp( (const char*) decryptedtext, start_date, 10 ) < 0 || strncmp( (const char*) decryptedtext, end_date, 10 ) > 0) {
-        passed_drm = false;
-    }
-
-  }
-  else {
-    //This is what happens if the file does not exist
-    log_error << "Error: No Key Found!";
-    passed_drm = false;
-     
-  }
+  /* Show the decrypted text */
+  printf("Decrypted text is:\n");
+  printf("%s\n", decryptedtext);
 
   /* Clean up */
   EVP_cleanup();
   ERR_free_strings();
 
-  return passed_drm;
+  return 0;
 }
-
-
