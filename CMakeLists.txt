@@ -36,6 +36,10 @@ find_package(OpenMM   REQUIRED)
 find_package(Git      REQUIRED)
 find_package(OpenSSL      REQUIRED)
 
+#DRM Module
+set( SETDRM 0)
+
+
 set(CANDOCK_CUDA_SUPPORT OFF CACHE BOOL "Build CUDA support")
 
 if (CANDOCK_CUDA_SUPPORT)

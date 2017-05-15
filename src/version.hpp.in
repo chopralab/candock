@@ -39,6 +39,10 @@ namespace Version {
         std::string get_install_path() {
                 return "@CMAKE_INSTALL_PREFIX@";
         }
+        
+        int drm_active() {
+            return @SETDRM@;
+        }
 
 };
 
