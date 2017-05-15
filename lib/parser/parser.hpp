@@ -13,7 +13,7 @@ namespace Parser {
                 skip_hetatm=8,
                 skip_atom=16,
                 sparse_macromol=32,
-                docked_poses_only=64+skip_atom + all_models,
+                docked_poses_only=64,
         };
 
         class Parser {

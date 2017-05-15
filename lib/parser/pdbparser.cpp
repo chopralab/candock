@@ -197,7 +197,6 @@ namespace Parser {
                                                 if (__hm & all_models) {
                                                         found_model = false;
                                                 }
-
                                                 __generate_model (mols, found_model, stoi (m[1].str()));
                                         }
                                 } else {

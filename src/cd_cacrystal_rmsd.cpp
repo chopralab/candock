@@ -17,7 +17,7 @@ int main(int argc, char* argv[]) {
                 }
 
                 Parser::FileParser crys(argv[1], Parser::pdb_read_options::first_model);
-                Parser::FileParser mol1(argv[2], Parser::pdb_read_options::docked_poses_only);
+                Parser::FileParser mol1(argv[2], Parser::pdb_read_options::docked_poses_only | Parser::pdb_read_options::skip_atom | Parser::pdb_read_options::all_models);
 
                 Molib::Molecules cryst;
                 Molib::Molecules mols1;
