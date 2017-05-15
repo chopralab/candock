@@ -9,6 +9,7 @@ if(${CANDOCK_BUILD_STATIC_EXECUTABLE})
         $<TARGET_OBJECTS:program>
         $<TARGET_OBJECTS:design>
         $<TARGET_OBJECTS:docker>
+        $<TARGET_OBJECTS:drm>
         $<TARGET_OBJECTS:score>
         $<TARGET_OBJECTS:centro>
         $<TARGET_OBJECTS:kabsch>
@@ -65,6 +66,7 @@ add_executable( cd_cacrystal_rmsd cd_cacrystal_rmsd.cpp ${CANDOCK_SRC})
 add_executable( cd_minimize_force cd_minimize_force.cpp ${CANDOCK_SRC})
 add_executable( cd_rescore_docked cd_rescore_docked.cpp ${CANDOCK_SRC})
 add_executable( cd_design_ligands cd_design_ligands.cpp ${CANDOCK_SRC})
+add_executable( drm_key_generator drm_key_generator.cpp ${CANDOCK_SRC})
 
 target_link_libraries( cd_check_options  ${all_needed_libraries} )
 target_link_libraries( cd_find_centroids ${all_needed_libraries} )
@@ -77,6 +79,7 @@ target_link_libraries( cd_cacrystal_rmsd ${all_needed_libraries} )
 target_link_libraries( cd_minimize_force ${all_needed_libraries} )
 target_link_libraries( cd_rescore_docked ${all_needed_libraries} )
 target_link_libraries( cd_design_ligands ${all_needed_libraries} )
+target_link_libraries( drm_key_generator ${all_needed_libraries} )
 
 set_target_properties(
         cd_check_options
@@ -120,6 +123,7 @@ install(
         cd_minimize_force
         cd_rescore_docked
         cd_design_ligands
+        drm_key_generator
 
     RUNTIME DESTINATION
         bin
