@@ -2,6 +2,7 @@
 #include "program/cmdlnopts.hpp"
 #include "version.hpp"
 #include "helper/logger.hpp"
+#include "drm/drm.hpp"
 
 ////////////////// PRINT OUT CANDOCK CONFIGURATION FILE ///////////////////////////
 

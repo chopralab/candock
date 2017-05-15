@@ -3,6 +3,7 @@
 #include <fstream>
 #include <ctime>
 #include <chrono>
+#include <string.h>
 
 #include <boost/filesystem.hpp>
 #include <openssl/conf.h>
@@ -28,6 +29,46 @@ static const unsigned int BLOCK_SIZE = 16;
   ERR_print_errors_fp(stderr);
   abort();
 }
+
+int encrypt(unsigned char *plaintext, int plaintext_len, unsigned char *key,
+  unsigned char *iv, unsigned char *ciphertext)
+{
+  EVP_CIPHER_CTX *ctx;
+
+  int len;
+
+  int ciphertext_len;
+
+  /* Create and initialise the context */
+  if(!(ctx = EVP_CIPHER_CTX_new())) handleErrors();
+
+  /* Initialise the encryption operation. IMPORTANT - ensure you use a key
+   * and IV size appropriate for your cipher
+   * In this example we are using 256 bit AES (i.e. a 256 bit key). The
+   * IV size for *most* modes is the same as the block size. For AES this
+   * is 128 bits */
+  if(1 != EVP_EncryptInit_ex(ctx, EVP_aes_256_cbc(), NULL, key, iv))
+    handleErrors();
+
+  /* Provide the message to be encrypted, and obtain the encrypted output.
+   * EVP_EncryptUpdate can be called multiple times if necessary
+   */
+  if(1 != EVP_EncryptUpdate(ctx, ciphertext, &len, plaintext, plaintext_len))
+    handleErrors();
+  ciphertext_len = len;
+
+  /* Finalise the encryption. Further ciphertext bytes may be written at
+   * this stage.
+   */
+  if(1 != EVP_EncryptFinal_ex(ctx, ciphertext + len, &len)) handleErrors();
+  ciphertext_len += len;
+
+  /* Clean up */
+  EVP_CIPHER_CTX_free(ctx);
+
+  return ciphertext_len;
+}
+
 
 
  int decrypt(unsigned char *ciphertext, int ciphertext_len, unsigned char *key, unsigned char *iv, unsigned char *plaintext)
@@ -113,12 +154,6 @@ static const unsigned int BLOCK_SIZE = 16;
     /* Decrypt the ciphertext */
     int decryptedtext_len = decrypt(encrypted, 16, key, iv, decryptedtext);
 
-    if((long long int) decryptedtext > 1504936752 || (long long int) std::time(NULL) < 1494809088) {
-        /* Clean up */
-        EVP_cleanup();
-        ERR_free_strings();
-        return false;
-    }
 
 /* Do something useful with the ciphertext here */
   printf("Ciphertext is:\n");
@@ -129,13 +164,28 @@ static const unsigned int BLOCK_SIZE = 16;
     //decryptedtext[decryptedtext_len] = '\0';
 
     cout << "Number " << decryptedtext << endl;
+    //unsigned int num =  static_cast<unsigned int>(decryptedtext);
+    
+    unsigned int i, k = 0;
+    for (i = 0; i < 10; i++) {
+      cout << decryptedtext[i] << endl;
+      k = 10 * k + decryptedtext[i];
+    }
+    cout << "Real number real " << k << endl;
 
+    cout << "string compare " << strncmp( (const char*) decryptedtext, "1494809088", 10 ) << endl;
+
+    if((long long int) decryptedtext > 1504936752 || (long long int) std::time(NULL) < 1494809088) {
+        /* Clean up */
+        EVP_cleanup();
+        ERR_free_strings();
+        return false;
+    }
 
   }
   else {
     //This is what happens if the file does not exist
       log_error << "Error: No Key Found!";
-
     /* Clean up */
     
     EVP_cleanup();
@@ -145,21 +195,21 @@ static const unsigned int BLOCK_SIZE = 16;
   }
 
   /* Buffer for the decrypted text */
- /* unsigned char ciphertext[128];
+  unsigned char ciphertext[128];
   unsigned char plaintext[128];
   
   plaintext = static_cast<unsigned char*> std::time(NULL);
 
-*/
+
   /* Encrypt the plaintext */
- /* int ciphertext_len = encrypt (plaintext, strlen ((char *)plaintext), key, iv,
+  int ciphertext_len = encrypt (plaintext, strlen ((char *)plaintext), key, iv,
                             ciphertext);
 
   ofstream writeEncrypted;
-  writeEncrypted.open ("~/.candock");
+  writeEncrypted.open ("/home/brandon_stewart/.candock");
   writeEncrypted << ciphertext;
   writeEncrypted.close();
-*/
+
 
   /* Clean up */
   EVP_cleanup();
@@ -168,51 +218,4 @@ static const unsigned int BLOCK_SIZE = 16;
   return true;
 }
 
-
-
-
-
-
-
-
-
-
- int encrypt(unsigned char *plaintext, int plaintext_len, unsigned char *key,
-  unsigned char *iv, unsigned char *ciphertext)
-{
-  EVP_CIPHER_CTX *ctx;
-
-  int len;
-
-  int ciphertext_len;
-
-  /* Create and initialise the context */
-  if(!(ctx = EVP_CIPHER_CTX_new())) handleErrors();
-
-  /* Initialise the encryption operation. IMPORTANT - ensure you use a key
-   * and IV size appropriate for your cipher
-   * In this example we are using 256 bit AES (i.e. a 256 bit key). The
-   * IV size for *most* modes is the same as the block size. For AES this
-   * is 128 bits */
-  if(1 != EVP_EncryptInit_ex(ctx, EVP_aes_256_cbc(), NULL, key, iv))
-    handleErrors();
-
-  /* Provide the message to be encrypted, and obtain the encrypted output.
-   * EVP_EncryptUpdate can be called multiple times if necessary
-   */
-  if(1 != EVP_EncryptUpdate(ctx, ciphertext, &len, plaintext, plaintext_len))
-    handleErrors();
-  ciphertext_len = len;
-
-  /* Finalise the encryption. Further ciphertext bytes may be written at
-   * this stage.
-   */
-  if(1 != EVP_EncryptFinal_ex(ctx, ciphertext + len, &len)) handleErrors();
-  ciphertext_len += len;
-
-  /* Clean up */
-  EVP_CIPHER_CTX_free(ctx);
-
-  return ciphertext_len;
-}
 

@@ -2,6 +2,7 @@
 #include "program/cmdlnopts.hpp"
 #include "program/target.hpp"
 #include "version.hpp"
+#include "drm/drm.hpp"
 
 ////////////////// BINDING SITE DETECTION USING PROBIS ///////////////////////////
 

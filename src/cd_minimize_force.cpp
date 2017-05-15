@@ -3,6 +3,8 @@
 #include "program/target.hpp"
 
 #include "version.hpp"
+#include "drm/drm.hpp"
+
 using namespace std;
 using namespace Program;
 

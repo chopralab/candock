@@ -2,6 +2,7 @@
 #include "program/cmdlnopts.hpp"
 #include "program/fragmentligands.hpp"
 #include "version.hpp"
+#include "drm/drm.hpp"
 
 ////////////////// FRAGMENTING OF LIGANDS ///////////////////////////
 

@@ -9,6 +9,7 @@
 #include "program/fragmentligands.hpp"
 
 #include "version.hpp"
+#include "drm/drm.hpp"
 
 using namespace std;
 
