@@ -16,7 +16,7 @@ namespace Docker {
 		
 		vector<Gpoints::PGpointVec> __conf_vec;
 		ConfMap __conf_map;
-		Array2d<float> __rmsd_sq;
+		Array2d<double> __rmsd_sq;
 		
 	public:
 		Conformations(const Molib::Molecule &seed, const Gpoints &gpoints, const double &conf_spin, const int num_univec);
@@ -25,7 +25,7 @@ namespace Docker {
 		const vector<Gpoints::PGpointVec> &get_conformations() const { return __conf_vec; }
 		ConfMap &get_confmap() { return __conf_map; }
 		vector<int> &get_confs_at(const Gpoints::IJK &ijk) { return __conf_map[ijk.i][ijk.j][ijk.k]; }
-		double get_rmsd_sq(const int i, const int j) { return (double) __rmsd_sq.data[i][j]; }
+		double get_rmsd_sq(const int i, const int j) { return __rmsd_sq.data[i][j]; }
 
 		friend ostream& operator<<(ostream& os, const Conformations &conformations);
 	};
