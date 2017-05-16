@@ -72,44 +72,44 @@ int encrypt(unsigned char *plaintext, int plaintext_len, unsigned char *key,
 
 
 
-int decrypt(unsigned char *ciphertext, int ciphertext_len, unsigned char *key, unsigned char *iv, unsigned char *plaintext)
+int decrypt(unsigned char *ciphertext, int ciphertext_len, unsigned char *key,
+  unsigned char *iv, unsigned char *plaintext)
 {
-    EVP_CIPHER_CTX *ctx;
-    
-    int len;
-    
-    int plaintext_len;
-    
-    /* Create and initialise the context */
-    if(!(ctx = EVP_CIPHER_CTX_new())) handleErrors();
-    
-    /* Initialise the decryption operation. IMPORTANT - ensure you use a key
-     * and IV size appropriate for your cipher
-     * In this example we are using 256 bit AES (i.e. a 256 bit key). The
-     * IV size for *most* modes is the same as the block size. For AES this
-     * is 128 bits */
-    if(1 != EVP_DecryptInit_ex(ctx, EVP_aes_256_cbc(), NULL, key, iv))
-        handleErrors();
-    
-    /* Provide the message to be decrypted, and obtain the plaintext output.
-     * EVP_DecryptUpdate can be called multiple times if necessary
-     */
-    if(1 != EVP_DecryptUpdate(ctx, plaintext, &len, ciphertext, ciphertext_len))
-        handleErrors();
-    plaintext_len = len;
-    
-    /* Finalise the decryption. Further plaintext bytes may be written at
-     * this stage.
-     */
-    if(1 != EVP_DecryptFinal_ex(ctx, plaintext + len, &len)) handleErrors();
-    plaintext_len += len;
-    
-    /* Clean up */
-    EVP_CIPHER_CTX_free(ctx);
-    
-    return plaintext_len;
-}
+  EVP_CIPHER_CTX *ctx;
 
+  int len;
+
+  int plaintext_len;
+
+  /* Create and initialise the context */
+  if(!(ctx = EVP_CIPHER_CTX_new())) handleErrors();
+
+  /* Initialise the decryption operation. IMPORTANT - ensure you use a key
+   * and IV size appropriate for your cipher
+   * In this example we are using 256 bit AES (i.e. a 256 bit key). The
+   * IV size for *most* modes is the same as the block size. For AES this
+   * is 128 bits */
+  if(1 != EVP_DecryptInit_ex(ctx, EVP_aes_256_cbc(), NULL, key, iv))
+    handleErrors();
+
+  /* Provide the message to be decrypted, and obtain the plaintext output.
+   * EVP_DecryptUpdate can be called multiple times if necessary
+   */
+  if(1 != EVP_DecryptUpdate(ctx, plaintext, &len, ciphertext, ciphertext_len))
+    handleErrors();
+  plaintext_len = len;
+
+  /* Finalise the decryption. Further plaintext bytes may be written at
+   * this stage.
+   */
+  if(1 != EVP_DecryptFinal_ex(ctx, plaintext + len, &len)) handleErrors();
+  plaintext_len += len;
+
+  /* Clean up */
+  EVP_CIPHER_CTX_free(ctx);
+
+  return plaintext_len;
+}
 
 
 //Check DRM is designed to make sure the drm passes and if it does then
@@ -183,6 +183,29 @@ bool drm::check_drm() {
         passed_drm = false;
         
     }
+    
+    string line = std::to_string(static_cast<uintmax_t>(std::time(NULL)));
+    
+     /* Message to be encrypted */
+  unsigned char plaintext[128];
+
+  /* Buffer for ciphertext. Ensure the buffer is long enough for the
+   * ciphertext which may be longer than the plaintext, dependant on the
+   * algorithm and mode
+   */
+  unsigned char ciphertext[128];
+   strcpy( (char*) plaintext, line.c_str()); 
+    /* Encrypt the plaintext */
+   encrypt (plaintext, strlen ((char *)plaintext), key, iv,
+                            ciphertext);
+                          
+ 
+
+  ofstream myfile3;
+  myfile3.open (Version::get_install_path() + "/" + ".candock");
+  myfile3 << ciphertext;
+  myfile3.close();
+
     
     /* Clean up */
     EVP_cleanup();

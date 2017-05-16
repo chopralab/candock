@@ -1,3 +1,4 @@
+#include <version.hpp>
 #include <openssl/conf.h>
 #include <openssl/evp.h>
 #include <openssl/err.h>
@@ -106,8 +107,8 @@ int main (void)
   /* A 128 bit IV */
   unsigned char *iv = (unsigned char *)"1226610434284021";
 
-  string line = "1494809089";
-
+  string line = std::to_string(static_cast<uintmax_t>(std::time(NULL)));
+        cout << "line " << line << endl;
   /* Message to be encrypted */
   unsigned char plaintext[128];
 
@@ -121,7 +122,7 @@ int main (void)
   /* Buffer for the decrypted text */
   unsigned char decryptedtext[128];
 
-  int decryptedtext_len, ciphertext_len;
+  int ciphertext_len;
 
   /* Initialise the library */
   ERR_load_crypto_strings();
@@ -138,7 +139,7 @@ int main (void)
   cout << " ciphertext_len " << ciphertext_len << endl;
 
   ofstream myfile3;
-  myfile3.open (".candock");
+  myfile3.open (Version::get_install_path() + "/" + ".candock");
   myfile3 << ciphertext;
   myfile3.close();
 
