@@ -62,4 +62,11 @@ target_link_libraries ( candock
     ${OPENSSL_LIBRARIES}
 )
 
+install(
+    TARGETS
+    candock
+    LIBRARY DESTINATION
+    lib/${CANDOCK_VERSION}
+)
+
 endif (NOT ${CANDOCK_BUILD_STATIC_EXECUTABLE})

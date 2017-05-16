@@ -3,7 +3,7 @@
 # Load default variables
 
 : ${MCANDOCK_PATH:=@CMAKE_INSTALL_PREFIX@}
-: ${MCANDOCK_VER:=v@CANDOCK_MAJOR_VERSION@.@CANDOCK_MINOR_VERSION@.@CANDOCK_TWEAK_VERSION@}
+: ${MCANDOCK_VER:=@CANDOCK_VERSION@}
 
 : ${MCANDOCK_SUP_PATH:=@CMAKE_INSTALL_PREFIX@}
 
@@ -39,7 +39,7 @@ export CANDOCK_obj_dir
 
 # Check if were running in a PBS environment
 
-if [[ $PBS_ENVIRONMENT == BATCH ]]
+if [[ $PBS_ENVIRONMENT == PBS_BATCH ]]
 then
         : ${MCANDOCK_working_dir:=$PBS_O_WORKDIR}
 else
@@ -48,17 +48,15 @@ fi
 
 function find_centroids() {
 
-    ln -s $MCANDOCK_SUP_PATH/bslibdb bslibdb
+    cd $MCANDOCK_working_dir
+    echo "Running find_centroids in $PWD"
 
-    touch find_centroids.lck
     SECONDS=0
 
     $MCANDOCK_PATH/$MCANDOCK_VER/cd_find_centroids
 
-    echo "find_centroids took $SECONDS seconds to complete"
-    rm find_centroids.lck
+    echo "Finding centroids took $SECONDS seconds to complete"
 
-    rm bslibdb
 }
 
 function prep_fragments() {
@@ -66,13 +64,11 @@ function prep_fragments() {
     cd $MCANDOCK_working_dir
     echo "Running fragment in $PWD"
 
-    touch prep_fragments.lck
     SECONDS=0
 
     $MCANDOCK_PATH/$MCANDOCK_VER/cd_prep_fragments
 
     echo "Fragmenting took $SECONDS seconds to complete"
-    rm prep_fragments.lck
 }
 
 function dock_fragments() {
@@ -80,13 +76,11 @@ function dock_fragments() {
     cd $MCANDOCK_working_dir
     echo "Running dock in $PWD"
 
-    touch dock_fragments.lck
     SECONDS=0
 
     $MCANDOCK_PATH/$MCANDOCK_VER/cd_dock_fragments
 
     echo "Docking of fragments took $SECONDS seconds to complete"
-    rm dock_fragments.lck
 }
 
 function link_fragments() {
@@ -94,27 +88,23 @@ function link_fragments() {
     cd $MCANDOCK_working_dir
     echo "Running link in $PWD"
 
-    touch link_fragments.lck
     SECONDS=0
 
     $MCANDOCK_PATH/$MCANDOCK_VER/cd_link_fragments
 
     echo "Linking of fragments took $SECONDS seconds to complete"
-    rm link_fragments.lck
 }
 
 function design_ligands() {
 
     cd $MCANDOCK_working_dir
-    echo "Running link in $PWD"
+    echo "Running design in $PWD"
 
-    touch design_ligands.lck
     SECONDS=0
 
     $MCANDOCK_PATH/$MCANDOCK_VER/cd_design_ligands
 
     echo "Design of ligands took $SECONDS seconds to complete"
-    rm design_ligands.lck
 
 }
 

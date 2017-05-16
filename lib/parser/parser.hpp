@@ -7,13 +7,13 @@
 
 namespace Parser {
         enum pdb_read_options {
-                first_model=1,
-                all_models=2,
-                hydrogens=4,
-                skip_hetatm=8,
-                skip_atom=16,
-                sparse_macromol=32,
-                docked_poses_only=64,
+                first_model=        1 << 0,
+                all_models=         1 << 1,
+                hydrogens=          1 << 2,
+                skip_hetatm=        1 << 3,
+                skip_atom=          1 << 4,
+                sparse_macromol=    1 << 5,
+                docked_poses_only=  1 << 6,
         };
 
         class Parser {
