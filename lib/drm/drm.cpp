@@ -155,7 +155,7 @@ bool drm::check_drm() {
         
         
         /* Decrypt the ciphertext */
-        int decryptedtext_len = decrypt(encrypted, 16, key, iv, decryptedtext);
+        decrypt(encrypted, 16, key, iv, decryptedtext);
         
         
         /* Do something useful with the ciphertext here */
