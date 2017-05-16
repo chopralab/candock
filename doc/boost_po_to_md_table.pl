@@ -24,6 +24,7 @@ while (<>) {
     }
         
     next if $current_variable eq "Generic options:";
+    next if $current_variable eq "Logging options:";
     
     if ( $_ =~ m/^\s+\-\-(\S+)\s\[=arg\(=(\S+)\)\](?:\s+(\S.*))?/x ) {
         $current_option = $1;
@@ -51,6 +52,7 @@ while (<>) {
 for my $key (@variable_list) {
 
     next if $key eq "Generic options:";
+    next if $key eq "Logging options:";
 
     my $value = $variable_group{ $key };
 

@@ -22,7 +22,6 @@ if(${CANDOCK_BUILD_STATIC_EXECUTABLE})
         $<TARGET_OBJECTS:molib>
         $<TARGET_OBJECTS:probis>
         $<TARGET_OBJECTS:fragmenter>
-        $<TARGET_OBJECTS:kbforce>
         $<TARGET_OBJECTS:geom3d>
         $<TARGET_OBJECTS:helper>
     )
@@ -98,7 +97,6 @@ set_target_properties(
     INSTALL_RPATH ${CMAKE_INSTALL_PREFIX}/lib/${CANDOCK_VERSION}
     INSTALL_RPATH_USE_LINK_PATH TRUE
 )
-
 
 if(CUDA_FOUND)
     cuda_add_executable( cuda_link_fragments cd_link_fragments.cpp )
