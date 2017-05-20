@@ -12,7 +12,7 @@ int main(int argc, char* argv[]) {
                 main_timer.display_time("Starting");
 
                 if ( argc <= 2 ) {
-                        cerr << "You MUST supply atleast two arguments!" << endl;
+                        cerr << "You MUST supply at least two arguments!" << endl;
                         return 1;
                 }
 
