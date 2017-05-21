@@ -33,6 +33,11 @@ int main(int argc, char* argv[]) {
                         output_matrix.open("rmsds.lst");
                 }
 
+                if (mols1.size() <= 0) {
+                        output_matrix.close();
+                        return 0;
+                }
+
                 cryst[0].erase_properties();
                 Molib::Atom::Graph cryst_graph =  Molib::Atom::create_graph(cryst[0].get_atoms());
                 std::vector< Molib::Atom::Graph > atom_graphs;

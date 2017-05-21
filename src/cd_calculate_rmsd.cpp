@@ -24,7 +24,12 @@ int main(int argc, char* argv[]) {
 
                 std::ofstream output_matrix("outmatrix.tbl");
 
-                if (mols1.size() <= 1) {
+                if (mols1.size() <= 0) {
+                        output_matrix.close();
+                        return 0;
+                }
+
+                if (mols1.size() == 1) {
                         output_matrix << 0 << endl;
                         output_matrix.close();
                         return 0;
