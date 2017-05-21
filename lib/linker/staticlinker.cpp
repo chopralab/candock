@@ -283,6 +283,6 @@ namespace Linker {
 		
 		log_benchmark << "Reconstruction of molecules took " << bench.seconds_from_start() 
 			<< " wallclock seconds for " << __ligand.name() << endl;
-		return DockedConformation(ligand, __receptor, conformation.get_energy(), 0);
+		return DockedConformation(ligand, __receptor, conformation.get_energy(), 0, 0);
 	}
 };

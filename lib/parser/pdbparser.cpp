@@ -442,7 +442,7 @@ namespace Parser {
                                 }
 
                                 connect_bonds (get_bonds_in (molecule.get_atoms()));
-                        } else if (line.compare (0, 22, "REMARK  20 non-binder") == 0 && (__hm & docked_poses_only)) {
+                        } else if (line.compare (0, 21, "REMARK  20 non-binder") == 0 && (__hm & docked_poses_only)) {
                                 return;
                         }
                 }

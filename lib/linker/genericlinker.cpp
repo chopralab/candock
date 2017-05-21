@@ -151,7 +151,9 @@ namespace Linker {
 	DockedConformation::Vec Linker::GenericLinker::__minimize_final(DockedConformation::Vec &docked_conformations) {
 
 		DockedConformation::Vec minimized_conformations;
-
+                
+                size_t max_clq_identity = 0;
+                
 		for (auto &docked : docked_conformations) {
 		
 			try {
@@ -179,7 +181,7 @@ namespace Linker {
 				Molib::Atom::Grid gridrec(minimized_receptor.get_atoms());
 		
 				minimized_conformations.push_back(DockedConformation(minimized_ligand, minimized_receptor,
-					__score.non_bonded_energy(gridrec, minimized_ligand), potential_energy));
+					__score.non_bonded_energy(gridrec, minimized_ligand), potential_energy, ++max_clq_identity));
 		
 			} catch(OMMIface::Modeler::MinimizationError &e) {
 				log_error << "MinimizationError: skipping minimization of one conformation of ligand " 

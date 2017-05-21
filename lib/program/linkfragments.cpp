@@ -99,14 +99,34 @@ namespace Program {
 
                         int model = 0;
 
+                        Molib::Atom::Graph cryst_graph =  Molib::Atom::create_graph(ligand.get_atoms());
+
                         for (auto &docked : docks) {
 
                                 docked.get_ligand().change_residue_name ("CAN");
-                                double rmsd = cmdl.get_bool_option ("rmsd_crystal") ? docked.get_ligand().compute_rmsd_ord (ligand) : std::nan ("");
+                                
+                                double rmsd = std::nan ("");
+
+                                if (cmdl.get_bool_option ("rmsd_crystal")) {
+                                        
+                                        Molib::Atom::Vec atoms = docked.get_ligand().get_atoms();
+                        
+                                        int reenum = 0;
+                                        for ( auto &atom : atoms ) {
+                                                atom->set_atom_number(++reenum);
+                                                atom->erase_properties();
+                                        }
+
+                                        Molib::Atom::Graph docked_graph = Molib::Atom::create_graph(atoms);
+
+                                        rmsd = Molib::Atom::compute_rmsd(cryst_graph, docked_graph) ;
+                                }
+
+                                // output docked molecule conformations
                                 Inout::output_file (Molib::Molecule::print_complex (docked.get_ligand(), docked.get_receptor(),
                                                                                     docked.get_energy(), docked.get_potential_energy(),
-                                                                                    ++model, rmsd),
-                                                    p.string(), ios_base::app); // output docked molecule conformations
+                                                                                    ++model, docked.get_max_clq_identity(), rmsd),
+                                                    p.string(), ios_base::app);
                         }
 
                         __all_top_poses.add (new Molib::Molecule (docks[0].get_ligand()));

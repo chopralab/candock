@@ -405,13 +405,14 @@ namespace Molib {
 		}
 	}
 
-        string Molecule::print_complex (Molecule &ligand, Molecule &receptor, const double energy, const double potential, const int model, const double rmsd) {
+        string Molecule::print_complex (Molecule &ligand, Molecule &receptor, const double energy, const double potential, const int model, const size_t max_clq_id, const double rmsd) {
                 stringstream ss;
 
                 ss << "MODEL    " << model << endl;
 
                 ss << "REMARK   1 MINIMIZED COMPLEX OF " << ligand.name() << " AND " << receptor.name() << " WITH SCORE OF " << energy << endl;
                 ss << "REMARK   2 POTENTIAL ENERGY OF " << ligand.name() << " IS " << potential << endl;
+                ss << "REMARK   3 THIS IS CONFIGUATION " << ligand.name() << " NUMBER " << max_clq_id << endl; 
 
                 if (! std::isnan (rmsd))
                         ss << "REMARK   3 DOCKED CONFORMATION HAS AN RMSD OF " << rmsd << " FROM ORIGINAL STRUCTURE" << endl;
