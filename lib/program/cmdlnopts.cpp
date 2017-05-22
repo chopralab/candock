@@ -216,6 +216,8 @@ namespace Program {
 			 "Additional fragments to be added to seeds.pdb")
 			("fragment_mol",        po::value<std::string>()->default_value("")->implicit_value("fragment_mol.mol2"),
 			 "Additional fragments to be added to seeds.pdb without rotatable bonds being cut.")
+                        ("new_scaffold",        po::value<bool>()->default_value(false,"false"),
+                         "Generate new scaffolds even if prep_fragments.pdb")
 			("seeds_to_add",        po::value<int>()->default_value(50),
 			 "Number of seeds from seeds.pdb to be considered for addition to the ligands in prepared_ligands.pdb")
 			("seeds_to_avoid",      po::value<int>()->default_value(50),
