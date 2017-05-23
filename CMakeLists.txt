@@ -29,17 +29,6 @@ if ( NOT RAPIDXML_ROOT )
     set( RAPIDXML_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/foreign/ )
 endif( NOT RAPIDXML_ROOT )
 
-find_package(Boost    REQUIRED  COMPONENTS filesystem system regex program_options)
-find_package(GSL      REQUIRED)
-find_package(RapidXML REQUIRED)
-find_package(OpenMM   REQUIRED)
-find_package(Git      REQUIRED)
-find_package(OpenSSL  REQUIRED)
-
-#DRM Module
-set(CANDOCK_SETDRM 0 CACHE OFF "Build DRM into Candock")
-
-
 set(CANDOCK_CUDA_SUPPORT OFF CACHE BOOL "Build CUDA support")
 
 if (CANDOCK_CUDA_SUPPORT)
@@ -53,6 +42,16 @@ if (CANDOCK_CUDA_SUPPORT)
     endif(CUDA_FOUND)
 
 endif(CANDOCK_CUDA_SUPPORT)
+
+find_package(Boost    REQUIRED  COMPONENTS filesystem system regex program_options)
+find_package(GSL      REQUIRED)
+find_package(RapidXML REQUIRED)
+find_package(OpenMM   REQUIRED)
+find_package(Git      REQUIRED)
+find_package(OpenSSL  REQUIRED)
+
+#DRM Module
+set(CANDOCK_SETDRM 0 CACHE OFF "Build DRM into Candock")
 
 set(JSONCPP_INCLUDE_DIR "foreign/jsoncpp/include" "foreign/jsoncpp/src" )
 

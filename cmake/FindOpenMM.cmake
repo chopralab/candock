@@ -13,44 +13,34 @@
 find_path(
     OPENMM_INCLUDE_DIR 
     NAMES OpenMM.h
-    PATHS /usr/local/openmm/include
+    PATHS ${OPEMMM_ROOT}/include /usr/local/openmm/include
     DOC "openmm include dir"
 )
 
+find_library(
+    OPENMM_LIBRARY
+    NAMES OpenMM
+    PATHS ${OPEMMM_ROOT}/lib /usr/local/openmm/lib/
+    DOC "openmm library"
+)
 
-if(CYGWIN)
-    find_library(
-        OPENMM_LIBRARY
-        NAMES libOpenMM.dll.a
-        PATHS /usr/local/openmm/lib
-        DOC "openmm library"
-    )
-    find_library(
-        OPENMM_KBPLUGIN
-        NAMES libKBPlugin.dll.a
-        PATHS /usr/local/openmm/lib/
-        DOC "KBPlugin Plugin"
-    )
-else(CYGWIN)
-    find_library(
-        OPENMM_LIBRARY
-        NAMES OpenMM
-        PATHS /usr/local/openmm/lib/
-        DOC "openmm library"
-    )
-    find_library(
-        OPENMM_KBPLUGIN
-        NAMES KBPlugin
-        PATHS /usr/local/openmm/lib/
-        DOC "KBPlugin Plugin"
-    )
+find_library(
+    OPENMM_KBPLUGIN
+    NAMES KBPlugin
+    PATHS ${OPEMMM_ROOT}/lib /usr/local/openmm/lib/
+    DOC "KBPlugin Plugin"
+)
+
+if(CUDA_FOUND)
+
     find_library(
         OPENMM_LIBRARY_CUDA
         NAMES OpenMMCUDA
-        PATHS /usr/local/openmm/plugins/
+        PATHS ${OPEMMM_ROOT}/plugins /usr/local/openmm/plugins/
         DOC "openmm library cuda"
     )
-endif(CYGWIN)
+
+endif(CUDA_FOUND)
 
 set(OPENMM_INCLUDE_DIR ${OPENMM_INCLUDE_DIR} CACHE STRING INTERNAL)
 set(OPENMM_LIBRARY ${OPENMM_LIBRARY} ${OPENMM_LIBRARY_CUDA} ${OPENMM_KBPLUGIN} CACHE STRING INTERNAL)
@@ -63,5 +53,5 @@ ENDIF(OPENMM_LIBRARY AND OPENMM_INCLUDE_DIR AND OPENMM_KBPLUGIN)
 
 # ==========================================
 IF(NOT OPENMM_FOUND)
-    MESSAGE(FATAL_ERROR "OPENMM required, please specify it's location.")
+    MESSAGE(FATAL_ERROR "OPENMM required, please specify it's location. Try setting OPEMMM_ROOT.")
 ENDIF(NOT OPENMM_FOUND)
