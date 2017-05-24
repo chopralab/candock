@@ -97,8 +97,7 @@ set_target_properties(
         cd_rescore_docked
         cd_design_ligands
     PROPERTIES
-    INSTALL_RPATH ${CMAKE_INSTALL_PREFIX}/lib/${CANDOCK_VERSION}
-    INSTALL_RPATH ${CMAKE_INSTALL_PREFIX}/lib/ext
+    INSTALL_RPATH ${CMAKE_INSTALL_PREFIX}/lib/${CANDOCK_VERSION}:${CMAKE_INSTALL_PREFIX}/lib/ext
     INSTALL_RPATH_USE_LINK_PATH TRUE
 )
 
@@ -108,8 +107,7 @@ if(CUDA_FOUND)
     set_target_properties(
         cuda_link_fragments
         PROPERTIES
-        INSTALL_RPATH ${CMAKE_INSTALL_PREFIX}/lib/${CANDOCK_VERSION}
-        INSTALL_RPATH ${CMAKE_INSTALL_PREFIX}/lib/ext
+        INSTALL_RPATH ${CMAKE_INSTALL_PREFIX}/lib/${CANDOCK_VERSION}:${CMAKE_INSTALL_PREFIX}/lib/ext
         INSTALL_RPATH_USE_LINK_PATH TRUE
     )
 endif(CUDA_FOUND)
