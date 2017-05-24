@@ -55,7 +55,7 @@ add_library(
 )
 
 target_link_libraries ( candock
-    ${OPENMM_LIBRARY}
+    ${OPENMM_LIBRARIES}
     ${OPENMM_KBPLUGIN}
     ${Boost_LIBRARIES}
     ${GSL_LIBRARIES}

@@ -43,10 +43,13 @@ if (CANDOCK_CUDA_SUPPORT)
 
 endif(CANDOCK_CUDA_SUPPORT)
 
+set(OPENMM_ROOT_DIR "/usr/local/openmm" CACHE STRING "Location of OpenMM and KBForce")
+
+
 find_package(Boost    REQUIRED  COMPONENTS filesystem system regex program_options)
 find_package(GSL      REQUIRED)
 find_package(RapidXML REQUIRED)
-find_package(OpenMM   REQUIRED)
+find_package(OpenMM   REQUIRED  COMPONENTS openmm kbforce)
 find_package(Git      REQUIRED)
 find_package(OpenSSL  REQUIRED)
 

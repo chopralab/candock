@@ -27,7 +27,7 @@ if(${CANDOCK_BUILD_STATIC_EXECUTABLE})
     )
     
     set( all_needed_libraries
-        ${OPENMM_LIBRARY}
+        ${OPENMM_LIBRARIES}
         ${OPENMM_KBPLUGIN}
         ${Boost_LIBRARIES}
         ${GSL_LIBRARIES}
