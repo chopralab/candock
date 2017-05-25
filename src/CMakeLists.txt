@@ -102,14 +102,7 @@ set_target_properties(
 )
 
 if(CUDA_FOUND)
-    cuda_add_executable( cuda_link_fragments cd_link_fragments.cpp )
-    target_link_libraries( cuda_link_fragments ${all_needed_libraries} )
-    set_target_properties(
-        cuda_link_fragments
-        PROPERTIES
-        INSTALL_RPATH ${CMAKE_INSTALL_PREFIX}/lib/${CANDOCK_VERSION}:${CMAKE_INSTALL_PREFIX}/lib/ext
-        INSTALL_RPATH_USE_LINK_PATH TRUE
-    )
+   
 endif(CUDA_FOUND)
 
 install(

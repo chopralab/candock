@@ -105,8 +105,25 @@ find_library( OPENMM_KBFORCE_LIBRARY_DEBUG
   HINTS ${OPENMM_ROOT_DIR}/lib
   PATH_SUFFIXES Debug
 )
-set( OPENMM_INCLUDE_DIRS ${OPENMM_INCLUDE_DIR} )
+
+
+
 set( OPENMM_LIBRARIES ${OPENMM_LIBRARY} ${OPENMM_KBFORCE_LIBRARY} )
+
+IF(CANDOCK_CUDA_SUPPORT)
+
+    find_library(
+        OPENMM_LIBRARY_CUDA
+        NAMES OpenMMCUDA
+        PATHS ${OPENMM_ROOT_DIR}/lib/plugins
+        DOC "openmm library cuda"
+    )
+
+    set( OPENMM_LIBRARIES ${OPENMM_LIBRARY} ${OPENMM_LIBRARY_CUDA} ${OPENMM_KBFORCE_LIBRARY})
+
+ENDIF(CANDOCK_CUDA_SUPPORT)
+
+set( OPENMM_INCLUDE_DIRS ${OPENMM_INCLUDE_DIR} )
 
 #=============================================================================
 # handle the QUIETLY and REQUIRED arguments and set OPENMM_FOUND to TRUE if all

@@ -26,13 +26,8 @@ namespace Linker {
 			const double max_allow_energy, const int max_num_possibles, 
 			const int max_clique_size, const int max_iterations_final) { 
 
-		if (cuda) {
-			l = new CUDA_IterativeLinker(modeler, receptor, ligand, top_seeds, 
-				gridrec, score, dist_cutoff, spin_degrees, tol_seed_dist, 
-				lower_tol_seed_dist, upper_tol_seed_dist, max_possible_conf, link_iter, 
-				clash_coeff, docked_clus_rad, max_allow_energy, max_num_possibles, 
-				max_clique_size, max_iterations_final);
-		} else if (iterative) {
+		
+		if (iterative) {
 			l = new IterativeLinker(modeler, receptor, ligand, top_seeds, 
 				gridrec, score, dist_cutoff, spin_degrees, tol_seed_dist, 
 				lower_tol_seed_dist, upper_tol_seed_dist, max_possible_conf, link_iter, 

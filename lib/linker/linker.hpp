@@ -150,14 +150,6 @@ namespace Linker {
 			using GenericLinker::GenericLinker;
 		};
 		
-		class CUDA_IterativeLinker : public GenericLinker {
-			DockedConformation __a_star(const int segment_graph_size, const Partial &start_conformation, vector<unique_ptr<State>> &states, int iter);
-			Partial::Vec __generate_rigid_conformations(const Seed::Graph &seed_graph);
-			DockedConformation __reconstruct(const Partial &conformation);
-
-		public:
-			using GenericLinker::GenericLinker;
-		};
 
 		GenericLinker *l;
 		
