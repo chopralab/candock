@@ -222,7 +222,6 @@ namespace Molib {
 	bool BondOrder::__basic_rules(ValenceState &valence_state, BondToOrder &bond_orders) {
 		while (!__my_success(valence_state)) {
 			bool bo_was_set = false;
-                        cout << "Grrr" << endl;
 			for (auto &kv : valence_state) {
 				Atom &atom = *kv.first;
 				AtomParams &apar = kv.second;
