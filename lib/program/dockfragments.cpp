@@ -6,6 +6,7 @@
 #include "helper/inout.hpp"
 #include "options.hpp"
 #include "helper/grep.hpp"
+#include "molib/atomtype.hpp"
 
 namespace Program {
 
@@ -151,6 +152,14 @@ namespace Program {
                                 Parser::FileParser spdb (p.string(), Parser::first_model, 1);
 
                                 Molib::Molecules seed_molec = spdb.parse_molecule();
+                                
+                                seed_molec.compute_hydrogen();
+                                std::tuple <double, size_t, size_t, size_t> frag_tuple = Molib::AtomType::determine_lipinski(seed_molec.get_atoms());
+
+                                if ( std::get<2>(frag_tuple) > 1 || std::get<3>(frag_tuple) > 1 ) {
+                                        continue;
+                                }
+
                                 seed_score_map.push_back( {std::stod( seed_molec.first().name()), seed.name()} );
                         } catch ( Error e) {
                                 log_warning << "Skipping seed " << seed.name() << " in " << __name << " because " << e.what() << endl;

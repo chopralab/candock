@@ -934,19 +934,24 @@ namespace AtomType {
 		dbgmsg("MOLECULE AFTER RING TYPING" << endl << atoms);
 	}
 	
-	std::tuple<double, int, int> determine_lipinski(const Atom::Vec &atoms) {
+	std::tuple<double, size_t, size_t, size_t> determine_lipinski(const Atom::Vec &atoms) {
                 double molar_mass = 0.0;
-                int h_bond_acceptors = 0;
-                int h_bond_donors = 0;
+                size_t h_bond_acceptors = 0;
+                size_t h_bond_donor_OH = 0;
+                size_t h_bond_donor_NH = 0;
                 for (auto atom : atoms) {
                         molar_mass += atom->element().mass();
-                        if ( atom->element() == Element::N || atom->element() == Element::O ) {
+                        if ( atom->element() == Element::N ) {
                                 ++h_bond_acceptors;
-                                h_bond_donors += atom->get_num_hydrogens();
-                                
+                                h_bond_donor_NH += atom->get_num_hydrogens();
+                        }
+                        
+                        if ( atom->element() == Element::O ) {
+                                ++h_bond_acceptors;
+                                h_bond_donor_OH += atom->get_num_hydrogens();
                         }
                 }
-                return std::make_tuple(molar_mass, h_bond_acceptors, h_bond_donors);
+                return std::make_tuple(molar_mass, h_bond_acceptors, h_bond_donor_OH, h_bond_donor_NH);
         }
 }
 };

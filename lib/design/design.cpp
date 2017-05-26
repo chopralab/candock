@@ -135,7 +135,7 @@ namespace design {
 			throw Error("No seeds given for modificatiton");
 		}
 
-		std::tuple<double,int,int> original_lipinski = Molib::AtomType::determine_lipinski(__original.get_atoms());
+		std::tuple<double,size_t,size_t,size_t> original_lipinski = Molib::AtomType::determine_lipinski(__original.get_atoms());
 
 		for ( auto &start_atom : __original.get_atoms() ) {
 
@@ -147,13 +147,14 @@ namespace design {
 			for ( const auto &fragment : nr )  {
                             
 			Molib::Hydrogens::compute_hydrogen(fragment.first().first().first().first().first());
-                        std::tuple<double,int,int> frag_lipinski = Molib::AtomType::determine_lipinski(
+                        std::tuple<double,size_t,size_t,size_t> frag_lipinski = Molib::AtomType::determine_lipinski(
                             fragment.first().first().first().first().first().get_atoms());
                         Molib::Hydrogens::erase_hydrogen(fragment.first().first().first().first().first());
                         
                         if ( std::get<0>(original_lipinski) + std::get<0>(frag_lipinski) > 500.0 ||
                              std::get<1>(original_lipinski) + std::get<1>(frag_lipinski) > 10    ||
-                             std::get<2>(original_lipinski) + std::get<2>(frag_lipinski) > 5     ) {
+                             std::get<2>(original_lipinski) + std::get<2>(frag_lipinski) > 2     ||
+                             std::get<3>(original_lipinski) + std::get<3>(frag_lipinski) > 2     ){
                                 continue;
                         }
 

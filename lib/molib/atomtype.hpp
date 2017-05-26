@@ -20,7 +20,7 @@ namespace Molib {
 		void compute_gaff_type(const Atom::Vec &atoms);
 		void compute_ring_type(const Atom::Vec &atoms);
                 
-                std::tuple<double, int, int> determine_lipinski(const Atom::Vec &atoms);
+                std::tuple<double, size_t, size_t, size_t> determine_lipinski(const Atom::Vec &atoms);
 	};
 };
 #endif
