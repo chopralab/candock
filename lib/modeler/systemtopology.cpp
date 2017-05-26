@@ -496,11 +496,9 @@ namespace OMMIface {
                         const int type2 = topology.get_type (atom2);
                         const int type3 = topology.get_type (atom3);
                         const int type4 = topology.get_type (atom4);
-
+                        
                         try {
-                                const ForceField::TorsionTypeVec &v_ttype =
-                                        __ffield->get_dihedral_type (type1, type2, type3, type4); // cannot make it const ??
-
+                                const ForceField::TorsionTypeVec &v_ttype = __ffield->get_dihedral_type (type1, type2, type3, type4); // cannot make it const ??
                                 for (auto &ttype : v_ttype) {
                                         dbgmsg ("force_idx = " << force_idx << " idx1 = " << idx1 << " idx2 = " << idx2
                                                 << " idx3 = " << idx3 << " idx4 = " << idx4 << " periodicity = " << ttype.periodicity
@@ -512,11 +510,22 @@ namespace OMMIface {
                                         bondTorsionData[idx4].push_back (ForceData {force_idx, idx1, idx2, idx3, idx4, 0, 0, ttype.periodicity, ttype.phase, ttype.k});
 
                                         ++force_idx;
-
                                 }
+
                         } catch (ParameterError &e) {
-                                log_error << e.what() << " (" << ++warn << ")" << endl;
+                                log_warning << e.what() << " (WARNINGS ARE NOT INCREASED) (using default parameters for this dihedral)" << endl;
+                                // if everything else fails just constrain at something reasonable
+                                //cout <<  Geom3D::dihedral(atom1.crd(), atom2.crd(), atom3.crd(), atom4.crd()) << endl;
+                                //ForceField::TorsionType vtype = ForceField::TorsionType {1, Geom3D::dihedral(atom1.crd(), atom2.crd(), atom3.crd(), atom4.crd()), 0};
+                                //bondTorsion->addTorsion (idx1, idx2, idx3, idx4, vtype.periodicity, vtype.phase, vtype.k);
+                                //bondTorsionData[idx1].push_back (ForceData {force_idx, idx1, idx2, idx3, idx4, 0, 0, vtype.periodicity, vtype.phase, vtype.k});
+                                //bondTorsionData[idx2].push_back (ForceData {force_idx, idx1, idx2, idx3, idx4, 0, 0, vtype.periodicity, vtype.phase, vtype.k});
+                                //bondTorsionData[idx3].push_back (ForceData {force_idx, idx1, idx2, idx3, idx4, 0, 0, vtype.periodicity, vtype.phase, vtype.k});
+                                //bondTorsionData[idx4].push_back (ForceData {force_idx, idx1, idx2, idx3, idx4, 0, 0, vtype.periodicity, vtype.phase, vtype.k});
+
+                                //++force_idx;
                         }
+
                 }
 
                 // Create the 1-2-3-4 improper terms where 3 is the central atom
