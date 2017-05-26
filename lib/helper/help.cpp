@@ -95,7 +95,11 @@ namespace help {
 		if (initial.size() == 2) {
 			const string &iniclass1 = initial[0];
 			const string &iniclass2 = initial[1];
+                        if ( gaff_replacement.count(iniclass1) == 0 )
+                                return result;
 			for (auto &repclass1 : gaff_replacement.at(iniclass1)) {
+                                if ( gaff_replacement.count(iniclass2) == 0 )
+                                        continue;
 				for (auto &repclass2 : gaff_replacement.at(iniclass2)) {
 					if (!(repclass1 == iniclass1 && repclass2 == iniclass2)) {
 						dbgmsg("replacement bond type [" << repclass1 << " " 
@@ -108,8 +112,14 @@ namespace help {
 			const string &iniclass1 = initial[0];
 			const string &iniclass2 = initial[1];
 			const string &iniclass3 = initial[2];
+                        if ( gaff_replacement.count(iniclass1) == 0 )
+                                return result;
 			for (auto &repclass1 : gaff_replacement.at(iniclass1)) {
+                                if ( gaff_replacement.count(iniclass2) == 0 )
+                                        continue;
 				for (auto &repclass2 : gaff_replacement.at(iniclass2)) {
+                                        if ( gaff_replacement.count(iniclass3) == 0 )
+                                                continue;
 					for (auto &repclass3 : gaff_replacement.at(iniclass3)) {
 						if (!(repclass1 == iniclass1 && repclass2 == iniclass2 && repclass3 == iniclass3)) {
 							dbgmsg("replacement angle type [" << repclass1 << " " 
@@ -124,9 +134,17 @@ namespace help {
 			const string &iniclass2 = initial[1];
 			const string &iniclass3 = initial[2];
 			const string &iniclass4 = initial[3];
+                        if ( gaff_replacement.count(iniclass1) == 0 )
+                                return result;
 			for (auto &repclass1 : gaff_replacement.at(iniclass1)) {
-				for (auto &repclass2 : gaff_replacement.at(iniclass2)) {
+                                if ( gaff_replacement.count(iniclass2) == 0 )
+                                        continue;
+				for (auto &repclass2 : gaff_replacement.at(iniclass3)) {
+                                        if ( gaff_replacement.count(iniclass3) == 0 )
+                                                continue;
 					for (auto &repclass3 : gaff_replacement.at(iniclass3)) {
+                                                if ( gaff_replacement.count(iniclass4) == 0 )
+                                                        continue;
 						for (auto &repclass4 : gaff_replacement.at(iniclass4)) {
 							if (!(repclass1 == iniclass1 && repclass2 == iniclass2 
 								&& repclass3 == iniclass3 && repclass4 == iniclass4)) {
