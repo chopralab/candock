@@ -55,6 +55,22 @@ namespace OMMIface {
 		return stream;
 	}
 
+        int Topology::get_index(const Molib::Atom &atom) const {
+                if ( ! atom_to_index.count(&atom) ) {
+                        log_error << "Problem with atom index: " << atom << endl;
+                }
+
+                return atom_to_index.at(&atom);
+        }
+
+        int Topology::get_type(const Molib::Atom &atom) const {
+                if ( ! atom_to_type.count(&atom) ) {
+                        log_error << "Problem with atom type: " << atom << endl;
+                }
+
+                return atom_to_type.at(&atom);
+        }
+
 	Topology& Topology::add_topology(const Molib::Atom::Vec &atoms, const ForceField &ffield) {
 
 		int sz = this->atoms.size();

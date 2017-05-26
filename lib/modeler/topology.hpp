@@ -36,8 +36,8 @@ namespace OMMIface {
 		~Topology() { dbgmsg("calling destructor of Topology"); }
 
 		Topology& add_topology(const Molib::Atom::Vec &atoms, const ForceField &ffield);
-		int get_index(const Molib::Atom &atom) const { return atom_to_index.at(&atom); }
-		int get_type(const Molib::Atom &atom) const { return atom_to_type.at(&atom); }
+		int get_index(const Molib::Atom &atom) const;
+		int get_type(const Molib::Atom &atom) const;
 		
 	};
 
