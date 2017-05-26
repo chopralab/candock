@@ -222,6 +222,7 @@ namespace Molib {
 	bool BondOrder::__basic_rules(ValenceState &valence_state, BondToOrder &bond_orders) {
 		while (!__my_success(valence_state)) {
 			bool bo_was_set = false;
+                        cout << "Grrr" << endl;
 			for (auto &kv : valence_state) {
 				Atom &atom = *kv.first;
 				AtomParams &apar = kv.second;
@@ -234,6 +235,12 @@ namespace Molib {
 							// rule 1 : for each atom in a bond, if the bond order bo 
 							// is determined, con is deducted by 1 and av is deducted by bo
 							bond_orders[&bond] = 1;
+                                                        if (valence_state.count(&bond.second_atom(atom)) == 0 ) {
+                                                                apar.con -= 1;
+                                                                apar.val -= 1;
+                                                                bo_was_set = true;
+                                                                continue;
+                                                        }
 							AtomParams &apar2 = valence_state.at(&bond.second_atom(atom));
 							apar.con -= 1;
 							apar.val -= 1;
@@ -258,6 +265,12 @@ namespace Molib {
 							if (bo <= 0)
 								throw BondOrderError("exception : zero bond order");
 							bond_orders[&bond] = bo;
+                                                        if (valence_state.count(&bond.second_atom(atom)) == 0 ) {
+                                                                apar.con -= 1;
+                                                                apar.val -= bo;
+                                                                bo_was_set = true;
+                                                                continue;
+                                                        }
 							AtomParams &apar2 = valence_state.at(&bond.second_atom(atom));
 							apar.con -= 1;
 							apar.val -= bo;
