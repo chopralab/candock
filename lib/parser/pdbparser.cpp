@@ -27,6 +27,8 @@ namespace Parser {
                 Residue *residue = nullptr;
                 bool ter_found=false;
 
+                char chain_id_replacement = 'A';
+
                 for (string &line : pdb_raw) {
 
                         if ( (__hm & skip_hetatm) && line.compare (0, 6, "HETATM") == 0) {
@@ -53,6 +55,7 @@ namespace Parser {
                                 char alt_loc = line.at (16);
                                 string resn = boost::algorithm::trim_copy (line.substr (17,3));
                                 char chain_id = line.at (21);
+                                                                
                                 int resi = stoi (line.substr (22, 4));
                                 char ins_code = line.at (26);
                                 double x_coord = stof (line.substr (30, 8));
@@ -113,6 +116,15 @@ namespace Parser {
                                                         if (!__giant_molecule || rest != Residue::protein || atom_name == "CA") {
                                                                 Model &model = mols.last().last().last();
 
+                                                                if ( chain_id == ' ' ) {
+                                                                        chain_id = chain_id_replacement;
+                                                                        if ( model.has_chain(chain_id) 
+                                                                                && model.chain(chain_id).size() > 0
+                                                                                && model.chain(chain_id).last().resi() > resi ) {
+                                                                                chain_id = ++chain_id_replacement;
+                                                                        }
+                                                                }
+                                                                
                                                                 // chains may alternate : A B A ...
                                                                 if (!model.has_chain (chain_id)) {
                                                                         chain = &model.add (new Chain (chain_id));
@@ -423,7 +435,8 @@ namespace Parser {
                                                                         const string &resn2 = a2.br().resn();
 
                                                                         // don't allow inter-residue bonds e.g., between MG and ATP, or between FAD and CYS (issue #114)
-                                                                        if (resn1 == resn2) {
+                                                                        if (help::ions.count (resn1) == 0 
+                                                                        &&  help::ions.count (resn2) == 0 ){
                                                                                 a1.connect (a2);
                                                                         }
 
