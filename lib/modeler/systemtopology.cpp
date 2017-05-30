@@ -609,6 +609,4 @@ namespace OMMIface {
                 OpenMM::LocalEnergyMinimizer::minimize (*context, tolerance, max_iterations);
         }
 
-
-
 };

@@ -182,8 +182,8 @@ namespace OMMIface {
 			dbgmsg("ending minimization step iter = " << iter);
 
 		}
-		dbgmsg( "Minimized in " << iter << " iterations, which took " 
-			<< bench.seconds_from_start() << " wallclock seconds");
+		log_benchmark << "Minimized in " << iter << " iterations, which took " 
+			<< bench.seconds_from_start() << " wallclock seconds" << endl;
 	}
 
 	void Modeler::init_openmm_positions() {
