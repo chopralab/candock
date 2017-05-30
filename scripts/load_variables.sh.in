@@ -37,6 +37,10 @@ export CANDOCK_gaff_dat
 export CANDOCK_dist
 export CANDOCK_obj_dir
 
+: ${OPENMM_PLUGIN_DIR:=@OPENMM_ROOT_DIR@/lib/plugins}
+
+export OPENMM_PLUGIN_DIR
+
 # Check if were running in a PBS environment
 
 if [[ $PBS_ENVIRONMENT == PBS_BATCH ]]
@@ -53,7 +57,7 @@ function find_centroids() {
 
     SECONDS=0
 
-    $MCANDOCK_PATH/$MCANDOCK_VER/cd_find_centroids
+    $MCANDOCK_PATH/bin/$MCANDOCK_VER/cd_find_centroids
 
     echo "Finding centroids took $SECONDS seconds to complete"
 
@@ -66,7 +70,7 @@ function prep_fragments() {
 
     SECONDS=0
 
-    $MCANDOCK_PATH/$MCANDOCK_VER/cd_prep_fragments
+    $MCANDOCK_PATH/bin/$MCANDOCK_VER/cd_prep_fragments
 
     echo "Fragmenting took $SECONDS seconds to complete"
 }
@@ -78,7 +82,7 @@ function dock_fragments() {
 
     SECONDS=0
 
-    $MCANDOCK_PATH/$MCANDOCK_VER/cd_dock_fragments
+    $MCANDOCK_PATH/bin/$MCANDOCK_VER/cd_dock_fragments
 
     echo "Docking of fragments took $SECONDS seconds to complete"
 }
@@ -90,7 +94,7 @@ function link_fragments() {
 
     SECONDS=0
 
-    $MCANDOCK_PATH/$MCANDOCK_VER/cd_link_fragments
+    $MCANDOCK_PATH/bin/$MCANDOCK_VER/cd_link_fragments
 
     echo "Linking of fragments took $SECONDS seconds to complete"
 }
@@ -102,7 +106,7 @@ function design_ligands() {
 
     SECONDS=0
 
-    $MCANDOCK_PATH/$MCANDOCK_VER/cd_design_ligands
+    $MCANDOCK_PATH/bin/$MCANDOCK_VER/cd_design_ligands
 
     echo "Design of ligands took $SECONDS seconds to complete"
 
