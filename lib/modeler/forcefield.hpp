@@ -24,6 +24,7 @@ namespace OMMIface {
 		double coulomb14scale;
 		double lj14scale;
 		double step; // for knowledge-based potential
+		double cutoff; //FIXME intitialize this
 		
 		//~ static const double Temperature         = 300;     // Kelvins
 		//~ static const double FrictionInPerPs     = 91.;     // collisions per picosecond
@@ -61,6 +62,7 @@ namespace OMMIface {
                 bool has_dihedral_type(  const string &aclass1, const string &aclass2, const string &aclass3, const string &aclass4) const;
                 bool has_improper_type(  const string &aclass1, const string &aclass2, const string &aclass3, const string &aclass4) const;
                 const KBType& get_kb_force_type(const Molib::Atom &atom1, const Molib::Atom &atom2) const;
+                const KBType& get_kb_force_type(int aclass1, int aclass2) const;
                 const AtomType& get_atom_type(const int type) const;
                 const BondType& get_bond_type(const int type1, const int type2) const;
                 const AngleType& get_angle_type(const int type1, const int type2, const int type3) const;
@@ -71,7 +73,7 @@ namespace OMMIface {
 		ForceField& parse_gaff_dat_file(const string&);
 		ForceField& insert_topology(const Molib::Molecule&);
 		ForceField& erase_topology(const Molib::Molecule&);
-		ForceField& add_kb_forcefield(const Molib::Score&, const double step);
+		ForceField& add_kb_forcefield(const Molib::Score&, const double step, const double cutoff);
 		
 		bool residue_exists(const string &name) const { return residue_topology.count(name); }
 	};

@@ -201,8 +201,7 @@ namespace OMMIface {
 		__system_topology.init_integrator(__step_size_in_ps);
 
 		if (__fftype == "kb") {
-
-			// do nothing since force will be initialized when minimization starts
+			__system_topology.init_knowledge_based_force(__topology);
 			
 		} else if (__fftype == "phy") {
 			

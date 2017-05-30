@@ -126,7 +126,7 @@ namespace Program {
                         OMMIface::ForceField* ffield = new OMMIface::ForceField;
 
                         ffield->parse_gaff_dat_file(cmdl.get_string_option("gaff_dat"))
-                                .add_kb_forcefield(*a.score, cmdl.get_double_option("step"))
+                                .add_kb_forcefield(*a.score, cmdl.get_double_option("step"), 15)
                                 .parse_forcefield_file(cmdl.get_string_option("amber_xml"))
                                 .parse_forcefield_file(cmdl.get_string_option("water_xml"));
 

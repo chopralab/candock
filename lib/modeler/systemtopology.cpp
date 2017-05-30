@@ -264,18 +264,11 @@ namespace OMMIface {
 
                         dbgmsg ("NONBOND LIST (KBFORCES) (SIZE = " << nonbondlist.size() << ") : " << endl << nonbondlist);
 
-                        // remove force if it exists
-                        dbgmsg ("__kbfoce_idx = " << __kbforce_idx);
-
-                        if (__kbforce_idx != -1)
-                                system->removeForce (__kbforce_idx);
-
-                        KBPlugin::KBForce *kbforce = new KBPlugin::KBForce();
-                        kbforce->setStep (__ffield->step);
                         dbgmsg ("kbforce step = " << setprecision (9) << fixed << __ffield->step);
 
                         int warn = 0;
 
+                        __kbforce->clearBonds();
                         // init OpenMM's kbforce object
                         for (auto &bond : nonbondlist) {
                                 dbgmsg ("next iteration in nonbondlist");
@@ -286,10 +279,7 @@ namespace OMMIface {
 
                                 if (!masked[idx1] && !masked[idx2]) { // don't make the force if one or both atoms are masked
                                         try {
-                                                const ForceField::KBType &kbtype = __ffield->get_kb_force_type (atom1, atom2);
-                                                kbforce->addBond (idx1, idx2,
-                                                                  const_cast<vector<double>&> (kbtype.potential),
-                                                                  const_cast<vector<double>&> (kbtype.derivative));
+                                                __kbforce->addBond (idx1, idx2, atom1.idatm_type(), atom2.idatm_type());
                                                 dbgmsg ("adding kbforce between idx1 = " << idx1 << " and idx2 = " << idx2);
                                         } catch (ParameterError &e) {
                                                 log_error << e.what() << " (" << ++warn << ")" << endl;
@@ -298,10 +288,6 @@ namespace OMMIface {
                         }
 
                         dbgmsg ("out of loop");
-                        // and add it back to the system
-                        __kbforce_idx = system->addForce (kbforce);
-                        dbgmsg ("after addForce context = " << (context == nullptr ? "NULL" : "NOTNULL")
-                                << " __kbforce_idx = " << __kbforce_idx);
                         context->reinitialize();
                         dbgmsg ("after reinitialize");
                         context->setPositions (positions);
@@ -365,6 +351,29 @@ namespace OMMIface {
 
                 if (warn > 0) {
                         throw Error ("die : missing parameters detected");
+                }
+
+        }
+
+        void SystemTopology::init_knowledge_based_force(Topology &topology) {
+                if (__kbforce_idx != -1)
+                        system->removeForce (__kbforce_idx);
+
+                std::set<int> used_atom_types;
+
+                //FIXME Fixup topology to contain all the atom types used in the system (thus no need to initialize per ligand/protein)
+                for (const auto &atom : topology.atoms) {
+                        used_atom_types.insert(atom->idatm_type());
+                }
+
+                __kbforce = new KBPlugin::KBForce(used_atom_types.size(), __ffield->step, __ffield->cutoff);
+                __kbforce_idx = system->addForce (__kbforce);
+
+                for ( const auto &type1 : used_atom_types ) {
+                        for ( const auto &type2 : used_atom_types ) {
+                                const ForceField::KBType kb = __ffield->get_kb_force_type(type1, type2);
+                                __kbforce->addBondType( type1, type2, kb.potential, kb.derivative);
+                        }
                 }
 
         }

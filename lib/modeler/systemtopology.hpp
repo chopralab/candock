@@ -27,6 +27,10 @@ namespace OpenMM {
         class PeriodicTorsionForce;
 };
 
+namespace KBPlugin {
+        class KBForce;
+};
+
 namespace OMMIface {
         struct ForceField;
 
@@ -44,6 +48,7 @@ namespace OMMIface {
 
                 const ForceField *__ffield;
 
+                KBPlugin::KBForce* __kbforce;
                 int __kbforce_idx;
                 vector<bool> masked;
                 vector<double> masses;
@@ -88,7 +93,8 @@ namespace OMMIface {
                 void init_integrator (const double step_size_in_ps);
                 void init_particles (Topology &topology);
                 void update_knowledge_based_force (Topology &topology, const vector<OpenMM::Vec3> &positions, const double dist_cutoff);
-                void init_physics_based_force (Topology &topology);
+                void init_physics_based_force  (Topology &topology);
+                void init_knowledge_based_force(Topology &topology);
                 void init_bonded (Topology &topology, const bool use_constraints);
                 void init_positions (const Geom3D::Point::Vec &crds);
                 //~ const vector<OpenMM::Vec3>& get_positions_in_nm();

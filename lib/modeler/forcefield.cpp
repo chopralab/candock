@@ -79,6 +79,22 @@ namespace OMMIface {
 
         }
 
+        const ForceField::KBType& ForceField::get_kb_force_type(int aclass1, int aclass2) const {
+                if ( kb_force_type.count(aclass1) != 0 && kb_force_type.at(aclass1).count(aclass2) != 0) {
+                        return kb_force_type.at(aclass1).at(aclass2);
+                }
+
+                if ( kb_force_type.count(aclass2) != 0 && kb_force_type.at(aclass2).count(aclass1) != 0) {
+                        return kb_force_type.at(aclass2).at(aclass1);
+                }
+
+                stringstream ss;
+                ss << "warning : missing kb force type " << help::idatm_unmask[aclass1] 
+                   << "-" << help::idatm_unmask[aclass2];
+                throw ParameterError(ss.str());
+
+        }
+
         bool ForceField::has_atom_type(const int aclass1) const {
                 return (atom_type.count(aclass1) != 0);
         }
@@ -345,8 +361,9 @@ namespace OMMIface {
 	}
 
 	ForceField& ForceField::add_kb_forcefield(const Molib::Score &score, 
-		const double step) {
-		this->step = step * OpenMM::NmPerAngstrom;
+		const double step, const double cutoff) {
+                this->cutoff = cutoff * OpenMM::NmPerAngstrom;
+		this->step   = step * OpenMM::NmPerAngstrom;
 		for (auto &kv : score.get_energies()) {
 			auto &atom_pair = kv.first;
 			auto &energy = kv.second;
@@ -357,8 +374,6 @@ namespace OMMIface {
 			auto &der = kv.second;
 			this->kb_force_type[atom_pair.first][atom_pair.second].derivative = der;
 		}
-		//~ dbgmsg("####################KNOWLEDGE-BASED FORCEFIELD###########"
-			//~ << endl << kb_force_type);
 		return *this;
 	}
 

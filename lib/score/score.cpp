@@ -78,7 +78,7 @@ namespace Molib {
 	}
 
         Score& Score::parse_objective_function(const string &obj_dir, const double scale_non_bond) {
-            
+
                 boost::filesystem::path path_to_objective_function(obj_dir);
                 std::string subdir = std::to_string(__step_non_bond);
 
@@ -116,6 +116,16 @@ namespace Molib {
                                 string str1;
                                 ss >> str1;
                                 __energies[atom_pair].push_back(stod(str1));
+                        }
+
+                        if ( __energies[atom_pair].size() < 1501 ) {
+                                size_t energies_diff = 1501 - __energies.size();
+
+                                dbgmsg( "Adding " << energies_diff << " 0s to " << atom_pair);
+
+                                for ( size_t i = 0; i < energies_diff; ++i ) {
+                                        __energies[atom_pair].push_back(0.0);
+                                }
                         }
 
                         __derivatives[atom_pair] = Interpolation::derivative(__energies[atom_pair], __step_non_bond);
