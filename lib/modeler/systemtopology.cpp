@@ -288,7 +288,7 @@ namespace OMMIface {
                         }
 
                         dbgmsg ("out of loop");
-                        context->reinitialize();
+                        __kbforce->updateParametersInContext(*context);
                         dbgmsg ("after reinitialize");
                         context->setPositions (positions);
                         dbgmsg ("after setPositions");

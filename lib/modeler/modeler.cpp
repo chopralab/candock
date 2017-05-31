@@ -198,7 +198,6 @@ namespace OMMIface {
 		__system_topology.set_forcefield(*__ffield);
 		__system_topology.init_particles(__topology);
 		__system_topology.init_bonded(__topology, __use_constraints);
-		__system_topology.init_integrator(__step_size_in_ps);
 
 		if (__fftype == "kb") {
 			__system_topology.init_knowledge_based_force(__topology);
@@ -210,7 +209,8 @@ namespace OMMIface {
 		} else {
 			throw Error("die : unsupported forcefield");
 		}
-		
+
+		__system_topology.init_integrator(__step_size_in_ps);
 	}
 
         double Modeler::potential_energy() {
