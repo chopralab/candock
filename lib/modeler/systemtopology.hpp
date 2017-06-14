@@ -92,6 +92,7 @@ namespace OMMIface {
 
                 void init_integrator (const double step_size_in_ps);
                 void init_particles (Topology &topology);
+                void clear_knowledge_based_force();
                 void update_knowledge_based_force (Topology &topology, const vector<OpenMM::Vec3> &positions, const double dist_cutoff);
                 void init_physics_based_force  (Topology &topology);
                 void init_knowledge_based_force(Topology &topology);

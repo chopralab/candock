@@ -227,6 +227,11 @@ namespace OMMIface {
                 }
         }
 
+        void SystemTopology::clear_knowledge_based_force() {
+                __kbforce->clearBonds();
+                __kbforce->updateParametersInContext(*context);
+        }
+
         void SystemTopology::update_knowledge_based_force (Topology &topology, const vector<OpenMM::Vec3> &positions, const double dist_cutoff) {
                 try {
                         // we have to set new coordinates for atoms
@@ -367,7 +372,6 @@ namespace OMMIface {
                 }
 
                 __kbforce = new KBPlugin::KBForce(used_atom_types.size(), __ffield->step, __ffield->cutoff);
-                __kbforce_idx = system->addForce (__kbforce);
 
                 for ( const auto &type1 : used_atom_types ) {
                         for ( const auto &type2 : used_atom_types ) {
@@ -376,6 +380,7 @@ namespace OMMIface {
                         }
                 }
 
+                 __kbforce_idx = system->addForce (__kbforce);
         }
 
         void SystemTopology::init_bonded (Topology &topology, const bool use_constraints) {
