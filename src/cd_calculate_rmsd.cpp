@@ -36,22 +36,16 @@ int main(int argc, char* argv[]) {
                 }
 
                 std::vector< std::vector<double> > previous(mols1.size());
-                std::vector< Molib::Atom::Graph > atom_graphs;
 
-                mols1.erase_properties();
-                for ( const Molib::Molecule& mol : mols1 ) {
-                        atom_graphs.push_back( Molib::Atom::create_graph(mol.get_atoms()) );
-                }
-
-                for (size_t i = 0; i < atom_graphs.size(); ++i) {
+                for (size_t i = 0; i < mols1.size(); ++i) {
 
                         for (size_t l = 0; l < i; ++l)
                                 output_matrix << setw (12) << setprecision (8) << previous[l].at (i - (1 + l));
 
                         output_matrix << setw (12) << setprecision (8) << 0;
 
-                        for (size_t j = i + 1; j < atom_graphs.size(); ++j) {
-                                double rmsd = Molib::Atom::compute_rmsd(atom_graphs[i], atom_graphs[j]);
+                        for (size_t j = i + 1; j < mols1.size(); ++j) {
+                                double rmsd = mols1[i].compute_rmsd_ord(mols1[j]);
                                 previous[i].push_back (rmsd);
                                 output_matrix << setw (12) << setprecision (8) << rmsd;
                         }
