@@ -375,8 +375,17 @@ namespace OMMIface {
 
                 for ( const auto &type1 : used_atom_types ) {
                         for ( const auto &type2 : used_atom_types ) {
-                                const ForceField::KBType kb = __ffield->get_kb_force_type(type1, type2);
-                                __kbforce->addBondType( type1, type2, kb.potential, kb.derivative);
+                                try {
+                                        const ForceField::KBType kb = __ffield->get_kb_force_type(type1, type2);
+                                        __kbforce->addBondType( type1, type2, kb.potential, kb.derivative);
+                                } catch ( ParameterError& e ) {
+                                        cerr << e.what() << endl;
+                                        cerr << "This is normal for atom types only present in the ligand" << endl;
+                                        
+                                        size_t number_of_steps = static_cast<size_t> (__ffield->cutoff / __ffield->step);
+                                        __kbforce->addBondType( type1, type2, std::vector<double>(number_of_steps, 0.0),
+                                                                              std::vector<double>(number_of_steps, 0.0) );
+                                }
                         }
                 }
 
