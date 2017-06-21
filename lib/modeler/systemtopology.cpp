@@ -392,6 +392,36 @@ namespace OMMIface {
                  __kbforce_idx = system->addForce (__kbforce);
         }
 
+        void SystemTopology::retype_amber_protein_atom_to_gaff(const Molib::Atom &atom, int &type) {
+
+                // Only retype protein atoms to gaff atoms
+                if (atom.br().rest() != Molib::Residue::protein) {
+                        // Its the N in the peptide bond needs to be N, not n3....
+                        if (atom.element() == Molib::Element::N) {
+                                type = __ffield->gaff_name_to_type.at("n");
+                        }
+                }
+
+                if (atom.element() == Molib::Element::C) {
+                        // C2 == 18 aka the carbon is in the carbonyl
+                        if (atom.idatm_type() == 18)
+                                type = __ffield->gaff_name_to_type.at("c");
+                        // Otherwise it's the alpha carbon
+                        else
+                                type = __ffield->gaff_name_to_type.at("c3");
+                }
+
+                // Its the N in the peptide bond
+                if (atom.element() == Molib::Element::N) {
+                        type = __ffield->gaff_name_to_type.at("n");
+                }
+
+                // Its the O in the peptide bond
+                if (atom.element() == Molib::Element::O) {
+                        type = __ffield->gaff_name_to_type.at("o");
+                }
+        }
+
         void SystemTopology::init_bonded (Topology &topology, const bool use_constraints) {
 
                 int warn = 0;
@@ -429,10 +459,22 @@ namespace OMMIface {
                         dbgmsg (idx1);
                         const int idx2 = topology.get_index (atom2);
                         dbgmsg (idx2);
-                        const int type1 = topology.get_type (atom1);
+                        int type1 = topology.get_type (atom1);
                         dbgmsg (type1);
-                        const int type2 = topology.get_type (atom2);
+                        int type2 = topology.get_type (atom2);
                         dbgmsg (type2);
+
+                        // Check for modified residues
+                        int number_protein = (atom1.br().rest() == Molib::Residue::protein)
+                                           + (atom2.br().rest() == Molib::Residue::protein);
+
+                        int number_not_set = (atom1.gaff_type() != "???") + (atom2.gaff_type() != "???");
+
+                        // It should both protein or non-protein, otherwise we fix it
+                        if (number_protein == 1 && number_not_set == 1) {
+                                retype_amber_protein_atom_to_gaff(atom1, type1);
+                                retype_amber_protein_atom_to_gaff(atom2, type2);
+                        }
 
                         ForceField::BondType btype;
 
@@ -473,10 +515,26 @@ namespace OMMIface {
                         const int idx2 = topology.get_index (atom2);
                         dbgmsg ("checkpoint5");
                         const int idx3 = topology.get_index (atom3);
-                        const int type1 = topology.get_type (atom1);
-                        const int type2 = topology.get_type (atom2);
-                        const int type3 = topology.get_type (atom3);
+                        int type1 = topology.get_type (atom1);
+                        int type2 = topology.get_type (atom2);
+                        int type3 = topology.get_type (atom3);
                         dbgmsg ("checkpoint6");
+
+                        // Check for modified residues
+                        int number_protein = (atom1.br().rest() == Molib::Residue::protein)
+                                           + (atom2.br().rest() == Molib::Residue::protein)
+                                           + (atom3.br().rest() == Molib::Residue::protein);
+
+                        int number_not_set = (atom1.gaff_type() != "???") + (atom2.gaff_type() != "???") + 
+                                             (atom3.gaff_type() != "???");
+
+                        // It should all be protein or non-protein, otherwise we fix it
+                        if ( (number_protein == 1 || number_protein == 2) && (number_not_set == 1 || number_not_set == 2)) {
+                                retype_amber_protein_atom_to_gaff(atom1, type1);
+                                retype_amber_protein_atom_to_gaff(atom2, type2);
+                                retype_amber_protein_atom_to_gaff(atom3, type3);
+                        }
+
 
                         ForceField::AngleType atype;
 
@@ -486,6 +544,9 @@ namespace OMMIface {
                                 atype = __ffield->get_angle_type (type1, type2, type3);
                         } catch (ParameterError &e) {
                                 log_warning << e.what() << " (WARNINGS ARE NOT INCREASED) (using default parameters for this angle)" << endl;
+                                cout << atom1;
+                                cout << atom2;
+                                cout << atom3;
                                 // if everything else fails just constrain at something reasonable
                                 atype = ForceField::AngleType {Geom3D::angle (atom1.crd(), atom2.crd(), atom3.crd()), 500};
                         }
@@ -515,11 +576,28 @@ namespace OMMIface {
                         const int idx2 = topology.get_index (atom2);
                         const int idx3 = topology.get_index (atom3);
                         const int idx4 = topology.get_index (atom4);
-                        const int type1 = topology.get_type (atom1);
-                        const int type2 = topology.get_type (atom2);
-                        const int type3 = topology.get_type (atom3);
-                        const int type4 = topology.get_type (atom4);
-                        
+                        int type1 = topology.get_type (atom1);
+                        int type2 = topology.get_type (atom2);
+                        int type3 = topology.get_type (atom3);
+                        int type4 = topology.get_type (atom4);
+
+                        // Check for modified residues
+                        int number_protein = (atom1.br().rest() == Molib::Residue::protein)
+                                           + (atom2.br().rest() == Molib::Residue::protein)
+                                           + (atom3.br().rest() == Molib::Residue::protein)
+                                           + (atom4.br().rest() == Molib::Residue::protein);
+
+                        int number_not_set = (atom1.gaff_type() != "???") + (atom2.gaff_type() != "???") + 
+                                             (atom3.gaff_type() != "???") + (atom4.gaff_type() != "???");
+
+                        // It should all be protein or non-protein, otherwise we fix it
+                        if ( (number_protein == 1 || number_protein == 2 || number_protein == 3) && (number_not_set == 1 || number_not_set == 2 || number_not_set == 3)) {
+                                retype_amber_protein_atom_to_gaff(atom1, type1);
+                                retype_amber_protein_atom_to_gaff(atom2, type2);
+                                retype_amber_protein_atom_to_gaff(atom3, type3);
+                                retype_amber_protein_atom_to_gaff(atom4, type4);
+                        }
+
                         try {
                                 const ForceField::TorsionTypeVec &v_ttype = __ffield->get_dihedral_type (type1, type2, type3, type4); // cannot make it const ??
                                 for (auto &ttype : v_ttype) {
@@ -561,10 +639,27 @@ namespace OMMIface {
                         const int idx2 = topology.get_index (atom2);
                         const int idx3 = topology.get_index (atom3);
                         const int idx4 = topology.get_index (atom4);
-                        const int type1 = topology.get_type (atom1);
-                        const int type2 = topology.get_type (atom2);
-                        const int type3 = topology.get_type (atom3);
-                        const int type4 = topology.get_type (atom4);
+                        int type1 = topology.get_type (atom1);
+                        int type2 = topology.get_type (atom2);
+                        int type3 = topology.get_type (atom3);
+                        int type4 = topology.get_type (atom4);
+
+                        // Check for modified residues
+                        int number_protein = (atom1.br().rest() == Molib::Residue::protein)
+                                           + (atom2.br().rest() == Molib::Residue::protein)
+                                           + (atom3.br().rest() == Molib::Residue::protein)
+                                           + (atom4.br().rest() == Molib::Residue::protein);
+
+                        int number_not_set = (atom1.gaff_type() != "???") + (atom2.gaff_type() != "???") + 
+                                             (atom3.gaff_type() != "???") + (atom4.gaff_type() != "???");
+
+                        // It should all be protein or non-protein, otherwise we fix it
+                        if ( (number_protein == 1 || number_protein == 2 || number_protein == 3) && (number_not_set == 1 || number_not_set == 2 || number_not_set == 3)) {
+                                retype_amber_protein_atom_to_gaff(atom1, type1);
+                                retype_amber_protein_atom_to_gaff(atom2, type2);
+                                retype_amber_protein_atom_to_gaff(atom3, type3);
+                                retype_amber_protein_atom_to_gaff(atom4, type4);
+                        }
 
                         try {
                                 const ForceField::TorsionTypeVec &v_ttype =

@@ -31,6 +31,8 @@ namespace OMMIface {
 		//~ static const double SolventDielectric   = 80.;     // typical for water
 		//~ static const double SoluteDielectric    = 2.;      // typical for protein
 
+                std::map<const std::string, const int> gaff_name_to_type;
+
 		struct AtomType { string cl, element; double mass, 
 			charge, sigma, epsilon;	};
 		struct BondType { double length, k; bool can_constrain; };

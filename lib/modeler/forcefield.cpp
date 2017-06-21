@@ -385,7 +385,6 @@ namespace OMMIface {
 		bool non_bonded = false;
 		int semaphore = 0;
 		int type = 10000; // start ligand types with 10000 to NOT overlap with receptor
-		map<const string, const int> atom_name_to_type;
 		for (auto &line : gdf) {
 			if (line.compare(0, 5, "AMBER") == 0) {
 				continue;
@@ -408,7 +407,7 @@ namespace OMMIface {
 					at.mass = stod(m[2].str());
 					at.element = "";
 					//~ at.polarizability = stod(m[3].str()); // not used ...
-					atom_name_to_type.insert({at.cl, type});
+					gaff_name_to_type.insert({at.cl, type});
 					dbgmsg("type = " << type << " class = " << at.cl << " at.element = " 
 							<< at.element << " at.mass = " << at.mass);
 					type++;
@@ -487,7 +486,7 @@ namespace OMMIface {
 			}
 			if (non_bonded && boost::regex_search(line, m, boost::regex("^\\s{2}(\\S{1,2})\\s+(\\S+)\\s+(\\S+)"))) {
 				if (m[1].matched && m[2].matched && m[3].matched) {
-					const int type = atom_name_to_type.at(m[1].str());
+					const int type = gaff_name_to_type.at(m[1].str());
 					AtomType &at = this->atom_type[type];
 					at.charge = 0; // for now set charge to 0
 					at.sigma = stod(m[2].str()) * OpenMM::NmPerAngstrom 

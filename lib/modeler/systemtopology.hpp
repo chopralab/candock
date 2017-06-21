@@ -80,6 +80,7 @@ namespace OMMIface {
                 };
                 vector<vector<ForceData>> bondStretchData, bondBendData, bondTorsionData;
 
+                void retype_amber_protein_atom_to_gaff(const Molib::Atom &atom, int &type);
         public:
                 SystemTopology() : system (nullptr), integrator (nullptr), context (nullptr), __kbforce_idx (-1) {}
                 ~SystemTopology();
