@@ -139,7 +139,7 @@ namespace help {
 			for (auto &repclass1 : gaff_replacement.at(iniclass1)) {
                                 if ( gaff_replacement.count(iniclass2) == 0 )
                                         continue;
-				for (auto &repclass2 : gaff_replacement.at(iniclass3)) {
+				for (auto &repclass2 : gaff_replacement.at(iniclass2)) {
                                         if ( gaff_replacement.count(iniclass3) == 0 )
                                                 continue;
 					for (auto &repclass3 : gaff_replacement.at(iniclass3)) {
@@ -185,11 +185,8 @@ namespace help {
 		{"MSE",{{"OXT","O2-"},{"CA","C3"},{"CB","C3"},{"C","C2"},{"CE","C3"},{"CG","C3"},{"N","Npl"},{"O","O2"},{"SE","Se"},{"H","H"},{"HA","HC"},{"HB2","HC"},{"HB3","HC"},{"HG2","HC"},{"HG3","HC"},{"HE1","HC"},{"HE2","HC"},{"HE3","HC"}}},
 		{"PHE",{{"OXT","O2-"},{"CA","C3"},{"CB","C3"},{"C","C2"},{"CD1","Car"},{"CD2","Car"},{"CE1","Car"},{"CE2","Car"},{"CG","Car"},{"CZ","Car"},{"N","Npl"},{"O","O2"},{"H","H"},{"HA","HC"},{"HB2","HC"},{"HB3","HC"},{"HD1","HC"},{"HE1","HC"},{"HZ","HC"},{"HE2","HC"},{"HD2","HC"}}},
 		{"PRO",{{"OXT","O2-"},{"CA","C3"},{"CB","C3"},{"C","C2"},{"CD","C3"},{"CG","C3"},{"N","Npl"},{"O","O2"},{"HD2","HC"},{"HD3","HC"},{"HG2","HC"},{"HG3","HC"},{"HB2","HC"},{"HB3","HC"},{"HA","HC"}}},
-		{"PTR",{{"OXT","O2-"},{"CA","C3"},{"CB","C3"},{"C","C2"},{"CD1","Car"},{"CD2","Car"},{"CE1","Car"},{"CE2","Car"},{"CG","Car"},{"CZ","Car"},{"N","Npl"},{"OH","O3"},{"O","O2"},{"O1P","O3-"},{"O2P","O3-"},{"O3P","O3-"},{"P","Pac"},{"H","H"},{"HA","HC"},{"HB2","HC"},{"HB3","HC"},{"HD1","HC"},{"HE1","HC"},{"HH","H"},{"HE2","HC"},{"HD2","HC"}}},
 		{"SER",{{"OXT","O2-"},{"CA","C3"},{"CB","C3"},{"C","C2"},{"N","Npl"},{"OG","O3"},{"O","O2"},{"H","H"},{"HA","HC"},{"HB2","HC"},{"HB3","HC"},{"HG","H"}}},
-		{"SEP",{{"OXT","O2-"},{"CA","C3"},{"CB","C3"},{"C","C2"},{"N","Npl"},{"OG","O3"},{"O","O2"},{"O1P","O3-"},{"O2P","O3-"},{"O3P","O3-"},{"P","Pac"},{"H","H"},{"HA","HC"},{"HB2","HC"},{"HB3","HC"},{"HG","H"}}},
 		{"THR",{{"OXT","O2-"},{"CA","C3"},{"CB","C3"},{"C","C2"},{"CG2","C3"},{"N","Npl"},{"OG1","O3"},{"O","O2"},{"H","H"},{"HA","HC"},{"HB","HC"},{"HG21","HC"},{"HG22","HC"},{"HG23","HC"},{"HG1","H"}}},
-		{"TPO",{{"OXT","O2-"},{"CA","C3"},{"CB","C3"},{"C","C2"},{"CG2","C3"},{"N","Npl"},{"OG1","O3"},{"O","O2"},{"O1P","O3-"},{"O2P","O3-"},{"O3P","O3-"},{"P","Pac"},{"H","H"},{"HA","HC"},{"HB","HC"},{"HG21","HC"},{"HG22","HC"},{"HG23","HC"},{"HG1","H"}}},
 		{"TRP",{{"OXT","O2-"},{"CA","C3"},{"CB","C3"},{"C","C2"},{"CD1","Car"},{"CD2","Car"},{"CE2","Car"},{"CE3","Car"},{"CG","Car"},{"CH2","Car"},{"CZ2","Car"},{"CZ3","Car"},{"NE1","Npl"},{"N","Npl"},{"O","O2"},{"H","H"},{"HA","HC"},{"HB2","HC"},{"HB3","HC"},{"HD1","HC"},{"HE1","H"},{"HZ2","HC"},{"HH2","HC"},{"HZ3","HC"},{"HE3","HC"}}},
 		{"TYR",{{"OXT","O2-"},{"CA","C3"},{"CB","C3"},{"C","C2"},{"CD1","Car"},{"CD2","Car"},{"CE1","Car"},{"CE2","Car"},{"CG","Car"},{"CZ","Car"},{"N","Npl"},{"OH","O3"},{"O","O2"},{"H","H"},{"HA","HC"},{"HB2","HC"},{"HB3","HC"},{"HD1","HC"},{"HE1","HC"},{"HH","H"},{"HE2","HC"},{"HD2","HC"}}},
 		{"VAL",{{"OXT","O2-"},{"CA","C3"},{"CB","C3"},{"C","C2"},{"CG1","C3"},{"CG2","C3"},{"N","Npl"},{"O","O2"},{"H","H"},{"HA","HC"},{"HB","HC"},{"HG11","HC"},{"HG12","HC"},{"HG13","HC"},{"HG21","HC"},{"HG22","HC"},{"HG23","HC"}}},

@@ -213,7 +213,7 @@ namespace OMMIface {
 
                 if ( has_dihedral_type("X",aclass3,aclass2,"X") )
                         return torsion_type.at("X").at(aclass3).at(aclass2).at("X");
-                
+
                 // if this fails, we try finding a similar dihedral parameter
                 for (auto &sclass : help::get_replacement({aclass1, aclass2, aclass3, aclass4})) {
 

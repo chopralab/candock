@@ -548,12 +548,11 @@ namespace OMMIface {
 
                                 //++force_idx;
                         }
-
                 }
 
                 // Create the 1-2-3-4 improper terms where 3 is the central atom
                 for (auto &dihedral : topology.impropers) {
-                        dbgmsg ("checkpoint9");
+                        dbgmsg ("checkpoint10");
                         const Molib::Atom &atom1 = *get<0> (dihedral);
                         const Molib::Atom &atom2 = *get<1> (dihedral);
                         const Molib::Atom &atom3 = *get<2> (dihedral);

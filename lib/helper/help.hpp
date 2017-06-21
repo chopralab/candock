@@ -145,9 +145,6 @@ namespace help {
 		{"TRP"},
 		{"TYR"},
 		{"VAL"},
-		{"PTR"},
-		{"SEP"},
-		{"TPO"}
 	};
 	const set<string> nucleic_acids {
 		{"NNN"}, // artificial for geo
