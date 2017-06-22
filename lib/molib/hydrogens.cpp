@@ -51,6 +51,14 @@ namespace Molib {
 					/* ***************************** */
 
 					int num_h = con - atom.size();
+                                        
+                                        for ( size_t i = 0; i < atom.size(); ++i)
+                                                if ( atom[i].element() >= Element::Sc && atom[i].element() <= Element::Zn )
+                                                        ++num_h;
+
+                                        if (atom.element() >= Element::Sc && atom.element() <= Element::Zn )
+                                                num_h = 0;
+
 					dbgmsg("computing hydrogens for " << atom.idatm_type_unmask() << " con = "
 						<< con << " atom.size() = " << atom.size());
 					if (num_h > 0) {
@@ -104,7 +112,7 @@ namespace Molib {
 							}
 						}
 						if (h_excess > 0) {
-                                                        log_error << atom << endl << h_excess << endl;
+                                                        log_error << "Issue with " << '\n' << atom << "Excess of " << h_excess << endl;
 							throw Error("die : deleting of excess hydrogens failed");
                                                 }
 					}

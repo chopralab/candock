@@ -80,12 +80,6 @@ namespace Parser {
                                 dbgmsg ("hydrogen = " << boolalpha << hydrogen);
 
                                 if ( (__hm & hydrogens) || !hydrogen) {
-                                        // FIXME: This is a temporary hack until I can find a way to place a bond between the Ns and the FE
-                                        if (resn == "HEM" && element =="FE") {
-                                                resn = "FE2";
-                                                resi = 9999;
-                                        }
-
                                         if (alt_loc == ' ' || alt_loc == 'A') {
                                                 if (!mols.last().is_modified (Residue::res_tuple2 (chain_id, resn, resi, ins_code))) {
                                                         Residue::res_type rest;

@@ -47,7 +47,7 @@ namespace Molib {
 		Residue::res_type rest() const { return __rest; }
 		Atom& atom(int p) const { return this->element(p); }
 		bool has_atom(int p) { return this->has_element(p); }
-		Atom::Vec get_atoms() const;
+		Atom::Vec get_atoms(bool include_ions = true) const;
 		void renumber_atoms(int new_start);
 		Residue& erase_properties() { for (auto &atom : *this) atom.erase_properties(); return *this; }
 

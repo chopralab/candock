@@ -111,7 +111,7 @@ namespace Molib {
 					Residue &residue = *presidue;
 					if (!(help::standard_residues.count(residue.resn())
 					   || help::ions.count(residue.resn()))) {
-						BondOrder::compute_bond_order(residue.get_atoms());
+						BondOrder::compute_bond_order(residue.get_atoms(false));
 					}
 				}
 			} catch (exception &e) {

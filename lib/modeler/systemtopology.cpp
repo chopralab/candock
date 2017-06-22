@@ -544,9 +544,6 @@ namespace OMMIface {
                                 atype = __ffield->get_angle_type (type1, type2, type3);
                         } catch (ParameterError &e) {
                                 log_warning << e.what() << " (WARNINGS ARE NOT INCREASED) (using default parameters for this angle)" << endl;
-                                cout << atom1;
-                                cout << atom2;
-                                cout << atom3;
                                 // if everything else fails just constrain at something reasonable
                                 atype = ForceField::AngleType {Geom3D::angle (atom1.crd(), atom2.crd(), atom3.crd()), 500};
                         }

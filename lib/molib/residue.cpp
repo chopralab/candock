@@ -29,9 +29,14 @@ namespace Molib {
 		else for (auto &atom : *this) {	atom.crd().rotate_inline(rota); }
 	}
 
-	Atom::Vec Residue::get_atoms() const {
+	Atom::Vec Residue::get_atoms(bool include_ions) const {
 		Atom::Vec atoms;
 		for (auto &atom : *this) {
+                        
+                        if (!include_ions && atom.element() >= Element::Sc && atom.element() <= Element::Zn ) {
+                                continue;
+                        }
+                        
 			atoms.push_back(&atom);
 		}
 		return atoms;
