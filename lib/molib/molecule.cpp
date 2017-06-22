@@ -405,7 +405,9 @@ namespace Molib {
 		}
 	}
 
-        string Molecule::print_complex (Molecule &ligand, Molecule &receptor, const double energy, const double potential, const int model, const size_t max_clq_id, const double rmsd) {
+        string Molecule::print_complex (Molecule &ligand, Molecule &receptor, const double energy,
+                                        const double potential, const int model, const size_t max_clq_id,
+                                        const double rmsd, const double rmsd_ord) {
                 stringstream ss;
 
                 ss << "MODEL    " << model << endl;
@@ -415,7 +417,7 @@ namespace Molib {
                 ss << "REMARK   3 THIS IS CONFIGUATION " << ligand.name() << " NUMBER " << max_clq_id << endl; 
 
                 if (! std::isnan (rmsd))
-                        ss << "REMARK   3 DOCKED CONFORMATION HAS AN RMSD OF " << rmsd << " FROM ORIGINAL STRUCTURE" << endl;
+                        ss << "REMARK   3 DOCKED CONFORMATION HAS AN RMSD OF " << rmsd << " AND " << rmsd_ord << " FROM ORIGINAL STRUCTURE" << endl;
 
                 int reenum = 0;
                 for (auto &patom : receptor.get_atoms()) {

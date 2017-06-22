@@ -41,6 +41,7 @@ int main(int argc, char* argv[]) {
                 cryst[0].erase_properties();
                 Molib::Atom::Graph cryst_graph =  Molib::Atom::create_graph(cryst[0].get_atoms());
                 std::vector< Molib::Atom::Graph > atom_graphs;
+                std::vector< double > rmsd_ords;
 
                 for ( Molib::Molecule& mol : mols1 ) {
                         Molib::Atom::Vec atoms = mol.get_atoms();
@@ -52,12 +53,14 @@ int main(int argc, char* argv[]) {
                         }
 
                         atom_graphs.push_back( Molib::Atom::create_graph(atoms));
+
+                        rmsd_ords.push_back(mol.compute_rmsd_ord(cryst[0]));
                 }
 
                 for (size_t i = 0; i < atom_graphs.size(); ++i) {
 
                         double rmsd = Molib::Atom::compute_rmsd(cryst_graph, atom_graphs[i]);
-                        output_matrix << rmsd << '\n';
+                        output_matrix << rmsd << " " << rmsd_ords[i] << '\n';
                 }
 
                 output_matrix.close();

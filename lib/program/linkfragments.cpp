@@ -65,6 +65,8 @@ namespace Program {
                         ligand.erase_properties(); // required for graph matching
                         top_seeds.erase_properties(); // required for graph matching
 
+                        Molib::Molecule crystal_ligand(ligand);
+
                         /**
                          * Jiggle the coordinates by one-thousand'th of an Angstrom to avoid minimization failures
                          * with initial bonded relaxation failed errors
@@ -83,6 +85,8 @@ namespace Program {
                          * seeds with appendices, minimize partial conformations between linking.
                          *
                          */
+
+                        //FIXME Why does this modify (remove?) the ligand coordinates
                         Linker::Linker linker (modeler, __receptor, ligand, top_seeds, __gridrec, __score,
                                                cmdl.get_bool_option ("cuda"), cmdl.get_bool_option ("iterative"),
                                                cmdl.get_int_option ("cutoff"), cmdl.get_int_option ("spin"),
@@ -94,23 +98,25 @@ namespace Program {
                                                cmdl.get_double_option ("max_allow_energy"), cmdl.get_int_option ("max_num_possibles"),
                                                cmdl.get_int_option ("max_clique_size"), cmdl.get_int_option ("max_iter_final"));
 
+                        Molib::Atom::Graph cryst_graph =  Molib::Atom::create_graph(crystal_ligand.get_atoms());
+
                         Linker::DockedConformation::Vec docks = linker.link();
                         Linker::DockedConformation::sort (docks);
 
                         int model = 0;
 
-                        Molib::Atom::Graph cryst_graph =  Molib::Atom::create_graph(ligand.get_atoms());
-
                         for (auto &docked : docks) {
 
                                 docked.get_ligand().change_residue_name ("CAN");
-                                
+
                                 double rmsd = std::nan ("");
+                                double rmsd_ord = std::nan("");
 
                                 if (cmdl.get_bool_option ("rmsd_crystal")) {
-                                        
+
+                                        docked.get_ligand().erase_properties();
                                         Molib::Atom::Vec atoms = docked.get_ligand().get_atoms();
-                        
+
                                         int reenum = 0;
                                         for ( auto &atom : atoms ) {
                                                 atom->set_atom_number(++reenum);
@@ -119,13 +125,14 @@ namespace Program {
 
                                         Molib::Atom::Graph docked_graph = Molib::Atom::create_graph(atoms);
 
-                                        rmsd = Molib::Atom::compute_rmsd(cryst_graph, docked_graph) ;
+                                        rmsd = Molib::Atom::compute_rmsd(cryst_graph, docked_graph);
+                                        rmsd_ord = Geom3D::compute_rmsd(crystal_ligand.get_crds(), docked.get_ligand().get_crds());
                                 }
 
                                 // output docked molecule conformations
                                 Inout::output_file (Molib::Molecule::print_complex (docked.get_ligand(), docked.get_receptor(),
                                                                                     docked.get_energy(), docked.get_potential_energy(),
-                                                                                    ++model, docked.get_max_clq_identity(), rmsd),
+                                                                                    ++model, docked.get_max_clq_identity(), rmsd, rmsd_ord),
                                                     p.string(), ios_base::app);
                         }
 
