@@ -90,7 +90,8 @@ namespace Parser {
                                                                 rest = Residue::nucleic;
                                                         } else if (help::ions.find (resn) != help::ions.end()) {
                                                                 rest = Residue::ion;
-                                                        } else if (resn == "HOH") {
+                                                        } else if (resn == "HOH" || resn == "WAT" || resn == "WAM" || resn == "WAU") {
+                                                                resn = "HOH";
                                                                 rest = Residue::water;
                                                         } else {
                                                                 // if nothing known then hetero...
