@@ -152,6 +152,8 @@ namespace Program {
 			 "Gaff DAT forcefield input file")
 			("gaff_xml",  po::value<std::string> () ->default_value ("data/gaff.xml"),
 			 "Gaff XML forcefield and ligand topology output file")
+                        ("gaff_heme", po::value<std::string> () ->default_value (""),
+                         "Gaff DAT file to use for Heme groups")
 			("fftype"   , po::value<std::string> ()->default_value ("kb"),
 			 "Forcefield to use 'kb' (knowledge-based) or 'phy' (physics-based)")
 			("pos_tol",   po::value<double> ()->default_value (0.00000000001, "0.00000000001"),

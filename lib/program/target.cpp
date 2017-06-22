@@ -130,6 +130,11 @@ namespace Program {
                                 .parse_forcefield_file(cmdl.get_string_option("amber_xml"))
                                 .parse_forcefield_file(cmdl.get_string_option("water_xml"));
 
+                        if ( ! cmdl.get_string_option("gaff_heme").empty() ) {
+                                dbgmsg( "Adding " << cmdl.get_string_option("gaff_heme") << endl);
+                                ffield->parse_gaff_dat_file(cmdl.get_string_option("gaff_heme"));
+                        }
+
                         a.ffield = ffield;
 
                         a.protein.prepare_for_mm(*a.ffield, *a.gridrec);

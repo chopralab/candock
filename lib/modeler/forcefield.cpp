@@ -384,7 +384,7 @@ namespace OMMIface {
 		Inout::read_file(gaff_dat_file, gdf);
 		bool non_bonded = false;
 		int semaphore = 0;
-		int type = 10000; // start ligand types with 10000 to NOT overlap with receptor
+		int type = 10000 + gaff_name_to_type.size(); // start ligand types with 10000 to NOT overlap with receptor
 		for (auto &line : gdf) {
 			if (line.compare(0, 5, "AMBER") == 0) {
 				continue;
@@ -393,7 +393,7 @@ namespace OMMIface {
 				semaphore++;
 				continue;
 			}
-			if (line.compare(0, 4, "MOD4") == 0) {
+			if (line.compare(0, 4, "MOD4") == 0 || line.compare(0, 6, "NONBON") == 0) {
 				non_bonded = true;
 				continue;
 			}

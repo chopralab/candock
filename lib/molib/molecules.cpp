@@ -128,7 +128,7 @@ namespace Molib {
 			Residue &residue = *presidue;
 			if (!(help::standard_residues.count(residue.resn())
 			   || help::ions.count(residue.resn()))) {
-				BondOrder::compute_bond_gaff_type(residue.get_atoms());
+				BondOrder::compute_bond_gaff_type(residue.get_atoms(false));
 			}
 		}
 		return *this; 
@@ -138,6 +138,7 @@ namespace Molib {
 		for (auto &presidue : this->get_residues()) {
 			Residue &residue = *presidue;
 			if (!(help::standard_residues.count(residue.resn())
+                           || help::cofactor_residues.count(residue.resn())
 			   || help::ions.count(residue.resn()))) {
 				AtomType::refine_idatm_type(residue.get_atoms());
 			}
@@ -174,7 +175,25 @@ namespace Molib {
 			Residue &residue = *presidue;
 			if (!(help::standard_residues.count(residue.resn())
 			   || help::metals.count(residue.resn()))) {
-				AtomType::compute_gaff_type(residue.get_atoms());
+                                AtomType::compute_gaff_type(residue.get_atoms(false));
+                                for ( auto &atom : residue.get_atoms() ) {
+                                        if ( atom->element() >= Element::Sc && atom->element() <= Element::Zn ) {
+                                                std::string new_gaff_name = atom->element().name();
+                                                std::transform(new_gaff_name.begin(), new_gaff_name.end(), new_gaff_name.begin(), ::tolower);
+                                                atom->set_gaff_type(new_gaff_name);
+                                        }
+                                        
+                                         if (residue.resn() == "HEM") {
+                                                 if (atom->atom_name() == "NA" || atom->atom_name() == "NC") {
+                                                         atom->set_gaff_type("nd");
+                                                 }
+                                                 
+                                                 if (atom->atom_name() == "NB" || atom->atom_name() == "ND") {
+                                                         atom->set_gaff_type("nc");
+                                                 }
+                                         }
+                                }
+
 			}
 		}
 		return *this;
@@ -185,7 +204,7 @@ namespace Molib {
                         if (!(help::standard_residues.count(residue.resn())
                            || help::cofactor_residues.count(residue.resn())
                            || help::ions.count(residue.resn()))) {
-                                BondOrder::compute_rotatable_bonds(residue.get_atoms());
+                                BondOrder::compute_rotatable_bonds(residue.get_atoms(false));
                         }
                 }
                 return *this;
