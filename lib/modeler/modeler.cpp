@@ -198,11 +198,10 @@ namespace OMMIface {
 
 		if (__fftype == "kb") {
 			__system_topology.init_knowledge_based_force(__topology);
-			
 		} else if (__fftype == "phy") {
-			
 			__system_topology.init_physics_based_force(__topology);
-			
+                } else if (__fftype == "none") {
+                        //Do nothing
 		} else {
 			throw Error("die : unsupported forcefield");
 		}

@@ -8,16 +8,17 @@ using namespace std;
 int main(int argc, char* argv[]) {
         try {
 
-                Benchmark main_timer;
-                main_timer.display_time("Starting");
-
                 if ( argc <= 2 ) {
                         cerr << "You MUST supply at least two arguments!" << endl;
+                        cerr << "A third argument gives the number of threads (defaults to 1)" << endl;
                         return 1;
                 }
 
                 Parser::FileParser crys(argv[1], Parser::pdb_read_options::first_model);
-                Parser::FileParser mol1(argv[2], Parser::pdb_read_options::docked_poses_only | Parser::pdb_read_options::skip_atom | Parser::pdb_read_options::all_models);
+
+                Parser::FileParser mol1(argv[2], Parser::pdb_read_options::docked_poses_only |
+                                                 Parser::pdb_read_options::skip_atom |
+                                                 Parser::pdb_read_options::all_models);
 
                 Molib::Molecules cryst;
                 Molib::Molecules mols1;
@@ -25,23 +26,26 @@ int main(int argc, char* argv[]) {
                 crys.parse_molecule(cryst);
                 mol1.parse_molecule(mols1);
 
-                std::ofstream output_matrix;
-                
-                if (argc >= 4) {
-                        output_matrix.open(argv[3]);
-                } else {
-                        output_matrix.open("rmsds.lst");
+                if (cryst.size() != 1 ) {
+                        cerr << "The crystal ligand file must only have 1 molecule in it" << endl;
+                        return 1;
                 }
 
                 if (mols1.size() <= 0) {
-                        output_matrix.close();
                         return 0;
+                }
+
+                size_t num_threads = 1;
+                if (argc >=4) {
+                        num_threads = std::atoi(argv[3]);
                 }
 
                 cryst[0].erase_properties();
                 Molib::Atom::Graph cryst_graph =  Molib::Atom::create_graph(cryst[0].get_atoms());
                 std::vector< Molib::Atom::Graph > atom_graphs;
-                std::vector< double > rmsd_ords;
+
+                std::vector<double> rmsd_graph (mols1.size());
+                std::vector<double> rmsd_ords  (mols1.size());
 
                 for ( Molib::Molecule& mol : mols1 ) {
                         Molib::Atom::Vec atoms = mol.get_atoms();
@@ -53,19 +57,25 @@ int main(int argc, char* argv[]) {
                         }
 
                         atom_graphs.push_back( Molib::Atom::create_graph(atoms));
-
-                        rmsd_ords.push_back(mol.compute_rmsd_ord(cryst[0]));
                 }
 
-                for (size_t i = 0; i < atom_graphs.size(); ++i) {
+                std::vector<std::thread> threads;
 
-                        double rmsd = Molib::Atom::compute_rmsd(cryst_graph, atom_graphs[i]);
-                        output_matrix << rmsd << " " << rmsd_ords[i] << '\n';
+                for ( size_t thread_id = 0; thread_id < num_threads; ++thread_id)
+                threads.push_back (std::thread ([&, thread_id] {
+                        for (size_t i = thread_id; i < mols1.size(); i+=num_threads) {
+                                rmsd_ords[i] = mols1[i].compute_rmsd_ord(cryst[0]);
+                                rmsd_graph[i] = Molib::Atom::compute_rmsd(cryst_graph, atom_graphs[i]);
+                        }
+                }));
+
+                for (auto &thread : threads) {
+                        thread.join();
                 }
 
-                output_matrix.close();
-
-                main_timer.display_time("Finished");
+                for (size_t i = 0; i < rmsd_graph.size(); ++i) {
+                        std::cout << rmsd_graph[i] << " " << rmsd_ords[i] << '\n';
+                }
 
         } catch (exception& e) {
                 log_error << e.what() << endl;

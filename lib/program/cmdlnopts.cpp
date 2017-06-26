@@ -155,7 +155,7 @@ namespace Program {
                         ("gaff_heme", po::value<std::string> () ->default_value (""),
                          "Gaff DAT file to use for Heme groups")
 			("fftype"   , po::value<std::string> ()->default_value ("kb"),
-			 "Forcefield to use 'kb' (knowledge-based) or 'phy' (physics-based)")
+			 "Forcefield to use 'kb' (knowledge-based), 'phy' (physics-based), or 'none' (do not calculate intermolecular forces)")
 			("pos_tol",   po::value<double> ()->default_value (0.00000000001, "0.00000000001"),
 			 "Minimization position tolerance in Angstroms - only for KB")
 			("mini_tol",  po::value<double> ()->default_value (0.0001),
@@ -331,7 +331,7 @@ namespace Program {
 			}
 
 			const string &fftype = get_string_option("fftype");
-			if (fftype != "kb" && fftype != "phy") {
+			if (fftype != "kb" && fftype != "phy" && fftype != "none") {
 				throw po::validation_error (po::validation_error::invalid_option_value,
 				                            "fftype", fftype);
 			}

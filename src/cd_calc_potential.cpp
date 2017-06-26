@@ -13,9 +13,6 @@ int main(int argc, char* argv[]) {
                 help::Options::set_options( new Program::CmdLnOpts( 
                     argc, argv));
 
-                Benchmark main_timer;
-                main_timer.display_time("Starting");
-
                 if ( argc <= 1 ) {
                         cerr << "You supply an argument!" << endl;
                         return 1;
@@ -24,20 +21,15 @@ int main(int argc, char* argv[]) {
                 Parser::FileParser mol1(argv[1], Parser::pdb_read_options::docked_poses_only | Parser::pdb_read_options::skip_atom | Parser::pdb_read_options::all_models);
 
                 Molib::Molecules mols1;
-
                 mol1.parse_molecule(mols1);
 
-                std::ofstream output_matrix;
-                
-                if (argc >= 3) {
-                        output_matrix.open(argv[2]);
-                } else {
-                        output_matrix.open("poten.lst");
-                }
-                
                 if (mols1.size() <= 0) {
-                        output_matrix.close();
                         return 0;
+                }
+
+                size_t num_threads = 1;
+                if (argc >= 3) {
+                        num_threads = std::atoi(argv[2]);
                 }
 
                 OMMIface::ForceField ffield;
@@ -48,26 +40,39 @@ int main(int argc, char* argv[]) {
 
                 ffield.insert_topology (mols1[0]);
 
-                for ( size_t i = 0; i < mols1.size(); ++i) {
+                std::vector<double> potentials(mols1.size());
 
-                        OMMIface::Modeler modeler (ffield, cmdl.get_string_option("fftype"), cmdl.get_int_option("cutoff"),
-                                           cmdl.get_double_option("mini_tol"), cmdl.get_int_option("max_iter"), cmdl.get_int_option("update_freq"), 
-                                           cmdl.get_double_option("pos_tol"), false, 2.0);
+                std::vector<std::thread> threads;
 
-                        modeler.add_topology (mols1[i].get_atoms());
+                for ( size_t thread_id = 0; thread_id < num_threads; ++thread_id)
+                threads.push_back( (std::thread ([&, thread_id] {
+                        for ( size_t i = thread_id; i < mols1.size(); i+=num_threads) {
 
-                        modeler.init_openmm();
-                        modeler.add_crds (mols1[i].get_atoms(), mols1[i].get_crds());
-                        modeler.init_openmm_positions();
+                                OMMIface::Modeler modeler (ffield,
+                                                           cmdl.get_string_option("fftype"), cmdl.get_int_option("cutoff"),
+                                                           cmdl.get_double_option("mini_tol"), cmdl.get_int_option("max_iter"),
+                                                           cmdl.get_int_option("update_freq"), 
+                                                           cmdl.get_double_option("pos_tol"), false, 2.0);
 
-                        const double potential_energy = modeler.potential_energy();
+                                modeler.add_topology (mols1[i].get_atoms());
 
-                        output_matrix << potential_energy << '\n';
-                }
+                                modeler.init_openmm();
+                                modeler.add_crds (mols1[i].get_atoms(), mols1[i].get_crds());
+                                modeler.init_openmm_positions();
+
+                                const double potential_energy = modeler.potential_energy();
+
+                                potentials[i] = potential_energy;
+                        }
+                })));
                 
-                output_matrix.close();
+                for (auto &thread : threads) {
+                        thread.join();
+                }
 
-                main_timer.display_time("Finished");
+                for ( auto &poten : potentials ) {
+                        cout << poten << endl;
+                }
 
         } catch (exception& e) {
                 log_error << e.what() << endl;
