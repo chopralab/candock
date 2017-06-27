@@ -1,8 +1,10 @@
 #ifndef DRM_H
 #define DRM_H
 
-class drm {
-    static  void handleErrors();
+#include "program/candockexport.hpp"
+
+
+class CANDOCK_EXPORT drm {
     
 public:
     static bool check_drm();

@@ -7,12 +7,12 @@
 namespace Inout {
 
         enum Severity {
-                NONE      = 0,
-                NOTE      = 1 << 1,
-                STEP      = 1 << 2,
-                BENCHMARK = 1 << 3,
-                WARNING   = 1 << 4,
-                ERROR     = 1 << 5,
+                CD_NONE      = 0,
+                CD_NOTE      = 1 << 1,
+                CD_STEP      = 1 << 2,
+                CD_BENCHMARK = 1 << 3,
+                CD_WARNING   = 1 << 4,
+                CD_ERROR     = 1 << 5
         };
 
         class Logger {
@@ -21,15 +21,15 @@ namespace Inout {
 
                 template <Severity s>
                 class LoggerImpl {
-                        std::ostream& __out;
+                        std::ostream& __log_out;
                 public:
 
-                        explicit LoggerImpl(std::ostream& out) : __out(out) {}
+                        explicit LoggerImpl(std::ostream& out) : __log_out(out) {}
 
                         template<typename T>
                         const LoggerImpl &operator<< (const T &v) const {
                                 if (__application_setting & s) {
-                                        __out << v;
+                                        __log_out << v;
                                 }
 
                                 return *this;
@@ -37,7 +37,7 @@ namespace Inout {
 
                         LoggerImpl const &operator<< (std::ostream& (*F) (std::ostream &)) const {
                                 if (__application_setting & s) {
-                                        F(__out);
+                                        F(__log_out);
                                 }
                                 return *this;
                         }
@@ -51,16 +51,16 @@ namespace Inout {
 
                 template<Severity log_type>
                 static LoggerImpl<log_type> log() {
-                        return log_type >= WARNING? LoggerImpl<log_type>(std::cerr) : LoggerImpl<log_type>(std::cout);
+                        return log_type >= CD_WARNING? LoggerImpl<log_type>(std::cerr) : LoggerImpl<log_type>(std::cout);
                 }
 
         };
 }
 
-#define log_note      Inout::Logger::log<Inout::Severity::NOTE>()
-#define log_step      Inout::Logger::log<Inout::Severity::STEP>()
-#define log_benchmark Inout::Logger::log<Inout::Severity::BENCHMARK>()
-#define log_warning   Inout::Logger::log<Inout::Severity::WARNING>()
-#define log_error     Inout::Logger::log<Inout::Severity::ERROR>()
+#define log_note      Inout::Logger::log<Inout::Severity::CD_NOTE>()
+#define log_step      Inout::Logger::log<Inout::Severity::CD_STEP>()
+#define log_benchmark Inout::Logger::log<Inout::Severity::CD_BENCHMARK>()
+#define log_warning   Inout::Logger::log<Inout::Severity::CD_WARNING>()
+#define log_error     Inout::Logger::log<Inout::Severity::CD_ERROR>()
 
 #endif // HELP_LOGGER_H

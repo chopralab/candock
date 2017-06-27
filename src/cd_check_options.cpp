@@ -20,7 +20,7 @@ int main(int argc, char* argv[]) {
                 cout << help::Options::get_options()->configuration_file() << endl;
                 
         } catch (exception& e) {
-                log_error << e.what() << endl;
+                std::cerr << e.what() << endl;
                 return 1;
         }
         return 0;

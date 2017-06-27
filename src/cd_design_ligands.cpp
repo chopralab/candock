@@ -48,7 +48,7 @@ int main(int argc, char* argv[]) {
                 cout << Version::get_banner()   <<
                         Version::get_version()  <<
                         Version::get_run_info();
-                log_note << help::Options::get_options()->configuration_file() << endl;
+                cout << help::Options::get_options()->configuration_file() << endl;
 
                 Program::FragmentLigands ligand_fragmenter;
                 ligand_fragmenter.run_step();
@@ -73,7 +73,7 @@ int main(int argc, char* argv[]) {
 
                 main_timer.display_time("Finished");
         } catch ( exception& e) {
-                log_error << e.what() << endl;
+                cerr << e.what() << endl;
                 return 1;
         }
 

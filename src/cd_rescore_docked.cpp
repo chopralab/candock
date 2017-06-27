@@ -28,7 +28,7 @@ int main(int argc, char* argv[]) {
                 cout << Version::get_banner()   <<
                         Version::get_version()  <<
                         Version::get_run_info();
-                log_note << help::Options::get_options()->configuration_file() << endl;
+                cout << help::Options::get_options()->configuration_file() << endl;
 
 
                 Program::FragmentLigands ligand_fragmenter;
@@ -38,7 +38,7 @@ int main(int argc, char* argv[]) {
                 targets.rescore_docked(ligand_fragmenter);
 
         } catch (exception& e) {
-                log_error << e.what() << endl;
+                cerr << e.what() << endl;
         }
         return 0;
 }

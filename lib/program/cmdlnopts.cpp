@@ -311,19 +311,19 @@ namespace Program {
 			po::notify(__vm);
 
                         if (__vm.count("verbose")) {
-                                Inout::Logger::flip_mode(Inout::Severity::NOTE);
+                                Inout::Logger::flip_mode(Inout::Severity::CD_NOTE);
                         }
 
                         if (! __vm.count("quiet")) {
-                                Inout::Logger::flip_mode(Inout::Severity::STEP);
+                                Inout::Logger::flip_mode(Inout::Severity::CD_STEP);
                         }
 
                         if (__vm.count("benchmark")) {
-                                Inout::Logger::flip_mode(Inout::Severity::BENCHMARK);
+                                Inout::Logger::flip_mode(Inout::Severity::CD_BENCHMARK);
                         }
 
                         if (__vm.count("warnings")) {
-                                Inout::Logger::flip_mode(Inout::Severity::WARNING);
+                                Inout::Logger::flip_mode(Inout::Severity::CD_WARNING);
                         }
 
 			if (__ncpu == -1) {

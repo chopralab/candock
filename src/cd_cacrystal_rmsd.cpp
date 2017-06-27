@@ -7,7 +7,7 @@ using namespace std;
 
 int main(int argc, char* argv[]) {
         try {
-
+#ifndef _WINDOWS
                 if ( argc <= 2 ) {
                         cerr << "You MUST supply at least two arguments!" << endl;
                         cerr << "A third argument gives the number of threads (defaults to 1)" << endl;
@@ -76,9 +76,9 @@ int main(int argc, char* argv[]) {
                 for (size_t i = 0; i < rmsd_graph.size(); ++i) {
                         std::cout << rmsd_graph[i] << " " << rmsd_ords[i] << '\n';
                 }
-
+#endif
         } catch (exception& e) {
-                log_error << e.what() << endl;
+                cerr << e.what() << endl;
                 return 1;
         }
         return 0;

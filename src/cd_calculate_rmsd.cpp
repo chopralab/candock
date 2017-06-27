@@ -7,7 +7,7 @@ using namespace std;
 
 int main(int argc, char* argv[]) {
         try {
-
+#ifndef _WINDOWS
                 if ( argc <= 1 ) {
                         cerr << "You MUST supply an argument!" << endl;
                         cerr << "A fourth argument gives the number of threads (defaults to 1)" << endl;
@@ -64,9 +64,9 @@ int main(int argc, char* argv[]) {
                         }
                         cout << '\n';
                 }
-
+#endif
         } catch (exception& e) {
-                log_error << e.what() << endl;
+                cerr << e.what() << endl;
                 return 1;
         }
         return 0;

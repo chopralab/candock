@@ -62,11 +62,24 @@ target_link_libraries ( candock
     ${OPENSSL_LIBRARIES}
 )
 
+if (NOT WIN32)
+
 install(
     TARGETS
     candock
     LIBRARY DESTINATION
     lib/${CANDOCK_VERSION}
 )
+
+else (NOT WIN32)
+
+install(
+    TARGETS
+    candock
+    RUNTIME DESTINATION
+    bin/${CANDOCK_VERSION}
+)
+
+endif(NOT WIN32)
 
 endif (NOT ${CANDOCK_BUILD_STATIC_EXECUTABLE})

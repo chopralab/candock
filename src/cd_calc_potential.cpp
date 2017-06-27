@@ -9,7 +9,7 @@ using namespace std;
 
 int main(int argc, char* argv[]) {
         try {
-
+#ifndef _WINDOWS
                 help::Options::set_options( new Program::CmdLnOpts( 
                     argc, argv));
 
@@ -73,9 +73,9 @@ int main(int argc, char* argv[]) {
                 for ( auto &poten : potentials ) {
                         cout << poten << endl;
                 }
-
+#endif
         } catch (exception& e) {
-                log_error << e.what() << endl;
+                cerr << e.what() << endl;
                 return 1;
         }
         return 0;

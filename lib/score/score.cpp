@@ -121,9 +121,7 @@ namespace Molib {
                         if ( __energies[atom_pair].size() < 1501 ) {
                                 size_t energies_diff = 1501 - __energies.size();
 
-                                dbgmsg( "Adding " << energies_diff << " 0s to " << atom_pair);
-
-                                for ( size_t i = 0; i < energies_diff; ++i ) {
+								for ( size_t i = 0; i < energies_diff; ++i ) {
                                         __energies[atom_pair].push_back(0.0);
                                 }
                         }

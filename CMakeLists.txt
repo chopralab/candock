@@ -79,6 +79,7 @@ include_directories(${GSL_INCLUDE_DIRS})
 include_directories(${JSONCPP_INCLUDE_DIR})
 include_directories(${RAPIDXML_DIR})
 include_directories(${OPENMM_INCLUDE_DIR})
+include_directories(${OPENSSL_INCLUDE_DIR})
 include_directories(lib)
 
 execute_process(
