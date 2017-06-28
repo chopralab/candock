@@ -26,10 +26,10 @@ int main(int argc, char* argv[]) {
                 Benchmark main_timer;
                 main_timer.display_time("Starting");
 
-                cout << Version::get_banner()   <<
+                cerr << Version::get_banner()   <<
                         Version::get_version()  <<
                         Version::get_run_info();
-                cout << help::Options::get_options()->configuration_file() << endl;
+                cerr << help::Options::get_options()->configuration_file() << endl;
 
                 Molib::Molecules receptor_mols;
                 Molib::Molecules ligand_mols;
@@ -106,9 +106,7 @@ int main(int argc, char* argv[]) {
                         Molib::Atom::Grid gridrec_min (minimized_receptor.get_atoms());
                         const double energy = score.non_bonded_energy (gridrec_min, minimized_ligand);
 
-                        Inout::output_file (Molib::Molecule::print_complex (minimized_ligand, minimized_receptor, energy,
-                                                                            std::nan(""), i + 1, -1, std::nan("")), "minimized.pdb",
-                                            ios_base::app);
+                        std::cout << Molib::Molecule::print_complex (minimized_ligand, minimized_receptor, energy, std::nan(""), i + 1, -1, std::nan(""));
                         
                         ffield.erase_topology(ligand);
 

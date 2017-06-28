@@ -108,7 +108,7 @@ namespace Molib {
 		}
 		Molecule& erase_properties() { for (auto &assembly : *this) assembly.erase_properties(); return *this; }
 		friend ostream& operator<< (ostream& stream, const Molecule& m);
-		static std::string print_complex(Molecule &ligand, Molecule &receptor, const double energy, const double potential = 0.0,
+		static std::string print_complex(const Molecule &ligand, const Molecule &receptor, const double energy, const double potential = 0.0,
                                                  const int model = 1, const size_t max_clq_id = 1,
                                                  const double rmsd = std::nan(""), const double compute_rmsd_ord = std::nan(""));
 	};

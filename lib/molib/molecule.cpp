@@ -405,7 +405,7 @@ namespace Molib {
 		}
 	}
 
-        string Molecule::print_complex (Molecule &ligand, Molecule &receptor, const double energy,
+        string Molecule::print_complex (const Molecule &ligand, const Molecule &receptor, const double energy,
                                         const double potential, const int model, const size_t max_clq_id,
                                         const double rmsd, const double rmsd_ord) {
                 stringstream ss;
@@ -427,6 +427,29 @@ namespace Molib {
                 for (auto &patom : receptor.get_atoms()) {
                         ss << setw (66) << left << *patom;
                         reenum = patom->atom_number();
+                }
+
+                for (auto &presd : receptor.get_residues()) {
+                        if (help::standard_residues.count(presd->resn()) != 0)
+                             continue;
+
+                        // Print internal bonds
+                        for (auto pbond : get_bonds_in(presd->get_atoms())) {
+                                ss << "REMARK   8 BONDTYPE " << pbond->get_bo()
+                                   << " " << pbond->get_bond_gaff_type()
+                                   << " " << pbond->atom1().atom_number()
+                                   << " " << pbond->atom2().atom_number()
+                                   << endl;
+                        }
+
+                        // Print external bonds
+                        for (auto pbond : get_bonds_in(presd->get_atoms(), false)) {
+                                ss << "REMARK   8 BONDTYPE " << pbond->get_bo()
+                                   << " " << pbond->get_bond_gaff_type()
+                                   << " " << pbond->atom1().atom_number()
+                                   << " " << pbond->atom2().atom_number()
+                                   << endl;
+                        }
                 }
 
                 ss << "TER" << endl;

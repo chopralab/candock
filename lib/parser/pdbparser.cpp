@@ -382,11 +382,15 @@ namespace Parser {
                                 a1.connect (a2).set_rotatable (vs[0]);
                         } else if (line.compare (0, 19, "REMARK   8 BONDTYPE") == 0) {
 
-                                vector<string> vs = help::ssplit (line.substr (20), " ");
-
-                                if ( __hm & protein_poses_only ) {
+                                if ( (__hm & docked_poses_only) && (! ter_found)) {
                                         continue;
                                 }
+
+                                if ( (__hm & protein_poses_only)&& (  ter_found)) {
+                                        continue;
+                                }
+
+                                vector<string> vs = help::ssplit (line.substr (20), " ");
 
                                  // to avoid when bond_gaff_type is undefined
                                 if (vs.size() == 4) {
