@@ -45,6 +45,10 @@ namespace Parser {
                                         continue;
                                 }
 
+                                if ( (__hm & protein_poses_only)&& (  ter_found)) {
+                                        continue;
+                                }
+
                                 __generate_molecule (mols, found_molecule, "");
                                 __generate_assembly (mols, found_assembly, 0, "ASYMMETRIC UNIT");
                                 __generate_model (mols, found_model, 1);
@@ -191,13 +195,13 @@ namespace Parser {
                                 if (boost::regex_search (line, m, boost::regex ("MODEL\\s+(\\d+)"))) {
                                         if (m[1].matched) {
                                                 
-                                                if ( __hm & skip_atom ) {
+                                                if ( __hm & skip_atom || __hm & protein_poses_only) {
                                                         found_molecule = false;
                                                         found_assembly = false;
                                                 }
 
                                                 ter_found = false;
-                                                
+
                                                 __generate_molecule (mols, found_molecule, "");
                                                 __generate_assembly (mols, found_assembly, 0, "ASYMMETRIC UNIT");
 
@@ -379,6 +383,10 @@ namespace Parser {
                         } else if (line.compare (0, 19, "REMARK   8 BONDTYPE") == 0) {
 
                                 vector<string> vs = help::ssplit (line.substr (20), " ");
+
+                                if ( __hm & protein_poses_only ) {
+                                        continue;
+                                }
 
                                  // to avoid when bond_gaff_type is undefined
                                 if (vs.size() == 4) {

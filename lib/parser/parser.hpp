@@ -14,6 +14,7 @@ namespace Parser {
                 skip_atom=          1 << 4,
                 sparse_macromol=    1 << 5,
                 docked_poses_only=  1 << 6,
+                protein_poses_only= 1 << 7,
         };
 
         class Parser {

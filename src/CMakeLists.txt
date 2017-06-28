@@ -65,6 +65,7 @@ add_executable( cd_calculate_rmsd cd_calculate_rmsd.cpp ${CANDOCK_SRC})
 add_executable( cd_cacrystal_rmsd cd_cacrystal_rmsd.cpp ${CANDOCK_SRC})
 add_executable( cd_calc_potential cd_calc_potential.cpp ${CANDOCK_SRC})
 add_executable( cd_minimize_force cd_minimize_force.cpp ${CANDOCK_SRC})
+add_executable( cd_minimize_poses cd_minimize_poses.cpp ${CANDOCK_SRC})
 add_executable( cd_rescore_docked cd_rescore_docked.cpp ${CANDOCK_SRC})
 add_executable( cd_design_ligands cd_design_ligands.cpp ${CANDOCK_SRC})
 add_executable( drm_key_generator drm_key_generator.cpp ${CANDOCK_SRC})
@@ -79,6 +80,7 @@ target_link_libraries( cd_calculate_rmsd ${all_needed_libraries} )
 target_link_libraries( cd_cacrystal_rmsd ${all_needed_libraries} )
 target_link_libraries( cd_calc_potential ${all_needed_libraries} )
 target_link_libraries( cd_minimize_force ${all_needed_libraries} )
+target_link_libraries( cd_minimize_poses ${all_needed_libraries} )
 target_link_libraries( cd_rescore_docked ${all_needed_libraries} )
 target_link_libraries( cd_design_ligands ${all_needed_libraries} )
 target_link_libraries( drm_key_generator ${all_needed_libraries} )
@@ -94,6 +96,7 @@ set_target_properties(
         cd_cacrystal_rmsd
         cd_calc_potential
         cd_minimize_force
+        cd_minimize_poses
         cd_rescore_docked
         cd_design_ligands
     PROPERTIES
@@ -117,6 +120,7 @@ install(
         cd_cacrystal_rmsd
         cd_calc_potential
         cd_minimize_force
+        cd_minimize_poses
         cd_rescore_docked
         cd_design_ligands
         drm_key_generator
