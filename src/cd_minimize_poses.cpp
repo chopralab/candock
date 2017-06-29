@@ -23,9 +23,6 @@ int main(int argc, char* argv[]) {
                                 Program::CmdLnOpts::FORCE_FIELD| 
                                 Program::CmdLnOpts::SCORING));
 
-                Benchmark main_timer;
-                main_timer.display_time("Starting");
-
                 cerr << Version::get_banner()   <<
                         Version::get_version()  <<
                         Version::get_run_info();
@@ -34,14 +31,21 @@ int main(int argc, char* argv[]) {
                 Molib::Molecules receptor_mols;
                 Molib::Molecules ligand_mols;
 
-                Parser::FileParser drpdb (cmdl.get_string_option("receptor"), Parser::pdb_read_options::protein_poses_only |
-                                                                              Parser::pdb_read_options::all_models);
+                Parser::FileParser drpdb (cmdl.get_string_option("receptor"),
+                                          Parser::pdb_read_options::protein_poses_only |
+                                          Parser::pdb_read_options::all_models);
 
                 drpdb.parse_molecule(receptor_mols);
 
-                Parser::FileParser dlpdb (cmdl.get_string_option("receptor"), Parser::pdb_read_options::docked_poses_only |
-                                                                              Parser::pdb_read_options::skip_atom |
-                                                                              Parser::pdb_read_options::all_models);
+                // Check to see if the user set the ligand option, use the receptor as a last resort.
+                const std::string &ligand_file = cmdl.get_string_option("ligand").empty() ?
+                                                    cmdl.get_string_option("receptor") :
+                                                    cmdl.get_string_option("ligand");
+
+                Parser::FileParser dlpdb (ligand_file,
+                                          Parser::pdb_read_options::docked_poses_only |
+                                          Parser::pdb_read_options::skip_atom |
+                                          Parser::pdb_read_options::all_models);
 
                 dlpdb.parse_molecule(ligand_mols);
 
@@ -55,7 +59,6 @@ int main(int argc, char* argv[]) {
                      .compile_scoring_function()
                      .parse_objective_function(cmdl.get_string_option("obj_dir"), cmdl.get_double_option("scale"));
 
-                // Prepare the receptor for docking to
                 OMMIface::ForceField ffield;
 
                 ffield.parse_gaff_dat_file(cmdl.get_string_option("gaff_dat"))
@@ -106,8 +109,8 @@ int main(int argc, char* argv[]) {
                         Molib::Atom::Grid gridrec_min (minimized_receptor.get_atoms());
                         const double energy = score.non_bonded_energy (gridrec_min, minimized_ligand);
 
-                        std::cout << Molib::Molecule::print_complex (minimized_ligand, minimized_receptor, energy, std::nan(""), i + 1, -1, std::nan(""));
-                        
+                        std::cout << Molib::Molecule::print_complex (minimized_ligand, minimized_receptor, energy, std::nan(""), i + 1, 0xFFFFFF, std::nan(""));
+
                         ffield.erase_topology(ligand);
 
                 }
