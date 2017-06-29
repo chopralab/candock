@@ -1,8 +1,6 @@
 #include "program/fragmentligands.hpp"
 #include "version.hpp"
 
-////////////////// FRAGMENTING OF LIGANDS ///////////////////////////
-
 using namespace std;
 
 int main(int argc, char* argv[]) {
@@ -83,4 +81,3 @@ int main(int argc, char* argv[]) {
         }
         return 0;
 }
-

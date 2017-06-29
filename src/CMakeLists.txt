@@ -57,8 +57,9 @@ if (NOT WIN32)
 
 endif(NOT WIN32)
 
-set( program_names cd_check_options
+set( program_names  cd_check_options
                     cd_find_centroids
+                    cd_process_input
                     cd_prep_fragments
                     cd_make_objective
                     cd_dock_fragments
