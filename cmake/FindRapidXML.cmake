@@ -8,12 +8,11 @@
 #
 # Sets RAPIDXML_DIR
 
-# find the tinyxml directory find the SFML include directory
 find_path(RAPIDXML_DIR 
           NAMES rapidxml/rapidxml.hpp
           DOC "RapidXML include dir"
           HINTS ${RAPIDXML_ROOT}
-         )
+)
 
 if (NOT RAPIDXML_DIR)
     if(RapidXML_FIND_REQUIRED) #prefix is filename, case matters

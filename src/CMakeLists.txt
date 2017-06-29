@@ -97,7 +97,6 @@ foreach( candock_program ${program_names} )
 endforeach( candock_program ${program_names} )
 
 if( ${CANDOCK_DRM} )
-message( STATUS ${OPENSSL_SSL_LIBRARY} ${OPENSSL_CRYPTO_LIBRARY} )
     add_executable( drm_key_generator drm_key_generator.cpp )
     target_link_libraries( drm_key_generator ${OPENSSL_LIBRARIES} )
     install( TARGETS drm_key_generator RUNTIME DESTINATION bin/${CANDOCK_VERSION} )
