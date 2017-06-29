@@ -51,7 +51,7 @@ namespace Inout {
 
                 template<Severity log_type>
                 static LoggerImpl<log_type> log() {
-                        return log_type >= CD_WARNING? LoggerImpl<log_type>(std::cerr) : LoggerImpl<log_type>(std::cout);
+                        return log_type >= CD_BENCHMARK? LoggerImpl<log_type>(std::cerr) : LoggerImpl<log_type>(std::cout);
                 }
 
         };
