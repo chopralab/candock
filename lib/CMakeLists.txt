@@ -54,31 +54,35 @@ add_library(
         $<TARGET_OBJECTS:helper>
 )
 
-target_link_libraries ( candock
-    ${OPENMM_LIBRARIES}
-    ${OPENMM_KBPLUGIN}
-    ${Boost_LIBRARIES}
-    ${GSL_LIBRARIES}
-    ${OPENSSL_LIBRARIES}
+set( candock_libraries_to_link ${OPENMM_LIBRARIES}
+                               ${OPENMM_KBPLUGIN}
+                               ${Boost_LIBRARIES}
+                               ${GSL_LIBRARIES}
 )
+
+if( ${CANDOCK_DRM} )
+    set( candock_libraries_to_link ${candock_libraries_to_link} ${OPENSSL_LIBRARIES})
+endif( ${CANDOCK_DRM} )
+
+target_link_libraries ( candock ${candock_libraries_to_link} )
 
 if (NOT WIN32)
 
-install(
-    TARGETS
-    candock
-    LIBRARY DESTINATION
-    lib/${CANDOCK_VERSION}
-)
+    install(
+        TARGETS
+            candock
+        LIBRARY DESTINATION
+            lib/${CANDOCK_VERSION}
+    )
 
 else (NOT WIN32)
 
-install(
-    TARGETS
-    candock
-    RUNTIME DESTINATION
-    bin/${CANDOCK_VERSION}
-)
+    install(
+        TARGETS
+            candock
+        RUNTIME DESTINATION
+            bin/${CANDOCK_VERSION}
+    )
 
 endif(NOT WIN32)
 

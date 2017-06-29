@@ -45,16 +45,29 @@ endif(CANDOCK_CUDA_SUPPORT)
 
 set(OPENMM_ROOT_DIR "/usr/local/openmm" CACHE STRING "Location of OpenMM and KBForce")
 
+#DRM Module
+set(CANDOCK_DRM OFF CACHE BOOL "Build DRM into Candock")
 
 find_package(Boost    REQUIRED  COMPONENTS filesystem system regex program_options)
 find_package(GSL      REQUIRED)
 find_package(RapidXML REQUIRED)
 find_package(OpenMM   REQUIRED  COMPONENTS openmm kbforce)
 find_package(Git      REQUIRED)
-find_package(OpenSSL  REQUIRED)
 
-#DRM Module
-set(CANDOCK_SETDRM 0 CACHE OFF "Build DRM into Candock")
+if( ${CANDOCK_DRM} )
+
+    find_package(OpenSSL REQUIRED)
+    include_directories(${OPENSSL_INCLUDE_DIR})
+
+    if( WIN32 )
+        add_definitions( /DCANDOCK_DRM )
+    else( WIN32 )
+        add_definitions( -DCANDOCK_DRM )
+    endif( WIN32 )
+    
+endif( ${CANDOCK_DRM} )
+
+find_package(OpenSSL  REQUIRED)
 
 set(JSONCPP_INCLUDE_DIR "foreign/jsoncpp/include" "foreign/jsoncpp/src" )
 
@@ -69,8 +82,8 @@ if (WIN32)
 
 else(WIN32)
 
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -fPIC -Wall -lcrypto")
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c11 -fPIC -Wall -lcrypto")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -fPIC -Wall")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c11 -fPIC -Wall")
 
 endif(WIN32)
 
@@ -79,7 +92,6 @@ include_directories(${GSL_INCLUDE_DIRS})
 include_directories(${JSONCPP_INCLUDE_DIR})
 include_directories(${RAPIDXML_DIR})
 include_directories(${OPENMM_INCLUDE_DIR})
-include_directories(${OPENSSL_INCLUDE_DIR})
 include_directories(lib)
 
 execute_process(

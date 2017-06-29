@@ -31,8 +31,11 @@ if(${CANDOCK_BUILD_STATIC_EXECUTABLE})
         ${OPENMM_KBPLUGIN}
         ${Boost_LIBRARIES}
         ${GSL_LIBRARIES}
-        ${OPENSSL_LIBRARIES}
     )
+
+    if ( ${CANDOCK_DRM} )
+        set( all_needed_libraries ${all_needed_libraries} ${OPENSSL_LIBRARIES} )
+    endif( ${CANDOCK_DRM} )
 
 else (${CANDOCK_BUILD_STATIC_EXECUTABLE})
 
@@ -46,85 +49,56 @@ endif (${CANDOCK_BUILD_STATIC_EXECUTABLE})
 
 if (NOT WIN32)
 
-set ( all_needed_libraries
-    ${all_needed_libraries}
-    pthread
-    dl
-)
+    set ( all_needed_libraries
+        ${all_needed_libraries}
+        pthread
+        dl
+    )
 
 endif(NOT WIN32)
 
+set( program_names cd_check_options
+                    cd_find_centroids
+                    cd_prep_fragments
+                    cd_make_objective
+                    cd_dock_fragments
+                    cd_link_fragments
+                    cd_cacrystal_rmsd
+                    cd_calculate_rmsd
+                    cd_calc_potential
+                    cd_rescore_docked
+                    cd_minimize_force
+                    cd_minimize_poses
+)
+
 # New programs with new features that change functionality
-add_executable( cd_check_options  cd_check_options.cpp  ${CANDOCK_SRC})
-add_executable( cd_find_centroids cd_find_centroids.cpp ${CANDOCK_SRC})
-add_executable( cd_prep_fragments cd_prep_fragments.cpp ${CANDOCK_SRC})
-add_executable( cd_make_objective cd_make_objective.cpp ${CANDOCK_SRC})
-add_executable( cd_dock_fragments cd_dock_fragments.cpp ${CANDOCK_SRC})
-add_executable( cd_link_fragments cd_link_fragments.cpp ${CANDOCK_SRC})
-add_executable( cd_calculate_rmsd cd_calculate_rmsd.cpp ${CANDOCK_SRC})
-add_executable( cd_cacrystal_rmsd cd_cacrystal_rmsd.cpp ${CANDOCK_SRC})
-add_executable( cd_calc_potential cd_calc_potential.cpp ${CANDOCK_SRC})
-add_executable( cd_minimize_force cd_minimize_force.cpp ${CANDOCK_SRC})
-add_executable( cd_minimize_poses cd_minimize_poses.cpp ${CANDOCK_SRC})
-add_executable( cd_rescore_docked cd_rescore_docked.cpp ${CANDOCK_SRC})
-add_executable( cd_design_ligands cd_design_ligands.cpp ${CANDOCK_SRC})
-add_executable( drm_key_generator drm_key_generator.cpp ${CANDOCK_SRC})
 
-target_link_libraries( cd_check_options  ${all_needed_libraries} )
-target_link_libraries( cd_find_centroids ${all_needed_libraries} )
-target_link_libraries( cd_prep_fragments ${all_needed_libraries} )
-target_link_libraries( cd_make_objective ${all_needed_libraries} )
-target_link_libraries( cd_dock_fragments ${all_needed_libraries} )
-target_link_libraries( cd_link_fragments ${all_needed_libraries} )
-target_link_libraries( cd_calculate_rmsd ${all_needed_libraries} )
-target_link_libraries( cd_cacrystal_rmsd ${all_needed_libraries} )
-target_link_libraries( cd_calc_potential ${all_needed_libraries} )
-target_link_libraries( cd_minimize_force ${all_needed_libraries} )
-target_link_libraries( cd_minimize_poses ${all_needed_libraries} )
-target_link_libraries( cd_rescore_docked ${all_needed_libraries} )
-target_link_libraries( cd_design_ligands ${all_needed_libraries} )
-target_link_libraries( drm_key_generator ${all_needed_libraries} )
+foreach( candock_program ${program_names} )
 
-set_target_properties(
-        cd_check_options
-        cd_find_centroids
-        cd_prep_fragments
-        cd_make_objective
-        cd_dock_fragments
-        cd_link_fragments
-        cd_calculate_rmsd
-        cd_cacrystal_rmsd
-        cd_calc_potential
-        cd_minimize_force
-        cd_minimize_poses
-        cd_rescore_docked
-        cd_design_ligands
-    PROPERTIES
-    INSTALL_RPATH ${CMAKE_INSTALL_PREFIX}/lib/${CANDOCK_VERSION}:${CMAKE_INSTALL_PREFIX}/lib/ext
-    INSTALL_RPATH_USE_LINK_PATH TRUE
-)
+    add_executable( ${candock_program} "${candock_program}.cpp"  ${CANDOCK_SRC})
 
-if(CUDA_FOUND)
-   
-endif(CUDA_FOUND)
+    target_link_libraries( ${candock_program}  ${all_needed_libraries} )
 
-install(
-    TARGETS    
-        cd_check_options
-        cd_find_centroids
-        cd_prep_fragments
-        cd_make_objective
-        cd_dock_fragments
-        cd_link_fragments
-        cd_calculate_rmsd
-        cd_cacrystal_rmsd
-        cd_calc_potential
-        cd_minimize_force
-        cd_minimize_poses
-        cd_rescore_docked
-        cd_design_ligands
-        drm_key_generator
+    set_target_properties(
+        ${candock_program}
+        PROPERTIES
+        INSTALL_RPATH ${CMAKE_INSTALL_PREFIX}/lib/${CANDOCK_VERSION}:${CMAKE_INSTALL_PREFIX}/lib/ext
+        INSTALL_RPATH_USE_LINK_PATH TRUE
+    )
 
-    RUNTIME DESTINATION
-        bin/${CANDOCK_VERSION}
-)
+    install(
+        TARGETS
+            ${candock_program}
+
+        RUNTIME DESTINATION
+            bin/${CANDOCK_VERSION}
+    )
+
+endforeach( candock_program ${program_names} )
+
+if( ${CANDOCK_DRM} )
+message( STATUS ${OPENSSL_SSL_LIBRARY} ${OPENSSL_CRYPTO_LIBRARY} )
+    add_executable( drm_key_generator drm_key_generator.cpp )
+    target_link_libraries( drm_key_generator ${OPENSSL_LIBRARIES} )
+    install( TARGETS drm_key_generator RUNTIME DESTINATION bin/${CANDOCK_VERSION} )
+endif( ${CANDOCK_DRM} )

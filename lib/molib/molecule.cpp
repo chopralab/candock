@@ -417,7 +417,7 @@ namespace Molib {
                 if (! std::isnan (potential))
                         ss << "REMARK   2 POTENTIAL ENERGY OF " << ligand.name() << " IS " << potential << endl;
                 
-                if (max_clq_id != -1)
+                if (max_clq_id != 0xFFFFFF)
                         ss << "REMARK   3 THIS IS CONFIGUATION " << ligand.name() << " NUMBER " << max_clq_id << endl; 
 
                 if (! std::isnan (rmsd))

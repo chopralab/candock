@@ -10,7 +10,7 @@ using namespace std;
 
 int main(int argc, char* argv[]) {
         try {
-                if(Version::drm_active() && !drm::check_drm()) {
+                if(!drm::check_drm(Version::get_install_path() + "/.candock")) {
                     throw logic_error("CANDOCK has expired. Please contact your CANDOCK distributor to get a new version.");
                 }
 

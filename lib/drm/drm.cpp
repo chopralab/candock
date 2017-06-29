@@ -6,15 +6,14 @@
 #include <string.h>
 
 #include <boost/filesystem.hpp>
-#include <openssl/conf.h>
-#include <openssl/evp.h>
-#include <openssl/err.h>
 #include "drm.hpp"
 
 #include "helper/logger.hpp"
-#include "version.hpp"
 
 using namespace std;
+
+#ifdef CANDOCK_DRM
+
 static const unsigned int KEY_SIZE = 32;
 static const unsigned int BLOCK_SIZE = 16;
 
@@ -24,6 +23,10 @@ static const unsigned int BLOCK_SIZE = 16;
  *Unix Time
  *
  */
+
+#include <openssl/conf.h>
+#include <openssl/evp.h>
+#include <openssl/err.h>
 
 void handleErrors()
 {
@@ -116,7 +119,7 @@ int decrypt(unsigned char *ciphertext, int ciphertext_len, unsigned char *key,
 //create a new file with a later time stamp to prevent further tampering
 //Passed DRM if returns true
 //Failed DRM if returns false
-bool drm::check_drm() {
+bool drm::check_drm(const std::string& key_location) {
     
     bool passed_drm = true;
     
@@ -136,10 +139,10 @@ bool drm::check_drm() {
      *    If it does decrypt it.
      */
     
-    if(boost::filesystem::exists(Version::get_install_path() + "/" + ".candock")) {
+    if(boost::filesystem::exists(key_location)) {
         
         string readEncrypted;
-        ifstream readEncryptedFile (Version::get_install_path() + "/" + ".candock");
+        ifstream readEncryptedFile (key_location);
         getline (readEncryptedFile,readEncrypted);
         readEncryptedFile.close();
         
@@ -179,33 +182,32 @@ bool drm::check_drm() {
     }
     else {
         //This is what happens if the file does not exist
-        log_error << "Error: No Key Found!";
+        log_error << "Error: No Key Found!" << "\n";
         passed_drm = false;
         
     }
     
     string line = std::to_string(static_cast<uintmax_t>(std::time(NULL)));
     
-     /* Message to be encrypted */
-  unsigned char plaintext[128];
+    /* Message to be encrypted */
+    unsigned char plaintext[128];
 
-  /* Buffer for ciphertext. Ensure the buffer is long enough for the
-   * ciphertext which may be longer than the plaintext, dependant on the
-   * algorithm and mode
-   */
-  unsigned char ciphertext[128];
-   strcpy( (char*) plaintext, line.c_str()); 
+    /* Buffer for ciphertext. Ensure the buffer is long enough for the
+     * ciphertext which may be longer than the plaintext, dependant on the
+     * algorithm and mode
+     */
+    unsigned char ciphertext[128];
+    strcpy( (char*) plaintext, line.c_str()); 
     /* Encrypt the plaintext */
-   encrypt (plaintext, strlen ((char *)plaintext), key, iv,
+    encrypt (plaintext, strlen ((char *)plaintext), key, iv,
                             ciphertext);
-                          
- 
 
-  ofstream myfile3;
-  myfile3.open (Version::get_install_path() + "/" + ".candock");
-  myfile3 << ciphertext;
-  myfile3.close();
-
+    if (passed_drm) {
+        ofstream myfile3;
+        myfile3.open (key_location);
+        myfile3 << ciphertext;
+        myfile3.close();
+    }
     
     /* Clean up */
     EVP_cleanup();
@@ -214,4 +216,10 @@ bool drm::check_drm() {
     return passed_drm;
 }
 
+#else
 
+bool drm::check_drm(const std::string& ) {
+    return true;
+}
+
+#endif /*CANDOCK_DRM*/

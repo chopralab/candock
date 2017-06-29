@@ -13,7 +13,7 @@ using namespace Program;
 int main(int argc, char* argv[]) {
         try {
 
-                if(Version::drm_active() && !drm::check_drm()) {
+                if(!drm::check_drm(Version::get_install_path() + "/.candock")) {
                     throw logic_error("CANDOCK has expired. Please contact your CANDOCK distributor to get a new version.");
                 }
 
@@ -29,7 +29,6 @@ int main(int argc, char* argv[]) {
                         Version::get_version()  <<
                         Version::get_run_info();
                 cout << help::Options::get_options()->configuration_file() << endl;
-
 
                 Program::FragmentLigands ligand_fragmenter;
                 ligand_fragmenter.run_step();

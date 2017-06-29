@@ -1,4 +1,3 @@
-#include <version.hpp>
 #include <openssl/conf.h>
 #include <openssl/evp.h>
 #include <openssl/err.h>
@@ -95,8 +94,14 @@ int decrypt(unsigned char *ciphertext, int ciphertext_len, unsigned char *key,
 
 
 
-int main (void)
+int main (int argc, char **argv)
 {
+
+  if( argc <= 1 ) {
+      cerr << "You must give an argument for key location" << endl;
+      return 1;
+  }
+
   /* Set up the key and iv. Do I need to say to not hard code these in a
    * real application? :-)
    */
@@ -139,7 +144,7 @@ int main (void)
   cout << " ciphertext_len " << ciphertext_len << endl;
 
   ofstream myfile3;
-  myfile3.open (Version::get_install_path() + "/" + ".candock");
+  myfile3.open (argv[1]);
   myfile3 << ciphertext;
   myfile3.close();
 
