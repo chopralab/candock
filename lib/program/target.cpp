@@ -395,6 +395,8 @@ namespace Program {
                             return;
                     }
 
+                    created_design.write_out();
+
                     all_designs.compute_hydrogen()
                                .compute_bond_order()
                                .compute_bond_gaff_type()

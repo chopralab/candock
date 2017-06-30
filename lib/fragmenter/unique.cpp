@@ -137,4 +137,12 @@ namespace Molib {
 		return false;
 	}
 
+        void Unique::write_out() {
+                if (__seeds_file != "") { // output to seeds_file if given
+                        std::stringstream ss;
+                        ss << __unique_seeds;
+                        Inout::file_open_put_stream(__seeds_file, ss);
+                }
+        }
+
 }

@@ -23,15 +23,16 @@ namespace Molib {
 			if (__seeds_file != "") 
 				__read_seeds_file();
 		}
+
 		~Unique() {
-			if (__seeds_file != "") { // output to seeds_file if given
-				std::stringstream ss;
-				ss << __unique_seeds;
-				Inout::file_open_put_stream(__seeds_file, ss);
-			}
+                        write_out();
 		}
+
 		size_t get_seed_id(const Atom::Set &a) { return __unique(a); }
 		bool is_seed_unique( const Atom::Set &a) const;
+
+                void write_out();
+
 		friend ostream& operator<<(ostream& os, const USeeds& useeds);
 	};
 }
