@@ -18,6 +18,7 @@ namespace Inout {
         class Logger {
 
                 static int __application_setting;
+                static bool __all_to_stderr;
 
                 template <Severity s>
                 class LoggerImpl {
@@ -49,9 +50,18 @@ namespace Inout {
                         __application_setting = __application_setting^s1;
                 }
 
+                static void set_all_stderr(bool mode) {
+                        __all_to_stderr = mode;
+                }
+
+                static bool all_stderr() {
+                        return __all_to_stderr;
+                }
+
                 template<Severity log_type>
                 static LoggerImpl<log_type> log() {
-                        return log_type >= CD_BENCHMARK? LoggerImpl<log_type>(std::cerr) : LoggerImpl<log_type>(std::cout);
+                        return log_type >= CD_WARNING || all_stderr()?
+                            LoggerImpl<log_type>(std::cerr) : LoggerImpl<log_type>(std::cout);
                 }
 
         };

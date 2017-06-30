@@ -10,6 +10,9 @@ using namespace std;
 int main(int argc, char* argv[]) {
         try {
 #ifndef _WINDOWS
+
+                Inout::Logger::set_all_stderr(true);
+
                 help::Options::set_options( new Program::CmdLnOpts( 
                     argc, argv));
 

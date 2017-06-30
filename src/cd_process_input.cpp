@@ -12,6 +12,8 @@ int main(int argc, char* argv[]) {
                         return 1;
                 }
 
+                Inout::Logger::set_all_stderr(true);
+
                 Parser::FileParser input(argv[1], Parser::pdb_read_options::all_models);
 
                 Molib::Molecules input_read;

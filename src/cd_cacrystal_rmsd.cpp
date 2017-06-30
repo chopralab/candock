@@ -12,6 +12,8 @@ int main(int argc, char* argv[]) {
                         return 1;
                 }
 
+                Inout::Logger::set_all_stderr(true);
+
                 Parser::FileParser crys(argv[1], Parser::pdb_read_options::first_model);
 
                 Parser::FileParser mol1(argv[2], Parser::pdb_read_options::docked_poses_only |

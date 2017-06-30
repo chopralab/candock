@@ -14,7 +14,9 @@ int main(int argc, char* argv[]) {
                 if(!drm::check_drm(Version::get_install_path() + "/.candock")) {
                     throw logic_error("CANDOCK has expired. Please contact your CANDOCK distributor to get a new version.");
                 }
-                
+
+                Inout::Logger::set_all_stderr(true);
+
                 help::Options::set_options(new Program::CmdLnOpts(argc, argv));
 
                 cout << help::Options::get_options()->configuration_file() << endl;

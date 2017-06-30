@@ -29,6 +29,7 @@
 namespace Inout {
 
         int Logger::__application_setting = Severity::CD_ERROR;
+        bool Logger::__all_to_stderr = false;
 
         void __mkdir(const string &dir_path) {
                 // makes a path "janez/aska/mia from e.g. "janez/aska/mia/test.txt"
