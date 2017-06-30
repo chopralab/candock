@@ -247,7 +247,8 @@ namespace Program {
 
                                         OMMIface::Modeler modeler (*a.ffield, cmdl.get_string_option("fftype"), cmdl.get_int_option("cutoff"),
                                                   cmdl.get_double_option("mini_tol"), cmdl.get_int_option("max_iter"), cmdl.get_int_option("update_freq"), 
-                                                  cmdl.get_double_option("pos_tol"), false, 2.0);
+                                                  cmdl.get_double_option("pos_tol"), false, cmdl.get_double_option("dynamic_step_size"),
+                                                   cmdl.get_double_option("temperature"), cmdl.get_double_option("friction"));
 
                                         modeler.add_topology (a.protein.get_atoms());
                                         modeler.add_topology (ligand.get_atoms());
@@ -262,7 +263,7 @@ namespace Program {
                                         cout << "Initial energy for " << a.protein.name() << " and " << ligand.name() 
                                              << " = " << a.score->non_bonded_energy (*a.gridrec, ligand) << endl;
 
-                                        modeler.minimize_state (ligand, a.protein, *a.score);
+                                        modeler.minimize_state ();
 
                                         // init with minimized coordinates
                                         Molib::Molecule minimized_receptor (a.protein, modeler.get_state (a.protein.get_atoms()));

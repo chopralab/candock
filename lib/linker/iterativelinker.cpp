@@ -92,7 +92,7 @@ namespace Linker {
 #endif
 
 							// minimize ...
-							__modeler.minimize_state(__ligand, __receptor, __score);
+							__modeler.minimize_state();
 
 #ifndef NDEBUG
 							dbgmsg("minimized coordinates:");

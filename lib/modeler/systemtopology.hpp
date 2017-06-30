@@ -36,11 +36,19 @@ namespace OMMIface {
 
         class SystemTopology {
         public:
-                typedef enum {torsional=1, nonbond=2} options;
+                enum integrator_type {
+                    none,
+                    verlet,
+                    langevin,
+                    brownian,
+                };
         private:
                 OpenMM::System *system;
                 OpenMM::Integrator *integrator;
                 OpenMM::Context *context;
+
+                integrator_type __integrator_used;
+                int __thermostat_idx;
 
                 OpenMM::HarmonicBondForce *bondStretch;
                 OpenMM::HarmonicAngleForce *bondBend;
@@ -82,7 +90,8 @@ namespace OMMIface {
 
                 void retype_amber_protein_atom_to_gaff(const Molib::Atom &atom, int &type);
         public:
-                SystemTopology() : system (nullptr), integrator (nullptr), context (nullptr), __kbforce_idx (-1) {}
+                SystemTopology() : system (nullptr), integrator (nullptr), context (nullptr),
+                    __integrator_used(integrator_type::none), __thermostat_idx(-1), __kbforce_idx (-1) {}
                 ~SystemTopology();
                 static void loadPlugins (const std::string &extra_dir = "");
                 void mask (Topology &topology, const Molib::Atom::Vec &atoms);
@@ -91,19 +100,28 @@ namespace OMMIface {
                 void mask_forces (const int atom_idx, const set<int> &substruct);
                 void unmask_forces (const int atom_idx, const set<int> &substruct);
 
-                void init_integrator (const double step_size_in_ps);
+                void init_integrator  (SystemTopology::integrator_type type,
+                                            const double step_size_in_ps,
+                                            const double temperature_in_kevin,
+                                            const double friction_in_per_ps);
+
                 void init_particles (Topology &topology);
-                void clear_knowledge_based_force();
-                void update_knowledge_based_force (Topology &topology, const vector<OpenMM::Vec3> &positions, const double dist_cutoff);
                 void init_physics_based_force  (Topology &topology);
                 void init_knowledge_based_force(Topology &topology);
                 void init_bonded (Topology &topology, const bool use_constraints);
                 void init_positions (const Geom3D::Point::Vec &crds);
-                //~ const vector<OpenMM::Vec3>& get_positions_in_nm();
+
+                void update_thermostat(const double temperature_in_kevin,
+                                       const double collision_frequency);
+
+                void clear_knowledge_based_force();
+                void update_knowledge_based_force (Topology &topology, const vector<OpenMM::Vec3> &positions, const double dist_cutoff);
+
                 vector<OpenMM::Vec3> get_positions_in_nm();
                 vector<OpenMM::Vec3> get_forces();
                 double get_potential_energy();
                 void minimize (const double tolerance, const double max_iterations);
+                void dynamics (const int steps);
                 void set_forcefield (const ForceField &ffield) {
                         __ffield = &ffield;
                 }

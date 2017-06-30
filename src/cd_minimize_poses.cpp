@@ -18,6 +18,7 @@ int main(int argc, char* argv[]) {
                 if(!drm::check_drm(Version::get_install_path() + "/.candock")) {
                     throw logic_error("CANDOCK has expired. Please contact your CANDOCK distributor to get a new version.");
                 }
+
                 help::Options::set_options(new Program::CmdLnOpts(
                     argc, argv, Program::CmdLnOpts::STARTING |
                                 Program::CmdLnOpts::FORCE_FIELD| 
@@ -38,7 +39,7 @@ int main(int argc, char* argv[]) {
                 drpdb.parse_molecule(receptor_mols);
 
                 // Check to see if the user set the ligand option, use the receptor as a last resort.
-                const std::string &ligand_file = cmdl.get_string_option("ligand").empty() ?
+                const std::string &ligand_file = Inout::file_size(cmdl.get_string_option("ligand")) == 0 ?
                                                     cmdl.get_string_option("receptor") :
                                                     cmdl.get_string_option("ligand");
 
@@ -86,7 +87,9 @@ int main(int argc, char* argv[]) {
 
                         OMMIface::Modeler modeler (ffield, cmdl.get_string_option("fftype"),   cmdl.get_int_option("cutoff"),
                                                            cmdl.get_double_option("mini_tol"), cmdl.get_int_option("max_iter"),
-                                                           cmdl.get_int_option("update_freq"), cmdl.get_double_option("pos_tol"), false, 2.0);
+                                                           cmdl.get_int_option("update_freq"), cmdl.get_double_option("pos_tol"), false,
+                                                           cmdl.get_double_option("dynamic_step_size"),
+                                                           cmdl.get_double_option("temperature"), cmdl.get_double_option("friction") );
 
                         modeler.add_topology (protein.get_atoms());
                         modeler.add_topology (ligand.get_atoms());
@@ -98,7 +101,7 @@ int main(int argc, char* argv[]) {
 
                         modeler.init_openmm_positions();
 
-                        modeler.minimize_state (ligand, protein, score);
+                        modeler.minimize_state ();
 
                         // init with minimized coordinates
                         Molib::Molecule minimized_receptor (protein,modeler.get_state (protein.get_atoms()));

@@ -166,7 +166,19 @@ namespace Program {
 			 "Maximum iterations for final minimization")
 			("update_freq", po::value<int> ()->default_value (10),
 			 "Update non-bond frequency")
-			;
+                        //("run_dynamics", po::value<bool>()->default_value(false,"false")->implicit_value(true),
+                        // "Run dynamics instead of minimzation")
+                        ("temperature", po::value<double>()->default_value(300.0f, "300"),
+                         "Temperature to run the dynamic simulation at.")
+                        ("friction",    po::value<double>()->default_value(91.f, "91.0"),
+                         "Friction/Collision frequency for a dynamics simulation in 1/ps")
+                        ("integrator",  po::value<std::string>()->default_value("verlet"),
+                         "Which integrator to use. Options are 'verlet', 'langevin', or 'brownian'")
+                        ("dynamic_step_size", po::value<double>()->default_value(2.0f, "2.0"),
+                         "Step size (in fempto seconds)")
+                        ("dynamic_steps", po::value<int>()->default_value(1000),
+                         "Number of steps to do a dynamic simulation for.")
+                        ;
 
 			po::options_description linking_step ("Fragment Linking Options");
 			linking_step.add_options()
@@ -335,6 +347,12 @@ namespace Program {
 				throw po::validation_error (po::validation_error::invalid_option_value,
 				                            "fftype", fftype);
 			}
+
+                        const string &integrator = get_string_option("integrator");
+                        if (integrator != "verlet" && integrator != "langevin" && integrator != "brownian") {
+                                throw po::validation_error (po::validation_error::invalid_option_value,
+                                                            "integrator", integrator);
+                        }
 
 			const string &ref_state = get_string_option("ref");
 			if (ref_state != "mean" && ref_state != "cumulative") {

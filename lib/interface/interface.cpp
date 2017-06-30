@@ -401,7 +401,7 @@ size_t minimize_complex (size_t max_iter, size_t update_freq) {
 
                 OMMIface::Modeler modeler (*__ffield, "kb", 6,
                                            0.0001, max_iter,
-                                           update_freq, 0.00000000001, false, 2.0);
+                                           update_freq, 0.00000000001, false, 2.0, 300, 91);
 
                 Molib::Atom::Vec rec_atoms = __receptor->get_atoms();
                 Molib::Atom::Vec lig_atoms = __ligand->get_atoms();
@@ -416,7 +416,7 @@ size_t minimize_complex (size_t max_iter, size_t update_freq) {
 
                 modeler.init_openmm_positions();
 
-                modeler.minimize_state (__ligand->element (0), __receptor->element (0), *__score);
+                modeler.minimize_state ();
 
                 // init with minimized coordinates
                 Geom3D::Point::Vec rec_coords = modeler.get_state (rec_atoms);

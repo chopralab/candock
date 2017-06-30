@@ -6,6 +6,9 @@
 #include <openmm/HarmonicAngleForce.h>
 #include <openmm/PeriodicTorsionForce.h>
 #include <openmm/VerletIntegrator.h>
+#include <openmm/LangevinIntegrator.h>
+#include <openmm/BrownianIntegrator.h>
+#include <openmm/AndersenThermostat.h>
 #include <openmm/NonbondedForce.h>
 #include <openmm/LocalEnergyMinimizer.h>
 
@@ -21,7 +24,6 @@
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string.hpp>
 #include <boost/asio/ip/host_name.hpp>
-#include <stdexcept>
 
 using namespace std;
 
@@ -179,12 +181,37 @@ namespace OMMIface {
         }
 
 
-        void SystemTopology::init_integrator (const double step_size_in_ps) {
-                // Choose an Integrator for advancing time, and a Context connecting the
-                // System with the Integrator for simulation. Let the Context choose the
-                // best available Platform. Initialize the configuration from the default
-                // positions we collected above. Initial velocities will be zero.
-                integrator = new OpenMM::VerletIntegrator (step_size_in_ps);
+        // Choose an Integrator for advancing time, and a Context connecting the
+        // System with the Integrator for simulation. Let the Context choose the
+        // best available Platform. Initialize the configuration from the default
+        // positions we collected above. Initial velocities will be zero.
+
+        void SystemTopology::init_integrator (SystemTopology::integrator_type type,
+                                              const double step_size_in_ps,
+                                              const double temperature_in_kevin,
+                                              const double friction_in_per_ps) {
+
+                if (integrator != nullptr)
+                        throw Error("Integrator already initialized");
+
+                __integrator_used = type;
+
+                switch (__integrator_used) {
+                    case verlet:
+                        __thermostat_idx = system->addForce(new OpenMM::AndersenThermostat (temperature_in_kevin, friction_in_per_ps));
+                        // Fall through
+                    case none:
+                        integrator = new OpenMM::VerletIntegrator (step_size_in_ps);
+                        break;
+                    case langevin:
+                        integrator = new OpenMM::LangevinIntegrator(temperature_in_kevin, friction_in_per_ps, step_size_in_ps);
+                        break;
+                    case brownian:
+                        integrator = new OpenMM::BrownianIntegrator(temperature_in_kevin, friction_in_per_ps, step_size_in_ps);
+                        break;
+                }
+
+
                 context = new OpenMM::Context (*system, *integrator);
                 dbgmsg ("REMARK  Using OpenMM platform " << context->getPlatform().getName());
         }
@@ -224,6 +251,29 @@ namespace OMMIface {
 
                 if (warn > 0) {
                         throw Error ("die : missing parameters detected");
+                }
+        }
+
+        void SystemTopology::update_thermostat(const double temperature_in_kevin,
+                                               const double collision_frequency) {
+
+                switch (__integrator_used) {
+                    case verlet:
+                        dynamic_cast<OpenMM::AndersenThermostat&>(system->getForce(__thermostat_idx)).setDefaultTemperature(temperature_in_kevin);
+                        dynamic_cast<OpenMM::AndersenThermostat&>(system->getForce(__thermostat_idx)).setDefaultCollisionFrequency(collision_frequency);
+                        break;
+                    case langevin:
+                        dynamic_cast<OpenMM::LangevinIntegrator*>(integrator)->setTemperature(temperature_in_kevin);
+                        dynamic_cast<OpenMM::LangevinIntegrator*>(integrator)->setFriction(collision_frequency);
+                        break;
+                    case brownian:
+                        dynamic_cast<OpenMM::BrownianIntegrator*>(integrator)->setTemperature(temperature_in_kevin);
+                        dynamic_cast<OpenMM::BrownianIntegrator*>(integrator)->setFriction(collision_frequency);
+                        break;
+                    case none:
+                    default:
+                        throw Error("No integrator is being used!");
+                        break;
                 }
         }
 
@@ -714,4 +764,10 @@ namespace OMMIface {
                 OpenMM::LocalEnergyMinimizer::minimize (*context, tolerance, max_iterations);
         }
 
+        void SystemTopology::dynamics (const int steps) {
+                if (__integrator_used == integrator_type::verlet && __thermostat_idx == -1)
+                    log_warning << "No thermostat set, performing NVE dynamics" << endl;
+
+                integrator->step(steps);
+        }
 };

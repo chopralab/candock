@@ -32,6 +32,7 @@ namespace OMMIface {
 	private:
 		map<const Molib::Atom*, const int> atom_to_type;
 		map<const Molib::Atom*, const int> atom_to_index;
+
 	public:
 		~Topology() { dbgmsg("calling destructor of Topology"); }
 
