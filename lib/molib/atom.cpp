@@ -225,4 +225,31 @@ namespace Molib {
                 return sqrt(min_sum_squared / g1.size());	
         }
 
+        double compute_rmsd_vina_sq(const Atom::Vec &crds1, const Atom::Vec &crds2) {
+
+                double distance_sum = 0.0;
+
+                for (const auto &a : crds1) {
+                        double min_dist = std::numeric_limits<double>::max();
+                        for (const auto &b : crds2) {
+
+                                if (a->idatm_type() != b->idatm_type()) {
+                                        continue;
+                                }
+
+                                double temp = b->crd().distance_sq(a->crd());
+                                min_dist = std::min(min_dist, temp);
+                        }
+                        distance_sum += min_dist;
+                }
+
+                return distance_sum / ( (crds1.size() + crds2.size()) / 2 );
+        }
+
+        double compute_rmsd_vina(const Atom::Vec &crds1, const Atom::Vec &crds2) {
+                double rmsd_sq = compute_rmsd_vina_sq(crds1, crds2);
+                return std::sqrt(rmsd_sq);
+        }
+
+
 };

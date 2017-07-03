@@ -164,7 +164,7 @@ namespace Molib {
 				min_sum_squared = sum_squared;
 		}
 
-		return sqrt(min_sum_squared / g1.size());	
+		return sqrt(min_sum_squared / g1.size());
 	}
 
 	double Molecule::compute_rmsd_ord(const Molecule &other) const {

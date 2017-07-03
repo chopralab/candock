@@ -4,8 +4,10 @@
 #include <algorithm>
 
 namespace Geom3D {
-	double degrees(double radians) { return radians * 57.29577951308232286465; }
-	double radians(double degrees) { return degrees / 57.29577951308232286465; }
+        
+        double degrees(double radians) { return radians * 57.29577951308232286465; }
+        double radians(double degrees) { return degrees / 57.29577951308232286465; }
+
 	double angle(const Vector3 &v0, const Vector3 &v1) { // angle in radians
 		double acc = Coordinate::scalar(v0, v1);
 		double d0 = v0.distance(Coordinate(0,0,0));

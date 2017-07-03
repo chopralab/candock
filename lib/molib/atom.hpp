@@ -107,7 +107,7 @@ namespace Molib {
 		void set_br(void *br) { __br = br; }
 		// the following are required for Atom::Graph :-)
 		bool compatible(const Atom &atom) const;
-	std::string get_label() const { return (__smiles_label.empty() 
+                std::string get_label() const { return (__smiles_label.empty() 
 			? help::idatm_unmask[__idatm_type] : __smiles_label); }
                 int weight() const { return 0; } // dummy for graph ostream operator
 
@@ -117,10 +117,13 @@ namespace Molib {
 
 	};
 
-	BondSet get_bonds_in(const Atom::Set &atoms, bool in=true);
-	BondSet get_bonds_in(const Atom::Vec &atoms, bool in=true);
+        double compute_rmsd_vina_sq(const Atom::Vec &crds1, const Atom::Vec &crds2);
+        double compute_rmsd_vina(const Atom::Vec &crds1, const Atom::Vec &crds2);
 
-	ostream& operator<< (ostream& stream, const Atom::Set &atoms);
-	ostream& operator<< (ostream& stream, const Atom::Vec &atoms);
+        BondSet get_bonds_in(const Atom::Set &atoms, bool in=true);
+        BondSet get_bonds_in(const Atom::Vec &atoms, bool in=true);
+
+        ostream& operator<< (ostream& stream, const Atom::Set &atoms);
+        ostream& operator<< (ostream& stream, const Atom::Vec &atoms);
 };
 #endif
