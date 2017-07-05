@@ -295,6 +295,15 @@ namespace Program {
         }
 
         void Target::make_scaffolds(FragmentLigands& ligand_fragments, const std::set<std::string>& seeds_to_add ) {
+            
+                std::stringstream used_seeds;
+                for (auto &s : seeds_to_add ) {
+                        used_seeds << s << endl;
+                }
+                
+                Inout::output_file (used_seeds.str(),"new_scaffold_seeds.lst");
+
+            
                 Molib::Unique created_design("designed.txt");
                 Molib::Molecules all_designs;
 
@@ -328,6 +337,8 @@ namespace Program {
                         return;
                 }
 
+                created_design.write_out();
+
                 all_designs .compute_hydrogen()
                             .compute_bond_order()
                             .compute_bond_gaff_type()
@@ -357,11 +368,13 @@ namespace Program {
         }
 
         void Target::design_ligands(FragmentLigands& ligand_fragments, const std::set<std::string>& seeds_to_add ) {
-#ifndef NDEBUG
+
+                std::stringstream used_seeds;
                 for (auto &s : seeds_to_add ) {
-                        cout << s << endl;
+                        used_seeds << s << endl;
                 }
-#endif
+                
+                Inout::output_file (used_seeds.str(),"lead_optimization_seeds.lst");
 
                 int n = 0;
                 Molib::Unique created_design("designed.txt");
