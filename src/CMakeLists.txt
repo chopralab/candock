@@ -6,6 +6,7 @@ if(${CANDOCK_BUILD_STATIC_EXECUTABLE})
     endif(WIN32)
 
     set( CANDOCK_SRC
+        $<TARGET_OBJECTS:fileout>
         $<TARGET_OBJECTS:program>
         $<TARGET_OBJECTS:design>
         $<TARGET_OBJECTS:docker>
@@ -59,6 +60,7 @@ endif(NOT WIN32)
 
 set( program_names  cd_check_options
                     cd_find_centroids
+                    cd_output_mol2
                     cd_process_input
                     cd_prep_fragments
                     cd_make_objective

@@ -14,6 +14,8 @@
 #include "dockfragments.hpp"
 #include "linkfragments.hpp"
 
+#include "fileout/fileout.hpp"
+
 namespace Program {
 
         Target::DockedReceptor::~DockedReceptor() {
@@ -179,7 +181,9 @@ namespace Program {
                         for ( auto &ligand : ligands ) {
                                 const double energy = a.score->non_bonded_energy(*a.gridrec, ligand);
 
-                                Inout::output_file(Molib::Molecule::print_complex(ligand, a.protein, energy, std::nan("")), 
+                                std::stringstream ss;
+                                Fileout::print_complex_pdb (ss, ligand, a.protein, energy, std::nan(""));
+                                Inout::output_file(ss.str(),
                                 Path::join( cmdl.get_string_option("docked_dir"), ligand.name() + ".pdb"),  ios_base::app);
 
                                 cout << "Energy is " << energy << " for " << ligand.name() << " in " << a.protein.name() << endl;
@@ -276,8 +280,9 @@ namespace Program {
 
                                         cout << "Minimized energy = " << energy << endl;
 
-                                        Inout::output_file (Molib::Molecule::print_complex (minimized_ligand, minimized_receptor, energy, std::nan("")),
-                                                            Path::join (cmdl.get_string_option("docked_dir"), minimized_ligand.name() + ".pdb"), ios_base::app);
+                                        std::stringstream ss;
+                                        Fileout::print_complex_pdb (ss,minimized_ligand, minimized_receptor, energy, std::nan(""));
+                                        Inout::output_file (ss.str(), Path::join (cmdl.get_string_option("docked_dir"), minimized_ligand.name() + ".pdb"), ios_base::app);
 
                                 } catch (exception &e) {
                                         log_error << "MINIMIZATION FAILED FOR LIGAND " << ligand.name()
@@ -336,6 +341,12 @@ namespace Program {
                             .compute_overlapping_rigid_segments(cmdl.get_string_option("seeds"));
 
                 Inout::output_file(all_designs, design_file);
+                
+                std::stringstream ss;
+                for (const auto &m : all_designs) {
+                        Fileout::print_mol2(ss,m);
+                }
+                Inout::output_file(ss.str(), "designed_0.mol2");
 
                 ligand_fragments.add_seeds_from_molecules(all_designs);
                 for ( auto &b : __preprecs ) {
@@ -352,13 +363,13 @@ namespace Program {
                 }
 #endif
 
-                int n = 1;
+                int n = 0;
                 Molib::Unique created_design("designed.txt");
                 while (true) { // Probably a bad idea
 
-                    log_step << "Starting design iteration #" << n << endl;
+                    log_step << "Starting design iteration #" << ++n << endl;
 
-                    string design_file = "designed_" + std::to_string(n++) + ".pdb";
+                    string design_file = "designed_" + std::to_string(n) + ".pdb";
                     Molib::Molecules all_designs;
                     if ( Inout::file_size(design_file) ) {
                             log_note << design_file << " found -- skipping generation of new designs this iteration" << endl;
@@ -411,6 +422,12 @@ namespace Program {
                                .compute_overlapping_rigid_segments(cmdl.get_string_option("seeds"));
 
                     Inout::output_file(all_designs, design_file);
+
+                    std::stringstream ss;
+                    for (const auto &m : all_designs) {
+                            Fileout::print_mol2(ss,m);
+                    }
+                    Inout::output_file(ss.str(), "designed_" + std::to_string(n) + ".mol2");
 
                     ligand_fragments.add_seeds_from_molecules(all_designs);
                     for ( auto &b : __preprecs ) {

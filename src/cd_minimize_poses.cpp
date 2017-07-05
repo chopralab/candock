@@ -8,6 +8,8 @@
 #include "version.hpp"
 #include "drm/drm.hpp"
 
+#include "fileout/fileout.hpp"
+
 using namespace std;
 using namespace Program;
 
@@ -114,7 +116,7 @@ int main(int argc, char* argv[]) {
                         Molib::Atom::Grid gridrec_min (minimized_receptor.get_atoms());
                         const double energy = score.non_bonded_energy (gridrec_min, minimized_ligand);
 
-                        std::cout << Molib::Molecule::print_complex (minimized_ligand, minimized_receptor, energy, std::nan(""), i + 1, 0xFFFFFF, std::nan(""));
+                        Fileout::print_complex_pdb (std::cout, minimized_ligand, minimized_receptor, energy, std::nan(""), i + 1, 0xFFFFFF, std::nan(""));
 
                         ffield.erase_topology(ligand);
 

@@ -7,6 +7,8 @@
 #include "helper/path.hpp"
 #include "helper/grep.hpp"
 
+#include "fileout/fileout.hpp"
+
 namespace Program {
 
         bool LinkFragments::__can_read_from_files () {
@@ -111,7 +113,6 @@ namespace Program {
                                 docked.get_ligand().change_residue_name ("CAN");
 
                                 double rmsd = std::nan ("");
-                                double rmsd_ord = std::nan("");
 
                                 if (cmdl.get_bool_option ("rmsd_crystal")) {
 
@@ -127,14 +128,14 @@ namespace Program {
                                         Molib::Atom::Graph docked_graph = Molib::Atom::create_graph(atoms);
 
                                         rmsd = Molib::Atom::compute_rmsd(cryst_graph, docked_graph);
-                                        rmsd_ord = Geom3D::compute_rmsd(crystal_ligand.get_crds(), docked.get_ligand().get_crds());
                                 }
 
                                 // output docked molecule conformations
-                                Inout::output_file (Molib::Molecule::print_complex (docked.get_ligand(), docked.get_receptor(),
-                                                                                    docked.get_energy(), docked.get_potential_energy(),
-                                                                                    ++model, docked.get_max_clq_identity(), rmsd, rmsd_ord),
-                                                    p.string(), ios_base::app);
+                                std::stringstream ss;
+                                Fileout::print_complex_pdb (ss, docked.get_ligand(), docked.get_receptor(),
+                                                        docked.get_energy(), docked.get_potential_energy(),
+                                                        ++model, docked.get_max_clq_identity(), rmsd);
+                                Inout::output_file (ss.str(), p.string(), ios_base::app);
                         }
 
                         __all_top_poses.add (new Molib::Molecule (docks[0].get_ligand()));

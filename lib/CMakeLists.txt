@@ -12,6 +12,7 @@ endif(WIN32)
 add_subdirectory(centro)
 add_subdirectory(cluster)
 add_subdirectory(drm)
+add_subdirectory(fileout)
 add_subdirectory(docker)
 add_subdirectory(design)
 add_subdirectory(fragmenter)
@@ -34,6 +35,7 @@ if (NOT ${CANDOCK_BUILD_STATIC_EXECUTABLE})
 add_library(
     candock SHARED
         $<TARGET_OBJECTS:interface>
+        $<TARGET_OBJECTS:fileout>
         $<TARGET_OBJECTS:program>
         $<TARGET_OBJECTS:design>
         $<TARGET_OBJECTS:docker>
