@@ -18,6 +18,17 @@ namespace Molib {
 		return ss.str();
 	}
 
+        string Bond::get_pdb_remark() const {
+                std::pair<int,int> bminmax = std::minmax(atom1().atom_number(), atom2().atom_number());
+
+                return
+                std::string("REMARK   8 BONDTYPE ") + std::to_string(get_bo()) +
+                                   " " + get_bond_gaff_type() +
+                                   " " + std::to_string(bminmax.first) +
+                                   " " + std::to_string(bminmax.second) +
+                                   "\n";
+        }
+
 	Bond::~Bond() { 
 		if (__owns_atoms) {
 			dbgmsg("deleting bond");
@@ -186,7 +197,7 @@ namespace Molib {
 		return BondGraph(std::move(create_bonds(edges)), true, false);
 	}
 
-	void Bond::erase_stale_refs(const Bond &deleted_bond, const BondVec &bonds) {
+	void erase_stale_bond_refs(const Bond &deleted_bond, const BondVec &bonds) {
 		for (auto &pbond : bonds) {
 			auto &bond = *pbond;
 #ifndef NDEBUG
@@ -228,4 +239,26 @@ namespace Molib {
 		BondVec bv(bonds.begin(), bonds.end());
 		return stream << bv;
 	}
+
+        bool BondPtrComp::operator() (const Bond* lhs, const Bond* rhs) const {
+                if (lhs->atom1().atom_number() < rhs->atom1().atom_number()) {
+                        return true;
+                }
+
+                if (lhs->atom1().atom_number() > rhs->atom1().atom_number()) {
+                        return false;
+                }
+
+                // Must be equal, check second atom
+                if (lhs->atom2().atom_number() < rhs->atom2().atom_number()) {
+                        return true;
+                }
+
+                if (lhs->atom2().atom_number() > rhs->atom2().atom_number()) {
+                        return false;
+                }
+
+                // It's the same bond....
+                return false;
+        }
 }; // Molib

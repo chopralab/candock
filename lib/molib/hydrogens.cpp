@@ -91,7 +91,7 @@ namespace Molib {
 									atom.erase(i--);
 									auto &shpbond = atom.get_shared_ptr_bond(bondee);
 									const Bond &deleted_bond = *shpbond;
-									Bond::erase_stale_refs(deleted_bond, atom.get_bonds()); // delete references 
+									erase_stale_bond_refs(deleted_bond, atom.get_bonds()); // delete references 
 									dbgmsg("shared_count1 = " << shpbond.use_count());
 									atom.erase_bond(bondee);
 									dbgmsg("shared_count2 = " << shpbond.use_count());

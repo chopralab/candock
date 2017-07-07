@@ -13,12 +13,9 @@
 using namespace std;
 
 namespace Molib {
-	class Atom;
-	class Bond;
+        class Atom;
+        class Bond;
 
-	typedef vector<Bond*> BondVec;
-	typedef set<Bond*> BondSet;
-	
 	class Bond : public template_vector_container<Bond*, Bond> {
 		Atom *__atom1, *__atom2;
 		int __idx1, __idx2;
@@ -65,24 +62,32 @@ namespace Molib {
 		int idx1() const { return __idx1; }
 		int idx2() const { return __idx2; }
 		double length() const;
-		static void erase_stale_refs(const Bond &deleted_bond, const BondVec &bonds);
 		friend ostream& operator<< (ostream& stream, const Bond& b);
 		// the following are required for BondGraph :-)
 		bool compatible(const Bond &other) const;
                 std::string get_label() const;
+                std::string get_pdb_remark() const;
 		int weight() const { return 0; } // dummy for graph ostream operator
 	};
-	
-	typedef Glib::Graph<Bond> BondGraph;
 
-	map<string, int> decode_smiles_prop(const vector<string> &s);
-	vector<unique_ptr<Bond>> create_bonds(const help::smiles &edges);
+        struct BondPtrComp
+        {
+                bool operator()(const Bond* lhs, const Bond* rhs) const;
+        };
+
+        typedef std::vector<Bond*> BondVec;
+        typedef std::set<Bond*, BondPtrComp> BondSet;
+        typedef Glib::Graph<Bond> BondGraph;
+
+        void erase_stale_bond_refs(const Bond &deleted_bond, const BondVec &bonds);
+	std::map<std::string, int> decode_smiles_prop(const std::vector<std::string> &s);
+	std::vector<std::unique_ptr<Bond>> create_bonds(const help::smiles &edges);
 	BondGraph create_graph(const help::smiles &edges);
 	void connect_bonds(const BondSet &bonds);
 	void erase_bonds(const BondSet &bonds);
 	BondGraph create_graph(const BondSet &bonds);
 
-	ostream& operator<< (ostream& stream, const BondVec& bonds);
-	ostream& operator<< (ostream& stream, const BondSet& bonds);
+	std::ostream& operator<< (std::ostream& stream, const BondVec& bonds);
+	std::ostream& operator<< (std::ostream& stream, const BondSet& bonds);
 } // Molib
 #endif

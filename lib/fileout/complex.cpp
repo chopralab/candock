@@ -36,20 +36,12 @@ namespace Fileout {
 
                         // Print internal bonds
                         for (auto pbond : get_bonds_in (presd->get_atoms())) {
-                                ss << "REMARK   8 BONDTYPE " << pbond->get_bo()
-                                   << " " << pbond->get_bond_gaff_type()
-                                   << " " << pbond->atom1().atom_number()
-                                   << " " << pbond->atom2().atom_number()
-                                   << "\n";
+                                ss << pbond->get_pdb_remark();
                         }
 
                         // Print external bonds
                         for (auto pbond : get_bonds_in (presd->get_atoms(), false)) {
-                                ss << "REMARK   8 BONDTYPE " << pbond->get_bo()
-                                   << " " << pbond->get_bond_gaff_type()
-                                   << " " << pbond->atom1().atom_number()
-                                   << " " << pbond->atom2().atom_number()
-                                   << "\n";
+                                ss << pbond->get_pdb_remark();
                         }
                 }
 
@@ -61,12 +53,7 @@ namespace Fileout {
                 }
 
                 for (auto &pbond : get_bonds_in (ligand.get_atoms())) {
-                        Molib::Bond &bond = *pbond;
-                        ss << "REMARK   8 BONDTYPE " << bond.get_bo()
-                           << " " << bond.get_bond_gaff_type()
-                           << " " << bond.atom1().atom_number()
-                           << " " << bond.atom2().atom_number()
-                           << "\n";
+                        ss << pbond->get_pdb_remark();
                 }
 
                 ss << "ENDMDL" << "\n";
