@@ -256,7 +256,7 @@ size_t initialize_scoring(const char* obj_dir) {
                                              __ligand->get_idatm_types())
                 .process_distributions_file ("data/csd_complete_distance_distributions.txt")
                 .compile_scoring_function()
-                .parse_objective_function (obj_dir, 10.0);
+                .parse_objective_function (obj_dir, 10.0, 1501);
 
                 return 1;
 

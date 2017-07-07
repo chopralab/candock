@@ -60,7 +60,6 @@ namespace Program {
 
                 // TODO: Instead of named function, pass in fully initiallized ProgramSteps????????
                 void find_centroids();
-                void rescore_docked (const FragmentLigands &ligand_fragments);
                 void dock_fragments (const FragmentLigands &ligand_fragments);
                 void link_fragments (const FragmentLigands &ligand_fragments);
                 void minimize_force (const FragmentLigands &ligand_fragments);

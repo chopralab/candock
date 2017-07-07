@@ -67,7 +67,7 @@ namespace Molib {
 		Score& process_distributions_file(const string &distributions_file);
 		Score& compile_scoring_function();
 		Score& compile_objective_function();
-		Score& parse_objective_function(const string &obj_dir, const double scale_non_bond);
+		Score& parse_objective_function(const string &obj_dir, const double scale_non_bond, const size_t max_step);
 		Score& output_objective_function(const string &obj_dir);
 
 		friend ostream& operator<< (ostream& stream, const vector<double> &energy);

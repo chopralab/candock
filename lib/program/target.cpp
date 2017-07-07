@@ -114,7 +114,7 @@ namespace Program {
                                                    ligand_fragments.ligand_idatm_types())
                               .process_distributions_file(cmdl.get_string_option("dist"))
                               .compile_scoring_function()
-                              .parse_objective_function(cmdl.get_string_option("obj_dir"), cmdl.get_double_option("scale"));
+                              .parse_objective_function(cmdl.get_string_option("obj_dir"), cmdl.get_double_option("scale"), 1501);
                 }
         }
 
@@ -162,32 +162,6 @@ namespace Program {
 
                         a.centroids = new FindCentroids(a.protein, a.filename);
                         a.centroids->run_step();
-                }
-        }
-
-        void Target::rescore_docked(const FragmentLigands& ligand_fragments) {
-
-                __initialize_score(ligand_fragments);
-                __initialize_ffield();
-
-                for ( auto &a : __preprecs ) {
-
-                        Parser::FileParser lpdb(cmdl.get_string_option("prep"), 
-                        Parser::all_models|Parser::hydrogens, 
-                        cmdl.get_int_option("max_num_ligands"));
-
-                        Molib::Molecules ligands = lpdb.parse_molecule();
-
-                        for ( auto &ligand : ligands ) {
-                                const double energy = a.score->non_bonded_energy(*a.gridrec, ligand);
-
-                                std::stringstream ss;
-                                Fileout::print_complex_pdb (ss, ligand, a.protein, energy, std::nan(""));
-                                Inout::output_file(ss.str(),
-                                Path::join( cmdl.get_string_option("docked_dir"), ligand.name() + ".pdb"),  ios_base::app);
-
-                                cout << "Energy is " << energy << " for " << ligand.name() << " in " << a.protein.name() << endl;
-                        }
                 }
         }
 

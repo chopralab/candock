@@ -77,7 +77,7 @@ namespace Molib {
 		return *this;
 	}
 
-        Score& Score::parse_objective_function(const string &obj_dir, const double scale_non_bond) {
+        Score& Score::parse_objective_function(const string &obj_dir, const double scale_non_bond, const size_t max_step) {
 
                 boost::filesystem::path path_to_objective_function(obj_dir);
                 std::string subdir = std::to_string(__step_non_bond);
@@ -118,10 +118,16 @@ namespace Molib {
                                 __energies[atom_pair].push_back(stod(str1));
                         }
 
-                        if ( __energies[atom_pair].size() < 1501 ) {
-                                size_t energies_diff = 1501 - __energies.size();
+                        if ( __energies[atom_pair].size() < max_step ) {
+                                int energies_diff = max_step - __energies[atom_pair].size();
 
-								for ( size_t i = 0; i < energies_diff; ++i ) {
+                                if (energies_diff < 0) {
+                                        log_warning << "Large atom pair: " << __energies[atom_pair].size()
+                                                    << " " << idatm_type1 << " " << idatm_type2 << endl;
+                                        __energies[atom_pair].resize(max_step);
+                                }
+
+                                for ( int i = 0; i < energies_diff; ++i ) {
                                         __energies[atom_pair].push_back(0.0);
                                 }
                         }
@@ -181,7 +187,7 @@ namespace Molib {
 				}
 			}
 		} else if (__comp == "complete") {
-			int sz = sizeof(help::idatm_unmask) / sizeof(help::idatm_unmask[0]);
+			int sz = help::idatm_mask.size();
 			for (int i = 0; i < sz; ++i) {
 				for (int j = i; j < sz; ++j) {
 					__prot_lig_pairs.insert({i, j});
