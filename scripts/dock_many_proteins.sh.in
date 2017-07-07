@@ -24,27 +24,27 @@ source $MCANDOCK_MOD_PATH/load_variables.sh
 
 cd $PBS_O_WORKDIR
 
-count=0
-current=1
+__count=0
+__current=1
 
 for i in `cat $prot_list`
 do
 
-    if [[ "$count" -ge "$p_limit" ]]
+    if [[ "$__count" -ge "$p_limit" ]]
     then
         break
     fi
 
-    if [[ "$current" -lt "$p_start" ]]
+    if [[ "$__current" -lt "$p_start" ]]
     then
-        current=$((current+1))
+        __current=$((__current+1))
         continue
     fi
 
     if [[ -d $i ]]
     then
         echo "Skipping $i, directory already exists"
-        count=$((count+1))
+        __count=$((__count+1))
         continue
     fi
 
@@ -63,7 +63,7 @@ do
 
     rm state.lck
 
-    count=$((count+1))
+    __count=$((__count+1))
 
     cd ..
 done
