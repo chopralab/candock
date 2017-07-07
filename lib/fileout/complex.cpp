@@ -12,7 +12,7 @@ namespace Fileout {
 
                 ss << "MODEL    " << model << "\n";
 
-                ss << "REMARK   1 MINIMIZED COMPLEX OF " << ligand.name() << " AND " << receptor.name() << " WITH SCORE OF " << energy << "\n";
+                ss << "REMARK   1 MINIMIZED COMPLEX OF " << ligand.name() << " AND " << receptor.name() << " WITH SCORE OF " << std::setprecision(6) << energy << endl;
 
                 if (! std::isnan (potential))
                         ss << "REMARK   2 POTENTIAL ENERGY OF " << ligand.name() << " IS " << potential << "\n";
