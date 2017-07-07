@@ -27,13 +27,13 @@ namespace Molib {
 		return stream;
 	}
 
-	void NRset::jiggle() {
-		srand((unsigned)time(NULL));
+	void NRset::jiggle(std::mt19937 rng) {
+		std::uniform_real_distribution<> dist_thousandth( -1.0f / 1000.0f, 1.0f / 1000.0f);
 		for (auto &patom : this->get_atoms()) {
 			dbgmsg("before jiggle crd = " << patom->crd());
-			Geom3D::Coordinate dcrd(((double)rand() / (double)RAND_MAX) / 1000, 
-				((double)rand() / (double)RAND_MAX) / 1000,
-				((double)rand() / (double)RAND_MAX) / 1000);
+			Geom3D::Coordinate dcrd(dist_thousandth(rng), 
+				dist_thousandth(rng),
+				dist_thousandth(rng));
 			patom->set_crd(patom->crd() + dcrd);
 			dbgmsg("after jiggle crd = " << patom->crd());
 		}

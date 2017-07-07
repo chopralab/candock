@@ -73,7 +73,15 @@ namespace Program {
                          * Jiggle the coordinates by one-thousand'th of an Angstrom to avoid minimization failures
                          * with initial bonded relaxation failed errors
                         */
-                        top_seeds.jiggle();
+                        std::mt19937 rng;
+                        
+                        if (cmdl.get_int_option("jiggle_seed") != -1) {
+                                rng.seed(cmdl.get_int_option("jiggle_seed"));
+                        } else {
+                                rng.seed(std::random_device()());
+                        }
+                        
+                        top_seeds.jiggle(rng);
 
                         /* Init minization options and constants, including ligand and receptor topology
                          *
