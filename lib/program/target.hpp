@@ -63,7 +63,6 @@ namespace Program {
                 void find_centroids();
                 void dock_fragments (const FragmentLigands &ligand_fragments);
                 void link_fragments (const FragmentLigands &ligand_fragments);
-                void minimize_force (const FragmentLigands &ligand_fragments);
                 void make_scaffolds (FragmentLigands &ligand_fragments, const std::set<std::string> &seeds_to_add);
                 void design_ligands (FragmentLigands &ligand_fragments, const std::set<std::string> &seeds_to_add);
 

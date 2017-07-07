@@ -70,12 +70,9 @@ set( program_names  cd_check_options
                     cd_calculate_rmsd
                     cd_calc_potential
                     cd_rescore_docked
-                    cd_minimize_force
                     cd_minimize_poses
                     cd_dynamics_run
 )
-
-# New programs with new features that change functionality
 
 foreach( candock_program ${program_names} )
 
