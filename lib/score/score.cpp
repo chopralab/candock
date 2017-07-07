@@ -79,6 +79,8 @@ namespace Molib {
 
         Score& Score::parse_objective_function(const string &obj_dir, const double scale_non_bond, const size_t max_step) {
 
+                log_step << "Parsing obj function from disk" << endl;
+
                 boost::filesystem::path path_to_objective_function(obj_dir);
                 std::string subdir = std::to_string(__step_non_bond);
 

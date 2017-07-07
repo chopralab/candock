@@ -50,6 +50,7 @@ namespace Program {
 
                 void __initialize_score(const FragmentLigands &ligand_fragments);
                 void __initialize_ffield();
+                void __initialize_kbforce();
 
         public:
                 Target (const std::string &input_name);

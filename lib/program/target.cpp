@@ -113,8 +113,7 @@ namespace Program {
                         a.score->define_composition(a.protein.get_idatm_types(),
                                                    ligand_fragments.ligand_idatm_types())
                               .process_distributions_file(cmdl.get_string_option("dist"))
-                              .compile_scoring_function()
-                              .parse_objective_function(cmdl.get_string_option("obj_dir"), cmdl.get_double_option("scale"), 1501);
+                              .compile_scoring_function();
                 }
         }
 
@@ -128,7 +127,6 @@ namespace Program {
                         OMMIface::ForceField* ffield = new OMMIface::ForceField;
 
                         ffield->parse_gaff_dat_file(cmdl.get_string_option("gaff_dat"))
-                                .add_kb_forcefield(*a.score, cmdl.get_double_option("step"), 15)
                                 .parse_forcefield_file(cmdl.get_string_option("amber_xml"))
                                 .parse_forcefield_file(cmdl.get_string_option("water_xml"));
 
@@ -140,6 +138,15 @@ namespace Program {
                         a.ffield = ffield;
 
                         a.protein.prepare_for_mm(*a.ffield, *a.gridrec);
+                }
+        }
+
+        void Target::__initialize_kbforce() {
+                OMMIface::SystemTopology::loadPlugins();
+
+                for (auto& a : __preprecs) {
+                        a.score->parse_objective_function(cmdl.get_string_option("obj_dir"), cmdl.get_double_option("scale"), 1501);
+                        a.ffield->add_kb_forcefield(*a.score, cmdl.get_double_option("step"), 15);
                 }
         }
 
@@ -187,7 +194,7 @@ namespace Program {
 
                 dock_fragments(ligand_fragments);
 
-                OMMIface::SystemTopology::loadPlugins();
+                __initialize_kbforce();
 
                 for ( auto &a : __preprecs ) {
 
