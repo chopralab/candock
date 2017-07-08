@@ -74,13 +74,18 @@ namespace Program {
                          * with initial bonded relaxation failed errors
                         */
                         std::mt19937 rng;
+                        std::random_device::result_type seed;
                         
                         if (cmdl.get_int_option("jiggle_seed") != -1) {
-                                rng.seed(cmdl.get_int_option("jiggle_seed"));
+                                seed = static_cast<std::random_device::result_type>(cmdl.get_int_option("jiggle_seed"));
                         } else {
-                                rng.seed(std::random_device()());
+                                // Fix issue with getting default values....
+                                seed = std::random_device()() >> 2;
+                                log_step << "Seed for " << ligand.name() << " is " << seed << endl;
                         }
-                        
+
+                        rng.seed(seed);
+
                         top_seeds.jiggle(rng);
 
                         /* Init minization options and constants, including ligand and receptor topology
@@ -140,6 +145,7 @@ namespace Program {
 
                                 // output docked molecule conformations
                                 std::stringstream ss;
+                                ss << "REMARK   4 SEED USED FOR " << ligand.name() << " IS " << seed << "\n";
                                 Fileout::print_complex_pdb (ss, docked.get_ligand(), docked.get_receptor(),
                                                         docked.get_energy(), docked.get_potential_energy(),
                                                         ++model, docked.get_max_clq_identity(), rmsd);
