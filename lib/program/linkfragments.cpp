@@ -76,7 +76,7 @@ namespace Program {
                         std::mt19937 rng;
                         std::random_device::result_type seed;
                         
-                        if (cmdl.get_int_option("jiggle_seed") != -1) {
+                        if (cmdl.get_int_option("jiggle_seed") != -1 && cmdl.get_int_option("jiggle_seed") != -2) {
                                 seed = static_cast<std::random_device::result_type>(cmdl.get_int_option("jiggle_seed"));
                         } else {
                                 // Fix issue with getting default values....
@@ -84,9 +84,10 @@ namespace Program {
                                 log_step << "Seed for " << ligand.name() << " is " << seed << endl;
                         }
 
-                        rng.seed(seed);
-
-                        top_seeds.jiggle(rng);
+                        if (cmdl.get_int_option("jiggle_seed") != -2) {
+                            rng.seed(seed);
+                            top_seeds.jiggle(rng);
+                        }
 
                         /* Init minization options and constants, including ligand and receptor topology
                          *
