@@ -4,7 +4,7 @@
 
 #include "helper/path.hpp"
 #include "helper/inout.hpp"
-#include "options.hpp"
+#include "program/options.hpp"
 #include "helper/grep.hpp"
 #include "molib/atomtype.hpp"
 
@@ -34,10 +34,10 @@ namespace Program {
                 const Molib::Molecules& all_seeds = __fragmented_ligands.seeds();
 
                 // No early return so that we have the ability to redock missing seeds
-                const string &top_seeds_file= cmdl.get_string_option("top_seeds_file");
                 for (const auto& seed : all_seeds) {
                         boost::filesystem::path p (__top_seeds_location);
-                        p = p / seed.name() / top_seeds_file;
+                        p = p / seed.name();
+                        p += ".pdb";
                         if (Inout::file_size(p.string()) <= 0)
                                 return false;
                 }
@@ -50,12 +50,12 @@ namespace Program {
         }
 
         void DockFragments::__dock_fragment ( int start, const Docker::Gpoints& gpoints, const Docker::Gpoints& gpoints0 ) {
-                // iterate over docked seeds and dock unique seeds
-                const string &top_seeds_file= cmdl.get_string_option("top_seeds_file");
 
+                // iterate over docked seeds and dock unique seeds
                 for (size_t j = start; j < __fragmented_ligands.seeds().size(); j+= cmdl.ncpu()) {
                         boost::filesystem::path p (__top_seeds_location);
-                        p = p / __fragmented_ligands.seeds() [j].name() / top_seeds_file;
+                        p = p / __fragmented_ligands.seeds() [j].name();
+                        p += (".pdb");
 
                         try {
                                 if ( Inout::file_size(p.string()) > 0 ) {
@@ -102,8 +102,7 @@ namespace Program {
 
         void DockFragments::__continue_from_prev () {
 
-                log_step << "Docking fragments into: " << __top_seeds_location << 
-                        ". Files will be named: " << cmdl.get_string_option("top_seeds_file") << endl;
+                log_step << "Docking fragments into: " << __top_seeds_location  << endl;
 
                 /* Create gridpoints for ALL centroids representing one or more binding sites
                  * 
@@ -148,7 +147,8 @@ namespace Program {
                         dbgmsg("Reading: " << seed.name() << endl);
                         try {
                                 boost::filesystem::path p (__top_seeds_location);
-                                p = p / seed.name() / cmdl.get_string_option("top_seeds_file");
+                                p = p / seed.name();
+                                p += ".pdb";
                                 Parser::FileParser spdb (p.string(), Parser::first_model, 1);
 
                                 Molib::Molecules seed_molec = spdb.parse_molecule();
@@ -180,7 +180,8 @@ namespace Program {
 
                         boost::filesystem::path file_to_read(__top_seeds_location);
                         file_to_read /= fragment;
-                        file_to_read /= cmdl.get_string_option("top_seeds_file");
+                        file_to_read += ".pdb";
+
                         std::ifstream file( file_to_read.c_str() );
 
                         const size_t number_of_seeds = Grep::count_matches(file, regex);

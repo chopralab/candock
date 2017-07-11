@@ -98,8 +98,6 @@ namespace Program {
 			frag_dock_options.add_options()
 			("top_seeds_dir",  po::value<std::string> ()->default_value (""),
 			 "Directory for saving top docked seeds")
-			("top_seeds_file",   po::value<std::string> ()->default_value ("top_seeds.pdb"),
-			 "Top seeds output file")
 			("gridpdb_hcp",    po::value<std::string> ()->default_value ("gridpdb_hcp.pdb"),
 			 "Grid pdb hcp file for output")
 			("max_frag_radius", po::value<double> ()->default_value (16.0, "16.0"),
