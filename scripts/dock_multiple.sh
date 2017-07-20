@@ -53,7 +53,9 @@ do
         continue
     fi
 
-    $MCANDOCK_MOD_PATH/submit_candock_module.sh $__command -N $(basename $__working_dir)_$i $([[ ! -z "$@" ]] && echo "$@") -o $i/$(basename $working_dir)_${i}_output.log -e $i/$(basename $working_dir)_${i}_errors.log
+    $MCANDOCK_MOD_PATH/submit_candock_module.sh $__command -N $(basename $__working_dir)_$i $([[ ! -z "$@" ]] && echo "$@") \
+                                                           -o $i/$(basename $__working_dir)_${i}_output.log \
+                                                           -e $i/$(basename $__working_dir)_${i}_errors.log
 
     __count=$((__count+1))
 

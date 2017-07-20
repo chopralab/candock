@@ -32,6 +32,17 @@ if ($print_title) {
 }
 
 while (my $line = <>) {
+    if ( $line =~ /REMARK  20 non-binder (\S+)/) {
+        $currlig = $1;
+        $currkey = "non";
+
+        unless ( defined $poses{$currlig} ) {
+            $poses{"non"} = {};
+        }
+
+        $poses{$currlig}->{"non"} = {PROTEIN=>[], LIGAND=>[], SCORE=>10000};
+    }
+
     if ( $line =~ /^REMARK.*COMPLEX OF (\S*).* SCORE OF (\S*)/) {
         $currkey = $.;
         $currlig = $1;
@@ -44,11 +55,11 @@ while (my $line = <>) {
         <>;
     }
 
-    elsif ( $line =~ /^ATOM  / ) {
+    elsif ( ! $no_make_files && $line =~ /^ATOM  / ) {
         push @{$poses{$currlig}->{$currkey}->{PROTEIN}}, substr( $line, 0, 80 );
     }
 
-    elsif ( $line =~ /^HETATM/ ) {
+    elsif ( ! $no_make_files && $line =~ /^HETATM/ ) {
         push @{$poses{$currlig}->{$currkey}->{LIGAND}}, substr( $line, 0, 80 );
     }
 }
