@@ -18,7 +18,9 @@ nc-fe-nc   38.000 147.303
 nd-fe-nd   38.000 147.778
 SH-fe-nc   13.000 106.153 # average angle
 SH-fe-nd   13.000 106.153 # average angle
+SH-fe-n    13.000 106.153
 CT-SH-fe   39.000 111.514
+c3-SH-fe   39.000 111.514
 cc-cc-cg   65.600 123.920 # same as cc-cc-cf  65.6   123.92 SOURCE3   
 cd-cd-cg   65.600 123.920 # same as cc-cc-cf  65.6   123.92 SOURCE3   
 nc-cc-cg   68.500 123.000 # same as cf-cf-n2  68.5   123.00 SOURCE3 
@@ -49,6 +51,8 @@ cc-nd-fe-nd  1     1.600     180.000       2.000
 cd-nc-fe-nc  1     1.600     180.000       2.000
 cc-nc-fe-SH  1     2.400     180.000       2.000
 cd-nd-fe-SH  1     2.400     180.000       2.000
+c3-n -fe-SH  1     2.400     108.000       2.000
+c3-c3-SH-fe  1     2.400      80.000       2.000
 
 IMPROPER
 
