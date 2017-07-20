@@ -4,7 +4,7 @@
 
 //~ Maxclique::Maxclique (const Array2d<bool> &conn, const vector<double> &scores, const float tt) : __conn(conn), __scores(scores), pk(0), level(1), Tlimit(tt), V(conn.get_szi()), Q(conn.get_szi()), QMAX(conn.get_szi()) {
 Maxclique::Maxclique (const Array2d<bool> &conn, const float tt) : __conn(conn), pk(0), level(1), Tlimit(tt), V(conn.get_szi()), QMAX(conn.get_szi()), Q(conn.get_szi()) {
-  if (conn.get_szi()==0) throw Error("WARNING: Graph is empty (meaning that the molecule is built of non-seed fragments only)."); // fixes issue #116
+  if (conn.get_szi()==0) throw Error("WARNING: Graph is empty\n(ussually means that the molecule is built of non-seed fragments only and you need to increase the binding site size)."); // fixes issue #116
   for (size_t i=0; i < conn.get_szi(); i++) V.push(i);
   C = new ColorClass[conn.get_szi() + 1];
   for (size_t i=0; i < conn.get_szi() + 1; i++) C[i].init(conn.get_szi() + 1);
