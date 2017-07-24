@@ -25,7 +25,7 @@ namespace Program {
 			po::options_description generic ("Generic options");
 			generic.add_options()
 			("help,h", "Show this help")
-			("conifg,c", po::value<std::string> (&config_file)->default_value (""), "Configuration File")
+			("config,c", po::value<std::string> (&config_file)->default_value (""), "Configuration File")
 			("ncpu",     po::value<int> (&__ncpu)             ->default_value(-1),
 			 "Number of CPUs to use concurrently (use -1 to use all CPUs)")
 			;
