@@ -13,6 +13,8 @@
 : ${MCANDOCK_poses:=1}
 : ${MCANDOCK_pymol:=/depot/gchopra/apps/pymol/pymol}
 
+: ${MCANDOCK_NCPU:=-1}
+
 : ${CANDOCK_bslib:=$MCANDOCK_SUP_PATH/bslibdb}
 : ${CANDOCK_names:=$MCANDOCK_SUP_PATH/bslibdb/data/names}
 : ${CANDOCK_bio:=$MCANDOCK_SUP_PATH/bslibdb/data/bio}
@@ -49,68 +51,6 @@ then
 else
         : ${MCANDOCK_working_dir:=$PWD}
 fi
-
-function find_centroids() {
-
-    cd $MCANDOCK_working_dir
-    echo "Running find_centroids in $PWD"
-
-    SECONDS=0
-
-    $MCANDOCK_PATH/bin/$MCANDOCK_VER/cd_find_centroids
-
-    echo "Finding centroids took $SECONDS seconds to complete"
-
-}
-
-function prep_fragments() {
-
-    cd $MCANDOCK_working_dir
-    echo "Running fragment in $PWD"
-
-    SECONDS=0
-
-    $MCANDOCK_PATH/bin/$MCANDOCK_VER/cd_prep_fragments
-
-    echo "Fragmenting took $SECONDS seconds to complete"
-}
-
-function dock_fragments() {
-
-    cd $MCANDOCK_working_dir
-    echo "Running dock in $PWD"
-
-    SECONDS=0
-
-    $MCANDOCK_PATH/bin/$MCANDOCK_VER/cd_dock_fragments
-
-    echo "Docking of fragments took $SECONDS seconds to complete"
-}
-
-function link_fragments() {
-
-    cd $MCANDOCK_working_dir
-    echo "Running link in $PWD"
-
-    SECONDS=0
-
-    $MCANDOCK_PATH/bin/$MCANDOCK_VER/cd_link_fragments
-
-    echo "Linking of fragments took $SECONDS seconds to complete"
-}
-
-function design_ligands() {
-
-    cd $MCANDOCK_working_dir
-    echo "Running design in $PWD"
-
-    SECONDS=0
-
-    $MCANDOCK_PATH/bin/$MCANDOCK_VER/cd_design_ligands
-
-    echo "Design of ligands took $SECONDS seconds to complete"
-
-}
 
 function extract_result() {
     cd $MCANDOCK_working_dir
