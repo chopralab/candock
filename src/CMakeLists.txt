@@ -66,6 +66,7 @@ set( program_names  cd_check_options
                     cd_make_objective
                     cd_dock_fragments
                     cd_link_fragments
+                    cd_design_ligands
                     cd_cacrystal_rmsd
                     cd_calculate_rmsd
                     cd_calc_potential
