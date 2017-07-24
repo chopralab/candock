@@ -41,9 +41,9 @@ do
         continue
     fi
 
-    export CANDOCK_receptor=$working_dir/structures/$i.pdb
-    export CANDOCK_centroid=$working_dir/structures/$i.cen
-    export CANDOCK_top_seeds_dir=$working_dir/seeds_database/$i/top_seeds
+    export CANDOCK_receptor=$__working_dir/structures/$i.pdb
+    export CANDOCK_centroid=$__working_dir/structures/$i.cen
+    export CANDOCK_top_seeds_dir=$__working_dir/seeds_database/$i/top_seeds
 
     if [[ ! -d $i ]]
     then
