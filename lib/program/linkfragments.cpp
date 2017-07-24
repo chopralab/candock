@@ -21,25 +21,38 @@ namespace Program {
                 boost::filesystem::path p (__receptor.name());
                 p /= cmdl.get_string_option ("docked_dir");
 
-                bool is_done = true;
-
                 for (auto molec : all_names) {
                         boost::filesystem::path p2 = p / (molec + ".pdb");
 
                         if (Inout::file_size (p2.string()) <= 0) {
-                                is_done = false;
-                        } else {
-                                Parser::FileParser conf (p2.string(), Parser::skip_atom | Parser::first_model, 1);
-                                conf.parse_molecule (__all_top_poses);
-                                __all_top_poses.last().set_name (molec);
+                                return false;
                         }
                 }
 
-                return is_done;
+                log_note << "Linking for all molecules in " << cmdl.get_string_option ("prep") << " for " << __receptor.name() << " is complete, skipping." << endl;
+
+                return true;
         }
 
         void LinkFragments::__read_from_files () {
-                log_note << "Linking for all molecules in " << cmdl.get_string_option ("prep") << " for " << __receptor.name() << " is complete, skipping." << endl;
+
+                boost::regex regex;
+                regex.assign ("REMARK   5 MOLECULE (\\w*)");
+                std::ifstream file (cmdl.get_string_option ("prep"));
+
+                std::vector<std::string> all_names = Grep::search_stream (file, regex);
+
+                boost::filesystem::path p (__receptor.name());
+                p /= cmdl.get_string_option ("docked_dir");
+
+                for (auto molec : all_names) {
+                        boost::filesystem::path p2 = p / (molec + ".pdb");
+
+                        Parser::FileParser conf (p2.string(), Parser::skip_atom | Parser::first_model, 1);
+                        conf.parse_molecule (__all_top_poses);
+                        __all_top_poses.last().set_name (molec);
+                }
+
         }
 
         void LinkFragments::__link_ligand (Molib::Molecule &ligand, const OMMIface::ForceField &ffield) {
@@ -48,6 +61,11 @@ namespace Program {
 
                 if (Inout::file_size (p.string()) > 0) {
                         log_note << ligand.name() << " is alread docked to " << __receptor.name() << ", skipping." << endl;
+
+                        Parser::FileParser conf (p.string(), Parser::skip_atom | Parser::first_model, 1);
+                        conf.parse_molecule (__all_top_poses);
+                        __all_top_poses.last().set_name (ligand.name());
+
                         return;
                 }
 
@@ -193,10 +211,10 @@ namespace Program {
                                                 ffcopy.insert_topology (ligand);
                                                 __link_ligand (ligand, ffcopy);
                                                 ffcopy.erase_topology (ligand); // he he
-                                                ligands.clear();
                                         } catch (exception &e) {
                                                 log_error << "Error: problem with ligand " << ligand.name() << " due to : " << e.what() << endl;
                                         }
+                                        ligands.clear();
                                 }
                         }));
                 }
