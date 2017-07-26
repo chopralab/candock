@@ -58,31 +58,31 @@ if (NOT WIN32)
 
 endif(NOT WIN32)
 
-set( program_names  cd_check_options
-                    cd_find_centroids
-                    cd_output_mol2
-                    cd_process_input
-                    cd_prep_fragments
-                    cd_make_objective
-                    cd_dock_fragments
-                    cd_link_fragments
-                    cd_design_ligands
-                    cd_cacrystal_rmsd
-                    cd_calculate_rmsd
-                    cd_calc_potential
-                    cd_rescore_docked
-                    cd_minimize_poses
-                    cd_dynamics_run
+set( program_names  check_options
+                    find_centroids
+                    output_mol2
+                    process_input
+                    prep_fragments
+                    make_objective
+                    dock_fragments
+                    link_fragments
+                    design_ligands
+                    cacrystal_rmsd
+                    calculate_rmsd
+                    calc_potential
+                    rescore_docked
+                    minimize_poses
+                    dynamics_run
 )
 
 foreach( candock_program ${program_names} )
 
-    add_executable( ${candock_program} "${candock_program}.cpp"  ${CANDOCK_SRC})
+    add_executable( cd_${candock_program} "cd_${candock_program}.cpp"  ${CANDOCK_SRC})
 
-    target_link_libraries( ${candock_program}  ${all_needed_libraries} )
+    target_link_libraries( cd_${candock_program} ${all_needed_libraries} )
 
     set_target_properties(
-        ${candock_program}
+        cd_${candock_program}
         PROPERTIES
         INSTALL_RPATH ${CMAKE_INSTALL_PREFIX}/lib/${CANDOCK_VERSION}:${CMAKE_INSTALL_PREFIX}/lib/ext
         INSTALL_RPATH_USE_LINK_PATH TRUE
@@ -90,12 +90,23 @@ foreach( candock_program ${program_names} )
 
     install(
         TARGETS
-            ${candock_program}
+            cd_${candock_program}
 
         RUNTIME DESTINATION
             bin/${CANDOCK_VERSION}
     )
 
+    if( NOT WIN32 )
+    
+        install(CODE "execute_process(
+                  WORKING_DIRECTORY  ${CMAKE_INSTALL_PREFIX}/modules/${CANDOCK_VERSION}
+                  COMMAND ${CMAKE_COMMAND} -E create_symlink module.sh ${candock_program}.sh)")
+
+    else ( NOT WIN32 )
+        install(CODE "execute_process(
+                  WORKING_DIRECTORY  ${CMAKE_INSTALL_PREFIX}/modules/${CANDOCK_VERSION}
+                  COMMAND ${CMAKE_COMMAND} -E copy module.sh ${candock_program}.sh)")
+    endif( NOT WIN32 )
 endforeach( candock_program ${program_names} )
 
 if( ${CANDOCK_DRM} )

@@ -23,13 +23,6 @@ install( PROGRAMS ${PROJECT_BINARY_DIR}/load_variables.sh
                   ${PROJECT_SOURCE_DIR}/scripts/dock_multiple.sh
                   ${PROJECT_SOURCE_DIR}/scripts/submit_many_proteins.sh
                   
-                  ${PROJECT_SOURCE_DIR}/scripts/find_centroids.sh
-                  ${PROJECT_SOURCE_DIR}/scripts/prep_fragments.sh
-                  ${PROJECT_SOURCE_DIR}/scripts/make_fragments.sh
-                  ${PROJECT_SOURCE_DIR}/scripts/dock_fragments.sh
-                  ${PROJECT_SOURCE_DIR}/scripts/link_fragments.sh
-                  ${PROJECT_SOURCE_DIR}/scripts/design_ligands.sh
-                  ${PROJECT_SOURCE_DIR}/scripts/extract_result.sh
          DESTINATION
-                  ${CMAKE_INSTALL_PREFIX}/modules/v${CANDOCK_MAJOR_VERSION}.${CANDOCK_MINOR_VERSION}.${CANDOCK_TWEAK_VERSION}
+                  ${CMAKE_INSTALL_PREFIX}/modules/${CANDOCK_VERSION}
 )
