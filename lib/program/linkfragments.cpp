@@ -55,22 +55,17 @@ namespace Program {
 
         }
 
-        void LinkFragments::__link_ligand (Molib::Molecule &ligand, const OMMIface::ForceField &ffield) {
+        void LinkFragments::__link_ligand (Molib::Molecule &ligand) {
+
                 boost::filesystem::path p (__receptor.name());
                 p = p / cmdl.get_string_option ("docked_dir") / (ligand.name() + ".pdb");
 
-                if (Inout::file_size (p.string()) > 0) {
-                        log_note << ligand.name() << " is alread docked to " << __receptor.name() << ", skipping." << endl;
-
-                        Parser::FileParser conf (p.string(), Parser::skip_atom | Parser::first_model, 1);
-                        conf.parse_molecule (__all_top_poses);
-                        __all_top_poses.last().set_name (ligand.name());
-
-                        return;
-                }
+                OMMIface::ForceField ffcopy (__ffield);
 
                 // if docking of one ligand fails, docking of others shall continue...
                 try {
+                        ffcopy.insert_topology (ligand);
+
                         dbgmsg ("LINKING LIGAND : " << endl << ligand);
 
                         if (ligand.first().first().get_rigid().size() < 1) {
@@ -110,7 +105,7 @@ namespace Program {
                         /* Init minization options and constants, including ligand and receptor topology
                          *
                          */
-                        OMMIface::Modeler modeler (ffield, cmdl.get_string_option ("fftype"), cmdl.get_int_option ("cutoff"),
+                        OMMIface::Modeler modeler (ffcopy, cmdl.get_string_option ("fftype"), cmdl.get_int_option ("cutoff"),
                                                    cmdl.get_double_option ("mini_tol"), cmdl.get_int_option ("max_iter"), cmdl.get_int_option ("update_freq"),
                                                    cmdl.get_double_option ("pos_tol"), false, cmdl.get_double_option("dynamic_step_size"),
                                                    cmdl.get_double_option("temperature"), cmdl.get_double_option("friction"));
@@ -172,6 +167,7 @@ namespace Program {
                         }
 
                         __all_top_poses.add (new Molib::Molecule (docks[0].get_ligand()));
+                        ffcopy.erase_topology (ligand);
                 } catch (exception &e) {
                         log_error << "Error: skipping ligand " << ligand.name() << " with " << __receptor.name() << " due to : " << e.what() << endl;
                         stringstream ss;
@@ -192,28 +188,39 @@ namespace Program {
 
                 Parser::FileParser lpdb2 (cmdl.get_string_option ("prep"), Parser::all_models, 1);
 
+                std::mutex concurrent_numbering;
+                std::mutex additon_to_top_dock;
                 std::vector<std::thread> threads;
 
                 for (int i = 0; i < cmdl.ncpu(); ++i) {
                         threads.push_back (std::thread ([ &,this] {
-                                OMMIface::ForceField ffcopy (__ffield);
                                 Molib::Molecules ligands;
 
                                 while (lpdb2.parse_molecule (ligands)) {
 
                                         Molib::Molecule &ligand = ligands.first();
+                                        
+                                        boost::filesystem::path p (__receptor.name());
+                                        p = p / cmdl.get_string_option ("docked_dir") / (ligand.name() + ".pdb");
+
+                                        if (Inout::file_size (p.string()) > 0) {
+                                                std::lock_guard<std::mutex> guard(additon_to_top_dock);
+                                                log_note << ligand.name() << " is alread docked to " << __receptor.name() << ", skipping." << endl;
+
+                                                Parser::FileParser conf (p.string(), Parser::skip_atom | Parser::first_model | Parser::docked_poses_only, 1);
+                                                conf.parse_molecule (__all_top_poses);
+                                                __all_top_poses.last().set_name (ligand.name());
+                                                ligands.clear();
+
+                                                continue;
+                                        }
+
                                         /**
                                          * Ligand's resn MUST BE UNIQUE for ffield
                                          */
-                                        ligand.change_residue_name (__concurrent_numbering, __ligand_cnt);
+                                        ligand.change_residue_name (concurrent_numbering, __ligand_cnt);
 
-                                        try {
-                                                ffcopy.insert_topology (ligand);
-                                                __link_ligand (ligand, ffcopy);
-                                                ffcopy.erase_topology (ligand); // he he
-                                        } catch (exception &e) {
-                                                log_error << "Error: problem with ligand " << ligand.name() << " due to : " << e.what() << endl;
-                                        }
+                                        __link_ligand (ligand);
                                         ligands.clear();
                                 }
                         }));
@@ -231,11 +238,11 @@ namespace Program {
 
                 std::vector<std::thread> threads;
                 std::mutex counter_protect;
+                std::mutex concurrent_numbering;
+                std::mutex additon_to_top_dock;
 
                 for (int i = 0; i < cmdl.ncpu(); ++i) {
                         threads.push_back (std::thread ([ &,this] {
-                                OMMIface::ForceField ffcopy (__ffield);
-
                                 while (true) {
                                         unique_lock<std::mutex> guard (counter_protect, std::defer_lock);
                                         guard.lock();
@@ -247,13 +254,25 @@ namespace Program {
 
                                         guard.unlock();
 
+                                        boost::filesystem::path p (__receptor.name());
+                                        p = p / cmdl.get_string_option ("docked_dir") / (ligand.name() + ".pdb");
+
+                                        if (Inout::file_size (p.string()) > 0) {
+                                                std::lock_guard<std::mutex> guard(additon_to_top_dock);
+                                                log_note << ligand.name() << " is alread docked to " << __receptor.name() << ", skipping." << endl;
+
+                                                Parser::FileParser conf (p.string(), Parser::skip_atom | Parser::first_model, 1);
+                                                conf.parse_molecule (__all_top_poses);
+                                                __all_top_poses.last().set_name (ligand.name());
+
+                                                continue;
+                                        }
+
                                         /**
                                          * Ligand's resn MUST BE UNIQUE for ffield
                                          */
-                                        ligand.change_residue_name (__concurrent_numbering, __ligand_cnt);
-                                        ffcopy.insert_topology (ligand);
-                                        __link_ligand (ligand, ffcopy);
-                                        ffcopy.erase_topology (ligand); // he he
+                                        ligand.change_residue_name (concurrent_numbering, __ligand_cnt);
+                                        __link_ligand (ligand);
                                 }
                         }));
                 }
