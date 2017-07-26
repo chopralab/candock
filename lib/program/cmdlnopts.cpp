@@ -14,21 +14,18 @@ namespace po = boost::program_options;
 
 namespace Program {
 
-	void CmdLnOpts::__init (int argc, char *argv[], int opts_to_parse) {
+        void CmdLnOpts::__init (int argc, char *argv[], int opts_to_parse) {
  
-		__program_name = argv[0];
+                __program_name = argv[0];
 
-		try {
+                try {
 
-			std::string config_file;
+                        std::string config_file;
 
-			po::options_description generic ("Generic options");
-			generic.add_options()
-			("help,h", "Show this help")
-			("config,c", po::value<std::string> (&config_file)->default_value (""), "Configuration File")
-			("ncpu",     po::value<int> (&__ncpu)             ->default_value(-1),
-			 "Number of CPUs to use concurrently (use -1 to use all CPUs)")
-			;
+                        po::options_description generic ("Generic options");
+                        generic.add_options()
+                        ("help,h", "Show this help")
+                        ;
 
                         po::options_description logging ("Logging options");
                         logging.add_options()
@@ -38,13 +35,16 @@ namespace Program {
                         ("benchmark", "Show timings for benchmarking purposes")
                         ;
 
-			po::options_description starting_inputs ("Starting Input Files");
-			starting_inputs.add_options()
-			("receptor", po::value<std::string> ()->default_value("receptor.pdb"),
-			 "Receptor filename")
-			("ligand",   po::value<std::string> ()  ->default_value("ligands.mol2"),
-			 "Ligand filename")
-			;
+                        po::options_description starting_inputs ("Starting Input Files");
+                        starting_inputs.add_options()
+                        ("receptor", po::value<std::string> ()->default_value("receptor.pdb"),
+                         "Receptor filename")
+                        ("ligand",   po::value<std::string> ()  ->default_value("ligands.mol2"),
+                         "Ligand filename")
+                        ("config,c", po::value<std::string> (&config_file)->default_value (""), "Configuration File")
+                        ("ncpu",     po::value<int> (&__ncpu)             ->default_value(-1),
+                         "Number of CPUs to use concurrently (use -1 to use all CPUs)")
+                        ;
 
 			po::options_description probis_options ("Probis (binding site indentification) Options");
 			probis_options.add_options()
@@ -164,8 +164,6 @@ namespace Program {
 			 "Maximum iterations for final minimization")
 			("update_freq", po::value<int> ()->default_value (10),
 			 "Update non-bond frequency")
-                        //("run_dynamics", po::value<bool>()->default_value(false,"false")->implicit_value(true),
-                        // "Run dynamics instead of minimzation")
                         ("temperature", po::value<double>()->default_value(300.0f, "300"),
                          "Temperature to run the dynamic simulation at.")
                         ("friction",    po::value<double>()->default_value(91.f, "91.0"),
