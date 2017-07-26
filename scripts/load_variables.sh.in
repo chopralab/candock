@@ -13,8 +13,6 @@
 : ${MCANDOCK_poses:=1}
 : ${MCANDOCK_pymol:=/depot/gchopra/apps/pymol/pymol}
 
-: ${MCANDOCK_NCPU:=-1}
-
 : ${CANDOCK_bslib:=$MCANDOCK_SUP_PATH/bslibdb}
 : ${CANDOCK_names:=$MCANDOCK_SUP_PATH/bslibdb/data/names}
 : ${CANDOCK_bio:=$MCANDOCK_SUP_PATH/bslibdb/data/bio}
