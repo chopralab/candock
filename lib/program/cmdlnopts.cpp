@@ -184,7 +184,7 @@ namespace Program {
 			 "Enable iterative minimization during linking")
 			("cuda",       po::value<bool> ()->default_value (false, "false")->implicit_value(true),
 			 "Enable cuda iterative linker during linking")
-                        ("jiggle_seed",po::value<int>  ()->default_value (-1),
+                        ("jiggle_seed",po::value<int>  ()->default_value (0x5f3759df),
                          "Seed to use for randomization of top_seed positions. -1 will set the seed by random device, -2 will disable jiggle.")
 			("top_percent",     po::value<double> ()->default_value (0.05, "0.05"),
 			 "Top percent of each docked seed to extend to full molecule")
