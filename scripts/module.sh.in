@@ -16,7 +16,8 @@ __sub_program=$(basename $(basename $0 .sh) )
 if [[ $PBS_ENVIRONMENT == PBS_BATCH ]]
 then
         __sub_program=$(basename $module_to_run .sh)
-        : ${CANDOCK_NCPU:=$(cat $PBS_NODEFILE | egrep -v '^#'\|'^$' | wc -l | awk '{print $1}')}
+        : ${CANDOCK_NCPU:=$(grep -cv '^#|^$' ${PBS_NODEFILE})}
+        export CANDOCK_NCPU
 fi
 
 echo "Using modules in $MCANDOCK_MOD_PATH"

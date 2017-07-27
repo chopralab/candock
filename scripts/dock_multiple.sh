@@ -2,7 +2,7 @@
 
 : ${MCANDOCK_MOD_PATH:=$( cd $( dirname ${BASH_SOURCE[0]} ) && pwd )}
 
-if [[ ! -z $PBS_ENVIRONMENT ]]
+if [[ $PBS_ENVIRONMENT == PBS_BATCH ]]
 then
     echo "DO NOT 'qsub' this script :-)"
     exit 1
@@ -19,16 +19,13 @@ export CANDOCK_prep=$__working_dir/compounds/prepared_ligands.pdb
 export CANDOCK_seeds=$__working_dir/compounds/seeds.txt
 export CANDOCK_seeds_pdb=$__working_dir/compounds/seeds.pdb
 
-: ${MCANDOCK_relaunch:=0}
-
 : ${MCANDOCK_limit:=1000}
 : ${MCANDOCK_start:=1}
 
 __count=0
 __current=1
 
-for i in `cat $__prot_list`
-do
+while read i || [[ -n $i ]]; do
 
     if [[ "$__count" -ge "$MCANDOCK_limit" ]]
     then
@@ -48,15 +45,22 @@ do
     if [[ ! -d $i ]]
     then
         mkdir $i
-    elif [[ "$MCANDOCK_relaunch" -eq "0" ]]
+    elif [[ -z $MCANDOCK_relaunch ]]
+    then
         echo "Warning: previous run for $i, using previous results"
         continue
     fi
 
-    $MCANDOCK_MOD_PATH/submit_candock_module.sh $__command -N $(basename $__working_dir)_$i $([[ ! -z "$@" ]] && echo "$@") \
-                                                           -o $i/$(basename $__working_dir)_${i}_output.log \
-                                                           -e $i/$(basename $__working_dir)_${i}_errors.log
+    if [[ -z $MCANDOCK_test ]]
+    then
+        $MCANDOCK_MOD_PATH/submit_candock_module.sh $__command -N $(basename $__working_dir)_$i \
+                                                               -o $i/$(basename $__working_dir)_${i}_output.log \
+                                                               -e $i/$(basename $__working_dir)_${i}_errors.log \
+                                                                  $([[ ! -z "$@" ]] && echo "$@") \
 
+    else
+        $MCANDOCK_MOD_PATH/${__command}.sh
+    fi
     __count=$((__count+1))
 
-done
+done <$__prot_list

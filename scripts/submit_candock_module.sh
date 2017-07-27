@@ -4,19 +4,14 @@
 
 
 # If NOT undefined PBS Variable
-if [[ ! -z $PBS_ENVIRONMENT ]]
+if [[ $PBS_ENVIRONMENT == PBS_BATCH ]]
 then
     echo "DO NOT 'qsub' this script :-)"
     exit 1
-fi
-
-if [[ -s settings.sh ]]
-then
-    source settings.sh
 fi
 
 export module_to_run=$1
 
 shift 1
 
-qsub -V $MCANDOCK_MOD_PATH/${module_to_run}.sh $([[ ! -z "$@" ]] && echo "$@")
+qsub -V $MCANDOCK_MOD_PATH/${module_to_run}.sh -d . $([[ ! -z "$@" ]] && echo "$@")

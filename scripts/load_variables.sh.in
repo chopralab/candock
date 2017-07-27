@@ -9,10 +9,6 @@
 
 : ${MCANDOCK_frag_separator:=$MCANDOCK_MOD_PATH/splitfragments.pl}
 
-: ${MCANDOCK_extractor:=$MCANDOCK_MOD_PATH/extract_candock_to_scores_and_models.pl}
-: ${MCANDOCK_poses:=1}
-: ${MCANDOCK_pymol:=/depot/gchopra/apps/pymol/pymol}
-
 : ${CANDOCK_bslib:=$MCANDOCK_SUP_PATH/bslibdb}
 : ${CANDOCK_names:=$MCANDOCK_SUP_PATH/bslibdb/data/names}
 : ${CANDOCK_bio:=$MCANDOCK_SUP_PATH/bslibdb/data/bio}
@@ -41,30 +37,8 @@ export CANDOCK_obj_dir
 
 export OPENMM_PLUGIN_DIR
 
-# Check if were running in a PBS environment
-
-if [[ $PBS_ENVIRONMENT == PBS_BATCH ]]
+if [[ -s candock.cfg ]]
 then
-        : ${MCANDOCK_working_dir:=$PBS_O_WORKDIR}
-else
-        : ${MCANDOCK_working_dir:=$PWD}
+    : ${CANDOCK_config:=candock.cfg}
+    export CANDOCK_config
 fi
-
-function extract_result() {
-    cd $MCANDOCK_working_dir
-    echo "Running extract in $PWD"
-
-    mkdir extract
-    cd extract
-
-    perl $MCANDOCK_extractor $([[ "$MCANDOCK_MAKE_PYMOL" -eq 0 ]] && echo -f) -n $MCANDOCK_poses ../docked/*.pdb > ../scores.csv
-
-    if [[ "$MCANDOCK_MAKE_PYMOL" -ne 0 ]]
-    then
-        $MCANDOCK_pymol -c create_pse.py
-        mv all.pse ..
-    fi
-
-    cd ..
-    rm -fr extract
-}

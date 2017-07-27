@@ -18,10 +18,10 @@ install( PROGRAMS ${PROJECT_BINARY_DIR}/load_variables.sh
                   ${PROJECT_BINARY_DIR}/dock_many_proteins.sh
 
                   ${PROJECT_SOURCE_DIR}/scripts/extract_candock_to_scores_and_models.pl
-                  ${PROJECT_SOURCE_DIR}/scripts/splitfragments.pl
                   ${PROJECT_SOURCE_DIR}/scripts/submit_candock_module.sh
                   ${PROJECT_SOURCE_DIR}/scripts/dock_multiple.sh
                   ${PROJECT_SOURCE_DIR}/scripts/submit_many_proteins.sh
+                  ${PROJECT_SOURCE_DIR}/scripts/extract_result.sh
                   
          DESTINATION
                   ${CMAKE_INSTALL_PREFIX}/modules/${CANDOCK_VERSION}

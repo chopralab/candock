@@ -306,19 +306,8 @@ namespace Program {
 				exit (0);
 			}
 
-			if (!config_file.empty()) {
-				std::ifstream config_stream (config_file.c_str());
-
-				if (!config_stream) {
-					throw Error ("Unable to open conifguration file!\n");
-				}
-
-				store (parse_config_file (config_stream, config_options), __vm);
-				notify (__vm);
-			}
-
-			po::store(po::parse_environment(config_options,"CANDOCK_"), __vm);
-			po::notify(__vm);
+                        po::store(po::parse_environment(config_options,"CANDOCK_"), __vm);
+                        po::notify(__vm);
 
                         if (__vm.count("verbose")) {
                                 Inout::Logger::flip_mode(Inout::Severity::CD_NOTE);
@@ -334,6 +323,17 @@ namespace Program {
 
                         if (__vm.count("warnings")) {
                                 Inout::Logger::flip_mode(Inout::Severity::CD_WARNING);
+                        }
+
+                        if (!config_file.empty()) {
+                                std::ifstream config_stream (config_file.c_str());
+
+                                if (!config_stream) {
+                                        throw Error ("Unable to open conifguration file!\n");
+                                }
+
+                                store (parse_config_file (config_stream, config_options), __vm);
+                                notify (__vm);
                         }
 
 			if (__ncpu == -1) {
