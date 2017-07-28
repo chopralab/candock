@@ -54,21 +54,6 @@ find_package(RapidXML REQUIRED)
 find_package(OpenMM   REQUIRED  COMPONENTS openmm kbforce)
 find_package(Git      REQUIRED)
 
-if( ${CANDOCK_DRM} )
-
-    find_package(OpenSSL REQUIRED)
-    include_directories(${OPENSSL_INCLUDE_DIR})
-
-    if( WIN32 )
-        add_definitions( /DCANDOCK_DRM )
-    else( WIN32 )
-        add_definitions( -DCANDOCK_DRM )
-    endif( WIN32 )
-    
-endif( ${CANDOCK_DRM} )
-
-find_package(OpenSSL  REQUIRED)
-
 set(JSONCPP_INCLUDE_DIR "foreign/jsoncpp/include" "foreign/jsoncpp/src" )
 
 if (WIN32)
@@ -92,6 +77,20 @@ include_directories(${GSL_INCLUDE_DIRS})
 include_directories(${JSONCPP_INCLUDE_DIR})
 include_directories(${RAPIDXML_DIR})
 include_directories(${OPENMM_INCLUDE_DIR})
+
+if( ${CANDOCK_DRM} )
+
+    find_package(OpenSSL REQUIRED)
+    include_directories(${OPENSSL_INCLUDE_DIR})
+
+    if( WIN32 )
+        add_definitions( /DCANDOCK_DRM )
+    else( WIN32 )
+        add_definitions( -DCANDOCK_DRM )
+    endif( WIN32 )
+    
+endif( ${CANDOCK_DRM} )
+
 include_directories(lib)
 
 execute_process(
