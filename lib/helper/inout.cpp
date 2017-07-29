@@ -1,3 +1,5 @@
+#include "inout.hpp"
+
 #include <boost/regex.hpp>
 #include <boost/algorithm/string.hpp>
 #include <boost/filesystem.hpp>
@@ -22,7 +24,6 @@
 #endif
 
 #include "error.hpp"
-#include "inout.hpp"
 #include "debug.hpp"
 #include "logger.hpp"
 
@@ -107,6 +108,15 @@ namespace Inout {
 #endif
                         throw Error("Cannot read " + name);
                 }
+                read_stream(in, s, pos_in_file, num_occur, pattern);
+                in.close();
+#ifndef _WINDOWS
+                __unlock(fd);
+#endif
+        }
+
+        void read_stream(std::istream &in, vector<string> &s, streampos &pos_in_file, 
+                const int num_occur, const string &pattern) {
                 in.seekg(pos_in_file);
                 string line;
                 int i = 0;
@@ -119,11 +129,7 @@ namespace Inout {
                                 pos = in.tellg();
                         s.push_back(line);
                 }
-                pos_in_file = pos;
-                in.close();
-#ifndef _WINDOWS
-                __unlock(fd);
-#endif
+                pos_in_file = pos;   
         }
 
         void file_open_put_contents(const string &name, 

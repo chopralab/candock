@@ -20,6 +20,9 @@ namespace Inout {
         void read_file(const std::string &name, std::string&,
                        std::streampos &pos_in_file, f_not_found=panic, const int num_occur=-1, 
                        const std::string &pattern=""); // throws Error
+        void read_stream(std::istream &in, std::vector<std::string> &s,
+                       std::streampos &pos_in_file, const int num_occur=-1,
+                       const std::string &pattern="");
         void file_open_put_contents(const std::string &name,
                        const std::vector<std::string> &v, std::ios_base::openmode=std::ios_base::out);
         void file_open_put_stream(const std::string &name,
