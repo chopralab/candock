@@ -166,8 +166,12 @@ namespace Linker {
 				__modeler.unmask(__receptor.get_atoms());
 				__modeler.unmask(__ligand.get_atoms());
 		
-				__modeler.set_max_iterations(__max_iterations_final); // until converged
-				__modeler.minimize_state();
+                                __modeler.set_max_iterations(__max_iterations_final); // until converged
+
+                                log_benchmark << "Starting minimization of " << __ligand.name()
+                                              << " and " << __receptor.name() << "\n";
+
+                                __modeler.minimize_state();
 
                                 __modeler.mask(__receptor.get_atoms());
                                 const double potential_energy = __modeler.potential_energy();

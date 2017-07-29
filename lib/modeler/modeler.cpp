@@ -262,7 +262,8 @@ namespace OMMIface {
 
                 }
                 __system_topology.clear_knowledge_based_force();
-                log_benchmark << "Minimized in " << iter << " iterations, which took " 
+                log_benchmark << "Minimized " << ligand.name() << " and " << receptor.name()
+                        << " in " << iter << " iterations, which took " 
                         << bench.seconds_from_start() << " wallclock seconds" << endl;
         }
 #endif
