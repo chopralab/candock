@@ -24,7 +24,7 @@ namespace Molib {
 			|| a.br().rest() == Molib::Residue::water ? "HETATM" : "ATOM");
 		stream << setw(5) << right << a.atom_number();
 		stream << setw(1) << " ";
-		stream << setw(4) << left << (a.atom_name().size() < 4 ? " " + a.atom_name() : a.atom_name());
+		stream << setw(4) << left << (a.atom_name().size() < 4 ? " " + a.atom_name() : a.atom_name().substr(0,4));
 		stream << setw(1) << " ";
 		stream << setw(3) << right << a.br().resn();
 		stream << setw(1) << " ";
