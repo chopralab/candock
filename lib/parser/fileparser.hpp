@@ -24,17 +24,16 @@ namespace Parser {
                         using Parser::Parser;
                         void parse_molecule (Molib::Molecules &);
                 };
-                Parser *p;
+                std::shared_ptr<std::istream> molecule_stream;
+                std::unique_ptr<Parser> p;
         public:
                 FileParser() : p (nullptr) {};
-                FileParser (const string &molecule_file, unsigned int hm=all_models,
+                FileParser (const std::string &molecule_file, unsigned int hm=all_models,
                             const int num_occur=-1);
-                ~FileParser() {
-                        delete p;
-                }
-                void prepare_parser (const string &molecule_file, unsigned int hm=all_models,
+                void prepare_parser (const std::string &molecule_file, unsigned int hm=all_models,
                                      const int num_occur=-1);
-                void rewind();
+                void prepare_parser (std::shared_ptr<std::istream>& stream, const std::string &extension,
+                                     unsigned int hm=all_models, const int num_occur=-1);
                 void set_flags (unsigned int hm);
                 bool parse_molecule (Molib::Molecules &mols);
                 Molib::Molecules parse_molecule();

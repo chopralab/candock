@@ -129,7 +129,23 @@ namespace Inout {
                                 pos = in.tellg();
                         s.push_back(line);
                 }
+                in.seekg(pos);
                 pos_in_file = pos;   
+        }
+
+        void read_stream(std::istream &in, vector<string> &s, const int num_occur, const string &pattern) {
+                string line;
+                int i = 0;
+                streampos pos;
+                while (getline(in, line)) {
+                        if (num_occur != -1 && (line.find(pattern) != string::npos && i++ == num_occur)) {
+                                dbgmsg("breaking on line = " << line);
+                                break;
+                        } else
+                                pos = in.tellg();
+                        s.push_back(line);
+                }
+                in.seekg(pos);
         }
 
         void file_open_put_contents(const string &name, 

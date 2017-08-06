@@ -18,9 +18,6 @@ using namespace std;
 using namespace Molib;
 
 namespace Parser {
-        void FileParser::rewind() {
-                p->set_pos (0);
-        }
         void FileParser::set_flags (unsigned int hm) {
                 p->set_hm (hm);
         }
@@ -49,6 +46,11 @@ namespace Parser {
 
         void FileParser::prepare_parser (const string &molecule_file, unsigned int hm,
                                          const int num_occur) {
+
+                if ( Inout::file_size(molecule_file) <= 0 ) {
+                        throw Error ("die : file not valid: " + molecule_file + ". Check to see if it exists and has contents!");
+                }
+
                 auto ret = molecule_file.find_last_of (".");
 
                 if (ret == string::npos) {
@@ -59,20 +61,25 @@ namespace Parser {
                 transform (extension.begin(), extension.end(),
                            extension.begin(), ::toupper);
 
+                std::shared_ptr<istream> temp_molecule_stream = std::make_shared<ifstream>(molecule_file, std::ios::in);
+
+                prepare_parser(temp_molecule_stream, extension, hm, num_occur);                
+        }
+
+        void FileParser::prepare_parser(std::shared_ptr<std::istream>& stream, const std::string &extension,
+                                     unsigned int hm, const int num_occur) {
+                molecule_stream = stream;
+
                 dbgmsg ("pdb reader options = " << hm << " molecule is a " << boolalpha
                         << (extension == "PDB" || extension == "ENT" ? "PDB file" :
-                            (extension == "MOL2" ? "Mol2 file" : "undetermined file type")));
+                           (extension == "MOL2" ? "Mol2 file" : "undetermined file type")));
 
                 if (extension == "PDB" || extension == "ENT") {
-                        p = new PdbParser (molecule_file, hm, num_occur);
+                        p = std::unique_ptr<Parser> (new PdbParser (*molecule_stream, hm, num_occur));
                 } else if (extension == "MOL2") {
-                        p = new Mol2Parser (molecule_file, hm, num_occur);
+                        p = std::unique_ptr<Parser> (new Mol2Parser (*molecule_stream, hm, num_occur));
                 } else {
                         throw Error ("die : could not determine the file type of the input molecule");
-                }
-
-                if (Inout::file_size (molecule_file) == 0) {
-                        throw Error (string ("die : file not valid: ") + molecule_file + ". Check to see if it exists and has contents!");
                 }
         }
 };

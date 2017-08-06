@@ -5,8 +5,10 @@ using namespace Molib;
 namespace Parser {
         void FileParser::Mol2Parser::parse_molecule (Molecules &mols) {
                 vector<string> mol2_raw;
-                Inout::read_file (__molecule_file, mol2_raw, __pos,
-                                  Inout::panic, __num_occur, "@<TRIPOS>MOLECULE");
+                {
+                        std::lock_guard<std::mutex> gaurd(__concurrent_read_mtx);
+                        Inout::read_stream (__stream, mol2_raw, __num_occur, "@<TRIPOS>MOLECULE");
+                }
                 bool found_molecule = false, found_assembly = false, found_model = false;
                 map<const Model *, map<const int, Atom *>> atom_number_to_atom;
 

@@ -12,10 +12,12 @@ using namespace Molib;
 namespace Parser {
 
         void FileParser::PdbParser::parse_molecule (Molecules &mols) {
-                vector<string> pdb_raw;
                 dbgmsg ("num_occur = " << __num_occur);
-                Inout::read_file (__molecule_file, pdb_raw, __pos,
-                                  Inout::panic, __num_occur, "REMARK   5 MOLECULE");
+                vector<string> pdb_raw;
+                {
+                        std::lock_guard<std::mutex> gaurd(__concurrent_read_mtx);
+                        Inout::read_stream( __stream, pdb_raw, __num_occur, "REMARK   5 MOLECULE");
+                }
                 boost::smatch m;
                 set<char> bio_chain;
                 int biomolecule_number = -1;

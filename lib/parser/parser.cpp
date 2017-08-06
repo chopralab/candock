@@ -39,7 +39,7 @@ namespace Parser {
         }
 
         void Parser::set_pos(std::streampos pos) {
-                __pos = pos;
+                __stream.seekg(pos);
         }
         
         void Parser::set_hm(unsigned int hm) {
