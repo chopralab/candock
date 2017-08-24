@@ -17,9 +17,10 @@ using namespace std;
 
 namespace Linker {
 
-	DockedConformation Linker::StaticLinker::__a_star(const int segment_graph_size, const Partial &start_conformation, vector<unique_ptr<State>> &states, int iter) {
+        DockedConformation Linker::StaticLinker::__a_star(const int segment_graph_size, const Partial &start_conformation, vector<unique_ptr<State>> &states, int iter) {
 
-		
+                Benchmark bench;
+
 		for (auto &pstate : start_conformation.get_states())
 			states.push_back(unique_ptr<State>(new State(*pstate)));
 		if (start_conformation.empty())
@@ -133,9 +134,12 @@ namespace Linker {
 		}
 
 #endif
-		return __reconstruct(min_conformation);
-	}
-	
+                log_benchmark << "A-STAR for " << __ligand.name() << " took " << bench.seconds_from_start() 
+                              << " wallclock seconds" << "\n";
+
+                return __reconstruct(min_conformation);
+        }
+
 	Partial::Vec Linker::StaticLinker::__generate_rigid_conformations(const Seed::Graph &seed_graph) {
 		Benchmark bench;
 		log_note << "Generating rigid conformations of states for " << __ligand.name() << "..." << endl;
@@ -182,7 +186,7 @@ namespace Linker {
 			//help::memusage("after max.clique.search");
 	
 			log_benchmark << "found " << qmaxes.size() << " maximum cliques, which took " 
-				<< bench.seconds_from_start() << " wallclock seconds for " << __ligand.name() << endl;
+				<< bench.seconds_from_start() << " wallclock seconds for " << __ligand.name() << "\n";
 	
 			if (qmaxes.empty())
 				throw Error("die : couldn't find any possible conformations for ligand " 
@@ -250,13 +254,13 @@ namespace Linker {
 		log_benchmark << "Generated " << clustered_possibles_w_energy.size() 
 			<< " possible conformations for ligand " << __ligand.name()
 			<< ", which took " << bench.seconds_from_start() 
-			<< " wallclock seconds" << endl;
+			<< " wallclock seconds" << "\n";
 		return clustered_possibles_w_energy;
 	}
 	
 	DockedConformation Linker::StaticLinker::__reconstruct(const Partial &conformation) {
 		Benchmark bench;
-		log_note << "Reconstructing docked ligands for " << __ligand.name() << "..." << endl;
+		log_note << "Reconstructing docked ligands for " << __ligand.name() << "..." << "\n";
 		int conf_number = 0;
 		
 		// ligand
@@ -282,7 +286,7 @@ namespace Linker {
 		ligand.set_name(__ligand.name() + "_" + std::to_string(++conf_number));
 		
 		log_benchmark << "Reconstruction of molecules took " << bench.seconds_from_start() 
-			<< " wallclock seconds for " << __ligand.name() << endl;
+			<< " wallclock seconds for " << __ligand.name() << "\n";
 		return DockedConformation(ligand, __receptor, conformation.get_energy(), 0, 0);
 	}
 };

@@ -121,7 +121,7 @@ namespace Docker {
 			}
 		}
 		log_benchmark << "Fragment docking for seed " << __seed.name() << " took " << bench.seconds_from_start() << " seconds"
-			<< " number of accepted confomations is " << accepted.size() << endl;
+			<< " number of accepted confomations is " << accepted.size() << "\n";
 
 		return accepted;
 	}
@@ -168,7 +168,7 @@ namespace Docker {
 			}
 		}
 		log_benchmark << "Clustering accepted conformations for seed " << __seed.name() << " took " 
-			<< bench.seconds_from_start() << " seconds" << endl;
+			<< bench.seconds_from_start() << " seconds" << "\n";
 		return reps;
 	}
 

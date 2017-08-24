@@ -103,12 +103,12 @@ namespace OMMIface {
                         log_step << "Doing energy minimization using physical forcefield" << endl;
                         __system_topology.minimize(__tolerance, __max_iterations);
                         log_benchmark << "time to minimize took " << bench.seconds_from_start() 
-                                      << " wallclock seconds" << endl;
+                                      << " wallclock seconds" << "\n";
                 } else {
                         log_step << "Doing energy minimization using physical forcefield" << endl;
                         __system_topology.dynamics(__dynamics_steps);
                         log_benchmark << "time to minimize took " << bench.seconds_from_start() 
-                                      << " wallclock seconds" << endl;
+                                      << " wallclock seconds" << "\n";
                 }
 
         }
@@ -179,7 +179,7 @@ namespace OMMIface {
 
                 __system_topology.clear_knowledge_based_force();
                 log_benchmark << "Minimized in " << iter << " iterations, which took " 
-                        << bench.seconds_from_start() << " wallclock seconds" << endl;
+                        << bench.seconds_from_start() << " wallclock seconds" << "\n";
         }
 
 #ifndef NDEBUG
@@ -264,7 +264,7 @@ namespace OMMIface {
                 __system_topology.clear_knowledge_based_force();
                 log_benchmark << "Minimized " << ligand.name() << " and " << receptor.name()
                         << " in " << iter << " iterations, which took " 
-                        << bench.seconds_from_start() << " wallclock seconds" << endl;
+                        << bench.seconds_from_start() << " wallclock seconds" << "\n";
         }
 #endif
 

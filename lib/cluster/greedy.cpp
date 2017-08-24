@@ -40,7 +40,7 @@ namespace Molib {
 		}
 		log_benchmark << "Clustering " << initial.size() << " accepted conformations resulted in "
 			<< reps.size() << " clusters took " << bench.seconds_from_start() 
-			<< " seconds" << endl;
+			<< " seconds" << "\n";
 		return reps;
 	}
 
@@ -75,7 +75,7 @@ namespace Molib {
 		}
 		log_benchmark << "Clustering " << initial.size() << " accepted conformations resulted in "
 			<< reps.size() << " clusters took " << bench.seconds_from_start() 
-			<< " seconds" << endl;
+			<< " seconds" << "\n";
 		return reps;
 	}
 
@@ -121,7 +121,7 @@ namespace Molib {
 		}
 		log_benchmark << "Clustering " << initial.size() << " accepted conformations resulted in "
 			<< reps.size() << " clusters took " << bench.seconds_from_start() 
-			<< " seconds" << endl;
+			<< " seconds" << "\n";
 		return reps;
 	}
 

@@ -143,7 +143,7 @@ namespace Docker {
 
                         log_benchmark << "time to find " << __conf_vec.size() << " conformations of seed " 
                                       << seed.name() << " took " << bench.seconds_from_start() 
-                                      << " wallclock seconds" << endl;
+                                      << " wallclock seconds" << "\n";
 	
 	
 		} catch(...) {

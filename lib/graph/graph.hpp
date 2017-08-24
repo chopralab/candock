@@ -239,7 +239,7 @@ namespace Glib {
 				dbgmsg("clique push vertex = " << vnum);
 			}
 		}
-		log_benchmark << "time to find max.weight clique " << bench.seconds_from_start() << " wallclock seconds" << endl;
+		log_benchmark << "time to find max.weight clique " << bench.seconds_from_start() << " wallclock seconds" << "\n";
 		return clique;
 	}
 

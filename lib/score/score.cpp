@@ -256,7 +256,7 @@ namespace Molib {
 			}
 		}
 		log_benchmark << "time to process distributions file " << bench.seconds_from_start() 
-			<< " wallclock seconds" << endl;
+			<< " wallclock seconds" << "\n";
 		return *this;
 	}
 

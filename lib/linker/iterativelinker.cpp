@@ -159,7 +159,7 @@ namespace Linker {
 		//help::memusage("before max.clique.search");
 		
 		log_benchmark << "find_compatible_state_pairs took " << bench.seconds_from_start() 
-			<< " wallclock seconds for " << __ligand.name() << endl;
+			<< " wallclock seconds for " << __ligand.name() << "\n";
 		
 		Partial::Vec possibles_w_energy;
 		{
@@ -172,7 +172,7 @@ namespace Linker {
 			//help::memusage("after max.clique.search");
 	
 			log_benchmark << "found " << qmaxes.size() << " maximum cliques, which took " 
-				<< bench.seconds_from_start() << " wallclock seconds for " << __ligand.name() << endl;
+				<< bench.seconds_from_start() << " wallclock seconds for " << __ligand.name() << "\n";
 	
 			if (qmaxes.empty())
 				throw Error("die : couldn't find any possible conformations for ligand " 
@@ -223,7 +223,7 @@ namespace Linker {
 		log_benchmark << "Generated " << clustered_possibles_w_energy.size() 
 			<< " possible top percent docked seeds that will serve as starting points for reconstruction of ligand " << __ligand.name()
 			<< ", which took " << bench.seconds_from_start() 
-			<< " wallclock seconds" << endl;
+			<< " wallclock seconds" << "\n";
 		return clustered_possibles_w_energy;
 	}
 	
@@ -263,7 +263,7 @@ namespace Linker {
 			patom->set_crd(crds[i++]);
 		}
 		log_benchmark << "Reconstruction of molecules took " << bench.seconds_from_start() 
-			<< " wallclock seconds for " << __ligand.name() << endl;
+			<< " wallclock seconds for " << __ligand.name() << "\n";
 		return DockedConformation(ligand, receptor, conformation.get_energy(), 0, 0);
 	}
 };
