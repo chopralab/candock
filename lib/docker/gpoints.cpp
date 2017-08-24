@@ -49,7 +49,7 @@ namespace Docker {
 		try {
 			__identify_gridpoints(grid_spacing, radial_check);
 		} catch(...) {
-			dbgmsg("FAILURE: constructor of Gpoints failed ... cleaning up resources...");
+			log_error << "FAILURE: gridless constructor of Gpoints\n";
 			throw;
 		}
 	}
@@ -61,7 +61,7 @@ namespace Docker {
 			__identify_gridpoints(centroids, grid, grid_spacing, dist_cutoff, 
 				excluded_radius, max_interatomic_distance);
 		} catch(...) {
-			dbgmsg("FAILURE: constructor of Gpoints failed ... cleaning up resources...");
+			log_error << "FAILURE: complete constructor of Gpoints\n";
 			throw;
 		}
 	}
@@ -73,7 +73,7 @@ namespace Docker {
 			__identify_gridpoints(centroids, grid, grid_spacing, dist_cutoff, 
 				excluded_radius, max_interatomic_distance);
 		} catch(...) {
-			dbgmsg("FAILURE: constructor of Gpoints failed ... cleaning up resources...");
+			log_error << "FAILURE: scoreless constructor of Gpoints\n";
 			throw;
 		}
 	}

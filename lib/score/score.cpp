@@ -146,34 +146,39 @@ namespace Molib {
                 return *this;
         }
 
-	Array1d<double> Score::compute_energy(const Atom::Grid &gridrec, const Geom3D::Coordinate &crd, const set<int> &ligand_atom_types) const {
-		dbgmsg("computing energy");
-		Array1d<double> energy_sum(*ligand_atom_types.rbegin() + 1);
-		for (auto &patom : gridrec.get_neighbors(crd, __dist_cutoff)) {
-			const double dist = patom->crd().distance(crd);
-			const auto &atom_1 = patom->idatm_type();
-			const int index = __get_index(dist);
-			for (auto &l : ligand_atom_types) {
-				auto atom_pair = minmax(atom_1, l);
+        Array1d<double> Score::compute_energy(const Atom::Grid &gridrec, const Geom3D::Coordinate &crd, const set<int> &ligand_atom_types) const {
+                dbgmsg("computing energy");
+                Array1d<double> energy_sum(*ligand_atom_types.rbegin() + 1);
+                for (auto &patom : gridrec.get_neighbors(crd, __dist_cutoff)) {
+                        const double dist = patom->crd().distance(crd);
+                        const auto &atom_1 = patom->idatm_type();
+                        const int index = __get_index(dist);
+                        for (auto &l : ligand_atom_types) {
+                                auto atom_pair = minmax(atom_1, l);
 #ifndef NDEBUG
-				if (!__energies_scoring.count(atom_pair))
-					throw Error("undefined atom_pair in __energies_scoring");
-				if (static_cast<size_t> (index) >= __energies_scoring.at(atom_pair).size())
-					throw Error("undefined index in __energies_scoring");
-				dbgmsg("atom pairs = " << help::idatm_unmask[atom_pair.first] << " " 
-					<< help::idatm_unmask[atom_pair.second] << " index = " << index
-					<< " dist = " << dist << " __energies_scoring.at(atom_pair).size() = " 
-					<< __energies_scoring.at(atom_pair).size() << " partial energy = "
-					<< __energies_scoring.at(atom_pair).at(index));
+                                if (!__energies_scoring.count(atom_pair))
+                                        throw Error("undefined atom_pair in __energies_scoring");
+                                if (static_cast<size_t> (index) >= __energies_scoring.at(atom_pair).size())
+                                        throw Error("undefined index in __energies_scoring");
+                                dbgmsg("atom pairs = " << help::idatm_unmask[atom_pair.first] << " " 
+                                        << help::idatm_unmask[atom_pair.second] << " index = " << index
+                                        << " dist = " << dist << " __energies_scoring.at(atom_pair).size() = " 
+                                        << __energies_scoring.at(atom_pair).size() << " partial energy = "
+                                        << __energies_scoring.at(atom_pair).at(index));
 #endif
-				//~ assert(index < __energies_scoring.at(atom_pair).size());
-				//~ assert(l < energy_sum.sz);
-				energy_sum.data[l] += __energies_scoring.at(atom_pair).at(index);
-			}
-		}
-		dbgmsg("out of compute energy energy_sum = " << energy_sum);
-		return energy_sum;
-	}
+                                if ( static_cast<size_t>(index) >= __energies_scoring.at(atom_pair).size()) {
+                                        log_warning << "An index from get_neighbors is greater than cutoff by step_in_file ("
+                                                    << index << " and " << __dist_cutoff / __step_in_file << " respectively).\n"
+                                                    << " -- Original distance is " << dist << "\n"
+                                                    << " -- Setting point's score to zero." << endl;
+                                        continue;
+                                }
+                                energy_sum.data[l] += __energies_scoring.at(atom_pair).at(index);
+                        }
+                }
+                dbgmsg("out of compute energy energy_sum = " << energy_sum);
+                return energy_sum;
+        }
 
 	Score& Score::define_composition(const set<int> &receptor_idatm_types, const set<int> &ligand_idatm_types) {
 		// JANEZ: num_pairs is now __prot_lig_pairs.size() !!!
