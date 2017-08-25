@@ -80,7 +80,10 @@ namespace Parser {
                                 idatm_type = help::idatm_mask.count (idatm_type) ? idatm_type : "???";
                                 string gaff_type = line.size() > 85 ? boost::algorithm::trim_copy (line.substr (85, 5)) : "???";
                                 string rest_of_line = line.size() > 90 ? boost::algorithm::trim_copy (line.substr (90)) : "";
-                                const bool hydrogen = (element == "H" || (atom_name.size() == 1 && atom_name.at (0) == 'H'));
+                                const bool hydrogen = (element == "H"  || 
+                                                     ((element.empty() || element.at(0) == ' ') 
+                                                                       && (atom_name.size() == 1 &&
+                                                                           atom_name.at (0) == 'H')) );
                                 dbgmsg ("hydrogen = " << boolalpha << hydrogen);
 
                                 if ( (__hm & hydrogens) || !hydrogen) {
