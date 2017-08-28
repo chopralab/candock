@@ -18,26 +18,6 @@
 
 namespace Program {
 
-        Target::DockedReceptor::~DockedReceptor() {
-                if (score)
-                        delete score;
-
-                if (ffield)
-                        delete ffield;
-
-                if (gridrec)
-                        delete gridrec;
-
-                if (centroids)
-                        delete centroids;
-
-                if (prepseeds)
-                        delete prepseeds;
-
-                if (dockedlig)
-                        delete dockedlig;
-        }
-
         Target::Target (const std::string &input_name) {
 
                 // If the user doesn't want to use this feature
@@ -59,7 +39,7 @@ namespace Program {
                         Molib::Molecule &current = __receptors.add (new Molib::Molecule (std::move (receptors[0])));
                         current.set_name (boost::filesystem::basename (input_name.substr (0, input_name.length() - 4))); // Emulate the original version of candock
                         boost::filesystem::create_directory (current.name());
-                        __preprecs.push_back (DockedReceptor (current, input_name));
+                        __preprecs.push_back ( std::unique_ptr<DockedReceptor>( new DockedReceptor (current, input_name)));
                 } else for (const auto &a : Inout::files_matching_pattern (input_name, ".pdb")) {
                                 // Otherwise we treat it like the new version intends.
                                 Parser::FileParser rpdb (a, Parser::first_model);
@@ -68,7 +48,7 @@ namespace Program {
                                 current.set_name (a.substr (0, a.length() - 4));
                                 boost::filesystem::create_directory (current.name());
 
-                                __preprecs.push_back (DockedReceptor (current, a));
+                                __preprecs.push_back ( std::unique_ptr<DockedReceptor>( new DockedReceptor (current, a)));
                         }
 
                 /* Compute atom types for receptor and cofactor(s): gaff types for protein,
@@ -92,7 +72,8 @@ namespace Program {
                  *
                  */
                 for (auto &a : __preprecs) {
-                        a.gridrec = new Molib::Atom::Grid (a.protein.get_atoms());
+                        Molib::Atom::Grid *gridrec = new Molib::Atom::Grid (a->protein.get_atoms());
+                        a->gridrec = std::unique_ptr<Molib::Atom::Grid> (gridrec);
                 }
         }
 
@@ -102,15 +83,16 @@ namespace Program {
 
         void Target::__initialize_score(const FragmentLigands &ligand_fragments) {
                 for ( auto& a : __preprecs ) {
-                        if ( a.score != nullptr) {
+                        if ( a->score != nullptr) {
                                 continue;
                         }
 
-                        a.score = new Molib::Score(cmdl.get_string_option("ref"), cmdl.get_string_option("comp"),
+                        Molib::Score *score = new Molib::Score(cmdl.get_string_option("ref"), cmdl.get_string_option("comp"),
                                                    cmdl.get_string_option("func"),cmdl.get_int_option("cutoff"),
                                                    cmdl.get_double_option("step"));
+                        a->score = std::unique_ptr<Molib::Score> (score);
 
-                        a.score->define_composition(a.protein.get_idatm_types(),
+                        a->score->define_composition(a->protein.get_idatm_types(),
                                                    ligand_fragments.ligand_idatm_types())
                               .process_distributions_file(cmdl.get_string_option("dist"))
                               .compile_scoring_function();
@@ -119,25 +101,24 @@ namespace Program {
 
         void Target::__initialize_ffield() {
                 for (auto& a : __preprecs) {
-                        if ( a.ffield != nullptr) {
+                        if ( a->ffield != nullptr) {
                                 continue;
                         }
 
                         // Prepare the receptor for docking to
                         OMMIface::ForceField* ffield = new OMMIface::ForceField;
+                        a->ffield = std::unique_ptr<OMMIface::ForceField> (ffield);
 
-                        ffield->parse_gaff_dat_file(cmdl.get_string_option("gaff_dat"))
+                        a->ffield->parse_gaff_dat_file(cmdl.get_string_option("gaff_dat"))
                                 .parse_forcefield_file(cmdl.get_string_option("amber_xml"))
                                 .parse_forcefield_file(cmdl.get_string_option("water_xml"));
 
                         if ( ! cmdl.get_string_option("gaff_heme").empty() ) {
                                 dbgmsg( "Adding " << cmdl.get_string_option("gaff_heme") << endl);
-                                ffield->parse_gaff_dat_file(cmdl.get_string_option("gaff_heme"));
+                                a->ffield->parse_gaff_dat_file(cmdl.get_string_option("gaff_heme"));
                         }
 
-                        a.ffield = ffield;
-
-                        a.protein.prepare_for_mm(*a.ffield, *a.gridrec);
+                        a->protein.prepare_for_mm(*(a->ffield), *(a->gridrec));
                 }
         }
 
@@ -145,8 +126,8 @@ namespace Program {
                 OMMIface::SystemTopology::loadPlugins();
 
                 for (auto& a : __preprecs) {
-                        a.score->parse_objective_function(cmdl.get_string_option("obj_dir"), cmdl.get_double_option("scale"), 1501);
-                        a.ffield->add_kb_forcefield(*a.score, cmdl.get_double_option("step"), 15);
+                        a->score->parse_objective_function(cmdl.get_string_option("obj_dir"), cmdl.get_double_option("scale"), 1501);
+                        a->ffield->add_kb_forcefield(*a->score, cmdl.get_double_option("step"), 15);
                 }
         }
 
@@ -157,8 +138,9 @@ namespace Program {
         void Target::find_centroids( ) {
                 for ( auto &a : __preprecs ) {
                         
-                        if ( a.centroids != nullptr ) {
-                                continue;
+                        if ( a->centroids == nullptr ) {
+                                Program::FindCentroids *centroids = new FindCentroids(a->protein, a->filename);
+                                a->centroids = std::unique_ptr<Program::FindCentroids>(centroids);
                         }
                         
                         /* Run section of Candock designed to find binding site1s
@@ -167,8 +149,7 @@ namespace Program {
                          *
                          */
 
-                        a.centroids = new FindCentroids(a.protein, a.filename);
-                        a.centroids->run_step();
+                        a->centroids->run_step();
                 }
         }
 
@@ -180,13 +161,13 @@ namespace Program {
 
                 for ( auto &a : __preprecs ) {
 
-                        if (a.prepseeds != nullptr) {
-                                continue;
+                        if (a->prepseeds == nullptr) {
+                                Program::DockFragments *prepseeds = new Program::DockFragments(*(a->centroids), ligand_fragments, *(a->score), *(a->gridrec), a->protein.name());
+                                a->prepseeds = std::unique_ptr<Program::DockFragments> (prepseeds);
                         }
 
-                        a.prepseeds = new DockFragments(*a.centroids, ligand_fragments, *a.score, *a.gridrec, a.protein.name());
-                        Docker::Gpoints gpoints = a.prepseeds->get_gridhcp();
-                        Inout::output_file(gpoints, Path::join(a.protein.name(), cmdl.get_string_option("gridpdb_hcp")));
+                        Docker::Gpoints gpoints = a->prepseeds->get_gridhcp();
+                        Inout::output_file(gpoints, Path::join(a->protein.name(), cmdl.get_string_option("gridpdb_hcp")));
                 }
 
         }
@@ -200,12 +181,12 @@ namespace Program {
 
                 for ( auto &a : __preprecs ) {
 
-                        if (a.prepseeds != nullptr) {
-                                continue;
+                        if (a->prepseeds != nullptr) {
+                                Program::DockFragments *prepseeds = new Program::DockFragments(*(a->centroids), ligand_fragments, *(a->score), *(a->gridrec), a->protein.name());
+                                a->prepseeds = std::unique_ptr<Program::DockFragments> (prepseeds);
                         }
 
-                        a.prepseeds = new DockFragments(*a.centroids, ligand_fragments, *a.score, *a.gridrec, a.protein.name());
-                        a.prepseeds->run_step();
+                        a->prepseeds->run_step();
                 }
         }
 
@@ -217,13 +198,13 @@ namespace Program {
 
                 for ( auto &a : __preprecs ) {
 
-                        if ( a.dockedlig != nullptr ) {
-                                continue;
+                        if ( a->dockedlig == nullptr ) {
+                                a->ffield->insert_topology(a->protein);
+                                Program::LinkFragments *dockedlig = new LinkFragments(a->protein, *(a->score), *(a->ffield), *(a->prepseeds), *(a->gridrec));
+                                a->dockedlig =  std::unique_ptr<Program::LinkFragments>(dockedlig);
                         }
 
-                        a.ffield->insert_topology(a.protein);
-                        a.dockedlig = new LinkFragments(a.protein, *a.score, *a.ffield, *a.prepseeds, *a.gridrec);
-                        a.dockedlig->run_step();
+                        a->dockedlig->run_step();
                 }
         }
 
@@ -233,10 +214,9 @@ namespace Program {
                 for (auto &s : seeds_to_add ) {
                         used_seeds << s << endl;
                 }
-                
+
                 Inout::output_file (used_seeds.str(),"new_scaffold_seeds.lst");
 
-            
                 Molib::Unique created_design("designed.txt");
                 Molib::Molecules all_designs;
 
@@ -252,7 +232,7 @@ namespace Program {
                         all_designs.add(designs);
                 } else {
                     for (auto &a : __preprecs) {
-                        Molib::NRset nr = a.prepseeds->get_top_seeds(seeds_to_add, cmdl.get_double_option("top_percent") );
+                        Molib::NRset nr = a->prepseeds->get_top_seeds(seeds_to_add, cmdl.get_double_option("top_percent") );
                         for ( auto &molecules : nr ) {
                                 design::Design designer (molecules.first(), created_design);
                                 designer.change_original_name(molecules.name());
@@ -294,9 +274,9 @@ namespace Program {
 
                 ligand_fragments.add_seeds_from_molecules(all_designs);
                 for ( auto &b : __preprecs ) {
-                        b.prepseeds->run_step();
-                        b.dockedlig->clear_top_poses();
-                        b.dockedlig->link_ligands(all_designs);
+                        b->prepseeds->run_step();
+                        b->dockedlig->clear_top_poses();
+                        b->dockedlig->link_ligands(all_designs);
                 }
         }
 
@@ -327,10 +307,10 @@ namespace Program {
                             all_designs.add(designs);
                     } else {
                         for ( auto &a : __preprecs ) {
-                            for ( auto &molecule : a.dockedlig->top_poses() ) {
+                            for ( auto &molecule : a->dockedlig->top_poses() ) {
                                 design::Design designer ( molecule, created_design);
                                 if (! seeds_to_add.empty() )
-                                        designer.functionalize_hydrogens_with_fragments(a.prepseeds->get_top_seeds(seeds_to_add,cmdl.get_double_option("top_percent")),
+                                        designer.functionalize_hydrogens_with_fragments(a->prepseeds->get_top_seeds(seeds_to_add,cmdl.get_double_option("top_percent")),
                                                                                         cmdl.get_double_option("tol_seed_dist"), cmdl.get_double_option("clash_coeff") );
 
                                 const vector<string>& h_single_atoms = cmdl.get_string_vector("add_single_atoms");
@@ -377,9 +357,9 @@ namespace Program {
 
                     ligand_fragments.add_seeds_from_molecules(all_designs);
                     for ( auto &b : __preprecs ) {
-                        b.prepseeds->run_step();
-                        b.dockedlig->clear_top_poses();
-                        b.dockedlig->link_ligands(all_designs);
+                        b->prepseeds->run_step();
+                        b->dockedlig->clear_top_poses();
+                        b->dockedlig->link_ligands(all_designs);
                     }
                 }
         }
@@ -404,7 +384,7 @@ namespace Program {
                 std::multiset<std::string> good_seed_list;
 
                 for (auto &a : __preprecs) {
-                        auto result = a.prepseeds->get_best_seeds();
+                        auto result = a->prepseeds->get_best_seeds();
 
                         if (max_seeds != -1 && static_cast<size_t> (max_seeds) < result.size())
                                 result.resize (max_seeds);

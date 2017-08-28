@@ -7,6 +7,11 @@
 #include "docker/gpoints.hpp"
 #include "molib/molecules.hpp"
 
+#include "modeler/forcefield.hpp"
+#include "program/findcentroids.hpp"
+#include "program/dockfragments.hpp"
+#include "program/linkfragments.hpp"
+
 #include <string>
 
 namespace Program {
@@ -24,29 +29,24 @@ namespace Program {
                 struct CANDOCK_EXPORT DockedReceptor {
 
                         DockedReceptor (Molib::Molecule &rec, const std::string &file) :
-                                filename(file), protein (rec),
-                                score (nullptr), ffield (nullptr),
-                                gridrec (nullptr), centroids (nullptr),
-                                prepseeds (nullptr), dockedlig (nullptr) {
+                                filename(file), protein (rec){
                         }
 
-                        virtual ~DockedReceptor();
-
-                        DockedReceptor (const DockedReceptor &rhs) = default;
-                        DockedReceptor &operator= (const DockedReceptor &rhs) = default;
+                        DockedReceptor (const DockedReceptor &rhs) = delete;
+                        DockedReceptor &operator= (const DockedReceptor &rhs) = delete;
 
                         std::string          filename;
                         Molib::Molecule      &protein;
-                        Molib::Score         *score;
-                        OMMIface::ForceField *ffield;
-                        Molib::Atom::Grid    *gridrec;
-                        FindCentroids        *centroids;
-                        DockFragments        *prepseeds;
-                        LinkFragments        *dockedlig;
+                        std::unique_ptr <Molib::Score>            score;
+                        std::unique_ptr <OMMIface::ForceField>    ffield;
+                        std::unique_ptr <Molib::Atom::Grid>       gridrec;
+                        std::unique_ptr <Program::FindCentroids>  centroids;
+                        std::unique_ptr <Program::DockFragments>  prepseeds;
+                        std::unique_ptr <Program::LinkFragments>  dockedlig;
                 };
 
                 Molib::Molecules            __receptors;
-                std::vector<DockedReceptor> __preprecs;
+                std::vector<std::unique_ptr<DockedReceptor>> __preprecs;
 
                 void __initialize_score(const FragmentLigands &ligand_fragments);
                 void __initialize_ffield();
