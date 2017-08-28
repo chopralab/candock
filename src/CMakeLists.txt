@@ -64,6 +64,7 @@ set( program_names  check_options
                     process_input
                     prep_fragments
                     make_objective
+                    make_gridhcp
                     dock_fragments
                     link_fragments
                     design_ligands

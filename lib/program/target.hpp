@@ -61,6 +61,7 @@ namespace Program {
 
                 // TODO: Instead of named function, pass in fully initiallized ProgramSteps????????
                 void find_centroids();
+                void make_gridhcp  (const FragmentLigands &ligand_fragments);
                 void dock_fragments (const FragmentLigands &ligand_fragments);
                 void link_fragments (const FragmentLigands &ligand_fragments);
                 void make_scaffolds (FragmentLigands &ligand_fragments, const std::set<std::string> &seeds_to_add);

@@ -45,6 +45,8 @@ namespace Program {
 
                 Molib::NRset get_top_seeds(const std::set<std::string> &seeds, const double top_percent) const;
                 Molib::NRset get_top_seeds(const Molib::Molecule      &ligand, const double top_percent) const;
+
+                Docker::Gpoints get_gridhcp();
         };
 
 }

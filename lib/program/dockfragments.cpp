@@ -107,11 +107,7 @@ namespace Program {
                 /* Create gridpoints for ALL centroids representing one or more binding sites
                  * 
                  */
-                Docker::Gpoints gpoints(__score, __fragmented_ligands.ligand_idatm_types(), __found_centroids.centroids(),
-                                        __gridrec, cmdl.get_double_option("grid"), cmdl.get_int_option("cutoff"),
-                                        cmdl.get_double_option("excluded"), 
-                                        cmdl.get_double_option("interatomic"));
-                Inout::output_file(gpoints, Path::join(__name, cmdl.get_string_option("gridpdb_hcp")));
+                Docker::Gpoints gpoints = get_gridhcp();
 
                 /* Create a zero centered centroid with 10 A radius (max fragment 
                  * radius) for getting all conformations of each seed
@@ -215,5 +211,13 @@ namespace Program {
                         }
                 }
                 return get_top_seeds(seeds_to_read, top_percent);
+        }
+
+        Docker::Gpoints DockFragments::get_gridhcp() {
+                Docker::Gpoints gpoints(__score, __fragmented_ligands.ligand_idatm_types(), __found_centroids.centroids(),
+                                        __gridrec, cmdl.get_double_option("grid"), cmdl.get_int_option("cutoff"),
+                                        cmdl.get_double_option("excluded"), 
+                                        cmdl.get_double_option("interatomic"));
+                return gpoints;
         }
 }

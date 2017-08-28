@@ -172,6 +172,25 @@ namespace Program {
                 }
         }
 
+        void Target::make_gridhcp(const FragmentLigands &ligand_fragments) {
+                find_centroids();
+
+                __initialize_score(ligand_fragments);
+                __initialize_ffield();
+
+                for ( auto &a : __preprecs ) {
+
+                        if (a.prepseeds != nullptr) {
+                                continue;
+                        }
+
+                        a.prepseeds = new DockFragments(*a.centroids, ligand_fragments, *a.score, *a.gridrec, a.protein.name());
+                        Docker::Gpoints gpoints = a.prepseeds->get_gridhcp();
+                        Inout::output_file(gpoints, Path::join(a.protein.name(), cmdl.get_string_option("gridpdb_hcp")));
+                }
+
+        }
+
         void Target::dock_fragments(const FragmentLigands& ligand_fragments) {
 
                 find_centroids();
