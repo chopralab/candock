@@ -181,7 +181,7 @@ namespace Program {
 
                 for ( auto &a : __preprecs ) {
 
-                        if (a->prepseeds != nullptr) {
+                        if (a->prepseeds == nullptr) {
                                 Program::DockFragments *prepseeds = new Program::DockFragments(*(a->centroids), ligand_fragments, *(a->score), *(a->gridrec), a->protein.name());
                                 a->prepseeds = std::unique_ptr<Program::DockFragments> (prepseeds);
                         }
