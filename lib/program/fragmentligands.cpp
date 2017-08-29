@@ -19,22 +19,24 @@ namespace Program {
 
         void FragmentLigands::__read_from_files() {
 
+                Parser::FileParser lpdb (cmdl.get_string_option ("prep"), Parser::all_models, cmdl.get_int_option ("max_num_ligands"));
+
+                Molib::Molecules ligands;
+
+                while (lpdb.parse_molecule (ligands)) {
+                        __ligand_idatm_types = ligands.get_idatm_types (__ligand_idatm_types);
+                        if (Inout::file_size (cmdl.get_string_option ("seeds_pdb")) <= 0) {
+                                Molib::create_mols_from_seeds (__added, __seeds, ligands);
+                        }
+                        ligands.clear();
+                }
+
+                __seeds.erase_properties();
+
                 if (Inout::file_size (cmdl.get_string_option ("seeds_pdb")) <= 0) {
 
                         log_warning << "Could not read seeds from " << cmdl.get_string_option ("seeds_pdb") << endl;
                         log_note << "Reading fragmented files from " << cmdl.get_string_option ("prep") << endl;
-
-                        Parser::FileParser lpdb (cmdl.get_string_option ("prep"), Parser::all_models, cmdl.get_int_option ("max_num_ligands"));
-
-                        Molib::Molecules ligands;
-
-                        while (lpdb.parse_molecule (ligands)) {
-                                __ligand_idatm_types = ligands.get_idatm_types (__ligand_idatm_types);
-                                Molib::create_mols_from_seeds (__added, __seeds, ligands);
-                                ligands.clear();
-                        }
-
-                        __seeds.erase_properties();
 
                         Inout::output_file (__seeds, cmdl.get_string_option ("seeds_pdb"), ios_base::out);
                 } else {
