@@ -16,37 +16,15 @@
 
 namespace Program {
 
-        // TODO: Implement as a templated_map<Molecule,Target,Target> ????? Or as a Molecules?????
-
-        class FindCentroids;
-        class DockFragments;
-        class LinkFragments;
-
         class CANDOCK_EXPORT Target {
 
-                // FIXME: There's a better to design this, but this works for *now*
-                // TODO:  Consider using ProgramSteps instead of named things?
-                struct CANDOCK_EXPORT DockedReceptor {
-
-                        DockedReceptor (Molib::Molecule &rec, const std::string &file) :
-                                filename(file), protein (rec){
-                        }
-
-                        DockedReceptor (const DockedReceptor &rhs) = delete;
-                        DockedReceptor &operator= (const DockedReceptor &rhs) = delete;
-
-                        std::string          filename;
-                        Molib::Molecule      &protein;
-                        std::unique_ptr <Molib::Score>            score;
-                        std::unique_ptr <OMMIface::ForceField>    ffield;
-                        std::unique_ptr <Molib::Atom::Grid>       gridrec;
-                        std::unique_ptr <Program::FindCentroids>  centroids;
-                        std::unique_ptr <Program::DockFragments>  prepseeds;
-                        std::unique_ptr <Program::LinkFragments>  dockedlig;
-                };
-
-                Molib::Molecules            __receptors;
-                std::vector<std::unique_ptr<DockedReceptor>> __preprecs;
+                std::unique_ptr <Molib::Molecule>         __protein;
+                std::unique_ptr <Molib::Score>            __score;
+                std::unique_ptr <OMMIface::ForceField>    __ffield;
+                std::unique_ptr <Molib::Atom::Grid>       __gridrec;
+                std::unique_ptr <Program::FindCentroids>  __centroids;
+                std::unique_ptr <Program::DockFragments>  __prepseeds;
+                std::unique_ptr <Program::LinkFragments>  __dockedlig;
 
                 void __initialize_score(const FragmentLigands &ligand_fragments);
                 void __initialize_ffield();
@@ -57,22 +35,22 @@ namespace Program {
                 Target (const Target &) = delete;
                 Target &operator= (const Target &) = delete;
 
-                std::set<int> get_idatm_types (const std::set<int> &previous = std::set<int>());
+                std::set<int> get_idatm_types (const std::set<int> &previous = std::set<int>()) const;
 
-                // TODO: Instead of named function, pass in fully initiallized ProgramSteps????????
-                void find_centroids();
-                void make_gridhcp  (const FragmentLigands &ligand_fragments);
+                void find_centroids ();
+                void make_gridhcp   (const FragmentLigands &ligand_fragments);
                 void dock_fragments (const FragmentLigands &ligand_fragments);
                 void link_fragments (const FragmentLigands &ligand_fragments);
-                void make_scaffolds (FragmentLigands &ligand_fragments, const std::set<std::string> &seeds_to_add);
-                void design_ligands (FragmentLigands &ligand_fragments, const std::set<std::string> &seeds_to_add);
+                void make_scaffolds (const std::set<std::string>& seeds_to_add, Molib::Molecules& all_designs_out );
+                void design_ligands (const std::set<std::string>& seeds_to_add, Molib::Molecules& all_designs_out );
 
-                static void make_objective();
+                const DockFragments& get_seeds() const {
+                        return *__prepseeds;
+                }
 
-                // TODO: Ideally this would be done internally.....
-                std::multiset<std::string> determine_overlapping_seeds (const int max_seeds, const int number_of_occurances) const;
-
-                static std::set<std::string> determine_non_overlapping_seeds (const Target &targets, const Target &antitargets);
+                const std::string& name() const {
+                        return __protein->name();
+                }
         };
 
 }

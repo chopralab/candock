@@ -5,7 +5,7 @@
 #include <boost/filesystem.hpp>
 
 #include "program/cmdlnopts.hpp"
-#include "program/target.hpp"
+#include "program/targetgroup.hpp"
 #include "program/fragmentligands.hpp"
 
 #include "version.hpp"
@@ -54,22 +54,21 @@ int main(int argc, char* argv[]) {
                 ligand_fragmenter.run_step();
 
                 //TODO: Combine into one class?????
-                Program::Target targets (cmdl.get_string_option("target_dir"));
-                targets.link_fragments(ligand_fragmenter);
+                Program::TargetGroup targets (cmdl.get_string_option("target_dir"));
+                targets.dock_ligands(ligand_fragmenter);
 
-                Program::Target antitargets(cmdl.get_string_option("antitarget_dir"));
-                antitargets.find_centroids();
+                Program::TargetGroup antitargets(cmdl.get_string_option("antitarget_dir"));
                 antitargets.dock_fragments(ligand_fragmenter);
 
                 if (cmdl.get_bool_option("antitarget_linking"))
-                        antitargets.link_fragments(ligand_fragmenter);
+                        antitargets.dock_ligands(ligand_fragmenter);
 
-                set<string> solo_target_seeds = Program::Target::determine_non_overlapping_seeds(targets, antitargets);
+                set<string> solo_target_seeds = Program::TargetGroup::determine_non_overlapping_seeds(targets, antitargets);
                 if (cmdl.get_bool_option("new_scaffold") || ! boost::filesystem::is_regular_file(cmdl.get_string_option("prep"))) {
-                        targets.make_scaffolds(ligand_fragmenter, solo_target_seeds);
+                        targets.make_scaffolds(antitargets);
                 }
 
-                targets.design_ligands(ligand_fragmenter, solo_target_seeds);
+                targets.design_ligands(antitargets);
 
                 main_timer.display_time("Finished");
         } catch ( exception& e) {

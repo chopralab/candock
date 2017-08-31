@@ -90,7 +90,7 @@ namespace OMMIface {
 
                 stringstream ss;
                 ss << "warning : missing kb force type " << help::idatm_unmask[aclass1] 
-                   << "-" << help::idatm_unmask[aclass2];
+                   << "-" << help::idatm_unmask[aclass2] << " requested " << aclass1 << " " << aclass2;
                 throw ParameterError(ss.str());
 
         }

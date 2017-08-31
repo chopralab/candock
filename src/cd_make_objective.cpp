@@ -27,7 +27,17 @@ int main(int argc, char* argv[]) {
                         Version::get_run_info();
                 cout << help::Options::get_options()->configuration_file() << endl;
 
-                Program::Target::make_objective();
+                Molib::Score score(cmdl.get_string_option("ref"), "complete",
+                                   cmdl.get_string_option("func"), cmdl.get_int_option("cutoff"),
+                                   cmdl.get_double_option("step"));
+
+                score.define_composition(set<int>(), set<int>())
+                     .process_distributions_file(cmdl.get_string_option("dist"))
+                     .compile_objective_function();
+
+                score.output_objective_function(cmdl.get_string_option("obj_dir"));
+
+                Inout::output_file(score, cmdl.get_string_option("potential_file"));
 
                 main_timer.display_time("Finished");
         } catch (exception& e) {

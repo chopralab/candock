@@ -16,6 +16,9 @@ set( program_SRC
         linkfragments.cpp
         linkfragments.hpp
         target.cpp
-        target.hpp)
+        target.hpp
+        targetgroup.cpp
+        targetgroup.hpp
+  )
 
 add_library(program OBJECT ${program_SRC})
