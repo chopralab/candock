@@ -47,7 +47,7 @@ namespace Program {
                 return good_seed_list;
         }
 
-        std::set<std::string> TargetGroup::determine_non_overlapping_seeds (const TargetGroup &targets, const TargetGroup &antitargets) {
+        std::set<std::string> TargetGroup::determine_non_overlapping_seeds (const TargetGroup &antitargets) {
                 set<string> solo_target_seeds;
                 const vector<string> &forced_seeds = cmdl.get_string_vector ("force_seed");
 
@@ -55,7 +55,7 @@ namespace Program {
                         std::copy (forced_seeds.begin(), forced_seeds.end(), std::inserter (solo_target_seeds, solo_target_seeds.end()));
                 } else {
                         log_step << "Determining the best seeds to add" << endl;
-                        multiset<string>  target_seeds =     targets.determine_overlapping_seeds (cmdl.get_int_option ("seeds_to_add"),   cmdl.get_int_option ("seeds_till_good"));
+                        multiset<string>  target_seeds =             determine_overlapping_seeds (cmdl.get_int_option ("seeds_to_add"),   cmdl.get_int_option ("seeds_till_good"));
                         multiset<string> atarget_seeds = antitargets.determine_overlapping_seeds (cmdl.get_int_option ("seeds_to_avoid"), cmdl.get_int_option ("seeds_till_bad"));
 
                         std::set_difference (target_seeds.begin(),  target_seeds.end(),
@@ -69,7 +69,7 @@ namespace Program {
 
         void TargetGroup::make_scaffolds(const TargetGroup& antitargets) {
 
-                set<string> seeds_to_add = Program::TargetGroup::determine_non_overlapping_seeds(*this, antitargets);
+                set<string> seeds_to_add = determine_non_overlapping_seeds(antitargets);
 
                 std::stringstream used_seeds;
                 for (auto &s : seeds_to_add ) {
@@ -118,7 +118,7 @@ namespace Program {
 
         void TargetGroup::design_ligands(const TargetGroup& antitargets) {
 
-                set<string> seeds_to_add = Program::TargetGroup::determine_non_overlapping_seeds(*this, antitargets);
+                set<string> seeds_to_add = determine_non_overlapping_seeds(antitargets);
 
                 std::stringstream used_seeds;
                 for (auto &s : seeds_to_add ) {

@@ -63,7 +63,6 @@ int main(int argc, char* argv[]) {
                 if (cmdl.get_bool_option("antitarget_linking"))
                         antitargets.dock_ligands(ligand_fragmenter);
 
-                set<string> solo_target_seeds = Program::TargetGroup::determine_non_overlapping_seeds(targets, antitargets);
                 if (cmdl.get_bool_option("new_scaffold") || ! boost::filesystem::is_regular_file(cmdl.get_string_option("prep"))) {
                         targets.make_scaffolds(antitargets);
                 }
