@@ -82,13 +82,6 @@ foreach( candock_program ${program_names} )
 
     target_link_libraries( cd_${candock_program} ${all_needed_libraries} )
 
-    set_target_properties(
-        cd_${candock_program}
-        PROPERTIES
-        INSTALL_RPATH ${CMAKE_INSTALL_PREFIX}/lib/${CANDOCK_VERSION}:${CMAKE_INSTALL_PREFIX}/lib/ext
-        INSTALL_RPATH_USE_LINK_PATH TRUE
-    )
-
     install(
         TARGETS
             cd_${candock_program}
