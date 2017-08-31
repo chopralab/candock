@@ -35,4 +35,4 @@ SECONDS=0
 
 $MCANDOCK_PATH/bin/$MCANDOCK_VER/cd_${__sub_program} $([[ ! -z "$@" ]] && echo "$@")
 
-echo "All caclulations for ${__sub_program} are complete taking $SECONDS to complete"
+echo "All calculations for ${__sub_program} are complete taking $SECONDS to complete"

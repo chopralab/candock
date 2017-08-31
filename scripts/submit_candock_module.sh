@@ -14,4 +14,7 @@ export module_to_run=$1
 
 shift 1
 
-qsub -V $MCANDOCK_MOD_PATH/${module_to_run}.sh -d . $([[ ! -z "$@" ]] && echo "$@")
+__variable_list=`env | grep CANDOCK | sed -e ':a;N;$!ba;s/\n/,/g'`
+
+qsub -v module_to_run,$__variable_list $MCANDOCK_MOD_PATH/${module_to_run}.sh -d . $([[ ! -z "$@" ]] && echo "$@")
+
