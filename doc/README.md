@@ -153,4 +153,18 @@ mkdir -p top_0.02/all_conf
 cd top_0.02/all_conf
 dock_multiple.sh link_fragments
 ```
-### All Variables
+## Troubleshooting
+
+### You have no seeds, cannot proceed!
+
+Make sure you have provided a *ligands.mol2* file and that it fragments properly. You can check this by running `prep_fragments.sh` in the same directory that contains this file.
+
+### Graph is empty
+
+This error ussually occurs when a ligand consists of one fragment and all the seeds for this fragment have positive scores. There are two ways to fix this, either increase the size of the binding pocket, or increase *max_allow_energy* to be greater than the score of atleast one seed.
+
+### The linking step produces no output, but does not give any errors
+
+Check the *docked_dir* with `ls -a` to see if a *.pdb* file exists. If so, it is likely that the original *ligands.mol2* file was not formatted properly, and you did not provide a name for your molecules. You can add names to your molecules by placing text under the *@TRIPOS<MOLECULE>* lines in the initial *ligands.mol2* file.
+
+## All Variables
