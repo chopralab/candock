@@ -95,7 +95,7 @@ namespace Molib {
                         throw Error( "Objective function not found! check 'obj_dir' and 'step'");
                 }
 
-                for (auto &atom_pair : __prot_lig_pairs) {
+                for (auto &atom_pair : __avail_prot_lig) {
 
                         const string idatm_type1 = help::idatm_unmask[atom_pair.first];
                         const string idatm_type2 = help::idatm_unmask[atom_pair.second];
@@ -180,37 +180,39 @@ namespace Molib {
                 return energy_sum;
         }
 
-	Score& Score::define_composition(const set<int> &receptor_idatm_types, const set<int> &ligand_idatm_types) {
-		// JANEZ: num_pairs is now __prot_lig_pairs.size() !!!
-		set<int> idatm_types;
-		for (auto &key : receptor_idatm_types) idatm_types.insert(key);
-		for (auto &key : ligand_idatm_types) idatm_types.insert(key);
-		
-		dbgmsg("idatm_types.size() = " << idatm_types.size());
-		if (__comp == "reduced") {
-			for (auto &prot_key : idatm_types) {
-				for (auto &lig_key : idatm_types) {
-					__prot_lig_pairs.insert(minmax(prot_key, lig_key));
-				}
-			}
-		} else if (__comp == "complete") {
-			int sz = help::idatm_mask.size();
-			for (int i = 0; i < sz; ++i) {
-				for (int j = i; j < sz; ++j) {
-					__prot_lig_pairs.insert({i, j});
-				}
-			}
-		}
-		dbgmsg("__prot_lig_pairs.size() = " << __prot_lig_pairs.size());
+        Score& Score::define_composition(const set<int> &receptor_idatm_types, const set<int> &ligand_idatm_types) {
+                set<int> idatm_types;
+                for (auto &key : receptor_idatm_types) idatm_types.insert(key);
+                for (auto &key : ligand_idatm_types) idatm_types.insert(key);
+
+                dbgmsg("idatm_types.size() = " << idatm_types.size());
+                for (auto &prot_key : idatm_types) {
+                        for (auto &lig_key : idatm_types) {
+                                __prot_lig_pairs.insert(minmax(prot_key, lig_key));
+                        }
+                }
+
+                __avail_prot_lig = __prot_lig_pairs;
+
+                if (__comp == "complete") {
+                        int sz = help::idatm_mask.size();
+                        for (int i = 0; i < sz; ++i) {
+                                for (int j = i; j < sz; ++j) {
+                                        __prot_lig_pairs.insert({i, j});
+                                }
+                        }
+                }
+
+                dbgmsg("__prot_lig_pairs.size() = " << __prot_lig_pairs.size());
 #ifndef NDEBUG
-		for (auto &i : __prot_lig_pairs) {
-			dbgmsg("pairs: " << help::idatm_unmask[i.first] << " " 
-				<< help::idatm_unmask[i.second]); 
-		}
+                for (auto &i : __prot_lig_pairs) {
+                        dbgmsg("pairs: " << help::idatm_unmask[i.first] << " " 
+                                << help::idatm_unmask[i.second]); 
+                }
 #endif
-		return *this;
-	}
-	
+                return *this;
+        }
+
 	Score& Score::process_distributions_file(const string &distributions_file) {
 		Benchmark bench;
 		log_step << "processing combined histogram ...\n";
