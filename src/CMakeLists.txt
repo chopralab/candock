@@ -91,17 +91,10 @@ foreach( candock_program ${program_names} )
     )
 
     if( NOT WIN32 )
-    
         install(CODE "message( STATUS \"Linking ${candock_program}.sh\")
             execute_process(
                   WORKING_DIRECTORY  ${CMAKE_INSTALL_PREFIX}/modules/${CANDOCK_VERSION}
                   COMMAND ${CMAKE_COMMAND} -E create_symlink module.sh ${candock_program}.sh)")
-
-    else ( NOT WIN32 )
-        install(CODE "message( STATUS \"Copying ${candock_program}.sh\")
-            execute_process(
-                  WORKING_DIRECTORY  ${CMAKE_INSTALL_PREFIX}/modules/${CANDOCK_VERSION}
-                  COMMAND ${CMAKE_COMMAND} -E copy module.sh ${candock_program}.sh)")
     endif( NOT WIN32 )
 endforeach( candock_program ${program_names} )
 

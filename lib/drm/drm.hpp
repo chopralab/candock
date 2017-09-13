@@ -1,7 +1,7 @@
 #ifndef DRM_H
 #define DRM_H
 
-#include "program/candockexport.hpp"
+#include "candockexport.hpp"
 
 
 class CANDOCK_EXPORT drm {

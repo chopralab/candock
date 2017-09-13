@@ -1,7 +1,6 @@
 include_directories($CMAKE_CURRENT_SOURCE_DIR)
 
 set( program_SRC
-        candockexport.hpp
         cmdlnopts.cpp
         cmdlnopts.hpp
         programstep.hpp

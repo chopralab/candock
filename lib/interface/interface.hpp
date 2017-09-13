@@ -1,7 +1,7 @@
 #ifndef INTERFACE_H
 #define INTERFACE_H
 
-#include "program/candockexport.hpp"
+#include "candockexport.hpp"
 #include <stddef.h>
 
 #ifdef __cplusplus

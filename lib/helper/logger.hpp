@@ -4,6 +4,8 @@
 #include <memory>
 #include <iostream>
 
+#include "candockexport.hpp"
+
 namespace Inout {
 
         enum Severity {
@@ -15,7 +17,7 @@ namespace Inout {
                 CD_ERROR     = 1 << 5
         };
 
-        class Logger {
+        class CANDOCK_EXPORT Logger {
 
                 static int __application_setting;
                 static bool __all_to_stderr;

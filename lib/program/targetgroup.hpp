@@ -6,9 +6,10 @@
 
 namespace Program {
         class CANDOCK_EXPORT TargetGroup {
-                std::vector< std::unique_ptr<Target> > __targets;
+                std::vector< Target* > __targets;
         public:
                 TargetGroup (const std::string &input_name);
+				virtual ~TargetGroup();
 
                 void dock_fragments(const FragmentLigands& ligands);
                 void dock_ligands(const FragmentLigands& ligands);
