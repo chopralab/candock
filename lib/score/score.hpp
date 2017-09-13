@@ -33,11 +33,12 @@ namespace Molib {
 		AtomPairValues __energies, __derivatives; // objective function
 		AtomPairValues __energies_scoring; // scoring function
 
-		map<pair_of_ints, double> __sum_gij_of_r_numerator;
-		vector<double> __gij_of_r_bin_range_sum, __bin_range_sum;
-		double __total_quantity;
-		set<pair_of_ints> __prot_lig_pairs;
-		
+                map<pair_of_ints, double> __sum_gij_of_r_numerator;
+                vector<double> __gij_of_r_bin_range_sum, __bin_range_sum;
+                double __total_quantity;
+                set<pair_of_ints> __prot_lig_pairs;
+                set<pair_of_ints> __avail_prot_lig;
+
 		const double __eps;
 		const string __ref_state, __comp, __rad_or_raw;
 		const double __dist_cutoff, __step_non_bond;
