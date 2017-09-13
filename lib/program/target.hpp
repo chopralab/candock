@@ -32,8 +32,8 @@ namespace Program {
 
         public:
                 Target (const std::string &input_name);
-                Target (const Target &) = delete;
-                Target &operator= (const Target &) = delete;
+				//Target(const Target &) {};
+				//Target &operator= (const Target &) {};
 
                 std::set<int> get_idatm_types (const std::set<int> &previous = std::set<int>()) const;
 

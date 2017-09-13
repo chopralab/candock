@@ -34,6 +34,7 @@ if (NOT ${CANDOCK_BUILD_STATIC_EXECUTABLE})
 
 add_library(
     candock SHARED
+        candockexport.hpp
         $<TARGET_OBJECTS:interface>
         $<TARGET_OBJECTS:fileout>
         $<TARGET_OBJECTS:program>
@@ -89,3 +90,16 @@ else (NOT WIN32)
 endif(NOT WIN32)
 
 endif (NOT ${CANDOCK_BUILD_STATIC_EXECUTABLE})
+
+if(WIN32)
+
+     install(
+	     FILES
+			${GSL_LIBRARIES}
+			${OPENMM_LIBRARIES}
+			${Boost_LIBRARIES}
+	 	 RUNTIME DESTINATION
+			lib/${CANDOCK_VERSION}
+	 )
+
+endif(WIN32)

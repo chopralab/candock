@@ -4,11 +4,17 @@
 namespace Program {
 
         TargetGroup::TargetGroup(const std::string& input_name) {
-
                 for (const auto &a : Inout::files_matching_pattern (input_name, ".pdb")) {
-                        __targets.push_back (std::unique_ptr<Target>( new Target (a)));
+                        __targets.push_back (new Target (a));
                 }
         }
+
+		TargetGroup::~TargetGroup() {
+				for (Target* target : __targets) {
+                        delete target;
+				}
+				__targets.clear();
+		}
 
         void TargetGroup::dock_fragments(const FragmentLigands& ligands) {
                 for (auto &target : __targets) {
@@ -21,7 +27,7 @@ namespace Program {
                         target->link_fragments(ligands);
                 }
         }
-        
+
         std::multiset<std::string> TargetGroup::determine_overlapping_seeds (const int max_seeds, const int number_of_occurances) const {
 
                 std::multiset<std::string> good_seed_list;

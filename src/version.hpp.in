@@ -1,7 +1,10 @@
 #ifndef VERSION_H
 #define VERSION_H
 
+#ifndef _WINDOWS
 #include <boost/asio/ip/host_name.hpp>
+#endif
+
 #include <thread>
 #include <string>
 #include "program/options.hpp"
@@ -35,9 +38,16 @@ namespace Version {
         }
 
         std::string get_run_info() {
+#ifndef _WINDOWS
                 return std::string("running ") + cmdl.program_name() + " on hostname " + boost::asio::ip::host_name() + "\n" +
                        "Detected support for " + std::to_string(std::thread::hardware_concurrency()) + " concurrent threads." + "\n\t" +
                        " Using " + std::to_string(cmdl.ncpu()) + " threads.\n";
+#else
+                return std::string("running ") + cmdl.program_name() + " on hostname " + " Windows" + "\n" +
+                       "Detected support for " + std::to_string(std::thread::hardware_concurrency()) + " concurrent threads." + "\n\t" +
+                       " Using " + std::to_string(cmdl.ncpu()) + " threads.\n";
+
+#endif
         }
 
         std::string get_install_path() {

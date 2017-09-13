@@ -60,8 +60,16 @@ if (WIN32)
 
     set(Boost_USE_STATIC_LIBS        OFF)
     set(Boost_USE_MULTITHREADED      ON)    
-    set(Boost_USE_STATIC_RUNTIME     OFF)
-    set(BOOST_ALL_DYN_LINK           ON)   # force dynamic linking for all libraries
+
+	if (${CANDOCK_BUILD_STATIC_EXECUTABLE})
+	    set(Boost_USE_STATIC_LIBS        ON)
+	    set(Boost_USE_STATIC_RUNTIME     ON)
+	    set(BOOST_ALL_DYN_LINK           OFF)   # force dynamic linking for all libraries
+	else (${CANDOCK_BUILD_STATIC_EXECUTABLE})
+	    set(Boost_USE_STATIC_LIBS        OFF)
+	    set(Boost_USE_STATIC_RUNTIME     OFF)
+	    set(BOOST_ALL_DYN_LINK           ON)   # force dynamic linking for all libraries
+	endif(${CANDOCK_BUILD_STATIC_EXECUTABLE})
 
     add_definitions( /D_USE_MATH_DEFINES /DBOOST_ALL_NO_LIB /DBOOST_ALL_DYN_LINK /DWIN32_LEAN_AND_MEAN /DWINVER=0x0A00 /D_WIN32_WINNT=0x0A00)
 
