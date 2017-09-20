@@ -35,7 +35,7 @@ namespace Score {
                 AtomPairValues __energies_scoring; // scoring function
 
                 std::map<pair_of_ints, double> __sum_gij_of_r_numerator;
-                vector<double> __gij_of_r_bin_range_sum, __bin_range_sum;
+                std::vector<double> __gij_of_r_bin_range_sum, __bin_range_sum;
                 double __total_quantity;
                 std::set<pair_of_ints> __prot_lig_pairs;
                 std::set<pair_of_ints> __avail_prot_lig;
@@ -60,12 +60,12 @@ namespace Score {
                 double non_bonded_energy(const Molib::Atom::Grid &gridrec, const Molib::Molecule&) const; // this was formerly called distances_and_scores_frag_lig
                 double non_bonded_energy(const Molib::Atom::Grid &gridrec, const Molib::Atom::Vec &atoms, const Geom3D::Point::Vec &crds) const;
 
-                Array1d<double> compute_energy(const Molib::Atom::Grid &gridrec, const Geom3D::Coordinate &crd, const set<int> &ligand_atom_types) const;
+                Array1d<double> compute_energy(const Molib::Atom::Grid &gridrec, const Geom3D::Coordinate &crd, const std::set<int> &ligand_atom_types) const;
 
                 const AtomPairValues& get_energies() const { return __energies; }
                 const AtomPairValues& get_derivatives() const { return __derivatives; }
 
-                Score& define_composition(const std::set<int> &receptor_idatm_types, const set<int> &ligand_idatm_types);
+                Score& define_composition(const std::set<int> &receptor_idatm_types, const std::set<int> &ligand_idatm_types);
                 Score& process_distributions_file(const std::string &distributions_file);
                 Score& compile_scoring_function();
                 Score& compile_objective_function();
