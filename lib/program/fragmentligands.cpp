@@ -177,6 +177,7 @@ namespace Program {
                 Inout::output_file (__seeds, cmdl.get_string_option ("seeds_pdb"), ios_base::out);
         }
 
+        // TODO: Consider making another function that computes the properties as well.
         void FragmentLigands::add_seeds_from_molecules (const Molib::Molecules &molecules) {
                 __ligand_idatm_types = molecules.get_idatm_types (__ligand_idatm_types);
                 Molib::create_mols_from_seeds (__added, __seeds, molecules);

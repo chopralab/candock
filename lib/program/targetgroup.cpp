@@ -73,7 +73,7 @@ namespace Program {
                 return solo_target_seeds;
         }
 
-        void TargetGroup::make_scaffolds(const TargetGroup& antitargets) {
+        void TargetGroup::make_scaffolds(const TargetGroup& antitargets, FragmentLigands& ligands) {
 
                 set<string> seeds_to_add = determine_non_overlapping_seeds(antitargets);
 
@@ -120,9 +120,15 @@ namespace Program {
                         Fileout::print_mol2(ss,m);
                 }
                 Inout::output_file(ss.str(), "designed_0.mol2");
+
+                ligands.add_seeds_from_molecules(all_designs);
+
+                for (auto &target : __targets) {
+                        target->link_fragments(ligands);
+                }
         }
 
-        void TargetGroup::design_ligands(const TargetGroup& antitargets) {
+        void TargetGroup::design_ligands(const TargetGroup& antitargets, FragmentLigands& ligands) {
 
                 set<string> seeds_to_add = determine_non_overlapping_seeds(antitargets);
 
@@ -179,6 +185,12 @@ namespace Program {
                                 Fileout::print_mol2(ss,m);
                         }
                         Inout::output_file(ss.str(), "designed_" + std::to_string(n) + ".mol2");
+
+                        ligands.add_seeds_from_molecules(all_designs);
+
+                        for (auto &target : __targets) {
+                                target->link_fragments(ligands);
+                        }
                 }
 
         }

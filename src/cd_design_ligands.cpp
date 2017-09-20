@@ -53,7 +53,6 @@ int main(int argc, char* argv[]) {
                 Program::FragmentLigands ligand_fragmenter;
                 ligand_fragmenter.run_step();
 
-                //TODO: Combine into one class?????
                 Program::TargetGroup targets (cmdl.get_string_option("target_dir"));
                 targets.dock_ligands(ligand_fragmenter);
 
@@ -64,10 +63,10 @@ int main(int argc, char* argv[]) {
                         antitargets.dock_ligands(ligand_fragmenter);
 
                 if (cmdl.get_bool_option("new_scaffold") || ! boost::filesystem::is_regular_file(cmdl.get_string_option("prep"))) {
-                        targets.make_scaffolds(antitargets);
+                        targets.make_scaffolds(antitargets, ligand_fragmenter);
                 }
 
-                targets.design_ligands(antitargets);
+                targets.design_ligands(antitargets, ligand_fragmenter);
 
                 main_timer.display_time("Finished");
         } catch ( exception& e) {

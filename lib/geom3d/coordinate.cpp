@@ -30,7 +30,7 @@ namespace Geom3D {
 	unique_ptr<Coordinate> Coordinate::rotate(const Matrix &matrix) {
 		unique_ptr<Coordinate> c(new Coordinate(*this));
 		c->rotate_inline(matrix);
-		return std::move(c);
+		return c;
 	}
 	
 	void Coordinate::inverse_rotate_inline(const Matrix &matrix) {
@@ -51,6 +51,6 @@ namespace Geom3D {
 	unique_ptr<Coordinate> Coordinate::inverse_rotate(const Matrix &matrix) {
 		unique_ptr<Coordinate> c(new Coordinate(*this));
 		c->inverse_rotate_inline(matrix);
-		return std::move(c);
+		return c;
 	}
 };

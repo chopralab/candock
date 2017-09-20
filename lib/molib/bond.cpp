@@ -194,7 +194,8 @@ namespace Molib {
 		return bonds;
 	}
 	BondGraph create_graph(const help::smiles &edges) {
-		return BondGraph(std::move(create_bonds(edges)), true, false);
+                auto bg = BondGraph(create_bonds(edges), true, false);
+		return bg;
 	}
 
 	void erase_stale_bond_refs(const Bond &deleted_bond, const BondVec &bonds) {
