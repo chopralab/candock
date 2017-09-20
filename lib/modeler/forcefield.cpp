@@ -360,7 +360,7 @@ namespace OMMIface {
 		return *this;
 	}
 
-	ForceField& ForceField::add_kb_forcefield(const Molib::Score &score, 
+	ForceField& ForceField::add_kb_forcefield(const Score::Score &score, 
 		const double step, const double cutoff) {
                 this->cutoff = cutoff * OpenMM::NmPerAngstrom;
 		this->step   = step * OpenMM::NmPerAngstrom;

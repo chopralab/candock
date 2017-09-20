@@ -78,10 +78,10 @@ namespace Program {
                         return;
                 }
 
-                Molib::Score *score = new Molib::Score(cmdl.get_string_option("ref"), cmdl.get_string_option("comp"),
+                Score::Score *score = new Score::Score(cmdl.get_string_option("ref"), cmdl.get_string_option("comp"),
                                             cmdl.get_string_option("func"),cmdl.get_int_option("cutoff"),
                                             cmdl.get_double_option("step"));
-                __score = std::unique_ptr<Molib::Score> (score);
+                __score = std::unique_ptr<Score::Score> (score);
 
                 __score->define_composition(__protein->get_idatm_types(),
                                           ligand_fragments.ligand_idatm_types())

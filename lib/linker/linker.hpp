@@ -15,20 +15,23 @@
 #include "dockedconformation.hpp"
 
 namespace Geom3D {
-	class Quaternion;
+        class Quaternion;
 };
 
 namespace Molib {
-	class Atom;
-	class Molecule;
-	class Molecules;
-	class NRset;
-	class Score;
-};
+        class Atom;
+        class Molecule;
+        class Molecules;
+        class NRset;
+}
+
+namespace Score {
+        class Score;
+}
 
 namespace OMMIface {
-	class Modeler;
-};
+        class Modeler;
+}
 
 namespace Linker {
 	class State;
@@ -57,7 +60,7 @@ namespace Linker {
 			const Molib::Molecule &__receptor, &__ligand;
 			const Molib::NRset &__top_seeds;
 			const Molib::Atom::Grid &__gridrec;
-			const Molib::Score &__score;
+			const Score::Score &__score;
 			const double __dist_cutoff, __spin_degrees,
 				__tol_seed_dist, __lower_tol_seed_dist, __upper_tol_seed_dist, 
 				__clash_coeff, __docked_clus_rad,
@@ -105,7 +108,7 @@ namespace Linker {
 		public:
 			GenericLinker(OMMIface::Modeler &modeler, const Molib::Molecule &receptor, 
 				const Molib::Molecule &ligand, const Molib::NRset &top_seeds, 
-				const Molib::Atom::Grid &gridrec, const Molib::Score &score, 
+				const Molib::Atom::Grid &gridrec, const Score::Score &score, 
 				const double dist_cutoff, const double spin_degrees, 
 				const double tol_seed_dist, const double lower_tol_seed_dist, 
 				const double upper_tol_seed_dist, const int max_possible_conf, 
@@ -157,7 +160,7 @@ namespace Linker {
 	public:
 		Linker(OMMIface::Modeler &modeler, const Molib::Molecule &receptor, const Molib::Molecule &ligand, 
 			const Molib::NRset &top_seeds, const Molib::Atom::Grid &gridrec, 
-			const Molib::Score &score, const bool cuda, const bool iterative, const double dist_cutoff, 
+			const Score::Score &score, const bool cuda, const bool iterative, const double dist_cutoff, 
 			const double spin_degrees, const double tol_seed_dist, 
 			const double lower_tol_seed_dist, const double upper_tol_seed_dist, 
 			const int max_possible_conf, const int link_iter, 

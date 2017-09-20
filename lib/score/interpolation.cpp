@@ -11,7 +11,7 @@
 #include <assert.h>
 #include "interpolation.hpp"
 
-namespace Molib {
+namespace Score {
 	vector<double> Interpolation::derivative(const vector<double> &y, const double step) {
 
 		assert(y.size() > 0);

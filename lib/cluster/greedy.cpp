@@ -9,7 +9,9 @@
 #include <exception>
 #include "helper/logger.hpp"
 
-namespace Molib {
+using namespace Molib;
+
+namespace Cluster {
 
 	/**
 	 * Cluter points
@@ -44,7 +46,7 @@ namespace Molib {
 		return reps;
 	}
 
-	Molib::Molecules Cluster::greedy(const Molib::Molecules &initial, const Molib::Score &score, Molib::Atom::Grid &gridrec, const double clus_rad) {
+	Molib::Molecules Cluster::greedy(const Molib::Molecules &initial, const Score::Score &score, Molib::Atom::Grid &gridrec, const double clus_rad) {
 
 		Benchmark bench;
 

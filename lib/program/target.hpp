@@ -19,7 +19,7 @@ namespace Program {
         class CANDOCK_EXPORT Target {
 
                 std::unique_ptr <Molib::Molecule>         __protein;
-                std::unique_ptr <Molib::Score>            __score;
+                std::unique_ptr <Score::Score>            __score;
                 std::unique_ptr <OMMIface::ForceField>    __ffield;
                 std::unique_ptr <Molib::Atom::Grid>       __gridrec;
                 std::unique_ptr <Program::FindCentroids>  __centroids;

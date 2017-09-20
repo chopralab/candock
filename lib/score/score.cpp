@@ -11,7 +11,7 @@
 #include <math.h>
 #include <string>
 
-namespace Molib {
+namespace Score {
 	ostream& operator<< (ostream& stream, const vector<double> &energy) {
 		for (size_t i = 0; i < energy.size(); ++i) {
 			stream << i << "=" << energy[i] << " ";
@@ -146,7 +146,7 @@ namespace Molib {
                 return *this;
         }
 
-        Array1d<double> Score::compute_energy(const Atom::Grid &gridrec, const Geom3D::Coordinate &crd, const set<int> &ligand_atom_types) const {
+        Array1d<double> Score::compute_energy(const Molib::Atom::Grid &gridrec, const Geom3D::Coordinate &crd, const set<int> &ligand_atom_types) const {
                 dbgmsg("computing energy");
                 Array1d<double> energy_sum(*ligand_atom_types.rbegin() + 1);
                 for (auto &patom : gridrec.get_neighbors(crd, __dist_cutoff)) {
@@ -579,14 +579,14 @@ namespace Molib {
 		return -log(ratio);
 	}
 	
-	double Score::non_bonded_energy(const Atom::Grid &gridrec, const Molecule &ligand) const {
+	double Score::non_bonded_energy(const Molib::Atom::Grid &gridrec, const Molib::Molecule &ligand) const {
 		return this->non_bonded_energy(gridrec, ligand.get_atoms(), ligand.get_crds());
 	}
 
-	double Score::non_bonded_energy(const Atom::Grid &gridrec, const Atom::Vec &atoms, const Geom3D::Point::Vec &crds) const {
+	double Score::non_bonded_energy(const Molib::Atom::Grid &gridrec, const Molib::Atom::Vec &atoms, const Geom3D::Point::Vec &crds) const {
 		double energy_sum = 0.0;
 		for (size_t i = 0; i < atoms.size(); ++i) {
-			const Atom &atom2 = *atoms[i];
+			const Molib::Atom &atom2 = *atoms[i];
 			const Geom3D::Coordinate &atom2_crd = crds[i];
 			const auto &atom_2 = atom2.idatm_type();
 			dbgmsg("ligand atom = " << atom2.atom_number() << " crd= " << atom2_crd.pdb());

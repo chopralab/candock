@@ -12,7 +12,7 @@ namespace Program {
 
         DockFragments::DockFragments( const FindCentroids& found_centroids,
                                       const FragmentLigands& fragmented_ligands,
-                                      const Molib::Score& score,
+                                      const Score::Score& score,
                                       const Molib::Atom::Grid& gridrec,
                                       const std::string& name ) :
                                       __found_centroids(found_centroids),

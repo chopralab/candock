@@ -12,7 +12,7 @@
 
 std::unique_ptr <Molib::Molecules> __receptor;
 std::unique_ptr <Molib::Molecules> __ligand;
-std::unique_ptr <Molib::Score> __score;
+std::unique_ptr <Score::Score> __score;
 std::unique_ptr <Molib::Atom::Grid> __gridrec;
 std::unique_ptr <OMMIface::ForceField> __ffield;
 std::string __error_string = "";
@@ -249,8 +249,8 @@ size_t initialize_scoring(const char* obj_dir) {
         }
 
         try {
-                __score = std::unique_ptr<Molib::Score> (
-                                  new  Molib::Score ("mean", "reduced", "radial", 6.0, 0.01));
+                __score = std::unique_ptr<Score::Score> (
+                                  new  Score::Score ("mean", "reduced", "radial", 6.0, 0.01));
 
                 __score->define_composition (__receptor->get_idatm_types(),
                                              __ligand->get_idatm_types())
