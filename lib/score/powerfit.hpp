@@ -12,7 +12,8 @@ namespace Score {
             size_t max_iter
         );
 
-        std::tuple<double, double, double> fit_range_power_function (std::vector<double> x, std::vector<double> y)
+        std::tuple<double, double, double> fit_range_power_function (std::vector<double> x, std::vector<double> y);
+        std::tuple<double, double, double> fit_range_power_function_fast (std::vector<double> x, std::vector<double> y);
 }
 
 #endif

@@ -3,11 +3,10 @@
 #include "molib/molecule.hpp"
 #include "helper/inout.hpp"
 #include "helper/path.hpp"
+#include "powerfit.hpp"
 #include <boost/filesystem/path.hpp>
 #include <boost/filesystem/operations.hpp>
 #include <functional>
-#include <gsl/gsl_errno.h>
-#include <gsl/gsl_spline.h>
 #include <math.h>
 #include <string>
 
@@ -413,26 +412,26 @@ namespace Score {
 				vector<double> potential = Interpolation::interpolate_bspline(dataX, dataY, __step_non_bond);
 
                                 // add repulsion term by fitting 1/x**12 function to slope points
-				const double x1 = __get_lower_bound(*slope.begin());
-				const double x2 = __get_lower_bound(*slope.rbegin());
-				string datapoints("");
-				int i = 0;
-				for (double xi = dataX.front(); xi <= dataX.back(); xi += __step_non_bond) {
-					if (xi >= x1 && xi <=x2) {
-						datapoints += std::to_string(xi) + " " + std::to_string(potential[i]) + "\n";
-					}
-					++i;
-				}
-				
-				dbgmsg("x1 = " << x1);
-				dbgmsg("x2 = " << x2);
-				dbgmsg("datapoints = " << datapoints);
+                                const double x1 = __get_lower_bound(*slope.begin());
+                                const double x2 = __get_lower_bound(*slope.rbegin());
+                                std::vector<double> r;
+                                std::vector<double> pot;
+                                int i = 0;
+                                for (double xi = dataX.front(); xi <= dataX.back(); xi += __step_non_bond) {
+                                        if (xi >= x1 && xi <=x2) {
+                                                r.push_back(xi);
+                                                pot.push_back(potential[i]);
+                                        }
+                                        ++i;
+                                }
+
+                                dbgmsg("x1 = " << x1);
+                                dbgmsg("x2 = " << x2);
+                                dbgmsg("datapoints = " << datapoints);
 
                                 // fit function to slope
-				double coeffA, coeffB, WSSR;
-				std::tie(coeffA, coeffB, WSSR) = help::gnuplot(x1, x2, datapoints);
-
-                                if (WSSR == HUGE_VAL) throw InterpolationError("warning : could not fit repulsion term, zero everything");
+                                double coeffA, coeffB, WSSR;
+                                std::tie(coeffA, coeffB, WSSR) = fit_range_power_function_fast(r, pot);
 	
 				dbgmsg("atom1 = " << idatm_type1
 					<< " atom2 = " << idatm_type2

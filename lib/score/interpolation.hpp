@@ -1,7 +1,6 @@
 #ifndef INTERPOLATION_H
 #define INTERPOLATION_H
 #include <vector>
-#include "helper/array1d.hpp"
 
 namespace Score {
         namespace Interpolation {
