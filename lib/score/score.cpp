@@ -408,8 +408,8 @@ namespace Score {
 					dataX.push_back(__get_lower_bound(i));
 					dataY.push_back(energy[i]);
 				}
-			
-				vector<double> potential = Interpolation::interpolate_bspline(dataX, dataY, __step_non_bond);
+
+                                vector<double> potential = Interpolation::interpolate_bspline(dataX, dataY, __step_non_bond);
 
                                 // add repulsion term by fitting 1/x**12 function to slope points
                                 const double x1 = __get_lower_bound(*slope.begin());
@@ -432,18 +432,18 @@ namespace Score {
                                 // fit function to slope
                                 double coeffA, coeffB, WSSR;
                                 std::tie(coeffA, coeffB, WSSR) = fit_range_power_function_fast(r, pot);
-	
+
 				dbgmsg("atom1 = " << idatm_type1
 					<< " atom2 = " << idatm_type2
 					<< " coeffA = " << coeffA
 					<< " coeffB = " << coeffB
 					<< " WSSR = " << WSSR);
-	
-				
+
+
 				vector<double> repulsion;
 				for (double xi = 0; xi < dataX.front(); xi += __step_non_bond) {
 					const double yi = coeffA / pow(xi, 12) + coeffB;
-					repulsion.push_back(std::isinf(yi) ? 10 * coeffA / pow(xi + __step_non_bond , 12) + coeffB: yi);
+					repulsion.push_back(std::isinf(yi) ? 10 * coeffA / pow(xi + __step_non_bond , 12) + coeffB : yi);
 				}
 				dbgmsg("repulsion.size() = " << repulsion.size());
 #ifndef NDEBUG
@@ -456,9 +456,9 @@ namespace Score {
 					repulsion.pop_back();
 					++w;
 				}
-	
+
 				dbgmsg("repulsion.size() = " << repulsion.size());
-	
+
 				const double rep_good = repulsion.back();
 				const double k0 = (potential.front() - rep_good) / w;
 				for (int k = 1; k < w; ++k) {

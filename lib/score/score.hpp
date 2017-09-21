@@ -24,11 +24,6 @@ namespace Score {
                 typedef std::pair<int, int> pair_of_ints;
                 typedef std::map<pair_of_ints, std::vector<double>> AtomPairValues;
 
-                class InterpolationError : public Error {
-                public: 
-                        InterpolationError(const std::string &msg) : Error(msg) {}
-                };
-
                 AtomPairValues __gij_of_r_numerator;
 
                 AtomPairValues __energies, __derivatives; // objective function

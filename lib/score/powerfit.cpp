@@ -16,6 +16,7 @@
 
 #include "helper/debug.hpp"
 #include "helper/error.hpp"
+#include "powerfit.hpp"
 
 namespace Score {
 
@@ -154,9 +155,9 @@ namespace Score {
                 dbgmsg ("reason for stopping: ");
                 (info == 1) ? std::cerr << "small step size\n" : std::cerr << "small gradient\n";
 
-                std::cerr << "initial |f(x)| = " << std::sqrt (chisq0) << "\n";
-                std::cerr << "final   |f(x)| = " << std::sqrt (chisq)  << "\n";
-                std::cerr << "dof            = " << x.size() - param_count << "\n";
+                dbgmsg ("initial |f(x)| = " << std::sqrt (chisq0));
+                dbgmsg ("final   |f(x)| = " << std::sqrt (chisq));
+                dbgmsg ("dof            = " << x.size() - param_count);
 
                 double dof = x.size() - param_count;
                 double c = std::max (1.0, std::sqrt (chisq / dof));
@@ -255,7 +256,7 @@ namespace Score {
                 dbgmsg ("Best  guess: (" << best_guess_sigma << ", " << best_guess_b << ")");
 
                 if (best_error == HUGE_VAL) {
-                        throw Error ("warning : could not fit repulsion term, zero everything");
+                        throw InterpolationError ("warning : could not fit repulsion term, zero everything");
                 }
 
                 return std::make_tuple (best_sigma, best_b, best_p);

@@ -2,8 +2,16 @@
 #define POWERFIT_H
 
 #include <tuple>
+#include "helper/error.hpp"
 
 namespace Score {
+    
+        class InterpolationError : public Error {
+        public: 
+                InterpolationError(const std::string &msg) : Error(msg) {}
+        };
+
+    
         std::tuple<double, double, double> fit_power_function (
             std::vector<double> x,
             std::vector<double> y,
