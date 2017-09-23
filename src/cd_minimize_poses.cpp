@@ -62,7 +62,7 @@ int main(int argc, char* argv[]) {
                                          ligand_mols.get_idatm_types())
                      .process_distributions_file(cmdl.get_string_option("dist"))
                      .compile_scoring_function()
-                     .parse_objective_function(cmdl.get_string_option("obj_dir"), cmdl.get_double_option("scale"), 1501);
+                     .compile_objective_function(cmdl.get_double_option("scale"));
 
                 OMMIface::ForceField ffield;
 

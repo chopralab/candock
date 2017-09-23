@@ -266,7 +266,7 @@ namespace Score {
 		return *this;
 	}
 
-	Score& Score::compile_objective_function() {
+	Score& Score::compile_objective_function(const double scale_non_bond) {
 		log_step << "Compiling objective function for minimization...\n";
 		auto energy_function = __ref_state == "mean" ? 
 			mem_fn(&Score::__energy_mean) : mem_fn(&Score::__energy_cumulative);
@@ -487,6 +487,13 @@ namespace Score {
 				potential.insert(potential.begin(), repulsion.begin(), repulsion.end());
 
                                 __energies[atom_pair].assign(potential.begin(), potential.end());
+                                
+                                __derivatives[atom_pair] = Interpolation::derivative(__energies[atom_pair], __step_non_bond);
+
+                                // scale derivatives ONLY not energies and don't do it in kbforce cause here is more efficient
+                                for (auto &dEdt : __derivatives[atom_pair]) {
+                                        dEdt *= scale_non_bond;
+                                }
 
 #ifndef NDEBUG
 				for (size_t i = 0; i < potential.size(); ++i) {

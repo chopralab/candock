@@ -63,7 +63,7 @@ namespace Score {
                 Score& define_composition(const std::set<int> &receptor_idatm_types, const std::set<int> &ligand_idatm_types);
                 Score& process_distributions_file(const std::string &distributions_file);
                 Score& compile_scoring_function();
-                Score& compile_objective_function();
+                Score& compile_objective_function(const double scale_non_bond);
                 Score& parse_objective_function(const std::string &obj_dir, const double scale_non_bond, const size_t max_step);
                 Score& output_objective_function(const std::string &obj_dir);
 

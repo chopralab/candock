@@ -113,7 +113,7 @@ namespace Program {
         void Target::__initialize_kbforce() {
                 OMMIface::SystemTopology::loadPlugins();
 
-                __score->parse_objective_function(cmdl.get_string_option("obj_dir"), cmdl.get_double_option("scale"), 1501);
+                __score->compile_objective_function(cmdl.get_double_option("scale"));
                 __ffield->add_kb_forcefield(*__score, cmdl.get_double_option("step"), 15);
         }
 

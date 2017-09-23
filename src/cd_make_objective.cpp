@@ -33,7 +33,7 @@ int main(int argc, char* argv[]) {
 
                 score.define_composition(set<int>(), set<int>())
                      .process_distributions_file(cmdl.get_string_option("dist"))
-                     .compile_objective_function();
+                     .compile_objective_function(cmdl.get_double_option("scale"));
 
                 score.output_objective_function(cmdl.get_string_option("obj_dir"));
 
