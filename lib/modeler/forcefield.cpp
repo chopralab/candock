@@ -360,10 +360,9 @@ namespace OMMIface {
 		return *this;
 	}
 
-	ForceField& ForceField::add_kb_forcefield(const Score::Score &score, 
-		const double step, const double cutoff) {
-                this->cutoff = cutoff * OpenMM::NmPerAngstrom;
-		this->step   = step * OpenMM::NmPerAngstrom;
+	ForceField& ForceField::add_kb_forcefield(const Score::Score &score) {
+                this->kb_cutoff = score.get_dist_cutoff()  * OpenMM::NmPerAngstrom;
+		this->step      = score.get_step_nonbond() * OpenMM::NmPerAngstrom;
 		for (auto &kv : score.get_energies()) {
 			auto &atom_pair = kv.first;
 			auto &energy = kv.second;

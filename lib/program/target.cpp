@@ -114,7 +114,7 @@ namespace Program {
                 OMMIface::SystemTopology::loadPlugins();
 
                 __score->compile_objective_function(cmdl.get_double_option("scale"));
-                __ffield->add_kb_forcefield(*__score, cmdl.get_double_option("step"), 15);
+                __ffield->add_kb_forcefield(*__score);
         }
 
         std::set<int> Target::get_idatm_types(const std::set<int>& previous) const {

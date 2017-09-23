@@ -294,7 +294,7 @@ size_t initialize_ffield(const char* data_dir) {
                 __ffield = std::unique_ptr<OMMIface::ForceField> (new OMMIface::ForceField);
 
                 __ffield->parse_gaff_dat_file ( (p / "gaff.dat").string())
-                .add_kb_forcefield (*__score, 0.01, 6.0)
+                .add_kb_forcefield (*__score)
                 .parse_forcefield_file ( (p / "amber10.xml").string())
                 .parse_forcefield_file ( (p / "tip3p.xml").string());
 

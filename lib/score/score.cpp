@@ -268,10 +268,17 @@ namespace Score {
 
 	Score& Score::compile_objective_function(const double scale_non_bond) {
 		log_step << "Compiling objective function for minimization...\n";
+                Benchmark bench;
 		auto energy_function = __ref_state == "mean" ? 
 			mem_fn(&Score::__energy_mean) : mem_fn(&Score::__energy_cumulative);
 		for (auto &el1 : __gij_of_r_numerator) {
 			const pair_of_ints &atom_pair = el1.first;
+
+                        // Don't bother making an objective function
+                        // unless we're going to use it
+                        if (!__avail_prot_lig.count(atom_pair))
+                                continue;
+                        
 			const vector<double> &gij_of_r_vals = el1.second;
 			dbgmsg(atom_pair.first << " " << atom_pair.second);
 			const double w1 = help::vdw_radius[atom_pair.first];
@@ -509,9 +516,11 @@ namespace Score {
 				const int n = (int) std::floor( __dist_cutoff / __step_non_bond) + 1;
 				dbgmsg("n = " << n);
 				__energies[atom_pair].assign(n, 0.0);
+                                __derivatives[atom_pair].assign(n,0.0);
 			}
 		}
 		dbgmsg("out of loop");
+                log_benchmark << "Time to compile the objective function: " << bench.seconds_from_start() << "\n";
 		return *this;
 	}
 	

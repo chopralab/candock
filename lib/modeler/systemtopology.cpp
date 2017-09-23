@@ -421,7 +421,7 @@ namespace OMMIface {
                         used_atom_types.insert(atom->idatm_type());
                 }
 
-                __kbforce = new KBPlugin::KBForce(used_atom_types.size(), __ffield->step, __ffield->cutoff);
+                __kbforce = new KBPlugin::KBForce(used_atom_types.size(), __ffield->step, __ffield->kb_cutoff);
 
                 for ( const auto &type1 : used_atom_types ) {
                         for ( const auto &type2 : used_atom_types ) {
@@ -432,7 +432,7 @@ namespace OMMIface {
                                         cerr << e.what() << endl;
                                         cerr << "This is normal for atom types only present in the ligand" << endl;
                                         
-                                        size_t number_of_steps = static_cast<size_t> (__ffield->cutoff / __ffield->step);
+                                        size_t number_of_steps = static_cast<size_t> (__ffield->kb_cutoff / __ffield->step);
                                         __kbforce->addBondType( type1, type2, std::vector<double>(number_of_steps, 0.0),
                                                                               std::vector<double>(number_of_steps, 0.0) );
                                 }

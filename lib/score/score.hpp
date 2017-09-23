@@ -57,6 +57,8 @@ namespace Score {
 
                 Array1d<double> compute_energy(const Molib::Atom::Grid &gridrec, const Geom3D::Coordinate &crd, const std::set<int> &ligand_atom_types) const;
 
+                double get_dist_cutoff() const { return __dist_cutoff; }
+                double get_step_nonbond()const { return __step_non_bond; }
                 const AtomPairValues& get_energies() const { return __energies; }
                 const AtomPairValues& get_derivatives() const { return __derivatives; }
 
