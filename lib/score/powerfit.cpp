@@ -66,8 +66,10 @@ namespace Score {
         }
 
         void ex_rep_callback (const size_t iter, void *unused, const gsl_multifit_nlinear_workspace *w) {
+#ifndef NDEBUG
                 gsl_vector *f      = gsl_multifit_nlinear_residual (w);
                 gsl_vector *params = gsl_multifit_nlinear_position (w);
+#endif
                 double rcond;
 
                 /* compute reciprocal condition number of J(x) */
@@ -153,7 +155,12 @@ namespace Score {
                 dbgmsg ("function evaluations: " << fdf.nevalf);
                 dbgmsg ("Jacobian evaluations: " << fdf.nevaldf);
                 dbgmsg ("reason for stopping: ");
-                (info == 1) ? std::cerr << "small step size\n" : std::cerr << "small gradient\n";
+                
+                if (info == 1) {
+                        dbgmsg("small step size");
+                } else {
+                        dbgmsg("small gradient\n");
+                }
 
                 dbgmsg ("initial |f(x)| = " << std::sqrt (chisq0));
                 dbgmsg ("final   |f(x)| = " << std::sqrt (chisq));
@@ -185,8 +192,9 @@ namespace Score {
 
                 double best_sigma, best_b, best_p;
                 double best_error = HUGE_VAL;
+#ifndef NDEBUG
                 double best_guess_sigma, best_guess_b;
-
+#endif
                 // try a range of coefficients to get the best fit
                 for (double b_guess = -2.00; b_guess <= 2; b_guess += 0.50)
                         for (size_t p_guess = 9; p_guess <= 13; p_guess += 1)
@@ -205,8 +213,10 @@ namespace Score {
                                                 best_sigma = sigma;
                                                 best_b = b;
                                                 best_error = chi;
+#ifndef NDEBUG
                                                 best_guess_sigma = s_guess;
                                                 best_guess_b = b_guess;
+#endif
                                                 best_p = p_guess;
                                         }
                                 }
@@ -225,8 +235,9 @@ namespace Score {
 
                 double best_sigma, best_b, best_p;
                 double best_error = HUGE_VAL;
+#ifndef NDEBUG
                 double best_guess_sigma, best_guess_b;
-
+#endif
                 // try a range of coefficients to get the best fit
                 double b_guess = -1.00;
                 size_t p_guess = 12;
@@ -246,8 +257,10 @@ namespace Score {
                                 best_sigma = sigma;
                                 best_b = b;
                                 best_error = chi;
+#ifndef NDEBUG
                                 best_guess_sigma = s_guess;
                                 best_guess_b = b_guess;
+#endif
                                 best_p = p_guess;
                         }
                 }
