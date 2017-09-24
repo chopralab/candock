@@ -29,13 +29,37 @@ public:
         typedef std::tuple< const Molib::Atom*, const Molib::Atom*,
                             const Molib::Atom*, const Molib::Atom* > BondDihedral;
         typedef std::map< BondDihedral, double> BondDihedrals;
+        typedef std::map< BondDihedral, double> BondImproper;
 
 private:
         BondStretches bs;
         BondAngles    ba;
         BondDihedrals bd;
+        BondDihedrals bi; // Impropers
+
         Glib::Graph<Molib::Atom>::VertexRingMap all_rings;
         std::map<const Molib::Atom*, size_t> substitutions;
+
+        int __comp_atoms ( const Molib::Atom* atom1, const Molib::Atom* atom2) const {
+
+                if ( atom1 == atom2 )
+                        return 0;
+
+                if ( atom1->idatm_type() < atom2->idatm_type() ) {
+                        return -2;
+                } else if ( atom1->idatm_type() > atom2->idatm_type() ) {
+                        return 2;
+                }
+                
+                //IDATM types are equal, compare addresses
+                if ( atom1 < atom2 ) {
+                        return -1;
+                } else if ( atom1 > atom2 ) {
+                        return 1;
+                }
+                
+                return 0;
+        }
 
         std::string __print_ring_info( const std::vector<size_t>& ring_vec) const {
                 if (ring_vec.size() == 0) {
@@ -46,27 +70,56 @@ private:
                 }
                 return std::to_string(ring_vec.at(0));
         }
-        
-public:
 
-        void addStretch ( BondStretch stretch ) {
-                double distance = get<0>(stretch)->crd().distance(get<1>(stretch)->crd());
-                bs[stretch] = distance;
+        void __print_atom( const Molib::Atom* atom, std::ostream& os, char delim ) const {
+                os << help::idatm_unmask[ atom->idatm_type() ] << delim;
+                os << __print_ring_info(all_rings.at(atom)) << delim;
+                os << substitutions.at(atom) << delim;
+
         }
 
-        void addAngle ( BondAngle angle) {
-                const Molib::Atom *atom1, *atom2, *atom3;
-                std::tie(atom1, atom2, atom3) = angle;
+public:
 
-                if (atom1->atom_number() == atom3->atom_number())
+        void addStretch ( BondStretch stretch_atoms ) {
+
+                const Molib::Atom *atom1, *atom2;
+                std::tie(atom1, atom2) = stretch_atoms;
+
+                BondStretch s_new;
+
+                if ( atom1 < atom2 ) {
+                        s_new = make_tuple(atom1, atom2);
+                } else {
+                        s_new = make_tuple(atom2, atom1);
+                }
+
+                if ( bs.count(s_new) )
                         return;
 
-                double angle_val = Geom3D::angle(atom1->crd(), atom2->crd(), atom3->crd());
-                if ( atom1->idatm_type() < atom3->idatm_type() ) {
-                        ba[make_tuple(atom1, atom2, atom3)] = angle_val;
+                double distance = atom1->crd().distance(atom2->crd());
+                bs[s_new] = distance;
+        }
+
+        void addAngle ( BondAngle angle_atoms) {
+
+                const Molib::Atom *atom1, *atom2, *atom3;
+                std::tie(atom1, atom2, atom3) = angle_atoms;
+
+                if (atom1 == atom3)
+                        return;
+
+                BondAngle a_new;
+                if ( atom1 < atom3 ) {
+                        a_new = make_tuple(atom1, atom2, atom3);
                 } else {
-                        ba[make_tuple(atom3, atom2, atom1)] = angle_val;
+                        a_new = make_tuple(atom3, atom2, atom1);
                 }
+
+                if ( ba.count(a_new) )
+                        return;
+
+                double angle = Geom3D::angle(atom1->crd(), atom2->crd(), atom3->crd());
+                ba[a_new] = angle;
         }
 
         void addDihedral (BondDihedral dihedral_atoms) {
@@ -74,24 +127,52 @@ public:
                 const Molib::Atom *atom1, *atom2, *atom3, *atom4;
                 std::tie(atom1, atom2, atom3, atom4) = dihedral_atoms;
             
-                if (atom4->atom_number() == atom3->atom_number())
+                if (atom4 == atom2 || atom4 == atom1 || atom3 == atom1)
+                        return;
+
+
+                BondDihedral d_new;
+
+                if ( atom1 < atom4 ) {
+                        d_new = make_tuple(atom1, atom2, atom3, atom4);
+                } else if ( atom4 < atom1 ) {
+                        d_new = make_tuple(atom4, atom3, atom2, atom1);
+                }
+
+                if ( bd.count(d_new) )
                         return;
 
                 double dihedral = Geom3D::dihedral(atom1->crd(), atom2->crd(),
                                                    atom3->crd(), atom4->crd());
-
-                if ( atom1->idatm_type() < atom4->idatm_type() ) {
-                        bd[make_tuple(atom1, atom2, atom3, atom4)] = dihedral;
-                } else if ( atom1->idatm_type() > atom4->idatm_type() ) {
-                        bd[make_tuple(atom4, atom3, atom2, atom1)] = dihedral;
-                } else {
-                        if ( atom2->idatm_type() < atom3->idatm_type() ) {
-                                bd[make_tuple(atom1, atom2, atom3, atom4)] = dihedral;
-                        } else { // does not matter if they are equal, it will be the same result
-                                bd[make_tuple(atom4, atom3, atom2, atom1)] = dihedral;
-                        }
-                }
+                bd[d_new] = dihedral;
         }
+        
+        void addImproper (BondDihedral improper_atoms) {
+
+                const Molib::Atom *atom1, *atom2, *atom3, *atom4;
+                std::tie(atom1, atom2, atom3, atom4) = improper_atoms;
+            
+                if (atom4 == atom3 || atom4 == atom1 || atom3 == atom1)
+                        return;
+
+                // Order should be:
+                // Lowest, 2nd Lowest, Atom2, highest
+                BondDihedral i_new;
+                
+                const Molib::Atom* highest = max( max( atom1, atom3), atom4);
+                const Molib::Atom* lowest  = min( min( atom1, atom3), atom4);
+                const Molib::Atom* middle  = max( min(atom1,atom3), min(max(atom1,atom3),atom4));
+
+                i_new = make_tuple (lowest, middle, atom2, highest);
+
+                if ( bd.count(i_new) )
+                        return;
+
+                double dihedral = Geom3D::dihedral(atom1->crd(), atom2->crd(),
+                                                   atom3->crd(), atom4->crd());
+                bd[i_new] = dihedral;
+        }
+
 
         void addMolecule( const Molib::Molecule& mol ) {
                 auto all_my_atoms = mol.get_atoms();
@@ -112,6 +193,10 @@ public:
                                                 addDihedral(make_tuple(&atom1, &atom2,
                                                                        &atom3, &atom4));
                                         }
+                                        for ( const auto& atom4 : atom2 ) {
+                                                addImproper(make_tuple(&atom1, &atom2,
+                                                                       &atom3, &atom4));
+                                        }
                                 }
                         }
 
@@ -119,50 +204,46 @@ public:
                 }
         }
 
-        void printBonds () const {
+        void printBonds (std::ostream& os) const {
                 for ( const auto& bond : bs ) {
-                        cout << "BOND: ";
-                        cout << help::idatm_unmask[ get<0>(bond.first)->idatm_type() ] << " ";
-                        cout << help::idatm_unmask[ get<1>(bond.first)->idatm_type() ] << " ";
-                        cout << bond.second;
-                        cout << "\n";
+                        __print_atom(get<0>(bond.first), os, ',');
+                        __print_atom(get<1>(bond.first), os, ',');
+                        os << bond.second;
+                        os << "\n";
                 }
         }
 
-        void printAngles () {
+        void printAngles (std::ostream& os) const {
                 for ( const auto& angle : ba ) {
-                        cout << "ANGLE: ";
-                        cout << help::idatm_unmask[ get<0>(angle.first)->idatm_type() ] << "_";
-                        cout << __print_ring_info(all_rings[get<0>(angle.first)]) << " ";
-                        cout << help::idatm_unmask[ get<1>(angle.first)->idatm_type() ] << "_";
-                        cout << __print_ring_info(all_rings[get<1>(angle.first)]) << " ";
-                        cout << help::idatm_unmask[ get<2>(angle.first)->idatm_type() ] << "_";
-                        cout << __print_ring_info(all_rings[get<2>(angle.first)]) << " ";
-                        cout << Geom3D::degrees(angle.second);
-                        cout << "\n";
+                        __print_atom(get<0>(angle.first), os, ',');
+                        __print_atom(get<1>(angle.first), os, ',');
+                        __print_atom(get<2>(angle.first), os, ',');
+                        os << Geom3D::degrees(angle.second);
+                        os << "\n";
                 }
         }
         
-        void printDihedrals () {
+        void printDihedrals (std::ostream& os) const {
                 for ( const auto& dihedral : bd ) {
-                        cout << "DIHEDRAL: ";
-                        cout << help::idatm_unmask[ get<0>(dihedral.first)->idatm_type() ] << "_";
-                        cout << __print_ring_info(all_rings[get<0>(dihedral.first)]) << "_";
-                        cout << substitutions[get<0>(dihedral.first)] << " ";
-                        cout << help::idatm_unmask[ get<1>(dihedral.first)->idatm_type() ] << "_";
-                        cout << __print_ring_info(all_rings[get<1>(dihedral.first)]) << "_";
-                        cout << substitutions[get<1>(dihedral.first)] << " ";
-                        cout << help::idatm_unmask[ get<2>(dihedral.first)->idatm_type() ] << "_";
-                        cout << __print_ring_info(all_rings[get<2>(dihedral.first)]) << "_";
-                        cout << substitutions[get<2>(dihedral.first)] << " ";
-                        cout << help::idatm_unmask[ get<3>(dihedral.first)->idatm_type() ] << "_";
-                        cout << __print_ring_info(all_rings[get<3>(dihedral.first)]) << "_";
-                        cout << substitutions[get<3>(dihedral.first)] << " ";
-                        cout << Geom3D::degrees(dihedral.second);
-                        cout << "\n";
+                        __print_atom(get<0>(dihedral.first), os, ',');
+                        __print_atom(get<1>(dihedral.first), os, ',');
+                        __print_atom(get<2>(dihedral.first), os, ',');
+                        __print_atom(get<3>(dihedral.first), os, ',');
+                        os << Geom3D::degrees(dihedral.second);
+                        os << "\n";
                 }
         }
 
+        void printImpropers (std::ostream& os) const {
+                for ( const auto& improper : bi ) {
+                        __print_atom(get<0>(improper.first), os, ',');
+                        __print_atom(get<1>(improper.first), os, ',');
+                        __print_atom(get<2>(improper.first), os, ',');
+                        __print_atom(get<3>(improper.first), os, ',');
+                        os << Geom3D::degrees(improper.second);
+                        os << "\n";
+                }
+        }
 
 };
 
@@ -187,9 +268,10 @@ int main(int argc, char* argv[]) {
                         MBE.addMolecule(mols[0]);
                 }
 
-                MBE.printBonds();
-                MBE.printAngles();
-                MBE.printDihedrals();
+                MBE.printBonds(std::cout);
+                MBE.printAngles(std::cout);
+                MBE.printDihedrals(std::cout);
+                MBE.printImpropers(std::cout);
 
         } catch (exception& e) {
                 cerr << e.what() << endl;
