@@ -40,18 +40,7 @@ int main(int argc, char* argv[]) {
                         
                         auto all_my_atoms = mols[0].get_atoms();
                         Molib::Atom::Graph  graph = Molib::Atom::create_graph(all_my_atoms);
-                        auto rings = graph.find_rings();
-                        auto fused = graph.find_fused_rings();
-
-                        auto count_rings = [&] (const Molib::Atom* atom) {
-                                for ( const auto& ring : rings ) {
-                                        for ( const auto& ring_atom : ring ) {
-                                                if ( atom == ring_atom )
-                                                        return ring.size();
-                                        }
-                                }
-                                return (size_t)0;
-                        };
+                        auto atom_ring_map = graph.vertex_rings();
 
                         BondCounts     bc;
                         AngleCounts    ac;
@@ -73,8 +62,8 @@ int main(int argc, char* argv[]) {
                                         }*/
 
                                         cout << "BOND: ";
-                                        cout << help::idatm_unmask[atom1.idatm_type()] << "_" << count_rings(&atom1) << " ";
-                                        cout << help::idatm_unmask[atom2.idatm_type()] << "_" << count_rings(&atom2) << " ";
+                                        cout << help::idatm_unmask[atom1.idatm_type()] << " ";
+                                        cout << help::idatm_unmask[atom2.idatm_type()] << " ";
                                         cout << distance << endl;
 
                                         for ( const auto& atom3 : atom2 ) {
@@ -87,10 +76,24 @@ int main(int argc, char* argv[]) {
                                                                                     atom2->idatm_type(),
                                                                                     min(atom1->idatm_type(), atom2->idatm_type()) );*/
 
-                                                cout << "ANGLE: " << help::idatm_unmask[min(atom1.idatm_type(), atom2.idatm_type())]
-                                                                  << " " << help::idatm_unmask[atom2.idatm_type()]
-                                                                  << " " << help::idatm_unmask[max(atom1.idatm_type(), atom2.idatm_type())]
-                                                                  << " " << Geom3D::degrees(angle) << endl;
+                                                cout << "ANGLE: ";
+                                                if ( atom1.idatm_type() < atom3.idatm_type() ) {
+                                                        cout << help::idatm_unmask[atom1.idatm_type()];
+                                                        atom_ring_map[&atom1].size() == 0 ? cout << " " : cout << "_" << atom_ring_map[&atom1].at(0) << " ";
+                                                        cout << help::idatm_unmask[atom2.idatm_type()];
+                                                        atom_ring_map[&atom2].size() == 0 ? cout << " " : cout << "_" << atom_ring_map[&atom2].at(0) << " ";
+                                                        cout << help::idatm_unmask[atom3.idatm_type()];
+                                                        atom_ring_map[&atom3].size() == 0 ? cout << " " : cout << "_" << atom_ring_map[&atom3].at(0) << " ";
+                                                } else {
+                                                        cout << help::idatm_unmask[atom3.idatm_type()];
+                                                        atom_ring_map[&atom3].size() == 0 ? cout << " " : cout << "_" << atom_ring_map[&atom3].at(0) << " ";
+                                                        cout << help::idatm_unmask[atom2.idatm_type()];
+                                                        atom_ring_map[&atom2].size() == 0 ? cout << " " : cout << "_" << atom_ring_map[&atom2].at(0) << " ";
+                                                        cout << help::idatm_unmask[atom1.idatm_type()];
+                                                        atom_ring_map[&atom1].size() == 0 ? cout << " " : cout << "_" << atom_ring_map[&atom1].at(0) << " ";
+
+                                                }
+                                                cout << Geom3D::degrees(angle) << endl;
 
                                                 for ( const auto& atom4 : atom3 ) {
                                                         if (atom4.atom_number() == atom3.atom_number())
@@ -122,7 +125,6 @@ int main(int argc, char* argv[]) {
                                                                         cout << help::idatm_unmask[atom1.idatm_type()] << " ";
                                                                 }
                                                         }
-                                                        
                                                         cout << dihedral << "\n";
                                                 }
                                         }
