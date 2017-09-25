@@ -55,8 +55,8 @@ namespace Molib {
 		bool is_triple() const { return __bo == 3; }
 		bool is_aromatic() const { return __bond_gaff_type == "AB" 
 			|| __bond_gaff_type == "SB" || __bond_gaff_type == "DB"; }
-		Atom& first_atom(Atom &origin) const { return (&origin == __atom1 ? *__atom1 : *__atom2); }
-		Atom& second_atom(Atom &origin) const { return (&origin == __atom1 ? *__atom2 : *__atom1); }
+		Atom& first_atom(const Atom &origin) const { return (&origin == __atom1 ? *__atom1 : *__atom2); }
+		Atom& second_atom(const Atom &origin) const { return (&origin == __atom1 ? *__atom2 : *__atom1); }
 		Atom& atom1() const { return *__atom1; }
 		Atom& atom2() const { return *__atom2; }
 		int idx1() const { return __idx1; }

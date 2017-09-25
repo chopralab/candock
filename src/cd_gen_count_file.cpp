@@ -52,7 +52,8 @@ private:
         DihedralCounts bdc;
         DihedralCounts bic;
         
-        Glib::Graph<Molib::Atom>::VertexRingMap all_rings;
+        Glib::Graph<Molib::Atom>::Cycles all_rings;
+        Glib::Graph<Molib::Atom>::VertexRingMap all_rings_sizes;
         std::map<const Molib::Atom*, size_t> substitutions;
 
         int __comp_atoms ( const Molib::Atom* atom1, const Molib::Atom* atom2) const {
@@ -82,12 +83,45 @@ private:
         }
 
         int __ring_size( const Molib::Atom* atom ) const {
-                const std::vector<size_t>& ring_vec = all_rings.at(atom);
-                if (ring_vec.size() == 0) {
+                const std::vector<size_t>& ring_vec = all_rings_sizes.at(atom);
+                if (ring_vec.size() == 0) { // Not in a ring
                         return 0;
                 }
-                if (ring_vec.size() > 1) {
-                        return -1;
+                if (ring_vec.size() > 1) { // Bridged or Spiro
+
+                        if ( atom->element() != Molib::Element::C) // Spiro must be carbon
+                                return 2;
+                        
+                        if ( substitutions.at(atom) != 4 ) { // Spiro must have four non-hydrogen neighbors
+                                return 2;
+                        }
+
+                        for ( const Molib::Bond* bond : atom->get_bonds() ) {
+                                const Molib::Atom& other = bond->second_atom(*atom);
+
+                                if ( all_rings_sizes.at(&other).size() == 0 ) { // Spiro must be connected to only rings
+                                        return 2;
+                                }
+                                
+                                if ( all_rings_sizes.at(&other).size() == 1 ) { // Vast majority of cases present here
+                                        continue;
+                                }
+
+                                // Missing quite a few Spiro cases here, they can be added later.
+                                size_t shared_rings = 0;
+                                for ( const auto& thing : all_rings ) {
+                                        // Are they in the same ring?
+                                        if ( thing.count( const_cast<Molib::Atom*>(atom) ) &&
+                                             thing.count( const_cast<Molib::Atom*>(&other) ) ) {
+                                                shared_rings++;
+                                        }
+                                }
+
+                                // FIXME: should be adjusted for large ring structures.
+                                if ( shared_rings >= 2 )
+                                        return 2;
+                        }
+                        return 1;
                 }
                 return ring_vec.at(0);
         }
@@ -100,6 +134,12 @@ private:
         }
 
 public:
+
+        void reset() {
+                substitutions.clear();
+                all_rings.clear();
+                all_rings_sizes.clear();
+        }
 
         void addStretch ( BondStretch stretch_atoms ) {
 
@@ -195,15 +235,19 @@ public:
         }
 
 
-        void addMolecule( const Molib::Molecule& mol ) {
-            
-                substitutions.clear();
-                all_rings.clear();
+        bool addMolecule( const Molib::Molecule& mol ) {
 
                 auto all_my_atoms = mol.get_atoms();
+                
+                if (!all_my_atoms.size()) {
+                        return false;
+                }
+                
                 Molib::Atom::Graph  graph = Molib::Atom::create_graph(all_my_atoms);
                 auto atom_ring_map = graph.vertex_rings();
-                all_rings.insert( atom_ring_map.begin(), atom_ring_map.end());
+                all_rings_sizes.insert( atom_ring_map.begin(), atom_ring_map.end());
+                auto atom_all_rings= graph.find_rings();
+                all_rings.insert(atom_all_rings.begin(), atom_all_rings.end());
 
                 for ( const auto& patom1 : all_my_atoms ) {
                         for ( const auto& atom2 : *patom1 ) {
@@ -227,6 +271,8 @@ public:
 
                         substitutions[patom1] = patom1->size() - patom1->get_num_hydrogens();
                 }
+                
+                return true;
         }
 
         void binStretches( const double bond_bin_size ) {
@@ -383,8 +429,8 @@ public:
 
         void printStretches (std::ostream& os) const {
                 for ( const auto& bond : bs ) {
-                        __print_atom(get<0>(bond.first), os, ',');
-                        __print_atom(get<1>(bond.first), os, ',');
+                        __print_atom(get<0>(bond.first), os, ' ');
+                        __print_atom(get<1>(bond.first), os, ' ');
                         os << bond.second;
                         os << "\n";
                 }
@@ -392,9 +438,9 @@ public:
 
         void printAngles (std::ostream& os) const {
                 for ( const auto& angle : ba ) {
-                        __print_atom(get<0>(angle.first), os, ',');
-                        __print_atom(get<1>(angle.first), os, ',');
-                        __print_atom(get<2>(angle.first), os, ',');
+                        __print_atom(get<0>(angle.first), os, ' ');
+                        __print_atom(get<1>(angle.first), os, ' ');
+                        __print_atom(get<2>(angle.first), os, ' ');
                         os << Geom3D::degrees(angle.second);
                         os << "\n";
                 }
@@ -402,10 +448,10 @@ public:
         
         void printDihedrals (std::ostream& os) const {
                 for ( const auto& dihedral : bd ) {
-                        __print_atom(get<0>(dihedral.first), os, ',');
-                        __print_atom(get<1>(dihedral.first), os, ',');
-                        __print_atom(get<2>(dihedral.first), os, ',');
-                        __print_atom(get<3>(dihedral.first), os, ',');
+                        __print_atom(get<0>(dihedral.first), os, ' ');
+                        __print_atom(get<1>(dihedral.first), os, ' ');
+                        __print_atom(get<2>(dihedral.first), os, ' ');
+                        __print_atom(get<3>(dihedral.first), os, ' ');
                         os << Geom3D::degrees(dihedral.second);
                         os << "\n";
                 }
@@ -413,10 +459,10 @@ public:
 
         void printImpropers (std::ostream& os) const {
                 for ( const auto& improper : bi ) {
-                        __print_atom(get<0>(improper.first), os, ',');
-                        __print_atom(get<1>(improper.first), os, ',');
-                        __print_atom(get<2>(improper.first), os, ',');
-                        __print_atom(get<3>(improper.first), os, ',');
+                        __print_atom(get<0>(improper.first), os, ' ');
+                        __print_atom(get<1>(improper.first), os, ' ');
+                        __print_atom(get<2>(improper.first), os, ' ');
+                        __print_atom(get<3>(improper.first), os, ' ');
                         os << Geom3D::degrees(improper.second);
                         os << "\n";
                 }
@@ -512,7 +558,8 @@ int main(int argc, char* argv[]) {
                         mols.erase_hydrogen();
 
                         for ( const auto& mol : mols ) {
-                                MBE.addMolecule(mol);
+                                if (!MBE.addMolecule(mol))
+                                    continue;
                                 MBE.binStretches(0.01);
                                 MBE.binAngles(0.01);
                                 MBE.binDihedrals(0.01);
