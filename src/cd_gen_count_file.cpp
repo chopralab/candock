@@ -196,6 +196,10 @@ public:
 
 
         void addMolecule( const Molib::Molecule& mol ) {
+            
+                substitutions.clear();
+                all_rings.clear();
+
                 auto all_my_atoms = mol.get_atoms();
                 Molib::Atom::Graph  graph = Molib::Atom::create_graph(all_my_atoms);
                 auto atom_ring_map = graph.vertex_rings();
@@ -506,19 +510,20 @@ int main(int argc, char* argv[]) {
                         
                         mols.compute_idatm_type();
                         mols.erase_hydrogen();
-                        
-                        MBE.addMolecule(mols[0]);
-                        
-                        MBE.binStretches(0.1);
-                        MBE.binAngles(0.1);
-                        MBE.binDihedrals(0.1);
-                        MBE.binImpropers(0.1);
+
+                        for ( const auto& mol : mols ) {
+                                MBE.addMolecule(mol);
+                                MBE.binStretches(0.01);
+                                MBE.binAngles(0.01);
+                                MBE.binDihedrals(0.01);
+                                MBE.binImpropers(0.01);
+                        }
                 }
 
-                MBE.printStretchBins(std::cout);
-                MBE.printAngleBins(std::cout);
-                MBE.printDihedralBins(std::cout);
-                MBE.printImproperBins(std::cout);
+                MBE.printStretchBins(std::cerr);
+                MBE.printAngleBins(std::cerr);
+                MBE.printDihedralBins(std::cerr);
+                MBE.printImproperBins(std::cerr);
 
         } catch (exception& e) {
                 cerr << e.what() << endl;
