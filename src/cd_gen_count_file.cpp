@@ -12,24 +12,34 @@
 using namespace std;
 using namespace Program;
 
-// NOTE: Bondorder not included (yet?)
-typedef std::map< std::tuple<int,int, size_t >, size_t >         BondCounts;
-typedef std::map< std::tuple<int,int,int, size_t >, size_t >     AngleCounts;
-typedef std::map< std::tuple<int,int,int,int, size_t >, size_t > DihedralCounts;
-
-
 class MoleculeBondExtractor {
 
 public:
-        typedef std::tuple< const Molib::Atom*, const Molib::Atom* > BondStretch;
-        typedef std::map< BondStretch, double> BondStretches;
-        typedef std::tuple< const Molib::Atom*, const Molib::Atom*,
+
+        // typedefs for raw Bond information
+        typedef std::tuple< const Molib::Atom*,
+                            const Molib::Atom* > BondStretch;
+        typedef std::map< BondStretch, double>   BondStretches;
+        typedef std::tuple< const Molib::Atom*,
+                            const Molib::Atom*,
                             const Molib::Atom* > BondAngle;
-        typedef std::map< BondAngle, double> BondAngles;
-        typedef std::tuple< const Molib::Atom*, const Molib::Atom*,
-                            const Molib::Atom*, const Molib::Atom* > BondDihedral;
-        typedef std::map< BondDihedral, double> BondDihedrals;
-        typedef std::map< BondDihedral, double> BondImproper;
+        typedef std::map< BondAngle, double>     BondAngles;
+        typedef std::tuple< const Molib::Atom*,
+                            const Molib::Atom*,
+                            const Molib::Atom*,
+                            const Molib::Atom* > BondDihedral;
+        typedef std::map< BondDihedral, double>  BondDihedrals;
+
+        // typedefs for binned Bond information
+        // NOTE: Bondorder not included (yet?)
+        typedef std::tuple<int,int, size_t>                          StretchBin;
+        typedef std::map< StretchBin, size_t >                       StretchCounts;
+        typedef std::tuple<int,int,int,int,int,int, size_t >         AngleBin;
+        typedef std::map< AngleBin, size_t >                         AngleCounts;
+        typedef std::tuple<int,int,int,int,
+                           int,int,int,int,
+                           int,int,int,int,int >                  DihedralBin;
+        typedef std::map< DihedralBin, size_t >                      DihedralCounts;
 
 private:
         BondStretches bs;
@@ -37,6 +47,11 @@ private:
         BondDihedrals bd;
         BondDihedrals bi; // Impropers
 
+        StretchCounts  bsc;
+        AngleCounts    bac;
+        DihedralCounts bdc;
+        DihedralCounts bic;
+        
         Glib::Graph<Molib::Atom>::VertexRingMap all_rings;
         std::map<const Molib::Atom*, size_t> substitutions;
 
@@ -46,34 +61,40 @@ private:
                         return 0;
 
                 if ( atom1->idatm_type() < atom2->idatm_type() ) {
-                        return -2;
+                        return -4;
                 } else if ( atom1->idatm_type() > atom2->idatm_type() ) {
+                        return 4;
+                }
+
+                if ( __ring_size(atom1) < __ring_size(atom2) ) {
+                        return -3;
+                } else if (__ring_size(atom1) > __ring_size(atom2)) {
+                        return 3;
+                }
+
+                if ( substitutions.at(atom1) < substitutions.at(atom2) ) {
+                        return -2;
+                } else if (substitutions.at(atom1) > substitutions.at(atom2)) {
                         return 2;
                 }
-                
-                //IDATM types are equal, compare addresses
-                if ( atom1 < atom2 ) {
-                        return -1;
-                } else if ( atom1 > atom2 ) {
-                        return 1;
-                }
-                
+                                
                 return 0;
         }
 
-        std::string __print_ring_info( const std::vector<size_t>& ring_vec) const {
+        int __ring_size( const Molib::Atom* atom ) const {
+                const std::vector<size_t>& ring_vec = all_rings.at(atom);
                 if (ring_vec.size() == 0) {
-                        return "0";
+                        return 0;
                 }
                 if (ring_vec.size() > 1) {
-                        return "BR";
+                        return -1;
                 }
-                return std::to_string(ring_vec.at(0));
+                return ring_vec.at(0);
         }
 
         void __print_atom( const Molib::Atom* atom, std::ostream& os, char delim ) const {
                 os << help::idatm_unmask[ atom->idatm_type() ] << delim;
-                os << __print_ring_info(all_rings.at(atom)) << delim;
+                os << __ring_size(atom) << delim;
                 os << substitutions.at(atom) << delim;
 
         }
@@ -161,16 +182,16 @@ public:
                 
                 const Molib::Atom* highest = max( max( atom1, atom3), atom4);
                 const Molib::Atom* lowest  = min( min( atom1, atom3), atom4);
-                const Molib::Atom* middle  = max( min(atom1,atom3), min(max(atom1,atom3),atom4));
+                const Molib::Atom* middle  = max( min( atom1, atom3), min(max(atom1,atom3),atom4));
 
                 i_new = make_tuple (lowest, middle, atom2, highest);
 
-                if ( bd.count(i_new) )
+                if ( bi.count(i_new) )
                         return;
 
                 double dihedral = Geom3D::dihedral(atom1->crd(), atom2->crd(),
                                                    atom3->crd(), atom4->crd());
-                bd[i_new] = dihedral;
+                bi[i_new] = dihedral;
         }
 
 
@@ -204,7 +225,159 @@ public:
                 }
         }
 
-        void printBonds (std::ostream& os) const {
+        void binStretches( const double bond_bin_size ) {
+                 for ( const auto& bond : bs ) {
+                        const size_t bin = floor(bond.second / bond_bin_size);
+                        
+                        StretchBin sb;
+                        if ( get<0>(bond.first)->idatm_type() <
+                             get<1>(bond.first)->idatm_type() ) {
+                                sb = make_tuple( get<0>(bond.first)->idatm_type(),
+                                                 get<1>(bond.first)->idatm_type(),
+                                                 bin
+                                               );
+                        } else {
+                                sb = make_tuple( get<1>(bond.first)->idatm_type(),
+                                                 get<0>(bond.first)->idatm_type(),
+                                                 bin
+                                               );
+                        }
+                        
+                        if ( ! bsc.count(sb) )
+                            bsc[sb] = 1;
+                        else
+                            ++bsc[sb];
+                 }
+                 bs.clear();
+        }
+
+        void binAngles( const double angle_bin_size ) {
+                 for ( const auto& angle : ba ) {
+                        const size_t bin = floor(angle.second / angle_bin_size);
+
+                        AngleBin ab;
+                        if ( __comp_atoms(get<0>(angle.first), get<2>(angle.first) ) < 0 ) {
+                                ab = make_tuple( get<0>(angle.first)->idatm_type(),
+                                                 __ring_size(get<0>(angle.first)),
+                                                 get<1>(angle.first)->idatm_type(),
+                                                 __ring_size(get<1>(angle.first)),
+                                                 get<2>(angle.first)->idatm_type(),
+                                                 __ring_size(get<2>(angle.first)),
+                                                 bin
+                                               );
+                        } else {
+                                ab = make_tuple( get<2>(angle.first)->idatm_type(),
+                                                 __ring_size(get<2>(angle.first)),
+                                                 get<1>(angle.first)->idatm_type(),
+                                                 __ring_size(get<1>(angle.first)),
+                                                 get<0>(angle.first)->idatm_type(),
+                                                 __ring_size(get<0>(angle.first)),
+                                                 bin
+                                               );
+                        }
+                        
+                        if ( ! bac.count(ab) )
+                            bac[ab] = 1;
+                        else
+                            ++bac[ab];
+                 }
+                 ba.clear();
+        }
+
+        void binDihedrals( const double dihedral_bin_size ) {
+                 for ( const auto& dihedral : bd ) {
+                        const int bin = floor(dihedral.second / dihedral_bin_size);
+
+                        DihedralBin f=make_tuple(get<0>(dihedral.first)->idatm_type(),
+                                                 __ring_size(get<0>(dihedral.first)),
+                                                 substitutions.at(get<0>(dihedral.first)),
+                                                 get<1>(dihedral.first)->idatm_type(),
+                                                 __ring_size(get<1>(dihedral.first)),
+                                                 substitutions.at(get<1>(dihedral.first)),
+                                                 get<2>(dihedral.first)->idatm_type(),
+                                                 __ring_size(get<2>(dihedral.first)),
+                                                 substitutions.at(get<2>(dihedral.first)),
+                                                 get<3>(dihedral.first)->idatm_type(),
+                                                 __ring_size(get<3>(dihedral.first)),
+                                                 substitutions.at(get<3>(dihedral.first)),
+                                                 bin
+                                               );
+
+                        DihedralBin b=make_tuple(get<3>(dihedral.first)->idatm_type(),
+                                                 __ring_size(get<3>(dihedral.first)),
+                                                 substitutions.at(get<3>(dihedral.first)),
+                                                 get<2>(dihedral.first)->idatm_type(),
+                                                 __ring_size(get<2>(dihedral.first)),
+                                                 substitutions.at(get<2>(dihedral.first)),
+                                                 get<1>(dihedral.first)->idatm_type(),
+                                                 __ring_size(get<1>(dihedral.first)),
+                                                 substitutions.at(get<1>(dihedral.first)),
+                                                 get<0>(dihedral.first)->idatm_type(),
+                                                 __ring_size(get<0>(dihedral.first)),
+                                                 substitutions.at(get<0>(dihedral.first)),
+                                                 bin
+                                               );
+                        DihedralBin db;
+                        
+                        if ( __comp_atoms(get<0>(dihedral.first), get<3>(dihedral.first) ) < 0 ) {
+                                db = f;
+                        } else if ( __comp_atoms(get<0>(dihedral.first), get<3>(dihedral.first) ) > 0 ) {
+                                db = b;
+                        } else if (__comp_atoms(get<1>(dihedral.first), get<2>(dihedral.first) ) < 0) {
+                                db = f;
+                        } else {
+                                db = b;
+                        }
+                        
+                        if ( ! bdc.count(db) )
+                            bdc.emplace(db, 1);
+                        else
+                            ++bdc[db];
+                 }
+                 bd.clear();
+        }
+
+        void binImpropers( const double improper_bin_size ) {
+                 for ( const auto& improper : bi ) {
+                        const int bin = floor(improper.second / improper_bin_size);
+
+                        const Molib::Atom *atom1, *atom2, *atom3, *atom4;
+                        std::tie(atom1, atom2, atom3, atom4) = improper.first;
+
+                        auto thing = [this](const Molib::Atom* atm1, const Molib::Atom* atm2) {
+                                return this->__comp_atoms(atm1, atm2);
+                        };
+
+                        const Molib::Atom* highest = max( max( atom1, atom3, thing), atom4, thing);
+                        const Molib::Atom* lowest  = min( min( atom1, atom3, thing), atom4, thing);
+                        const Molib::Atom* middle  = max( min( atom1, atom3, thing),
+                                                          min( max(atom1,atom3, thing), atom4, thing),
+                                                          thing);
+
+                        DihedralBin ib=make_tuple(lowest->idatm_type(),
+                                                 __ring_size(lowest),
+                                                 substitutions.at(lowest),
+                                                 middle->idatm_type(),
+                                                 __ring_size(middle),
+                                                 substitutions.at(middle),
+                                                 atom2->idatm_type(),
+                                                 __ring_size(atom2),
+                                                 substitutions.at(atom2),
+                                                 highest->idatm_type(),
+                                                 __ring_size(highest),
+                                                 substitutions.at(highest),
+                                                 bin
+                                               );
+
+                        if ( ! bic.count(ib) )
+                            bic[ib] = 1;
+                        else
+                            ++bic[ib];
+                 }
+                 bi.clear();
+        }
+
+        void printStretches (std::ostream& os) const {
                 for ( const auto& bond : bs ) {
                         __print_atom(get<0>(bond.first), os, ',');
                         __print_atom(get<1>(bond.first), os, ',');
@@ -245,6 +418,75 @@ public:
                 }
         }
 
+        void printStretchBins (std::ostream& os) const {
+                for ( const auto& bond : bsc ) {
+                        os << help::idatm_unmask[get<0>(bond.first)] << " ";
+                        os << help::idatm_unmask[get<1>(bond.first)] << " ";
+                        os << get<2>(bond.first) << " ";
+                        os << bond.second;
+                        os << "\n";
+                }
+
+        }
+
+        void printAngleBins (std::ostream& os) const {
+                for ( const auto& angle : bac ) {
+                        os << help::idatm_unmask[get<0>(angle.first)] << " ";
+                        os << get<1>(angle.first) << " ";
+                        os << help::idatm_unmask[get<2>(angle.first)] << " ";
+                        os << get<3>(angle.first) << " ";
+                        os << help::idatm_unmask[get<4>(angle.first)] << " ";
+                        os << get<5>(angle.first) << " ";
+                        os << get<6>(angle.first) << " ";
+                        os << angle.second;
+                        os << "\n";
+                }
+
+        }
+
+        void printDihedralBins (std::ostream& os) const {
+                for ( const auto& dihedral : bdc ) {
+                        os << help::idatm_unmask[get<0>(dihedral.first)] << " ";
+                        os << get<1>(dihedral.first) << " ";
+                        os << get<2>(dihedral.first) << " ";
+                        os << help::idatm_unmask[get<3>(dihedral.first)] << " ";
+                        os << get<4>(dihedral.first) << " ";
+                        os << get<5>(dihedral.first) << " ";
+                        os << help::idatm_unmask[get<6>(dihedral.first)] << " ";
+                        os << get<7>(dihedral.first) << " ";
+                        os << get<8>(dihedral.first) << " ";
+                        os << help::idatm_unmask[get<9>(dihedral.first)] << " ";
+                        os << get<10>(dihedral.first) << " ";
+                        os << get<11>(dihedral.first) << " ";
+                        os << get<12>(dihedral.first) << " ";
+                        os << dihedral.second;
+                        os << "\n";
+                }
+
+        }
+        
+        void printImproperBins (std::ostream& os) const {
+                for ( const auto& dihedral : bic ) {
+                        os << help::idatm_unmask[get<0>(dihedral.first)] << " ";
+                        os << get<1>(dihedral.first) << " ";
+                        os << get<2>(dihedral.first) << " ";
+                        os << help::idatm_unmask[get<3>(dihedral.first)] << " ";
+                        os << get<4>(dihedral.first) << " ";
+                        os << get<5>(dihedral.first) << " ";
+                        os << help::idatm_unmask[get<6>(dihedral.first)] << " ";
+                        os << get<7>(dihedral.first) << " ";
+                        os << get<8>(dihedral.first) << " ";
+                        os << help::idatm_unmask[get<9>(dihedral.first)] << " ";
+                        os << get<10>(dihedral.first) << " ";
+                        os << get<11>(dihedral.first) << " ";
+                        os << get<12>(dihedral.first) << " ";
+                        os << dihedral.second;
+                        os << "\n";
+                }
+
+        }
+
+
 };
 
 int main(int argc, char* argv[]) {
@@ -266,12 +508,17 @@ int main(int argc, char* argv[]) {
                         mols.erase_hydrogen();
                         
                         MBE.addMolecule(mols[0]);
+                        
+                        MBE.binStretches(0.1);
+                        MBE.binAngles(0.1);
+                        MBE.binDihedrals(0.1);
+                        MBE.binImpropers(0.1);
                 }
 
-                MBE.printBonds(std::cout);
-                MBE.printAngles(std::cout);
-                MBE.printDihedrals(std::cout);
-                MBE.printImpropers(std::cout);
+                MBE.printStretchBins(std::cout);
+                MBE.printAngleBins(std::cout);
+                MBE.printDihedralBins(std::cout);
+                MBE.printImproperBins(std::cout);
 
         } catch (exception& e) {
                 cerr << e.what() << endl;
