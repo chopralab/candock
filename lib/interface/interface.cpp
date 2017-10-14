@@ -252,9 +252,12 @@ size_t initialize_scoring(const char* obj_dir) {
                 __score = std::unique_ptr<Score::Score> (
                                   new  Score::Score ("mean", "reduced", "radial", 6.0, 0.01));
 
+                boost::filesystem::path p(obj_dir);
+                p /= "csd_complete_distance_distributions.txt";
+
                 __score->define_composition (__receptor->get_idatm_types(),
                                              __ligand->get_idatm_types())
-                .process_distributions_file ("data/csd_complete_distance_distributions.txt")
+                .process_distributions_file (p.string())
                 .compile_scoring_function()
                 .compile_objective_function(10.0);
 
