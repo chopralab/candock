@@ -40,16 +40,7 @@ namespace Program {
 
                         Inout::output_file (__seeds, cmdl.get_string_option ("seeds_pdb"), ios_base::out);
                 } else {
-
-                        log_note << "Reading seeds from: " << cmdl.get_string_option ("seeds_pdb") << endl;
-
-                        Parser::FileParser lpdb (cmdl.get_string_option ("seeds_pdb"), Parser::all_models);
-                        lpdb.parse_molecule (__seeds);
-                        __ligand_idatm_types = __seeds.get_idatm_types (__ligand_idatm_types);
-
-                        for (const auto &mol : __seeds) {
-                                __added.insert (stoi (mol.name()));
-                        }
+                        add_seeds_from_file(cmdl.get_string_option ("seeds_pdb"));
                 }
 
                 if (__seeds.size() == 0) {
@@ -182,6 +173,21 @@ namespace Program {
                 __ligand_idatm_types = molecules.get_idatm_types (__ligand_idatm_types);
                 Molib::create_mols_from_seeds (__added, __seeds, molecules);
                 __seeds.erase_properties();
-                Inout::output_file (__seeds, cmdl.get_string_option ("seeds_pdb"), ios_base::out);
+        }
+
+        void FragmentLigands::add_seeds_from_file(const std::string &filename) {
+                log_note << "Reading seeds from: " << filename << endl;
+
+                Parser::FileParser lpdb (filename, Parser::all_models);
+                lpdb.parse_molecule (__seeds);
+                __ligand_idatm_types = __seeds.get_idatm_types (__ligand_idatm_types);
+
+                for (const auto &mol : __seeds) {
+                        __added.insert (stoi (mol.name()));
+                }
+        }
+
+        void FragmentLigands::write_seeds_to_file(const std::string &filename) {
+                Inout::output_file (__seeds, filename, ios_base::out);
         }
 }

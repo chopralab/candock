@@ -10,7 +10,6 @@
 
 namespace Program {
 
-        // TODO Change class so that it can accept a string percursor to the seeds.pdb, seeds.txt, etc. for use in design
         class CANDOCK_EXPORT FragmentLigands : public ProgramStep {
                 Molib::Molecules __seeds;
                 std::set<int> __ligand_idatm_types;
@@ -34,6 +33,8 @@ namespace Program {
                 virtual ~FragmentLigands() {}
 
                 void add_seeds_from_molecules (const Molib::Molecules &molecules);
+                void add_seeds_from_file      (const std::string &filename);
+                void write_seeds_to_file      (const std::string &filename);
 
                 const Molib::Molecules &seeds() const {
                         return __seeds;
