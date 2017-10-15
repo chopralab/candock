@@ -449,7 +449,6 @@ namespace Score {
 
                                 dbgmsg("x1 = " << x1);
                                 dbgmsg("x2 = " << x2);
-                                dbgmsg("datapoints = " << datapoints);
 
                                 // fit function to slope
                                 double coeffA, coeffB, WSSR;

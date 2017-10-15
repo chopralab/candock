@@ -15,6 +15,9 @@
 #include <boost/asio/ip/host_name.hpp>
 #include <stdlib.h>
 #include <time.h>
+
+#include "fileout/fileout.hpp"
+
 using namespace std;
 
 namespace OMMIface {
@@ -115,7 +118,7 @@ namespace OMMIface {
 
         void Modeler::knowledge_based_calculation() {
                 Benchmark bench;
-                dbgmsg( "Doing energy minimization of ligand " << ligand.name() << " using knowledge-based forcefield");
+                dbgmsg( "Doing energy minimization using knowledge-based forcefield");
 
                 // for knowledge-based forcefield we implement a custom update nonbond
                 // function
@@ -183,7 +186,7 @@ namespace OMMIface {
         }
 
 #ifndef NDEBUG
-        void Modeler::minimize_knowledge_based(Molib::Molecule& ligand, Molib::Molecule& receptor, Molib::Score& score) {
+        void Modeler::minimize_knowledge_based(Molib::Molecule& ligand, Molib::Molecule& receptor, Score::Score& score) {
                 Benchmark bench;
                 dbgmsg( "Doing energy minimization of ligand " << ligand.name() << " using knowledge-based forcefield");
 
@@ -221,8 +224,9 @@ namespace OMMIface {
                         const double energy = score.non_bonded_energy(gridrec, minimized_ligand);
 
 
-                        Inout::output_file(Molib::Molecule::print_complex(minimized_ligand, minimized_receptor, energy), 
-                                ligand.name() + "_frame_" + std::to_string(iter) + ".pdb");
+                        std::stringstream ss;
+                        Fileout::print_complex_pdb(ss, minimized_ligand, minimized_receptor, energy);
+                        Inout::output_file(ss.str(), ligand.name() + "_frame_" + std::to_string(iter) + ".pdb");
 
                         __system_topology.minimize(__tolerance, __update_freq);
 

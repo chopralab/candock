@@ -96,9 +96,9 @@ namespace Molib {
 									dbgmsg("shared_count2 = " << shpbond.use_count());
 									bondee.erase_bond(atom);
 									dbgmsg("shared_count3 = " << shpbond.use_count());
-									dbgmsg("residue before erasing hydrogen " << bondee.atom_number() << endl << res);
+									dbgmsg("residue before erasing hydrogen " << bondee.atom_number() << endl << *this);
 									this->erase(bondee.atom_number());
-									dbgmsg("residue after erasing hydrogen " << bondee.atom_number() << endl << res);
+									dbgmsg("residue after erasing hydrogen " << bondee.atom_number() << endl << *this);
 									
 									auto it = find(all_atoms.begin(), all_atoms.end(), &bondee);
 									if (it != all_atoms.end()) {

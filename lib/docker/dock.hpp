@@ -51,7 +51,7 @@ namespace Docker {
 		Molib::Molecules __docked;
 
 #ifndef NDEBUG
-		const Molib::Score &__score;
+		const Score::Score &__score;
 		const Molib::Atom::Grid &__gridrec;
 #endif
 		DockedConf::Vec __dock();
@@ -61,7 +61,7 @@ namespace Docker {
 		
 	public:
 #ifndef NDEBUG
-		Dock(const Gpoints &gpoints, Conformations &conformations, const Molib::Molecule &seed, const Molib::Score &score, 
+		Dock(const Gpoints &gpoints, Conformations &conformations, const Molib::Molecule &seed, const Score::Score &score, 
 			 const Molib::Atom::Grid &gridrec, const double rmsd_tol=2.0) : __gpoints(gpoints), __conformations(conformations), 
 			__seed(seed), __rmsd_tol_sq(rmsd_tol * rmsd_tol), __rmsd_tol(rmsd_tol), __score(score), __gridrec(gridrec) {}
 #else

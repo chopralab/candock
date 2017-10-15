@@ -77,6 +77,8 @@ namespace Interpolation {
             mw (gsl_multifit_linear_alloc(n, ncoeffs2))
 
         {
+                assert(dataX.size() > 0 && dataX.size() == dataY.size());
+            
                 double chisq;
 
                 for (size_t i = 0; i < dataX.size(); ++i) {
@@ -118,8 +120,6 @@ namespace Interpolation {
         }
 
         vector<double> BSplineFit::interpolate_bspline(const double start, const double end, const double step) {
-
-                assert(dataX.size() > 0 && dataX.size() == dataY.size());
                 
                 vector<double> pot;
 
