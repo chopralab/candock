@@ -951,7 +951,7 @@ namespace AtomType {
                                 h_bond_donor_OH += atom->get_num_hydrogens();
                         }
                 }
-                return std::make_tuple(molar_mass, h_bond_acceptors, h_bond_donor_OH, h_bond_donor_NH);
+                return std::make_tuple(molar_mass, h_bond_acceptors, h_bond_donor_NH, h_bond_donor_OH);
         }
 }
 };

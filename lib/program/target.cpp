@@ -207,7 +207,15 @@ namespace Program {
                 for ( auto &molecules : nr ) {
                         design::Design designer (molecules.first(), created_design);
                         designer.change_original_name(molecules.name());
-                        designer.functionalize_hydrogens_with_fragments(nr, cmdl.get_double_option("tol_seed_dist"), cmdl.get_double_option("clash_coeff"));
+                        designer.functionalize_hydrogens_with_fragments(nr,
+                                                                        cmdl.get_double_option("tol_seed_dist"),
+                                                                        cmdl.get_double_option("clash_coeff"),
+                                                                        make_tuple(cmdl.get_double_option("lipinski_mass"),
+                                                                                   cmdl.get_int_option("lipinski_hbd"),
+                                                                                   cmdl.get_int_option("lipinski_nhs"),
+                                                                                   cmdl.get_int_option("lipinski_ohs")
+                                                                                  )
+                                                                       );
 #ifndef NDEBUG
                         Inout::output_file(designer.get_internal_designs(), "internal_designs.pdb", ios_base::app);
 #endif
@@ -230,7 +238,14 @@ namespace Program {
                         design::Design designer ( molecule, created_design);
                         if (! seeds_to_add.empty() )
                                 designer.functionalize_hydrogens_with_fragments(__prepseeds->get_top_seeds(seeds_to_add, cmdl.get_double_option("top_percent")),
-                                                                                        cmdl.get_double_option("tol_seed_dist"), cmdl.get_double_option("clash_coeff") );
+                                                                                cmdl.get_double_option("tol_seed_dist"),
+                                                                                cmdl.get_double_option("clash_coeff"),
+                                                                                make_tuple(cmdl.get_double_option("lipinski_mass"),
+                                                                                   cmdl.get_int_option("lipinski_hbd"),
+                                                                                   cmdl.get_int_option("lipinski_nhs"),
+                                                                                   cmdl.get_int_option("lipinski_ohs")
+                                                                                  )
+                                                                               );
 
                         const vector<string>& h_single_atoms = cmdl.get_string_vector("add_single_atoms");
                         const vector<string>& a_single_atoms = cmdl.get_string_vector("change_terminal_atom");

@@ -125,7 +125,8 @@ namespace Program {
 			("ref",     po::value<std::string> ()->default_value ("mean"),
 			 "Normalization method for the reference state ('mean' is averaged over all atom type pairs, whereas 'cumulative' is a summation for atom type pairs)")
 			("comp",    po::value<std::string> ()->default_value ("reduced"),
-			 "Atom types used in calculating reference state 'reduced' or 'complete' ('reduced' includes only those atom types present in the specified receptor and small molecule, whereas 'complete' includes all atom types)")
+			 "Atom types used in calculating reference state 'reduced' or 'complete'"
+                         "('reduced' includes only those atom types present in the specified receptor and small molecule, whereas 'complete' includes all atom types)")
 			("func",    po::value<std::string> ()->default_value ("radial"),
 			 "Function for calculating scores 'radial' or 'normalized_frequency'")
 			("cutoff",  po::value<int> ()->default_value (6),
@@ -245,7 +246,15 @@ namespace Program {
 			 "Change hydrogens to given atoms. Multiple atoms can be given.")
 			("change_terminal_atom",po::value< std::vector<std::string>>()->multitoken()->default_value(std::vector<std::string>(),""),
 			 "Change non-hydrogen atoms that terminate chains to given atoms. Multiple atoms can be given.")
-			;
+                        ("lipinski_mass",       po::value<double>()->default_value(500.0),
+                         "Maximum molecular mass for designs")
+                        ("lipinski_hbd",        po::value<int>()->default_value(10),
+                         "Maximum number of hydrogen bond donors allowed on a molecule.")
+                        ("lipinski_nhs",        po::value<int>()->default_value(2),
+                         "Maximum number of -NH groups allowed on a molecule.")
+                        ("lipinski_ohs",        po::value<int>()->default_value(2),
+                         "Maximum number of -OH groups allowed on a molecule.")
+                        ;
 
 			po::options_description config_options;
 			config_options.add(starting_inputs)
