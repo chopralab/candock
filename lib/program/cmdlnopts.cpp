@@ -134,36 +134,37 @@ namespace Program {
 			 "Step for spline generation of non-bonded knowledge-based potential [0.0-1.0]")
 			("scale",   po::value<double> ()->default_value (10.0, "10.0"),
 			 "Scale non-bonded forces and energy for knowledge-based potential [0.0-1000.0]")
-			("obj_dir", po::value<std::string> ()->default_value ("obj"),
-			 "Output directory for objective function and derivatives")
 			("potential_file", po::value<std::string> ()->default_value ("potentials.txt"),
 			 "Output file for potentials and derivatives")
 			;
 
-			po::options_description force_field_min ("Forcefield and Minimization Options");
-			force_field_min.add_options()
-			("amber_xml", po::value<std::string> ()->default_value ("data/amber10.xml"),
-			 "Receptor XML parameters (and topology) input file")
-			("water_xml", po::value<std::string> ()->default_value ("data/tip3p.xml"),
-			 "Water XML parameters (and topology) input file")
-			("gaff_dat",  po::value<std::string> () ->default_value ("data/gaff.dat"),
-			 "Gaff DAT forcefield input file")
-			("gaff_xml",  po::value<std::string> () ->default_value ("data/gaff.xml"),
-			 "Gaff XML forcefield and ligand topology output file")
+                        po::options_description force_field_min ("Forcefield and Minimization Options");
+                        force_field_min.add_options()
+                        ("amber_xml", po::value<std::string> ()->default_value ("data/amber10.xml"),
+                         "Receptor XML parameters (and topology) input file")
+                        ("water_xml", po::value<std::string> ()->default_value ("data/tip3p.xml"),
+                         "Water XML parameters (and topology) input file")
+                        ("gaff_dat",  po::value<std::string> () ->default_value ("data/gaff.dat"),
+                         "Gaff DAT forcefield input file")
+                        ("gaff_xml",  po::value<std::string> () ->default_value ("data/gaff.xml"),
+                         "Gaff XML forcefield and ligand topology output file")
                         ("gaff_heme", po::value<std::string> () ->default_value (""),
                          "Gaff DAT file to use for Heme groups")
-			("fftype"   , po::value<std::string> ()->default_value ("kb"),
-			 "Forcefield to use 'kb' (knowledge-based), 'phy' (physics-based), or 'none' (do not calculate intermolecular forces)")
-			("pos_tol",   po::value<double> ()->default_value (0.00000000001, "0.00000000001"),
-			 "Minimization position tolerance in Angstroms - only for KB")
-			("mini_tol",  po::value<double> ()->default_value (0.0001),
-			 "Minimization tolerance")
-			("max_iter",  po::value<int> ()->default_value (10),
-			 "Maximum iterations for minimization during linking")
-			("max_iter_final", po::value<int> ()->default_value (100),
-			 "Maximum iterations for final minimization")
-			("update_freq", po::value<int> ()->default_value (10),
-			 "Update non-bond frequency")
+                        ("fftype"   , po::value<std::string> ()->default_value ("kb"),
+                         "Forcefield to use 'kb' (knowledge-based), 'phy' (physics-based), or 'none' (do not calculate intermolecular forces)")
+                        ("obj_dir", po::value<std::string> ()->default_value (""),
+                         "Output directory for objective function. Setting this value will cause the KB potential to be read from disk."
+                         "Default(empty string) causes the objective function to be recalculated.")
+                        ("pos_tol",   po::value<double> ()->default_value (0.00000000001, "0.00000000001"),
+                         "Minimization position tolerance in Angstroms - only for KB")
+                        ("mini_tol",  po::value<double> ()->default_value (0.0001),
+                         "Minimization tolerance")
+                        ("max_iter",  po::value<int> ()->default_value (10),
+                         "Maximum iterations for minimization during linking")
+                        ("max_iter_final", po::value<int> ()->default_value (100),
+                         "Maximum iterations for final minimization")
+                        ("update_freq", po::value<int> ()->default_value (10),
+                         "Update non-bond frequency")
                         ("temperature", po::value<double>()->default_value(300.0f, "300"),
                          "Temperature to run the dynamic simulation at.")
                         ("friction",    po::value<double>()->default_value(91.f, "91.0"),

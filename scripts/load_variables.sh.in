@@ -28,7 +28,6 @@ export CANDOCK_gaff_xml
 export CANDOCK_gaff_dat
 
 : ${CANDOCK_dist:=$MCANDOCK_SUP_PATH/data/csd_complete_distance_distributions.txt}
-: ${CANDOCK_obj_dir:=$MCANDOCK_SUP_PATH/obj}
 
 export CANDOCK_dist
 export CANDOCK_obj_dir

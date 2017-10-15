@@ -45,8 +45,16 @@ int main(int argc, char* argv[]) {
                 score.define_composition(starting_mol.get_idatm_types(),
                                          starting_mol.get_idatm_types())
                      .process_distributions_file(cmdl.get_string_option("dist"))
-                     .compile_scoring_function()
-                     .compile_objective_function(cmdl.get_double_option("scale"));
+                     .compile_scoring_function();
+                
+                if (cmdl.get_string_option("obj_dir").empty()) {
+                        score.compile_objective_function(cmdl.get_double_option("scale"));
+                } else {
+                        score.parse_objective_function(cmdl.get_string_option("obj_dir"),
+                                                          cmdl.get_double_option("scale"),
+                                                          15
+                                                         );
+                }
 
                 OMMIface::ForceField ffield;
 
