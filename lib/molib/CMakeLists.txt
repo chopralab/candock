@@ -17,7 +17,6 @@ set( molib_SRC
         element.hpp
         grid.hpp
         hydrogens.cpp
-        hydrogens.hpp
         internal.cpp
         internal.hpp
         it.hpp

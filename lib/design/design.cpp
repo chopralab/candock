@@ -2,7 +2,6 @@
 
 #include <set>
 
-#include "molib/hydrogens.hpp"
 #include "molib/bondtype.hpp"
 #include "molib/atomtype.hpp"
 #include "fragmenter/unique.hpp"
@@ -16,7 +15,7 @@ namespace design {
 		}
 
 		// Create a new molecule, original bonds will be copied
-		Molib::Hydrogens::compute_hydrogen(__original.first().first().first().first());
+		__original.first().first().first().first().compute_hydrogen();
 		__original.erase_properties();
 		__original.first().first().first().first().renumber_atoms(1);
 	}
@@ -146,12 +145,12 @@ namespace design {
 				continue;
 			}
 
-			for ( const auto &fragment : nr )  {
+                        for ( const auto &fragment : nr )  {
                             
-			Molib::Hydrogens::compute_hydrogen(fragment.first().first().first().first().first());
+                        fragment.first().first().first().first().first().compute_hydrogen();
                         std::tuple<double,size_t,size_t,size_t> frag_lipinski = Molib::AtomType::determine_lipinski(
                             fragment.first().first().first().first().first().get_atoms());
-                        Molib::Hydrogens::erase_hydrogen(fragment.first().first().first().first().first());
+                        fragment.first().first().first().first().first().erase_hydrogen();
                         
                         if ( std::get<0>(original_lipinski) + std::get<0>(frag_lipinski) > std::get<0> (lipinski_values) ||
                              std::get<1>(original_lipinski) + std::get<1>(frag_lipinski) > std::get<1> (lipinski_values) ||
@@ -202,7 +201,7 @@ namespace design {
 					Molib::Molecule &new_design = __designs.add( new Molib::Molecule(__original) );
 
 					// Remove all hydrogens from the original ligand (they are not needed anymore)
-					Molib::Hydrogens::erase_hydrogen(new_design.first().first().first().first());
+					new_design.first().first().first().first().erase_hydrogen();
 
 					// Add new fragment as a "residue" of the molecule
 					Molib::Chain &chain = new_design.first().first().first();
@@ -272,7 +271,7 @@ namespace design {
 
 				// Remove all hydrogens from the original ligand (they are not needed anymore)
 				Molib::BondOrder::compute_bond_order(__designs.get_atoms());
-				Molib::Hydrogens::erase_hydrogen(    __designs.last().first().first().first().first());
+				__designs.last().first().first().first().first().erase_hydrogen();
 
 				Geom3D::Coordinate crd;
 
@@ -312,7 +311,7 @@ namespace design {
 
 				// Remove all hydrogens from the original ligand (they are not needed anymore)
 				Molib::BondOrder::compute_bond_order(__designs.last().get_atoms());
-				Molib::Hydrogens::erase_hydrogen(    __designs.last().first().first().first().first());
+				 __designs.last().first().first().first().first().erase_hydrogen();
 
 				Molib::Residue& mod_residue = __designs.last().first().first().first().first();
 
