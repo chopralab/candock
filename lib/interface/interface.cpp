@@ -22,6 +22,11 @@ const char* cd_get_error() {
 }
 
 size_t initialize_receptor(const char* filename) {
+
+        if ( __receptor != nullptr ) {
+                __receptor.reset();
+        }
+
         try {
                 Parser::FileParser rpdb (filename, Parser::first_model, 1);
 
@@ -132,6 +137,11 @@ size_t receptor_bonds( size_t* bonds ) {
 }
 
 size_t initialize_ligand(const char* filename) {
+
+        if ( __ligand != nullptr ) {
+                __ligand.reset();
+        }
+
         try {
                 Parser::FileParser rpdb (filename, Parser::first_model, 1);
 
@@ -242,6 +252,13 @@ size_t ligand_bonds( size_t* bonds ) {
 }
 
 size_t initialize_scoring(const char* obj_dir) {
+        return initialize_scoring_full(obj_dir, "radial", "mean", "reduced", 6.0, 0.01, 10.0);
+}
+
+size_t initialize_scoring_full(const char* obj_dir,
+                          const char* ref, const char* func, const char* comp,
+                          float cutoff, float step, float scale
+                         ) {
 
         if ( __ligand == nullptr  || __receptor == nullptr ) {
                 __error_string = std::string("You must run initialize_ligand and initialize_receptor first");
@@ -250,7 +267,7 @@ size_t initialize_scoring(const char* obj_dir) {
 
         try {
                 __score = std::unique_ptr<Score::Score> (
-                                  new  Score::Score ("mean", "reduced", "radial", 6.0, 0.01));
+                                  new  Score::Score (func, comp, ref, cutoff, step));
 
                 boost::filesystem::path p(obj_dir);
                 p /= "csd_complete_distance_distributions.txt";
@@ -259,7 +276,7 @@ size_t initialize_scoring(const char* obj_dir) {
                                              __ligand->get_idatm_types())
                 .process_distributions_file (p.string())
                 .compile_scoring_function()
-                .compile_objective_function(10.0);
+                .compile_objective_function(scale);
 
                 return 1;
 

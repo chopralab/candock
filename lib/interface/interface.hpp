@@ -36,6 +36,11 @@ CANDOCK_EXPORT size_t ligand_bond_count();
 CANDOCK_EXPORT size_t ligand_bonds( size_t* bonds );
 
 CANDOCK_EXPORT size_t initialize_scoring(const char* obj_dir);
+
+CANDOCK_EXPORT size_t initialize_scoring_full(const char* obj_dir,
+                                              const char* ref, const char* func, const char* comp,
+                                              float cutoff, float step, float scale);
+
 CANDOCK_EXPORT size_t initialize_plugins(const char* plugin_dir);
 CANDOCK_EXPORT size_t initialize_ffield(const char* data_dir);
 
