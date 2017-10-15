@@ -52,7 +52,7 @@ namespace Program {
                 __protein = unique_ptr<Molib::Molecule> ( new Molib::Molecule (std::move (receptors[0])));
 
                 // Emulate the original version of candock
-                __protein->set_name (boost::filesystem::basename (input_name.substr (0, input_name.length() - 4)));
+                __protein->set_name (input_name.substr (0, input_name.length() - 4));
                 boost::filesystem::create_directory (__protein->name());
 
                 /* Create receptor grid
@@ -179,10 +179,24 @@ namespace Program {
                 if ( __dockedlig == nullptr ) {
                         __ffield->insert_topology(*__protein);
                         Program::LinkFragments *dockedlig = new LinkFragments(*__protein, *__score, *__ffield, *__prepseeds, *__gridrec);
-                        __dockedlig =  std::unique_ptr<Program::LinkFragments>(dockedlig);
+                        __dockedlig = std::unique_ptr<Program::LinkFragments>(dockedlig);
                 }
 
                 __dockedlig->run_step();
+        }
+
+        void Target::link_fragments(const Molib::Molecules& ligands) {
+                if (__prepseeds == nullptr) {
+                        throw Error("You must run dock_fragments first!");
+                }
+
+                if (__dockedlig == nullptr ) {
+                        __ffield->insert_topology(*__protein);
+                        Program::LinkFragments *dockedlig = new LinkFragments(*__protein, *__score, *__ffield, *__prepseeds, *__gridrec);
+                        __dockedlig = std::unique_ptr<Program::LinkFragments>(dockedlig);
+                }
+
+                __dockedlig->link_ligands(ligands);
         }
 
         void Target::make_scaffolds(const std::set<std::string>& seeds_to_add, Molib::Molecules& all_designs_out) {

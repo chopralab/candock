@@ -4,17 +4,23 @@
 namespace Program {
 
         TargetGroup::TargetGroup(const std::string& input_name) {
+
+                // User has given blank option (ussual for case of antitargets)
+                if (input_name.empty()) {
+                        return;
+                }
+            
                 for (const auto &a : Inout::files_matching_pattern (input_name, ".pdb")) {
                         __targets.push_back (new Target (a));
                 }
         }
 
-		TargetGroup::~TargetGroup() {
-				for (Target* target : __targets) {
+        TargetGroup::~TargetGroup() {
+                for (Target* target : __targets) {
                         delete target;
-				}
-				__targets.clear();
-		}
+                }
+                __targets.clear();
+        }
 
         void TargetGroup::dock_fragments(const FragmentLigands& ligands) {
                 for (auto &target : __targets) {
@@ -124,7 +130,8 @@ namespace Program {
                 ligands.add_seeds_from_molecules(all_designs);
 
                 for (auto &target : __targets) {
-                        target->link_fragments(ligands);
+                        target->dock_fragments(ligands);
+                        target->link_fragments(all_designs);
                 }
         }
 
@@ -165,7 +172,7 @@ namespace Program {
                                 log_step << "No new designs, exiting" << endl;
                                 return;
                         }
-                    
+
                         all_designs.compute_hydrogen()
                                    .compute_bond_order()
                                    .compute_bond_gaff_type()
@@ -189,7 +196,8 @@ namespace Program {
                         ligands.add_seeds_from_molecules(all_designs);
 
                         for (auto &target : __targets) {
-                                target->link_fragments(ligands);
+                                target->dock_fragments(ligands);
+                                target->link_fragments(all_designs);
                         }
                 }
 
