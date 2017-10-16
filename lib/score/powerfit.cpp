@@ -2,6 +2,7 @@
 #include <iostream>
 #include <fstream>
 #include <cmath>
+#include <algorithm>
 
 #include <vector>
 #include <tuple>
