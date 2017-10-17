@@ -74,7 +74,6 @@ set( program_names  check_options
                     rescore_docked
                     minimize_poses
                     dynamics_run
-                    gen_count_file
 )
 
 foreach( candock_program ${program_names} )

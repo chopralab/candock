@@ -124,6 +124,7 @@ include_directories( ${PROJECT_BINARY_DIR} )
 add_subdirectory(lib)
 add_subdirectory(scripts)
 add_subdirectory(src)
+add_subdirectory(tools)
 add_subdirectory(tests)
 
 set(CANDOCK_BUILD_GUI OFF CACHE BOOL "Build the CANDOCK gui")
