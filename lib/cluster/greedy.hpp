@@ -1,15 +1,20 @@
 #ifndef GREEDY_CLUSTER_H
 #define GREEDY_CLUSTER_H
 
-//~ #include "molib/molecule.hpp"
 #include "geom3d/geom3d.hpp"
 #include "linker/partial.hpp"
+#include "score/score.hpp"
+
+namespace Score {
+        class Score;
+}
 
 namespace Molib {
-	class Score;
-	class Molecule;
-	class Molecules;
-	
+        class Molecule;
+        class Molecules;
+}
+
+namespace Cluster {
 	class Cluster {
 		template<typename T>
 		class LinkedConf {
@@ -33,12 +38,11 @@ namespace Molib {
 				}
 			};
 		};
-		friend ostream& operator<<(ostream& os, const set<const LinkedConf<Molecule>*, LinkedConf<Molecule>::by_energy> &confs);
+		friend ostream& operator<<(ostream& os, const set<const LinkedConf<Molib::Molecule>*, LinkedConf<Molib::Molecule>::by_energy> &confs);
 		friend ostream& operator<<(ostream& os, const set<const LinkedConf<Linker::Partial>*, LinkedConf<Linker::Partial>::by_energy> &confs);
 	public:
 		static Geom3D::Point::Vec greedy(const Geom3D::Point::Vec &initial, const double clus_rad);
-		static Molib::Molecules greedy(const Molib::Molecules &initial, const Molib::Score &score,
-			Molib::Atom::Grid &gridrec, const double clus_rad);
+		static Molib::Molecules greedy(const Molib::Molecules &initial, const Score::Score &score, Molib::Atom::Grid &gridrec, const double clus_rad);
 		static Linker::Partial::Vec greedy(const Linker::Partial::Vec &initial, const Molib::Atom::Grid &gridrec, const double clus_rad);
 	};
 		

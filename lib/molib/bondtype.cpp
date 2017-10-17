@@ -199,7 +199,9 @@ namespace Molib {
 			const AtomParams &apar = kv.second;
 			if ( (apar.val != 0 && apar.con == 0)
                           || (apar.val == 0 && apar.con != 0)) {
-				return true;
+                            dbgmsg( "Failure for atom = " << kv.first->atom_name() << " val = " << apar.val
+                                << " con = " << apar.con << " aps = " << apar.aps);
+                                return true;
 			}
 		}
 		return false;

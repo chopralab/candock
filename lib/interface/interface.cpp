@@ -12,7 +12,7 @@
 
 std::unique_ptr <Molib::Molecules> __receptor;
 std::unique_ptr <Molib::Molecules> __ligand;
-std::unique_ptr <Molib::Score> __score;
+std::unique_ptr <Score::Score> __score;
 std::unique_ptr <Molib::Atom::Grid> __gridrec;
 std::unique_ptr <OMMIface::ForceField> __ffield;
 std::string __error_string = "";
@@ -22,6 +22,11 @@ const char* cd_get_error() {
 }
 
 size_t initialize_receptor(const char* filename) {
+
+        if ( __receptor != nullptr ) {
+                __receptor.reset();
+        }
+
         try {
                 Parser::FileParser rpdb (filename, Parser::first_model, 1);
 
@@ -132,6 +137,11 @@ size_t receptor_bonds( size_t* bonds ) {
 }
 
 size_t initialize_ligand(const char* filename) {
+
+        if ( __ligand != nullptr ) {
+                __ligand.reset();
+        }
+
         try {
                 Parser::FileParser rpdb (filename, Parser::first_model, 1);
 
@@ -242,6 +252,13 @@ size_t ligand_bonds( size_t* bonds ) {
 }
 
 size_t initialize_scoring(const char* obj_dir) {
+        return initialize_scoring_full(obj_dir, "radial", "mean", "reduced", 6.0, 0.01, 10.0);
+}
+
+size_t initialize_scoring_full(const char* obj_dir,
+                          const char* ref, const char* func, const char* comp,
+                          float cutoff, float step, float scale
+                         ) {
 
         if ( __ligand == nullptr  || __receptor == nullptr ) {
                 __error_string = std::string("You must run initialize_ligand and initialize_receptor first");
@@ -249,14 +266,17 @@ size_t initialize_scoring(const char* obj_dir) {
         }
 
         try {
-                __score = std::unique_ptr<Molib::Score> (
-                                  new  Molib::Score ("mean", "reduced", "radial", 6.0, 0.01));
+                __score = std::unique_ptr<Score::Score> (
+                                  new  Score::Score (func, comp, ref, cutoff, step));
+
+                boost::filesystem::path p(obj_dir);
+                p /= "csd_complete_distance_distributions.txt";
 
                 __score->define_composition (__receptor->get_idatm_types(),
                                              __ligand->get_idatm_types())
-                .process_distributions_file ("data/csd_complete_distance_distributions.txt")
+                .process_distributions_file (p.string())
                 .compile_scoring_function()
-                .parse_objective_function (obj_dir, 10.0, 1501);
+                .compile_objective_function(scale);
 
                 return 1;
 
@@ -294,7 +314,7 @@ size_t initialize_ffield(const char* data_dir) {
                 __ffield = std::unique_ptr<OMMIface::ForceField> (new OMMIface::ForceField);
 
                 __ffield->parse_gaff_dat_file ( (p / "gaff.dat").string())
-                .add_kb_forcefield (*__score, 0.01, 6.0)
+                .add_kb_forcefield (*__score)
                 .parse_forcefield_file ( (p / "amber10.xml").string())
                 .parse_forcefield_file ( (p / "tip3p.xml").string());
 

@@ -33,6 +33,8 @@ namespace Program {
                 virtual ~FragmentLigands() {}
 
                 void add_seeds_from_molecules (const Molib::Molecules &molecules);
+                void add_seeds_from_file      (const std::string &filename);
+                void write_seeds_to_file      (const std::string &filename);
 
                 const Molib::Molecules &seeds() const {
                         return __seeds;

@@ -1,6 +1,5 @@
-//~ #include "molib/molecule.hpp"
-//~ #include "molib/pdbreader.hpp"
-//~ using namespace Molib;
+#ifndef COMMON_HPP
+#define COMMON_HPP
 
 namespace Molib {
 	class Residue;
@@ -20,3 +19,5 @@ namespace common_ligands {
 	pair<ResSet, ResSet> json_to_set(Json::Value aligned_residues);
 	ResMap json_to_map_reverse(Json::Value aligned_residues);
 };
+
+#endif

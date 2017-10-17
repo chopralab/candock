@@ -17,7 +17,7 @@ namespace Program {
                 const DockFragments& __seeds_database;
 
                 const Molib::Molecule& __receptor;
-                const Molib::Score& __score;
+                const Score::Score& __score;
                 const OMMIface::ForceField& __ffield;
                 const Molib::Atom::Grid& __gridrec;
 
@@ -30,7 +30,7 @@ namespace Program {
                 virtual void __continue_from_prev ();
         public:
                 LinkFragments ( const Molib::Molecule& receptor,
-                                const Molib::Score& score,
+                                const Score::Score& score,
                                 const OMMIface::ForceField& ffield,
                                 const DockFragments& seeds_database,
                                 const Molib::Atom::Grid& gridrec ) :

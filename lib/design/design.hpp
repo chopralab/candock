@@ -13,7 +13,10 @@ namespace design {
 		
 		Design( const Molib::Molecule &start, Molib::Unique &existing );
 		
-		void functionalize_hydrogens_with_fragments(const Molib::NRset& nr, const double cutoff, const double clash_coeff);
+		void functionalize_hydrogens_with_fragments(const Molib::NRset& nr,
+                                                            const double cutoff, const double clash_coeff,
+                                                            const std::tuple<double, size_t, size_t, size_t>& lipinski_values
+                                                           );
 		void functionalize_hydrogens_with_single_atoms( const std::vector< std::string >& idatms );
 		void functionalize_extremes_with_single_atoms( const std::vector< std::string >& idatms );
 		

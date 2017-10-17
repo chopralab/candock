@@ -17,7 +17,7 @@
 
 using namespace std;
 
-namespace Molib {
+namespace Score {
         class Score;
 };
 
@@ -72,7 +72,7 @@ namespace OMMIface {
                 Geom3D::Point::Vec get_state(const Molib::Atom::Vec &atoms);
 
 #ifndef NDEBUG
-                void minimize_knowledge_based(Molib::Molecule& ligand, Molib::Molecule& receptor, Molib::Score& score);
+                void minimize_knowledge_based(Molib::Molecule& ligand, Molib::Molecule& receptor, Score::Score& score);
 #endif
                 
                 void minimize_state();

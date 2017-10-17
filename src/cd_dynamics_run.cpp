@@ -38,20 +38,28 @@ int main(int argc, char* argv[]) {
 
                 drpdb.parse_molecule(starting_mol);
 
-                Molib::Score score(cmdl.get_string_option("ref"), cmdl.get_string_option("comp"),
+                Score::Score score(cmdl.get_string_option("ref"), cmdl.get_string_option("comp"),
                                    cmdl.get_string_option("func"),cmdl.get_int_option("cutoff"),
                                    cmdl.get_double_option("step"));
 
                 score.define_composition(starting_mol.get_idatm_types(),
                                          starting_mol.get_idatm_types())
                      .process_distributions_file(cmdl.get_string_option("dist"))
-                     .compile_scoring_function()
-                     .parse_objective_function(cmdl.get_string_option("obj_dir"), cmdl.get_double_option("scale"), 1501);
+                     .compile_scoring_function();
+                
+                if (cmdl.get_string_option("obj_dir").empty()) {
+                        score.compile_objective_function(cmdl.get_double_option("scale"));
+                } else {
+                        score.parse_objective_function(cmdl.get_string_option("obj_dir"),
+                                                          cmdl.get_double_option("scale"),
+                                                          15
+                                                         );
+                }
 
                 OMMIface::ForceField ffield;
 
                 ffield.parse_gaff_dat_file(cmdl.get_string_option("gaff_dat"))
-                      .add_kb_forcefield(score, cmdl.get_double_option("step"), 15)
+                      .add_kb_forcefield(score)
                       .parse_forcefield_file(cmdl.get_string_option("amber_xml"))
                       .parse_forcefield_file(cmdl.get_string_option("water_xml"));
 

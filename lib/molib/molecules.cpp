@@ -8,7 +8,6 @@
 #include "atomtype.hpp"
 #include "bondtype.hpp"
 #include "bond.hpp"
-#include "hydrogens.hpp"
 #include "geom3d/geom3d.hpp"
 #include "fragmenter/fragmenter.hpp"
 #include "fragmenter/unique.hpp"
@@ -90,7 +89,7 @@ namespace Molib {
 					Residue &residue = *presidue;
 					if (!(help::standard_residues.count(residue.resn())
 					   || help::ions.count(residue.resn()))) {
-						Hydrogens::compute_hydrogen(residue);
+                                                residue.compute_hydrogen();
 					}
 				}
 			} catch (exception &e) {
@@ -152,7 +151,7 @@ namespace Molib {
 			// Remove hydrogens added to protonated ions as well
 			if (!(help::standard_residues.count(residue.resn())
 			   || help::ions.count(residue.resn()))) {
-				Hydrogens::erase_hydrogen(residue);
+				residue.erase_hydrogen();
 			}
 		}
 		return *this;

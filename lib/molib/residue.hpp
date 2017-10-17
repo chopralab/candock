@@ -53,6 +53,10 @@ namespace Molib {
 
 		Residue& regenerate_bonds(const Residue&);
 
+                // NOTE: implementation in hydrogens.cpp
+                void compute_hydrogen();
+                void erase_hydrogen();
+
 		friend ostream& operator<< (ostream& stream, const Residue& r);
 	};
 

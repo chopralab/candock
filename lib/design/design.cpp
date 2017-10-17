@@ -2,7 +2,6 @@
 
 #include <set>
 
-#include "molib/hydrogens.hpp"
 #include "molib/bondtype.hpp"
 #include "molib/atomtype.hpp"
 #include "fragmenter/unique.hpp"
@@ -16,7 +15,7 @@ namespace design {
 		}
 
 		// Create a new molecule, original bonds will be copied
-		Molib::Hydrogens::compute_hydrogen(__original.first().first().first().first());
+		__original.first().first().first().first().compute_hydrogen();
 		__original.erase_properties();
 		__original.first().first().first().first().renumber_atoms(1);
 	}
@@ -129,7 +128,9 @@ namespace design {
 		return false;
 	}
 
-	void Design::functionalize_hydrogens_with_fragments(const Molib::NRset& nr, const double cutoff, const double clash_coeff) {
+	void design::Design::functionalize_hydrogens_with_fragments(const Molib::NRset& nr,
+                                                                    const double cutoff, const double clash_coeff,
+                                                                    const std::tuple< double, size_t, size_t, size_t >& lipinski_values) {
 
 		if (nr.size() == 0) {
 			throw Error("No seeds given for modificatiton");
@@ -144,17 +145,17 @@ namespace design {
 				continue;
 			}
 
-			for ( const auto &fragment : nr )  {
+                        for ( const auto &fragment : nr )  {
                             
-			Molib::Hydrogens::compute_hydrogen(fragment.first().first().first().first().first());
+                        fragment.first().first().first().first().first().compute_hydrogen();
                         std::tuple<double,size_t,size_t,size_t> frag_lipinski = Molib::AtomType::determine_lipinski(
                             fragment.first().first().first().first().first().get_atoms());
-                        Molib::Hydrogens::erase_hydrogen(fragment.first().first().first().first().first());
+                        fragment.first().first().first().first().first().erase_hydrogen();
                         
-                        if ( std::get<0>(original_lipinski) + std::get<0>(frag_lipinski) > 500.0 ||
-                             std::get<1>(original_lipinski) + std::get<1>(frag_lipinski) > 10    ||
-                             std::get<2>(original_lipinski) + std::get<2>(frag_lipinski) > 2     ||
-                             std::get<3>(original_lipinski) + std::get<3>(frag_lipinski) > 2     ){
+                        if ( std::get<0>(original_lipinski) + std::get<0>(frag_lipinski) > std::get<0> (lipinski_values) ||
+                             std::get<1>(original_lipinski) + std::get<1>(frag_lipinski) > std::get<1> (lipinski_values) ||
+                             std::get<2>(original_lipinski) + std::get<2>(frag_lipinski) > std::get<2> (lipinski_values) ||
+                             std::get<3>(original_lipinski) + std::get<3>(frag_lipinski) > std::get<3> (lipinski_values) ){
                                 continue;
                         }
 
@@ -185,21 +186,6 @@ namespace design {
 						continue;
 					}
 
-//                                        // Find terminal atoms that have invalid atom types for terminal atoms.
-//                                        // These test should never complete for non-fragments
-//                                         if ( (start_atom->idatm_type_unmask() == "Car"
-//                                             || start_atom->idatm_type_unmask() == "C2")
-//                                             && start_atom->get_bonds().size() == 1 
-//                                             && start_atom->get_bonds().at(0)->second_atom(*start_atom).idatm_type_unmask().back() != '2'  ) {
-//                                                     continue;
-//                                         } else if ( (start_atom->idatm_type_unmask() == "Nar"
-//                                             || start_atom->idatm_type_unmask() == "N2")
-//                                             && start_atom->get_bonds().size() == 1
-//                                             && start_atom->get_bonds().at(0)->second_atom(*start_atom).idatm_type_unmask().back() != '2'  ) {
-//                                                     continue;
-//                                         }
-// 
-
 					// Ensure the fragment is close enough to the original ligand in the pocket
 					if (start_atom->crd().distance( search_atom.crd() ) > cutoff ) {
 						continue;
@@ -215,7 +201,7 @@ namespace design {
 					Molib::Molecule &new_design = __designs.add( new Molib::Molecule(__original) );
 
 					// Remove all hydrogens from the original ligand (they are not needed anymore)
-					Molib::Hydrogens::erase_hydrogen(new_design.first().first().first().first());
+					new_design.first().first().first().first().erase_hydrogen();
 
 					// Add new fragment as a "residue" of the molecule
 					Molib::Chain &chain = new_design.first().first().first();
@@ -285,7 +271,7 @@ namespace design {
 
 				// Remove all hydrogens from the original ligand (they are not needed anymore)
 				Molib::BondOrder::compute_bond_order(__designs.get_atoms());
-				Molib::Hydrogens::erase_hydrogen(    __designs.last().first().first().first().first());
+				__designs.last().first().first().first().first().erase_hydrogen();
 
 				Geom3D::Coordinate crd;
 
@@ -325,7 +311,7 @@ namespace design {
 
 				// Remove all hydrogens from the original ligand (they are not needed anymore)
 				Molib::BondOrder::compute_bond_order(__designs.last().get_atoms());
-				Molib::Hydrogens::erase_hydrogen(    __designs.last().first().first().first().first());
+				 __designs.last().first().first().first().first().erase_hydrogen();
 
 				Molib::Residue& mod_residue = __designs.last().first().first().first().first();
 

@@ -125,7 +125,8 @@ namespace Program {
 			("ref",     po::value<std::string> ()->default_value ("mean"),
 			 "Normalization method for the reference state ('mean' is averaged over all atom type pairs, whereas 'cumulative' is a summation for atom type pairs)")
 			("comp",    po::value<std::string> ()->default_value ("reduced"),
-			 "Atom types used in calculating reference state 'reduced' or 'complete' ('reduced' includes only those atom types present in the specified receptor and small molecule, whereas 'complete' includes all atom types)")
+			 "Atom types used in calculating reference state 'reduced' or 'complete'"
+                         "('reduced' includes only those atom types present in the specified receptor and small molecule, whereas 'complete' includes all atom types)")
 			("func",    po::value<std::string> ()->default_value ("radial"),
 			 "Function for calculating scores 'radial' or 'normalized_frequency'")
 			("cutoff",  po::value<int> ()->default_value (6),
@@ -134,36 +135,37 @@ namespace Program {
 			 "Step for spline generation of non-bonded knowledge-based potential [0.0-1.0]")
 			("scale",   po::value<double> ()->default_value (10.0, "10.0"),
 			 "Scale non-bonded forces and energy for knowledge-based potential [0.0-1000.0]")
-			("obj_dir", po::value<std::string> ()->default_value ("obj"),
-			 "Output directory for objective function and derivatives")
 			("potential_file", po::value<std::string> ()->default_value ("potentials.txt"),
 			 "Output file for potentials and derivatives")
 			;
 
-			po::options_description force_field_min ("Forcefield and Minimization Options");
-			force_field_min.add_options()
-			("amber_xml", po::value<std::string> ()->default_value ("data/amber10.xml"),
-			 "Receptor XML parameters (and topology) input file")
-			("water_xml", po::value<std::string> ()->default_value ("data/tip3p.xml"),
-			 "Water XML parameters (and topology) input file")
-			("gaff_dat",  po::value<std::string> () ->default_value ("data/gaff.dat"),
-			 "Gaff DAT forcefield input file")
-			("gaff_xml",  po::value<std::string> () ->default_value ("data/gaff.xml"),
-			 "Gaff XML forcefield and ligand topology output file")
+                        po::options_description force_field_min ("Forcefield and Minimization Options");
+                        force_field_min.add_options()
+                        ("amber_xml", po::value<std::string> ()->default_value ("data/amber10.xml"),
+                         "Receptor XML parameters (and topology) input file")
+                        ("water_xml", po::value<std::string> ()->default_value ("data/tip3p.xml"),
+                         "Water XML parameters (and topology) input file")
+                        ("gaff_dat",  po::value<std::string> () ->default_value ("data/gaff.dat"),
+                         "Gaff DAT forcefield input file")
+                        ("gaff_xml",  po::value<std::string> () ->default_value ("data/gaff.xml"),
+                         "Gaff XML forcefield and ligand topology output file")
                         ("gaff_heme", po::value<std::string> () ->default_value (""),
                          "Gaff DAT file to use for Heme groups")
-			("fftype"   , po::value<std::string> ()->default_value ("kb"),
-			 "Forcefield to use 'kb' (knowledge-based), 'phy' (physics-based), or 'none' (do not calculate intermolecular forces)")
-			("pos_tol",   po::value<double> ()->default_value (0.00000000001, "0.00000000001"),
-			 "Minimization position tolerance in Angstroms - only for KB")
-			("mini_tol",  po::value<double> ()->default_value (0.0001),
-			 "Minimization tolerance")
-			("max_iter",  po::value<int> ()->default_value (10),
-			 "Maximum iterations for minimization during linking")
-			("max_iter_final", po::value<int> ()->default_value (100),
-			 "Maximum iterations for final minimization")
-			("update_freq", po::value<int> ()->default_value (10),
-			 "Update non-bond frequency")
+                        ("fftype"   , po::value<std::string> ()->default_value ("kb"),
+                         "Forcefield to use 'kb' (knowledge-based), 'phy' (physics-based), or 'none' (do not calculate intermolecular forces)")
+                        ("obj_dir", po::value<std::string> ()->default_value (""),
+                         "Output directory for objective function. Setting this value will cause the KB potential to be read from disk."
+                         "Default(empty string) causes the objective function to be recalculated.")
+                        ("pos_tol",   po::value<double> ()->default_value (0.00000000001, "0.00000000001"),
+                         "Minimization position tolerance in Angstroms - only for KB")
+                        ("mini_tol",  po::value<double> ()->default_value (0.0001),
+                         "Minimization tolerance")
+                        ("max_iter",  po::value<int> ()->default_value (10),
+                         "Maximum iterations for minimization during linking")
+                        ("max_iter_final", po::value<int> ()->default_value (100),
+                         "Maximum iterations for final minimization")
+                        ("update_freq", po::value<int> ()->default_value (10),
+                         "Update non-bond frequency")
                         ("temperature", po::value<double>()->default_value(300.0f, "300"),
                          "Temperature to run the dynamic simulation at.")
                         ("friction",    po::value<double>()->default_value(91.f, "91.0"),
@@ -244,7 +246,15 @@ namespace Program {
 			 "Change hydrogens to given atoms. Multiple atoms can be given.")
 			("change_terminal_atom",po::value< std::vector<std::string>>()->multitoken()->default_value(std::vector<std::string>(),""),
 			 "Change non-hydrogen atoms that terminate chains to given atoms. Multiple atoms can be given.")
-			;
+                        ("lipinski_mass",       po::value<double>()->default_value(500.0),
+                         "Maximum molecular mass for designs")
+                        ("lipinski_hbd",        po::value<int>()->default_value(10),
+                         "Maximum number of hydrogen bond donors allowed on a molecule.")
+                        ("lipinski_nhs",        po::value<int>()->default_value(2),
+                         "Maximum number of -NH groups allowed on a molecule.")
+                        ("lipinski_ohs",        po::value<int>()->default_value(2),
+                         "Maximum number of -OH groups allowed on a molecule.")
+                        ;
 
 			po::options_description config_options;
 			config_options.add(starting_inputs)

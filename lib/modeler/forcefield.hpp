@@ -12,8 +12,12 @@ namespace Molib {
 	class Atom;
 	class Molecule;
 	class Molecules;
-	class Score;
 }
+
+namespace Score {
+        class Score;
+}
+
 namespace OMMIface {
 	class ParameterError : public Error {
 	public: 
@@ -24,8 +28,8 @@ namespace OMMIface {
 		double coulomb14scale;
 		double lj14scale;
 		double step; // for knowledge-based potential
-		double cutoff; //FIXME intitialize this
-		
+		double kb_cutoff; // also for kb potential
+
 		//~ static const double Temperature         = 300;     // Kelvins
 		//~ static const double FrictionInPerPs     = 91.;     // collisions per picosecond
 		//~ static const double SolventDielectric   = 80.;     // typical for water
@@ -75,7 +79,7 @@ namespace OMMIface {
 		ForceField& parse_gaff_dat_file(const string&);
 		ForceField& insert_topology(const Molib::Molecule&);
 		ForceField& erase_topology(const Molib::Molecule&);
-		ForceField& add_kb_forcefield(const Molib::Score&, const double step, const double cutoff);
+		ForceField& add_kb_forcefield(const Score::Score&);
 		
 		bool residue_exists(const string &name) const { return residue_topology.count(name); }
 	};

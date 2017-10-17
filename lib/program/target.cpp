@@ -52,7 +52,7 @@ namespace Program {
                 __protein = unique_ptr<Molib::Molecule> ( new Molib::Molecule (std::move (receptors[0])));
 
                 // Emulate the original version of candock
-                __protein->set_name (boost::filesystem::basename (input_name.substr (0, input_name.length() - 4)));
+                __protein->set_name (input_name.substr (0, input_name.length() - 4));
                 boost::filesystem::create_directory (__protein->name());
 
                 /* Create receptor grid
@@ -78,10 +78,10 @@ namespace Program {
                         return;
                 }
 
-                Molib::Score *score = new Molib::Score(cmdl.get_string_option("ref"), cmdl.get_string_option("comp"),
+                Score::Score *score = new Score::Score(cmdl.get_string_option("ref"), cmdl.get_string_option("comp"),
                                             cmdl.get_string_option("func"),cmdl.get_int_option("cutoff"),
                                             cmdl.get_double_option("step"));
-                __score = std::unique_ptr<Molib::Score> (score);
+                __score = std::unique_ptr<Score::Score> (score);
 
                 __score->define_composition(__protein->get_idatm_types(),
                                           ligand_fragments.ligand_idatm_types())
@@ -113,8 +113,16 @@ namespace Program {
         void Target::__initialize_kbforce() {
                 OMMIface::SystemTopology::loadPlugins();
 
-                __score->parse_objective_function(cmdl.get_string_option("obj_dir"), cmdl.get_double_option("scale"), 1501);
-                __ffield->add_kb_forcefield(*__score, cmdl.get_double_option("step"), 15);
+                if (cmdl.get_string_option("obj_dir").empty()) {
+                        __score->compile_objective_function(cmdl.get_double_option("scale"));
+                } else {
+                        __score->parse_objective_function(cmdl.get_string_option("obj"),
+                                                          cmdl.get_double_option("scale"),
+                                                          15
+                                                         );
+                }
+
+                __ffield->add_kb_forcefield(*__score);
         }
 
         std::set<int> Target::get_idatm_types(const std::set<int>& previous) const {
@@ -171,10 +179,24 @@ namespace Program {
                 if ( __dockedlig == nullptr ) {
                         __ffield->insert_topology(*__protein);
                         Program::LinkFragments *dockedlig = new LinkFragments(*__protein, *__score, *__ffield, *__prepseeds, *__gridrec);
-                        __dockedlig =  std::unique_ptr<Program::LinkFragments>(dockedlig);
+                        __dockedlig = std::unique_ptr<Program::LinkFragments>(dockedlig);
                 }
 
                 __dockedlig->run_step();
+        }
+
+        void Target::link_fragments(const Molib::Molecules& ligands) {
+                if (__prepseeds == nullptr) {
+                        throw Error("You must run dock_fragments first!");
+                }
+
+                if (__dockedlig == nullptr ) {
+                        __ffield->insert_topology(*__protein);
+                        Program::LinkFragments *dockedlig = new LinkFragments(*__protein, *__score, *__ffield, *__prepseeds, *__gridrec);
+                        __dockedlig = std::unique_ptr<Program::LinkFragments>(dockedlig);
+                }
+
+                __dockedlig->link_ligands(ligands);
         }
 
         void Target::make_scaffolds(const std::set<std::string>& seeds_to_add, Molib::Molecules& all_designs_out) {
@@ -185,7 +207,15 @@ namespace Program {
                 for ( auto &molecules : nr ) {
                         design::Design designer (molecules.first(), created_design);
                         designer.change_original_name(molecules.name());
-                        designer.functionalize_hydrogens_with_fragments(nr, cmdl.get_double_option("tol_seed_dist"), cmdl.get_double_option("clash_coeff"));
+                        designer.functionalize_hydrogens_with_fragments(nr,
+                                                                        cmdl.get_double_option("tol_seed_dist"),
+                                                                        cmdl.get_double_option("clash_coeff"),
+                                                                        make_tuple(cmdl.get_double_option("lipinski_mass"),
+                                                                                   cmdl.get_int_option("lipinski_hbd"),
+                                                                                   cmdl.get_int_option("lipinski_nhs"),
+                                                                                   cmdl.get_int_option("lipinski_ohs")
+                                                                                  )
+                                                                       );
 #ifndef NDEBUG
                         Inout::output_file(designer.get_internal_designs(), "internal_designs.pdb", ios_base::app);
 #endif
@@ -208,7 +238,14 @@ namespace Program {
                         design::Design designer ( molecule, created_design);
                         if (! seeds_to_add.empty() )
                                 designer.functionalize_hydrogens_with_fragments(__prepseeds->get_top_seeds(seeds_to_add, cmdl.get_double_option("top_percent")),
-                                                                                        cmdl.get_double_option("tol_seed_dist"), cmdl.get_double_option("clash_coeff") );
+                                                                                cmdl.get_double_option("tol_seed_dist"),
+                                                                                cmdl.get_double_option("clash_coeff"),
+                                                                                make_tuple(cmdl.get_double_option("lipinski_mass"),
+                                                                                   cmdl.get_int_option("lipinski_hbd"),
+                                                                                   cmdl.get_int_option("lipinski_nhs"),
+                                                                                   cmdl.get_int_option("lipinski_ohs")
+                                                                                  )
+                                                                               );
 
                         const vector<string>& h_single_atoms = cmdl.get_string_vector("add_single_atoms");
                         const vector<string>& a_single_atoms = cmdl.get_string_vector("change_terminal_atom");

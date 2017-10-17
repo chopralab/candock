@@ -7,8 +7,8 @@
 
 int main( int argc, char **argv) {
 
-        if (argc < 5) {
-               puts("Error, please give at least 4 arguments\n");
+        if (argc < 6) {
+               puts("Error, please give at least 5 arguments\n");
                return 1;
         }
 
@@ -30,6 +30,11 @@ int main( int argc, char **argv) {
         }
 
         if (! initialize_ffield(argv[4])) {
+                printf("%s\n", cd_get_error());
+                return 1;
+        }
+
+        if (! initialize_plugins(argv[5])) {
                 printf("%s\n", cd_get_error());
                 return 1;
         }

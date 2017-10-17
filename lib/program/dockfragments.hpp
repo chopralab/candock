@@ -17,7 +17,7 @@ namespace Program {
                 const FindCentroids& __found_centroids;
                 const FragmentLigands& __fragmented_ligands;
 
-                const Molib::Score& __score;
+                const Score::Score& __score;
                 const Molib::Atom::Grid& __gridrec;
 
                 const std::string& __name;
@@ -34,7 +34,7 @@ namespace Program {
         public:
                 DockFragments ( const FindCentroids& found_centroids,
                                 const FragmentLigands& fragmented_ligands,
-                                const Molib::Score& score,
+                                const Score::Score& score,
                                 const Molib::Atom::Grid& gridrec,
                                 const std::string& name
                               );

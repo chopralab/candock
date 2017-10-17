@@ -27,13 +27,20 @@ int main(int argc, char* argv[]) {
                         Version::get_run_info();
                 cout << help::Options::get_options()->configuration_file() << endl;
 
-                Molib::Score score(cmdl.get_string_option("ref"), "complete",
+                Score::Score score(cmdl.get_string_option("ref"), "complete",
                                    cmdl.get_string_option("func"), cmdl.get_int_option("cutoff"),
                                    cmdl.get_double_option("step"));
 
-                score.define_composition(set<int>(), set<int>())
+                // Pretend that we'll use all types
+                set<int> all_types;
+                int sz = help::idatm_mask.size();
+                for (int i = 0; i < sz; ++i) {
+                        all_types.insert(i);
+                }
+
+                score.define_composition(all_types, all_types)
                      .process_distributions_file(cmdl.get_string_option("dist"))
-                     .compile_objective_function();
+                     .compile_objective_function(cmdl.get_double_option("scale"));
 
                 score.output_objective_function(cmdl.get_string_option("obj_dir"));
 

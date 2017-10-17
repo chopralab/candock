@@ -4,17 +4,23 @@
 namespace Program {
 
         TargetGroup::TargetGroup(const std::string& input_name) {
+
+                // User has given blank option (ussual for case of antitargets)
+                if (input_name.empty()) {
+                        return;
+                }
+            
                 for (const auto &a : Inout::files_matching_pattern (input_name, ".pdb")) {
                         __targets.push_back (new Target (a));
                 }
         }
 
-		TargetGroup::~TargetGroup() {
-				for (Target* target : __targets) {
+        TargetGroup::~TargetGroup() {
+                for (Target* target : __targets) {
                         delete target;
-				}
-				__targets.clear();
-		}
+                }
+                __targets.clear();
+        }
 
         void TargetGroup::dock_fragments(const FragmentLigands& ligands) {
                 for (auto &target : __targets) {
@@ -73,7 +79,7 @@ namespace Program {
                 return solo_target_seeds;
         }
 
-        void TargetGroup::make_scaffolds(const TargetGroup& antitargets) {
+        void TargetGroup::make_scaffolds(const TargetGroup& antitargets, FragmentLigands& ligands) {
 
                 set<string> seeds_to_add = determine_non_overlapping_seeds(antitargets);
 
@@ -120,9 +126,18 @@ namespace Program {
                         Fileout::print_mol2(ss,m);
                 }
                 Inout::output_file(ss.str(), "designed_0.mol2");
+
+                ligands.add_seeds_from_file("design_seeds.pdb");
+                ligands.add_seeds_from_molecules(all_designs);
+                ligands.write_seeds_to_file("design_seeds.pdb");
+
+                for (auto &target : __targets) {
+                        target->dock_fragments(ligands);
+                        target->link_fragments(all_designs);
+                }
         }
 
-        void TargetGroup::design_ligands(const TargetGroup& antitargets) {
+        void TargetGroup::design_ligands(const TargetGroup& antitargets, FragmentLigands& ligands) {
 
                 set<string> seeds_to_add = determine_non_overlapping_seeds(antitargets);
 
@@ -159,7 +174,7 @@ namespace Program {
                                 log_step << "No new designs, exiting" << endl;
                                 return;
                         }
-                    
+
                         all_designs.compute_hydrogen()
                                    .compute_bond_order()
                                    .compute_bond_gaff_type()
@@ -179,6 +194,15 @@ namespace Program {
                                 Fileout::print_mol2(ss,m);
                         }
                         Inout::output_file(ss.str(), "designed_" + std::to_string(n) + ".mol2");
+
+                        ligands.add_seeds_from_file("design_seeds.pdb");
+                        ligands.add_seeds_from_molecules(all_designs);
+                        ligands.write_seeds_to_file("design_seeds.pdb");
+
+                        for (auto &target : __targets) {
+                                target->dock_fragments(ligands);
+                                target->link_fragments(all_designs);
+                        }
                 }
 
         }
