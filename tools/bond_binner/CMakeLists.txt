@@ -1,4 +1,8 @@
-add_executable( cd_gen_count_file "cd_gen_count_file.cpp"  ${CANDOCK_SRC})
+add_executable( cd_gen_count_file
+                cd_gen_count_file.cpp
+                molecularbondextractor.hpp
+                molecularbondextractor.cpp
+            )
 
 target_link_libraries( cd_gen_count_file candock ${Boost_LIBRARIES} )
 
