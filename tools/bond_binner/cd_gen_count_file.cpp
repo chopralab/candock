@@ -105,7 +105,7 @@ int main(int argc, char* argv[]) {
                                     continue;
 
                                 MBE.printStretches(stretch_file);
-                                MBE.printAngles(stretch_file);
+                                MBE.printAngles(angle_file);
                                 MBE.printDihedrals(dihedral_file);
                                 MBE.printImpropers(improper_file);
 

@@ -10,66 +10,65 @@ class MoleculeBondExtractor {
 
 public:
 
-    // typedefs for raw Bond information
-    typedef std::tuple< const Molib::Atom*,
-            const Molib::Atom* > BondStretch;
-    typedef std::map< BondStretch, double>   BondStretches;
-    typedef std::tuple< const Molib::Atom*,
-            const Molib::Atom*,
-            const Molib::Atom* > BondAngle;
-    typedef std::map< BondAngle, double>     BondAngles;
-    typedef std::tuple< const Molib::Atom*,
-            const Molib::Atom*,
-            const Molib::Atom*,
-            const Molib::Atom* > BondDihedral;
-    typedef std::map< BondDihedral, double>  BondDihedrals;
-
     // typedefs for binned Bond information
     // NOTE: Bondorder not included (yet?)
     // FIXME: consider changing the types here
 
-    struct bond_info {
+    struct atom_info {
         int idatm_type;
         int ring_size;
         size_t substitutions;
         
-        friend bool operator< (const bond_info& lhs, const bond_info& rhs) {
+        friend bool operator< (const atom_info& lhs, const atom_info& rhs) {
             if ( lhs.idatm_type < rhs.idatm_type ) {
-                return -4;
+                return true;
             } else if ( lhs.idatm_type > rhs.idatm_type ) {
-                return 4;
+                return false;
             }
 
             if ( lhs.ring_size < rhs.ring_size ) {
-                return -3;
+                return true;
             } else if ( lhs.ring_size > rhs.ring_size) {
-                return 3;
+                return false;
             }
 
             if ( lhs.substitutions < rhs.substitutions ) {
-                return -2;
+                return true;
             } else if (lhs.substitutions > rhs.substitutions) {
-                return 2;
+                return false;
             }
 
-            return 0;
+            return false;
         }
+
+        friend std::ostream& operator<< (std::ostream& os, const atom_info& ai);
     };
 
-    typedef std::tuple<bond_info, bond_info, size_t> StretchBin;
-    typedef std::map< StretchBin, size_t >           StretchCounts;
-    typedef std::tuple<bond_info, bond_info,
-                       bond_info, size_t >           AngleBin;
-    typedef std::map< AngleBin, size_t >             AngleCounts;
-    typedef std::tuple<bond_info, bond_info,
-                       bond_info, bond_info, size_t> DihedralBin;
-    typedef std::map< DihedralBin, size_t >          DihedralCounts;
+    // typedefs for raw Bond information
+    typedef std::tuple< atom_info, atom_info> BondStretch;
+
+    typedef std::pair< BondStretch, double>    BondStretches;
+
+    typedef std::tuple< atom_info, atom_info,
+                                   atom_info> BondAngle;
+    typedef std::pair< BondAngle, double>     BondAngles;
+    
+    typedef std::tuple< atom_info, atom_info,
+                        atom_info, atom_info> BondDihedral;
+    typedef std::pair< BondDihedral, double>  BondDihedrals;
+
+    typedef std::pair<BondStretch, size_t>  StretchBin;
+    typedef std::map< StretchBin, size_t >  StretchCounts;
+    typedef std::pair<BondAngle, size_t >   AngleBin;
+    typedef std::map< AngleBin, size_t >    AngleCounts;
+    typedef std::pair<BondDihedral, size_t> DihedralBin;
+    typedef std::map< DihedralBin, size_t > DihedralCounts;
 
 private:
-    BondStretches bs;
-    BondAngles    ba;
-    BondDihedrals bd;
-    BondDihedrals bi; // Impropers
+    std::vector<BondStretches> bs;
+    std::vector<BondAngles>    ba;
+    std::vector<BondDihedrals> bd;
+    std::vector<BondDihedrals> bi; // Impropers
 
     StretchCounts  bsc;
     AngleCounts    bac;
@@ -80,23 +79,21 @@ private:
     Glib::Graph<Molib::Atom>::VertexRingMap all_rings_sizes;
     std::map<const Molib::Atom*, size_t> substitutions;
 
-    int __comp_atoms ( const Molib::Atom* atom1, const Molib::Atom* atom2) const;
-
     int __ring_size( const Molib::Atom* atom ) const;
 
     void __print_atom( const Molib::Atom* atom, std::ostream& os, char delim ) const;
 
-    bond_info __make_bond_info( const Molib::Atom* atom);
+    atom_info __make_atom_info( const Molib::Atom* atom);
     
+    void addStretch (const Molib::Atom* atom1, const Molib::Atom* atom2 );
+    void addAngle   (const Molib::Atom* atom1, const Molib::Atom* atom2, const Molib::Atom* atom3);
+    void addDihedral(const Molib::Atom* atom1, const Molib::Atom* atom2, const Molib::Atom* atom3, const Molib::Atom* atom4);
+    void addImproper(const Molib::Atom* atom1, const Molib::Atom* atom2, const Molib::Atom* atom3, const Molib::Atom* atom4);
 
 public:
 
     void reset();
 
-    void addStretch ( BondStretch stretch_atoms );
-    void addAngle ( BondAngle angle_atoms);
-    void addDihedral (BondDihedral dihedral_atoms);
-    void addImproper (BondDihedral improper_atoms);
     bool addMolecule( const Molib::Molecule& mol );
 
     void binStretches( const double bond_bin_size );
