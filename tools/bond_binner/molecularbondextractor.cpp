@@ -80,7 +80,8 @@ void MoleculeBondExtractor::reset() {
 
 void MoleculeBondExtractor::addStretch (const Molib::Atom* atom1, const Molib::Atom* atom2) {
 
-    if (atom1 == atom2)
+    // Avoid a double count if starting with a later atom
+    if (atom1 >= atom2)
         return;
 
     atom_info a0 = __make_atom_info(atom1);
@@ -100,7 +101,8 @@ void MoleculeBondExtractor::addStretch (const Molib::Atom* atom1, const Molib::A
 
 void MoleculeBondExtractor::addAngle (const Molib::Atom* atom1, const Molib::Atom* atom2, const Molib::Atom* atom3) {
 
-    if (atom1 == atom3 || atom1 == atom2 || atom3 == atom2)
+    // Middle and end cases not really possible, but the check is cheap
+    if (atom1 >= atom3 || atom1 == atom2 || atom3 == atom2)
         return;
 
     atom_info a0 = __make_atom_info(atom1);
@@ -121,7 +123,8 @@ void MoleculeBondExtractor::addAngle (const Molib::Atom* atom1, const Molib::Ato
 
 void MoleculeBondExtractor::addDihedral (const Molib::Atom* atom1, const Molib::Atom* atom2, const Molib::Atom* atom3, const Molib::Atom* atom4) {
 
-    if (atom4 == atom2 || atom4 == atom1 || atom3 == atom1)
+    // Some later checks are probably not needed
+    if ( atom1 >= atom4 || atom3 == atom1 || atom4 == atom2 || atom2 == atom3)
         return;
 
     atom_info a0 = __make_atom_info(atom1);
@@ -145,23 +148,24 @@ void MoleculeBondExtractor::addDihedral (const Molib::Atom* atom1, const Molib::
 
 void MoleculeBondExtractor::addImproper (const Molib::Atom* atom1, const Molib::Atom* atom2, const Molib::Atom* atom3, const Molib::Atom* atom4) {
 
-    if (atom4 == atom3 || atom4 == atom1 || atom3 == atom1)
+    // Leave atom2 alone, it is the pivot atom
+    if (atom1 >= atom3 || atom1 >= atom4 || atom3 >= atom4)
         return;
 
     // Order should be:
     // Lowest, 2nd Lowest, Atom2, highest
     BondDihedral i_new;
 
-    const Molib::Atom* highest = max( max( atom1, atom3), atom4);
-    const Molib::Atom* lowest  = min( min( atom1, atom3), atom4);
-    const Molib::Atom* middle  = max( min( atom1, atom3), min(max(atom1,atom3),atom4));
+    atom_info a0 = __make_atom_info(atom1);
+    atom_info a1 = __make_atom_info(atom2);
+    atom_info a2 = __make_atom_info(atom3);
+    atom_info a3 = __make_atom_info(atom4);
 
-    atom_info low  = __make_atom_info(lowest);
-    atom_info a2   = __make_atom_info(atom2);
-    atom_info mid  = __make_atom_info(middle);
-    atom_info high = __make_atom_info(highest);
+    atom_info lowest  = min( min( a0, a1), a3);
+    atom_info middle  = max( min( a0, a2), min(max(a0,a2),a3));
+    atom_info highest = max( max( a0, a2), a3);
 
-    i_new = make_tuple (low, mid, a2, high);
+    i_new = make_tuple (lowest, middle, a1, highest);
 
     double dihedral = Geom3D::dihedral(atom1->crd(), atom2->crd(),
                                        atom3->crd(), atom4->crd());
