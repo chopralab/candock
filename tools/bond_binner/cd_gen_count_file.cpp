@@ -34,6 +34,8 @@ int main(int argc, char* argv[]) {
 
                 po::options_description extract_file_options ("Molecular Bond Extraction Files");
                 extract_file_options.add_options()
+                ("num_mols_to_read", po::value<int>()->default_value(10),
+                 "Number of molecules to read from a file at a time.")
                 ("stretch_extract_file", po::value<std::string> ()->default_value("stretches.tbl"),
                  "File to save stretches")
                 ("angle_extract_file", po::value<std::string> ()->default_value("angles.tbl"),
@@ -86,6 +88,8 @@ int main(int argc, char* argv[]) {
                 std::ofstream dihedral_file (vm["dihedral_extract_file"].as<std::string>(), std::ios::app);
                 std::ofstream improper_file (vm["improper_extract_file"].as<std::string>(), std::ios::app);
 
+                int num_mols_to_read = vm["num_mols_to_read"].as<int>();
+
                 double stretch_bin = vm["stretch_bin_size"].as<double>();
                 double angle_bin = vm["angle_bin_size"].as<double>();
                 double dihedral_bin = vm["dihedral_bin_size"].as<double>();
@@ -97,16 +101,20 @@ int main(int argc, char* argv[]) {
                                                   improper_bin);
 
                 for (int i = 1; i < argc; ++i) {
-                        Parser::FileParser input(argv[i], Parser::pdb_read_options::all_models);
+                        Parser::FileParser input(argv[i],
+                                                 Parser::pdb_read_options::all_models,
+                                                 num_mols_to_read
+                                                );
                         Molib::Molecules mols;
-                        input.parse_molecule(mols);
-                        
-                        mols.compute_idatm_type();
-                        mols.erase_hydrogen();
 
                         AtomInfo::MolecularBondExtractor MBE;
 
-                        for ( const auto& mol : mols ) {
+                        while (input.parse_molecule(mols)) {
+
+                            mols.compute_idatm_type();
+                            mols.erase_hydrogen();
+
+                            for ( const auto& mol : mols ) {
                                 if (!MBE.addMolecule(mol))
                                     continue;
 
@@ -114,9 +122,10 @@ int main(int argc, char* argv[]) {
                                 MBE.printAngles(angle_file);
                                 MBE.printDihedrals(dihedral_file);
                                 MBE.printImpropers(improper_file);
-                        }
+                            }
 
-                        MBB.addExtracts(MBE);
+                            MBB.addExtracts(MBE);
+                        }
                 }
 
                 stretch_file.close();
