@@ -1,6 +1,8 @@
 #include "molecularbondextractor.hpp"
 
-int MoleculeBondExtractor::__ring_size( const Molib::Atom* atom ) const {
+namespace AtomInfo {
+
+int MolecularBondExtractor::__ring_size( const Molib::Atom* atom ) const {
     const std::vector<size_t>& ring_vec = all_rings_sizes.at(atom);
 
     // Not in a ring
@@ -57,13 +59,13 @@ int MoleculeBondExtractor::__ring_size( const Molib::Atom* atom ) const {
     return ring_vec.at(0);
 }
 
-void MoleculeBondExtractor::__print_atom( const Molib::Atom* atom, std::ostream& os, char delim ) const {
+void MolecularBondExtractor::__print_atom( const Molib::Atom* atom, std::ostream& os, char delim ) const {
     os << help::idatm_unmask[ atom->idatm_type() ] << delim;
     os << __ring_size(atom) << delim;
     os << substitutions.at(atom) << delim;
 }
 
-MoleculeBondExtractor::atom_info MoleculeBondExtractor::__make_atom_info(const Molib::Atom* atom) {
+atom_info MolecularBondExtractor::__make_atom_info(const Molib::Atom* atom) {
     atom_info a = { atom->idatm_type(),
                     __ring_size(atom),
                     substitutions.at(atom)
@@ -72,13 +74,13 @@ MoleculeBondExtractor::atom_info MoleculeBondExtractor::__make_atom_info(const M
     return a;
 }
 
-void MoleculeBondExtractor::reset() {
+void MolecularBondExtractor::reset() {
     substitutions.clear();
     all_rings.clear();
     all_rings_sizes.clear();
 }
 
-void MoleculeBondExtractor::addStretch (const Molib::Atom* atom1, const Molib::Atom* atom2) {
+void MolecularBondExtractor::addStretch (const Molib::Atom* atom1, const Molib::Atom* atom2) {
 
     // Avoid a double count if starting with a later atom
     if (atom1 >= atom2)
@@ -99,7 +101,7 @@ void MoleculeBondExtractor::addStretch (const Molib::Atom* atom1, const Molib::A
     bs.push_back(make_pair(s_new,distance));
 }
 
-void MoleculeBondExtractor::addAngle (const Molib::Atom* atom1, const Molib::Atom* atom2, const Molib::Atom* atom3) {
+void MolecularBondExtractor::addAngle (const Molib::Atom* atom1, const Molib::Atom* atom2, const Molib::Atom* atom3) {
 
     // Middle and end cases not really possible, but the check is cheap
     if (atom1 >= atom3 || atom1 == atom2 || atom3 == atom2)
@@ -121,7 +123,7 @@ void MoleculeBondExtractor::addAngle (const Molib::Atom* atom1, const Molib::Ato
     ba.push_back(make_pair(a_new, angle));
 }
 
-void MoleculeBondExtractor::addDihedral (const Molib::Atom* atom1, const Molib::Atom* atom2, const Molib::Atom* atom3, const Molib::Atom* atom4) {
+void MolecularBondExtractor::addDihedral (const Molib::Atom* atom1, const Molib::Atom* atom2, const Molib::Atom* atom3, const Molib::Atom* atom4) {
 
     // Some later checks are probably not needed
     if ( atom1 >= atom4 || atom3 == atom1 || atom4 == atom2 || atom2 == atom3)
@@ -146,7 +148,7 @@ void MoleculeBondExtractor::addDihedral (const Molib::Atom* atom1, const Molib::
     bd.push_back(make_pair(d_new, dihedral));
 }
 
-void MoleculeBondExtractor::addImproper (const Molib::Atom* atom1, const Molib::Atom* atom2, const Molib::Atom* atom3, const Molib::Atom* atom4) {
+void MolecularBondExtractor::addImproper (const Molib::Atom* atom1, const Molib::Atom* atom2, const Molib::Atom* atom3, const Molib::Atom* atom4) {
 
     // Leave atom2 alone, it is the pivot atom
     if (atom1 >= atom3 || atom1 >= atom4 || atom3 >= atom4)
@@ -174,7 +176,7 @@ void MoleculeBondExtractor::addImproper (const Molib::Atom* atom1, const Molib::
 }
 
 
-bool MoleculeBondExtractor::addMolecule( const Molib::Molecule& mol ) {
+bool MolecularBondExtractor::addMolecule( const Molib::Molecule& mol ) {
 
     auto all_my_atoms = mol.get_atoms();
 
@@ -224,88 +226,22 @@ bool MoleculeBondExtractor::addMolecule( const Molib::Molecule& mol ) {
     return true;
 }
 
-void MoleculeBondExtractor::binStretches( const double bond_bin_size ) {
-    for ( const auto& bond : bs ) {
-        const size_t bin = floor(bond.second / bond_bin_size);
-
-        StretchBin sb = make_pair(
-            make_tuple(
-                get<0>(bond.first),
-                get<1>(bond.first)
-            ),
-            bin);
-
-        if ( ! bsc.count(sb) )
-            bsc[sb] = 1;
-        else
-            ++bsc[sb];
-    }
-    bs.clear();
+const VBondStretches& MolecularBondExtractor::stretches() const {
+    return bs;
 }
 
-void MoleculeBondExtractor::binAngles( const double angle_bin_size ) {
-    for ( const auto& angle : ba ) {
-        const size_t bin = floor(angle.second / angle_bin_size);
-
-        AngleBin ab = make_pair(
-            make_tuple(
-                get<0>(angle.first),
-                get<1>(angle.first),
-                get<2>(angle.first)
-            ),
-            bin);
-
-        if ( ! bac.count(ab) )
-            bac[ab] = 1;
-        else
-            ++bac[ab];
-    }
-    ba.clear();
+const VBondAngles&    MolecularBondExtractor::angles() const {
+    return ba;
+}
+const VBondDihedrals& MolecularBondExtractor::dihedrals() const {
+    return bd;
 }
 
-void MoleculeBondExtractor::binDihedrals( const double dihedral_bin_size ) {
-    for ( const auto& dihedral : bd ) {
-        const int bin = floor(dihedral.second / dihedral_bin_size);
-
-        DihedralBin db = make_pair(
-            make_tuple(
-                get<0>(dihedral.first),
-                get<1>(dihedral.first),
-                get<2>(dihedral.first),
-                get<3>(dihedral.first)
-            ),
-            bin);
-
-        if ( ! bdc.count(db) )
-            bdc.emplace(db, 1);
-        else
-            ++bdc[db];
-    }
-    bd.clear();
+const VBondDihedrals& MolecularBondExtractor::impropers() const {
+    return bi;
 }
 
-void MoleculeBondExtractor::binImpropers( const double improper_bin_size ) {
-    for ( const auto& improper : bi ) {
-        const int bin = floor(improper.second / improper_bin_size);
-
-        DihedralBin ib = make_pair(
-            make_tuple(
-                get<0>(improper.first),
-                get<1>(improper.first),
-                get<2>(improper.first),
-                get<3>(improper.first)
-            ),
-            bin);
-
-        if ( ! bic.count(ib) )
-            bic[ib] = 1;
-        else
-            ++bic[ib];
-    }
-    bi.clear();
-}
-
-void MoleculeBondExtractor::printStretches (std::ostream& os) const {
+void MolecularBondExtractor::printStretches (std::ostream& os) const {
     for ( const auto& bond : bs ) {
         os << get<0>(bond.first) << ' '
            << get<1>(bond.first) << ' ';
@@ -314,7 +250,7 @@ void MoleculeBondExtractor::printStretches (std::ostream& os) const {
     }
 }
 
-void MoleculeBondExtractor::printAngles (std::ostream& os) const {
+void MolecularBondExtractor::printAngles (std::ostream& os) const {
     for ( const auto& angle : ba ) {
         os << get<0>(angle.first) << ' '
            << get<1>(angle.first) << ' '
@@ -324,7 +260,7 @@ void MoleculeBondExtractor::printAngles (std::ostream& os) const {
     }
 }
 
-void MoleculeBondExtractor::printDihedrals (std::ostream& os) const {
+void MolecularBondExtractor::printDihedrals (std::ostream& os) const {
     for ( const auto& dihedral : bd ) {
         os << get<0>(dihedral.first) << ' '
            << get<1>(dihedral.first) << ' '
@@ -335,7 +271,7 @@ void MoleculeBondExtractor::printDihedrals (std::ostream& os) const {
     }
 }
 
-void MoleculeBondExtractor::printImpropers (std::ostream& os) const {
+void MolecularBondExtractor::printImpropers (std::ostream& os) const {
     for ( const auto& improper : bi ) {
         os << get<0>(improper.first) << ' '
            << get<1>(improper.first) << ' '
@@ -346,58 +282,11 @@ void MoleculeBondExtractor::printImpropers (std::ostream& os) const {
     }
 }
 
-void MoleculeBondExtractor::printStretchBins (std::ostream& os) const {
-    for ( const auto& bond : bsc ) {
-        os << get<0>(bond.first.first) << " ";
-        os << get<1>(bond.first.first) << " ";
-        os << bond.first.second << " ";
-        os << bond.second;
-        os << "\n";
-    }
-
-}
-
-void MoleculeBondExtractor::printAngleBins (std::ostream& os) const {
-    for ( const auto& angle : bac ) {
-        os << get<0>(angle.first.first) << " ";
-        os << get<1>(angle.first.first) << " ";
-        os << get<2>(angle.first.first) << " ";
-        os << angle.first.second << " ";
-        os << angle.second;
-        os << "\n";
-    }
-
-}
-
-void MoleculeBondExtractor::printDihedralBins (std::ostream& os) const {
-    for ( const auto& dihedral : bdc ) {
-        os << get<0>(dihedral.first.first) << " ";
-        os << get<1>(dihedral.first.first) << " ";
-        os << get<2>(dihedral.first.first) << " ";
-        os << get<3>(dihedral.first.first) << " ";
-        os << dihedral.first.second << " ";
-        os << dihedral.second;
-        os << "\n";
-    }
-
-}
-
-void MoleculeBondExtractor::printImproperBins (std::ostream& os) const {
-    for ( const auto& dihedral : bic ) {
-        os << get<0>(dihedral.first.first) << " ";
-        os << get<1>(dihedral.first.first) << " ";
-        os << get<2>(dihedral.first.first) << " ";
-        os << get<3>(dihedral.first.first) << " ";
-        os << dihedral.first.second << " ";
-        os << dihedral.second;
-        os << "\n";
-    }
-
-}
-
-std::ostream& operator<< (std::ostream& os, const MoleculeBondExtractor::atom_info& ai) {
+std::ostream& operator<< (std::ostream& os, const atom_info& ai) {
         os << help::idatm_unmask[ ai.idatm_type ] << ' ';
         os << ai.ring_size << ' ';
         os << ai.substitutions << ' ';
         return os;
+}
+
 }

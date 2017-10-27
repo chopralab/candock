@@ -10,6 +10,7 @@
 #include "fileout/fileout.hpp"
 
 #include "molecularbondextractor.hpp"
+#include "molecularbondbinner.hpp"
 
 using namespace std;
 using namespace Program;
@@ -23,8 +24,6 @@ int main(int argc, char* argv[]) {
                 }
 
                 Inout::Logger::set_all_stderr(true);
-
-                MoleculeBondExtractor MBE;
 
                 boost::program_options::variables_map vm;
                 po::options_description cmdln_options;
@@ -92,6 +91,11 @@ int main(int argc, char* argv[]) {
                 double dihedral_bin = vm["dihedral_bin_size"].as<double>();
                 double improper_bin = vm["improper_bin_size"].as<double>();
 
+                AtomInfo::MolecularBondBinner MBB(stretch_bin,
+                                                  angle_bin,
+                                                  dihedral_bin,
+                                                  improper_bin);
+
                 for (int i = 1; i < argc; ++i) {
                         Parser::FileParser input(argv[i], Parser::pdb_read_options::all_models);
                         Molib::Molecules mols;
@@ -99,6 +103,8 @@ int main(int argc, char* argv[]) {
                         
                         mols.compute_idatm_type();
                         mols.erase_hydrogen();
+
+                        AtomInfo::MolecularBondExtractor MBE;
 
                         for ( const auto& mol : mols ) {
                                 if (!MBE.addMolecule(mol))
@@ -108,12 +114,9 @@ int main(int argc, char* argv[]) {
                                 MBE.printAngles(angle_file);
                                 MBE.printDihedrals(dihedral_file);
                                 MBE.printImpropers(improper_file);
-
-                                MBE.binStretches(stretch_bin);
-                                MBE.binAngles(angle_bin);
-                                MBE.binDihedrals(dihedral_bin);
-                                MBE.binImpropers(improper_bin);
                         }
+
+                        MBB.addExtracts(MBE);
                 }
 
                 stretch_file.close();
@@ -126,10 +129,10 @@ int main(int argc, char* argv[]) {
                 std::ofstream dihedral_bin_file (vm["dihedral_bin_out"].as<std::string>());
                 std::ofstream improper_bin_file (vm["improper_bin_out"].as<std::string>());
 
-                MBE.printStretchBins(stretch_bin_file);
-                MBE.printAngleBins(angle_bin_file);
-                MBE.printDihedralBins(dihedral_bin_file);
-                MBE.printImproperBins(improper_bin_file);
+                MBB.printStretchBins(stretch_bin_file);
+                MBB.printAngleBins(angle_bin_file);
+                MBB.printDihedralBins(dihedral_bin_file);
+                MBB.printImproperBins(improper_bin_file);
 
         } catch (po::error& e) {
                 std::cerr << "error: " << e.what() << std::endl;

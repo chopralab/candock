@@ -1,7 +1,10 @@
 add_executable( cd_gen_count_file
                 cd_gen_count_file.cpp
+                atominfotypes.hpp
                 molecularbondextractor.hpp
                 molecularbondextractor.cpp
+                molecularbondbinner.hpp
+                molecularbondbinner.cpp
             )
 
 target_link_libraries( cd_gen_count_file candock ${Boost_LIBRARIES} )

@@ -5,75 +5,17 @@
 #include <map>
 #include "molib/atom.hpp"
 #include "molib/molecule.hpp"
+#include "atominfotypes.hpp"
 
-class MoleculeBondExtractor {
+namespace AtomInfo {
 
-public:
-
-    // typedefs for binned Bond information
-    // NOTE: Bondorder not included (yet?)
-    // FIXME: consider changing the types here
-
-    struct atom_info {
-        int idatm_type;
-        int ring_size;
-        size_t substitutions;
-        
-        friend bool operator< (const atom_info& lhs, const atom_info& rhs) {
-            if ( lhs.idatm_type < rhs.idatm_type ) {
-                return true;
-            } else if ( lhs.idatm_type > rhs.idatm_type ) {
-                return false;
-            }
-
-            if ( lhs.ring_size < rhs.ring_size ) {
-                return true;
-            } else if ( lhs.ring_size > rhs.ring_size) {
-                return false;
-            }
-
-            if ( lhs.substitutions < rhs.substitutions ) {
-                return true;
-            } else if (lhs.substitutions > rhs.substitutions) {
-                return false;
-            }
-
-            return false;
-        }
-
-        friend std::ostream& operator<< (std::ostream& os, const atom_info& ai);
-    };
-
-    // typedefs for raw Bond information
-    typedef std::tuple< atom_info, atom_info> BondStretch;
-
-    typedef std::pair< BondStretch, double>    BondStretches;
-
-    typedef std::tuple< atom_info, atom_info,
-                                   atom_info> BondAngle;
-    typedef std::pair< BondAngle, double>     BondAngles;
-    
-    typedef std::tuple< atom_info, atom_info,
-                        atom_info, atom_info> BondDihedral;
-    typedef std::pair< BondDihedral, double>  BondDihedrals;
-
-    typedef std::pair<BondStretch, size_t>  StretchBin;
-    typedef std::map< StretchBin, size_t >  StretchCounts;
-    typedef std::pair<BondAngle, size_t >   AngleBin;
-    typedef std::map< AngleBin, size_t >    AngleCounts;
-    typedef std::pair<BondDihedral, size_t> DihedralBin;
-    typedef std::map< DihedralBin, size_t > DihedralCounts;
+class MolecularBondExtractor {
 
 private:
-    std::vector<BondStretches> bs;
-    std::vector<BondAngles>    ba;
-    std::vector<BondDihedrals> bd;
-    std::vector<BondDihedrals> bi; // Impropers
-
-    StretchCounts  bsc;
-    AngleCounts    bac;
-    DihedralCounts bdc;
-    DihedralCounts bic;
+    VBondStretches bs;
+    VBondAngles    ba;
+    VBondDihedrals bd;
+    VBondDihedrals bi; // Impropers
 
     Glib::Graph<Molib::Atom>::Cycles all_rings;
     Glib::Graph<Molib::Atom>::VertexRingMap all_rings_sizes;
@@ -96,21 +38,18 @@ public:
 
     bool addMolecule( const Molib::Molecule& mol );
 
-    void binStretches( const double bond_bin_size );
-    void binAngles( const double angle_bin_size );
-    void binDihedrals( const double dihedral_bin_size );
-    void binImpropers( const double improper_bin_size );
-
+    const VBondStretches& stretches() const;
+    const VBondAngles&    angles() const;
+    const VBondDihedrals& dihedrals() const;
+    const VBondDihedrals& impropers() const;
+    
     void printStretches (std::ostream& os) const;
     void printAngles (std::ostream& os) const;
     void printDihedrals (std::ostream& os) const;
     void printImpropers (std::ostream& os) const;
 
-    void printStretchBins (std::ostream& os) const;
-    void printAngleBins (std::ostream& os) const;
-    void printDihedralBins (std::ostream& os) const;
-    void printImproperBins (std::ostream& os) const;
-
 };
+
+}
 
 #endif
