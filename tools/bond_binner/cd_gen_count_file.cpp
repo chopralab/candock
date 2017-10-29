@@ -175,9 +175,9 @@ int main(int argc, char* argv[]) {
                         std::ifstream dihedral_file (vm["dihedral_extract_file"].as<std::string>());
                         std::ifstream improper_file (vm["improper_extract_file"].as<std::string>());
 
-                        MBB.addStretchExtracts(stretch_file); cout << "S" << endl;
-                        MBB.addAngleExtracts(angle_file); cout << "A" << endl;
-                        MBB.addDihedralExtracts(dihedral_file); cout << "D" << endl;
+                        MBB.addStretchExtracts(stretch_file);
+                        MBB.addAngleExtracts(angle_file);
+                        MBB.addDihedralExtracts(dihedral_file);
                         MBB.addImproperExtracts(improper_file);
                 }
 
