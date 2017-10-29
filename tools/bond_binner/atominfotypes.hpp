@@ -69,8 +69,7 @@ namespace AtomInfo {
     typedef std::pair<BondAngle, size_t >   AngleBin;
     typedef std::map< AngleBin, size_t >    AngleCounts;
 
-    // Dihedrals can be negative
-    typedef std::pair<BondDihedral, int> DihedralBin;
+    typedef std::pair<BondDihedral, size_t> DihedralBin;
     typedef std::map< DihedralBin, size_t > DihedralCounts;
 }
 

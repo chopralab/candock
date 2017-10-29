@@ -24,7 +24,13 @@ void MolecularBondBinner::binStretches(const VBondStretches& bs) {
 
 void MolecularBondBinner::binAngles(const VBondAngles& ba) {
     for ( const auto& angle : ba ) {
-        const size_t bin = std::floor(angle.second / __angle_bin_size);
+
+        double angle_val = angle.second;
+
+        while (angle_val < 0)
+            angle_val += M_PI * 2;
+
+        const size_t bin = std::floor(angle_val / __angle_bin_size);
 
         AngleBin ab = make_pair(
             angle.first,
@@ -40,7 +46,14 @@ void MolecularBondBinner::binAngles(const VBondAngles& ba) {
 void MolecularBondBinner::binDihedrals(const VBondDihedrals& bd) {
 
     for ( const auto& dihedral : bd ) {
-        const int bin = std::floor(dihedral.second / __dihedral_bin_size);
+
+        // Dihedrals can be negative, fix it!
+        double dihedral_val = dihedral.second;
+
+        while (dihedral_val < 0)
+            dihedral_val += M_PI * 2;
+        
+        const int bin = std::floor(dihedral_val / __dihedral_bin_size);
 
         DihedralBin db = make_pair(
             dihedral.first,
@@ -56,7 +69,12 @@ void MolecularBondBinner::binDihedrals(const VBondDihedrals& bd) {
 void MolecularBondBinner::binImpropers(const VBondDihedrals& bi) {
 
     for ( const auto& improper : bi ) {
-        const int bin = std::floor(improper.second / __improper_bin_size);
+        double improper_val = improper.second;
+        
+        while (improper_val < 0)
+            improper_val += M_PI * 2;
+        
+        const int bin = std::floor(improper_val / __improper_bin_size);
 
         DihedralBin ib = make_pair(
             improper.first,
@@ -130,6 +148,10 @@ void MolecularBondBinner::addAngleExtracts(std::istream& is) {
         atom_info a2 = {help::idatm_mask.at(atom2), atom_ring_2, atom_size_2};
         atom_info a3 = {help::idatm_mask.at(atom3), atom_ring_3, atom_size_3};
 
+        // Just in case...
+        while (angle < 0)
+            angle += M_PI * 2;
+
         size_t bin = std::floor( angle / __angle_bin_size );
 
         AngleBin ab = make_pair(
@@ -167,7 +189,11 @@ void MolecularBondBinner::addDihedralExtracts(std::istream& is) {
         atom_info a3 = {help::idatm_mask.at(atom3), atom_ring_3, atom_size_3};
         atom_info a4 = {help::idatm_mask.at(atom4), atom_ring_4, atom_size_4};
 
-        int bin = std::floor( dihedral / __dihedral_bin_size );
+        // Adjust for negative dihedrals
+        while (dihedral < 0)
+            dihedral += M_PI * 2;
+
+        size_t bin = std::floor( dihedral / __dihedral_bin_size );
 
         DihedralBin db = make_pair(
             make_tuple(a1, a2, a3, a4),
@@ -204,7 +230,10 @@ void MolecularBondBinner::addImproperExtracts(std::istream& is) {
         atom_info a3 = {help::idatm_mask.at(atom3), atom_ring_3, atom_size_3};
         atom_info a4 = {help::idatm_mask.at(atom4), atom_ring_4, atom_size_4};
 
-        int bin = std::floor( improper / __improper_bin_size );
+        while (improper < 0)
+            improper += M_PI * 2;
+
+        size_t bin = std::floor( improper / __improper_bin_size );
 
         DihedralBin ib = make_pair(
             make_tuple(a1, a2, a3, a4),

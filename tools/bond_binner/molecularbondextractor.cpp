@@ -255,7 +255,7 @@ void MolecularBondExtractor::printAngles (std::ostream& os) const {
         os << get<0>(angle.first) << ' '
            << get<1>(angle.first) << ' '
            << get<2>(angle.first) << ' ';
-        os << Geom3D::degrees(angle.second);
+        os << angle.second;
         os << "\n";
     }
 }
@@ -266,7 +266,7 @@ void MolecularBondExtractor::printDihedrals (std::ostream& os) const {
            << get<1>(dihedral.first) << ' '
            << get<2>(dihedral.first) << ' '
            << get<3>(dihedral.first) << ' ';
-        os << Geom3D::degrees(dihedral.second);
+        os << dihedral.second;
         os << "\n";
     }
 }
@@ -277,7 +277,7 @@ void MolecularBondExtractor::printImpropers (std::ostream& os) const {
            << get<1>(improper.first) << ' '
            << get<2>(improper.first) << ' '
            << get<3>(improper.first) << ' ';
-        os << Geom3D::degrees(improper.second);
+        os << improper.second;
         os << "\n";
     }
 }
