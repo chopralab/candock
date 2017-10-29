@@ -282,11 +282,4 @@ void MolecularBondExtractor::printImpropers (std::ostream& os) const {
     }
 }
 
-std::ostream& operator<< (std::ostream& os, const atom_info& ai) {
-        os << help::idatm_unmask[ ai.idatm_type ] << ' ';
-        os << ai.ring_size << ' ';
-        os << ai.substitutions << ' ';
-        return os;
-}
-
 }

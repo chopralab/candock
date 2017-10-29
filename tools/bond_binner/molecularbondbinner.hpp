@@ -36,6 +36,10 @@ public:
                         __improper_bin_size(improper_bin_size){}
 
     void addExtracts( const MolecularBondExtractor& mbe);
+    void addStretchExtracts( std::istream& os);
+    void addAngleExtracts( std::istream& os);
+    void addDihedralExtracts( std::istream& os);
+    void addImproperExtracts( std::istream& os);
 
     void printStretchBins (std::ostream& os) const;
     void printAngleBins (std::ostream& os) const;

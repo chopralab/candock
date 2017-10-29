@@ -17,6 +17,41 @@ using namespace Program;
 
 namespace po = boost::program_options;
 
+void run_extraction(
+    Parser::FileParser& input,
+    AtomInfo::MolecularBondBinner& MBB,
+    bool extract_only,
+    std::ofstream& stretch_file,
+    std::ofstream& angle_file,
+    std::ofstream& dihedral_file,
+    std::ofstream& improper_file ) {
+
+    Molib::Molecules mols;
+
+    while (input.parse_molecule(mols)) {
+
+        AtomInfo::MolecularBondExtractor MBE;
+
+        mols.compute_idatm_type();
+        mols.erase_hydrogen();
+
+        for ( const auto& mol : mols ) {
+            if (!MBE.addMolecule(mol))
+                continue;
+        }
+
+        MBE.printStretches(stretch_file);
+        MBE.printAngles(angle_file);
+        MBE.printDihedrals(dihedral_file);
+        MBE.printImpropers(improper_file);
+
+        if (!extract_only)
+            MBB.addExtracts(MBE);
+
+        mols.clear();
+    }
+}
+
 int main(int argc, char* argv[]) {
         try {
                 if(!drm::check_drm(Version::get_install_path() + "/.candock")) {
@@ -25,12 +60,17 @@ int main(int argc, char* argv[]) {
 
                 Inout::Logger::set_all_stderr(true);
 
+                std::vector<std::string> inputs;
+
                 boost::program_options::variables_map vm;
                 po::options_description cmdln_options;
 
                 po::options_description generic;
                 generic.add_options()
-                ("help,h", "Show this help");
+                ("help,h", "Show this help")
+                ("input,f", po::value<std::vector<std::string>>(&inputs), "Input file(s)")
+                ("extract_only,e", "Only extract results, do not bin")
+                ("bin_only,b","Treat input as extracted table files - cannot be used with 'extract_only'");
 
                 po::options_description extract_file_options ("Molecular Bond Extraction Files");
                 extract_file_options.add_options()
@@ -46,7 +86,7 @@ int main(int argc, char* argv[]) {
                  "File to save impropers")
                 ;
 
-                po::options_description binning_options ("Bond Bin Files");
+                po::options_description binning_options ("Bond Bin Sizes");
                 binning_options.add_options()
                 ("stretch_bin_size,s", po::value<double> ()->default_value(0.01),
                  "Stretch bin size")
@@ -58,7 +98,7 @@ int main(int argc, char* argv[]) {
                  "Improper bin size")
                 ;
 
-                po::options_description bin_file_options ("Bond Bin Sizes");
+                po::options_description bin_file_options ("Bond Bin Files");
                 bin_file_options.add_options()
                 ("stretch_bin_out", po::value<std::string> ()->default_value("stretch_bins.tbl"),
                  "File to save stretches")
@@ -75,10 +115,13 @@ int main(int argc, char* argv[]) {
                 cmdln_options.add(binning_options);
                 cmdln_options.add(bin_file_options);
 
-                po::store (po::parse_command_line (argc, argv, cmdln_options), vm);
+                po::positional_options_description p;
+                p.add("input", -1);
+
+                po::store (po::command_line_parser (argc, argv).options(cmdln_options).positional(p).run(), vm);
                 po::notify (vm);
 
-                if (vm.count ("help")) {
+                if (vm.count ("help") || (vm.count("extract_only") && vm.count("bin_only"))) {
                         std::cout << cmdln_options << std::endl;
                         return 0;
                 }
@@ -100,38 +143,43 @@ int main(int argc, char* argv[]) {
                                                   dihedral_bin,
                                                   improper_bin);
 
-                for (int i = 1; i < argc; ++i) {
-                        Parser::FileParser input(argv[i],
-                                                 Parser::pdb_read_options::all_models,
-                                                 num_mols_to_read
-                                                );
-                        Molib::Molecules mols;
+                if (!vm.count("bin_only"))
+                for (const auto& input_file : inputs) {
+                        Parser::FileParser input(
+                            input_file,
+                            Parser::pdb_read_options::all_models,
+                            num_mols_to_read );
 
-                        AtomInfo::MolecularBondExtractor MBE;
-
-                        while (input.parse_molecule(mols)) {
-
-                            mols.compute_idatm_type();
-                            mols.erase_hydrogen();
-
-                            for ( const auto& mol : mols ) {
-                                if (!MBE.addMolecule(mol))
-                                    continue;
-
-                                MBE.printStretches(stretch_file);
-                                MBE.printAngles(angle_file);
-                                MBE.printDihedrals(dihedral_file);
-                                MBE.printImpropers(improper_file);
-                            }
-
-                            MBB.addExtracts(MBE);
-                        }
+                        run_extraction(
+                            input,
+                            MBB,
+                            vm.count("extract_only"),
+                            stretch_file,
+                            angle_file,
+                            dihedral_file,
+                            improper_file
+                        );
                 }
 
                 stretch_file.close();
                 angle_file.close();
                 dihedral_file.close();
                 improper_file.close();
+ 
+                if (vm.count("extract_only"))
+                        return 0;
+
+                if (vm.count("bin_only")) {
+                        std::ifstream stretch_file  (vm["stretch_extract_file"].as<std::string>());
+                        std::ifstream angle_file    (vm["angle_extract_file"].as<std::string>());
+                        std::ifstream dihedral_file (vm["dihedral_extract_file"].as<std::string>());
+                        std::ifstream improper_file (vm["improper_extract_file"].as<std::string>());
+
+                        MBB.addStretchExtracts(stretch_file); cout << "S" << endl;
+                        MBB.addAngleExtracts(angle_file); cout << "A" << endl;
+                        MBB.addDihedralExtracts(dihedral_file); cout << "D" << endl;
+                        MBB.addImproperExtracts(improper_file);
+                }
 
                 std::ofstream stretch_bin_file  (vm["stretch_bin_out"].as<std::string>());
                 std::ofstream angle_bin_file    (vm["angle_bin_out"].as<std::string>());

@@ -4,6 +4,7 @@
 #include <ostream>
 #include <map>
 #include <tuple>
+#include "helper/help.hpp"
 
 namespace AtomInfo {
 
@@ -38,7 +39,12 @@ namespace AtomInfo {
             return false;
         }
 
-        friend std::ostream& operator<< (std::ostream& os, const atom_info& ai);
+        friend std::ostream& operator<< (std::ostream& os, const atom_info& ai) {
+            os << std::setw(3) << help::idatm_unmask[ ai.idatm_type ] << ' ';
+            os << ai.ring_size << ' ';
+            os << ai.substitutions << ' ';
+            return os;
+        }
     };
 
     // typedefs for raw Bond information
