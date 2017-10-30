@@ -16,6 +16,11 @@ class MolecularBondBinner
     double __dihedral_bin_size;
     double __improper_bin_size;
 
+    void __addStretch( const StretchBin& sb, size_t inc = 1);
+    void __addAngle( const AngleBin& sb, size_t inc = 1);
+    void __addDihedral( const DihedralBin& sb, size_t inc = 1);
+    void __addImproper( const DihedralBin& sb, size_t inc = 1);
+
     void binStretches(const VBondStretches& bs);
     void binAngles( const VBondAngles& ba );
     void binDihedrals( const VBondDihedrals& bd );
@@ -36,10 +41,12 @@ public:
                         __improper_bin_size(improper_bin_size){}
 
     void addExtracts( const MolecularBondExtractor& mbe);
-    void addStretchExtracts( std::istream& os);
-    void addAngleExtracts( std::istream& os);
-    void addDihedralExtracts( std::istream& os);
-    void addImproperExtracts( std::istream& os);
+    void addExtracts( const MolecularBondBinner& mbb);
+
+    void addStretchExtracts( std::istream& os, bool is_bin_file = false);
+    void addAngleExtracts( std::istream& os,   bool is_bin_file = false);
+    void addDihedralExtracts( std::istream& os,bool is_bin_file = false);
+    void addImproperExtracts( std::istream& os,bool is_bin_file = false);
 
     void printStretchBins (std::ostream& os) const;
     void printAngleBins (std::ostream& os) const;

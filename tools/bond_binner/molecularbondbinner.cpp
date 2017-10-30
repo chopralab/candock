@@ -7,6 +7,34 @@ using namespace std;
 
 namespace AtomInfo {
 
+void MolecularBondBinner::__addStretch(const StretchBin& sb, size_t inc) {
+    if ( ! bsc.count(sb) )
+        bsc[sb] = inc;
+    else
+        bsc[sb] += inc;
+}
+
+void MolecularBondBinner::__addAngle(const AngleBin& sb, size_t inc) {
+    if ( ! bac.count(sb) )
+        bac[sb] = inc;
+    else
+        bac[sb] += inc;
+}
+
+void MolecularBondBinner::__addDihedral(const DihedralBin& sb, size_t inc) {
+    if ( ! bdc.count(sb) )
+        bdc[sb] = inc;
+    else
+        bdc[sb] += inc;
+}
+
+void MolecularBondBinner::__addImproper(const DihedralBin& sb, size_t inc) {
+    if ( ! bic.count(sb) )
+        bic[sb] = inc;
+    else
+        bic[sb] += inc;
+}
+
 void MolecularBondBinner::binStretches(const VBondStretches& bs) {
     for ( const auto& bond : bs ) {
         const size_t bin = std::floor(bond.second / __stretch_bin_size);
@@ -15,10 +43,7 @@ void MolecularBondBinner::binStretches(const VBondStretches& bs) {
             bond.first,
             bin);
 
-        if ( ! bsc.count(sb) )
-            bsc[sb] = 1;
-        else
-            ++bsc[sb];
+        __addStretch(sb);
     }
 }
 
@@ -36,10 +61,7 @@ void MolecularBondBinner::binAngles(const VBondAngles& ba) {
             angle.first,
             bin);
 
-        if ( ! bac.count(ab) )
-            bac[ab] = 1;
-        else
-            ++bac[ab];
+        __addAngle(ab);
     }
 }
 
@@ -59,10 +81,7 @@ void MolecularBondBinner::binDihedrals(const VBondDihedrals& bd) {
             dihedral.first,
             bin);
 
-        if ( ! bdc.count(db) )
-            bdc.emplace(db, 1);
-        else
-            ++bdc[db];
+        __addDihedral(db);
     }
 }
 
@@ -80,10 +99,7 @@ void MolecularBondBinner::binImpropers(const VBondDihedrals& bi) {
             improper.first,
             bin);
 
-        if ( ! bic.count(ib) )
-            bic[ib] = 1;
-        else
-            ++bic[ib];
+        __addImproper(ib);
     }
 }
 
@@ -94,18 +110,40 @@ void MolecularBondBinner::addExtracts( const MolecularBondExtractor& mbe) {
     binImpropers(mbe.impropers());
 }
 
-void MolecularBondBinner::addStretchExtracts(std::istream& is) {
+void MolecularBondBinner::addExtracts( const MolecularBondBinner& mbb ) {
+    for (const auto& kv : mbb.bsc) {
+        __addStretch(kv.first, kv.second);
+    }
+
+    for (const auto& kv : mbb.bac) {
+        __addAngle(kv.first, kv.second);
+    }
+
+    for (const auto& kv : mbb.bdc) {
+        __addDihedral(kv.first, kv.second);
+    }
+
+    for (const auto& kv : mbb.bic) {
+        __addImproper(kv.first, kv.second);
+    }
+}
+
+void MolecularBondBinner::addStretchExtracts(std::istream& is, bool is_bin_file) {
     while (!is.eof()) {
         std::string atom1, atom2;
         int atom_ring_1, atom_ring_2; //FIXME: this type may change
         size_t atom_size_1, atom_size_2;
 
         double stretch;
+        size_t bin, count = 1;
 
         is >> atom1 >> atom_ring_1 >> atom_size_1;
         is >> atom2 >> atom_ring_2 >> atom_size_2;
 
-        is >> stretch;
+        if (is_bin_file)
+            is >> bin >> count;
+        else
+            is >> stretch;
 
         if (is.eof())
             break;
@@ -113,33 +151,34 @@ void MolecularBondBinner::addStretchExtracts(std::istream& is) {
         atom_info a1 = {help::idatm_mask.at(atom1), atom_ring_1, atom_size_1};
         atom_info a2 = {help::idatm_mask.at(atom2), atom_ring_2, atom_size_2};
 
-        size_t bin = std::floor( stretch / __stretch_bin_size );
+        if (!is_bin_file)
+            bin = std::floor( stretch / __stretch_bin_size );
 
         StretchBin sb = make_pair(
             make_tuple(a1, a2),
             bin);
 
-        if ( ! bsc.count(sb) )
-            bsc[sb] = 1;
-        else
-            ++bsc[sb];
-
+        __addStretch(sb, count);
     }
 }
 
-void MolecularBondBinner::addAngleExtracts(std::istream& is) {
+void MolecularBondBinner::addAngleExtracts(std::istream& is, bool is_bin_file) {
     while (!is.eof()) {
         std::string atom1, atom2, atom3;
         int atom_ring_1, atom_ring_2, atom_ring_3; //FIXME: this type may change
         size_t atom_size_1, atom_size_2, atom_size_3;
 
         double angle;
+        size_t bin, count = 1;
 
         is >> atom1 >> atom_ring_1 >> atom_size_1;
         is >> atom2 >> atom_ring_2 >> atom_size_2;
         is >> atom3 >> atom_ring_3 >> atom_size_3;
 
-        is >> angle;
+        if (is_bin_file)
+            is >> bin >> count;
+        else
+            is >> angle;
 
         if (is.eof())
             break;
@@ -148,38 +187,42 @@ void MolecularBondBinner::addAngleExtracts(std::istream& is) {
         atom_info a2 = {help::idatm_mask.at(atom2), atom_ring_2, atom_size_2};
         atom_info a3 = {help::idatm_mask.at(atom3), atom_ring_3, atom_size_3};
 
-        // Just in case...
-        while (angle < 0)
-            angle += M_PI * 2;
+        if (!is_bin_file) {
+            // Just in case...
+            while (angle < 0)
+                angle += M_PI * 2;
 
-        size_t bin = std::floor( angle / __angle_bin_size );
+            bin = std::floor( angle / __angle_bin_size );
+        }
 
         AngleBin ab = make_pair(
             make_tuple(a1, a2, a3),
             bin);
 
-        if ( ! bac.count(ab) )
-            bac[ab] = 1;
-        else
-            ++bac[ab];
-
+        
+        __addAngle(ab, count);
     }
 }
 
-void MolecularBondBinner::addDihedralExtracts(std::istream& is) {
+void MolecularBondBinner::addDihedralExtracts(std::istream& is, bool is_bin_file) {
     while (!is.eof()) {
         std::string atom1, atom2, atom3, atom4;
         int atom_ring_1, atom_ring_2, atom_ring_3, atom_ring_4; //FIXME: this type may change
         size_t atom_size_1, atom_size_2, atom_size_3, atom_size_4;
 
         double dihedral;
+        size_t bin, count = 1;
 
         is >> atom1 >> atom_ring_1 >> atom_size_1;
         is >> atom2 >> atom_ring_2 >> atom_size_2;
         is >> atom3 >> atom_ring_3 >> atom_size_3;
         is >> atom4 >> atom_ring_4 >> atom_size_4;
 
-        is >> dihedral;
+        if (is_bin_file)
+            is >> bin >> count;
+        else
+            is >> dihedral;
+
 
         if (is.eof())
             break;
@@ -189,38 +232,41 @@ void MolecularBondBinner::addDihedralExtracts(std::istream& is) {
         atom_info a3 = {help::idatm_mask.at(atom3), atom_ring_3, atom_size_3};
         atom_info a4 = {help::idatm_mask.at(atom4), atom_ring_4, atom_size_4};
 
-        // Adjust for negative dihedrals
-        while (dihedral < 0)
-            dihedral += M_PI * 2;
+        if (!is_bin_file) {
+            // Adjust for negative dihedrals
+            while (dihedral < 0)
+                dihedral += M_PI * 2;
 
-        size_t bin = std::floor( dihedral / __dihedral_bin_size );
+            bin = std::floor( dihedral / __dihedral_bin_size );
+        }
 
         DihedralBin db = make_pair(
             make_tuple(a1, a2, a3, a4),
             bin);
 
-        if ( ! bdc.count(db) )
-            bdc[db] = 1;
-        else
-            ++bdc[db];
-
+        __addDihedral(db, count);
     }
 }
 
-void MolecularBondBinner::addImproperExtracts(std::istream& is) {
+void MolecularBondBinner::addImproperExtracts(std::istream& is, bool is_bin_file) {
     while (!is.eof()) {
         std::string atom1, atom2, atom3, atom4;
         int atom_ring_1, atom_ring_2, atom_ring_3, atom_ring_4; //FIXME: this type may change
         size_t atom_size_1, atom_size_2, atom_size_3, atom_size_4;
 
         double improper;
+        size_t bin, count = 1;
 
         is >> atom1 >> atom_ring_1 >> atom_size_1;
         is >> atom2 >> atom_ring_2 >> atom_size_2;
         is >> atom3 >> atom_ring_3 >> atom_size_3;
         is >> atom4 >> atom_ring_4 >> atom_size_4;
 
-        is >> improper;
+        if (is_bin_file)
+            is >> bin >> count;
+        else
+            is >> improper;
+;
 
         if (is.eof())
             break;
@@ -230,20 +276,18 @@ void MolecularBondBinner::addImproperExtracts(std::istream& is) {
         atom_info a3 = {help::idatm_mask.at(atom3), atom_ring_3, atom_size_3};
         atom_info a4 = {help::idatm_mask.at(atom4), atom_ring_4, atom_size_4};
 
-        while (improper < 0)
-            improper += M_PI * 2;
+        if (!is_bin_file) {
+            while (improper < 0)
+                improper += M_PI * 2;
 
-        size_t bin = std::floor( improper / __improper_bin_size );
+            bin = std::floor( improper / __improper_bin_size );
+        }
 
         DihedralBin ib = make_pair(
             make_tuple(a1, a2, a3, a4),
             bin);
 
-        if ( ! bic.count(ib) )
-            bic[ib] = 1;
-        else
-            ++bic[ib];
-
+        __addImproper(ib, count);
     }
 }
 
