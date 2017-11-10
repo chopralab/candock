@@ -2,7 +2,7 @@
 
 namespace AtomInfo {
 
-int MolecularBondExtractor::__ring_size( const Molib::Atom* atom ) const {
+size_t MolecularBondExtractor::__ring_size( const Molib::Atom* atom ) const {
     const std::vector<size_t>& ring_vec = all_rings_sizes.at(atom);
 
     // Not in a ring
@@ -89,7 +89,7 @@ void MolecularBondExtractor::addStretch (const Molib::Atom* atom1, const Molib::
     atom_info a0 = __make_atom_info(atom1);
     atom_info a1 = __make_atom_info(atom2);
     
-    BondStretch s_new;
+    BondStretchAtoms s_new;
 
     if ( a0 < a1 ) {
         s_new = make_tuple(a0, a1);
@@ -111,7 +111,7 @@ void MolecularBondExtractor::addAngle (const Molib::Atom* atom1, const Molib::At
     atom_info a1 = __make_atom_info(atom2);
     atom_info a2 = __make_atom_info(atom3);
 
-    BondAngle a_new;
+    BondAngleAtoms a_new;
 
     if ( a0 < a2 ) {
         a_new = make_tuple(a0, a1, a2);
@@ -134,7 +134,7 @@ void MolecularBondExtractor::addDihedral (const Molib::Atom* atom1, const Molib:
     atom_info a2 = __make_atom_info(atom3);
     atom_info a3 = __make_atom_info(atom4);
     
-    BondDihedral d_new;
+    BondDihedralAtoms d_new;
 
     if ( atom1 < atom4 ) {
         d_new = make_tuple(a0, a1, a2, a3);
@@ -156,7 +156,7 @@ void MolecularBondExtractor::addImproper (const Molib::Atom* atom1, const Molib:
 
     // Order should be:
     // Lowest, 2nd Lowest, Atom2, highest
-    BondDihedral i_new;
+    BondDihedralAtoms i_new;
 
     atom_info a0 = __make_atom_info(atom1);
     atom_info a1 = __make_atom_info(atom2);
@@ -226,18 +226,18 @@ bool MolecularBondExtractor::addMolecule( const Molib::Molecule& mol ) {
     return true;
 }
 
-const VBondStretches& MolecularBondExtractor::stretches() const {
+const VBondStretchValues& MolecularBondExtractor::stretches() const {
     return bs;
 }
 
-const VBondAngles&    MolecularBondExtractor::angles() const {
+const VBondAngleValues&    MolecularBondExtractor::angles() const {
     return ba;
 }
-const VBondDihedrals& MolecularBondExtractor::dihedrals() const {
+const VBondDihedralValues& MolecularBondExtractor::dihedrals() const {
     return bd;
 }
 
-const VBondDihedrals& MolecularBondExtractor::impropers() const {
+const VBondDihedralValues& MolecularBondExtractor::impropers() const {
     return bi;
 }
 

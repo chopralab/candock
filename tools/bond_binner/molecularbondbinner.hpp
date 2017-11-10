@@ -16,15 +16,15 @@ class MolecularBondBinner
     double __dihedral_bin_size;
     double __improper_bin_size;
 
-    void __addStretch( const StretchBin& sb, size_t inc = 1);
-    void __addAngle( const AngleBin& sb, size_t inc = 1);
-    void __addDihedral( const DihedralBin& sb, size_t inc = 1);
-    void __addImproper( const DihedralBin& sb, size_t inc = 1);
+    void __addStretch( const BondStretchBin& sb, size_t inc = 1);
+    void __addAngle( const BondAngleBin& sb, size_t inc = 1);
+    void __addDihedral( const BondDihedralBin& sb, size_t inc = 1);
+    void __addImproper( const BondDihedralBin& sb, size_t inc = 1);
 
-    void binStretches(const VBondStretches& bs);
-    void binAngles( const VBondAngles& ba );
-    void binDihedrals( const VBondDihedrals& bd );
-    void binImpropers( const VBondDihedrals& bi );
+    void binStretches(const VBondStretchValues& bs);
+    void binAngles( const VBondAngleValues& ba );
+    void binDihedrals( const VBondDihedralValues& bd );
+    void binImpropers( const VBondDihedralValues& bi );
 
     StretchCounts  bsc;
     AngleCounts    bac;

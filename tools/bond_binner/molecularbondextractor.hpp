@@ -12,16 +12,16 @@ namespace AtomInfo {
 class MolecularBondExtractor {
 
 private:
-    VBondStretches bs;
-    VBondAngles    ba;
-    VBondDihedrals bd;
-    VBondDihedrals bi; // Impropers
+    VBondStretchValues bs;
+    VBondAngleValues    ba;
+    VBondDihedralValues bd;
+    VBondDihedralValues bi; // Impropers
 
     Glib::Graph<Molib::Atom>::Cycles all_rings;
     Glib::Graph<Molib::Atom>::VertexRingMap all_rings_sizes;
     std::map<const Molib::Atom*, size_t> substitutions;
 
-    int __ring_size( const Molib::Atom* atom ) const;
+    size_t __ring_size( const Molib::Atom* atom ) const;
 
     void __print_atom( const Molib::Atom* atom, std::ostream& os, char delim ) const;
 
@@ -38,10 +38,10 @@ public:
 
     bool addMolecule( const Molib::Molecule& mol );
 
-    const VBondStretches& stretches() const;
-    const VBondAngles&    angles() const;
-    const VBondDihedrals& dihedrals() const;
-    const VBondDihedrals& impropers() const;
+    const VBondStretchValues& stretches() const;
+    const VBondAngleValues&    angles() const;
+    const VBondDihedralValues& dihedrals() const;
+    const VBondDihedralValues& impropers() const;
     
     void printStretches (std::ostream& os) const;
     void printAngles (std::ostream& os) const;

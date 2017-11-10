@@ -70,7 +70,8 @@ int main(int argc, char* argv[]) {
                 ("help,h", "Show this help")
                 ("input,f", po::value<std::vector<std::string>>(&inputs), "Input file(s)")
                 ("extract_only,e", "Only extract results, do not bin")
-                ("bin_only,b","Treat input as extracted table files - cannot be used with 'extract_only'");
+                ("bin_only,b","Treat input as extracted table files - cannot be used with 'extract_only'")
+                ("concatinate,c","Concatinate multiple binned files together");
 
                 po::options_description extract_file_options ("Molecular Bond Extraction Files");
                 extract_file_options.add_options()

@@ -1,10 +1,13 @@
 #ifndef ATOMINFOTYPES_HPP
 #define ATOMINFOTYPES_HPP
 
+#include <cstddef>
 #include <ostream>
 #include <map>
 #include <tuple>
 #include "helper/help.hpp"
+
+using std::size_t;
 
 namespace AtomInfo {
 
@@ -14,7 +17,7 @@ namespace AtomInfo {
 
     struct atom_info {
         int idatm_type;
-        int ring_size;
+        size_t ring_size;
         size_t substitutions;
         
         friend bool operator< (const atom_info& lhs, const atom_info& rhs) {
@@ -48,29 +51,29 @@ namespace AtomInfo {
     };
 
     // typedefs for raw Bond information
-    typedef std::tuple< atom_info, atom_info> BondStretch;
-
-    typedef std::pair< BondStretch, double>   BondStretches;
-    typedef std::vector<BondStretches>        VBondStretches;
+    typedef std::tuple< atom_info, atom_info>    BondStretchAtoms;
+    typedef std::pair< BondStretchAtoms, double> BondStretchValue;
+    typedef std::vector<BondStretchValue>        VBondStretchValues;
 
     typedef std::tuple< atom_info, atom_info,
-                                   atom_info> BondAngle;
-    typedef std::pair< BondAngle, double>     BondAngles;
-    typedef std::vector<BondAngles>           VBondAngles;
+                                   atom_info>  BondAngleAtoms;
+    typedef std::pair< BondAngleAtoms, double> BondAngleValue;
+    typedef std::vector<BondAngleValue>        VBondAngleValues;
     
     typedef std::tuple< atom_info, atom_info,
-                        atom_info, atom_info> BondDihedral;
-    typedef std::pair< BondDihedral, double>  BondDihedrals;
-    typedef std::vector<BondDihedrals>        VBondDihedrals;
+                        atom_info, atom_info>     BondDihedralAtoms;
+    typedef std::pair< BondDihedralAtoms, double> BondDihedralValue;
+    typedef std::vector<BondDihedralValue>        VBondDihedralValues;
 
-    typedef std::pair<BondStretch, size_t>  StretchBin;
-    typedef std::map< StretchBin, size_t >  StretchCounts;
+    // typedefs for binned data
+    typedef std::pair<BondStretchAtoms, size_t>  BondStretchBin;
+    typedef std::map< BondStretchBin, size_t >   StretchCounts;
 
-    typedef std::pair<BondAngle, size_t >   AngleBin;
-    typedef std::map< AngleBin, size_t >    AngleCounts;
+    typedef std::pair<BondAngleAtoms, size_t >   BondAngleBin;
+    typedef std::map< BondAngleBin, size_t >     AngleCounts;
 
-    typedef std::pair<BondDihedral, size_t> DihedralBin;
-    typedef std::map< DihedralBin, size_t > DihedralCounts;
+    typedef std::pair<BondDihedralAtoms, size_t> BondDihedralBin;
+    typedef std::map< BondDihedralBin, size_t >  DihedralCounts;
 }
 
 #endif
