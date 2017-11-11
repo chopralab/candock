@@ -253,46 +253,45 @@ namespace design {
 		}
 	}
 
-	void Design::functionalize_hydrogens_with_single_atoms(const std::vector<std::string>& idatms)
-	{
-		if ( idatms.empty() )
-			throw Error("No atom types given for addition to the molecule");
+        Molib::Molecules Design::functionalize_hydrogens_with_single_atoms( const Molib::Molecule& original, const std::string& atom_type) {
 
-		for ( auto &atom_type  : idatms ) {
-			for ( auto &start_atom : __original.get_atoms() ) {
-				// Make sure the ligand atom has an open valency
-				if (start_atom->get_num_hydrogens() == 0 || start_atom->element() == Molib::Element::H) {
-					continue;
-				}
+                Molib::Molecules designs;
 
-				// Copy the new molecule into the returnable object
-				__designs.add( new Molib::Molecule(__original) );
-				__designs.last().set_name( __original.name() + "_added_" + atom_type + "_on_" + std::to_string(start_atom->atom_number()));
+                for ( const auto start_atom : original.get_atoms() ) {
 
-				// Remove all hydrogens from the original ligand (they are not needed anymore)
-				Molib::BondOrder::compute_bond_order(__designs.get_atoms());
-				__designs.last().first().first().first().first().erase_hydrogen();
+                        // Make sure the ligand atom has an open valency
+                        if (start_atom->get_num_hydrogens() == 0 || start_atom->element() == Molib::Element::H) {
+                                continue;
+                        }
 
-				Geom3D::Coordinate crd;
+                        for (const auto bond : start_atom->get_bonds()) {
 
-				for (const auto bond : start_atom->get_bonds()) {
-					const Molib::Atom& other = bond->second_atom(*start_atom);
-					if( other.element() == Molib::Element::H)
-						continue;
-					crd = crd + ( start_atom->crd() - other.crd() );
-				}
+                                Molib::Atom& other_orig = bond->second_atom(*start_atom);
 
-				crd = crd + start_atom->crd();
+                                if( other_orig.element() != Molib::Element::H)
+                                        continue;
 
-				Molib::Residue& mod_residue = __designs.last().first().first().first().first();
-				Molib::Atom& new_atom = ( atom_type == "C" || atom_type == "O" || atom_type == "N" || atom_type == "S" ) ?
-					mod_residue.add(new Molib::Atom(mod_residue.size() + 1, atom_type, crd, help::idatm_mask.at(atom_type + "3") ) ) :
-					mod_residue.add(new Molib::Atom(mod_residue.size() + 1, atom_type, crd, help::idatm_mask.at(atom_type ) ) ) ;
+                                // Copy the new molecule into the returnable object
+                                designs.add( new Molib::Molecule(original) );
+                                designs.last().set_name( original.name() + "_added_" + atom_type + "_on_" + std::to_string(start_atom->atom_number()));
 
-				mod_residue.element(start_atom->atom_number()).connect(new_atom).set_bo(1);
-			}
-		}
-	}
+                                Molib::Atom& mod_atom = designs.last().last().last().last().last().atom(other_orig.atom_number());
+
+                                mod_atom.set_element(atom_type);
+                                if ( atom_type == "C" || atom_type == "O" || atom_type == "N" || atom_type == "S" ) {
+                                        mod_atom.set_idatm_type(atom_type + "3");
+                                } else {
+                                        mod_atom.set_idatm_type(atom_type + "3");
+                                }
+                                
+                                Geom3D::Coordinate crd = (mod_atom.crd() - start_atom->crd());
+                                crd.normalize();
+                                mod_atom.set_crd(crd * 1.54 + start_atom->crd());
+                        }
+                }
+
+                return designs;
+        }
 
 	void Design::functionalize_extremes_with_single_atoms(const std::vector< std::string >& idatms) {
 		if ( idatms.empty() )

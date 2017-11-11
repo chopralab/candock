@@ -1,1 +1,2 @@
 add_subdirectory(bond_binner)
+add_subdirectory(structure_mutator)
