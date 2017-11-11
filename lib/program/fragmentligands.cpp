@@ -66,6 +66,7 @@ namespace Program {
                                 .compute_hydrogen()
                                 .compute_bond_order()
                                 .compute_bond_gaff_type()
+                                .compute_chirality()
                                 .refine_idatm_type()
                                 .erase_hydrogen()  // needed because refine changes connectivities
                                 .compute_hydrogen()   // needed because refine changes connectivities

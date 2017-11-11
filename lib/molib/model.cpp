@@ -49,6 +49,7 @@ namespace Molib {
 				stream << "REMARK   8 ROTA " << bond.get_rotatable() 
 					<< " " << bond.atom1().atom_number() 
 					<< " " << bond.atom2().atom_number() 
+                                        << " " << bond.stereo()
 					<< endl;
 			}
 		}
@@ -58,6 +59,7 @@ namespace Molib {
 				<< " " << bond.get_bond_gaff_type() 
 				<< " " << bond.atom1().atom_number() 
 				<< " " << bond.atom2().atom_number() 
+                                << " " << bond.stereo()
 				<< endl;
 		}
 		stream << "ENDMDL" << endl;

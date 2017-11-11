@@ -54,6 +54,9 @@ namespace Glib {
 		}
 		void set_conn(node_id i, node_id j) { __conn[i][j] = true; __conn[j][i] = true; }
 		bool get_conn(node_id i, node_id j) const { return __conn[i][j]; }
+                const Vertex& vertex(size_t i) const {
+                    return *__vertices[i];
+                }
 		int get_num_edges(const node_id i) const { return __num_edges[i]; } // real number of edges of a vertex
 		string get_smiles() const;
 		Cycles find_cycles_connected_graph();

@@ -113,7 +113,44 @@ namespace Molib {
 			throw e;
 		}
 	}
-	
+
+        void compute_chirality(const Atom::Vec &bonds) {
+                for (auto a : bonds) {
+                        if (a->idatm_type_unmask() != "C3") {
+                                continue;
+                        }
+                        if (a->get_num_hydrogens() != 1) {
+                                continue;
+                        }
+
+                        auto atom_bonds = a->get_bonds();
+
+                        if (atom_bonds.size() != 4) {
+                            throw BondOrderError("Error assigning chirality, wrong number of neighbors");
+                        }
+
+                        // FIXME: Using the topologic order is a bad idea, but it's all I got for now
+                        Atom::Vec neighbors;
+                        for (auto b : atom_bonds) {
+                                neighbors.push_back(&b->second_atom(*a));
+                        }
+
+                        atom_bonds[0]->set_stereo("I");
+                        atom_bonds[1]->set_stereo("I");
+
+                        double improper_1 = Geom3D::dihedral(neighbors[0]->crd(), a->crd(), neighbors[1]->crd(), neighbors[2]->crd());
+                        double improper_2 = Geom3D::dihedral(neighbors[0]->crd(), a->crd(), neighbors[1]->crd(), neighbors[3]->crd());
+
+                        if (improper_1 > improper_2) {
+                                atom_bonds[2]->set_stereo("U");
+                                atom_bonds[3]->set_stereo("D");
+                        } else {
+                                atom_bonds[2]->set_stereo("D");
+                                atom_bonds[3]->set_stereo("U");
+                        }
+                }
+        }
+
 	void BondOrder::__dfs(const int level, const int sum, const int tps, 
 		const vector<vector<AtomParams>> &V, vector<AtomParams> &Q, 
 		vector<vector<AtomParams>> &valence_states, const int max_valence_states) {
