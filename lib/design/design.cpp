@@ -287,6 +287,11 @@ namespace design {
                                 Geom3D::Coordinate crd = (mod_atom.crd() - start_atom->crd());
                                 crd.normalize();
                                 mod_atom.set_crd(crd * 1.54 + start_atom->crd());
+
+                                // Don't generate a bunch of junk!
+                                if (start_atom->get_num_hydrogens() == 3) {
+                                        break;
+                                }
                         }
                 }
 
