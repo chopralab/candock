@@ -12,3 +12,4 @@ external/
 *.kdev4
 *.swp
 .vscode/
+candock.code-workspace

@@ -264,6 +264,7 @@ namespace design {
                                 continue;
                         }
 
+                        size_t count = 0;
                         for (const auto bond : start_atom->get_bonds()) {
 
                                 Molib::Atom& other_orig = bond->second_atom(*start_atom);
@@ -273,11 +274,14 @@ namespace design {
 
                                 // Copy the new molecule into the returnable object
                                 designs.add( new Molib::Molecule(original) );
-                                designs.last().set_name( original.name() + "_added_" + atom_type + "_on_" + std::to_string(start_atom->atom_number()));
+                                designs.last().set_name( original.name() + "_added_" + atom_type
+                                                         + "_on_" + std::to_string(start_atom->atom_number())
+                                                         + "_count_" + std::to_string(++count) );
 
                                 Molib::Atom& mod_atom = designs.last().last().last().last().last().atom(other_orig.atom_number());
 
                                 mod_atom.set_element(atom_type);
+                                mod_atom.set_atom_name(atom_type + "_d");
                                 if ( atom_type == "C" || atom_type == "O" || atom_type == "N" || atom_type == "S" ) {
                                         mod_atom.set_idatm_type(atom_type + "3");
                                 } else {
