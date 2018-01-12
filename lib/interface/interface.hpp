@@ -23,17 +23,27 @@ typedef enum {
  * All functions return 0 upon failure and a non-zero number upon success
  */
 
+CANDOCK_EXPORT size_t initialize_complex(const char* filename);
+
 CANDOCK_EXPORT size_t initialize_receptor(const char* filename);
+
 CANDOCK_EXPORT size_t receptor_atom_count();
 CANDOCK_EXPORT size_t receptor_atoms(size_t* idx, float* pos);
+CANDOCK_EXPORT size_t receptor_atom_details(char* chain_ids, size_t* resi, size_t* rest, char* resn, size_t* elements);
+
+
 CANDOCK_EXPORT size_t receptor_bond_count();
 CANDOCK_EXPORT size_t receptor_bonds( size_t* bonds );
 
 CANDOCK_EXPORT size_t initialize_ligand(const char* filename);
+
 CANDOCK_EXPORT size_t ligand_atom_count();
 CANDOCK_EXPORT size_t ligand_atoms(size_t* idx, float* pos);
+CANDOCK_EXPORT size_t ligand_atom_details(char* chain_ids, size_t* resi, size_t* rest, size_t* elements);
+
 CANDOCK_EXPORT size_t ligand_bond_count();
 CANDOCK_EXPORT size_t ligand_bonds( size_t* bonds );
+CANDOCK_EXPORT size_t ligand_get_neighbors( size_t atom_idx, size_t* neighbors );
 
 CANDOCK_EXPORT size_t initialize_scoring(const char* obj_dir);
 

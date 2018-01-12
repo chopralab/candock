@@ -6,6 +6,7 @@
 #include "score/score.hpp"
 #include "modeler/forcefield.hpp"
 #include "modeler/modeler.hpp"
+#include "helper/help.hpp"
 
 #include <boost/filesystem/path.hpp>
 #include <memory>
@@ -19,6 +20,63 @@ std::string __error_string = "";
 
 const char* cd_get_error() {
         return __error_string.c_str();
+}
+
+size_t initialize_complex( const char* filename) {
+        if ( __receptor != nullptr ) {
+                __receptor.reset();
+        }
+
+        if ( __ligand != nullptr ) {
+                __ligand.reset();
+        }
+
+        try {
+                Parser::FileParser rpdb (filename, Parser::protein_poses_only, 1);
+
+                __receptor = std::unique_ptr<Molib::Molecules> (new Molib::Molecules);
+
+                rpdb.parse_molecule (*__receptor);
+
+                __receptor->compute_idatm_type()
+                .compute_hydrogen()
+                .compute_bond_order()
+                .compute_bond_gaff_type()
+                .refine_idatm_type()
+                .erase_hydrogen()  // needed because refine changes connectivities
+                .compute_hydrogen()   // needed because refine changes connectivities
+                .compute_ring_type()
+                .compute_gaff_type()
+                .compute_rotatable_bonds() // relies on hydrogens being assigned
+                .erase_hydrogen();
+
+                __gridrec = std::unique_ptr<Molib::Atom::Grid> (new Molib::Atom::Grid (__receptor->get_atoms()));
+                
+                Parser::FileParser lpdb (filename, Parser::first_model |
+                                          Parser::docked_poses_only, 1);
+
+                __ligand = std::unique_ptr<Molib::Molecules> (new Molib::Molecules);
+
+                lpdb.parse_molecule (*__ligand);
+
+                __ligand->compute_idatm_type()
+                .compute_hydrogen()
+                .compute_bond_order()
+                .compute_bond_gaff_type()
+                .refine_idatm_type()
+                .erase_hydrogen()  // needed because refine changes connectivities
+                .compute_hydrogen()   // needed because refine changes connectivities
+                .compute_ring_type()
+                .compute_gaff_type()
+                .compute_rotatable_bonds() // relies on hydrogens being assigned
+                .erase_hydrogen();
+
+                return 1;
+        } catch ( std::exception &e ) {
+                __error_string = std::string("Error in loading complex: ") + e.what();
+                return 0;
+        }
+
 }
 
 size_t initialize_receptor(const char* filename) {
@@ -79,6 +137,36 @@ size_t receptor_atoms(size_t* idx, float* pos) {
                         pos[ i * 3 + 0] = crd.x();
                         pos[ i * 3 + 1] = crd.y();
                         pos[ i * 3 + 2] = crd.z();
+                }
+
+                return atoms.size();
+        } catch( std::exception &e ) {
+                __error_string = std::string("Error creating receptor atom arrays: ") + e.what();
+                return 0;
+        }
+}
+
+size_t receptor_atom_details(char* chain_ids, size_t* resi, size_t* rest, char* resn, size_t* elements) {
+        if ( __receptor == nullptr ) {
+                __error_string = std::string("You must run initialize_receptor first");
+                return 0;
+        }
+        
+        try {
+                Molib::Atom::Vec atoms = __receptor->element(0).get_atoms();
+                for ( size_t i=0; i < atoms.size(); ++i ) {
+                        chain_ids[ i ] = atoms[i]->br().br().chain_id();
+                        resi[i] = atoms[i]->br().resi();
+                        rest[i] = atoms[i]->br().rest();
+
+                        if (help::one_letter.find(atoms[i]->br().resn()) != help::one_letter.end()) {
+                                resn[i] = help::one_letter.at(atoms[i]->br().resn());
+                        } else {
+                            cout << "UAASDFAS" << endl;
+                                resn[i] = 'X';
+                        }
+                        
+                        elements[i] = atoms[i]->element().number();
                 }
 
                 return atoms.size();
@@ -202,6 +290,28 @@ size_t ligand_atoms(size_t* idx, float* pos) {
         }
 }
 
+size_t ligand_atom_details(char* chain_ids, size_t* resi, size_t* rest, size_t* elements) {
+        if ( __ligand == nullptr ) {
+                __error_string = std::string("You must run initialize_ligand first");
+                return 0;
+        }
+        
+        try {
+                Molib::Atom::Vec atoms = __ligand->element(0).get_atoms();
+                for ( size_t i=0; i < atoms.size(); ++i ) {
+                        chain_ids[ i ] = atoms[i]->br().br().chain_id();
+                        resi[i] = atoms[i]->br().resi();
+                        rest[i] = atoms[i]->br().rest();
+                        elements[i] = atoms[i]->element().number();
+                }
+
+                return atoms.size();
+        } catch( std::exception &e ) {
+                __error_string = std::string("Error creating ligand atom arrays: ") + e.what();
+                return 0;
+        }
+}
+
 size_t ligand_bond_count() {
         if ( __ligand == nullptr ) {
                 __error_string = std::string("You must run initialize_ligand first");
@@ -247,6 +357,37 @@ size_t ligand_bonds( size_t* bonds ) {
                 return i;
         } catch (std::exception &e) {
                 __error_string = std::string("Error creating ligand bond arrays: ") + e.what();
+                return 0;
+        }
+}
+
+size_t ligand_get_neighbors( size_t atom_idx, size_t* neighbors ) {
+        if ( __ligand == nullptr ) {
+                __error_string = std::string("You must run initialize_ligand first");
+                return 0;
+        }
+        
+        try {
+                Molib::Atom::Vec atoms = __ligand->element(0).get_atoms();
+                
+                if (atom_idx >= atoms.size()) {
+                        __error_string = std::string("Atom index out of bounds");
+                        return 0;
+                }
+                
+                const Molib::Atom* current_atom = atoms[atom_idx];
+                
+                Molib::BondVec bdev = current_atom->get_bonds();
+                
+                for (size_t i = 0; i < bdev.size(); ++i) {
+                        const Molib::Atom& neigh = bdev[i]->second_atom(*current_atom);
+                        neighbors[i] = distance(atoms.begin(), find(atoms.begin(), atoms.end(), &neigh));
+                        
+                }
+                
+                return bdev.size();
+        } catch( std::exception &e ) {
+                __error_string = std::string("Error creating atom arrays");
                 return 0;
         }
 }

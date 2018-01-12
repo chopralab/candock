@@ -5,3 +5,4 @@ if (WIN32)
 endif(WIN32)
 
 add_subdirectory( interface_test )
+add_subdirectory( interface_test_2 )

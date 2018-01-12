@@ -31,6 +31,10 @@ namespace Parser {
 
                 for (string &line : pdb_raw) {
 
+                        if (line.compare (0, 4, "ATOM") == 0) {
+                                ter_found = false;
+                        }
+
                         if ( (__hm & skip_hetatm) && line.compare (0, 6, "HETATM") == 0) {
                                 continue;
                         }
@@ -88,6 +92,7 @@ namespace Parser {
 
                                 if ( (__hm & hydrogens) || !hydrogen) {
                                         if (alt_loc == ' ' || alt_loc == 'A') {
+
                                                 if (!mols.last().is_modified (Residue::res_tuple2 (chain_id, resn, resi, ins_code))) {
                                                         Residue::res_type rest;
 
@@ -285,7 +290,7 @@ namespace Parser {
                                         __generate_molecule (mols, found_molecule, "");
 
                                         // modified 'standard' residue gets saved,e.g., MET --> MSE, glycosylated...
-                                        mols.last().add_modified (Residue::res_tuple2 (chain_id, resn_mod, resi, ins_code));
+                                        //mols.last().add_modified (Residue::res_tuple2 (chain_id, resn_mod, resi, ins_code));
                                 }
                         } else if (line.compare (0, 4, "SITE") == 0 && boost::regex_search (line, m, boost::regex ("SITE\\s+\\d+\\s+(\\S+)\\s+\\S+(\\s+\\S+\\s?\\S{1}\\s{0,3}\\d{1,4}\\S?)?(\\s+\\S+\\s?\\S{1}\\s{0,3}\\d{1,4}\\S?)?(\\s+\\S+\\s?\\S{1}\\s{0,3}\\d{1,4}\\S?)?(\\s+\\S+\\s?\\S{1}\\s{0,3}\\d{1,4}\\S?)?"))) {
                                 if (m.empty()) {
