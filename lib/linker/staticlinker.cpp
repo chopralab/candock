@@ -235,6 +235,15 @@ namespace Linker {
 		
 		dbgmsg("number of possibles_w_energy = " << possibles_w_energy.size());
 		// cluster rigid conformations and take only cluster representatives for further linking
+
+		if (__docked_clus_rad <= 0.0) {
+			log_benchmark << "Generated " << possibles_w_energy.size() 
+				<< " possible conformations for ligand without clustering" << __ligand.name()
+				<< ", which took " << bench.seconds_from_start() 
+				<< " wallclock seconds" << "\n";
+			return possibles_w_energy;
+		}
+
 		Partial::Vec clustered_possibles_w_energy = Cluster::Cluster::greedy(
 			possibles_w_energy, __gridrec, __docked_clus_rad);
 			

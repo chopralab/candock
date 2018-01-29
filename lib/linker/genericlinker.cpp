@@ -133,7 +133,7 @@ namespace Linker {
 		if (failed_connections >= partials.size())
 			throw Error ("No generated confirmations are valid.");
 
-		if (__max_iterations_final > 0)
+		if (__max_iterations_final != -1)
 			return __minimize_final(docked_conformations);
 
                 // Potenital energy will never be set, and that's ok
