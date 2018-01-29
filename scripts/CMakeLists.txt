@@ -24,5 +24,5 @@ install( PROGRAMS ${PROJECT_BINARY_DIR}/load_variables.sh
                   ${PROJECT_SOURCE_DIR}/scripts/extract_result.sh
                   
          DESTINATION
-                  ${CMAKE_INSTALL_PREFIX}/modules/${CANDOCK_VERSION}
+                  ${CMAKE_INSTALL_PREFIX}/${CANDOCK_VERSION}/modules
 )

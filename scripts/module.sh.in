@@ -5,7 +5,7 @@
 #PBS -l naccesspolicy=shared
 
 : ${MCANDOCK_MOD_PATH:=$([[ $PBS_ENVIRONMENT == PBS_BATCH ]] \
-        && echo @CMAKE_INSTALL_PREFIX@/modules/@CANDOCK_VERSION@ \
+        && echo @CMAKE_INSTALL_PREFIX@/@CANDOCK_VERSION@/modules \
         || echo $( cd $( dirname ${BASH_SOURCE[0]} ) && pwd ) )}
 
 # Only used if submitted to torque
