@@ -59,19 +59,19 @@ if (NOT WIN32)
 endif(NOT WIN32)
 
 set( program_names  check_options
+                    check_inputpdb
                     find_centroids
-                    output_mol2
-                    process_input
                     prep_fragments
                     make_objective
-                    make_gridhcp
+                    make_bsitegrid
                     dock_fragments
                     link_fragments
                     design_ligands
-                    cacrystal_rmsd
-                    calculate_rmsd
+                    convertto_mol2
+                    calc_rmsdcryst
+                    calc_rmsdtable
                     calc_potential
-                    rescore_docked
+                    calc_posescore
                     minimize_poses
                     dynamics_run
 )
