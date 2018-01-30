@@ -133,7 +133,7 @@ namespace Linker {
 			void init_openmm();
 			Partial::Vec init_conformations();
 			DockedConformation::Vec compute_conformations(const Partial::Vec &partials);
-			
+			DockedConformation::Vec compute_conformations(Partial::Vec &partials);
 		};
 		
 		class StaticLinker : public GenericLinker {

@@ -296,6 +296,11 @@ namespace Linker {
 		
 		log_benchmark << "Reconstruction of molecules took " << bench.seconds_from_start() 
 			<< " wallclock seconds for " << __ligand.name() << "\n";
+		
+		// The receptor conformation will not be used, so don't copy it
+		if (__max_iterations_final == -1)
+			return DockedConformation(ligand, __receptor.name(), conformation.get_energy(), 0, 0);
+		
 		return DockedConformation(ligand, __receptor, conformation.get_energy(), 0, 0);
 	}
 };

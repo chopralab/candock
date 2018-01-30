@@ -143,6 +143,53 @@ namespace Linker {
 		return docked_conformations;
 	}
 
+
+    DockedConformation::Vec Linker::GenericLinker::compute_conformations(Partial::Vec &partials) {
+
+		DockedConformation::Vec docked_conformations;
+
+		size_t successful_connections = 0;
+
+		auto partial = std::begin(partials);
+
+		while ( partial != std::end(partials)) {
+			auto &conformation = partial->get_states();
+				
+			if (!__has_blacklisted(conformation, __blacklist)) {
+				try {
+					Partial grow_link_energy(conformation, partial->get_energy());
+					dbgmsg("connecting ligand " << __ligand.name() 
+						<< endl << "possible starting conformation is " << endl
+						<< grow_link_energy);
+					vector<unique_ptr<State>> states;
+					docked_conformations.push_back(
+						__a_star(__segment_graph.size(), grow_link_energy, states, __link_iter));
+					successful_connections++;
+
+					// Free up memory
+					partial = partials.erase(partial);
+				} catch (ConnectionError& e) {
+					dbgmsg("exception : " << e.what());
+					for (auto &failed_pair : e.get_failed_state_pairs())
+						__blacklist.insert(failed_pair);
+					++partial;
+				}
+			}
+		}
+
+		if (successful_connections == 0)
+			throw Error ("No generated confirmations are valid.");
+
+		if (__max_iterations_final != -1)
+			return __minimize_final(docked_conformations);
+
+                // Potenital energy will never be set, and that's ok
+		for (auto &docked : docked_conformations)
+			docked.get_receptor().undo_mm_specific();
+		
+		return docked_conformations;
+	}
+
 	/**
 	 * Final minimization of each docked ligand conformation
 	 * with full ligand and receptor flexibility
@@ -152,7 +199,7 @@ namespace Linker {
 
 		DockedConformation::Vec minimized_conformations;
                 
-                size_t max_clq_identity = 0;
+        size_t max_clq_identity = 0;
                 
 		for (auto &docked : docked_conformations) {
 		
@@ -166,15 +213,15 @@ namespace Linker {
 				__modeler.unmask(__receptor.get_atoms());
 				__modeler.unmask(__ligand.get_atoms());
 		
-                                __modeler.set_max_iterations(__max_iterations_final); // until converged
+                __modeler.set_max_iterations(__max_iterations_final); // until converged
 
-                                log_benchmark << "Starting minimization of " << __ligand.name()
-                                              << " and " << __receptor.name() << "\n";
+                log_benchmark << "Starting minimization of " << __ligand.name()
+                              << " and " << __receptor.name() << "\n";
 
-                                __modeler.minimize_state();
+                __modeler.minimize_state();
 
-                                __modeler.mask(__receptor.get_atoms());
-                                const double potential_energy = __modeler.potential_energy();
+                __modeler.mask(__receptor.get_atoms());
+                const double potential_energy = __modeler.potential_energy();
 
 				// init with minimized coordinates
 				Molib::Molecule minimized_receptor(__receptor, __modeler.get_state(__receptor.get_atoms()));
