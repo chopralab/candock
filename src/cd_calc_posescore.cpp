@@ -70,7 +70,7 @@ int main(int argc, char* argv[]) {
                         Molib::Atom::Grid gridrec(protein.get_atoms());                        
 
                         const double energy = score.non_bonded_energy (gridrec, ligand);
-                        cout << energy << endl;
+                        cout << energy << "\n";
 
                 }
         } catch (exception& e) {

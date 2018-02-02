@@ -162,7 +162,6 @@ size_t receptor_atom_details(char* chain_ids, size_t* resi, size_t* rest, char* 
                         if (help::one_letter.find(atoms[i]->br().resn()) != help::one_letter.end()) {
                                 resn[i] = help::one_letter.at(atoms[i]->br().resn());
                         } else {
-                            cout << "UAASDFAS" << endl;
                                 resn[i] = 'X';
                         }
                         
