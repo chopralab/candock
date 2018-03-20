@@ -13,6 +13,12 @@ using namespace Program;
 
 ////////////////// TEST SINGLEPOINT ENERGY CALCULATION OF COMPLEX ///////////////////////////
 
+void score_thread(Parser::FileParser &drpdb, Parser::FileParser &dlpdb, const Score::Score& score,
+        std::vector<double> &output, std::mutex& mutex, int start_index) {
+
+
+}
+
 int main(int argc, char* argv[]) {
         try {
 
@@ -62,17 +68,32 @@ int main(int argc, char* argv[]) {
                      .process_distributions_file(cmdl.get_string_option("dist"))
                      .compile_scoring_function();
 
-                for (size_t i = 0; i < receptor_mols.size(); ++i) {
+                std::vector<std::thread> threads;
+
+                size_t num_threads = cmdl.get_int_option("ncpu");
+                std::vector<double> output (receptor_mols.size());
+                for ( size_t thread_id = 0; thread_id < num_threads; ++thread_id)
+                threads.push_back (std::thread ([&, thread_id] {
+                        for (size_t i = thread_id; i < receptor_mols.size(); i+=num_threads) {
                         
-                        Molib::Molecule& protein = receptor_mols[i];
-                        Molib::Molecule& ligand  = ligand_mols[i];
+                                Molib::Molecule& protein = receptor_mols[i];
+                                Molib::Molecule& ligand  = ligand_mols[i];
 
-                        Molib::Atom::Grid gridrec(protein.get_atoms());                        
+                                Molib::Atom::Grid gridrec(protein.get_atoms());                        
 
-                        const double energy = score.non_bonded_energy (gridrec, ligand);
-                        cout << energy << "\n";
+                                output[i] = score.non_bonded_energy (gridrec, ligand);
+                } } ));
 
+                for (auto &thread : threads) {
+                        thread.join();
                 }
+
+                receptor_mols.clear();
+                ligand_mols.clear();
+                for (size_t i = 0; i < output.size(); ++i) {
+                        std::cout << output[i] << '\n';
+                }
+
         } catch (exception& e) {
                 cerr << e.what() << endl;
         }
