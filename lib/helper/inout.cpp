@@ -65,7 +65,7 @@ namespace Inout {
         }
 #endif
 
-        int file_size(const string &name) {
+        size_t file_size(const string &name) {
                 if ( boost::filesystem::exists(name) &&
                         boost::filesystem::is_regular_file(name) )
                 {

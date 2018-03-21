@@ -7,7 +7,7 @@
 
 namespace Inout {
         enum f_not_found {panic=0, no_panic=1};
-        int  file_size(const std::string &name);
+        size_t  file_size(const std::string &name);
         void read_file(const std::string &name, std::vector<std::string>&,
                        f_not_found=panic, const int num_occur=-1, 
                        const std::string &pattern=""); // throws Error
