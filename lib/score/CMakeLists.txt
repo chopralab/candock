@@ -7,6 +7,8 @@ set( score_SRC
         powerfit.hpp
         score.cpp
         score.hpp
+        xscore.hpp
+        xscore.cpp
 )
 
 add_library(score OBJECT ${score_SRC})

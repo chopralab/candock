@@ -5,7 +5,7 @@
 #include "version.hpp"
 #include "drm/drm.hpp"
 
-#include "score/score.hpp"
+#include "score/xscore.hpp"
 #include "modeler/forcefield.hpp"
 
 using namespace std;
@@ -53,15 +53,6 @@ int main(int argc, char* argv[]) {
 
                 dlpdb.parse_molecule(ligand_mols);
 
-                Score::Score score(cmdl.get_string_option("ref"), cmdl.get_string_option("comp"),
-                                   cmdl.get_string_option("func"),cmdl.get_int_option("cutoff"),
-                                   cmdl.get_double_option("step"));
-
-                score.define_composition(receptor_mols.get_idatm_types(),
-                                         ligand_mols.get_idatm_types())
-                     .process_distributions_file(cmdl.get_string_option("dist"))
-                     .compile_scoring_function();
-
                 std::vector<std::thread> threads;
 
                 size_t num_threads = cmdl.get_int_option("ncpu");
@@ -75,7 +66,7 @@ int main(int argc, char* argv[]) {
 
                                 Molib::Atom::Grid gridrec(protein.get_atoms());                        
 
-                                output[i] = score.non_bonded_energy (gridrec, ligand);
+                                output[i] = Score::vina_xscore(gridrec, ligand.get_atoms());
                 } } ));
 
                 for (auto &thread : threads) {
@@ -85,7 +76,8 @@ int main(int argc, char* argv[]) {
                 receptor_mols.clear();
                 ligand_mols.clear();
                 for (size_t i = 0; i < output.size(); ++i) {
-                        std::cout << output[i] << '\n';
+                        //std::cout << output[i] << '\n';
+                        break;
                 }
 
         } catch (exception& e) {

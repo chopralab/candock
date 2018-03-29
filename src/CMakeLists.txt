@@ -72,6 +72,7 @@ set( program_names  check_options
                     calc_rmsdtable
                     calc_potential
                     calc_posescore
+                    calc_posexscore
                     minimize_poses
                     dynamics_run
 )
