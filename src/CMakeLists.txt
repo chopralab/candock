@@ -73,6 +73,7 @@ set( program_names  check_options
                     calc_potential
                     calc_posescore
                     calc_posexscore
+                    calc_allscores
                     minimize_poses
                     dynamics_run
 )
