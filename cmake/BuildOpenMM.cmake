@@ -58,11 +58,17 @@ add_subdirectory(
 set(OPENMM_INCLUDE_DIR ${CMAKE_CURRENT_BINARY_DIR}/openmm/openmmapi/include)
 list(APPEND OPENMM_INCLUDE_DIR ${CMAKE_CURRENT_BINARY_DIR}/openmm/olla/include)
 list(APPEND OPENMM_INCLUDE_DIR ${CMAKE_CURRENT_BINARY_DIR}/openmm/platforms/reference/include)
-list(APPEND OPENMM_INCLUDE_DIR foreign/kbforce/openmmapi/include)
+list(APPEND OPENMM_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/foreign/kbforce/openmmapi/include)
 set(OPENMM_LIBRARY OpenMM CACHE STRING "Internal OpenMM Library" )
 
-add_subdirectory(foreign/kbforce)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/foreign/kbforce)
 
-set(OPENMM_KBPLUGIN KBPluginReference CACHE STRING  "KBForce Internal Library")
+set(OPENMM_KBPLUGIN KBPlugin CACHE STRING  "KBForce Internal Library")
 
 mark_as_advanced(OPENMM_LIBRARY)
+
+install(FILES
+ ${CMAKE_CURRENT_BINARY_DIR}/libOpenMM.so
+DESTINATION
+ ${CMAKE_INSTALL_PREFIX}/${CANDOCK_VERSION}/lib
+)

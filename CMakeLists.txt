@@ -47,7 +47,6 @@ endif(CANDOCK_CUDA_SUPPORT)
 set(CANDOCK_DRM OFF CACHE BOOL "Build DRM into Candock")
 
 find_package(Boost    REQUIRED  COMPONENTS filesystem system regex program_options)
-find_package(GSL      REQUIRED)
 find_package(RapidXML REQUIRED)
 find_package(Git      REQUIRED)
 
@@ -78,7 +77,6 @@ else(WIN32)
 endif(WIN32)
 
 include_directories(${Boost_INCLUDE_DIRS})
-include_directories(${GSL_INCLUDE_DIRS})
 include_directories(${JSONCPP_INCLUDE_DIR})
 include_directories(${RAPIDXML_DIR})
 
@@ -88,7 +86,14 @@ else()
     find_package(OpenMM REQUIRED COMPONENTS openmm kbforce)
 endif()
 
+if (NOT GSL_ROOT_DIR)
+    include(BuildGSL)
+else()
+    find_package(GSL      REQUIRED)
+endif()
+
 include_directories(${OPENMM_INCLUDE_DIR})
+include_directories(${GSL_INCLUDE_DIRS})
 
 if( ${CANDOCK_DRM} )
 
