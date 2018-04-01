@@ -43,15 +43,12 @@ if (CANDOCK_CUDA_SUPPORT)
 
 endif(CANDOCK_CUDA_SUPPORT)
 
-set(OPENMM_ROOT_DIR "/usr/local/openmm" CACHE STRING "Location of OpenMM and KBForce")
-
 #DRM Module
 set(CANDOCK_DRM OFF CACHE BOOL "Build DRM into Candock")
 
 find_package(Boost    REQUIRED  COMPONENTS filesystem system regex program_options)
 find_package(GSL      REQUIRED)
 find_package(RapidXML REQUIRED)
-find_package(OpenMM   REQUIRED  COMPONENTS openmm kbforce)
 find_package(Git      REQUIRED)
 
 set(JSONCPP_INCLUDE_DIR "foreign/jsoncpp/include" "foreign/jsoncpp/src" )
@@ -84,6 +81,13 @@ include_directories(${Boost_INCLUDE_DIRS})
 include_directories(${GSL_INCLUDE_DIRS})
 include_directories(${JSONCPP_INCLUDE_DIR})
 include_directories(${RAPIDXML_DIR})
+
+if (NOT OPENMM_ROOT_DIR)
+    include("BuildOpenMM")
+else()
+    find_package(OpenMM REQUIRED COMPONENTS openmm kbforce)
+endif()
+
 include_directories(${OPENMM_INCLUDE_DIR})
 
 if( ${CANDOCK_DRM} )
