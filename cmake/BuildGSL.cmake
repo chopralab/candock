@@ -16,7 +16,7 @@ ExternalProject_Add( GSL
 add_library(gsl SHARED IMPORTED)
 add_library(gslcblas SHARED IMPORTED)
 set_property(TARGET gsl PROPERTY IMPORTED_LOCATION ${CMAKE_CURRENT_BINARY_DIR}/gsl_build/lib/${CMAKE_SHARED_LIBRARY_PREFIX}gsl${CMAKE_SHARED_LIBRARY_SUFFIX})
-set_property(TARGET gslcblas PROPERTY IMPORTED_LOCATION ${CMAKE_CURRENT_BINARY_DIR}/gsl_build/lib/libgslcblas.so)
+set_property(TARGET gslcblas PROPERTY IMPORTED_LOCATION ${CMAKE_CURRENT_BINARY_DIR}/gsl_build/lib/${CMAKE_SHARED_LIBRARY_PREFIX}gslcblas${CMAKE_SHARED_LIBRARY_SUFFIX})
 add_dependencies(gsl GSL)
 add_dependencies(gslcblas GSL)
 
