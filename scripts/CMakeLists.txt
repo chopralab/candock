@@ -1,3 +1,5 @@
+string (REPLACE ";" ":" CANDOCK_ADDITONAL_LD_PATH "${CANDOCK_ADDITONAL_LD_PATH}")
+
 configure_file( ${PROJECT_SOURCE_DIR}/scripts/load_variables.sh.in
                 ${PROJECT_BINARY_DIR}/load_variables.sh
                 @ONLY

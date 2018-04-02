@@ -12,3 +12,7 @@ set( score_SRC
 )
 
 add_library(score OBJECT ${score_SRC})
+
+if (USING_INTERNAL_GSL)
+    add_dependencies(score GSL)
+endif()

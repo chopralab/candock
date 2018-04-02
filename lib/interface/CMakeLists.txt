@@ -5,3 +5,7 @@ set( interface_SRC
         interface.hpp)
 
 add_library(interface OBJECT ${interface_SRC})
+
+if (USING_INTERNAL_OPENMM)
+    add_dependencies(interface OpenMM_Build)
+endif()
