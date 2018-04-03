@@ -20,8 +20,6 @@ then
         export CANDOCK_NCPU
 fi
 
-echo "Using modules in $MCANDOCK_MOD_PATH"
-
 if [[ ! -s $MCANDOCK_MOD_PATH/load_variables.sh ]]
 then
         echo "Modules not found in \$MCANDOCK_MOD_PATH!"
@@ -34,5 +32,3 @@ source $MCANDOCK_MOD_PATH/load_variables.sh
 SECONDS=0
 
 $MCANDOCK_PATH/$MCANDOCK_VER/bin/cd_${__sub_program} $([[ ! -z "$@" ]] && echo "$@")
-
-echo "All calculations for ${__sub_program} are complete taking $SECONDS to complete"
