@@ -10,6 +10,9 @@
 #include "molib/molecule.hpp"
 #include "modeler/topology.hpp"
 #include "openmm/Vec3.h"
+#include <openmm/CustomNonbondedForce.h>
+
+
 
 using namespace std;
 
@@ -46,6 +49,7 @@ namespace OMMIface {
                 OpenMM::System *system;
                 OpenMM::Integrator *integrator;
                 OpenMM::Context *context;
+                OpenMM::CustomNonbondedForce *forcefield;
 
                 integrator_type __integrator_used;
                 int __thermostat_idx;
@@ -56,7 +60,7 @@ namespace OMMIface {
 
                 const ForceField *__ffield;
 
-                KBPlugin::KBForce* __kbforce;
+                //KBPlugin::KBForce* __kbforce;
                 int __kbforce_idx;
                 vector<bool> masked;
                 vector<double> masses;

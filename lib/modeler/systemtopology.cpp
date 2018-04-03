@@ -10,6 +10,7 @@
 #include <openmm/BrownianIntegrator.h>
 #include <openmm/AndersenThermostat.h>
 #include <openmm/NonbondedForce.h>
+#include <openmm/CustomNonbondedForce.h>
 #include <openmm/LocalEnergyMinimizer.h>
 
 #include "forcefield.hpp"
@@ -278,8 +279,8 @@ namespace OMMIface {
         }
 
         void SystemTopology::clear_knowledge_based_force() {
-                __kbforce->clearBonds();
-                __kbforce->updateParametersInContext(*context);
+                //__kbforce->clearBonds();
+                //__kbforce->updateParametersInContext(*context);
         }
 
         void SystemTopology::update_knowledge_based_force (Topology &topology, const vector<OpenMM::Vec3> &positions, const double dist_cutoff) {
@@ -323,7 +324,7 @@ namespace OMMIface {
 
                         int warn = 0;
 
-                        __kbforce->clearBonds();
+                        //__kbforce->clearBonds();
                         // init OpenMM's kbforce object
                         for (auto &bond : nonbondlist) {
                                 dbgmsg ("next iteration in nonbondlist");
@@ -334,7 +335,7 @@ namespace OMMIface {
 
                                 if (!masked[idx1] && !masked[idx2]) { // don't make the force if one or both atoms are masked
                                         try {
-                                                __kbforce->addBond (idx1, idx2, atom1.idatm_type(), atom2.idatm_type());
+                                                //__kbforce->addBond (idx1, idx2, atom1.idatm_type(), atom2.idatm_type());
                                                 dbgmsg ("adding kbforce between idx1 = " << idx1 << " and idx2 = " << idx2);
                                         } catch (ParameterError &e) {
                                                 log_error << e.what() << " (" << ++warn << ")" << endl;
@@ -343,7 +344,7 @@ namespace OMMIface {
                         }
 
                         dbgmsg ("out of loop");
-                        __kbforce->updateParametersInContext(*context);
+                        //__kbforce->updateParametersInContext(*context);
                         dbgmsg ("after reinitialize");
                         context->setPositions (positions);
                         dbgmsg ("after setPositions");
@@ -419,27 +420,39 @@ namespace OMMIface {
                 //FIXME Fixup topology to contain all the atom types used in the system (thus no need to initialize per ligand/protein)
                 for (const auto &atom : topology.atoms) {
                         used_atom_types.insert(atom->idatm_type());
+                        //forcefield->addParticle({atom->idatm_type()});
                 }
 
-                __kbforce = new KBPlugin::KBForce(used_atom_types.size(), __ffield->step, __ffield->kb_cutoff);
+               forcefield = new OpenMM::CustomNonbondedForce("");
+
+                
+
+                /* Disable KBForce */
+
+               // __kbforce = new KBPlugin::KBForce(used_atom_types.size(), __ffield->step, __ffield->kb_cutoff);
 
                 for ( const auto &type1 : used_atom_types ) {
                         for ( const auto &type2 : used_atom_types ) {
                                 try {
                                         const ForceField::KBType kb = __ffield->get_kb_force_type(type1, type2);
-                                        __kbforce->addBondType( type1, type2, kb.potential, kb.derivative);
+                                        
+                                        forcefield->addTabulatedFunction("fn", new OpenMM::Discrete2DFunction(5, 5, kb.potential));
+                                        //__kbforce->addBondType( type1, type2, kb.potential, kb.derivative);
                                 } catch ( ParameterError& e ) {
                                         cerr << e.what() << endl;
                                         cerr << "This is normal for atom types only present in the ligand" << endl;
                                         
                                         size_t number_of_steps = static_cast<size_t> (__ffield->kb_cutoff / __ffield->step);
-                                        __kbforce->addBondType( type1, type2, std::vector<double>(number_of_steps, 0.0),
-                                                                              std::vector<double>(number_of_steps, 0.0) );
+                                       // __kbforce->addBondType( type1, type2, std::vector<double>(number_of_steps, 0.0),
+                                                                          //    std::vector<double>(number_of_steps, 0.0) );
                                 }
                         }
                 }
 
-                 __kbforce_idx = system->addForce (__kbforce);
+                std::cerr << "exiting" << std::endl;
+                exit(0);
+
+                 //__kbforce_idx = system->addForce (__kbforce); 
         }
 
         void SystemTopology::retype_amber_protein_atom_to_gaff(const Molib::Atom &atom, int &type) {
