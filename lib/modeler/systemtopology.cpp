@@ -228,6 +228,7 @@ void SystemTopology::init_integrator(SystemTopology::integrator_type type,
                 // Fall through
         case none:
                 integrator = new OpenMM::VerletIntegrator(step_size_in_ps);
+                std::cerr << "using verlet" << std::endl;
                 break;
         case langevin:
                 integrator = new OpenMM::LangevinIntegrator(temperature_in_kevin, friction_in_per_ps, step_size_in_ps);
@@ -237,7 +238,24 @@ void SystemTopology::init_integrator(SystemTopology::integrator_type type,
                 break;
         }
 
-        context = new OpenMM::Context(*system, *integrator);
+        map<string, string> properties;
+        properties["CudaPrecision"] = "double";
+        //properties["DisablePmeStream"] = "true";
+
+        int numParameters = forcefield->getNumPerParticleParameters();
+        std::cerr << "num particles per parameter " << numParameters << std::endl;
+        vector<double> parameters;
+        forcefield->getParticleParameters(0, parameters);
+        std::cerr << "parameter size " << parameters.size() << std::endl;
+
+        std::cerr
+            << "step size " << step_size_in_ps << std::endl;
+        OpenMM::Platform &platform = OpenMM::Platform::getPlatformByName("CUDA");
+        context = new OpenMM::Context(*system, *integrator, platform, properties);
+        std::cerr << "Using OpenMM platform " << context->getPlatform().getName() << std::endl;
+        std::cerr << "exiting" << std::endl;
+        exit(0);
+
         dbgmsg("REMARK  Using OpenMM platform " << context->getPlatform().getName());
 }
 
@@ -471,14 +489,18 @@ void SystemTopology::init_knowledge_based_force(Topology &topology)
 
         std::set<int> used_atom_types;
 
+        forcefield = new OpenMM::CustomNonbondedForce("r;");
+
         //FIXME Fixup topology to contain all the atom types used in the system (thus no need to initialize per ligand/protein)
         for (const auto &atom : topology.atoms)
         {
                 used_atom_types.insert(atom->idatm_type());
+                int index = forcefield->addParticle({atom->idatm_type()});
+
                 //forcefield->addParticle({atom->idatm_type()});
         }
 
-        forcefield = new OpenMM::CustomNonbondedForce("");
+        forcefield->addPerParticleParameter("atomtype");
 
         /* Disable KBForce */
 
@@ -496,12 +518,10 @@ void SystemTopology::init_knowledge_based_force(Topology &topology)
                                 const ForceField::KBType kb = __ffield->get_kb_force_type(type1, type2);
 
                                 //std::cerr << "size " << kb.potential.size() << std::endl;
-                                xsize = kb.potential.size();
-                                ysize++;
+                                ysize = kb.potential.size();
+                                xsize++;
                                 for (size_t i = 0; i < kb.potential.size(); i++)
                                         table.push_back(kb.potential[i]);
-
-                                //forcefield->addTabulatedFunction("fn", new OpenMM::Discrete2DFunction(5, 5, kb.potential));
                                 //__kbforce->addBondType( type1, type2, kb.potential, kb.derivative);
                         }
                         catch (ParameterError &e)
@@ -511,7 +531,7 @@ void SystemTopology::init_knowledge_based_force(Topology &topology)
 
                                 //size_t number_of_steps = static_cast<size_t>(__ffield->kb_cutoff / __ffield->step);
                                 // __kbforce->addBondType( type1, type2, std::vector<double>(number_of_steps, 0.0),
-                                //    std::vector<double>(number_of_steps, 0.0) );
+                                //    std::vector<double>(number_of_steps, 0.0) );addForce
                         }
                 }
         }
@@ -525,10 +545,9 @@ void SystemTopology::init_knowledge_based_force(Topology &topology)
                 cerr << "Exiting" << endl;
                 exit(0);
         }
-        std::cerr << "exiting" << std::endl;
-        exit(0);
 
         __kbforce_idx = system->addForce(forcefield);
+        std::cerr << "hello" << std::endl;
 }
 
 void SystemTopology::retype_amber_protein_atom_to_gaff(const Molib::Atom &atom, int &type)
