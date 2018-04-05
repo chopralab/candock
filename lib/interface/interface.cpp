@@ -39,7 +39,7 @@ size_t initialize_complex( const char* filename) {
                 rpdb.parse_molecule (*__receptor);
 
                 __receptor->compute_idatm_type()
-                .compute_hydrogen()
+                /*.compute_hydrogen()
                 .compute_bond_order()
                 .compute_bond_gaff_type()
                 .refine_idatm_type()
@@ -48,7 +48,7 @@ size_t initialize_complex( const char* filename) {
                 .compute_ring_type()
                 .compute_gaff_type()
                 .compute_rotatable_bonds() // relies on hydrogens being assigned
-                .erase_hydrogen();
+                .erase_hydrogen()*/;
 
                 __gridrec = std::unique_ptr<Molib::Atom::Grid> (new Molib::Atom::Grid (__receptor->get_atoms()));
                 
@@ -60,7 +60,7 @@ size_t initialize_complex( const char* filename) {
                 lpdb.parse_molecule (*__ligand);
 
                 __ligand->compute_idatm_type()
-                .compute_hydrogen()
+                /*.compute_hydrogen()
                 .compute_bond_order()
                 .compute_bond_gaff_type()
                 .refine_idatm_type()
@@ -69,7 +69,7 @@ size_t initialize_complex( const char* filename) {
                 .compute_ring_type()
                 .compute_gaff_type()
                 .compute_rotatable_bonds() // relies on hydrogens being assigned
-                .erase_hydrogen();
+                .erase_hydrogen()*/;
 
                 return 1;
         } catch ( std::exception &e ) {
@@ -93,7 +93,7 @@ size_t initialize_receptor(const char* filename) {
                 rpdb.parse_molecule (*__receptor);
 
                 __receptor->compute_idatm_type()
-                .compute_hydrogen()
+                /*.compute_hydrogen()
                 .compute_bond_order()
                 .compute_bond_gaff_type()
                 .refine_idatm_type()
@@ -102,7 +102,7 @@ size_t initialize_receptor(const char* filename) {
                 .compute_ring_type()
                 .compute_gaff_type()
                 .compute_rotatable_bonds() // relies on hydrogens being assigned
-                .erase_hydrogen();
+                .erase_hydrogen()*/;
 
                 __gridrec = std::unique_ptr<Molib::Atom::Grid> (new Molib::Atom::Grid (__receptor->get_atoms()));
 
@@ -237,7 +237,7 @@ size_t initialize_ligand(const char* filename) {
                 rpdb.parse_molecule (*__ligand);
 
                 __ligand->compute_idatm_type()
-                .compute_hydrogen()
+                /*.compute_hydrogen()
                 .compute_bond_order()
                 .compute_bond_gaff_type()
                 .refine_idatm_type()
@@ -246,7 +246,7 @@ size_t initialize_ligand(const char* filename) {
                 .compute_ring_type()
                 .compute_gaff_type()
                 .compute_rotatable_bonds() // relies on hydrogens being assigned
-                .erase_hydrogen();
+                .erase_hydrogen()*/;
 
                 return 1;
 
