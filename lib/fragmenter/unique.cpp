@@ -31,7 +31,7 @@ namespace Molib {
                                 if (atom_props.size() == 2)
                                     edges.push_back(help::edge{atom_props[0], atom_props[1], ""});
                                 else
-                                    edges.push_back(help::edge{atom_props[0], atom_props[1], ""});
+                                    edges.push_back(help::edge{atom_props[0], atom_props[1], "", atom_props[3]});
 			}
 			__unique_seeds.insert(make_pair(hsh, 
 				SeedData{unique_ptr<BondGraph>(new BondGraph(create_bonds(edges), true, false)), seed_id}));

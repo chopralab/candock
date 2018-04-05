@@ -387,7 +387,12 @@ namespace Parser {
                                 vector<string> vs = help::ssplit (line.substr (16), " ");
                                 Atom &a1 = *atom_number_to_atom[&model][stoi (vs[1])];
                                 Atom &a2 = *atom_number_to_atom[&model][stoi (vs[2])];
-                                a1.connect (a2).set_rotatable (vs[0]);
+                                auto b = a1.connect (a2);
+                                b.set_rotatable(vs[0]);
+
+                                if(vs.size() >= 4)
+                                        b.set_stereo(vs[3]);
+
                         } else if (line.compare (0, 19, "REMARK   8 BONDTYPE") == 0) {
 
                                 if ( (__hm & docked_poses_only) && (! ter_found)) {

@@ -14,7 +14,7 @@ namespace Molib {
 		stringstream ss;
 		ss << atom1().get_label() << "#" << atom1().atom_number() << "_" 
 			<< atom2().get_label() << "#" << atom2().atom_number()
-			<< "_" << __stereo << "_" << get_bond_gaff_type();
+			<< "_" << get_bond_gaff_type()  << "_" << __stereo;
 		return ss.str();
 	}
 

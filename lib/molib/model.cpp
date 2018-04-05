@@ -49,7 +49,7 @@ namespace Molib {
 				stream << "REMARK   8 ROTA " << bond.get_rotatable() 
 					<< " " << bond.atom1().atom_number() 
 					<< " " << bond.atom2().atom_number() 
-                                        << " " << bond.stereo()
+                    << " " << bond.stereo()
 					<< endl;
 			}
 		}
