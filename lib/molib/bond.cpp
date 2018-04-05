@@ -179,7 +179,7 @@ namespace Molib {
 			// here bond "owns" atoms and must delete them in destructor
 			bonds.push_back(unique_ptr<Bond>(new Bond(new Atom(atom1), new Atom(atom2), true)));
 			bonds.back()->set_members(e.bond_property);
-                        bonds.back()->set_stereo(e.bond_stereo);
+            //bonds.back()->set_stereo(e.bond_stereo);
 		}
 		for (size_t i = 0; i < bonds.size(); ++i) {
 			Bond &bond1 = *bonds[i];

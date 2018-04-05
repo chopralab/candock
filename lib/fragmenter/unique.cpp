@@ -29,9 +29,9 @@ namespace Molib {
 			while (ss >> vpair) {
 				auto atom_props = help::ssplit(vpair, "_");
                                 if (atom_props.size() == 2)
-                                    edges.push_back(help::edge{atom_props[0], atom_props[1], "", ""});
+                                    edges.push_back(help::edge{atom_props[0], atom_props[1], ""});
                                 else
-                                    edges.push_back(help::edge{atom_props[0], atom_props[1], "", atom_props[2]});
+                                    edges.push_back(help::edge{atom_props[0], atom_props[1], ""});
 			}
 			__unique_seeds.insert(make_pair(hsh, 
 				SeedData{unique_ptr<BondGraph>(new BondGraph(create_bonds(edges), true, false)), seed_id}));
@@ -100,7 +100,7 @@ namespace Molib {
 			stringstream vertex1, vertex2;
 			vertex1 << bond.atom1().get_label() << "#" << bond.atom1().atom_number();
 			vertex2 << bond.atom2().get_label() << "#" << bond.atom2().atom_number();
-			edges.push_back(help::edge{vertex1.str(), vertex2.str(), "", bond.stereo()});
+			edges.push_back(help::edge{vertex1.str(), vertex2.str(), ""});
 		}
 		dbgmsg("before outputting edges");
 		dbgmsg(edges);
@@ -140,7 +140,7 @@ namespace Molib {
 			stringstream vertex1, vertex2;
 			vertex1 << bond.atom1().get_label() << "#" << bond.atom1().atom_number();
 			vertex2 << bond.atom2().get_label() << "#" << bond.atom2().atom_number();
-			edges.push_back(help::edge{vertex1.str(), vertex2.str(), "", bond.stereo()});
+			edges.push_back(help::edge{vertex1.str(), vertex2.str(), ""});
 		}
 		dbgmsg("before outputting edges");
 		dbgmsg(edges);
