@@ -20,13 +20,13 @@ namespace Molib {
 
         string Bond::get_pdb_remark() const {
                 std::pair<int,int> bminmax = std::minmax(atom1().atom_number(), atom2().atom_number());
-
+				
                 return
                 std::string("REMARK   8 BONDTYPE ") + std::to_string(get_bo()) +
                                    " " + get_bond_gaff_type() +
                                    " " + std::to_string(bminmax.first) +
                                    " " + std::to_string(bminmax.second) +
-                                   " " + __stereo + 
+                                   //" " + __stereo + 
                                    "\n";
         }
 

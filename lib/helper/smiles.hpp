@@ -12,7 +12,7 @@ namespace help {
 		string atom_property1;
 		string atom_property2;
 		string bond_property;
-        string bond_stereo;
+        //string bond_stereo;
 	};
 	typedef vector<edge> smiles;
 	struct rename_rule {

@@ -390,8 +390,8 @@ namespace Parser {
                                 auto b = a1.connect (a2);
                                 b.set_rotatable(vs[0]);
 
-                                if(vs.size() >= 4)
-                                        b.set_stereo(vs[3]);
+                                //if(vs.size() >= 4)
+                                //        b.set_stereo(vs[3]);
 
                         } else if (line.compare (0, 19, "REMARK   8 BONDTYPE") == 0) {
 
@@ -413,6 +413,8 @@ namespace Parser {
                                         auto &bond = a1.connect (a2);
                                         bond.set_bo (stoi (vs[0]));
                                         bond.set_bond_gaff_type (vs[1]);
+                                        //if(vs.size() >= 5)
+                                                //bond.set_stereo(vs[4]);
                                 }
                         } else if (line.compare (0, 6, "CONECT") == 0) {
                                 const string ln = boost::algorithm::trim_right_copy (line.substr (6));
