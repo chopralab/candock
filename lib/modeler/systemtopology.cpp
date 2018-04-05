@@ -238,8 +238,11 @@ void SystemTopology::init_integrator(SystemTopology::integrator_type type,
         }
 
         map<string, string> properties;
-        properties["CudaPrecision"] = "double";
+        //properties["CudaPrecision"] = "double";
+        //properties["CudaDeviceIndex"] = "2";
         //properties["DisablePmeStream"] = "true";
+        properties["OpenCLPrecision"] = "double";
+        properties["OpenCLDeviceIndex"] = "2";
 
         //int numParameters = forcefield->getNumPerParticleParameters();
         //std::cerr << "num particles per parameter " << numParameters << std::endl;
@@ -248,7 +251,7 @@ void SystemTopology::init_integrator(SystemTopology::integrator_type type,
         //std::cerr << "parameter size " << parameters.size() << std::endl;
 
         //std::cerr << "step size " << step_size_in_ps << std::endl;
-        OpenMM::Platform &platform = OpenMM::Platform::getPlatformByName("CUDA");
+        OpenMM::Platform &platform = OpenMM::Platform::getPlatformByName("OpenCL");
         context = new OpenMM::Context(*system, *integrator, platform, properties);
         //std::cerr << "Using OpenMM platform " << context->getPlatform().getName() << std::endl;
 
