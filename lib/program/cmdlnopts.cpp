@@ -2,8 +2,6 @@
 #include <boost/program_options/cmdline.hpp>
 #include <boost/program_options/errors.hpp>
 
-#include "modeler/systemtopology.hpp"
-
 #include "helper/logger.hpp"
 
 #include <iostream>

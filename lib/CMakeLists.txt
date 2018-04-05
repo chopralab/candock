@@ -57,7 +57,7 @@ add_library(
         $<TARGET_OBJECTS:helper>
 )
 
-set( candock_libraries_to_link ${OPENMM_LIBRARIES}
+set( candock_libraries_to_link ${OPENMM_LIBRARY}
                                ${OPENMM_KBPLUGIN}
                                ${Boost_LIBRARIES}
                                ${GSL_LIBRARIES}

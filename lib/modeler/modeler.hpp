@@ -5,13 +5,10 @@
 #include <set>
 #include <vector>
 
-#include <openmm/Units.h>
-
 #include "geom3d/coordinate.hpp"
 #include "molib/molecule.hpp"
 #include "helper/help.hpp"
 #include "helper/benchmark.hpp"
-#include "KBForce.h"
 #include "topology.hpp"
 #include "systemtopology.hpp"
 
@@ -53,14 +50,7 @@ namespace OMMIface {
 
                 Modeler(const ForceField &ffield, const string &fftype, double dist_cutoff,
                         double tolerance, int max_iterations, int update_freq, double position_tolerance,
-                        bool use_constraints, double step_size_in_fs, double temperature, double friction ) 
-                        : 
-                        __ffield(&ffield), __fftype(fftype), __dist_cutoff_in_nm(dist_cutoff * OpenMM::NmPerAngstrom),
-                        __tolerance(tolerance), __max_iterations(max_iterations), __update_freq(update_freq), 
-                        __position_tolerance_in_nm(position_tolerance * OpenMM::NmPerAngstrom), 
-                        __use_constraints(use_constraints), __step_size_in_ps(step_size_in_fs * OpenMM::PsPerFs),
-                        __temperature(temperature), __friction(friction), __run_dyanmics(false)
-                        {}
+                        bool use_constraints, double step_size_in_fs, double temperature, double friction );
 
                 void mask(const Molib::Atom::Vec &atoms);
                 void unmask(const Molib::Atom::Vec &atoms);
