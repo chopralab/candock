@@ -53,10 +53,18 @@ int main(int argc, char* argv[]) {
 
                 dlpdb.parse_molecule(ligand_mols);
 
+                if (receptor_mols.size() == 0 || ligand_mols.size() == 0) {
+                        return 0;
+                }
+
                 std::vector<std::thread> threads;
 
                 size_t num_threads = cmdl.get_int_option("ncpu");
-                std::vector<double> output (receptor_mols.size());
+
+                std::vector<std::array<double,5>> output;
+
+                output.reserve(ligand_mols.size());
+
                 for ( size_t thread_id = 0; thread_id < num_threads; ++thread_id)
                 threads.push_back (std::thread ([&, thread_id] {
                         for (size_t i = thread_id; i < receptor_mols.size(); i+=num_threads) {
@@ -66,7 +74,7 @@ int main(int argc, char* argv[]) {
 
                                 Molib::Atom::Grid gridrec(protein.get_atoms());                        
 
-                                output[i] = Score::vina_xscore(gridrec, ligand.get_atoms());
+                                output.emplace_back(Score::vina_xscore(gridrec, ligand.get_atoms()));
                 } } ));
 
                 for (auto &thread : threads) {
@@ -75,9 +83,11 @@ int main(int argc, char* argv[]) {
 
                 receptor_mols.clear();
                 ligand_mols.clear();
-                for (size_t i = 0; i < output.size(); ++i) {
-                        //std::cout << output[i] << '\n';
-                        break;
+                for (const auto& values : output ) {
+                        for (const auto& component : values) {
+                                std::cout << component << ",";
+                        }
+                        std::cout << "\n";
                 }
 
         } catch (exception& e) {

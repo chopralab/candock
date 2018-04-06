@@ -163,7 +163,7 @@ inline double hydrogen_eval(const Molib::Atom& t1, const Molib::Atom& t2, double
 	return 0;
 }
 
-double Score::vina_xscore(const Molib::Atom::Grid &gridrec, const Molib::Atom::Vec &atoms) {
+std::array<double,5> Score::vina_xscore(const Molib::Atom::Grid &gridrec, const Molib::Atom::Vec &atoms) {
     double gauss_1 = 0.0;
     double gauss_2 = 0.0;
     double rep = 0.0;
@@ -186,11 +186,7 @@ double Score::vina_xscore(const Molib::Atom::Grid &gridrec, const Molib::Atom::V
         }
     }
 
-    cout << gauss_1 << " " << gauss_2 << " " << rep << " " << hydrophobic << " " << hydrogen << endl;
+    std::array<double, 5> ret = {gauss_1, gauss_2, rep, hydrophobic, hydrogen};
 
-    return gauss_1 * -0.035579 +
-           gauss_2 * -0.005156 +
-           rep     *  0.840245 +
-           hydrophobic * -0.035069 +
-           hydrogen * -0.587439;
+    return ret;
 }
