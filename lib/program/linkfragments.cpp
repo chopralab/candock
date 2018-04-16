@@ -58,7 +58,7 @@ namespace Program {
         void LinkFragments::__link_ligand (Molib::Molecule &ligand) {
 
                 boost::filesystem::path p (__receptor.name());
-                p = p.filename() / cmdl.get_string_option ("docked_dir") / (ligand.name() + ".pdb");
+                p = p / cmdl.get_string_option ("docked_dir") / (ligand.name() + ".pdb");
 
                 OMMIface::ForceField ffcopy (__ffield);
 

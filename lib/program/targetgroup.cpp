@@ -127,7 +127,8 @@ namespace Program {
                 }
                 Inout::output_file(ss.str(), "designed_0.mol2");
 
-                ligands.add_seeds_from_file("design_seeds.pdb");
+                if (Inout::file_size("design_seeds.pdb"))
+                        ligands.add_seeds_from_file("design_seeds.pdb");
                 ligands.add_seeds_from_molecules(all_designs);
                 ligands.write_seeds_to_file("design_seeds.pdb");
 
@@ -195,7 +196,8 @@ namespace Program {
                         }
                         Inout::output_file(ss.str(), "designed_" + std::to_string(n) + ".mol2");
 
-                        ligands.add_seeds_from_file("design_seeds.pdb");
+                        if (Inout::file_size("design_seeds.pdb"))
+                                ligands.add_seeds_from_file("design_seeds.pdb");
                         ligands.add_seeds_from_molecules(all_designs);
                         ligands.write_seeds_to_file("design_seeds.pdb");
 
