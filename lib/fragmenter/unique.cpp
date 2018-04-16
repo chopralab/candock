@@ -20,7 +20,7 @@ namespace Molib {
 		Inout::read_file(__seeds_file, v_seeds, Inout::no_panic);
 		for (auto &s : v_seeds) {
 			dbgmsg("reading seed file " << s);
-			stringstream ss(s);
+ 			stringstream ss(s);
 			size_t seed_id, hsh;
 			ss >> seed_id >> hsh;
 			dbgmsg(seed_id << " " << hsh);
@@ -47,8 +47,14 @@ namespace Molib {
                         dbgmsg("g.size() == g2.size() " << boolalpha << (g.size() == g2.size()));
                         dbgmsg("g.match(g2).size() " << g.match(g2)[0].first.size());
 
-                        it1++;
+                        if (g.isomorphic(g2)) {
+                                si = it1->second.seed_id;
+                                dbgmsg("finding equal seed number = " << si);
+                                return true;
+                        }
 
+                        it1++;
+/*
                         if (g.size() != g2.size())
                                 continue;
 
@@ -76,7 +82,7 @@ namespace Molib {
                                 si = it1->second.seed_id;
                                 dbgmsg("finding equal seed number = " << si);
                                 return true;
-                        }
+                        }*/
                 }
                 return false;
         }
