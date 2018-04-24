@@ -17,80 +17,82 @@
 
 using namespace std;
 
-namespace Score {
-        class Score;
+namespace Score
+{
+class Score;
 };
 
-namespace OMMIface {
+namespace OMMIface
+{
 
-        class Modeler {
-            public:
-                class MinimizationError : public Error {
-                public: 
-                        MinimizationError(const string &msg) : Error(msg) {}
-                };
+class Modeler
+{
+public:
+  class MinimizationError : public Error
+  {
+  public:
+    MinimizationError(const string &msg) : Error(msg) {}
+  };
 
-            private:
-                const ForceField *__ffield;
-                string __fftype;
-                double __dist_cutoff_in_nm;
-                double __tolerance;
-                int __max_iterations;
-                int __update_freq;
-                double __position_tolerance_in_nm;
-                bool __use_constraints;
-                double __step_size_in_ps;
-                double __temperature;
-                double __friction;
+private:
+  const ForceField *__ffield;
+  string __fftype;
+  double __dist_cutoff_in_nm;
+  double __tolerance;
+  int __max_iterations;
+  int __update_freq;
+  double __position_tolerance_in_nm;
+  bool __use_constraints;
+  double __step_size_in_ps;
+  double __temperature;
+  double __friction;
 
-                Geom3D::Point::Vec __positions;
-                Topology __topology;
-                SystemTopology __system_topology;
+  Geom3D::Point::Vec __positions;
+  Topology __topology;
+  SystemTopology __system_topology;
 
-                bool __run_dyanmics;
-                int __dynamics_steps;
-            public:
+  bool __run_dyanmics;
+  int __dynamics_steps;
 
-                Modeler(const ForceField &ffield, const string &fftype, double dist_cutoff,
-                        double tolerance, int max_iterations, int update_freq, double position_tolerance,
-                        bool use_constraints, double step_size_in_fs, double temperature, double friction ) 
-                        : 
-                        __ffield(&ffield), __fftype(fftype), __dist_cutoff_in_nm(dist_cutoff * OpenMM::NmPerAngstrom),
-                        __tolerance(tolerance), __max_iterations(max_iterations), __update_freq(update_freq), 
-                        __position_tolerance_in_nm(position_tolerance * OpenMM::NmPerAngstrom), 
-                        __use_constraints(use_constraints), __step_size_in_ps(step_size_in_fs * OpenMM::PsPerFs),
-                        __temperature(temperature), __friction(friction), __run_dyanmics(false)
-                        {}
+public:
+  Modeler(const ForceField &ffield, const string &fftype, double dist_cutoff,
+          double tolerance, int max_iterations, int update_freq, double position_tolerance,
+          bool use_constraints, double step_size_in_fs, double temperature, double friction)
+      : __ffield(&ffield), __fftype(fftype), __dist_cutoff_in_nm(dist_cutoff * OpenMM::NmPerAngstrom),
+        __tolerance(tolerance), __max_iterations(max_iterations), __update_freq(update_freq),
+        __position_tolerance_in_nm(position_tolerance * OpenMM::NmPerAngstrom),
+        __use_constraints(use_constraints), __step_size_in_ps(step_size_in_fs * OpenMM::PsPerFs),
+        __temperature(temperature), __friction(friction), __run_dyanmics(false)
+  {
+  }
 
-                void mask(const Molib::Atom::Vec &atoms);
-                void unmask(const Molib::Atom::Vec &atoms);
+  void mask(const Molib::Atom::Vec &atoms);
+  void unmask(const Molib::Atom::Vec &atoms);
 
-                void add_topology(const Molib::Atom::Vec &atoms);
-                void add_crds(const Molib::Atom::Vec &atoms, const Geom3D::Point::Vec &crds);
-                void add_random_crds(const Molib::Atom::Vec &atoms);
+  void add_topology(const Molib::Atom::Vec &atoms);
+  void add_crds(const Molib::Atom::Vec &atoms, const Geom3D::Point::Vec &crds);
+  void add_random_crds(const Molib::Atom::Vec &atoms);
 
-                Geom3D::Point::Vec get_state(const Molib::Atom::Vec &atoms);
+  Geom3D::Point::Vec get_state(const Molib::Atom::Vec &atoms);
 
 #ifndef NDEBUG
-                void minimize_knowledge_based(Molib::Molecule& ligand, Molib::Molecule& receptor, Score::Score& score);
+  void minimize_knowledge_based(Molib::Molecule &ligand, Molib::Molecule &receptor, Score::Score &score);
 #endif
-                
-                void minimize_state();
-                void dynamics();
 
-                void knowledge_based_calculation();
-                void physical_calculation();
+  void minimize_state();
+  void dynamics();
 
-                void init_openmm_positions();
-                void init_openmm(SystemTopology::integrator_type type = SystemTopology::integrator_type::none);
+  void knowledge_based_calculation();
+  void physical_calculation();
 
-                void set_max_iterations(const int max_iterations) { __max_iterations = max_iterations; }
-                void set_num_steps_to_run(const int num_steps_to_run) { __dynamics_steps = num_steps_to_run;}
+  void init_openmm_positions();
+  void init_openmm(SystemTopology::integrator_type type = SystemTopology::integrator_type::none, string platform = "CPU");
 
-                double potential_energy();
+  void set_max_iterations(const int max_iterations) { __max_iterations = max_iterations; }
+  void set_num_steps_to_run(const int num_steps_to_run) { __dynamics_steps = num_steps_to_run; }
 
-        };
-
+  double potential_energy();
+};
 }
 
 #endif

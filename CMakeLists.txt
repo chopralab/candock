@@ -43,7 +43,7 @@ if (CANDOCK_CUDA_SUPPORT)
 
 endif(CANDOCK_CUDA_SUPPORT)
 
-set(OPENMM_ROOT_DIR "/usr/local/openmm" CACHE STRING "Location of OpenMM and KBForce")
+set(OPENMM_ROOT_DIR "/home/brandon_stewart/openmm-7.2" CACHE STRING "Location of OpenMM and KBForce")
 
 #DRM Module
 set(CANDOCK_DRM OFF CACHE BOOL "Build DRM into Candock")

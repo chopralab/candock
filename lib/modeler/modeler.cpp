@@ -136,33 +136,7 @@ void Modeler::physical_calculation()
 void Modeler::knowledge_based_calculation()
 {
         Benchmark bench;
-        /*dbgmsg("Doing energy minimization using knowledge-based forcefield");
 
-        // for knowledge-based forcefield we implement a custom update nonbond
-        // function
-
-        int iter = 0;
-
-        // do a brief relaxation of bonded forces initially (without non-bonded forces)
-        __system_topology.clear_knowledge_based_force();
-        __system_topology.minimize(__tolerance, 20);
-
-        vector<OpenMM::Vec3> initial_positions = __system_topology.get_positions_in_nm();
-        dbgmsg("initial_positions (after brief minimization) = " << initial_positions);
-
-        // check if minimization failed
-        if (std::isnan(initial_positions[0][0]))
-                throw MinimizationError("die : minimization failed (initial bonded relaxation)");
-
-        while (iter < __max_iterations)
-        {
-
-                dbgmsg("starting minimization step = " << iter);
-
-                dbgmsg("initial_positions = " << initial_positions);
-
-                __system_topology.update_knowledge_based_force(__topology, initial_positions, __dist_cutoff_in_nm);
-        */
         if (!__run_dyanmics)
         {
                 __system_topology.minimize(__tolerance, __update_freq);
@@ -172,132 +146,10 @@ void Modeler::knowledge_based_calculation()
                 __system_topology.dynamics(__dynamics_steps);
         }
 
-        /* const vector<OpenMM::Vec3>& minimized_positions = __system_topology.get_positions_in_nm();
-
-                        // check if minimization failed
-                        if (std::isnan(minimized_positions[0][0]))
-                                throw MinimizationError("die : minimization failed (in loop)");
-                
-                dbgmsg("minimized_positions = " << minimized_positions);
-
-                // check if positions have converged
-                double max_error = 0;
-                for (size_t i = 0; i < initial_positions.size(); ++i)
-                {
-                        OpenMM::Vec3 dif_pos = initial_positions[i] - minimized_positions[i];
-                        const double error = dif_pos.dot(dif_pos);
-                        if (error > max_error)
-                                max_error = error;
-                }
-
-                // stop if convergence reached
-                if (sqrt(max_error) < __position_tolerance_in_nm)
-                {
-                        dbgmsg("Convergence reached (position_tolerance) - minimization finished");
-                        break;
-                }*/
-
-        //iter += __update_freq;
-
-        //initial_positions = minimized_positions;
-        //dbgmsg("ending minimization step iter = " << iter);
-        //}
-
-        //__system_topology.clear_knowledge_based_force();
-        log_benchmark << "Minimized which took "
+        log_benchmark << "Minimization took "
                       << bench.seconds_from_start() << " wallclock seconds"
                       << "\n";
 }
-
-#ifndef NDEBUG
-void Modeler::minimize_knowledge_based(Molib::Molecule &ligand, Molib::Molecule &receptor, Score::Score &score)
-{
-        Benchmark bench;
-        dbgmsg("Doing energy minimization of ligand " << ligand.name() << " using knowledge-based forcefield");
-
-        // for knowledge-based forcefield we implement a custom update nonbond
-        // function
-
-        int iter = 0;
-
-        // do a brief relaxation of bonded forces initially (without non-bonded forces)
-        //__system_topology.clear_knowledge_based_force();
-        //__system_topology.minimize(__tolerance, 20);
-
-        //vector<OpenMM::Vec3> initial_positions = __system_topology.get_positions_in_nm();
-        dbgmsg("initial_positions (after brief minimization) = " << initial_positions);
-
-        // check if minimization failed
-        //if (std::isnan(initial_positions[0][0]))
-        //      throw MinimizationError("die : minimization failed (initial bonded relaxation)");
-
-        //__system_topology.update_knowledge_based_force(__topology, initial_positions, __dist_cutoff_in_nm);
-
-        while (iter < __max_iterations)
-        {
-
-                dbgmsg("starting minimization step = " << iter);
-
-                dbgmsg("initial_positions = " << initial_positions);
-
-                // output frames during minimization
-                Molib::Molecule minimized_receptor(receptor, get_state(receptor.get_atoms()));
-                Molib::Molecule minimized_ligand(ligand, get_state(ligand.get_atoms()));
-
-                minimized_receptor.undo_mm_specific();
-
-                Molib::Atom::Grid gridrec(minimized_receptor.get_atoms());
-                const double energy = score.non_bonded_energy(gridrec, minimized_ligand);
-
-                std::stringstream ss;
-                Fileout::print_complex_pdb(ss, minimized_ligand, minimized_receptor, energy);
-                Inout::output_file(ss.str(), ligand.name() + "_frame_" + std::to_string(iter) + ".pdb");
-
-                __system_topology.minimize(__tolerance, __update_freq);
-
-                /* const vector<OpenMM::Vec3> &minimized_positions = __system_topology.get_positions_in_nm();
-
-                // check if minimization failed
-                if (std::isnan(minimized_positions[0][0]))
-                        throw MinimizationError("die : minimization failed (in loop)");
-
-                dbgmsg("minimized_positions = " << minimized_positions); */
-
-                const vector<OpenMM::Vec3> &forces = __system_topology.get_forces();
-                dbgmsg("forces after minimization = " << forces);
-
-                // check if positions have converged
-                /*  double max_error = 0;
-                for (size_t i = 0; i < initial_positions.size(); ++i)
-                {
-                        OpenMM::Vec3 dif_pos = initial_positions[i] - minimized_positions[i];
-                        const double error = dif_pos.dot(dif_pos);
-                        if (error > max_error)
-                                max_error = error;
-                }
-
-                // stop if convergence reached
-                if (sqrt(max_error) < __position_tolerance_in_nm)
-                {
-                        dbgmsg("Convergence reached (position_tolerance) - minimization finished");
-                        break;
-                }
-
-                // update knowledge-based nonbond list
-                __system_topology.update_knowledge_based_force(__topology, minimized_positions, __dist_cutoff_in_nm);
-                */
-                iter += __update_freq;
-
-                //initial_positions = minimized_positions;
-                dbgmsg("ending minimization step iter = " << iter);
-        }
-        __system_topology.clear_knowledge_based_force();
-        log_benchmark << "Minimized " << ligand.name() << " and " << receptor.name()
-                      << " in " << iter << " iterations, which took "
-                      << bench.seconds_from_start() << " wallclock seconds"
-                      << "\n";
-}
-#endif
 
 void Modeler::init_openmm_positions()
 {
@@ -309,7 +161,7 @@ void Modeler::init_openmm_positions()
         __system_topology.init_positions(__positions);
 }
 
-void Modeler::init_openmm(SystemTopology::integrator_type type)
+void Modeler::init_openmm(SystemTopology::integrator_type type, string platform)
 {
         __system_topology.set_forcefield(*__ffield);
         __system_topology.init_particles(__topology);
@@ -332,7 +184,7 @@ void Modeler::init_openmm(SystemTopology::integrator_type type)
                 throw Error("die : unsupported forcefield");
         }
 
-        __system_topology.init_integrator(type, __step_size_in_ps, __temperature, __friction);
+        __system_topology.init_integrator(type, __step_size_in_ps, __temperature, __friction, platform);
 }
 
 double Modeler::potential_energy()

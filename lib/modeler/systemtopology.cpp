@@ -213,7 +213,8 @@ void SystemTopology::unmask_forces(const int atom_idx, const set<int> &substruct
 void SystemTopology::init_integrator(SystemTopology::integrator_type type,
                                      const double step_size_in_ps,
                                      const double temperature_in_kevin,
-                                     const double friction_in_per_ps)
+                                     const double friction_in_per_ps,
+                                     string platform)
 {
 
         if (integrator != nullptr)
@@ -238,11 +239,20 @@ void SystemTopology::init_integrator(SystemTopology::integrator_type type,
         }
 
         map<string, string> properties;
-        //properties["CudaPrecision"] = "double";
-        //properties["CudaDeviceIndex"] = "2";
+
+        if (!platform.compare("CUDA"))
+        {
+                std::cout << "USING CUDA TO CREATE FORCEFIELD" << std::endl;
+                properties["CudaPrecision"] = "double";
+                properties["CudaDeviceIndex"] = "2";
+        }
+        else if (!platform.compare("OpenCL"))
+        {
+                properties["OpenCLPrecision"] = "double";
+                properties["OpenCLDeviceIndex"] = "2";
+        }
+
         //properties["DisablePmeStream"] = "true";
-        properties["OpenCLPrecision"] = "double";
-        properties["OpenCLDeviceIndex"] = "2";
 
         //int numParameters = forcefield->getNumPerParticleParameters();
         //std::cerr << "num particles per parameter " << numParameters << std::endl;
@@ -251,8 +261,8 @@ void SystemTopology::init_integrator(SystemTopology::integrator_type type,
         //std::cerr << "parameter size " << parameters.size() << std::endl;
 
         //std::cerr << "step size " << step_size_in_ps << std::endl;
-        OpenMM::Platform &platform = OpenMM::Platform::getPlatformByName("OpenCL");
-        context = new OpenMM::Context(*system, *integrator, platform, properties);
+        OpenMM::Platform &platform2 = OpenMM::Platform::getPlatformByName(platform);
+        context = new OpenMM::Context(*system, *integrator, platform2, properties);
         //std::cerr << "Using OpenMM platform " << context->getPlatform().getName() << std::endl;
 
         dbgmsg("REMARK  Using OpenMM platform " << context->getPlatform().getName());
@@ -407,20 +417,20 @@ void SystemTopology::update_knowledge_based_force(Topology &topology, const vect
                         }
                 } */
 
-                dbgmsg("out of loop");
+                //dbgmsg("out of loop");
                 //__kbforce->updateParametersInContext(*context);
                 //forcefield->updateParametersInContext(*context);
 
-                dbgmsg("after reinitialize");
+                //dbgmsg("after reinitialize");
                 //context->setPositions(positions);
-                dbgmsg("after setPositions");
+                //dbgmsg("after setPositions");
 
                 /* if (warn > 0)
                 {
                         throw Error("die : missing parameters detected");
                 }*/
 
-                dbgmsg("exiting update_knowledge_based_force");
+                //dbgmsg("exiting update_knowledge_based_force");
         }
         catch (std::exception &e)
         {
@@ -484,6 +494,13 @@ void SystemTopology::init_physics_based_force(Topology &topology)
         }
 }
 
+void printstuff(int i, int j, int k, vector<double> table, int xsize)
+{
+        for (auto k = 0; k < 60; k++)
+        {
+        }
+}
+
 void SystemTopology::init_knowledge_based_force(Topology &topology)
 {
         if (__kbforce_idx != -1)
@@ -491,10 +508,12 @@ void SystemTopology::init_knowledge_based_force(Topology &topology)
 
         std::set<int> used_atom_types;
 
-        forcefield = new OpenMM::CustomNonbondedForce("kbpot( idatm1, idatm2 , r / ffstep); ");
+        forcefield = new OpenMM::CustomNonbondedForce("kbpot( r / ffstep, idatm2 , idatm1); ");
         forcefield->setNonbondedMethod(OpenMM::CustomNonbondedForce::CutoffPeriodic);
         forcefield->setCutoffDistance(__ffield->kb_cutoff);
-        //FIXME Fixup topology to contain all the atom types used in the system (thus no need to initialize per ligand/protein)
+        forcefield->addGlobalParameter("ffstep", __ffield->step);
+        forcefield->addPerParticleParameter("idatm");
+
         std::map<int, int> __idatm_to_internal;
         std::map<int, int> __internal_to_idatm;
         int num_types = 0;
@@ -510,14 +529,18 @@ void SystemTopology::init_knowledge_based_force(Topology &topology)
 
                 forcefield->addParticle({__idatm_to_internal[atom->idatm_type()]});
         }
-        forcefield->addGlobalParameter("ffstep", __ffield->step);
-        forcefield->addPerParticleParameter("idatm");
-        /* Disable KBForce */
-
-        // __kbforce = new KBPlugin::KBForce(used_atom_types.size(), __ffield->step, __ffield->kb_cutoff);
 
         vector<double> table;
         int xsize = 0, ysize = 0;
+        for (auto &i : __idatm_to_internal)
+        {
+                std::cerr << "idatm one " << i.first << " two " << i.second << std::endl;
+        }
+
+        for (auto &i : __internal_to_idatm)
+        {
+                std::cerr << "internal one " << i.first << " two " << i.second << std::endl;
+        }
 
         for (int i = 0; i < __idatm_to_internal.size(); i++)
         {
@@ -538,51 +561,30 @@ void SystemTopology::init_knowledge_based_force(Topology &topology)
 
                                 for (size_t i = 0; i < kb.potential.size(); i++)
                                         table.push_back(kb.potential[i]);
-                                //__kbforce->addBondType( type1, type2, kb.potential, kb.derivative);
                         }
                         catch (ParameterError &e)
                         {
                                 cerr << e.what() << endl;
                                 cerr << "This is normal for atom types only present in the ligand" << endl;
-
-                                //size_t number_of_steps = static_cast<size_t>(__ffield->kb_cutoff / __ffield->step);
-                                // __kbforce->addBondType( type1, type2, std::vector<double>(number_of_steps, 0.0),
-                                //    std::vector<double>(number_of_steps, 0.0) );addForce
                         }
                 }
         }
         try
         {
-                //std::cerr << "x y table " << xsize << " " << ysize << " " << table.size() << std::endl;
-                //forcefield->addGlobalParameter("ntypes", __idatm_to_internal.size());
-
-                forcefield->addTabulatedFunction("kbpot", new OpenMM::Discrete3DFunction(__idatm_to_internal.size(), __idatm_to_internal.size(), ysize, table));
+                forcefield->addTabulatedFunction("kbpot", new OpenMM::Discrete3DFunction(ysize, __idatm_to_internal.size(), __idatm_to_internal.size(), table));
 
                 vector<pair<int, int>> bondPairs;
 
                 for (auto &bond : topology.bonds)
                 {
-                        dbgmsg("checkpoint0");
                         const Molib::Atom &atom1 = *bond.first;
-                        dbgmsg(atom1);
                         const Molib::Atom &atom2 = *bond.second;
-                        dbgmsg(atom2);
                         const int idx1 = topology.get_index(atom1);
-                        dbgmsg(idx1);
                         const int idx2 = topology.get_index(atom2);
-                        dbgmsg(idx2);
                         bondPairs.push_back({idx1, idx2});
                 }
 
                 forcefield->createExclusionsFromBonds(bondPairs, 4);
-                auto num_exclusions = forcefield->getNumExclusions();
-                //std::cerr << "num exlcusions " << num_exclusions << std::endl;
-                /*for (auto i = 0; i < forcefield->getNumExclusions(); i++)
-                {
-                        int p1 = -1, p2 = -1;
-                        forcefield->getExclusionParticles(i, p1, p2);
-                        std::cerr << "exclusions p1 " << p1 << " p2 " << p2 << std::endl;
-                }*/
         }
         catch (ParameterError &e)
         {
@@ -942,7 +944,17 @@ double SystemTopology::get_potential_energy()
 
 void SystemTopology::minimize(const double tolerance, const double max_iterations)
 {
+        std::cerr << " energy value " << context->getState(OpenMM::State::Energy).getPotentialEnergy() << std::endl;
         OpenMM::LocalEnergyMinimizer::minimize(*context, tolerance, max_iterations);
+        std::cerr << " energy value " << context->getState(OpenMM::State::Energy).getPotentialEnergy() << std::endl;
+
+        int a, b;
+
+        for (int i = 0; i < forcefield->getNumExclusions() - 1; i++)
+        {
+                // forcefield->getExclusionParticles(i, a, b);
+                //std::cerr << "a " << a << " b " << b << std::endl;
+        }
 }
 
 void SystemTopology::dynamics(const int steps)
