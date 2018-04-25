@@ -427,11 +427,13 @@ void SystemTopology::init_knowledge_based_force(Topology &topology)
                         num_types++;
                 }
 
-                forcefield->addParticle({__idatm_to_internal[atom->idatm_type()]});
+                forcefield->addParticle({static_cast<double>(__idatm_to_internal[atom->idatm_type()])});
         }
 
         vector<double> table;
-        int xsize = 0, ysize = 0;
+        size_t xsize = 0, ysize = 0;
+
+        /*
         for (auto &i : __idatm_to_internal)
         {
                 std::cerr << "idatm one " << i.first << " two " << i.second << std::endl;
@@ -441,10 +443,11 @@ void SystemTopology::init_knowledge_based_force(Topology &topology)
         {
                 std::cerr << "internal one " << i.first << " two " << i.second << std::endl;
         }
+        */
 
-        for (int i = 0; i < __idatm_to_internal.size(); i++)
+        for (size_t i = 0; i < __idatm_to_internal.size(); i++)
         {
-                for (int j = 0; j < __idatm_to_internal.size(); j++)
+                for (size_t j = 0; j < __idatm_to_internal.size(); j++)
                 {
                         try
                         {
