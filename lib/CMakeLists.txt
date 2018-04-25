@@ -58,7 +58,6 @@ add_library(
 )
 
 set( candock_libraries_to_link ${OPENMM_LIBRARY}
-                               ${OPENMM_KBPLUGIN}
                                ${Boost_LIBRARIES}
                                ${GSL_LIBRARIES}
 )

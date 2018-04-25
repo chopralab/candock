@@ -27,8 +27,6 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/asio/ip/host_name.hpp>
 
-#include "KBForce.h"
-
 using namespace std;
 
 namespace OMMIface
@@ -947,17 +945,7 @@ double SystemTopology::get_potential_energy()
 
 void SystemTopology::minimize(const double tolerance, const double max_iterations)
 {
-        std::cerr << " energy value " << context->getState(OpenMM::State::Energy).getPotentialEnergy() << std::endl;
         OpenMM::LocalEnergyMinimizer::minimize(*context, tolerance, max_iterations);
-        std::cerr << " energy value " << context->getState(OpenMM::State::Energy).getPotentialEnergy() << std::endl;
-
-        int a, b;
-
-        for (int i = 0; i < forcefield->getNumExclusions() - 1; i++)
-        {
-                // forcefield->getExclusionParticles(i, a, b);
-                //std::cerr << "a " << a << " b " << b << std::endl;
-        }
 }
 
 void SystemTopology::dynamics(const int steps)

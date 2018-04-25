@@ -31,15 +31,8 @@ add_dependencies(OpenMM OpenMM_Build)
 set(OPENMM_INCLUDE_DIR ${CMAKE_CURRENT_BINARY_DIR}/openmm_master/include CACHE PATH "Internal OpenMM Includes")
 set(OPENMM_LIBRARY OpenMM CACHE STRING "Internal OpenMM Library" )
 
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/foreign/kbforce)
-
-set(OPENMM_KBPLUGIN KBPlugin CACHE STRING  "KBForce Internal Library")
-set(OPENMM_KBPLUGIN_INCLUDE  ${CMAKE_CURRENT_SOURCE_DIR}/foreign/kbforce/openmmapi/include)
-
 mark_as_advanced(OPENMM_LIBRARY)
 mark_as_advanced(OPENMM_INCLUDE_DIR)
-mark_as_advanced(OPENMM_KBPLUGIN)
-mark_as_advanced(OPENMM_KBPLUGIN_INCLUDE)
 
 install(FILES
  ${CMAKE_CURRENT_BINARY_DIR}/openmm_master/lib/${CMAKE_SHARED_LIBRARY_PREFIX}OpenMM${CMAKE_SHARED_LIBRARY_SUFFIX}
@@ -49,3 +42,4 @@ DESTINATION
 
 set(OPENMM_PLUGIN_DIR ${CMAKE_INSTALL_PREFIX}/${CANDOCK_VERSION}/lib/plugins CACHE STRING "OpenMM Plugin Location")
 mark_as_advanced(OPENMM_PLUGIN_DIR)
+
