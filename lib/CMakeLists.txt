@@ -57,7 +57,7 @@ add_library(
         $<TARGET_OBJECTS:helper>
 )
 
-set( candock_libraries_to_link ${OPENMM_LIBRARIES}
+set( candock_libraries_to_link ${OPENMM_LIBRARY}
                                ${OPENMM_KBPLUGIN}
                                ${Boost_LIBRARIES}
                                ${GSL_LIBRARIES}
@@ -75,7 +75,7 @@ if (NOT WIN32)
         TARGETS
             candock
         LIBRARY DESTINATION
-            lib/${CANDOCK_VERSION}
+            ${CANDOCK_VERSION}/lib
     )
 
 else (NOT WIN32)
@@ -84,7 +84,7 @@ else (NOT WIN32)
         TARGETS
             candock
         RUNTIME DESTINATION
-            bin/${CANDOCK_VERSION}
+        ${CANDOCK_VERSION}/bin/
     )
 
 endif(NOT WIN32)
@@ -99,7 +99,7 @@ if(WIN32)
 			${OPENMM_LIBRARIES}
 			${Boost_LIBRARIES}
 	 	 RUNTIME DESTINATION
-			lib/${CANDOCK_VERSION}
+          ${CANDOCK_VERSION}/lib
 	 )
 
 endif(WIN32)

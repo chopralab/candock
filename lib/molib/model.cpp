@@ -49,6 +49,7 @@ namespace Molib {
 				stream << "REMARK   8 ROTA " << bond.get_rotatable() 
 					<< " " << bond.atom1().atom_number() 
 					<< " " << bond.atom2().atom_number() 
+                    //<< " " << bond.stereo()
 					<< endl;
 			}
 		}
@@ -58,6 +59,7 @@ namespace Molib {
 				<< " " << bond.get_bond_gaff_type() 
 				<< " " << bond.atom1().atom_number() 
 				<< " " << bond.atom2().atom_number() 
+                //<< " " << bond.stereo()
 				<< endl;
 		}
 		stream << "ENDMDL" << endl;
@@ -110,9 +112,10 @@ namespace Molib {
 					// copying of bonds does not preserve bond properties !!!
 					Atom &copy2 = *atom1_to_copy1.at(&atom2);
 					Bond &new_bond =copy1.connect(copy2);
-                                        Bond &old_bond =atom2.get_bond(atom1);
-                                        new_bond.set_bo( old_bond.get_bo() );
-                                        new_bond.set_bond_gaff_type( old_bond.get_bond_gaff_type() );
+                    Bond &old_bond =atom2.get_bond(atom1);
+                    new_bond.set_bo( old_bond.get_bo() );
+                    new_bond.set_bond_gaff_type( old_bond.get_bond_gaff_type() );
+					//new_bond.set_stereo(old_bond.stereo());
 				}
 			}
 		}

@@ -31,6 +31,10 @@ namespace Parser {
 
                 for (string &line : pdb_raw) {
 
+                        if (line.compare (0, 4, "ATOM") == 0) {
+                                ter_found = false;
+                        }
+
                         if ( (__hm & skip_hetatm) && line.compare (0, 6, "HETATM") == 0) {
                                 continue;
                         }
@@ -88,6 +92,7 @@ namespace Parser {
 
                                 if ( (__hm & hydrogens) || !hydrogen) {
                                         if (alt_loc == ' ' || alt_loc == 'A') {
+
                                                 if (!mols.last().is_modified (Residue::res_tuple2 (chain_id, resn, resi, ins_code))) {
                                                         Residue::res_type rest;
 
@@ -285,7 +290,7 @@ namespace Parser {
                                         __generate_molecule (mols, found_molecule, "");
 
                                         // modified 'standard' residue gets saved,e.g., MET --> MSE, glycosylated...
-                                        mols.last().add_modified (Residue::res_tuple2 (chain_id, resn_mod, resi, ins_code));
+                                        //mols.last().add_modified (Residue::res_tuple2 (chain_id, resn_mod, resi, ins_code));
                                 }
                         } else if (line.compare (0, 4, "SITE") == 0 && boost::regex_search (line, m, boost::regex ("SITE\\s+\\d+\\s+(\\S+)\\s+\\S+(\\s+\\S+\\s?\\S{1}\\s{0,3}\\d{1,4}\\S?)?(\\s+\\S+\\s?\\S{1}\\s{0,3}\\d{1,4}\\S?)?(\\s+\\S+\\s?\\S{1}\\s{0,3}\\d{1,4}\\S?)?(\\s+\\S+\\s?\\S{1}\\s{0,3}\\d{1,4}\\S?)?"))) {
                                 if (m.empty()) {
@@ -382,7 +387,12 @@ namespace Parser {
                                 vector<string> vs = help::ssplit (line.substr (16), " ");
                                 Atom &a1 = *atom_number_to_atom[&model][stoi (vs[1])];
                                 Atom &a2 = *atom_number_to_atom[&model][stoi (vs[2])];
-                                a1.connect (a2).set_rotatable (vs[0]);
+                                auto b = a1.connect (a2);
+                                b.set_rotatable(vs[0]);
+
+                                //if(vs.size() >= 4)
+                                //        b.set_stereo(vs[3]);
+
                         } else if (line.compare (0, 19, "REMARK   8 BONDTYPE") == 0) {
 
                                 if ( (__hm & docked_poses_only) && (! ter_found)) {
@@ -403,6 +413,8 @@ namespace Parser {
                                         auto &bond = a1.connect (a2);
                                         bond.set_bo (stoi (vs[0]));
                                         bond.set_bond_gaff_type (vs[1]);
+                                        //if(vs.size() >= 5)
+                                                //bond.set_stereo(vs[4]);
                                 }
                         } else if (line.compare (0, 6, "CONECT") == 0) {
                                 const string ln = boost::algorithm::trim_right_copy (line.substr (6));

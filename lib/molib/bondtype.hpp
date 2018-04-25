@@ -20,12 +20,13 @@ namespace Molib {
 	typedef map<Atom*, AtomParams> ValenceState;
 	typedef vector<ValenceState> ValenceStateVec;
 	typedef map<Bond*, int> BondToOrder;
-	
+
+        class BondOrderError : public Error {
+        public: 
+                BondOrderError(const std::string &msg) : Error(msg) {}
+        };
+        
 	class BondOrder {
-		class BondOrderError : public Error {
-		public: 
-			BondOrderError(const std::string &msg) : Error(msg) {}
-		};
 		static ValenceStateVec __create_valence_states(const Atom::Vec &atoms, const int max_valence_states);
 		static void __dfs(const int level, const int sum, const int tps, const vector<vector<AtomParams>> &V,
 			vector<AtomParams> &Q, vector<vector<AtomParams>> &valence_states, const int max_valence_states);
@@ -40,8 +41,13 @@ namespace Molib {
 		static void compute_bond_order(const Atom::Vec &atoms);
 		static void compute_bond_gaff_type(const Atom::Vec &atoms);
 	};
+        
+        void compute_chirality(const Atom::Vec &bonds);
+        
 	ostream& operator<< (ostream& stream, const ValenceState& valence_state);
 	ostream& operator<< (ostream& stream, const ValenceStateVec& valence_states);
 	ostream& operator<< (ostream& os, const BondToOrder& bond_orders);
+        
+        
 };
 #endif

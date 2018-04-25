@@ -5,7 +5,7 @@
 #PBS -l naccesspolicy=shared
 
 : ${MCANDOCK_MOD_PATH:=$([[ $PBS_ENVIRONMENT == PBS_BATCH ]] \
-        && echo @CMAKE_INSTALL_PREFIX@/modules/@CANDOCK_VERSION@ \
+        && echo @CMAKE_INSTALL_PREFIX@/@CANDOCK_VERSION@/modules \
         || echo $( cd $( dirname ${BASH_SOURCE[0]} ) && pwd ) )}
 
 # Only used if submitted to torque
@@ -20,8 +20,6 @@ then
         export CANDOCK_NCPU
 fi
 
-echo "Using modules in $MCANDOCK_MOD_PATH"
-
 if [[ ! -s $MCANDOCK_MOD_PATH/load_variables.sh ]]
 then
         echo "Modules not found in \$MCANDOCK_MOD_PATH!"
@@ -33,6 +31,4 @@ source $MCANDOCK_MOD_PATH/load_variables.sh
 
 SECONDS=0
 
-$MCANDOCK_PATH/bin/$MCANDOCK_VER/cd_${__sub_program} $([[ ! -z "$@" ]] && echo "$@")
-
-echo "All calculations for ${__sub_program} are complete taking $SECONDS to complete"
+$MCANDOCK_PATH/$MCANDOCK_VER/bin/cd_${__sub_program} $([[ ! -z "$@" ]] && echo "$@")

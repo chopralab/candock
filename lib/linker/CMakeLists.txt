@@ -24,3 +24,6 @@ include_directories( ../modeler )
 
 add_library(linker OBJECT ${linker_SRC})
 
+if (USING_INTERNAL_OPENMM)
+    add_dependencies(linker OpenMM_Build)
+endif()

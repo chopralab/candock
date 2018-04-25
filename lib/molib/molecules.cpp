@@ -145,6 +145,18 @@ namespace Molib {
 		return *this; 
 	}
 
+        Molecules& Molecules::compute_chirality() { 
+                for (auto &presidue : this->get_residues()) {
+                        Residue &residue = *presidue;
+                        if (!(help::standard_residues.count(residue.resn())
+                            || help::cofactor_residues.count(residue.resn())
+                            || help::ions.count(residue.resn()))) {
+                                ::Molib::compute_chirality(residue.get_atoms());
+                        }
+                }
+                return *this; 
+        }
+
 	Molecules& Molecules::erase_hydrogen() { 
 		for (auto &presidue : this->get_residues()) {
 			Residue &residue = *presidue;

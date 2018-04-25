@@ -16,6 +16,9 @@
 #include <stdlib.h>
 #include <time.h>
 
+#include <openmm/Units.h>
+#include <openmm/Vec3.h>
+
 #include "fileout/fileout.hpp"
 
 using namespace std;
@@ -31,45 +34,50 @@ ostream &operator<<(ostream &os, const vector<OpenMM::Vec3> &positions)
         return os;
 }
 
-void Modeler::mask(const Molib::Atom::Vec &atoms)
-{
-        dbgmsg("Masking atoms " << atoms);
-        __system_topology.mask(__topology, atoms);
-}
 
-void Modeler::unmask(const Molib::Atom::Vec &atoms)
-{
-        dbgmsg("Unmasking atoms " << atoms);
-        __system_topology.unmask(__topology, atoms);
-}
+Modeler::Modeler(const ForceField &ffield, const string &fftype, double dist_cutoff,
+          double tolerance, int max_iterations, int update_freq, double position_tolerance,
+          bool use_constraints, double step_size_in_fs, double temperature, double friction)
+      : __ffield(&ffield), __fftype(fftype), __dist_cutoff_in_nm(dist_cutoff * OpenMM::NmPerAngstrom),
+        __tolerance(tolerance), __max_iterations(max_iterations), __update_freq(update_freq),
+        __position_tolerance_in_nm(position_tolerance * OpenMM::NmPerAngstrom),
+        __use_constraints(use_constraints), __step_size_in_ps(step_size_in_fs * OpenMM::PsPerFs),
+        __temperature(temperature), __friction(friction), __run_dyanmics(false)
+  {
+  }
 
-void Modeler::add_topology(const Molib::Atom::Vec &atoms)
-{
-        __topology.add_topology(atoms, *__ffield);
-        __positions.resize(__topology.atoms.size()); // as many positions as there are atoms
-}
-
-void Modeler::add_crds(const Molib::Atom::Vec &atoms, const Geom3D::Point::Vec &crds)
-{
-        for (size_t i = 0; i < atoms.size(); ++i)
-        {
-                int idx = __topology.get_index(*atoms[i]);
-                __positions[idx] = crds[i];
+        void Modeler::mask(const Molib::Atom::Vec &atoms) {
+                dbgmsg("Masking atoms " << atoms);
+                __system_topology.mask(__topology, atoms);
         }
-}
 
-void Modeler::add_random_crds(const Molib::Atom::Vec &atoms)
-{
-        srand(time(NULL));
-        for (size_t i = 0; i < atoms.size(); ++i)
-        {
-                int idx = __topology.get_index(*atoms[i]);
-                const double x = rand() % 100 + 1;
-                const double y = rand() % 100 + 1;
-                const double z = rand() % 100 + 1;
-                __positions[idx] = Geom3D::Point(x, y, z);
+        void Modeler::unmask(const Molib::Atom::Vec &atoms) {
+                dbgmsg("Unmasking atoms " << atoms);
+                __system_topology.unmask(__topology, atoms);
         }
-}
+
+        void Modeler::add_topology(const Molib::Atom::Vec &atoms) {
+                __topology.add_topology(atoms, *__ffield);
+                __positions.resize(__topology.atoms.size()); // as many positions as there are atoms
+        }
+
+        void Modeler::add_crds(const Molib::Atom::Vec &atoms, const Geom3D::Point::Vec &crds) {
+                for (size_t i = 0; i < atoms.size(); ++i) {
+                        int idx = __topology.get_index(*atoms[i]);
+                        __positions[idx] = crds[i];
+                }
+        }
+
+        void Modeler::add_random_crds(const Molib::Atom::Vec &atoms) {
+                srand(time(NULL));
+                for (size_t i = 0; i < atoms.size(); ++i) {
+                        int idx = __topology.get_index(*atoms[i]);
+                        const double x = rand() % 100 + 1;
+                        const double y = rand() % 100 + 1;
+                        const double z = rand() % 100 + 1;
+                        __positions[idx] = Geom3D::Point(x, y, z); 
+                }
+        }
 
 /**
          * Changes coordinates of atoms

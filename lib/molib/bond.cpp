@@ -11,21 +11,22 @@ namespace Molib {
 	}
 
 	string Bond::get_label() const { 
-		stringstream ss; 
+		stringstream ss;
 		ss << atom1().get_label() << "#" << atom1().atom_number() << "_" 
 			<< atom2().get_label() << "#" << atom2().atom_number()
-			<< "_" << get_bond_gaff_type();
+			<< "_" << get_bond_gaff_type()  << "_" << __stereo;
 		return ss.str();
 	}
 
         string Bond::get_pdb_remark() const {
                 std::pair<int,int> bminmax = std::minmax(atom1().atom_number(), atom2().atom_number());
-
+				
                 return
                 std::string("REMARK   8 BONDTYPE ") + std::to_string(get_bo()) +
                                    " " + get_bond_gaff_type() +
                                    " " + std::to_string(bminmax.first) +
                                    " " + std::to_string(bminmax.second) +
+                                   //" " + __stereo + 
                                    "\n";
         }
 
@@ -178,6 +179,7 @@ namespace Molib {
 			// here bond "owns" atoms and must delete them in destructor
 			bonds.push_back(unique_ptr<Bond>(new Bond(new Atom(atom1), new Atom(atom2), true)));
 			bonds.back()->set_members(e.bond_property);
+            //bonds.back()->set_stereo(e.bond_stereo);
 		}
 		for (size_t i = 0; i < bonds.size(); ++i) {
 			Bond &bond1 = *bonds[i];
@@ -260,6 +262,6 @@ namespace Molib {
                 }
 
                 // It's the same bond....
-                return false;
+                return lhs->stereo() < rhs->stereo();
         }
 }; // Molib

@@ -5,7 +5,7 @@
 #include "version.hpp"
 #include "drm/drm.hpp"
 
-#include "score/score.hpp"
+#include "score/xscore.hpp"
 #include "modeler/forcefield.hpp"
 
 using namespace std;
@@ -53,26 +53,43 @@ int main(int argc, char* argv[]) {
 
                 dlpdb.parse_molecule(ligand_mols);
 
-                Score::Score score(cmdl.get_string_option("ref"), cmdl.get_string_option("comp"),
-                                   cmdl.get_string_option("func"),cmdl.get_int_option("cutoff"),
-                                   cmdl.get_double_option("step"));
-
-                score.define_composition(receptor_mols.get_idatm_types(),
-                                         ligand_mols.get_idatm_types())
-                     .process_distributions_file(cmdl.get_string_option("dist"))
-                     .compile_scoring_function();
-
-                for (size_t i = 0; i < receptor_mols.size(); ++i) {
-                        
-                        Molib::Molecule& protein = receptor_mols[i];
-                        Molib::Molecule& ligand  = ligand_mols[i];
-
-                        Molib::Atom::Grid gridrec(protein.get_atoms());                        
-
-                        const double energy = score.non_bonded_energy (gridrec, ligand);
-                        cout << energy << endl;
-
+                if (receptor_mols.size() == 0 || ligand_mols.size() == 0) {
+                        return 0;
                 }
+
+                std::vector<std::thread> threads;
+
+                size_t num_threads = cmdl.get_int_option("ncpu");
+
+                std::vector<std::array<double,5>> output;
+
+                output.reserve(ligand_mols.size());
+
+                for ( size_t thread_id = 0; thread_id < num_threads; ++thread_id)
+                threads.push_back (std::thread ([&, thread_id] {
+                        for (size_t i = thread_id; i < receptor_mols.size(); i+=num_threads) {
+                        
+                                Molib::Molecule& protein = receptor_mols[i];
+                                Molib::Molecule& ligand  = ligand_mols[i];
+
+                                Molib::Atom::Grid gridrec(protein.get_atoms());                        
+
+                                output.emplace_back(Score::vina_xscore(gridrec, ligand.get_atoms()));
+                } } ));
+
+                for (auto &thread : threads) {
+                        thread.join();
+                }
+
+                receptor_mols.clear();
+                ligand_mols.clear();
+                for (const auto& values : output ) {
+                        for (const auto& component : values) {
+                                std::cout << component << ",";
+                        }
+                        std::cout << "\n";
+                }
+
         } catch (exception& e) {
                 cerr << e.what() << endl;
         }

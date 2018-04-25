@@ -8,6 +8,7 @@ namespace Fileout {
                 {"Cac","C.2"},
                 {"Car","C.ar"},
                 {"C1", "C.1"},
+                {"HC", "H"},
                 {"N3+","N.3"},
                 {"N3", "N.3"},
                 {"N2", "N.2"},
@@ -28,7 +29,6 @@ namespace Fileout {
                 {"???","ANY"},
         };
 
-    
         void print_mol2( std::ostream &ss, const Molib::Molecule &ligand ) {
                 const Molib::Atom::Vec all_atoms = ligand.get_atoms();
                 const Molib::BondSet all_bonds = Molib::get_bonds_in(all_atoms);

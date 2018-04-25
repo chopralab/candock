@@ -37,7 +37,7 @@ namespace Program {
 
         void FindCentroids::__continue_from_prev( ) {
 
-                log_step << "Running PROBIS for receptor in file: " << __filename + ".pdb" << endl;
+                log_step << "Running PROBIS for receptor in file: " << __filename << endl;
 
                 // Creates an empty nosql file for probis local structural alignments
                 Inout::output_file("", Path::join(__out_dir, cmdl.get_string_option("nosql")));
@@ -53,6 +53,9 @@ namespace Program {
                 boost::filesystem::path bslibdb (cmdl.get_string_option("bslib"));
                 bslibdb = bslibdb.parent_path();
 
+                boost::filesystem::path protein_dir(__out_dir);
+
+
 #ifdef _WINDOWS
                 int chdir_error = _wchdir( bslibdb.c_str() );
 #else
@@ -62,12 +65,14 @@ namespace Program {
                         throw Error ("Unable to change into bslibdb dir: " + bslibdb.string() + " because " + strerror(chdir_error)) ;
                 }
 
+                boost::filesystem::path p = cwd / protein_dir;
+
                 probis::compare_against_bslib(original_file.string(),
-                        (cwd / __out_dir / cmdl.get_string_option("srf_file")).string(),
+                        (p/ cmdl.get_string_option("srf_file")).string(),
                         __chain_ids,
                         "bslibdb/bslib.txt", cmdl.ncpu(),
-                        (cwd / __out_dir / cmdl.get_string_option("nosql")).string(),
-                        (cwd / __out_dir / cmdl.get_string_option("json")).string() );
+                        (p / cmdl.get_string_option("nosql")).string(),
+                        (p / cmdl.get_string_option("json")).string() );
 
 #ifdef _WINDOWS
                 chdir_error = _wchdir( cwd.c_str() );
@@ -79,8 +84,8 @@ namespace Program {
                 }
 
                 genclus::generate_clusters_of_ligands(
-                        Path::join(__out_dir, cmdl.get_string_option("json")),
-                        Path::join(__out_dir, cmdl.get_string_option("jsonwl")),
+                        Path::join(protein_dir.string(), cmdl.get_string_option("json")),
+                        Path::join(protein_dir.string(), cmdl.get_string_option("jsonwl")),
                         cmdl.get_string_option("bio"),
                         cmdl.get_string_option("names"),
                         cmdl.get_bool_option("neighb"),
@@ -90,12 +95,12 @@ namespace Program {
 
                 auto binding_sites = 
                         genlig::generate_binding_site_prediction(
-                                Path::join(__out_dir, cmdl.get_string_option("jsonwl")), 
+                                Path::join(protein_dir.string(), cmdl.get_string_option("jsonwl")), 
                                 cmdl.get_string_option("bio"),
                                 cmdl.get_int_option("num_bsites"));
 
-                Inout::output_file(binding_sites.first,  Path::join(__out_dir, cmdl.get_string_option("lig_clus_file")));
-                Inout::output_file(binding_sites.second, Path::join(__out_dir, cmdl.get_string_option("z_scores_file")));
+                Inout::output_file(binding_sites.first,  Path::join(protein_dir.string(), cmdl.get_string_option("lig_clus_file")));
+                Inout::output_file(binding_sites.second, Path::join(protein_dir.string(), cmdl.get_string_option("z_scores_file")));
 
                 __result = Centro::set_centroids(binding_sites.first, cmdl.get_double_option("centro_clus_rad"));
                 Inout::output_file(__result, __centroid_file); // probis local structural alignments

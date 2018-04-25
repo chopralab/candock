@@ -21,6 +21,7 @@ namespace Molib {
 		int __idx1, __idx2;
 	std::string __rotatable;
 	std::string __bond_gaff_type;
+        std::string __stereo;
 		int __bo;
 		bool __ring;
 		bool __owns_atoms;
@@ -48,6 +49,8 @@ namespace Molib {
 		bool is_rotatable() const { return !__rotatable.empty() && __rotatable != "amide"; }
 		void set_bond_gaff_type(const std::string &bond_gaff_type) { __bond_gaff_type = bond_gaff_type; }
 		const std::string& get_bond_gaff_type() const { return __bond_gaff_type; }
+		void set_stereo(std::string s) { __stereo = s; }
+                const std::string& stereo() const { return __stereo; }
 		void set_bo(const int &bo) { __bo = bo; }
 		int get_bo() const { return __bo; }
 		bool is_single() const { return __bo == 1; }
@@ -55,8 +58,8 @@ namespace Molib {
 		bool is_triple() const { return __bo == 3; }
 		bool is_aromatic() const { return __bond_gaff_type == "AB" 
 			|| __bond_gaff_type == "SB" || __bond_gaff_type == "DB"; }
-		Atom& first_atom(Atom &origin) const { return (&origin == __atom1 ? *__atom1 : *__atom2); }
-		Atom& second_atom(Atom &origin) const { return (&origin == __atom1 ? *__atom2 : *__atom1); }
+		Atom& first_atom(const Atom &origin) const { return (&origin == __atom1 ? *__atom1 : *__atom2); }
+		Atom& second_atom(const Atom &origin) const { return (&origin == __atom1 ? *__atom2 : *__atom1); }
 		Atom& atom1() const { return *__atom1; }
 		Atom& atom2() const { return *__atom2; }
 		int idx1() const { return __idx1; }

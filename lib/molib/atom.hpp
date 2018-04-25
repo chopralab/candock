@@ -19,6 +19,7 @@ namespace Molib {
 		typedef vector<Atom*> Vec;
                 typedef vector<const Atom*> ConstVec;
 		typedef set<Atom*> Set;
+                typedef set<const Atom*> CSet;
 		typedef ::Grid<Atom> Grid;
 		typedef Glib::Graph<Atom> Graph;
 

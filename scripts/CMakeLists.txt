@@ -1,3 +1,11 @@
+string (REPLACE ";" ":" CANDOCK_ADDITONAL_LD_PATH "${CANDOCK_ADDITONAL_LD_PATH}")
+
+if (APPLE)
+  set(ADDITIONAL_LOOKUP "DYLD_LIBRARY_PATH")
+else()
+  set(ADDITIONAL_LOOKUP "LD_LIBRARY_PATH")
+endif()
+
 configure_file( ${PROJECT_SOURCE_DIR}/scripts/load_variables.sh.in
                 ${PROJECT_BINARY_DIR}/load_variables.sh
                 @ONLY
@@ -24,5 +32,5 @@ install( PROGRAMS ${PROJECT_BINARY_DIR}/load_variables.sh
                   ${PROJECT_SOURCE_DIR}/scripts/extract_result.sh
                   
          DESTINATION
-                  ${CMAKE_INSTALL_PREFIX}/modules/${CANDOCK_VERSION}
+                  ${CMAKE_INSTALL_PREFIX}/${CANDOCK_VERSION}/modules
 )

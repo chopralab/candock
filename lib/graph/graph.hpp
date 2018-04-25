@@ -26,6 +26,7 @@ namespace Glib {
 		typedef vector<Vertex*> Path;
 		typedef vector<Path> Cliques;
 		typedef set<VertexSet> Cycles;
+                typedef map<const Vertex*,vector<size_t>> VertexRingMap;
 		typedef pair<vector<node_id>, vector<node_id>> MatchedVertices;
 		typedef vector<MatchedVertices> Matches;
 	private:
@@ -53,11 +54,15 @@ namespace Glib {
 		}
 		void set_conn(node_id i, node_id j) { __conn[i][j] = true; __conn[j][i] = true; }
 		bool get_conn(node_id i, node_id j) const { return __conn[i][j]; }
+                const Vertex& vertex(size_t i) const {
+                    return *__vertices[i];
+                }
 		int get_num_edges(const node_id i) const { return __num_edges[i]; } // real number of edges of a vertex
 		string get_smiles() const;
 		Cycles find_cycles_connected_graph();
 		Cycles find_fused_rings();
 		Cycles find_rings();
+                VertexRingMap vertex_rings();
 		Cliques max_weight_clique(const int);
 		template<class Vertex2>
 		Matches match(const Graph<Vertex2>&) const;
@@ -342,7 +347,23 @@ namespace Glib {
 		}
 		return rings;
 	}
-	
+
+        template<class Vertex>
+        typename Graph<Vertex>::VertexRingMap Graph<Vertex>::vertex_rings() {
+                VertexRingMap ring_map;
+                Cycles rings = find_rings();
+                
+                for ( auto& vert : *this ) {
+                        ring_map[&vert] = std::vector<size_t>();
+                        for ( const auto& ring : rings ) {
+                                if (ring.count(&vert))
+                                    ring_map[&vert].push_back(ring.size());
+                        }
+                }
+                
+                return ring_map;
+        }
+
 	template<class Vertex>
 	void Graph<Vertex>::__expand(Vertex &v, Path &path, Cycles &cycles, VertexSet &visited) {
 		path.push_back(&v);

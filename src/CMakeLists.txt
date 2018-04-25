@@ -59,19 +59,21 @@ if (NOT WIN32)
 endif(NOT WIN32)
 
 set( program_names  check_options
+                    check_inputpdb
                     find_centroids
-                    output_mol2
-                    process_input
                     prep_fragments
                     make_objective
-                    make_gridhcp
+                    make_bsitegrid
                     dock_fragments
                     link_fragments
                     design_ligands
-                    cacrystal_rmsd
-                    calculate_rmsd
+                    convertto_mol2
+                    calc_rmsdcryst
+                    calc_rmsdtable
                     calc_potential
-                    rescore_docked
+                    calc_posescore
+                    calc_posexscore
+                    calc_allscores
                     minimize_poses
                     dynamics_run
 )
@@ -87,13 +89,13 @@ foreach( candock_program ${program_names} )
             cd_${candock_program}
 
         RUNTIME DESTINATION
-            bin/${CANDOCK_VERSION}
+        ${CANDOCK_VERSION}/bin
     )
 
     if( NOT WIN32 )
         install(CODE "message( STATUS \"Linking ${candock_program}.sh\")
             execute_process(
-                  WORKING_DIRECTORY  ${CMAKE_INSTALL_PREFIX}/modules/${CANDOCK_VERSION}
+                  WORKING_DIRECTORY  ${CMAKE_INSTALL_PREFIX}/${CANDOCK_VERSION}/modules
                   COMMAND ${CMAKE_COMMAND} -E create_symlink module.sh ${candock_program}.sh)")
     endif( NOT WIN32 )
 endforeach( candock_program ${program_names} )
@@ -101,5 +103,5 @@ endforeach( candock_program ${program_names} )
 if( ${CANDOCK_DRM} )
     add_executable( drm_key_generator drm_key_generator.cpp )
     target_link_libraries( drm_key_generator ${OPENSSL_LIBRARIES} )
-    install( TARGETS drm_key_generator RUNTIME DESTINATION bin/${CANDOCK_VERSION} )
+    install( TARGETS drm_key_generator RUNTIME DESTINATION ${CANDOCK_VERSION}/bin )
 endif( ${CANDOCK_DRM} )

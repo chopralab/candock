@@ -3,10 +3,10 @@ project(candock)
 cmake_minimum_required(VERSION 3.2 FATAL_ERROR)
 
 set( CANDOCK_MAJOR_VERSION 0 )
-set( CANDOCK_MINOR_VERSION 5 )
+set( CANDOCK_MINOR_VERSION 6 )
 set( CANDOCK_TWEAK_VERSION 0 )
 
-set(CANDOCK_VERSION "v${CANDOCK_MAJOR_VERSION}.${CANDOCK_MINOR_VERSION}.${CANDOCK_TWEAK_VERSION}"
+set(CANDOCK_VERSION "v${CANDOCK_MAJOR_VERSION}.${CANDOCK_MINOR_VERSION}.${CANDOCK_TWEAK_VERSION}_dev"
      CACHE STRING "CANDOCK version." FORCE
 )
 
@@ -43,15 +43,11 @@ if (CANDOCK_CUDA_SUPPORT)
 
 endif(CANDOCK_CUDA_SUPPORT)
 
-set(OPENMM_ROOT_DIR "/home/brandon_stewart/openmm-7.2" CACHE STRING "Location of OpenMM and KBForce")
-
 #DRM Module
 set(CANDOCK_DRM OFF CACHE BOOL "Build DRM into Candock")
 
 find_package(Boost    REQUIRED  COMPONENTS filesystem system regex program_options)
-find_package(GSL      REQUIRED)
 find_package(RapidXML REQUIRED)
-find_package(OpenMM   REQUIRED  COMPONENTS openmm kbforce)
 find_package(Git      REQUIRED)
 
 set(JSONCPP_INCLUDE_DIR "foreign/jsoncpp/include" "foreign/jsoncpp/src" )
@@ -81,10 +77,30 @@ else(WIN32)
 endif(WIN32)
 
 include_directories(${Boost_INCLUDE_DIRS})
-include_directories(${GSL_INCLUDE_DIRS})
 include_directories(${JSONCPP_INCLUDE_DIR})
 include_directories(${RAPIDXML_DIR})
+
+set(CANDOCK_ADDITIONAL_LD_PATH "" CACHE PATH "Additional Library Paths")
+list(APPEND CANDOCK_ADDITIONAL_LD_PATH ${Boost_LIBRARY_DIR_RELEASE})
+
+if (NOT OPENMM_ROOT_DIR)
+    include(BuildOpenMM)
+else()
+    find_package(OpenMM REQUIRED COMPONENTS openmm kbforce)
+    set(OPENMM_KBPLUGIN_INCLUDE ${OPENMM_INCLUDE_DIR})
+    set(OPENMM_PLUGIN_DIR ${OPENMM_ROOT_DIR}/lib/plugins CACHE STRING "OpenMM Plugin Location")
+    list(APPEND CANDOCK_ADDITIONAL_LD_PATH ${OPENMM_ROOT_DIR}/lib/)
+endif()
+
+if (NOT GSL_ROOT_DIR)
+    include(BuildGSL)
+else()
+    find_package(GSL REQUIRED)
+    list(APPEND CANDOCK_ADDITIONAL_LD_PATH ${GSL_ROOT_DIR}/lib/)
+endif()
+
 include_directories(${OPENMM_INCLUDE_DIR})
+include_directories(${GSL_INCLUDE_DIRS})
 
 if( ${CANDOCK_DRM} )
 
@@ -124,6 +140,7 @@ include_directories( ${PROJECT_BINARY_DIR} )
 add_subdirectory(lib)
 add_subdirectory(scripts)
 add_subdirectory(src)
+add_subdirectory(tools)
 add_subdirectory(tests)
 
 set(CANDOCK_BUILD_GUI OFF CACHE BOOL "Build the CANDOCK gui")

@@ -20,7 +20,7 @@ namespace Molib {
 		Inout::read_file(__seeds_file, v_seeds, Inout::no_panic);
 		for (auto &s : v_seeds) {
 			dbgmsg("reading seed file " << s);
-			stringstream ss(s);
+ 			stringstream ss(s);
 			size_t seed_id, hsh;
 			ss >> seed_id >> hsh;
 			dbgmsg(seed_id << " " << hsh);
@@ -28,7 +28,10 @@ namespace Molib {
 			string vpair;
 			while (ss >> vpair) {
 				auto atom_props = help::ssplit(vpair, "_");
-				edges.push_back(help::edge{atom_props[0], atom_props[1], ""});
+                                //if (atom_props.size() == 2)
+                                edges.push_back(help::edge{atom_props[0], atom_props[1], ""});
+                                //else
+                                    //edges.push_back(help::edge{atom_props[0], atom_props[1], "", atom_props[3]});
 			}
 			__unique_seeds.insert(make_pair(hsh, 
 				SeedData{unique_ptr<BondGraph>(new BondGraph(create_bonds(edges), true, false)), seed_id}));
@@ -36,22 +39,53 @@ namespace Molib {
 		dbgmsg("exiting read_seeds_file");
 	}
 
-	bool Unique::__match(BondGraph &g, USeeds::const_iterator it1, USeeds::const_iterator it2, size_t &si) const {
-		dbgmsg("we are in __match");
-		while (it1 != it2) {
-			BondGraph &g2 = *(it1->second.graph);
-			dbgmsg("before getting smiles");
-			dbgmsg("g.size() == g2.size() " << boolalpha << (g.size() == g2.size()));
-			dbgmsg("g.match(g2).size() " << g.match(g2)[0].first.size());
-			if (g.isomorphic(g2)) {
-				si = it1->second.seed_id;
-				dbgmsg("finding equal seed number = " << si);
-				return true;
-			}
-			it1++;
-		}
-		return false;
-	}
+        bool Unique::__match(BondGraph &g, USeeds::const_iterator it1, USeeds::const_iterator it2, size_t &si) const {
+                dbgmsg("we are in __match");
+                while (it1 != it2) {
+                        BondGraph &g2 = *(it1->second.graph);
+                        dbgmsg("before getting smiles");
+                        dbgmsg("g.size() == g2.size() " << boolalpha << (g.size() == g2.size()));
+                        dbgmsg("g.match(g2).size() " << g.match(g2)[0].first.size());
+
+                        if (g.isomorphic(g2)) {
+                                si = it1->second.seed_id;
+                                dbgmsg("finding equal seed number = " << si);
+                                return true;
+                        }
+
+                        it1++;
+/*
+                        if (g.size() != g2.size())
+                                continue;
+
+                        auto m = g.match(g2);
+
+                        if (m.size() == 0 || m[0].first.size() != g2.size())
+                                continue;
+
+                        bool stereo_match = true;
+
+                        for (auto matched_graph : m){
+                                for ( size_t i = 0; i < matched_graph.first.size(); ++i) {
+                                        if (g.vertex(matched_graph.first[i]).stereo() !=
+                                            g2.vertex(matched_graph.second[i]).stereo()) {
+                                                stereo_match = false;
+                                                break;
+                                        }
+                                }
+                                if (!stereo_match) {
+                                        break;
+                                }
+                        }
+
+                        if (stereo_match) {
+                                si = it1->second.seed_id;
+                                dbgmsg("finding equal seed number = " << si);
+                                return true;
+                        }*/
+                }
+                return false;
+        }
 
 	size_t Unique::__hash(const Atom::Set &atoms) const {
 		map<string, int> chemical_formula;

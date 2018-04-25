@@ -3,7 +3,7 @@ configure_file( ${PROJECT_SOURCE_DIR}/doc/README.md
                 @ONLY
 )
 
-if ( NOT WIN32 )
+if ( NOT WIN32 AND NOT APPLE)
 
     add_custom_command( OUTPUT candock_defaults.cfg
                         COMMAND cd_check_options
@@ -15,4 +15,4 @@ if ( NOT WIN32 )
                         DEPENDS candock_defaults.cfg README.md
     )
 
-endif( NOT WIN32 )
+endif()

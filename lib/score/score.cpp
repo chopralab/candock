@@ -628,8 +628,19 @@ namespace Score {
 				dbgmsg("dist_sq = " << setprecision(12) << atom1->crd().distance_sq(atom2_crd));
 				const auto &atom_1 = atom1->idatm_type();
 				const pair_of_ints atom_pair = minmax(atom_1, atom_2);
-				const int idx = __get_index(dist);
-				energy_sum += __energies_scoring.at(atom_pair).at(idx);
+				const size_t idx = __get_index(dist);
+
+				// The index function can produce values that are too large due to the +0.0000000001
+				// We ignore these values because they are technically > the cutoff, if only by a little
+				if (idx < __energies_scoring.at(atom_pair).size()) {
+					energy_sum += __energies_scoring.at(atom_pair).at(idx);
+				} else { 
+					log_warning << "Close call: "
+						    << setprecision(12) << dist << " "
+						    << atom1->crd() << "\t" << atom2_crd << " "
+						    << "difference: " << __energies_scoring.at(atom_pair).back()
+						    << endl;
+				}
 #ifndef NDEBUG				
 				dbgmsg("ligand atom = " << atom2.atom_number() 
 					<< " crd= " << atom2_crd.pdb() << "protein atom = " << atom1->atom_number() 

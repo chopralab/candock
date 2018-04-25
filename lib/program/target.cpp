@@ -252,8 +252,8 @@ namespace Program {
 
                         if (!a_single_atoms.empty())
                                 designer.functionalize_extremes_with_single_atoms(a_single_atoms);
-                        if (!h_single_atoms.empty())
-                                designer.functionalize_hydrogens_with_single_atoms(h_single_atoms);
+                        //if (!h_single_atoms.empty())
+                        //        designer.functionalize_hydrogens_with_single_atoms(h_single_atoms);
 #ifndef NDEBUG
                         Inout::output_file(designer.get_internal_designs(), "internal_designs.pdb", ios_base::app);
 #endif

@@ -21,3 +21,7 @@ set( program_SRC
   )
 
 add_library(program OBJECT ${program_SRC})
+
+if (USING_INTERNAL_OPENMM)
+    add_dependencies(program OpenMM_Build)
+endif()

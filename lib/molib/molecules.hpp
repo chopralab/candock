@@ -39,6 +39,7 @@ namespace Molib {
 		Molecules& compute_hydrogen();
 		Molecules& compute_bond_order();
 		Molecules& compute_bond_gaff_type();
+                Molecules& compute_chirality();
 		Molecules& refine_idatm_type();
 		Molecules& erase_hydrogen();
 		Molecules& compute_ring_type();

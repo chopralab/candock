@@ -12,6 +12,7 @@
 #include <openmm/NonbondedForce.h>
 #include <openmm/CustomNonbondedForce.h>
 #include <openmm/LocalEnergyMinimizer.h>
+#include <openmm/Units.h>
 
 #include "forcefield.hpp"
 #include "topology.hpp"
@@ -25,6 +26,8 @@
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string.hpp>
 #include <boost/asio/ip/host_name.hpp>
+
+#include "KBForce.h"
 
 using namespace std;
 
