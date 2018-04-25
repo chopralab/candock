@@ -43,8 +43,8 @@ Modeler::Modeler(const ForceField &ffield, const string &fftype, double dist_cut
         __position_tolerance_in_nm(position_tolerance * OpenMM::NmPerAngstrom),
         __use_constraints(use_constraints), __step_size_in_ps(step_size_in_fs * OpenMM::PsPerFs),
         __temperature(temperature), __friction(friction), __run_dyanmics(false)
-  {
-  }
+{
+}
 
         void Modeler::mask(const Molib::Atom::Vec &atoms) {
                 dbgmsg("Masking atoms " << atoms);

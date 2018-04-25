@@ -130,9 +130,6 @@ class SystemTopology
         void update_thermostat(const double temperature_in_kevin,
                                const double collision_frequency);
 
-        void clear_knowledge_based_force();
-        void update_knowledge_based_force(Topology &topology, const vector<OpenMM::Vec3> &positions, const double dist_cutoff);
-
         vector<OpenMM::Vec3> get_positions_in_nm();
         vector<OpenMM::Vec3> get_forces();
         double get_potential_energy();
