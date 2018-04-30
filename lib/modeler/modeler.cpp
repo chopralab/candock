@@ -136,19 +136,14 @@ namespace OMMIface {
                 Benchmark bench;
                 dbgmsg( "Doing energy minimization using knowledge-based forcefield");
 
-                // for knowledge-based forcefield we implement a custom update nonbond
-                // function
-
                 int iter = 0;
 
-                // do a brief relaxation of bonded forces initially (without non-bonded forces)
                 __system_topology.clear_knowledge_based_force();
-                __system_topology.minimize(__tolerance, 20);
-
                 vector<OpenMM::Vec3> initial_positions = __system_topology.get_positions_in_nm();
-                dbgmsg("initial_positions (after brief minimization) = " << initial_positions);
 
-                // check if minimization failed
+                dbgmsg("initial_positions = " << initial_positions);
+
+                // check if for errors
                 if (std::isnan(initial_positions[0][0]))
                         throw MinimizationError("die : minimization failed (initial bonded relaxation)");
 
