@@ -243,7 +243,7 @@ void SystemTopology::init_integrator(SystemTopology::integrator_type type,
 
         if (!platform.compare("CUDA"))
         {
-                std::cout << "USING CUDA TO CREATE FORCEFIELD" << std::endl;
+                //std::cout << "USING CUDA TO CREATE FORCEFIELD" << std::endl;
                 properties["CudaPrecision"] = "double";
                 properties["CudaDeviceIndex"] = "2";
         }
@@ -409,8 +409,10 @@ void SystemTopology::init_knowledge_based_force(Topology &topology)
         std::set<int> used_atom_types;
 
         forcefield = new OpenMM::CustomNonbondedForce("kbpot( r / ffstep, idatm2 , idatm1); ");
-        forcefield->setNonbondedMethod(OpenMM::CustomNonbondedForce::CutoffPeriodic);
+        forcefield->setNonbondedMethod(OpenMM::CustomNonbondedForce::CutoffNonPeriodic);
+        std::cerr << "kb_cutoff " << __ffield->kb_cutoff << std::endl;
         forcefield->setCutoffDistance(__ffield->kb_cutoff);
+        std::cerr << "ffstep " << __ffield->step << std::endl;
         forcefield->addGlobalParameter("ffstep", __ffield->step);
         forcefield->addPerParticleParameter("idatm");
 
