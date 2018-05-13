@@ -174,8 +174,10 @@ namespace Program {
                          "Step size (in fempto seconds)")
                         ("dynamic_steps", po::value<int>()->default_value(1000),
                          "Number of steps to do a dynamic simulation for.")
-			  ("platform", po::value<std::string> () ->default_value ("CPU"),
+			("platform", po::value<std::string> () ->default_value ("CPU"),
                          "Platform to run KBForce on. Options are CPU, GPU, and OpenCL.")
+			("precision", po::value<std::string> () ->default_value ("double"),
+                         "Precision to run KBForce on. Options are single, mixed, double. Only works using CUDA or OpenCL platform")
                         ;
 
 			po::options_description linking_step ("Fragment Linking Options");

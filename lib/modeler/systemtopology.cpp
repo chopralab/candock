@@ -1,5 +1,7 @@
 #include "systemtopology.hpp"
 #include "modeler.hpp"
+#include "program/cmdlnopts.hpp"
+
 
 #include <openmm/Platform.h>
 #include <openmm/HarmonicBondForce.h>
@@ -244,12 +246,12 @@ void SystemTopology::init_integrator(SystemTopology::integrator_type type,
         if (!platform.compare("CUDA"))
         {
                 //std::cout << "USING CUDA TO CREATE FORCEFIELD" << std::endl;
-                properties["CudaPrecision"] = "double";
+                properties["CudaPrecision"] = cmdl.get_string_option("precision");
                 properties["CudaDeviceIndex"] = "2";
         }
         else if (!platform.compare("OpenCL"))
         {
-                properties["OpenCLPrecision"] = "double";
+                properties["OpenCLPrecision"] = cmdl.get_string_option("precision");
                 properties["OpenCLDeviceIndex"] = "2";
         }
 
@@ -262,6 +264,7 @@ void SystemTopology::init_integrator(SystemTopology::integrator_type type,
         //std::cerr << "parameter size " << parameters.size() << std::endl;
 
         //std::cerr << "step size " << step_size_in_ps << std::endl;
+        //Reference, CPU, CUDA, and OpenCL
         OpenMM::Platform &platform2 = OpenMM::Platform::getPlatformByName(platform);
         context = new OpenMM::Context(*system, *integrator, platform2, properties);
         //std::cerr << "Using OpenMM platform " << context->getPlatform().getName() << std::endl;
