@@ -178,6 +178,8 @@ namespace Program {
                          "Platform to run KBForce on. Options are CPU, GPU, and OpenCL.")
 			("precision", po::value<std::string> () ->default_value ("double"),
                          "Precision to run KBForce on. Options are single, mixed, double. Only works using CUDA or OpenCL platform")
+			("accelerators", po::value<std::string> () ->default_value ("double"),
+                         "Precision to run KBForce on. Options are single, mixed, double. Only works using CUDA or OpenCL platform")
                         ;
 
 			po::options_description linking_step ("Fragment Linking Options");
