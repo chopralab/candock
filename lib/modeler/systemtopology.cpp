@@ -216,8 +216,7 @@ void SystemTopology::unmask_forces(const int atom_idx, const set<int> &substruct
 void SystemTopology::init_integrator(SystemTopology::integrator_type type,
                                      const double step_size_in_ps,
                                      const double temperature_in_kevin,
-                                     const double friction_in_per_ps,
-                                     string platform)
+                                     const double friction_in_per_ps)
 {
 
         if (integrator != nullptr)
@@ -242,17 +241,19 @@ void SystemTopology::init_integrator(SystemTopology::integrator_type type,
         }
 
         map<string, string> properties;
+        
+        const string platform = cmdl.get_string_option("platform");
 
         if (!platform.compare("CUDA"))
         {
                 //std::cout << "USING CUDA TO CREATE FORCEFIELD" << std::endl;
                 properties["CudaPrecision"] = cmdl.get_string_option("precision");
-                properties["CudaDeviceIndex"] = "2";
+                properties["CudaDeviceIndex"] = cmdl.get_string_option("accelerators");
         }
         else if (!platform.compare("OpenCL"))
         {
                 properties["OpenCLPrecision"] = cmdl.get_string_option("precision");
-                properties["OpenCLDeviceIndex"] = "2";
+                properties["OpenCLDeviceIndex"] = cmdl.get_string_option("accelerators");
         }
 
         //properties["DisablePmeStream"] = "true";

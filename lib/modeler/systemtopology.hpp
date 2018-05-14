@@ -118,8 +118,7 @@ class SystemTopology
         void init_integrator(SystemTopology::integrator_type type,
                              const double step_size_in_ps,
                              const double temperature_in_kevin,
-                             const double friction_in_per_ps,
-                             string platform);
+                             const double friction_in_per_ps);
 
         void init_particles(Topology &topology);
         void init_physics_based_force(Topology &topology);

@@ -169,7 +169,7 @@ void Modeler::init_openmm_positions()
         __system_topology.init_positions(__positions);
 }
 
-void Modeler::init_openmm(SystemTopology::integrator_type type, string platform)
+void Modeler::init_openmm(SystemTopology::integrator_type type)
 {
         __system_topology.set_forcefield(*__ffield);
         __system_topology.init_particles(__topology);
@@ -192,7 +192,7 @@ void Modeler::init_openmm(SystemTopology::integrator_type type, string platform)
                 throw Error("die : unsupported forcefield");
         }
 
-        __system_topology.init_integrator(type, __step_size_in_ps, __temperature, __friction, platform);
+        __system_topology.init_integrator(type, __step_size_in_ps, __temperature, __friction);
 }
 
 double Modeler::potential_energy()

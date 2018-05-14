@@ -76,7 +76,7 @@ public:
   void physical_calculation();
 
   void init_openmm_positions();
-  void init_openmm(SystemTopology::integrator_type type = SystemTopology::integrator_type::none, string platform = "CPU");
+  void init_openmm(SystemTopology::integrator_type type = SystemTopology::integrator_type::none);
 
   void set_max_iterations(const int max_iterations) { __max_iterations = max_iterations; }
   void set_num_steps_to_run(const int num_steps_to_run) { __dynamics_steps = num_steps_to_run; }
