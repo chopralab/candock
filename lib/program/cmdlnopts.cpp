@@ -129,12 +129,6 @@ namespace Program {
 			 "Function for calculating scores 'radial' or 'normalized_frequency'")
 			("cutoff",  po::value<int> ()->default_value (6),
 			 "Cutoff length [4-15].")
-			("step",    po::value<double> ()->default_value (0.01, "0.01"),
-			 "Step for spline generation of non-bonded knowledge-based potential [0.0-1.0]")
-			("scale",   po::value<double> ()->default_value (10.0, "10.0"),
-			 "Scale non-bonded forces and energy for knowledge-based potential [0.0-1000.0]")
-			("potential_file", po::value<std::string> ()->default_value ("potentials.txt"),
-			 "Output file for potentials and derivatives")
 			;
 
                         po::options_description force_field_min ("Forcefield and Minimization Options");
@@ -151,11 +145,6 @@ namespace Program {
                          "Gaff DAT file to use for Heme groups")
                         ("fftype"   , po::value<std::string> ()->default_value ("kb"),
                          "Forcefield to use 'kb' (knowledge-based), 'phy' (physics-based), or 'none' (do not calculate intermolecular forces)")
-                        ("obj_dir", po::value<std::string> ()->default_value (""),
-                         "Output directory for objective function. Setting this value will cause the KB potential to be read from disk."
-                         "Default(empty string) causes the objective function to be recalculated.")
-                        ("pos_tol",   po::value<double> ()->default_value (0.00000000001, "0.00000000001"),
-                         "Minimization position tolerance in Angstroms - only for KB")
                         ("mini_tol",  po::value<double> ()->default_value (0.0001),
                          "Minimization tolerance")
                         ("max_iter",  po::value<int> ()->default_value (10),
@@ -181,6 +170,31 @@ namespace Program {
 			("accelerators", po::value<std::string> () ->default_value ("double"),
                          "Precision to run KBForce on. Options are single, mixed, double. Only works using CUDA or OpenCL platform")
                         ;
+
+                        po::options_description kb_ff ("Knowledge-Based Forcefield Options");
+			force_field_min.add_options()
+			("ff_ref",     po::value<std::string> ()->default_value ("mean"),
+			 "Normalization method for the reference state ('mean' is averaged over all atom type pairs, whereas 'cumulative' is a summation for atom type pairs)")
+			("ff_comp",    po::value<std::string> ()->default_value ("complete"),
+			 "Atom types used in calculating reference state 'reduced' or 'complete'"
+                         "('reduced' includes only those atom types present in the specified receptor and small molecule, whereas 'complete' includes all atom types)")
+			("ff_func",    po::value<std::string> ()->default_value ("radial"),
+			 "Function for calculating scores 'radial' or 'normalized_frequency'")
+			("ff_cutoff",  po::value<int> ()->default_value (15),
+			 "Cutoff length [4-15].")
+			("scale",   po::value<double> ()->default_value (10.0, "10.0"),
+			 "Scale non-bonded forces and energy for knowledge-based potential [0.0-1000.0]")
+			("potential_file", po::value<std::string> ()->default_value ("potentials.txt"),
+			 "Output file for potentials and derivatives")
+			("obj_dir", po::value<std::string> ()->default_value (""),
+                         "Output directory for objective function. Setting this value will cause the KB potential to be read from disk."
+                         "Default(empty string) causes the objective function to be recalculated.")
+			("step",    po::value<double> ()->default_value (0.01, "0.01"),
+			 "Step for spline generation of non-bonded knowledge-based potential [0.0-1.0]")
+                        ("pos_tol",   po::value<double> ()->default_value (0.00000000001, "0.00000000001"),
+			 "Minimization position tolerance in Angstroms - only for KB")
+			;
+
 
 			po::options_description linking_step ("Fragment Linking Options");
 			linking_step.add_options()
@@ -268,6 +282,7 @@ namespace Program {
 			              .add(frag_dock_options)
 			              .add(scoring_options)
 			              .add(force_field_min)
+				      .add(kb_ff)
 			              .add(linking_step)
 			              .add(design_step);
 

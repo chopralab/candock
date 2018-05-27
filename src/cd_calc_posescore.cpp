@@ -54,8 +54,7 @@ int main(int argc, char* argv[]) {
                 dlpdb.parse_molecule(ligand_mols);
 
                 Score::Score score(cmdl.get_string_option("ref"), cmdl.get_string_option("comp"),
-                                   cmdl.get_string_option("func"),cmdl.get_int_option("cutoff"),
-                                   cmdl.get_double_option("step"));
+                                   cmdl.get_string_option("func"),cmdl.get_int_option("cutoff"));
 
                 score.define_composition(receptor_mols.get_idatm_types(),
                                          ligand_mols.get_idatm_types())

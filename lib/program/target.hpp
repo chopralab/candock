@@ -7,6 +7,7 @@
 #include "docker/gpoints.hpp"
 #include "molib/molecules.hpp"
 
+#include "score/kbff.hpp"
 #include "modeler/forcefield.hpp"
 #include "program/findcentroids.hpp"
 #include "program/dockfragments.hpp"
@@ -20,6 +21,7 @@ namespace Program {
 
                 std::unique_ptr <Molib::Molecule>         __protein;
                 std::unique_ptr <Score::Score>            __score;
+                std::unique_ptr <Score::KBFF>             __ff_score;
                 std::unique_ptr <OMMIface::ForceField>    __ffield;
                 std::unique_ptr <Molib::Atom::Grid>       __gridrec;
                 std::unique_ptr <Program::FindCentroids>  __centroids;
@@ -28,7 +30,7 @@ namespace Program {
 
                 void __initialize_score(const FragmentLigands &ligand_fragments);
                 void __initialize_ffield();
-                void __initialize_kbforce();
+                void __initialize_kbforce(const FragmentLigands &ligand_fragments);
 
         public:
                 Target (const std::string &input_name);

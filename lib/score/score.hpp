@@ -21,12 +21,12 @@ namespace Molib {
 namespace Score {
 
         class Score {
+        protected:
                 typedef std::pair<int, int> pair_of_ints;
                 typedef std::map<pair_of_ints, std::vector<double>> AtomPairValues;
 
                 AtomPairValues __gij_of_r_numerator;
 
-                AtomPairValues __energies, __derivatives; // objective function
                 AtomPairValues __energies_scoring; // scoring function
 
                 std::map<pair_of_ints, double> __sum_gij_of_r_numerator;
@@ -37,7 +37,7 @@ namespace Score {
 
                 const double __eps;
                 const std::string __ref_state, __comp, __rad_or_raw;
-                const double __dist_cutoff, __step_non_bond;
+                const double __dist_cutoff;
 
                 double __step_in_file;
 
@@ -48,9 +48,9 @@ namespace Score {
                 double __get_lower_bound(const int idx) const { return (double) idx * (double) __step_in_file; }
         public:
                 Score(const std::string &ref_state, const std::string &comp, const std::string &rad_or_raw, 
-                        const double &dist_cutoff, const double &step_non_bond) 
+                        const double &dist_cutoff) 
                         : __total_quantity(0), __eps(0.0000001), __ref_state(ref_state), __comp(comp), __rad_or_raw(rad_or_raw),
-                          __dist_cutoff(dist_cutoff), __step_non_bond(step_non_bond), __step_in_file(-1) {}
+                          __dist_cutoff(dist_cutoff), __step_in_file(-1) {}
 
                 double non_bonded_energy(const Molib::Atom::Grid &gridrec, const Molib::Molecule&) const; // this was formerly called distances_and_scores_frag_lig
                 double non_bonded_energy(const Molib::Atom::Grid &gridrec, const Molib::Atom::Vec &atoms, const Geom3D::Point::Vec &crds) const;
@@ -58,16 +58,10 @@ namespace Score {
                 Array1d<double> compute_energy(const Molib::Atom::Grid &gridrec, const Geom3D::Coordinate &crd, const std::set<int> &ligand_atom_types) const;
 
                 double get_dist_cutoff() const { return __dist_cutoff; }
-                double get_step_nonbond()const { return __step_non_bond; }
-                const AtomPairValues& get_energies() const { return __energies; }
-                const AtomPairValues& get_derivatives() const { return __derivatives; }
 
                 Score& define_composition(const std::set<int> &receptor_idatm_types, const std::set<int> &ligand_idatm_types);
                 Score& process_distributions_file(const std::string &distributions_file);
                 Score& compile_scoring_function();
-                Score& compile_objective_function(const double scale_non_bond);
-                Score& parse_objective_function(const std::string &obj_dir, const double scale_non_bond, const size_t max_step);
-                Score& output_objective_function(const std::string &obj_dir);
 
                 friend ostream& operator<< (ostream& stream, const vector<double> &energy);
                 friend ostream& operator<< (ostream& stream, const Score::AtomPairValues &energies);

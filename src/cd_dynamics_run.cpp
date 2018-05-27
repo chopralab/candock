@@ -37,8 +37,8 @@ int main(int argc, char *argv[])
 
                 drpdb.parse_molecule(starting_mol);
 
-                Score::Score score(cmdl.get_string_option("ref"), cmdl.get_string_option("comp"),
-                                   cmdl.get_string_option("func"), cmdl.get_int_option("cutoff"),
+                Score::KBFF score(cmdl.get_string_option("ff_ref"), cmdl.get_string_option("ff_comp"),
+                                   cmdl.get_string_option("ff_func"), cmdl.get_int_option("ff_cutoff"),
                                    cmdl.get_double_option("step"));
 
                 score.define_composition(starting_mol.get_idatm_types(),

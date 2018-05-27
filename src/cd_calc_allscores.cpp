@@ -66,7 +66,7 @@ int main(int argc, char* argv[]) {
                 for (std::string func: {"radial","normalized_frequency"})
                 for (auto cutoff:{4,5,6,7,8,9,10,11,12,13,14,15}) {
                         std::string score_name = func + "_" + comp + "_" + ref + "_" + to_string(cutoff);
-                        scoring_map[score_name] = std::unique_ptr<Score::Score>(new Score::Score(comp, ref, func,cutoff, cmdl.get_double_option("step")));
+                        scoring_map[score_name] = std::unique_ptr<Score::Score>(new Score::Score(comp, ref, func,cutoff));
 
                         scoring_map[score_name]->define_composition(receptor_mols.get_idatm_types(),
                                                  ligand_mols.get_idatm_types())

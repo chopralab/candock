@@ -1,6 +1,8 @@
 include_directories($CMAKE_CURRENT_SOURCE_DIR)
 
 set( score_SRC
+        kbff.hpp
+        kbff.cpp
         interpolation.cpp
         interpolation.hpp
         powerfit.cpp

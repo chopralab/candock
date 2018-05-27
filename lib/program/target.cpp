@@ -7,6 +7,8 @@
 #include "molib/molecule.hpp"
 #include "parser/fileparser.hpp"
 
+#include "score/kbff.hpp"
+
 #include "modeler/systemtopology.hpp"
 #include "modeler/modeler.hpp"
 
@@ -79,8 +81,7 @@ namespace Program {
                 }
 
                 Score::Score *score = new Score::Score(cmdl.get_string_option("ref"), cmdl.get_string_option("comp"),
-                                            cmdl.get_string_option("func"),cmdl.get_int_option("cutoff"),
-                                            cmdl.get_double_option("step"));
+                                            cmdl.get_string_option("func"),cmdl.get_int_option("cutoff"));
                 __score = std::unique_ptr<Score::Score> (score);
 
                 __score->define_composition(__protein->get_idatm_types(),
@@ -110,19 +111,30 @@ namespace Program {
                 __protein->prepare_for_mm(*__ffield, *__gridrec);
         }
 
-        void Target::__initialize_kbforce() {
+        void Target::__initialize_kbforce(const FragmentLigands &ligand_fragments) {
                 OMMIface::SystemTopology::loadPlugins();
 
+                Score::KBFF *score = new Score::KBFF(cmdl.get_string_option("ff_ref"), cmdl.get_string_option("ff_comp"),
+                                            cmdl.get_string_option("ff_func"),cmdl.get_int_option("ff_cutoff"),
+                                            cmdl.get_double_option("step"));
+
+                __ff_score = std::unique_ptr<Score::KBFF> (score);
+
+                __ff_score->define_composition(__protein->get_idatm_types(),
+                                          ligand_fragments.ligand_idatm_types())
+                              .process_distributions_file(cmdl.get_string_option("dist"))
+                              .compile_scoring_function();
+
                 if (cmdl.get_string_option("obj_dir").empty()) {
-                        __score->compile_objective_function(cmdl.get_double_option("scale"));
+                        __ff_score->compile_objective_function(cmdl.get_double_option("scale"));
                 } else {
-                        __score->parse_objective_function(cmdl.get_string_option("obj"),
-                                                          cmdl.get_double_option("scale"),
+                        __ff_score->parse_objective_function(cmdl.get_string_option("obj"),
+                                                             cmdl.get_double_option("scale"),
                                                           15
                                                          );
                 }
 
-                __ffield->add_kb_forcefield(*__score);
+                __ffield->add_kb_forcefield(*__ff_score);
         }
 
         std::set<int> Target::get_idatm_types(const std::set<int>& previous) const {
@@ -174,7 +186,7 @@ namespace Program {
 
                 dock_fragments(ligand_fragments);
 
-                __initialize_kbforce();
+                __initialize_kbforce(ligand_fragments);
 
                 if ( __dockedlig == nullptr ) {
                         __ffield->insert_topology(*__protein);
@@ -247,7 +259,7 @@ namespace Program {
                                                                                   )
                                                                                );
 
-                        const vector<string>& h_single_atoms = cmdl.get_string_vector("add_single_atoms");
+                        //const vector<string>& h_single_atoms = cmdl.get_string_vector("add_single_atoms");
                         const vector<string>& a_single_atoms = cmdl.get_string_vector("change_terminal_atom");
 
                         if (!a_single_atoms.empty())

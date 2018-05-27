@@ -1,6 +1,6 @@
 #include "forcefield.hpp"
 #include "molib/molecule.hpp"
-#include "score/score.hpp"
+#include "score/kbff.hpp"
 #include "helper/inout.hpp"
 #include "helper/error.hpp"
 #include "rapidxml/rapidxml.hpp"
@@ -360,7 +360,7 @@ namespace OMMIface {
 		return *this;
 	}
 
-	ForceField& ForceField::add_kb_forcefield(const Score::Score &score) {
+	ForceField& ForceField::add_kb_forcefield(const Score::KBFF &score) {
                 this->kb_cutoff = score.get_dist_cutoff()  * OpenMM::NmPerAngstrom;
 		this->step      = score.get_step_nonbond() * OpenMM::NmPerAngstrom;
 		for (auto &kv : score.get_energies()) {

@@ -3,7 +3,7 @@
 #include "molib/molecules.hpp"
 #include "molib/molecule.hpp"
 #include "parser/fileparser.hpp"
-#include "score/score.hpp"
+#include "score/kbff.hpp"
 #include "modeler/forcefield.hpp"
 #include "modeler/modeler.hpp"
 #include "helper/help.hpp"
@@ -13,7 +13,7 @@
 
 std::unique_ptr<Molib::Molecules> __receptor;
 std::unique_ptr<Molib::Molecules> __ligand;
-std::unique_ptr<Score::Score> __score;
+std::unique_ptr<Score::KBFF> __score;
 std::unique_ptr<Molib::Atom::Grid> __gridrec;
 std::unique_ptr<OMMIface::ForceField> __ffield;
 std::string __error_string = "";
@@ -451,8 +451,8 @@ size_t initialize_scoring_full(const char *obj_dir,
 
         try
         {
-                __score = std::unique_ptr<Score::Score>(
-                    new Score::Score(func, comp, ref, cutoff, step));
+                __score = std::unique_ptr<Score::KBFF>(
+                    new Score::KBFF(func, comp, ref, cutoff, step));
 
                 boost::filesystem::path p(obj_dir);
                 p /= "csd_complete_distance_distributions.txt";
@@ -460,8 +460,8 @@ size_t initialize_scoring_full(const char *obj_dir,
                 __score->define_composition(__receptor->get_idatm_types(),
                                             __ligand->get_idatm_types())
                     .process_distributions_file(p.string())
-                    .compile_scoring_function()
-                    .compile_objective_function(scale);
+                    .compile_scoring_function();
+                __score->compile_objective_function(scale);
 
                 return 1;
         }

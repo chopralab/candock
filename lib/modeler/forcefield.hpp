@@ -15,7 +15,7 @@ namespace Molib {
 }
 
 namespace Score {
-        class Score;
+        class KBFF;
 }
 
 namespace OMMIface {
@@ -79,7 +79,7 @@ namespace OMMIface {
 		ForceField& parse_gaff_dat_file(const string&);
 		ForceField& insert_topology(const Molib::Molecule&);
 		ForceField& erase_topology(const Molib::Molecule&);
-		ForceField& add_kb_forcefield(const Score::Score&);
+		ForceField& add_kb_forcefield(const Score::KBFF&);
 		
 		bool residue_exists(const string &name) const { return residue_topology.count(name); }
 	};
