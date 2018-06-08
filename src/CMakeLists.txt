@@ -5,31 +5,8 @@ if(${CANDOCK_BUILD_STATIC_EXECUTABLE})
             add_definitions( /DCANDOCK_USE_STATIC_LIBRARIES)
     endif(WIN32)
 
-    set( CANDOCK_SRC
-        $<TARGET_OBJECTS:fileout>
-        $<TARGET_OBJECTS:program>
-        $<TARGET_OBJECTS:design>
-        $<TARGET_OBJECTS:docker>
-        $<TARGET_OBJECTS:drm>
-        $<TARGET_OBJECTS:score>
-        $<TARGET_OBJECTS:centro>
-        $<TARGET_OBJECTS:kabsch>
-        $<TARGET_OBJECTS:ligands>
-        $<TARGET_OBJECTS:linker>
-        $<TARGET_OBJECTS:cluster>
-        $<TARGET_OBJECTS:graph>
-        $<TARGET_OBJECTS:modeler>
-        $<TARGET_OBJECTS:parser>
-        $<TARGET_OBJECTS:molib>
-        $<TARGET_OBJECTS:probis>
-        $<TARGET_OBJECTS:fragmenter>
-        $<TARGET_OBJECTS:geom3d>
-        $<TARGET_OBJECTS:helper>
-    )
-    
     set( all_needed_libraries
         ${OPENMM_LIBRARIES}
-        ${OPENMM_KBPLUGIN}
         ${Boost_LIBRARIES}
         ${GSL_LIBRARIES}
     )

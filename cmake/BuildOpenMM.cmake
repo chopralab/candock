@@ -29,7 +29,7 @@ set_property(TARGET OpenMM PROPERTY IMPORTED_LOCATION ${CMAKE_CURRENT_BINARY_DIR
 add_dependencies(OpenMM OpenMM_Build)
 
 set(OPENMM_INCLUDE_DIR ${CMAKE_CURRENT_BINARY_DIR}/openmm_master/include CACHE PATH "Internal OpenMM Includes")
-set(OPENMM_LIBRARY OpenMM CACHE STRING "Internal OpenMM Library" )
+set(OPENMM_LIBRARY {CMAKE_CURRENT_BINARY_DIR}/openmm_master/lib/${CMAKE_SHARED_LIBRARY_PREFIX}OpenMM${CMAKE_SHARED_LIBRARY_SUFFIX} CACHE STRING "Internal OpenMM Library" )
 
 mark_as_advanced(OPENMM_LIBRARY)
 mark_as_advanced(OPENMM_INCLUDE_DIR)

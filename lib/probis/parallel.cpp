@@ -1,3 +1,5 @@
+#ifdef PROBIS_MPI_SUPPORT
+
 #include "parallel.h"
 #include <map>
 #include <utility>
@@ -114,3 +116,4 @@ void Controller::newResult(JobOutput& output, int id, int rank, double calcTime,
 //		timerOut << timerVals[i] << "\n";
 //}
 
+#endif

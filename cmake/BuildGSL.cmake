@@ -22,7 +22,9 @@ add_dependencies(gslcblas GSL)
 
 set(GSL_INCLUDE_DIRS ${CMAKE_CURRENT_BINARY_DIR}/gsl_build/include CACHE PATH "Included GSL Dir")
 link_directories(${CMAKE_CURRENT_BINARY_DIR}/gsl_build/lib)
-set(GSL_LIBRARIES gsl gslcblas)
+set(GSL_LIBRARIES ${CMAKE_CURRENT_BINARY_DIR}/gsl_build/lib/${CMAKE_SHARED_LIBRARY_PREFIX}gsl${CMAKE_SHARED_LIBRARY_SUFFIX}
+                  ${CMAKE_CURRENT_BINARY_DIR}/gsl_build/lib/${CMAKE_SHARED_LIBRARY_PREFIX}gslcblas${CMAKE_SHARED_LIBRARY_SUFFIX}
+)
 
 mark_as_advanced(GSL_INCLUDE_DIRS)
 mark_as_advanced(GSL_LIBRARIES)
