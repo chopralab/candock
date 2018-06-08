@@ -1,7 +1,7 @@
 #ifndef ATOM_H
 #define ATOM_H
-#include "candock/geom3d/coordinate.hpp"
-#include "candock/geom3d/matrix.hpp"
+#include "candock/geometry/coordinate.hpp"
+#include "candock/geometry/matrix.hpp"
 #include "candock/molib/it.hpp"
 #include "candock/molib/element.hpp"
 #include "candock/helper/help.hpp"
@@ -14,7 +14,7 @@ namespace Molib {
 	
 	class Atom : public template_vector_container<Atom*, Atom> {
 	public:
-		typedef tuple<int,std::string, unique_ptr<Geom3D::Coordinate>, double> atom_tuple;
+		typedef tuple<int,std::string, unique_ptr<geometry::Coordinate>, double> atom_tuple;
 		typedef pair<Atom*, Atom*> Pair;
 		typedef vector<Atom*> Vec;
                 typedef vector<const Atom*> ConstVec;
@@ -26,7 +26,7 @@ namespace Molib {
 	private:
 		int __atom_number;
 	std::string __atom_name;
-		Geom3D::Coordinate __crd;
+		geometry::Coordinate __crd;
 		int __idatm_type;
 	std::string __sybyl_type;
 	std::string __gaff_type;
@@ -51,11 +51,11 @@ namespace Molib {
 			const map<string, int> smiles_prop) : __atom_number(atom_number), 
 			 __element(""), __smiles_label(smiles_label), __smiles_prop(smiles_prop),
 			__br(nullptr) {}
-		Atom(const Geom3D::Coordinate &crd) : __crd(crd), __element("") {}
-		Atom(const Geom3D::Coordinate &crd, const int &idatm_type) : __crd(crd), 
+		Atom(const geometry::Coordinate &crd) : __crd(crd), __element("") {}
+		Atom(const geometry::Coordinate &crd, const int &idatm_type) : __crd(crd), 
 			__idatm_type(idatm_type), __element("") {}
 		// if element is missing, try to guess it from atom name
-		Atom(int atom_number, const std::string &atom_name, const Geom3D::Coordinate &crd, 
+		Atom(int atom_number, const std::string &atom_name, const geometry::Coordinate &crd, 
 			const int idatm_type, const std::string &element="", const std::string &sybyl_type="") 
 			: __atom_number(atom_number), __atom_name(atom_name), __crd(crd), 
 			__idatm_type(idatm_type), __sybyl_type(sybyl_type), __gaff_type("???"), 
@@ -88,7 +88,7 @@ namespace Molib {
 			return __smiles_prop.at(prop); }
 		int get_num_bond_with_bond_gaff_type(const std::string &prop) const;
 		int compute_num_property(const std::string &prop) const;
-		void set_crd(const Geom3D::Coordinate &crd) { __crd = crd; }
+		void set_crd(const geometry::Coordinate &crd) { __crd = crd; }
 	std::string idatm_type_unmask() const { return help::idatm_unmask[__idatm_type]; }
 		int idatm_type() const { return __idatm_type; }
 		const std::string& sybyl_type() const { return __sybyl_type; }
@@ -97,8 +97,8 @@ namespace Molib {
 		const std::string& atom_name() const { return __atom_name; }
 		Element element() const { return __element; }
 		void set_element(const Element& e) { __element = e; };
-		Geom3D::Coordinate& crd() { return __crd; }
-		const Geom3D::Coordinate& crd() const { return __crd; }
+		geometry::Coordinate& crd() { return __crd; }
+		const geometry::Coordinate& crd() const { return __crd; }
 		friend ostream& operator<< (ostream& stream, const Atom& a);
 		double distance() const { return 0.0; } // just dummy : needed by grid
 		void distance(double) const {} // just dummy : needed by grid

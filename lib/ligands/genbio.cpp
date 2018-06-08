@@ -7,7 +7,7 @@
 #include "candock/molib/molecules.hpp"
 #include "candock/parser/fileparser.hpp"
 #include "candock/helper/help.hpp"
-#include "candock/geom3d/matrix.hpp"
+#include "candock/geometry/matrix.hpp"
 #include "candock/helper/error.hpp"
 #include "candock/helper/inout.hpp"
 #include "candock/helper/debug.hpp"
@@ -180,7 +180,7 @@ namespace genbio {
 						mols.last().set_name(pdb_id);  // e.g., for bslib where the pdb_id represents ligand binding site
 						
 					if (bio != "none") mols.last().init_bio(bio == "all" ? Molib::Molecule::all_bio : Molib::Molecule::first_bio);  // make biounits coordinates (optional)
-					mols.last().rotate(Geom3D::Matrix(d["alignment"][0]["rotation_matrix"], d["alignment"][0]["translation_vector"]), true); // inverse rotation
+					mols.last().rotate(geometry::Matrix(d["alignment"][0]["rotation_matrix"], d["alignment"][0]["translation_vector"]), true); // inverse rotation
 					if (ralch) genbio::remove_assemblies(mols.last(), chain_ids); // remove assemblies that don't contain aligned chains
 					if (!qpdb_file.empty() && rnolig) genbio::remove_not_ligands(mols.last(), query_grid); // remove chains that are not near query chains
 					if (!qpdb_file.empty() && neighb) { map<Molib::Residue::res_tuple2, Molib::Residue::res_tuple2> res = common_ligands::json_to_map(d["alignment"][0]["aligned_residues"]); genbio::find_neighbor_residues(mols.last(), query_grid, &res); }

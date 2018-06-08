@@ -7,7 +7,7 @@
 #include <cstdlib>
 #include <boost/regex.hpp>
 #include "candock/molib/bond.hpp"
-#include "candock/geom3d/geom3d.hpp"
+#include "candock/geometry/geometry.hpp"
 #include "candock/molib/atom.hpp"
 #include "candock/molib/residue.hpp"
 #include "candock/molib/chain.hpp"

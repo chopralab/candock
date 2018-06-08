@@ -4,7 +4,7 @@
 #include <map>
 #include <set>
 #include <vector>
-#include "candock/geom3d/coordinate.hpp"
+#include "candock/geometry/coordinate.hpp"
 #include "candock/helper/debug.hpp"
 #include "candock/helper/help.hpp"
 #include "candock/molib/molecule.hpp"

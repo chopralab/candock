@@ -1,7 +1,7 @@
 #ifndef MODEL_H
 #define MODEL_H
-#include "candock/geom3d/geom3d.hpp"
-#include "candock/geom3d/matrix.hpp"
+#include "candock/geometry/geometry.hpp"
+#include "candock/geometry/matrix.hpp"
 #include "candock/fragmenter/fragmenter.hpp"
 #include "candock/molib/it.hpp"
 #include "candock/molib/element.hpp"
@@ -31,8 +31,8 @@ namespace Molib {
 		Fragmenter::Fragment::Vec& get_rigid() { return __rigid; }
 		const Fragmenter::Fragment::Vec& get_rigid() const { return __rigid; }
 		void set_rigid(const Fragmenter::Fragment::Vec &rigid) { __rigid = rigid; }
-		void init_bio(const Model &model_asym, const Geom3D::Matrix &matrix, const set<char> &chains);
-		void rotate(const Geom3D::Matrix &rota, const bool inverse=false);
+		void init_bio(const Model &model_asym, const geometry::Matrix &matrix, const set<char> &chains);
+		void rotate(const geometry::Matrix &rota, const bool inverse=false);
 		Chain& add(Chain *chain) { return this->aadd(chain->chain_id(), chain, this); }
 		void set_remark(const int remark_number, const Residue::res_tuple2 &ligand, pair<const Residue::res_tuple2&, const Residue::res_tuple2&> rpair) { 
 				this->__remarks[make_pair(remark_number, ligand)]

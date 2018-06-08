@@ -17,7 +17,7 @@
 #include "candock/helper/error.hpp"
 using namespace std;
 
-namespace Geom3D {
+namespace geometry {
 	class Matrix;
 	class Coordinate {
 		double __x, __y, __z;
@@ -76,5 +76,6 @@ namespace Geom3D {
 			return stream;
 		}
 	};
-};
+}
+
 #endif

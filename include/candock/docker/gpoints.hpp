@@ -1,6 +1,6 @@
 #ifndef GPOINTS_H
 #define GPOINTS_H
-#include "candock/geom3d/geom3d.hpp"
+#include "candock/geometry/geometry.hpp"
 #include "candock/helper/array1d.hpp"
 #include "candock/helper/array3d.hpp"
 #include "candock/helper/error.hpp"
@@ -30,16 +30,16 @@ namespace Docker {
                 };
 
                 struct Gpoint {
-                        Geom3D::Point __crd;
+                        geometry::Point __crd;
                         IJK __ijk;
                         Array1d<double> __energy; // ligand idatm type to energy
-                        Geom3D::Point &crd() {
+                        geometry::Point &crd() {
                                 return __crd;
                         }
                         double energy (const int l) const {
                                 return __energy.data[l];
                         }
-                        const Geom3D::Point &crd() const {
+                        const geometry::Point &crd() const {
                                 return __crd;
                         }
                         IJK &ijk() {

@@ -69,7 +69,7 @@ namespace Parser {
                                 double x_coord = stof (line.substr (30, 8));
                                 double y_coord = stof (line.substr (38, 8));
                                 double z_coord = stof (line.substr (46, 8));
-                                Geom3D::Coordinate crd (x_coord, y_coord, z_coord);
+                                geometry::Coordinate crd (x_coord, y_coord, z_coord);
                                 string element = line.size() > 77 ? boost::algorithm::trim_copy (line.substr (76,2)) : "";
 
                                 if (element.empty()) {

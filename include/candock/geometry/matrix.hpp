@@ -18,7 +18,7 @@ namespace Json {
     class Value;
 }
 
-namespace Geom3D {
+namespace geometry {
 	class Matrix {
 		typedef pair<gsl_matrix*, gsl_vector*> matrix_pair;
 		matrix_pair __matrix;
@@ -50,5 +50,6 @@ namespace Geom3D {
 			return stream;
 		}
 	};
-};
+}
+
 #endif

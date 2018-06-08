@@ -5,7 +5,7 @@
 #include <set>
 #include <vector>
 
-#include "candock/geom3d/coordinate.hpp"
+#include "candock/geometry/coordinate.hpp"
 #include "candock/molib/molecule.hpp"
 #include "candock/helper/help.hpp"
 #include "candock/helper/benchmark.hpp"
@@ -44,7 +44,7 @@ private:
   double __temperature;
   double __friction;
 
-  Geom3D::Point::Vec __positions;
+  geometry::Point::Vec __positions;
   Topology __topology;
   SystemTopology __system_topology;
 
@@ -60,10 +60,10 @@ public:
   void unmask(const Molib::Atom::Vec &atoms);
 
   void add_topology(const Molib::Atom::Vec &atoms);
-  void add_crds(const Molib::Atom::Vec &atoms, const Geom3D::Point::Vec &crds);
+  void add_crds(const Molib::Atom::Vec &atoms, const geometry::Point::Vec &crds);
   void add_random_crds(const Molib::Atom::Vec &atoms);
 
-  Geom3D::Point::Vec get_state(const Molib::Atom::Vec &atoms);
+  geometry::Point::Vec get_state(const Molib::Atom::Vec &atoms);
 
 #ifndef NDEBUG
   void minimize_knowledge_based(Molib::Molecule &ligand, Molib::Molecule &receptor, Score::Score &score);

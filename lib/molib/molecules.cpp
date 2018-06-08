@@ -8,7 +8,7 @@
 #include "candock/molib/atomtype.hpp"
 #include "candock/molib/bondtype.hpp"
 #include "candock/molib/bond.hpp"
-#include "candock/geom3d/geom3d.hpp"
+#include "candock/geometry/geometry.hpp"
 #include "candock/fragmenter/fragmenter.hpp"
 #include "candock/fragmenter/unique.hpp"
 #include "candock/molib/atom.hpp"
@@ -40,14 +40,14 @@ namespace Molib {
 		return previous;
 	}
 
-	void Molecules::rotate(const Geom3D::Matrix &rota, const bool inverse) {
+	void Molecules::rotate(const geometry::Matrix &rota, const bool inverse) {
 		for (auto &molecule : *this) {
 			molecule.rotate(rota, inverse);
 		}
 	}
 
 	double Molecules::compute_max_radius() const { 
-		Geom3D::Coordinate gc = compute_geometric_center();
+		geometry::Coordinate gc = compute_geometric_center();
 		double max_radius = -HUGE_VAL;
 		for (auto &molecule : *this) {
 			Atom::Vec atoms = molecule.get_atoms();
@@ -57,8 +57,8 @@ namespace Molib {
 		return max_radius;
 	}
 
-	Geom3D::Coordinate Molecules::compute_geometric_center() const { 
-		Geom3D::Coordinate center;
+	geometry::Coordinate Molecules::compute_geometric_center() const { 
+		geometry::Coordinate center;
 		for (auto &molecule : *this) {
 			center = center + molecule.compute_geometric_center();
 		}
@@ -252,10 +252,10 @@ namespace Molib {
 		return residues;
 	}
 
-	Geom3D::Point::Vec Molecules::get_crds(const string &chain_ids, const Residue::res_type &rest,
+	geometry::Point::Vec Molecules::get_crds(const string &chain_ids, const Residue::res_type &rest,
 		const int model_number) const { 
 
-		Geom3D::Point::Vec crds;
+		geometry::Point::Vec crds;
 		for (auto &patom : this->get_atoms(chain_ids, rest, model_number)) 
 			crds.push_back(patom->crd());
 		return crds;

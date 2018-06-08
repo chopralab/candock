@@ -3,8 +3,8 @@
 #include "candock/helper/error.hpp"
 #include "candock/helper/help.hpp"
 #include "candock/helper/debug.hpp"
-#include "candock/geom3d/geom3d.hpp"
-#include "candock/geom3d/coordinate.hpp"
+#include "candock/geometry/geometry.hpp"
+#include "candock/geometry/coordinate.hpp"
 #include <memory>
 #include <queue>
 #include <algorithm>
@@ -24,17 +24,17 @@ namespace Molib {
 		map<const Atom*, map<const Atom*, double>> __ic_bond;
 		map<const Atom*, map<const Atom*, map<const Atom*, double>>> __ic_angle;
 		map<const Atom*, map<const Atom*, map<const Atom*, map<const Atom*, double>>>> __ic_dihedral;
-		Geom3D::Coordinate __set_crd(const Geom3D::Point&, const Geom3D::Point&, const Geom3D::Point&, const double, const double, const double) const;
+		geometry::Coordinate __set_crd(const geometry::Point&, const geometry::Point&, const geometry::Point&, const double, const double, const double) const;
 
-		typedef map<const Atom*, Geom3D::Coordinate> AtomToCrd;
+		typedef map<const Atom*, geometry::Coordinate> AtomToCrd;
 
 	public:
 		Internal() {}
 		Internal(const Atom::Vec &atoms) { build(atoms); }
 		void build(const Atom::Vec &atoms);
-		Geom3D::Point::Vec cartesian(const Atom &ini1, const Atom &ini2, const Atom &ini3, 
-			const Geom3D::Coordinate &crd1, const Geom3D::Coordinate &crd2, 
-			const Geom3D::Coordinate &crd3, const Atom::Vec &next_atoms) const;
+		geometry::Point::Vec cartesian(const Atom &ini1, const Atom &ini2, const Atom &ini3, 
+			const geometry::Coordinate &crd1, const geometry::Coordinate &crd2, 
+			const geometry::Coordinate &crd3, const Atom::Vec &next_atoms) const;
 		void set_dihedral(const Atom &a1, const Atom &a2, const Atom &a3, const Atom &a4, const double angle) { __ic_dihedral[&a1][&a2][&a3][&a4] = angle; }
 		double get_dihedral(const Atom &a1, const Atom &a2, const Atom &a3, const Atom &a4) const { return __ic_dihedral.at(&a1).at(&a2).at(&a3).at(&a4); }
 		void set_dihedral(const Torsion &t, const double angle) { __ic_dihedral[t.a1][t.a2][t.a3][t.a4] = angle; }

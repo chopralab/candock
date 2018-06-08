@@ -27,7 +27,7 @@ namespace Linker {
 	bool State::clashes(const State &other, const double clash_coeff) const { // clashes between this and other state
 		const size_t other_size = other.get_crds().size();
 		for (size_t i = 0; i < __crds.size(); ++i) {
-			const Geom3D::Point &crd1 = get_crd(i);
+			const geometry::Point &crd1 = get_crd(i);
 			const Molib::Atom &a1 = __segment.get_atom(i);;
 			if (__segment.is_common_atom(i)) {
 				dbgmsg("common state atom = " << a1.atom_number() 
@@ -36,7 +36,7 @@ namespace Linker {
 			}
 			const double vdw1 = a1.radius();
 			for (size_t j = 0; j < other_size; ++j) {
-				const Geom3D::Point &crd2 = other.get_crd(j);
+				const geometry::Point &crd2 = other.get_crd(j);
 				const Molib::Atom &a2 = other.get_segment().get_atom(j);
 				if (other.get_segment().is_common_atom(j)) { 
 					dbgmsg("common state atom = " << a2.atom_number() 
@@ -55,7 +55,7 @@ namespace Linker {
 		stream << "State(id = " << s.get_id() <<", segment = " << s.__segment.get_seed_id() << ") " 
 			<< " energy = " << setprecision(4) << fixed << s.__energy << " atom_crd =  " ;
 		for (size_t i = 0; i < s.get_crds().size(); ++i) {
-			const Geom3D::Point &crd = s.get_crd(i);
+			const geometry::Point &crd = s.get_crd(i);
 			const Molib::Atom &a = s.__segment.get_atom(i);;
 			stream << a.atom_number() << " -> " << crd << " ";
 		}

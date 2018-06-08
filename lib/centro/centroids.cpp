@@ -3,7 +3,7 @@
 #include "candock/molib/grid.hpp"
 #include "candock/molib/molecules.hpp"
 #include "candock/helper/benchmark.hpp"
-#include "candock/geom3d/geom3d.hpp"
+#include "candock/geometry/geometry.hpp"
 #include "candock/parser/fileparser.hpp"
 #include "candock/cluster/greedy.hpp"
 
@@ -15,11 +15,11 @@ namespace Centro {
 	vector<Centroid> split_binding_site(const Molib::Molecules &binding_site_ligands, const double centro_clus_rad) {
 
 		vector<Centroid> centroids;
-		Geom3D::Point::Vec crds = binding_site_ligands.get_crds();
-		Geom3D::Point::Vec clustered = Cluster::Cluster::greedy(crds, centro_clus_rad);
+		geometry::Point::Vec crds = binding_site_ligands.get_crds();
+		geometry::Point::Vec clustered = Cluster::Cluster::greedy(crds, centro_clus_rad);
 		for (auto &point : clustered) {
 			// find closest point and calculate distance to this point
-			Geom3D::Point closest;
+			geometry::Point closest;
 			double min_dist = HUGE_VAL;
 			for (auto &point2 : clustered) {
 				const double d = point.distance(point2);
@@ -59,7 +59,7 @@ namespace Centro {
 			double x, y, z, rc;
 			ss >> bsite_id >> x >> y >> z >> rc;
 			if (bsite_id <= num_bsites) {
-				centroids[bsite_id].push_back(Centroid(Geom3D::Coordinate(x, y, z), rc));
+				centroids[bsite_id].push_back(Centroid(geometry::Coordinate(x, y, z), rc));
 			}
 		}
 		if (centroids.empty()) 

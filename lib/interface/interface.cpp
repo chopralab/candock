@@ -144,7 +144,7 @@ size_t receptor_atoms(size_t *idx, float *pos)
                 {
                         idx[i] = atoms[i]->atom_number();
 
-                        Geom3D::Point &crd = atoms[i]->crd();
+                        geometry::Point &crd = atoms[i]->crd();
                         pos[i * 3 + 0] = crd.x();
                         pos[i * 3 + 1] = crd.y();
                         pos[i * 3 + 2] = crd.z();
@@ -308,7 +308,7 @@ size_t ligand_atoms(size_t *idx, float *pos)
                 {
                         idx[i] = atoms[i]->atom_number();
 
-                        Geom3D::Point &crd = atoms[i]->crd();
+                        geometry::Point &crd = atoms[i]->crd();
                         pos[i * 3 + 0] = crd.x();
                         pos[i * 3 + 1] = crd.y();
                         pos[i * 3 + 2] = crd.z();
@@ -559,7 +559,7 @@ size_t set_positions_ligand(const size_t *atoms, const float *positions, size_t 
 
                 for (size_t i = 0; i < size; ++i)
                 {
-                        residue->element(atoms[i]).set_crd(Geom3D::Point(positions[i * 3 + 0],
+                        residue->element(atoms[i]).set_crd(geometry::Point(positions[i * 3 + 0],
                                                                          positions[i * 3 + 1],
                                                                          positions[i * 3 + 2]));
                 }
@@ -602,7 +602,7 @@ size_t set_positions_receptor(const size_t *atoms, const float *positions, size_
                                 break;
                         }
 
-                        residue->element(atoms[i]).set_crd(Geom3D::Point(positions[i * 3 + 0],
+                        residue->element(atoms[i]).set_crd(geometry::Point(positions[i * 3 + 0],
                                                                          positions[i * 3 + 1],
                                                                          positions[i * 3 + 2]));
                 }
@@ -650,12 +650,12 @@ size_t minimize_complex(size_t max_iter, size_t update_freq)
                 modeler.minimize_state();
 
                 // init with minimized coordinates
-                Geom3D::Point::Vec rec_coords = modeler.get_state(rec_atoms);
+                geometry::Point::Vec rec_coords = modeler.get_state(rec_atoms);
 
                 for (size_t i = 0; i < rec_atoms.size(); ++i)
                         rec_atoms[i]->set_crd(rec_coords[i]);
 
-                Geom3D::Point::Vec lig_coords = modeler.get_state(lig_atoms);
+                geometry::Point::Vec lig_coords = modeler.get_state(lig_atoms);
 
                 for (size_t j = 0; j < lig_atoms.size(); ++j)
                         lig_atoms[j]->set_crd(lig_coords[j]);

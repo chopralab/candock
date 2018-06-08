@@ -1,8 +1,8 @@
 #ifndef QUATERNION_H
 #define QUATERNION_H
 #include "candock/helper/debug.hpp"
-#include "candock/geom3d/geom3d.hpp"
-#include "candock/geom3d/matrix.hpp"
+#include "candock/geometry/geometry.hpp"
+#include "candock/geometry/matrix.hpp"
 #include <tuple>
 #include <functional>
 
@@ -12,7 +12,7 @@
  * Taken from : http://www.stanford.edu/~acoates/quaternion.h
  * 
  */ 
-namespace Geom3D {
+namespace geometry {
 	class Quaternion {
 		double mData[4];
 	public:
@@ -245,158 +245,5 @@ namespace Geom3D {
 		
 	};
 }
+
 #endif
-    //~ Quaternion(const double* array) {
-      //~ if (!array) {
-        //~ UAV_EXCEPTION("Constructing quaternion from 0 array.");
-      //~ }
-      //~ for (uint32_t i = 0; i < 4; i++) {
-        //~ mData[i] = array[i];
-      //~ }
-    //~ }
-		//~ Quaternion(const Vector4& v) {
-			//~ mData[0] = v.element(0,0);
-			//~ mData[1] = v.element(1,0);
-			//~ mData[2] = v.element(2,0);
-			//~ mData[3] = v.element(3,0);
-		//~ }
-		//~ /**
-		//~ * @brief Returns this quaternion as a 4-vector.
-		//~ *
-		//~ * This is simply the vector [x y z w]<sup>T</sup>
-		//~ */
-		//~ Vector4 vector() const { return Vector4(mData); }		
-    //~ /**
-     //~ * @brief Returns a matrix representation of this
-     //~ * quaternion.
-     //~ *
-     //~ * Specifically this is the matrix such that:
-     //~ *
-     //~ * this->matrix() * q.vector() = (*this) * q for any quaternion q.
-     //~ *
-     //~ * Note that this is @e NOT the rotation matrix that may be
-     //~ * represented by a unit quaternion.
-     //~ */
-    //~ TMatrix4 matrix() const {
-      //~ double m[16] = {
-         //~ w(), -z(),  y(), x(),
-         //~ z(),  w(), -x(), y(),
-        //~ -y(),  x(),  w(), z(),
-        //~ -x(), -y(), -z(), w()
-      //~ };
-      //~ return TMatrix4(m);
-    //~ }
-//~ 
-    //~ /**
-     //~ * @brief Returns a matrix representation of this
-     //~ * quaternion for right multiplication.
-     //~ *
-     //~ * Specifically this is the matrix such that:
-     //~ *
-     //~ * q.vector().transpose() * this->matrix() = (q *
-     //~ * (*this)).vector().transpose() for any quaternion q.
-     //~ *
-     //~ * Note that this is @e NOT the rotation matrix that may be
-     //~ * represented by a unit quaternion.
-     //~ */
-    //~ TMatrix4 rightMatrix() const {
-      //~ double m[16] = {
-        //~ +w(), -z(),  y(), -x(),
-        //~ +z(),  w(), -x(), -y(),
-        //~ -y(),  x(),  w(), -z(),
-        //~ +x(),  y(),  z(),  w() 
-      //~ };
-      //~ return TMatrix4(m);
-    //~ }
-    //~ /** 
-     //~ * @brief Returns the scaled-axis representation of this
-     //~ * quaternion rotation.
-     //~ */
-    //~ Vector3 scaledAxis(void) const {
-      //~ double w[3];
-      //~ HeliMath::scaled_axis_from_quaternion(w, mData);
-      //~ return Vector3(w);
-    //~ }
-//~ 
-    //~ /** 
-     //~ * @brief Sets quaternion to be same as rotation by scaled axis w.
-     //~ */
-    //~ void scaledAxis(const Vector3& w) {
-      //~ double theta = w.norm();
-      //~ if (theta > 0.0001) {
-        //~ double s = sin(theta / 2.0);
-        //~ Vector3 W(w / theta * s);
-        //~ mData[0] = W[0];
-        //~ mData[1] = W[1];
-        //~ mData[2] = W[2];
-        //~ mData[3] = cos(theta / 2.0);
-      //~ } else {
-        //~ mData[0]=mData[1]=mData[2]=0;
-        //~ mData[3]=1.0;
-      //~ }
-    //~ }
-  //~ /**
-   //~ * @brief Computes a special representation that decouples the Z
-   //~ * rotation.
-   //~ *
-   //~ * The decoupled representation is two rotations, Qxy and Qz,
-   //~ * so that Q = Qxy * Qz.
-   //~ */
-  //~ void decoupleZ(Quaternion* Qxy, Quaternion* Qz) const {
-      //~ Vector3 ztt(0,0,1);
-      //~ Vector3 zbt = this->rotatedVector(ztt);
-      //~ Vector3 axis_xy = ztt.cross(zbt);
-      //~ double axis_norm = axis_xy.norm();
-//~ 
-      //~ double axis_theta = acos(HeliMath::saturate(zbt[2], -1,+1));
-      //~ if (axis_norm > 0.00001) {
-        //~ axis_xy = axis_xy * (axis_theta/axis_norm); // limit is *1
-      //~ }
-//~ 
-      //~ Qxy->scaledAxis(axis_xy);
-      //~ *Qz = (Qxy->conjugate() * (*this));
-  //~ }
-  //~ /**
-   //~ * @brief Returns the quaternion slerped between this and q1 by fraction 0 <= t <= 1.
-   //~ */
-  //~ Quaternion slerp(const Quaternion& q1, double t) {
-    //~ return slerp(*this, q1, t);
-  //~ }
-//~ 
-  //~ /// Returns quaternion that is slerped by fraction 't' between q0 and q1.
-  //~ static Quaternion slerp(const Quaternion& q0, const Quaternion& q1, double t) {
-//~ 
-    //~ double omega = acos(HeliMath::saturate(q0.mData[0]*q1.mData[0] +
-                                           //~ q0.mData[1]*q1.mData[1] +
-                                           //~ q0.mData[2]*q1.mData[2] +
-                                           //~ q0.mData[3]*q1.mData[3], -1,1));
-    //~ if (fabs(omega) < 1e-10) {
-      //~ omega = 1e-10;
-    //~ }
-    //~ double som = sin(omega);
-    //~ double st0 = sin((1-t) * omega) / som;
-    //~ double st1 = sin(t * omega) / som;
-    //~ 
-    //~ return Quaternion(q0.mData[0]*st0 + q1.mData[0]*st1,
-                      //~ q0.mData[1]*st0 + q1.mData[1]*st1,
-                      //~ q0.mData[2]*st0 + q1.mData[2]*st1,
-                      //~ q0.mData[3]*st0 + q1.mData[3]*st1);
-  //~ }
-//~ 
-    //~ /**
-     //~ * @brief Returns pointer to the internal array.  
-     //~ *
-     //~ * Array is in order x,y,z,w.
-     //~ */
-    //~ double* row(uint32_t i) { return mData + i; }
-    //~ // Const version of the above.
-    //~ const double* row(uint32_t i) const { return mData + i; }
-//~ };
-//~ 
-//~ /**
- //~ * @brief Global operator allowing left-multiply by scalar.
- //~ */
-//~ Quaternion operator*(double s, const Quaternion& q);
-//~ 
-//~ 
-//~ #endif /* QUATERNION_H */

@@ -2,19 +2,19 @@
 #define CENTROIDS_H
 
 
-#include "candock/geom3d/coordinate.hpp"
+#include "candock/geometry/coordinate.hpp"
 #include "candock/ligands/genlig.hpp"
 
 namespace Centro {
 
 	class Centroid {
-		Geom3D::Coordinate __centroid;
+		geometry::Coordinate __centroid;
 		double __radial_check;
 	public:
 		Centroid() {}
-		Centroid(const Geom3D::Coordinate centroid, const double radial_check) :
+		Centroid(const geometry::Coordinate centroid, const double radial_check) :
 			__centroid(centroid), __radial_check(radial_check) {}
-		Geom3D::Coordinate get_centroid() const { return __centroid; }
+		geometry::Coordinate get_centroid() const { return __centroid; }
 		double get_radial_check() const { return __radial_check; }
 	};
 	

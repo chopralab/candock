@@ -3,7 +3,7 @@
 #include "candock/helper/debug.hpp"
 #include "candock/molib/it.hpp"
 #include "candock/fragmenter/fragmenter.hpp"
-#include "candock/geom3d/coordinate.hpp"
+#include "candock/geometry/coordinate.hpp"
 #include "candock/molib/internal.hpp"
 #include "candock/molib/molecule.hpp"
 #include "candock/graph/graph.hpp"

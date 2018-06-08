@@ -43,7 +43,7 @@ namespace Score {
 		return stream;
 	}
 
-        Array1d<double> Score::compute_energy(const Molib::Atom::Grid &gridrec, const Geom3D::Coordinate &crd, const set<int> &ligand_atom_types) const {
+        Array1d<double> Score::compute_energy(const Molib::Atom::Grid &gridrec, const geometry::Coordinate &crd, const set<int> &ligand_atom_types) const {
                 dbgmsg("computing energy");
                 Array1d<double> energy_sum(*ligand_atom_types.rbegin() + 1);
                 for (auto &patom : gridrec.get_neighbors(crd, __dist_cutoff)) {
@@ -256,11 +256,11 @@ namespace Score {
 		return this->non_bonded_energy(gridrec, ligand.get_atoms(), ligand.get_crds());
 	}
 
-	double Score::non_bonded_energy(const Molib::Atom::Grid &gridrec, const Molib::Atom::Vec &atoms, const Geom3D::Point::Vec &crds) const {
+	double Score::non_bonded_energy(const Molib::Atom::Grid &gridrec, const Molib::Atom::Vec &atoms, const geometry::Point::Vec &crds) const {
 		double energy_sum = 0.0;
 		for (size_t i = 0; i < atoms.size(); ++i) {
 			const Molib::Atom &atom2 = *atoms[i];
-			const Geom3D::Coordinate &atom2_crd = crds[i];
+			const geometry::Coordinate &atom2_crd = crds[i];
 			const auto &atom_2 = atom2.idatm_type();
 			dbgmsg("ligand atom = " << atom2.atom_number() << " crd= " << atom2_crd.pdb());
 			for (auto &atom1 : gridrec.get_neighbors(atom2_crd, __dist_cutoff)) {

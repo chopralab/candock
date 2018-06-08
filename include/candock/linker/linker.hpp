@@ -3,7 +3,7 @@
 #include "candock/helper/debug.hpp"
 #include "candock/molib/it.hpp"
 #include "candock/fragmenter/fragmenter.hpp"
-#include "candock/geom3d/coordinate.hpp"
+#include "candock/geometry/coordinate.hpp"
 #include "candock/molib/internal.hpp"
 #include "candock/molib/grid.hpp"
 #include <tuple>
@@ -14,7 +14,7 @@
 #include "candock/linker/partial.hpp"
 #include "candock/linker/dockedconformation.hpp"
 
-namespace Geom3D {
+namespace geometry {
         class Quaternion;
 };
 
@@ -83,8 +83,8 @@ namespace Linker {
 			bool __clashes_receptor(const State&) const;
 			bool __clashes_ligand(const State &current, 
 				const Partial &conformation, const State &prev) const;
-			Geom3D::Point::Vec __rotate(const Geom3D::Quaternion &q, const Geom3D::Point &p1, 
-				const Geom3D::Point::Vec &crds);
+			geometry::Point::Vec __rotate(const geometry::Quaternion &q, const geometry::Point &p1, 
+				const geometry::Point::Vec &crds);
 	
 			Array2d<bool> __find_compatible_state_pairs(const Seed::Graph &seed_graph, const int sz);
 			vector<vector<State::Vec>> __grow_possibles(const map<State*, State::Set> &pos);
@@ -119,7 +119,7 @@ namespace Linker {
 				__ic(ligand.get_atoms()), __modeler(modeler), __receptor(receptor), 
 				__ligand(ligand), __top_seeds(top_seeds), __gridrec(gridrec), 
 				__score(score), __dist_cutoff(dist_cutoff),
-				__spin_degrees(Geom3D::radians(spin_degrees / 2)), // it needs to be divided by two due to quaternion rotation (it seems to double the angles)..
+				__spin_degrees(geometry::radians(spin_degrees / 2)), // it needs to be divided by two due to quaternion rotation (it seems to double the angles)..
 				__tol_seed_dist(tol_seed_dist), __lower_tol_seed_dist(lower_tol_seed_dist), 
 				__upper_tol_seed_dist(upper_tol_seed_dist), __clash_coeff(clash_coeff),
 				__docked_clus_rad(docked_clus_rad), __max_allow_energy(max_allow_energy),

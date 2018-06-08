@@ -17,14 +17,14 @@ namespace Molib {
 		return stream;
 	}
 
-	void Chain::init_bio(Chain &chain_asym, const Geom3D::Matrix &bio_rota) {
+	void Chain::init_bio(Chain &chain_asym, const geometry::Matrix &bio_rota) {
 		for (auto &residue : chain_asym) {
 			Residue &last = add(new Residue(residue)); // pair and tuple !!
 			last.init_bio(residue, bio_rota);
 		}
 	}
 	
-	void Chain::rotate(const Geom3D::Matrix &rota, const bool inverse) {
+	void Chain::rotate(const geometry::Matrix &rota, const bool inverse) {
 		for (auto &residue : *this) {
 			residue.rotate(rota, inverse);
 		}

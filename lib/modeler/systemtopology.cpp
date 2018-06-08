@@ -676,7 +676,7 @@ void SystemTopology::init_bonded(Topology &topology, const bool use_constraints)
                 {
                         log_warning << e.what() << " (WARNINGS ARE NOT INCREASED) (using default parameters for this angle)" << endl;
                         // if everything else fails just constrain at something reasonable
-                        atype = ForceField::AngleType{Geom3D::angle(atom1.crd(), atom2.crd(), atom3.crd()), 500};
+                        atype = ForceField::AngleType{geometry::angle(atom1.crd(), atom2.crd(), atom3.crd()), 500};
                 }
 
                 dbgmsg("force_idx = " << force_idx << " idx1 = " << idx1 << " idx2 = " << idx2 << " idx3 = " << idx3
@@ -746,8 +746,8 @@ void SystemTopology::init_bonded(Topology &topology, const bool use_constraints)
                 {
                         log_warning << e.what() << " (WARNINGS ARE NOT INCREASED) (using default parameters for this dihedral)" << endl;
                         // if everything else fails just constrain at something reasonable
-                        //cout <<  Geom3D::dihedral(atom1.crd(), atom2.crd(), atom3.crd(), atom4.crd()) << endl;
-                        //ForceField::TorsionType vtype = ForceField::TorsionType {1, Geom3D::dihedral(atom1.crd(), atom2.crd(), atom3.crd(), atom4.crd()), 0};
+                        //cout <<  geometry::dihedral(atom1.crd(), atom2.crd(), atom3.crd(), atom4.crd()) << endl;
+                        //ForceField::TorsionType vtype = ForceField::TorsionType {1, geometry::dihedral(atom1.crd(), atom2.crd(), atom3.crd(), atom4.crd()), 0};
                         //bondTorsion->addTorsion (idx1, idx2, idx3, idx4, vtype.periodicity, vtype.phase, vtype.k);
                         //bondTorsionData[idx1].push_back (ForceData {force_idx, idx1, idx2, idx3, idx4, 0, 0, vtype.periodicity, vtype.phase, vtype.k});
                         //bondTorsionData[idx2].push_back (ForceData {force_idx, idx1, idx2, idx3, idx4, 0, 0, vtype.periodicity, vtype.phase, vtype.k});
@@ -820,7 +820,7 @@ void SystemTopology::init_bonded(Topology &topology, const bool use_constraints)
         }
 }
 
-void SystemTopology::init_positions(const Geom3D::Point::Vec &crds)
+void SystemTopology::init_positions(const geometry::Point::Vec &crds)
 {
         dbgmsg("entering init_positions crds.size() = " << crds.size());
         vector<OpenMM::Vec3> positions_in_nm;

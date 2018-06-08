@@ -5,7 +5,7 @@
 #include <string>
 #include <vector>
 #include <cstdlib>
-#include "candock/geom3d/geom3d.hpp"
+#include "candock/geometry/geometry.hpp"
 #include "candock/molib/atom.hpp"
 #include "candock/molib/residue.hpp"
 #include "candock/molib/chain.hpp"
@@ -23,16 +23,16 @@ namespace Molib {
 		return stream;
 	}
 
-	void Assembly::init_bio(const Assembly &asym, map<int, Geom3D::Matrix> &matrices, const set<char> &chains) {
+	void Assembly::init_bio(const Assembly &asym, map<int, geometry::Matrix> &matrices, const set<char> &chains) {
 		for (auto &i : matrices) {
 			int matrix_number = i.first;
-			Geom3D::Matrix &matrix = i.second;
+			geometry::Matrix &matrix = i.second;
 			Model &last = add(new Model(matrix_number));
 			last.init_bio(asym.first(), matrix, chains); // asymmetric unit has just one model - the 1-st
 		}
 	}
 
-	void Assembly::rotate(const Geom3D::Matrix &rota, const bool inverse) {
+	void Assembly::rotate(const geometry::Matrix &rota, const bool inverse) {
 		for (auto &model : *this) {
 			model.rotate(rota, inverse);
 		}

@@ -26,8 +26,8 @@ namespace Docker {
 		public:
 			DockedConf(const Gpoints::Gpoint &cavpoint, Gpoints::PGpointVec &conf0, double energy, size_t i, size_t bsite_id) 
 				: __cavpoint(cavpoint), __conf0(conf0), __energy(energy), __i(i), __bsite_id(bsite_id) {}
-			//Geom3D::Point& crd() { return __cavpoint.crd(); }
-			const Geom3D::Point& crd() const { return __cavpoint.crd(); }
+			//geometry::Point& crd() { return __cavpoint.crd(); }
+			const geometry::Point& crd() const { return __cavpoint.crd(); }
 			void distance(const double) const {} // dummy
 			const Gpoints::Gpoint &get_cavpoint() const { return __cavpoint; }
 			const Gpoints::PGpointVec &get_conf0() const { return __conf0; }

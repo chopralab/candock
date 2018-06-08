@@ -61,7 +61,7 @@ Modeler::Modeler(const ForceField &ffield, const string &fftype, double dist_cut
                 __positions.resize(__topology.atoms.size()); // as many positions as there are atoms
         }
 
-        void Modeler::add_crds(const Molib::Atom::Vec &atoms, const Geom3D::Point::Vec &crds) {
+        void Modeler::add_crds(const Molib::Atom::Vec &atoms, const geometry::Point::Vec &crds) {
                 for (size_t i = 0; i < atoms.size(); ++i) {
                         int idx = __topology.get_index(*atoms[i]);
                         __positions[idx] = crds[i];
@@ -75,7 +75,7 @@ Modeler::Modeler(const ForceField &ffield, const string &fftype, double dist_cut
                         const double x = rand() % 100 + 1;
                         const double y = rand() % 100 + 1;
                         const double z = rand() % 100 + 1;
-                        __positions[idx] = Geom3D::Point(x, y, z); 
+                        __positions[idx] = geometry::Point(x, y, z); 
                 }
         }
 
@@ -83,15 +83,15 @@ Modeler::Modeler(const ForceField &ffield, const string &fftype, double dist_cut
          * Changes coordinates of atoms
          */
 
-Geom3D::Point::Vec Modeler::get_state(const Molib::Atom::Vec &atoms)
+geometry::Point::Vec Modeler::get_state(const Molib::Atom::Vec &atoms)
 {
 
         const vector<OpenMM::Vec3> &positions_in_nm = __system_topology.get_positions_in_nm();
-        Geom3D::Point::Vec crds;
+        geometry::Point::Vec crds;
         for (size_t i = 0; i < atoms.size(); ++i)
         {
                 int idx = __topology.get_index(*atoms[i]);
-                crds.push_back(Geom3D::Point(
+                crds.push_back(geometry::Point(
                     positions_in_nm[idx][0] * OpenMM::AngstromsPerNm,
                     positions_in_nm[idx][1] * OpenMM::AngstromsPerNm,
                     positions_in_nm[idx][2] * OpenMM::AngstromsPerNm));

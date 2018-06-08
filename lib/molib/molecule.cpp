@@ -6,7 +6,7 @@
 #include <vector>
 #include <cstdlib>
 #include "candock/molib/bond.hpp"
-#include "candock/geom3d/geom3d.hpp"
+#include "candock/geometry/geometry.hpp"
 #include "candock/fragmenter/fragmenter.hpp"
 #include "candock/fragmenter/unique.hpp"
 #include "candock/modeler/forcefield.hpp"
@@ -80,7 +80,7 @@ namespace Molib {
 		return patom2;
 	}
 
-	void Molecule::rotate(const Geom3D::Matrix &rota, const bool inverse) {
+	void Molecule::rotate(const geometry::Matrix &rota, const bool inverse) {
 		for (auto &assembly : *this) {
 			assembly.rotate(rota, inverse);
 		}
@@ -121,10 +121,10 @@ namespace Molib {
 		return atoms;
 	}
 
-	Geom3D::Point::Vec Molecule::get_crds(const string &chain_ids, const Residue::res_type &rest,
+	geometry::Point::Vec Molecule::get_crds(const string &chain_ids, const Residue::res_type &rest,
 		const int model_number) const { 
 
-		Geom3D::Point::Vec crds;
+		geometry::Point::Vec crds;
 		for (auto &patom : this->get_atoms(chain_ids, rest, model_number)) 
 			crds.push_back(patom->crd());
 		return crds;
@@ -169,7 +169,7 @@ namespace Molib {
 
 	double Molecule::compute_rmsd_ord(const Molecule &other) const {
 		dbgmsg("computing rmsd between molecule " << *this << " and " << other);
-		return Geom3D::compute_rmsd(this->get_crds(), other.get_crds());
+		return geometry::compute_rmsd(this->get_crds(), other.get_crds());
 	}
 
 	Atom& Molecule::get_center_atom() const {
@@ -397,7 +397,7 @@ namespace Molib {
 	/**
 	 * Copy molecule with new coordinates
 	 */
-	Molecule::Molecule(const Molib::Molecule &rhs, const Geom3D::Point::Vec &crds) : Molecule(rhs) {
+	Molecule::Molecule(const Molib::Molecule &rhs, const geometry::Point::Vec &crds) : Molecule(rhs) {
 
 		auto atoms = get_atoms();
 		for (size_t i = 0; i < atoms.size(); ++i) {

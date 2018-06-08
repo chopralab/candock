@@ -1,7 +1,7 @@
 #ifndef MOLECULE_H
 #define MOLECULE_H
-#include "candock/geom3d/geom3d.hpp"
-#include "candock/geom3d/matrix.hpp"
+#include "candock/geometry/geometry.hpp"
+#include "candock/geometry/matrix.hpp"
 #include "candock/molib/it.hpp"
 #include "candock/molib/atom.hpp"
 #include "candock/molib/residue.hpp"
@@ -32,7 +32,7 @@ namespace Molib {
 		set<Residue::res_tuple2> __modified;
 		multimap<string, Residue::res_tuple2> __site;
 	std::string __name; // usually pdb file
-		typedef map<int, Geom3D::Matrix> M0;
+		typedef map<int, geometry::Matrix> M0;
 		typedef map<int, M0> M1;
 		M1 __bio_rota;
 		map<int, set<char> > __bio_chain;
@@ -62,7 +62,7 @@ namespace Molib {
 			return *this;
 		}
 
-		Molecule(const Molib::Molecule &rhs, const Geom3D::Point::Vec &crds);
+		Molecule(const Molib::Molecule &rhs, const geometry::Point::Vec &crds);
 		typedef enum {first_bio, all_bio} bio_how_many;
 
                 std::string get_chain_ids(const unsigned int hm) const;
@@ -75,7 +75,7 @@ namespace Molib {
 		Atom::Vec get_atoms(const std::string &chain_ids="", const Residue::res_type &rest=Residue::res_type::notassigned, const int model_number=-1) const;
 		Residue::Vec get_residues() const;
 
-		Geom3D::Point::Vec get_crds(const std::string &chain_ids="", const Residue::res_type &rest=Residue::res_type::notassigned, const int model_number=-1) const;
+		geometry::Point::Vec get_crds(const std::string &chain_ids="", const Residue::res_type &rest=Residue::res_type::notassigned, const int model_number=-1) const;
 		
 		double max_dist() const;
 		double max_dist(const Atom &atom) const;
@@ -93,15 +93,15 @@ namespace Molib {
 
 		void prepare_for_mm(const OMMIface::ForceField &ffield, const Atom::Grid &grid);
 
-		Geom3D::Coordinate compute_geometric_center() const { return Geom3D::compute_geometric_center(this->get_crds()); }
+		geometry::Coordinate compute_geometric_center() const { return geometry::compute_geometric_center(this->get_crds()); }
 		double compute_rmsd(const Molecule&) const;
 		double compute_rmsd_ord(const Molecule&) const;
-		void rotate(const Geom3D::Matrix &rota, const bool inverse=false);
+		void rotate(const geometry::Matrix &rota, const bool inverse=false);
 		Assembly& add(Assembly *a) { return this->aadd(a->number(), a, this); }
 		
 		void init_bio(bio_how_many bhm=Molecule::all_bio);
-		void add_bio_rota(const int &biomolecule_number, const int &rn, const int &row, const Geom3D::Matrix::matrix_tuple &t) {
-			__bio_rota[biomolecule_number][rn].set_row(row, t); // needs copy constructor in Geom3D::Matrix
+		void add_bio_rota(const int &biomolecule_number, const int &rn, const int &row, const geometry::Matrix::matrix_tuple &t) {
+			__bio_rota[biomolecule_number][rn].set_row(row, t); // needs copy constructor in geometry::Matrix
 		}
 		void add_bio_chain(const int &biomolecule_number, set<char> bio_chain) {
 			__bio_chain[biomolecule_number] = bio_chain;

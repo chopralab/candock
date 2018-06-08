@@ -1,6 +1,6 @@
 #include "candock/linker/linker.hpp"
 #include "candock/linker/poses.hpp"
-#include "candock/geom3d/quaternion.hpp"
+#include "candock/geometry/quaternion.hpp"
 #include "candock/score/score.hpp"
 #include "candock/molib/nrset.hpp"
 #include "candock/molib/bond.hpp"
@@ -9,7 +9,7 @@
 #include "candock/helper/array2d.hpp"
 #include "candock/graph/mcqd.hpp"
 #include "candock/modeler/modeler.hpp"
-#include "candock/geom3d/geom3d.hpp"
+#include "candock/geometry/geometry.hpp"
 #include "candock/cluster/greedy.hpp"
 #include <queue>
 
@@ -275,7 +275,7 @@ DockedConformation Linker::IterativeLinker::__reconstruct(const Partial &conform
 			Molib::Atom &atom = const_cast<Molib::Atom &>(state.get_segment().get_atom(i)); // ugly, correct this
 			if (!overlap.count(&atom))
 			{
-				const Geom3D::Coordinate &crd = state.get_crd(i);
+				const geometry::Coordinate &crd = state.get_crd(i);
 				atom.set_crd(crd);
 			}
 		}
@@ -286,7 +286,7 @@ DockedConformation Linker::IterativeLinker::__reconstruct(const Partial &conform
 
 	// receptor
 	Molib::Molecule receptor(__receptor);
-	const Geom3D::Point::Vec &crds = conformation.get_receptor_crds();
+	const geometry::Point::Vec &crds = conformation.get_receptor_crds();
 	int i = 0;
 	for (auto &patom : receptor.get_atoms())
 	{

@@ -4,7 +4,7 @@
 #include <map>
 #include <set>
 #include <vector>
-#include "candock/geom3d/geom3d.hpp"
+#include "candock/geometry/geometry.hpp"
 #include "candock/helper/debug.hpp"
 #include "candock/helper/help.hpp"
 #include "candock/molib/molecule.hpp"
@@ -73,12 +73,12 @@ class SystemTopology
         class AtomPoint
         {
               private:
-                const Geom3D::Point __crd;
+                const geometry::Point __crd;
                 Molib::Atom &__atom;
 
               public:
-                AtomPoint(const Geom3D::Point &crd, Molib::Atom &atom) : __crd(crd), __atom(atom) {}
-                const Geom3D::Point &crd() const
+                AtomPoint(const geometry::Point &crd, Molib::Atom &atom) : __crd(crd), __atom(atom) {}
+                const geometry::Point &crd() const
                 {
                         return __crd;
                 }
@@ -124,7 +124,7 @@ class SystemTopology
         void init_physics_based_force(Topology &topology);
         void init_knowledge_based_force(Topology &topology);
         void init_bonded(Topology &topology, const bool use_constraints);
-        void init_positions(const Geom3D::Point::Vec &crds);
+        void init_positions(const geometry::Point::Vec &crds);
 
         void update_thermostat(const double temperature_in_kevin,
                                const double collision_frequency);

@@ -1,6 +1,6 @@
 #ifndef RESIDUE_H
 #define RESIDUE_H
-#include "candock/geom3d/geom3d.hpp"
+#include "candock/geometry/geometry.hpp"
 #include "candock/molib/it.hpp"
 #include "candock/molib/atom.hpp"
 
@@ -20,7 +20,7 @@ namespace Molib {
 		int __resi;
 		char __ins_code;
 		Residue::res_type __rest;
-		Geom3D::Coordinate __crd; // geometric center
+		geometry::Coordinate __crd; // geometric center
 	public:
 		Residue(string resn, int resi, char ins_code, res_type(rest)) 
 			: __resn(resn), __resi(resi), __ins_code(ins_code), __rest(rest) {}
@@ -31,11 +31,11 @@ namespace Molib {
 				add(new Atom(atom)); 
 			} 
 		}
-		void init_bio(Residue &residue_asym, const Geom3D::Matrix &bio_rota);
-		void rotate(const Geom3D::Matrix &rota, const bool inverse=false);
+		void init_bio(Residue &residue_asym, const geometry::Matrix &bio_rota);
+		void rotate(const geometry::Matrix &rota, const bool inverse=false);
 		
-		Geom3D::Coordinate& crd() { return __crd; }
-		const Geom3D::Coordinate& crd() const { return __crd; }
+		geometry::Coordinate& crd() { return __crd; }
+		const geometry::Coordinate& crd() const { return __crd; }
 		void set_crd() { for (auto &atom : *this) { __crd = __crd + atom.crd(); } 
 			__crd = __crd / this->size(); } // calculate geom center
 		Atom& add(Atom *a) { return this->aadd(a->atom_number(), a, this); }

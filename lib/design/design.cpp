@@ -288,7 +288,7 @@ namespace design {
                                         mod_atom.set_idatm_type(atom_type + "3");
                                 }
                                 
-                                Geom3D::Coordinate crd = (mod_atom.crd() - start_atom->crd());
+                                geometry::Coordinate crd = (mod_atom.crd() - start_atom->crd());
                                 crd.normalize();
                                 mod_atom.set_crd(crd * 1.54 + start_atom->crd());
 
