@@ -53,8 +53,7 @@ size_t initialize_complex( const char* filename) {
 
                 __gridrec = std::unique_ptr<Molib::Atom::Grid> (new Molib::Atom::Grid (__receptor->get_atoms()));
                 
-                Parser::FileParser lpdb (filename, Parser::first_model |
-                                          Parser::docked_poses_only, 1);
+                Parser::FileParser lpdb (filename, Parser::docked_poses_only, 1);
 
                 __ligand = std::unique_ptr<Molib::Molecules> (new Molib::Molecules);
 
@@ -87,7 +86,7 @@ size_t initialize_receptor(const char* filename) {
                 __receptor.reset();
         }
 
-        try
+		try
         {
                 Parser::FileParser rpdb(filename, Parser::first_model, 1);
 
@@ -526,12 +525,6 @@ size_t initialize_ffield(const char *data_dir)
 
 float calculate_score()
 {
-        if (__ffield == nullptr)
-        {
-                __error_string = std::string("You must run initialize_ffield first");
-                return 0;
-        }
-
         try
         {
                 return __score->non_bonded_energy(*__gridrec, (*__ligand)[0]);

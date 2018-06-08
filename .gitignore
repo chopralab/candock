@@ -1,9 +1,7 @@
 *.o
 *.geany
 *.DS_Store
-build/
-build_intel/
-build_clang/
+build*
 external/
 .project
 .cproject

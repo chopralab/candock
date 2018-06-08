@@ -39,9 +39,6 @@ if (NOT ${CANDOCK_BUILD_STATIC_EXECUTABLE})
         install(
             TARGETS
                candock
-               ${GSL_LIBRARIES}
-               ${OPENMM_LIBRARIES}
-               ${Boost_LIBRARIES}   
             RUNTIME DESTINATION
                 ${CANDOCK_VERSION}/bin/
         )
