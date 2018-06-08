@@ -7,7 +7,7 @@
 #include "candock/parser/fileparser.hpp"
 #include "candock/cluster/greedy.hpp"
 
-namespace Centro {
+namespace centro {
 
 	/* Centroid stuff
 	 * 
@@ -69,7 +69,7 @@ namespace Centro {
 		return centroids;
 	}
 
-	ostream& operator<<(ostream& os, const Centro::Centroids& centroids) {
+	ostream& operator<<(ostream& os, const centro::Centroids& centroids) {
 		for (auto &kv : centroids) {
 			const int bsite_id = kv.first;
 			for (auto &centroid : kv.second) {

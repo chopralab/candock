@@ -5,7 +5,7 @@
 #include "candock/geometry/coordinate.hpp"
 #include "candock/ligands/genlig.hpp"
 
-namespace Centro {
+namespace centro {
 
 	class Centroid {
 		geometry::Coordinate __centroid;
@@ -26,7 +26,7 @@ namespace Centro {
 	// According to the C++ standard, operator overloads should be done in the same namespace as the
 	// object they are overloading
 	// See http://clang.llvm.org/compatibility.html#dep_lookup for details
-	ostream& operator<<(ostream& os, const Centro::Centroids& centroids);
-};
+	ostream& operator<<(ostream& os, const centro::Centroids& centroids);
+}
 
 #endif
