@@ -1,6 +1,6 @@
 #include "candock/linker/linker.hpp"
 #include "candock/linker/poses.hpp"
-#include "candock/geom3d/quaternion.hpp"
+#include "candock/geometry/quaternion.hpp"
 #include "candock/score/score.hpp"
 #include "candock/molib/nrset.hpp"
 #include "candock/molib/bond.hpp"
@@ -9,7 +9,7 @@
 #include "candock/helper/array2d.hpp"
 #include "candock/graph/mcqd.hpp"
 #include "candock/modeler/modeler.hpp"
-#include "candock/geom3d/geom3d.hpp"
+#include "candock/geometry/geometry.hpp"
 #include "candock/cluster/greedy.hpp"
 #include <queue>
 
@@ -32,7 +32,7 @@ namespace Linker {
 		Partial min_conformation(MAX_ENERGY);
 		PriorityQueue openset; // openset has conformations sorted from lowest to highest energy
 		openset.insert(Partial(State::Vec{&*states[0]}, states[0]->get_energy(),
-			Geom3D::Point::Vec()));
+			geometry::Point::Vec()));
 			
 		while(!openset.empty()) {
 			if (--iter < 0) break;
@@ -285,7 +285,7 @@ namespace Linker {
 			for (size_t i = 0; i < state.get_segment().get_atoms().size(); ++i) {
 				Molib::Atom &atom = const_cast<Molib::Atom&>(state.get_segment().get_atom(i)); // ugly, correct this
 				if (!overlap.count(&atom)) {
-					const Geom3D::Coordinate &crd = state.get_crd(i);
+					const geometry::Coordinate &crd = state.get_crd(i);
 					atom.set_crd(crd);
 				}
 			}

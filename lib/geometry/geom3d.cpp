@@ -1,9 +1,9 @@
-#include "candock/geom3d/geom3d.hpp"
+#include "candock/geometry/geometry.hpp"
 #include "candock/helper/debug.hpp"
 #include <assert.h>
 #include <algorithm>
 
-namespace Geom3D {
+namespace geometry {
         
         double degrees(double radians) { return radians * 57.29577951308232286465; }
         double radians(double degrees) { return degrees / 57.29577951308232286465; }
@@ -54,11 +54,11 @@ namespace Geom3D {
 	}
 
 	double compute_rmsd(const Point::Vec &crds1, const Point::Vec &crds2) { 
-		return sqrt(Geom3D::compute_rmsd_sq(crds1, crds2)); 
+		return sqrt(geometry::compute_rmsd_sq(crds1, crds2)); 
 	}
 
-	Point compute_geometric_center(const Geom3D::Point::Vec &crds) { 
-		Geom3D::Point center;
+	Point compute_geometric_center(const geometry::Point::Vec &crds) { 
+		geometry::Point center;
 		for (auto &crd : crds) {
 			center = center + crd;
 		}
@@ -96,13 +96,13 @@ namespace Geom3D {
 
 
 
-	ostream& operator<<(ostream& os, const Geom3D::Point::Vec &points)	{
+	ostream& operator<<(ostream& os, const geometry::Point::Vec &points)	{
 		for (auto &point : points) {
 			os << "ATOM      1   U  DIK     1    " << point.pdb() << endl;
 		}
 		return os;
 	}	
-	ostream& operator<<(ostream& os, const Geom3D::Point::ConstSet &points)	{
+	ostream& operator<<(ostream& os, const geometry::Point::ConstSet &points)	{
 		for (auto &point : points) {
 			os << "ATOM      1   U  DIK     1    " << point->pdb() << endl;
 		}

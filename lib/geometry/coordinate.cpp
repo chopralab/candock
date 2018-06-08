@@ -7,11 +7,11 @@
 #include <set>
 #include <algorithm>
 #include <sstream>
-#include "candock/geom3d/matrix.hpp"
-#include "candock/geom3d/coordinate.hpp"
+#include "candock/geometry/matrix.hpp"
+#include "candock/geometry/coordinate.hpp"
 using namespace std;
 
-namespace Geom3D {
+namespace geometry {
 	void Coordinate::rotate_inline(const Matrix &matrix) {
 		gsl_vector *vec1 = gsl_vector_alloc(3);
 		gsl_vector *vec2 = gsl_vector_alloc(3);

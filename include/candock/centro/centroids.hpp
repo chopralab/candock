@@ -2,19 +2,19 @@
 #define CENTROIDS_H
 
 
-#include "candock/geom3d/coordinate.hpp"
+#include "candock/geometry/coordinate.hpp"
 #include "candock/ligands/genlig.hpp"
 
-namespace Centro {
+namespace centro {
 
 	class Centroid {
-		Geom3D::Coordinate __centroid;
+		geometry::Coordinate __centroid;
 		double __radial_check;
 	public:
 		Centroid() {}
-		Centroid(const Geom3D::Coordinate centroid, const double radial_check) :
+		Centroid(const geometry::Coordinate centroid, const double radial_check) :
 			__centroid(centroid), __radial_check(radial_check) {}
-		Geom3D::Coordinate get_centroid() const { return __centroid; }
+		geometry::Coordinate get_centroid() const { return __centroid; }
 		double get_radial_check() const { return __radial_check; }
 	};
 	
@@ -26,7 +26,7 @@ namespace Centro {
 	// According to the C++ standard, operator overloads should be done in the same namespace as the
 	// object they are overloading
 	// See http://clang.llvm.org/compatibility.html#dep_lookup for details
-	ostream& operator<<(ostream& os, const Centro::Centroids& centroids);
-};
+	ostream& operator<<(ostream& os, const centro::Centroids& centroids);
+}
 
 #endif

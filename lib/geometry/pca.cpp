@@ -1,6 +1,6 @@
-#include "candock/geom3d/geom3d.hpp"
+#include "candock/geometry/geometry.hpp"
 #include "candock/helper/debug.hpp"
-#include "candock/geom3d/pca.hpp"
+#include "candock/geometry/pca.hpp"
 #include <iostream>
 #include <iomanip>
 #include <sstream>
@@ -14,7 +14,7 @@
 
 using namespace std;
 
-namespace Geom3D {
+namespace geometry {
 #ifndef NDEBUG
 	string print_matrix(const string &msg, const gsl_matrix *data) {
 		stringstream ss;
@@ -39,12 +39,12 @@ namespace Geom3D {
 	string print_line(gsl_matrix *eigenmatrix, const gsl_matrix *projection, 
 		const gsl_vector *mean) {
 
-		const Geom3D::Vector3 unit_vector = gsl_matrix_column(eigenmatrix, 0).vector;
+		const geometry::Vector3 unit_vector = gsl_matrix_column(eigenmatrix, 0).vector;
 		dbgmsg(unit_vector);
 		vector<double> projected_points;
 		for (size_t i = 0; i < projection->size2; ++i) 
 			projected_points.push_back(gsl_matrix_get(projection, 0, i)); 
-		const Geom3D::Point geom_center = *mean;
+		const geometry::Point geom_center = *mean;
 		dbgmsg(geom_center);
 		auto ret = minmax_element(projected_points.begin(), projected_points.end());
 		const double min_value = *ret.first, max_value = *ret.second;
@@ -55,7 +55,7 @@ namespace Geom3D {
 		for (int i = 1; i <= 10 ; ++i) {
 			const double position = min_value + i * interval;
 			ss << "ATOM      1  X   DUM X   1    " 
-				<< Geom3D::line_evaluate(geom_center, unit_vector, position).pdb()
+				<< geometry::line_evaluate(geom_center, unit_vector, position).pdb()
 				<< "  1.00  0.00           N  " << endl;
 		}
 		return ss.str();

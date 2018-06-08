@@ -1,6 +1,6 @@
 #ifndef MOLECULES_H
 #define MOLECULES_H
-#include "candock/geom3d/geom3d.hpp"
+#include "candock/geometry/geometry.hpp"
 #include "candock/helper/help.hpp"
 #include "candock/molib/it.hpp"
 #include "candock/molib/grid.hpp"
@@ -26,12 +26,12 @@ namespace Molib {
 		void add(const Molecules& rhs) { for (auto &molecule : rhs) { add(new Molecule(molecule)); } }
 		void set_name(const std::string &name) { __name = name; }
 		const std::string& name() const { return __name; }
-		void rotate(const Geom3D::Matrix &rota, const bool inverse=false);
+		void rotate(const geometry::Matrix &rota, const bool inverse=false);
 		double compute_max_radius() const;
-		Geom3D::Coordinate compute_geometric_center() const;
+		geometry::Coordinate compute_geometric_center() const;
 		
 		Molecule::Vec get_molecules(const Residue::res_type &rest) const;
-		Geom3D::Point::Vec get_crds(const std::string &chain_ids="", const Residue::res_type &rest=Residue::res_type::notassigned, const int model_number=-1) const;
+		geometry::Point::Vec get_crds(const std::string &chain_ids="", const Residue::res_type &rest=Residue::res_type::notassigned, const int model_number=-1) const;
 		Atom::Vec get_atoms(const std::string &chain_ids="", const Residue::res_type &rest=Residue::res_type::notassigned, const int model_number=-1) const;
 		Residue::Vec get_residues() const;
 

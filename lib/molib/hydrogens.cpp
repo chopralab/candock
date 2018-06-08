@@ -14,7 +14,7 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/asio/ip/host_name.hpp>
 #include "candock/molib/molecule.hpp"
-#include "candock/geom3d/geom3d.hpp"
+#include "candock/geometry/geometry.hpp"
 #include "candock/fragmenter/fragmenter.hpp"
 #include "candock/fragmenter/unique.hpp"
 #include "candock/helper/benchmark.hpp"
@@ -71,7 +71,7 @@ namespace Molib {
 							dbgmsg("idatm_type = " << idatm_type);
 							dbgmsg("idatm_mask = " << help::idatm_mask.at(idatm_type));
 							Atom &hatom = this->add(new Atom(++max_atom_number, "H", 
-								Geom3D::Coordinate(), help::idatm_mask.at(idatm_type)));
+								geometry::Coordinate(), help::idatm_mask.at(idatm_type)));
 							atom.connect(hatom);
 							dbgmsg("added hydrogen");
 							all_atoms.push_back(&hatom);

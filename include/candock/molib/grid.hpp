@@ -7,7 +7,7 @@
 #include <vector>
 #include <map>
 #include <iomanip>
-#include "candock/geom3d/coordinate.hpp"
+#include "candock/geometry/coordinate.hpp"
 #include "candock/helper/debug.hpp"
 #include "candock/helper/help.hpp"
 
@@ -18,11 +18,11 @@ public:
 private:
         Points ** *storage;
         int szi, szj, szk;
-        Geom3D::Coordinate __min_crd;
+        geometry::Coordinate __min_crd;
 
         template<typename U>
-        Geom3D::Coordinate __correct (const U &point, const double &dist) const {
-                Geom3D::Coordinate crd = point - __min_crd + dist;
+        geometry::Coordinate __correct (const U &point, const double &dist) const {
+                geometry::Coordinate crd = point - __min_crd + dist;
 
                 if (dist < 0) {
                         if (crd.x() < 0) crd.set_x (0);
@@ -109,7 +109,7 @@ public:
 
                 if (!points.empty()) {
                         // calculate min and max crd
-                        Geom3D::Coordinate min_crd (HUGE_VAL, HUGE_VAL, HUGE_VAL),
+                        geometry::Coordinate min_crd (HUGE_VAL, HUGE_VAL, HUGE_VAL),
                                max_crd (-HUGE_VAL, -HUGE_VAL, -HUGE_VAL);
 
                         for (auto &point : points) {
@@ -127,14 +127,14 @@ public:
                         }
 
                         __min_crd = min_crd;
-                        Geom3D::Coordinate corr = max_crd - min_crd; // calculate size of grid
+                        geometry::Coordinate corr = max_crd - min_crd; // calculate size of grid
                         szi = corr.i() + 1;
                         szj = corr.j() + 1;
                         szk = corr.k() + 1;
                         this->__allocate (szi, szj, szk);
 
                         for (auto &point : points) { // set data points to grid cells
-                                Geom3D::Coordinate crd = point->crd() - min_crd;
+                                geometry::Coordinate crd = point->crd() - min_crd;
                                 //~ storage[crd.i()][crd.j()][crd.k()].push_back(&*point);
                                 storage[crd.i()][crd.j()][crd.k()].push_back (&*point);
                         }
@@ -150,8 +150,8 @@ public:
 
         template<typename U>
         Points get_neighbors (const U &point, const double &dist) const {
-                Geom3D::Coordinate cmin = __correct (point, -dist);
-                Geom3D::Coordinate cmax = __correct (point, dist);
+                geometry::Coordinate cmin = __correct (point, -dist);
+                geometry::Coordinate cmax = __correct (point, dist);
                 Points points;
                 const double dist_sq = pow (dist, 2);
 
@@ -173,8 +173,8 @@ public:
 
         template<typename U>
         Points get_neighbors_including_self (const U &point, const double &dist) {
-                Geom3D::Coordinate cmin = __correct (point, -dist);
-                Geom3D::Coordinate cmax = __correct (point, dist);
+                geometry::Coordinate cmin = __correct (point, -dist);
+                geometry::Coordinate cmax = __correct (point, dist);
                 Points points;
                 const double dist_sq = pow (dist, 2);
 
@@ -201,8 +201,8 @@ public:
 
         template<typename U>
         Points get_neighbors_within_tolerance_asymmetric (const U &point, const double &dist, const double &lower_tol, const double &upper_tol) {
-                Geom3D::Coordinate cmin = __correct (point, - (dist + upper_tol));
-                Geom3D::Coordinate cmax = __correct (point, dist + upper_tol);
+                geometry::Coordinate cmin = __correct (point, - (dist + upper_tol));
+                geometry::Coordinate cmax = __correct (point, dist + upper_tol);
                 Points points;
                 const double dist_sq_max = pow (dist + upper_tol, 2);
                 const double dist_sq_min = dist > lower_tol ? pow (dist - lower_tol, 2) : 0.0;
@@ -225,8 +225,8 @@ public:
 
         template<typename U>
         bool has_neighbor_within (const U &point, const double &dist) {
-                Geom3D::Coordinate cmin = __correct (point, -dist);
-                Geom3D::Coordinate cmax = __correct (point, dist);
+                geometry::Coordinate cmin = __correct (point, -dist);
+                geometry::Coordinate cmax = __correct (point, dist);
                 const double dist_sq = pow (dist, 2);
 
                 for (int i = cmin.i(); i <= cmax.i(); ++i)
@@ -257,8 +257,8 @@ public:
         Points get_clashed (const V &atom, const double clash_coeff) {
                 const double dist = 3.0;
                 const double vdw1 = atom.radius();
-                Geom3D::Coordinate cmin = __correct (atom.crd(), -dist);
-                Geom3D::Coordinate cmax = __correct (atom.crd(), dist);
+                geometry::Coordinate cmin = __correct (atom.crd(), -dist);
+                geometry::Coordinate cmax = __correct (atom.crd(), dist);
                 Points points;
 
                 for (int i = cmin.i(); i <= cmax.i(); ++i)
@@ -281,8 +281,8 @@ public:
         bool clashes (const V &atom, const double clash_coeff) const {
                 const double dist = 3.0;
                 const double vdw1 = atom.radius();
-                Geom3D::Coordinate cmin = __correct (atom.crd(), -dist);
-                Geom3D::Coordinate cmax = __correct (atom.crd(), dist);
+                geometry::Coordinate cmin = __correct (atom.crd(), -dist);
+                geometry::Coordinate cmax = __correct (atom.crd(), dist);
 
                 for (int i = cmin.i(); i <= cmax.i(); ++i)
                         for (int j = cmin.j(); j <= cmax.j(); ++j)

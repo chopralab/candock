@@ -4,7 +4,7 @@
 #include "candock/helper/error.hpp"
 #include "candock/molib/atom.hpp"
 #include "candock/cluster/optics.hpp"
-#include "candock/geom3d/geom3d.hpp"
+#include "candock/geometry/geometry.hpp"
 #include <iostream>
 #include <exception>
 #include <typeinfo>
@@ -53,9 +53,9 @@ namespace Score {
                           __dist_cutoff(dist_cutoff), __step_in_file(-1) {}
 
                 double non_bonded_energy(const Molib::Atom::Grid &gridrec, const Molib::Molecule&) const; // this was formerly called distances_and_scores_frag_lig
-                double non_bonded_energy(const Molib::Atom::Grid &gridrec, const Molib::Atom::Vec &atoms, const Geom3D::Point::Vec &crds) const;
+                double non_bonded_energy(const Molib::Atom::Grid &gridrec, const Molib::Atom::Vec &atoms, const geometry::Point::Vec &crds) const;
 
-                Array1d<double> compute_energy(const Molib::Atom::Grid &gridrec, const Geom3D::Coordinate &crd, const std::set<int> &ligand_atom_types) const;
+                Array1d<double> compute_energy(const Molib::Atom::Grid &gridrec, const geometry::Coordinate &crd, const std::set<int> &ligand_atom_types) const;
 
                 double get_dist_cutoff() const { return __dist_cutoff; }
 

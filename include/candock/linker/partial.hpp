@@ -3,7 +3,7 @@
 #include "candock/helper/debug.hpp"
 #include "candock/molib/it.hpp"
 #include "candock/fragmenter/fragmenter.hpp"
-#include "candock/geom3d/coordinate.hpp"
+#include "candock/geometry/coordinate.hpp"
 #include "candock/molib/internal.hpp"
 #include "candock/molib/grid.hpp"
 #include "candock/linker/segment.hpp"
@@ -25,11 +25,11 @@ namespace Linker {
 	private:
 		State::Vec __states;
 		double __energy;
-		Geom3D::Point::Vec __crds;
+		geometry::Point::Vec __crds;
 	public:
-		Partial() : __states(State::Vec()), __energy(0.0), __crds(Geom3D::Point::Vec()) {}
-		Partial(const double energy) : __states(State::Vec()), __energy(energy), __crds(Geom3D::Point::Vec()) {}
-		Partial(const State::Vec &states, const double energy, const Geom3D::Point::Vec &crds=Geom3D::Point::Vec())
+		Partial() : __states(State::Vec()), __energy(0.0), __crds(geometry::Point::Vec()) {}
+		Partial(const double energy) : __states(State::Vec()), __energy(energy), __crds(geometry::Point::Vec()) {}
+		Partial(const State::Vec &states, const double energy, const geometry::Point::Vec &crds=geometry::Point::Vec())
 			: __states(states), __energy(energy), __crds(crds) {}
 
 		void add_state(State &state) { __states.push_back(&state); }
@@ -37,12 +37,12 @@ namespace Linker {
 		State::Vec& get_states() { return __states; }
 		const State::Vec& get_states() const { return __states; }
 
-		void set_receptor_crds(const Geom3D::Point::Vec &crds) { __crds = crds; }
-		Geom3D::Point::Vec& get_receptor_crds() { return __crds; }
-		const Geom3D::Point::Vec& get_receptor_crds() const { return __crds; }
+		void set_receptor_crds(const geometry::Point::Vec &crds) { __crds = crds; }
+		geometry::Point::Vec& get_receptor_crds() { return __crds; }
+		const geometry::Point::Vec& get_receptor_crds() const { return __crds; }
 
-		void set_ligand_crds(const Geom3D::Point::Vec &crds); 
-		Geom3D::Point::Vec get_ligand_crds() const;
+		void set_ligand_crds(const geometry::Point::Vec &crds); 
+		geometry::Point::Vec get_ligand_crds() const;
 
 		Molib::Atom::Vec get_ligand_atoms();
 
@@ -54,7 +54,7 @@ namespace Linker {
 
 		double compute_rmsd_ord(const Partial&) const;
 
-		Geom3D::Point compute_geometric_center() const;
+		geometry::Point compute_geometric_center() const;
 		
 		static void sort(Partial::Vec &v);
 		

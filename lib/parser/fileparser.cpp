@@ -6,7 +6,7 @@
 #include <vector>
 #include <string>
 
-#include "candock/geom3d/coordinate.hpp"
+#include "candock/geometry/coordinate.hpp"
 #include "candock/helper/inout.hpp"
 #include "candock/helper/help.hpp"
 #include "candock/helper/debug.hpp"

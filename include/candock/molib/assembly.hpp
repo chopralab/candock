@@ -1,7 +1,7 @@
 #ifndef ASSEMBLY_H
 #define ASSEMBLY_H
-#include "candock/geom3d/geom3d.hpp"
-#include "candock/geom3d/matrix.hpp"
+#include "candock/geometry/geometry.hpp"
+#include "candock/geometry/matrix.hpp"
 #include "candock/molib/it.hpp"
 #include "candock/molib/element.hpp"
 #include "candock/molib/grid.hpp"
@@ -28,7 +28,7 @@ namespace Molib {
 			} 
 		}
 		
-		void init_bio(const Assembly &asym, map<int, Geom3D::Matrix> &matrices, const set<char> &chains);
+		void init_bio(const Assembly &asym, map<int, geometry::Matrix> &matrices, const set<char> &chains);
 		
 		void set_number(int number) { __number = number; }
 		void set_name(const std::string &name) { __name = name; }
@@ -36,7 +36,7 @@ namespace Molib {
 	std::string name() const { return __name; }
 		Model& add(Model *m) { return this->aadd(m->number(), m, this); }
 
-		void rotate(const Geom3D::Matrix &rota, const bool inverse=false);
+		void rotate(const geometry::Matrix &rota, const bool inverse=false);
 		
 		Atom::Vec get_atoms(const std::string &chain_ids="", const Residue::res_type &rest=Residue::res_type::notassigned, const int model_number=-1) const;
 		Assembly& erase_properties() { for (auto &model : *this) model.erase_properties(); return *this; }

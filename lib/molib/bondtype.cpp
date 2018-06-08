@@ -14,7 +14,7 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/asio/ip/host_name.hpp>
 #include "candock/molib/molecule.hpp"
-#include "candock/geom3d/geom3d.hpp"
+#include "candock/geometry/geometry.hpp"
 #include "candock/fragmenter/fragmenter.hpp"
 #include "candock/fragmenter/unique.hpp"
 #include "candock/helper/benchmark.hpp"
@@ -138,8 +138,8 @@ namespace Molib {
                         atom_bonds[0]->set_stereo("I");
                         atom_bonds[1]->set_stereo("I");
 
-                        double improper_1 = Geom3D::dihedral(neighbors[0]->crd(), a->crd(), neighbors[1]->crd(), neighbors[2]->crd());
-                        double improper_2 = Geom3D::dihedral(neighbors[0]->crd(), a->crd(), neighbors[1]->crd(), neighbors[3]->crd());
+                        double improper_1 = geometry::dihedral(neighbors[0]->crd(), a->crd(), neighbors[1]->crd(), neighbors[2]->crd());
+                        double improper_2 = geometry::dihedral(neighbors[0]->crd(), a->crd(), neighbors[1]->crd(), neighbors[3]->crd());
 
                         if (improper_1 > improper_2) {
                                 atom_bonds[2]->set_stereo("U");

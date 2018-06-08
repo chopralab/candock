@@ -14,7 +14,7 @@
 #include <boost/asio/ip/host_name.hpp>
 #include "candock/molib/grid.hpp"
 #include "candock/molib/molecule.hpp"
-#include "candock/geom3d/geom3d.hpp"
+#include "candock/geometry/geometry.hpp"
 #include "candock/fragmenter/fragmenter.hpp"
 #include "candock/fragmenter/unique.hpp"
 #include "candock/helper/renamerules.hpp"
@@ -41,7 +41,7 @@ namespace AtomType {
 				if (ring_bonds.count(&b2)) {
 					for (auto &b3 : b2) {
 						if (ring_bonds.count(&b3) && &b3 != &b1) {
-							const double dangle = Geom3D::degrees(Geom3D::dihedral(b1.atom1().crd(), b1.atom2().crd(), b3.atom1().crd(), b3.atom2().crd()));
+							const double dangle = geometry::degrees(geometry::dihedral(b1.atom1().crd(), b1.atom2().crd(), b3.atom1().crd(), b3.atom2().crd()));
 							
 							dbgmsg("dihedral angle is " 
 								<<  dangle
@@ -329,7 +329,7 @@ namespace AtomType {
 				double avgAngle = 0.0;
 				for (int n1 = 0; n1 < 3; ++n1) {
 					for (int n2 = n1 + 1; n2 < 3; ++n2) {
-						avgAngle += Geom3D::degrees(Geom3D::angle(
+						avgAngle += geometry::degrees(geometry::angle(
 							a[n1].crd(),
 							a.crd(),
 							a[n2].crd()));
@@ -369,7 +369,7 @@ namespace AtomType {
 			//	N may be sp3 (N3), sp2 or planar (Npl), or sp (N1)
 			//	O and S are sp3 (O3 and S3, respectively)
 			else if (a.size() == 2) {
-				double ang = Geom3D::degrees(Geom3D::angle(a[0].crd(), a.crd(), a[1].crd()));
+				double ang = geometry::degrees(geometry::angle(a[0].crd(), a.crd(), a[1].crd()));
 				dbgmsg("valence 2 typing for atom = " << a.atom_number() 
 					<< " angle(" << a[0].atom_number() << "," << a.atom_number() 
 					<< "," << a[1].atom_number() << ") = " << ang);

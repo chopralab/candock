@@ -4,7 +4,7 @@
 #include <map>
 #include <set>
 #include <vector>
-#include "candock/geom3d/coordinate.hpp"
+#include "candock/geometry/coordinate.hpp"
 using namespace std;
 
 namespace Molib {

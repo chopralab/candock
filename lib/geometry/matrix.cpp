@@ -1,7 +1,7 @@
-#include "candock/geom3d/matrix.hpp"
+#include "candock/geometry/matrix.hpp"
 #include <json/json.h>
 
-namespace Geom3D {
+namespace geometry {
 
     Matrix::Matrix(const Json::Value& rota, const Json::Value& trans) { // c++11 :-)
         __matrix = make_pair(gsl_matrix_alloc(3, 3), gsl_vector_alloc(3));

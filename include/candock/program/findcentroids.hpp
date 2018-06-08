@@ -16,14 +16,14 @@ namespace Program {
                 const std::string __chain_ids;
                 const std::string __out_dir;
 
-                Centro::Centroids __result;
+                centro::Centroids __result;
                 std::string __centroid_file;
 
         public:
                 FindCentroids ( const std::string& filename, const std::string& chain_ids, const std::string& out_dir );
                 virtual ~FindCentroids() {}
 
-                const Centro::Centroids& centroids() const {
+                const centro::Centroids& centroids() const {
                         return __result;
                 }
 

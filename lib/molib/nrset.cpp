@@ -7,7 +7,7 @@
 #include <cstdlib>
 #include <time.h>
 #include "candock/molib/nrset.hpp"
-#include "candock/geom3d/geom3d.hpp"
+#include "candock/geometry/geometry.hpp"
 #include "candock/molib/atom.hpp"
 #include "candock/molib/residue.hpp"
 #include "candock/molib/chain.hpp"
@@ -31,7 +31,7 @@ namespace Molib {
 		std::uniform_real_distribution<> dist_thousandth( -1.0f / 1000.0f, 1.0f / 1000.0f);
 		for (auto &patom : this->get_atoms()) {
 			dbgmsg("before jiggle crd = " << patom->crd());
-			Geom3D::Coordinate dcrd(dist_thousandth(rng), 
+			geometry::Coordinate dcrd(dist_thousandth(rng), 
 				dist_thousandth(rng),
 				dist_thousandth(rng));
 			patom->set_crd(patom->crd() + dcrd);

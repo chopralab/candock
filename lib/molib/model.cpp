@@ -66,7 +66,7 @@ namespace Molib {
 		return stream;
 	}
 
-	void Model::init_bio(const Model &model_asym, const Geom3D::Matrix &matrix, const set<char> &chains) {
+	void Model::init_bio(const Model &model_asym, const geometry::Matrix &matrix, const set<char> &chains) {
 		for (const char &chain_id : chains) { 
 			if (model_asym.has_chain(chain_id)) {
 				Chain &last = add(new Chain(chain_id));
@@ -74,7 +74,7 @@ namespace Molib {
 			}
 		}
 	}
-	void Model::rotate(const Geom3D::Matrix &rota, const bool inverse) {
+	void Model::rotate(const geometry::Matrix &rota, const bool inverse) {
 		for (auto &chain : *this) {
 			chain.rotate(rota, inverse);
 		}

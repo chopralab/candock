@@ -1,7 +1,7 @@
 #ifndef CHAIN_H
 #define CHAIN_H
-#include "candock/geom3d/geom3d.hpp"
-#include "candock/geom3d/matrix.hpp"
+#include "candock/geometry/geometry.hpp"
+#include "candock/geometry/matrix.hpp"
 #include "candock/molib/it.hpp"
 #include "candock/molib/atom.hpp"
 #include "candock/molib/residue.hpp"
@@ -13,7 +13,7 @@ namespace Molib {
 	
 	class Chain : public template_map_container<Residue, Chain, Model, Residue::res_pair> {
 		char __chain_id;
-		Geom3D::Coordinate __crd; // geometric center
+		geometry::Coordinate __crd; // geometric center
 	public:
 		Chain(char chain_id) : __chain_id(chain_id) {}
 		Chain(const Chain &rhs) : __chain_id(rhs.__chain_id), __crd(rhs.__crd) { 
@@ -22,10 +22,10 @@ namespace Molib {
 				add(new Residue(residue)); 
 			} 
 		}
-		void init_bio(Chain &chain_asym, const Geom3D::Matrix &bio_rota);
-		void rotate(const Geom3D::Matrix &rota, const bool inverse=false);
+		void init_bio(Chain &chain_asym, const geometry::Matrix &bio_rota);
+		void rotate(const geometry::Matrix &rota, const bool inverse=false);
 		
-		Geom3D::Coordinate& crd() { return __crd; }
+		geometry::Coordinate& crd() { return __crd; }
 		Residue& add(Residue *r) { return this->aadd(Residue::res_pair(r->resi(), r->ins_code()), r, this); }
 		Residue& residue(Residue::res_pair p) const { return this->element(p); }
 

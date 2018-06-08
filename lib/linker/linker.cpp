@@ -7,7 +7,7 @@
 #include "candock/helper/array2d.hpp"
 #include "candock/graph/mcqd.hpp"
 #include "candock/modeler/modeler.hpp"
-#include "candock/geom3d/geom3d.hpp"
+#include "candock/geometry/geometry.hpp"
 #include "candock/cluster/greedy.hpp"
 #include <queue>
 

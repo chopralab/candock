@@ -2,7 +2,7 @@
 #define POSES_H
 
 #include "candock/molib/grid.hpp"
-#include "candock/geom3d/geom3d.hpp"
+#include "candock/geometry/geometry.hpp"
 #include "candock/linker/segment.hpp"
 #include "candock/linker/seed.hpp"
 
@@ -15,12 +15,12 @@ namespace Linker {
 	
 	class Poses {
 		class AtomPoint {
-			const Geom3D::Point &__crd;
+			const geometry::Point &__crd;
 			const Molib::Atom &__atom; 
 			State &__state;
 		public:
-			AtomPoint(const Geom3D::Point &crd, const Molib::Atom &atom, State &state) : __crd(crd), __atom(atom), __state(state) {}
-			const Geom3D::Point& crd() const { return __crd; }
+			AtomPoint(const geometry::Point &crd, const Molib::Atom &atom, State &state) : __crd(crd), __atom(atom), __state(state) {}
+			const geometry::Point& crd() const { return __crd; }
 			State& get_state() { return __state; }
 			const Molib::Atom& get_atom() const { return __atom; }
 			void distance(double) const {} // just dummy : needed by grid

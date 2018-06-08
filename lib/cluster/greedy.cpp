@@ -3,7 +3,7 @@
 #include "candock/score/score.hpp"
 #include "candock/helper/benchmark.hpp"
 #include "candock/helper/debug.hpp"
-#include "candock/geom3d/geom3d.hpp"
+#include "candock/geometry/geometry.hpp"
 #include "candock/cluster/greedy.hpp"
 #include <iostream>
 #include <exception>
@@ -16,23 +16,23 @@ namespace Cluster {
 	/**
 	 * Cluter points
 	 */
-	Geom3D::Point::Vec Cluster::greedy(const Geom3D::Point::Vec &initial, const double clus_rad) {
+	geometry::Point::Vec Cluster::greedy(const geometry::Point::Vec &initial, const double clus_rad) {
 
 		Benchmark bench;
 
-		Geom3D::Point::ConstSet confs;
+		geometry::Point::ConstSet confs;
 		for (auto &point : initial)
 			confs.insert(&point);
 
 		dbgmsg(confs);
 	
-		Grid<const Geom3D::Point> grid(confs); // grid of points
+		Grid<const geometry::Point> grid(confs); // grid of points
 
-		Geom3D::Point::Vec reps;
+		geometry::Point::Vec reps;
 
 		while (!confs.empty()) {
 			// accept lowest energy conformation as representative
-			const Geom3D::Point &lowest_point = **confs.begin();
+			const geometry::Point &lowest_point = **confs.begin();
 			reps.push_back(lowest_point);
 			confs.erase(confs.begin());
 			// delete all conformations within RMSD tolerance of this lowest energy yconformation
