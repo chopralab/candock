@@ -4,9 +4,9 @@
 #include <string>
 #include <sstream>
 #include <algorithm>
-#include "jsonreader.hpp"
-#include "helper/error.hpp"
-#include "helper/inout.hpp"
+#include "candock/ligands/jsonreader.hpp"
+#include "candock/helper/error.hpp"
+#include "candock/helper/inout.hpp"
 #include <lib_json/json_reader.cpp>
 #include <lib_json/json_value.cpp>
 #include <lib_json/json_writer.cpp>

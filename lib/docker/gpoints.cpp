@@ -1,14 +1,14 @@
-#include "helper/inout.hpp"
-#include "molib/grid.hpp"
-#include "molib/molecule.hpp"
-#include "helper/benchmark.hpp"
-#include "geom3d/geom3d.hpp"
-#include "centro/centroids.hpp"
-#include "score/score.hpp"
-#include "gpoints.hpp"
+#include "candock/helper/inout.hpp"
+#include "candock/molib/grid.hpp"
+#include "candock/molib/molecule.hpp"
+#include "candock/helper/benchmark.hpp"
+#include "candock/geom3d/geom3d.hpp"
+#include "candock/centro/centroids.hpp"
+#include "candock/score/score.hpp"
+#include "candock/docker/gpoints.hpp"
 #include <iostream>
 #include <exception>
-#include "helper/logger.hpp"
+#include "candock/helper/logger.hpp"
 
 using namespace std;
 

@@ -1,14 +1,14 @@
-#include "findcentroids.hpp"
+#include "candock/program/findcentroids.hpp"
 
 #include <boost/filesystem.hpp>
 
-#include "probis/probis.hpp"
-#include "helper/inout.hpp"
-#include "ligands/genclus.hpp"
-#include "molib/molecules.hpp"
+#include "candock/probis/probis.hpp"
+#include "candock/helper/inout.hpp"
+#include "candock/ligands/genclus.hpp"
+#include "candock/molib/molecules.hpp"
 
-#include "helper/path.hpp"
-#include "options.hpp"
+#include "candock/helper/path.hpp"
+#include "candock/program/options.hpp"
 
 #ifdef _WINDOWS
 #include <direct.h>

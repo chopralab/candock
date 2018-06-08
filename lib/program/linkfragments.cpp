@@ -1,13 +1,13 @@
-#include "linkfragments.hpp"
+#include "candock/program/linkfragments.hpp"
 
 #include <boost/filesystem.hpp>
 
-#include "linker/linker.hpp"
-#include "modeler/modeler.hpp"
-#include "helper/path.hpp"
-#include "helper/grep.hpp"
+#include "candock/linker/linker.hpp"
+#include "candock/modeler/modeler.hpp"
+#include "candock/helper/path.hpp"
+#include "candock/helper/grep.hpp"
 
-#include "fileout/fileout.hpp"
+#include "candock/fileout/fileout.hpp"
 
 namespace Program {
 

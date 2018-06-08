@@ -1,8 +1,8 @@
-#include "forcefield.hpp"
-#include "molib/molecule.hpp"
-#include "score/kbff.hpp"
-#include "helper/inout.hpp"
-#include "helper/error.hpp"
+#include "candock/modeler/forcefield.hpp"
+#include "candock/molib/molecule.hpp"
+#include "candock/score/kbff.hpp"
+#include "candock/helper/inout.hpp"
+#include "candock/helper/error.hpp"
 #include "rapidxml/rapidxml.hpp"
 #include "rapidxml/rapidxml_print.hpp"
 #include <boost/regex.hpp>

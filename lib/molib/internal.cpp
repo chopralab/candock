@@ -4,10 +4,10 @@
 #include <map>
 #include <string>
 #include <vector>
-#include "geom3d/geom3d.hpp"
-#include "graph/graph.hpp"
-#include "molecule.hpp"
-#include "internal.hpp"
+#include "candock/geom3d/geom3d.hpp"
+#include "candock/graph/graph.hpp"
+#include "candock/molib/molecule.hpp"
+#include "candock/molib/internal.hpp"
 using namespace std;
 
 namespace Molib {

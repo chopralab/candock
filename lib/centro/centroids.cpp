@@ -1,11 +1,11 @@
-#include "centroids.hpp"
-#include "helper/inout.hpp"
-#include "molib/grid.hpp"
-#include "molib/molecules.hpp"
-#include "helper/benchmark.hpp"
-#include "geom3d/geom3d.hpp"
-#include "parser/fileparser.hpp"
-#include "cluster/greedy.hpp"
+#include "candock/centro/centroids.hpp"
+#include "candock/helper/inout.hpp"
+#include "candock/molib/grid.hpp"
+#include "candock/molib/molecules.hpp"
+#include "candock/helper/benchmark.hpp"
+#include "candock/geom3d/geom3d.hpp"
+#include "candock/parser/fileparser.hpp"
+#include "candock/cluster/greedy.hpp"
 
 namespace Centro {
 

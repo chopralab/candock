@@ -6,9 +6,9 @@
 #include <string.h>
 
 #include <boost/filesystem.hpp>
-#include "drm.hpp"
+#include "candock/drm/drm.hpp"
 
-#include "helper/logger.hpp"
+#include "candock/helper/logger.hpp"
 
 using namespace std;
 

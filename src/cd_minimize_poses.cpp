@@ -1,16 +1,16 @@
-#include "program/cmdlnopts.hpp"
-#include "program/target.hpp"
+#include "candock/program/cmdlnopts.hpp"
+#include "candock/program/target.hpp"
 
-#include "score/kbff.hpp"
-#include "modeler/forcefield.hpp"
-#include "modeler/modeler.hpp"
+#include "candock/score/kbff.hpp"
+#include "candock/modeler/forcefield.hpp"
+#include "candock/modeler/modeler.hpp"
 
 #include "version.hpp"
-#include "drm/drm.hpp"
+#include "candock/drm/drm.hpp"
 
-#include "fileout/fileout.hpp"
+#include "candock/fileout/fileout.hpp"
 
-#include "modeler/systemtopology.hpp"
+#include "candock/modeler/systemtopology.hpp"
 
 using namespace std;
 using namespace Program;

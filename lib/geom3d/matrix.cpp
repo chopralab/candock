@@ -1,4 +1,4 @@
-#include "matrix.hpp"
+#include "candock/geom3d/matrix.hpp"
 #include <json/json.h>
 
 namespace Geom3D {

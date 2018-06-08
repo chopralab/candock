@@ -1,6 +1,6 @@
-#include "systemtopology.hpp"
-#include "modeler.hpp"
-#include "program/cmdlnopts.hpp"
+#include "candock/modeler/systemtopology.hpp"
+#include "candock/modeler/modeler.hpp"
+#include "candock/program/cmdlnopts.hpp"
 
 
 #include <openmm/Platform.h>
@@ -16,11 +16,11 @@
 #include <openmm/LocalEnergyMinimizer.h>
 #include <openmm/Units.h>
 
-#include "forcefield.hpp"
-#include "topology.hpp"
-#include "helper/inout.hpp"
-#include "helper/debug.hpp"
-#include "helper/error.hpp"
+#include "candock/modeler/forcefield.hpp"
+#include "candock/modeler/topology.hpp"
+#include "candock/helper/inout.hpp"
+#include "candock/helper/debug.hpp"
+#include "candock/helper/error.hpp"
 #include <boost/regex.hpp>
 #include <boost/algorithm/string.hpp>
 #include <boost/filesystem.hpp>

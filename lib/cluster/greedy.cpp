@@ -1,13 +1,13 @@
-#include "molib/grid.hpp"
-#include "molib/molecules.hpp"
-#include "score/score.hpp"
-#include "helper/benchmark.hpp"
-#include "helper/debug.hpp"
-#include "geom3d/geom3d.hpp"
-#include "greedy.hpp"
+#include "candock/molib/grid.hpp"
+#include "candock/molib/molecules.hpp"
+#include "candock/score/score.hpp"
+#include "candock/helper/benchmark.hpp"
+#include "candock/helper/debug.hpp"
+#include "candock/geom3d/geom3d.hpp"
+#include "candock/cluster/greedy.hpp"
 #include <iostream>
 #include <exception>
-#include "helper/logger.hpp"
+#include "candock/helper/logger.hpp"
 
 using namespace Molib;
 

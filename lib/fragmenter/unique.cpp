@@ -1,6 +1,6 @@
-#include "unique.hpp"
-#include "molib/molecule.hpp"
-#include "fragmenter/fragmenter.hpp"
+#include "candock/fragmenter/unique.hpp"
+#include "candock/molib/molecule.hpp"
+#include "candock/fragmenter/fragmenter.hpp"
 
 namespace Molib {
 	ostream& operator<<(ostream& os, const Unique::USeeds& useeds) {

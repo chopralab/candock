@@ -1,4 +1,5 @@
-#include "mnts.hpp"
+#include "candock/graph/mnts.hpp"
+
 void MNTS::initialize() {
 	srand( (unsigned) time( NULL ) );
 	Iteration = unique_ptr<int[]>(new int [iter]);

@@ -1,6 +1,6 @@
-#include "modeler/forcefield.hpp"
-#include "modeler/modeler.hpp"
-#include "program/fragmentligands.hpp"
+#include "candock/modeler/forcefield.hpp"
+#include "candock/modeler/modeler.hpp"
+#include "candock/program/fragmentligands.hpp"
 #include "version.hpp"
 
 ////////////////// FRAGMENTING OF LIGANDS ///////////////////////////

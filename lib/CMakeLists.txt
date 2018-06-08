@@ -14,7 +14,6 @@ if (NOT ${CANDOCK_BUILD_STATIC_EXECUTABLE})
 
     add_library(
         candock SHARED
-            candockexport.hpp
             ${CANDOCK_LIB_SOURCES}
     )
 

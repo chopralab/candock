@@ -1,6 +1,6 @@
-#include "geom3d/geom3d.hpp"
-#include "helper/debug.hpp"
-#include "pca.hpp"
+#include "candock/geom3d/geom3d.hpp"
+#include "candock/helper/debug.hpp"
+#include "candock/geom3d/pca.hpp"
 #include <iostream>
 #include <iomanip>
 #include <sstream>

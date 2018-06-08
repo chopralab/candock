@@ -1,12 +1,12 @@
-#include "interface.hpp"
-#include "parser/fileparser.hpp"
-#include "molib/molecules.hpp"
-#include "molib/molecule.hpp"
-#include "parser/fileparser.hpp"
-#include "score/kbff.hpp"
-#include "modeler/forcefield.hpp"
-#include "modeler/modeler.hpp"
-#include "helper/help.hpp"
+#include "candock/interface/interface.hpp"
+#include "candock/parser/fileparser.hpp"
+#include "candock/molib/molecules.hpp"
+#include "candock/molib/molecule.hpp"
+#include "candock/parser/fileparser.hpp"
+#include "candock/score/kbff.hpp"
+#include "candock/modeler/forcefield.hpp"
+#include "candock/modeler/modeler.hpp"
+#include "candock/helper/help.hpp"
 
 #include <boost/filesystem/path.hpp>
 #include <memory>

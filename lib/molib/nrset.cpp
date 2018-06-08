@@ -6,15 +6,15 @@
 #include <vector>
 #include <cstdlib>
 #include <time.h>
-#include "nrset.hpp"
-#include "geom3d/geom3d.hpp"
-#include "atom.hpp"
-#include "residue.hpp"
-#include "chain.hpp"
-#include "model.hpp"
-#include "assembly.hpp"
-#include "molecule.hpp"
-#include "molecules.hpp"
+#include "candock/molib/nrset.hpp"
+#include "candock/geom3d/geom3d.hpp"
+#include "candock/molib/atom.hpp"
+#include "candock/molib/residue.hpp"
+#include "candock/molib/chain.hpp"
+#include "candock/molib/model.hpp"
+#include "candock/molib/assembly.hpp"
+#include "candock/molib/molecule.hpp"
+#include "candock/molib/molecules.hpp"
 
 using namespace std;
 

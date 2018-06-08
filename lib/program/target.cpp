@@ -1,22 +1,22 @@
-#include "target.hpp"
+#include "candock/program/target.hpp"
 
 #include <boost/filesystem.hpp>
 
-#include "helper/path.hpp"
-#include "fragmenter/unique.hpp"
-#include "molib/molecule.hpp"
-#include "parser/fileparser.hpp"
+#include "candock/helper/path.hpp"
+#include "candock/fragmenter/unique.hpp"
+#include "candock/molib/molecule.hpp"
+#include "candock/parser/fileparser.hpp"
 
-#include "score/kbff.hpp"
+#include "candock/score/kbff.hpp"
 
-#include "modeler/systemtopology.hpp"
-#include "modeler/modeler.hpp"
+#include "candock/modeler/systemtopology.hpp"
+#include "candock/modeler/modeler.hpp"
 
-#include "findcentroids.hpp"
-#include "dockfragments.hpp"
-#include "linkfragments.hpp"
+#include "candock/program/findcentroids.hpp"
+#include "candock/program/dockfragments.hpp"
+#include "candock/program/linkfragments.hpp"
 
-#include "fileout/fileout.hpp"
+#include "candock/fileout/fileout.hpp"
 
 namespace Program {
 

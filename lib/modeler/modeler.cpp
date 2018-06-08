@@ -1,11 +1,11 @@
-#include "modeler.hpp"
-#include "forcefield.hpp"
-#include "systemtopology.hpp"
-#include "topology.hpp"
-#include "helper/inout.hpp"
-#include "helper/debug.hpp"
-#include "helper/error.hpp"
-#include "score/score.hpp"
+#include "candock/modeler/modeler.hpp"
+#include "candock/modeler/forcefield.hpp"
+#include "candock/modeler/systemtopology.hpp"
+#include "candock/modeler/topology.hpp"
+#include "candock/helper/inout.hpp"
+#include "candock/helper/debug.hpp"
+#include "candock/helper/error.hpp"
+#include "candock/score/score.hpp"
 #include <boost/regex.hpp>
 #include <boost/algorithm/string.hpp>
 #include <boost/filesystem.hpp>
@@ -19,7 +19,7 @@
 #include <openmm/Units.h>
 #include <openmm/Vec3.h>
 
-#include "fileout/fileout.hpp"
+#include "candock/fileout/fileout.hpp"
 
 using namespace std;
 

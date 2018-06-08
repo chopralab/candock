@@ -1,5 +1,5 @@
-#include "geom3d.hpp"
-#include "helper/debug.hpp"
+#include "candock/geom3d/geom3d.hpp"
+#include "candock/helper/debug.hpp"
 #include <assert.h>
 #include <algorithm>
 

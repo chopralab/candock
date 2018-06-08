@@ -7,8 +7,8 @@
 #include <set>
 #include <algorithm>
 #include <sstream>
-#include "matrix.hpp"
-#include "coordinate.hpp"
+#include "candock/geom3d/matrix.hpp"
+#include "candock/geom3d/coordinate.hpp"
 using namespace std;
 
 namespace Geom3D {

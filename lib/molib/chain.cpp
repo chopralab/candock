@@ -3,9 +3,9 @@
 #include <map>
 #include <string>
 #include <vector>
-#include "atom.hpp"
-#include "residue.hpp"
-#include "chain.hpp"
+#include "candock/molib/atom.hpp"
+#include "candock/molib/residue.hpp"
+#include "candock/molib/chain.hpp"
 using namespace std;
 
 namespace Molib {

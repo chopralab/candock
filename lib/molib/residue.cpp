@@ -3,10 +3,10 @@
 #include <map>
 #include <string>
 #include <vector>
-#include "atomtype.hpp"
-#include "bondtype.hpp"
-#include "atom.hpp"
-#include "residue.hpp"
+#include "candock/molib/atomtype.hpp"
+#include "candock/molib/bondtype.hpp"
+#include "candock/molib/atom.hpp"
+#include "candock/molib/residue.hpp"
 using namespace std;
 
 namespace Molib {

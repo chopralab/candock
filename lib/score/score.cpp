@@ -1,7 +1,7 @@
-#include "score.hpp"
-#include "molib/molecule.hpp"
-#include "helper/inout.hpp"
-#include "helper/path.hpp"
+#include "candock/score/score.hpp"
+#include "candock/molib/molecule.hpp"
+#include "candock/helper/inout.hpp"
+#include "candock/helper/path.hpp"
 #include <boost/filesystem/path.hpp>
 #include <boost/filesystem/operations.hpp>
 #include <functional>

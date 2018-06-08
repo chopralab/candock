@@ -1,19 +1,19 @@
 #include <iostream>
 #include <exception>
 #include <typeinfo>
-#include "molib/grid.hpp"
-#include "jsonreader.hpp"
-#include "nosqlreader.hpp"
-#include "molib/nrset.hpp"
-#include "parser/fileparser.hpp"
-#include "helper/help.hpp"
-#include "geom3d/matrix.hpp"
-#include "helper/error.hpp"
-#include "helper/inout.hpp"
-#include "helper/debug.hpp"
-#include "helper/path.hpp"
-#include "common.hpp"
-#include "genlig.hpp"
+#include "candock/molib/grid.hpp"
+#include "candock/ligands/jsonreader.hpp"
+#include "candock/ligands/nosqlreader.hpp"
+#include "candock/molib/nrset.hpp"
+#include "candock/parser/fileparser.hpp"
+#include "candock/helper/help.hpp"
+#include "candock/geom3d/matrix.hpp"
+#include "candock/helper/error.hpp"
+#include "candock/helper/inout.hpp"
+#include "candock/helper/debug.hpp"
+#include "candock/helper/path.hpp"
+#include "candock/ligands/common.hpp"
+#include "candock/ligands/genlig.hpp"
 using namespace std;
 
 namespace genlig {

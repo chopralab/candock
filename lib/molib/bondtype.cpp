@@ -13,14 +13,14 @@
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string.hpp>
 #include <boost/asio/ip/host_name.hpp>
-#include "molecule.hpp"
-#include "geom3d/geom3d.hpp"
-#include "fragmenter/fragmenter.hpp"
-#include "fragmenter/unique.hpp"
-#include "helper/benchmark.hpp"
-#include "helper/renamerules.hpp"
-#include "bond.hpp"
-#include "bondtype.hpp"
+#include "candock/molib/molecule.hpp"
+#include "candock/geom3d/geom3d.hpp"
+#include "candock/fragmenter/fragmenter.hpp"
+#include "candock/fragmenter/unique.hpp"
+#include "candock/helper/benchmark.hpp"
+#include "candock/helper/renamerules.hpp"
+#include "candock/molib/bond.hpp"
+#include "candock/molib/bondtype.hpp"
 using namespace std;
 
 namespace Molib {

@@ -1,13 +1,13 @@
-#include "linker.hpp"
-#include "score/score.hpp"
-#include "molib/nrset.hpp"
-#include "helper/benchmark.hpp"
-#include "helper/help.hpp"
-#include "helper/array2d.hpp"
-#include "modeler/modeler.hpp"
-#include "geom3d/quaternion.hpp"
-#include "poses.hpp"
-#include "molib/internal.hpp"
+#include "candock/linker/linker.hpp"
+#include "candock/score/score.hpp"
+#include "candock/molib/nrset.hpp"
+#include "candock/helper/benchmark.hpp"
+#include "candock/helper/help.hpp"
+#include "candock/helper/array2d.hpp"
+#include "candock/modeler/modeler.hpp"
+#include "candock/geom3d/quaternion.hpp"
+#include "candock/linker/poses.hpp"
+#include "candock/molib/internal.hpp"
 #include <queue>
 
 using namespace std;

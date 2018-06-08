@@ -15,9 +15,9 @@
 #include <gsl/gsl_blas.h>
 #include <gsl/gsl_multifit_nlinear.h>
 
-#include "helper/debug.hpp"
-#include "helper/error.hpp"
-#include "powerfit.hpp"
+#include "candock/helper/debug.hpp"
+#include "candock/helper/error.hpp"
+#include "candock/score/powerfit.hpp"
 
 namespace Score {
 

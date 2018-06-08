@@ -1,12 +1,12 @@
-#include "dockfragments.hpp"
+#include "candock/program/dockfragments.hpp"
 
 #include <boost/filesystem/path.hpp>
 
-#include "helper/path.hpp"
-#include "helper/inout.hpp"
-#include "program/options.hpp"
-#include "helper/grep.hpp"
-#include "molib/atomtype.hpp"
+#include "candock/helper/path.hpp"
+#include "candock/helper/inout.hpp"
+#include "candock/program/options.hpp"
+#include "candock/helper/grep.hpp"
+#include "candock/molib/atomtype.hpp"
 
 namespace Program {
 

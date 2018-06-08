@@ -5,19 +5,19 @@
 #include <string>
 #include <vector>
 #include <cstdlib>
-#include "atomtype.hpp"
-#include "bondtype.hpp"
-#include "bond.hpp"
-#include "geom3d/geom3d.hpp"
-#include "fragmenter/fragmenter.hpp"
-#include "fragmenter/unique.hpp"
-#include "atom.hpp"
-#include "residue.hpp"
-#include "chain.hpp"
-#include "model.hpp"
-#include "assembly.hpp"
-#include "molecule.hpp"
-#include "molecules.hpp"
+#include "candock/molib/atomtype.hpp"
+#include "candock/molib/bondtype.hpp"
+#include "candock/molib/bond.hpp"
+#include "candock/geom3d/geom3d.hpp"
+#include "candock/fragmenter/fragmenter.hpp"
+#include "candock/fragmenter/unique.hpp"
+#include "candock/molib/atom.hpp"
+#include "candock/molib/residue.hpp"
+#include "candock/molib/chain.hpp"
+#include "candock/molib/model.hpp"
+#include "candock/molib/assembly.hpp"
+#include "candock/molib/molecule.hpp"
+#include "candock/molib/molecules.hpp"
 
 using namespace std;
 

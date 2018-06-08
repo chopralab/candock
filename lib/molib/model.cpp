@@ -5,11 +5,11 @@
 #include <string>
 #include <vector>
 #include <cstdlib>
-#include "bond.hpp"
-#include "atom.hpp"
-#include "residue.hpp"
-#include "chain.hpp"
-#include "model.hpp"
+#include "candock/molib/bond.hpp"
+#include "candock/molib/atom.hpp"
+#include "candock/molib/residue.hpp"
+#include "candock/molib/chain.hpp"
+#include "candock/molib/model.hpp"
 using namespace std;
 
 namespace Molib {

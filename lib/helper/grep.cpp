@@ -1,4 +1,4 @@
-#include "grep.hpp"
+#include "candock/helper/grep.hpp"
 
 size_t Grep::count_matches(std::istream& stream, const boost::regex& regex) {
 	size_t count = 0;

@@ -1,9 +1,9 @@
-#include "kbff.hpp"
+#include "candock/score/kbff.hpp"
 #include <boost/filesystem/path.hpp>
 #include <boost/filesystem/operations.hpp>
-#include "score/interpolation.hpp"
-#include "score/powerfit.hpp"
-#include "helper/path.hpp"
+#include "candock/score/interpolation.hpp"
+#include "candock/score/powerfit.hpp"
+#include "candock/helper/path.hpp"
 
 namespace Score
 {

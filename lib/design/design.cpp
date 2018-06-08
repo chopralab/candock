@@ -1,11 +1,11 @@
-#include "design.hpp"
+#include "candock/design/design.hpp"
 
 #include <set>
 
-#include "molib/bondtype.hpp"
-#include "molib/atomtype.hpp"
-#include "fragmenter/unique.hpp"
-#include "helper/logger.hpp"
+#include "candock/molib/bondtype.hpp"
+#include "candock/molib/atomtype.hpp"
+#include "candock/fragmenter/unique.hpp"
+#include "candock/helper/logger.hpp"
 
 namespace design {
 

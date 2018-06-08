@@ -115,7 +115,7 @@ if( ${CANDOCK_DRM} )
     
 endif( ${CANDOCK_DRM} )
 
-include_directories(lib)
+include_directories(include)
 
 execute_process(
     COMMAND ${GIT_EXECUTABLE} log --pretty=format:%H -n 1

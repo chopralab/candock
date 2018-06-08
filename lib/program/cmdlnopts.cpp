@@ -1,8 +1,8 @@
-#include "cmdlnopts.hpp"
+#include "candock/program/cmdlnopts.hpp"
 #include <boost/program_options/cmdline.hpp>
 #include <boost/program_options/errors.hpp>
 
-#include "helper/logger.hpp"
+#include "candock/helper/logger.hpp"
 
 #include <iostream>
 #include <fstream>

@@ -1,11 +1,11 @@
-#include "design/design.hpp"
+#include "candock/design/design.hpp"
 #include <boost/program_options.hpp>
-#include "fileout/fileout.hpp"
+#include "candock/fileout/fileout.hpp"
 
 #include "version.hpp"
-#include "drm/drm.hpp"
-#include "parser/fileparser.hpp"
-#include "fragmenter/unique.hpp"
+#include "candock/drm/drm.hpp"
+#include "candock/parser/fileparser.hpp"
+#include "candock/fragmenter/unique.hpp"
 
 using namespace std;
 

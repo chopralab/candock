@@ -1,4 +1,4 @@
-#include "inout.hpp"
+#include "candock/helper/inout.hpp"
 
 #include <boost/regex.hpp>
 #include <boost/algorithm/string.hpp>
@@ -23,9 +23,9 @@
 
 #endif
 
-#include "error.hpp"
-#include "debug.hpp"
-#include "logger.hpp"
+#include "candock/helper/error.hpp"
+#include "candock/helper/debug.hpp"
+#include "candock/helper/logger.hpp"
 
 namespace Inout {
 

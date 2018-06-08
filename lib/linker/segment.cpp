@@ -1,7 +1,7 @@
-#include "segment.hpp"
-#include "molib/molecule.hpp"
-#include "helper/benchmark.hpp"
-#include "helper/help.hpp"
+#include "candock/linker/segment.hpp"
+#include "candock/molib/molecule.hpp"
+#include "candock/helper/benchmark.hpp"
+#include "candock/helper/help.hpp"
 
 namespace Linker {
 	ostream& operator<< (ostream& stream, const Segment& s) {
