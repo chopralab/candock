@@ -143,10 +143,4 @@ add_subdirectory(tests)
 
 install(DIRECTORY include/ DESTINATION ${CANDOCK_VERSION}/include)
 
-set(CANDOCK_BUILD_GUI OFF CACHE BOOL "Build the CANDOCK gui")
-
-if (CANDOCK_BUILD_GUI)
-    add_subdirectory(gui)
-endif (CANDOCK_BUILD_GUI)
-
 add_subdirectory(doc)
