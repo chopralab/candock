@@ -1,6 +1,6 @@
 #ifndef JSONREADER_H
 #define JSONREADER_H
-#include <json/json.h>
+#include "candock/external/json/json.h"
 #include <boost/regex.hpp>
 #include <boost/algorithm/string.hpp>
 #include <boost/filesystem.hpp>

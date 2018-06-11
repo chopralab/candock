@@ -3,8 +3,8 @@
 #include "candock/score/kbff.hpp"
 #include "candock/helper/inout.hpp"
 #include "candock/helper/error.hpp"
-#include "rapidxml/rapidxml.hpp"
-#include "rapidxml/rapidxml_print.hpp"
+#include "candock/external/rapidxml/rapidxml.hpp"
+#include "candock/external/rapidxml/rapidxml_print.hpp"
 #include <boost/regex.hpp>
 #include <boost/algorithm/string.hpp>
 #include <boost/filesystem.hpp>

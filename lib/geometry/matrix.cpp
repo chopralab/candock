@@ -1,5 +1,5 @@
 #include "candock/geometry/matrix.hpp"
-#include <json/json.h>
+#include "candock/external/json/json.h"
 
 namespace geometry {
 
