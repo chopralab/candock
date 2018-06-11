@@ -27,29 +27,30 @@ if (NOT ${CANDOCK_BUILD_STATIC_EXECUTABLE})
     endif( ${CANDOCK_DRM} )
 
     target_link_libraries ( candock ${candock_libraries_to_link} )
-
-    if (NOT WIN32)
-        install(
-            TARGETS
-                candock
-            LIBRARY DESTINATION
-                ${CANDOCK_VERSION}/lib
-        )
-    else()
-        install(
-            TARGETS
-               candock
-            RUNTIME DESTINATION
-                ${CANDOCK_VERSION}/bin/
-        )
-    endif()
 else()
     add_library(
         candock STATIC
-            candockexport.hpp
             ${CANDOCK_LIB_SOURCES}
     )
-endif (NOT ${CANDOCK_BUILD_STATIC_EXECUTABLE})
+endif()
+
+if (NOT WIN32)
+    install(
+        TARGETS
+            candock
+        LIBRARY DESTINATION
+            ${CANDOCK_VERSION}/lib
+        ARCHIVE DESTINATION
+            ${CANDOCK_VERSION}/lib
+    )
+else()
+    install(
+        TARGETS
+            candock
+        RUNTIME DESTINATION
+            ${CANDOCK_VERSION}/bin/
+    )
+endif()
 
 if (${USING_INTERNAL_GSL})
     add_dependencies(candock GSL)

@@ -6,7 +6,8 @@ if(${CANDOCK_BUILD_STATIC_EXECUTABLE})
     endif(WIN32)
 
     set( all_needed_libraries
-        ${OPENMM_LIBRARIES}
+        candock
+        ${OPENMM_LIBRARY}
         ${Boost_LIBRARIES}
         ${GSL_LIBRARIES}
     )
@@ -16,8 +17,6 @@ if(${CANDOCK_BUILD_STATIC_EXECUTABLE})
     endif( ${CANDOCK_DRM} )
 
 else (${CANDOCK_BUILD_STATIC_EXECUTABLE})
-
-    set( CANDOCK_SRC )
     
     set( all_needed_libraries
         candock

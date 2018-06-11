@@ -7,7 +7,12 @@ add_executable( cd_gen_count_file
                 molecularbondbinner.cpp
             )
 
-target_link_libraries( cd_gen_count_file candock ${Boost_LIBRARIES} )
+target_link_libraries( cd_gen_count_file
+    candock
+    ${Boost_LIBRARIES}
+    ${OPENMM_LIBRARY}
+    ${GSL_LIBRARIES}
+)
 
 install(
     TARGETS
