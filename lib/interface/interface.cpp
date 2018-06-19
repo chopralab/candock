@@ -16,6 +16,7 @@ std::unique_ptr<Molib::Molecules> __ligand;
 std::unique_ptr<Score::KBFF> __score;
 std::unique_ptr<Molib::Atom::Grid> __gridrec;
 std::unique_ptr<OMMIface::ForceField> __ffield;
+std::unique_ptr<OMMIface::Modeler> __modeler;
 std::string __error_string = "";
 
 const char *cd_get_error()
@@ -95,7 +96,7 @@ size_t initialize_receptor(const char* filename) {
                 rpdb.parse_molecule(*__receptor);
 
                 __receptor->compute_idatm_type()
-                /*.compute_hydrogen()
+                .compute_hydrogen()
                 .compute_bond_order()
                 .compute_bond_gaff_type()
                 .refine_idatm_type()
@@ -104,7 +105,7 @@ size_t initialize_receptor(const char* filename) {
                 .compute_ring_type()
                 .compute_gaff_type()
                 .compute_rotatable_bonds() // relies on hydrogens being assigned
-                .erase_hydrogen()*/;
+                .erase_hydrogen();
 
                 __gridrec = std::unique_ptr<Molib::Atom::Grid> (new Molib::Atom::Grid (__receptor->get_atoms()));
 
@@ -261,7 +262,7 @@ size_t initialize_ligand(const char *filename)
                 rpdb.parse_molecule(*__ligand);
 
                 __ligand->compute_idatm_type()
-                /*.compute_hydrogen()
+                .compute_hydrogen()
                 .compute_bond_order()
                 .compute_bond_gaff_type()
                 .refine_idatm_type()
@@ -270,7 +271,7 @@ size_t initialize_ligand(const char *filename)
                 .compute_ring_type()
                 .compute_gaff_type()
                 .compute_rotatable_bonds() // relies on hydrogens being assigned
-                .erase_hydrogen()*/;
+                .erase_hydrogen();
 
                 return 1;
         }
@@ -434,7 +435,7 @@ size_t ligand_get_neighbors( size_t atom_idx, size_t* neighbors ) {
 }
 
 size_t initialize_scoring(const char* obj_dir) {
-        return initialize_scoring_full(obj_dir, "radial", "mean", "reduced", 6.0, 0.01, 10.0);
+        return initialize_scoring_full(obj_dir, "radial", "mean", "complete", 15.0, 0.01, 10.0);
 }
 
 size_t initialize_scoring_full(const char *obj_dir,
@@ -473,17 +474,15 @@ size_t initialize_scoring_full(const char *obj_dir,
 
 size_t initialize_plugins(const char *plugin_dir)
 {
-
         try
         {
-
                 OMMIface::SystemTopology::loadPlugins(plugin_dir);
 
                 return 1;
         }
         catch (std::exception &e)
         {
-                __error_string = std::string("Error in creating KBPlugin: ") + e.what();
+                __error_string = std::string("Error in loading plugins: ") + e.what();
                 return 0;
         }
 }
@@ -523,6 +522,36 @@ size_t initialize_ffield(const char *data_dir)
         }
 }
 
+size_t initialize_modeler(const char* platform, const char* precision, const char* accelerators) {
+        if (__ffield == nullptr)
+        {
+                __error_string = std::string("You must run initialize_ffield first");
+                return 0;
+        }
+        try {
+                __modeler = std::unique_ptr<OMMIface::Modeler>(new OMMIface::Modeler(
+                        *__ffield, "kb", 6,
+                        0.0001, 100,
+                        10, 0.00000000001, false, 2.0, 300, 91
+                ));
+
+                Molib::Atom::Vec rec_atoms = __receptor->get_atoms();
+                Molib::Atom::Vec lig_atoms = __ligand->get_atoms();
+
+                __modeler->add_topology(rec_atoms);
+                __modeler->add_topology(lig_atoms);
+
+                __modeler->init_openmm(platform, precision, accelerators);
+
+                return 1;
+        }
+        catch (std::exception &e)
+        {
+                __error_string = std::string("Error in creating modeler: ") + e.what();
+                return 0;
+        }
+}
+
 float calculate_score()
 {
         try
@@ -547,7 +576,6 @@ size_t set_positions_ligand(const size_t *atoms, const float *positions, size_t 
 
         try
         {
-
                 Molib::Residue *residue = __ligand->element(0).get_residues().at(0);
 
                 for (size_t i = 0; i < size; ++i)
@@ -614,41 +642,34 @@ size_t set_positions_receptor(const size_t *atoms, const float *positions, size_
 size_t minimize_complex(size_t max_iter, size_t update_freq)
 {
 
-        if (__ffield == nullptr)
+        if (__modeler == nullptr)
         {
-                __error_string = std::string("You must run initialize_ffield first");
+                __error_string = std::string("You must run initialize_modeler first");
                 return 0;
         }
 
         try
         {
-
-                OMMIface::Modeler modeler(*__ffield, "kb", 6,
-                                          0.0001, max_iter,
-                                          update_freq, 0.00000000001, false, 2.0, 300, 91);
+                __modeler->set_max_iterations(max_iter);
+                __modeler->set_update_frequency(update_freq);
 
                 Molib::Atom::Vec rec_atoms = __receptor->get_atoms();
                 Molib::Atom::Vec lig_atoms = __ligand->get_atoms();
 
-                modeler.add_topology(rec_atoms);
-                modeler.add_topology(lig_atoms);
+                __modeler->add_crds(rec_atoms, __receptor->get_crds());
+                __modeler->add_crds(lig_atoms, __ligand->get_crds());
 
-                modeler.init_openmm();
+                __modeler->init_openmm_positions();
 
-                modeler.add_crds(rec_atoms, __receptor->get_crds());
-                modeler.add_crds(lig_atoms, __ligand->get_crds());
-
-                modeler.init_openmm_positions();
-
-                modeler.minimize_state();
+                __modeler->minimize_state();
 
                 // init with minimized coordinates
-                geometry::Point::Vec rec_coords = modeler.get_state(rec_atoms);
+                geometry::Point::Vec rec_coords = __modeler->get_state(rec_atoms);
 
                 for (size_t i = 0; i < rec_atoms.size(); ++i)
                         rec_atoms[i]->set_crd(rec_coords[i]);
 
-                geometry::Point::Vec lig_coords = modeler.get_state(lig_atoms);
+                geometry::Point::Vec lig_coords = __modeler->get_state(lig_atoms);
 
                 for (size_t j = 0; j < lig_atoms.size(); ++j)
                         lig_atoms[j]->set_crd(lig_coords[j]);

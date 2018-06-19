@@ -75,7 +75,7 @@ namespace Linker {
 		__modeler.add_topology(__receptor.get_atoms());
 		__modeler.add_topology(__ligand.get_atoms());
 		
-		__modeler.init_openmm();
+		__modeler.init_openmm(__platform, __precision, __accelerators);
 
 		__modeler.add_random_crds(__ligand.get_atoms());
 	}

@@ -24,7 +24,8 @@ namespace Linker {
 			const int max_possible_conf, const int link_iter,
 			const double clash_coeff, const double docked_clus_rad,
 			const double max_allow_energy, const int max_num_possibles, 
-			const int max_clique_size, const int max_iterations_final) { 
+			const int max_clique_size, const int max_iterations_final,
+			const std::string& platform, const std::string& precision, const std::string& accelerators) { 
 
 		
 		if (iterative) {
@@ -32,13 +33,15 @@ namespace Linker {
 				gridrec, score, dist_cutoff, spin_degrees, tol_seed_dist, 
 				lower_tol_seed_dist, upper_tol_seed_dist, max_possible_conf, link_iter, 
 				clash_coeff, docked_clus_rad, max_allow_energy, max_num_possibles, 
-				max_clique_size, max_iterations_final);
+				max_clique_size, max_iterations_final,
+				platform, precision, accelerators);
 		} else {
 			l = new StaticLinker(modeler, receptor, ligand, top_seeds, 
 				gridrec, score, dist_cutoff, spin_degrees, tol_seed_dist, 
 				lower_tol_seed_dist, upper_tol_seed_dist, max_possible_conf, link_iter, 
 				clash_coeff, docked_clus_rad, max_allow_energy, max_num_possibles, 
-				max_clique_size, max_iterations_final);
+				max_clique_size, max_iterations_final,
+				platform, precision, accelerators);
 		}
 	}
 	

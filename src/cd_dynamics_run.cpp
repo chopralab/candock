@@ -89,15 +89,24 @@ int main(int argc, char *argv[])
 
                 if (cmdl.get_string_option("integrator") == "verlet")
                 {
-                        modeler.init_openmm(OMMIface::SystemTopology::integrator_type::verlet);
+                        modeler.init_openmm(cmdl.get_string_option("platform"),
+                                            cmdl.get_string_option("precision"),
+                                            cmdl.get_string_option("accelerators"),
+                                            OMMIface::SystemTopology::integrator_type::verlet);
                 }
                 else if (cmdl.get_string_option("integrator") == "langevin")
                 {
-                        modeler.init_openmm(OMMIface::SystemTopology::integrator_type::langevin);
+                        modeler.init_openmm(cmdl.get_string_option("platform"),
+                                            cmdl.get_string_option("precision"),
+                                            cmdl.get_string_option("accelerators"),
+                                            OMMIface::SystemTopology::integrator_type::langevin);
                 }
                 else if (cmdl.get_string_option("integrator") == "brownian")
                 {
-                        modeler.init_openmm(OMMIface::SystemTopology::integrator_type::brownian);
+                        modeler.init_openmm(cmdl.get_string_option("platform"),
+                                            cmdl.get_string_option("precision"),
+                                            cmdl.get_string_option("accelerators"),
+                                            OMMIface::SystemTopology::integrator_type::brownian);
                 }
                 else
                 {

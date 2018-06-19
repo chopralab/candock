@@ -53,6 +53,7 @@ CANDOCK_EXPORT size_t initialize_scoring_full(const char* obj_dir,
 
 CANDOCK_EXPORT size_t initialize_plugins(const char* plugin_dir);
 CANDOCK_EXPORT size_t initialize_ffield(const char* data_dir);
+CANDOCK_EXPORT size_t initialize_modeler(const char* platform, const char* precision, const char* accelerators);
 
 CANDOCK_EXPORT float calculate_score();
 

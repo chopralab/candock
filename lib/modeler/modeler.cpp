@@ -126,7 +126,7 @@ void Modeler::physical_calculation()
         if (!__run_dyanmics)
         {
                 log_step << "Doing energy minimization using physical forcefield" << endl;
-                __system_topology.minimize(__tolerance, __max_iterations);
+                __system_topology.minimize(__tolerance, __update_freq, __max_iterations);
                 log_benchmark << "time to minimize took " << bench.seconds_from_start()
                               << " wallclock seconds"
                               << "\n";
@@ -147,7 +147,7 @@ void Modeler::knowledge_based_calculation()
 
         if (!__run_dyanmics)
         {
-                __system_topology.minimize(__tolerance, __update_freq);
+                __system_topology.minimize(__tolerance, __update_freq, __max_iterations);
         }
         else
         {
@@ -169,7 +169,7 @@ void Modeler::init_openmm_positions()
         __system_topology.init_positions(__positions);
 }
 
-void Modeler::init_openmm(SystemTopology::integrator_type type)
+void Modeler::init_openmm(const std::string& platform, const std::string& precision, const std::string& accelerators, SystemTopology::integrator_type type)
 {
         __system_topology.set_forcefield(*__ffield);
         __system_topology.init_particles(__topology);
@@ -193,6 +193,7 @@ void Modeler::init_openmm(SystemTopology::integrator_type type)
         }
 
         __system_topology.init_integrator(type, __step_size_in_ps, __temperature, __friction);
+        __system_topology.init_platform(platform, precision, accelerators);
 }
 
 double Modeler::potential_energy()

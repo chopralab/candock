@@ -66,7 +66,9 @@ int main(int argc, char *argv[])
 
                                         modeler.add_topology(mols1[i].get_atoms());
 
-                                        modeler.init_openmm();
+                                        modeler.init_openmm(cmdl.get_string_option("platform"),
+                                                            cmdl.get_string_option("precision"),
+                                                            cmdl.get_string_option("accelerators"));
                                         modeler.add_crds(mols1[i].get_atoms(), mols1[i].get_crds());
                                         modeler.init_openmm_positions();
 

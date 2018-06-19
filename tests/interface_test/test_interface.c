@@ -28,7 +28,7 @@ int main( int argc, char **argv) {
                 printf("%s\n", cd_get_error());
                 return 1;
         }
-
+        
         if (! initialize_ffield(argv[4])) {
                 printf("%s\n", cd_get_error());
                 return 1;
@@ -37,6 +37,23 @@ int main( int argc, char **argv) {
         if (! initialize_plugins(argv[5])) {
                 printf("%s\n", cd_get_error());
                 return 1;
+        }
+
+        if (argc >= 9) {
+                if (! initialize_modeler(argv[6], argv[7], argv[8])) {
+                        printf("%s\n", cd_get_error());
+                        return 1;
+                }
+        } else if (argc >= 7) {
+                if (! initialize_modeler(argv[6], "", "")) {
+                        printf("%s\n", cd_get_error());
+                        return 1;
+                }
+        } else {
+                if (! initialize_modeler("Reference", "", "")) {
+                        printf("%s\n", cd_get_error());
+                        return 1;
+                }
         }
 
         printf("Time to initialize: %f\n", (double) ( clock() - start) / CLOCKS_PER_SEC );
@@ -86,14 +103,23 @@ int main( int argc, char **argv) {
         printf("Time to score again: %f\n", (double) ( clock() - start) / CLOCKS_PER_SEC );
 
         start = clock();
-        if (! minimize_complex(100,10)) {
+        if (! minimize_complex(100,100)) {
                 printf("%s\n", cd_get_error());
                 return 1;
         }
 
         printf("Time to minimize complex: %f\n", (double) ( clock() - start) / CLOCKS_PER_SEC );
-        start = clock();
         printf("Score after minimize: %f\n", calculate_score());
+
+        start = clock();
+        if (! minimize_complex(100,100)) {
+                printf("%s\n", cd_get_error());
+                return 1;
+        }
+
+        printf("Time to minimize complex again: %f\n", (double) ( clock() - start) / CLOCKS_PER_SEC );
+        printf("Score after minimize: %f\n", calculate_score());
+
 
         start = clock();
         size_t lig_bond_count = ligand_bond_count();

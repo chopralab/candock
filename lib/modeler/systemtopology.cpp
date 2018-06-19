@@ -1,7 +1,5 @@
 #include "candock/modeler/systemtopology.hpp"
 #include "candock/modeler/modeler.hpp"
-#include "candock/program/cmdlnopts.hpp"
-
 
 #include <openmm/Platform.h>
 #include <openmm/HarmonicBondForce.h>
@@ -230,6 +228,7 @@ void SystemTopology::init_integrator(SystemTopology::integrator_type type,
                 __thermostat_idx = system->addForce(new OpenMM::AndersenThermostat(temperature_in_kevin, friction_in_per_ps));
                 // Fall through
         case none:
+        default:
                 integrator = new OpenMM::VerletIntegrator(step_size_in_ps);
                 break;
         case langevin:
@@ -239,38 +238,26 @@ void SystemTopology::init_integrator(SystemTopology::integrator_type type,
                 integrator = new OpenMM::BrownianIntegrator(temperature_in_kevin, friction_in_per_ps, step_size_in_ps);
                 break;
         }
+}
 
+void SystemTopology::init_platform(const std::string& platform, const std::string& precision, const std::string& accelerators)
+{
         map<string, string> properties;
-        
-        const string platform = cmdl.get_string_option("platform");
 
-        if (!platform.compare("CUDA"))
+        if (platform == "CUDA")
         {
-                //std::cout << "USING CUDA TO CREATE FORCEFIELD" << std::endl;
-                properties["CudaPrecision"] = cmdl.get_string_option("precision");
-                properties["CudaDeviceIndex"] = cmdl.get_string_option("accelerators");
-        }
-        else if (!platform.compare("OpenCL"))
-        {
-                properties["OpenCLPrecision"] = cmdl.get_string_option("precision");
-                properties["OpenCLDeviceIndex"] = cmdl.get_string_option("accelerators");
+                properties["CudaPrecision"] = precision;
+                properties["CudaDeviceIndex"] = accelerators;
+        } else if (platform == "OpenCL") {
+                properties["OpenCLPrecision"] = precision;
+                properties["OpenCLDeviceIndex"] = accelerators;
         }
 
-        //properties["DisablePmeStream"] = "true";
-
-        //int numParameters = forcefield->getNumPerParticleParameters();
-        //std::cerr << "num particles per parameter " << numParameters << std::endl;
-        //vector<double> parameters;
-        //forcefield->getParticleParameters(0, parameters);
-        //std::cerr << "parameter size " << parameters.size() << std::endl;
-
-        //std::cerr << "step size " << step_size_in_ps << std::endl;
         //Reference, CPU, CUDA, and OpenCL
         OpenMM::Platform &platform2 = OpenMM::Platform::getPlatformByName(platform);
         context = new OpenMM::Context(*system, *integrator, platform2, properties);
-        //std::cerr << "Using OpenMM platform " << context->getPlatform().getName() << std::endl;
 
-        dbgmsg("REMARK  Using OpenMM platform " << context->getPlatform().getName());
+        dbgmsg("Using OpenMM platform " << context->getPlatform().getName());
 }
 
 void SystemTopology::init_particles(Topology &topology)
@@ -414,9 +401,7 @@ void SystemTopology::init_knowledge_based_force(Topology &topology)
 
         forcefield = new OpenMM::CustomNonbondedForce("kbpot( r / ffstep, idatm2 , idatm1); ");
         forcefield->setNonbondedMethod(OpenMM::CustomNonbondedForce::CutoffNonPeriodic);
-        std::cerr << "kb_cutoff " << __ffield->kb_cutoff << std::endl;
         forcefield->setCutoffDistance(__ffield->kb_cutoff);
-        std::cerr << "ffstep " << __ffield->step << std::endl;
         forcefield->addGlobalParameter("ffstep", __ffield->step);
         forcefield->addPerParticleParameter("idatm");
 
@@ -438,18 +423,6 @@ void SystemTopology::init_knowledge_based_force(Topology &topology)
 
         vector<double> table;
         size_t xsize = 0, ysize = 0;
-
-        /*
-        for (auto &i : __idatm_to_internal)
-        {
-                std::cerr << "idatm one " << i.first << " two " << i.second << std::endl;
-        }
-
-        for (auto &i : __internal_to_idatm)
-        {
-                std::cerr << "internal one " << i.first << " two " << i.second << std::endl;
-        }
-        */
 
         for (size_t i = 0; i < __idatm_to_internal.size(); i++)
         {
@@ -851,9 +824,11 @@ double SystemTopology::get_potential_energy()
         return context->getState(OpenMM::State::Energy).getPotentialEnergy();
 }
 
-void SystemTopology::minimize(const double tolerance, const double max_iterations)
+void SystemTopology::minimize(const double tolerance, const int update_freq, const int max_iterations)
 {
-        OpenMM::LocalEnergyMinimizer::minimize(*context, tolerance, max_iterations);
+        for (int i = 0; i < max_iterations; i += update_freq) {
+                OpenMM::LocalEnergyMinimizer::minimize(*context, tolerance, update_freq);
+        }
 }
 
 void SystemTopology::dynamics(const int steps)

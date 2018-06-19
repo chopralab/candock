@@ -76,9 +76,12 @@ public:
   void physical_calculation();
 
   void init_openmm_positions();
-  void init_openmm(SystemTopology::integrator_type type = SystemTopology::integrator_type::none);
+  void init_openmm(const std::string& platform,
+    const std::string& precision, const std::string& accelerators,
+    SystemTopology::integrator_type type = SystemTopology::integrator_type::none);
 
   void set_max_iterations(const int max_iterations) { __max_iterations = max_iterations; }
+  void set_update_frequency(const int update_freq) { __update_freq = update_freq; }
   void set_num_steps_to_run(const int num_steps_to_run) { __dynamics_steps = num_steps_to_run; }
 
   double potential_energy();

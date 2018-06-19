@@ -65,7 +65,6 @@ class SystemTopology
 
         const ForceField *__ffield;
 
-        //KBPlugin::KBForce* __kbforce;
         int __kbforce_idx;
         vector<bool> masked;
         vector<double> masses;
@@ -120,6 +119,10 @@ class SystemTopology
                              const double temperature_in_kevin,
                              const double friction_in_per_ps);
 
+        void init_platform(const std::string& platform, 
+                           const std::string& precision,
+                           const std::string& accelerators);
+
         void init_particles(Topology &topology);
         void init_physics_based_force(Topology &topology);
         void init_knowledge_based_force(Topology &topology);
@@ -132,7 +135,7 @@ class SystemTopology
         vector<OpenMM::Vec3> get_positions_in_nm();
         vector<OpenMM::Vec3> get_forces();
         double get_potential_energy();
-        void minimize(const double tolerance, const double max_iterations);
+        void minimize(const double tolerance, const int update_freq, const int max_iterations);
         void dynamics(const int steps);
         void set_forcefield(const ForceField &ffield)
         {

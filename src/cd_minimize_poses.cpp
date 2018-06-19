@@ -109,7 +109,10 @@ int main(int argc, char *argv[])
                         modeler.add_topology(protein.get_atoms());
                         modeler.add_topology(ligand.get_atoms());
 
-                        modeler.init_openmm(OMMIface::SystemTopology::integrator_type::none);
+                        modeler.init_openmm(cmdl.get_string_option("platform"),
+                                            cmdl.get_string_option("precision"),
+                                            cmdl.get_string_option("accelerators"),
+                                            OMMIface::SystemTopology::integrator_type::none);
 
                         modeler.add_crds(protein.get_atoms(), protein.get_crds());
                         modeler.add_crds(ligand.get_atoms(), ligand.get_crds());
