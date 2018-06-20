@@ -42,19 +42,36 @@ int main(int argc, char* argv[]) {
                 drpdb.parse_molecule(receptor_mols);
 
                 // Check to see if the user set the ligand option, use the receptor as a last resort.
-                const std::string &ligand_file = Inout::file_size(cmdl.get_string_option("ligand")) == 0 ?
-                                                    cmdl.get_string_option("receptor") :
-                                                    cmdl.get_string_option("ligand");
-
-                Parser::FileParser dlpdb (ligand_file,
+                if (Inout::file_size(cmdl.get_string_option("ligand")) != 0) {
+                        Parser::FileParser dlpdb (cmdl.get_string_option("ligand"),
+                                Parser::pdb_read_options::all_models);
+                        dlpdb.parse_molecule(ligand_mols);
+                } else {
+                        Parser::FileParser dlpdb (cmdl.get_string_option("receptor"),
                                           Parser::pdb_read_options::docked_poses_only |
                                           Parser::pdb_read_options::skip_atom |
                                           Parser::pdb_read_options::all_models);
 
-                dlpdb.parse_molecule(ligand_mols);
+                        dlpdb.parse_molecule(ligand_mols);
+                }
 
                 Score::Score score(cmdl.get_string_option("ref"), cmdl.get_string_option("comp"),
                                    cmdl.get_string_option("func"),cmdl.get_int_option("cutoff"));
+
+                if (receptor_mols.get_idatm_types().size() == 1) {
+
+                        receptor_mols.compute_idatm_type()
+                        .compute_hydrogen()
+                        .compute_bond_order()
+                        .compute_bond_gaff_type()
+                        .refine_idatm_type()
+                        .erase_hydrogen()  // needed because refine changes connectivities
+                        .compute_hydrogen()   // needed because refine changes connectivities
+                        .compute_ring_type()
+                        .compute_gaff_type()
+                        .compute_rotatable_bonds() // relies on hydrogens being assigned
+                        .erase_hydrogen();
+                }
 
                 score.define_composition(receptor_mols.get_idatm_types(),
                                          ligand_mols.get_idatm_types())
