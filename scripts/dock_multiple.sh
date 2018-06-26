@@ -40,7 +40,7 @@ while read i || [[ -n $i ]]; do
 
     export CANDOCK_receptor=$__working_dir/structures/$i.pdb
     export CANDOCK_centroid=$__working_dir/structures/$i.cen
-    export CANDOCK_top_seeds_dir=$__working_dir/seeds_database/$i/top_seeds
+    export CANDOCK_top_seeds_dir=$__working_dir/seeds_database/$i/
 
     if [[ ! -d $i ]]
     then
