@@ -76,9 +76,9 @@ int main(int argc, char *argv[])
                 OMMIface::ForceField ffield;
 
                 ffield.parse_gaff_dat_file(cmdl.get_string_option("gaff_dat"))
-                    .add_kb_forcefield(score, cmdl.get_double_option("dist_cutoff"))
-                    .parse_forcefield_file(cmdl.get_string_option("amber_xml"))
-                    .parse_forcefield_file(cmdl.get_string_option("water_xml"));
+                .add_kb_forcefield(score, cmdl.get_double_option("dist_cutoff"))
+                .parse_forcefield_file(cmdl.get_string_option("amber_xml"))
+                .parse_forcefield_file(cmdl.get_string_option("water_xml"));
 
                 if (!cmdl.get_string_option("gaff_heme").empty())
                 {
@@ -100,11 +100,12 @@ int main(int argc, char *argv[])
                         ffield.insert_topology(protein);
                         ffield.insert_topology(ligand);
 
-                        OMMIface::Modeler modeler(ffield, cmdl.get_string_option("fftype"), cmdl.get_int_option("cutoff"),
-                                                  cmdl.get_double_option("mini_tol"), cmdl.get_int_option("max_iter"),
-                                                  cmdl.get_int_option("update_freq"), cmdl.get_double_option("pos_tol"), false,
-                                                  cmdl.get_double_option("dynamic_step_size"),
-                                                  cmdl.get_double_option("temperature"), cmdl.get_double_option("friction"));
+                        OMMIface::Modeler modeler(
+                                ffield,cmdl.get_string_option("fftype"),
+                                cmdl.get_double_option("mini_tol"),
+                                cmdl.get_int_option("max_iter"),
+                                cmdl.get_double_option("pos_tol")
+                        );
 
                         modeler.add_topology(protein.get_atoms());
                         modeler.add_topology(ligand.get_atoms());
@@ -116,6 +117,9 @@ int main(int argc, char *argv[])
 
                         modeler.add_crds(protein.get_atoms(), protein.get_crds());
                         modeler.add_crds(ligand.get_atoms(), ligand.get_crds());
+
+                        modeler.unmask(ligand.get_atoms());
+                        modeler.unmask(protein.get_atoms());
 
                         modeler.init_openmm_positions();
 
@@ -129,8 +133,19 @@ int main(int argc, char *argv[])
 
                         Molib::Atom::Grid gridrec_min(minimized_receptor.get_atoms());
                         const double energy = score.non_bonded_energy(gridrec_min, minimized_ligand);
+                        modeler.mask(protein.get_atoms());
+                        const double potential = modeler.potential_energy();
 
-                        Fileout::print_complex_pdb(std::cout, minimized_ligand, minimized_receptor, energy, std::nan(""), i + 1, 0xFFFFFF, std::nan(""));
+                        Fileout::print_complex_pdb(
+                                std::cout,
+                                minimized_ligand,
+                                minimized_receptor,
+                                energy,
+                                potential,
+                                i + 1,
+                                0xFFFFFF,
+                                std::nan("")
+                        );
 
                         ffield.erase_topology(ligand);
 

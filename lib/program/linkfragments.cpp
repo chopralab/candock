@@ -109,11 +109,8 @@ namespace Program {
                         OMMIface::Modeler modeler (
                                 ffcopy,
                                 cmdl.get_string_option ("fftype"),
-                                cmdl.get_double_option ("dist_cutoff"),
                                 cmdl.get_double_option ("mini_tol"),
                                 cmdl.get_int_option ("max_iter"),
-                                cmdl.get_int_option ("update_freq"),
-                                cmdl.get_double_option ("pos_tol"),
                                 false
                         );
 

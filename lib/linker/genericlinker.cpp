@@ -207,34 +207,33 @@ namespace Linker {
 
 
 				// Do a quick energy minization:
-				OMMIface::Modeler modeler (
-					__modeler.get_forcefield()
-				);
+				{
+					OMMIface::Modeler modeler (
+						__modeler.get_forcefield()
+					);
 
-				modeler.add_topology(__ligand.get_atoms());
-				modeler.init_openmm(__platform, __precision, __accelerators);
-				modeler.add_crds(__ligand.get_atoms(), docked.get_ligand().get_crds());
-				modeler.init_openmm_positions();
-				modeler.unmask(__ligand.get_atoms());
-				modeler.minimize_state();
+					modeler.add_topology(__ligand.get_atoms());
+					modeler.init_openmm(__platform, __precision, __accelerators);
+					modeler.add_crds(__ligand.get_atoms(), docked.get_ligand().get_crds());
+					modeler.init_openmm_positions();
+					modeler.unmask(__ligand.get_atoms());
+					modeler.minimize_state();
 
-				__modeler.add_crds(__receptor.get_atoms(), docked.get_receptor().get_crds());
-				__modeler.add_crds(__ligand.get_atoms(), modeler.get_state(__ligand.get_atoms()));
-				
+					__modeler.add_crds(__receptor.get_atoms(), docked.get_receptor().get_crds());
+					__modeler.add_crds(__ligand.get_atoms(), modeler.get_state(__ligand.get_atoms()));
+				}
+
 				__modeler.init_openmm_positions();
 				
 				__modeler.unmask(__receptor.get_atoms());
 				__modeler.unmask(__ligand.get_atoms());
 		
-                __modeler.set_max_iterations(__max_iterations_final); // until converged
+                __modeler.set_max_iterations(__max_iterations_final);
 
                 log_benchmark << "Starting minimization of " << __ligand.name()
                               << " and " << __receptor.name() << "\n";
 
                 __modeler.minimize_state();
-
-                __modeler.mask(__receptor.get_atoms());
-                const double potential_energy = __modeler.potential_energy();
 
 				// init with minimized coordinates
 				Molib::Molecule minimized_receptor(__receptor, __modeler.get_state(__receptor.get_atoms()));
@@ -243,9 +242,13 @@ namespace Linker {
 				minimized_receptor.undo_mm_specific();
 				
 				Molib::Atom::Grid gridrec(minimized_receptor.get_atoms());
-		
+
+				const double potential_energy = __modeler.potential_energy();
+
 				minimized_conformations.push_back(DockedConformation(minimized_ligand, minimized_receptor,
 					__score.non_bonded_energy(gridrec, minimized_ligand), potential_energy, ++max_clq_identity));
+
+                __modeler.mask(__receptor.get_atoms());
 		
 			} catch(OMMIface::Modeler::MinimizationError &e) {
 				log_error << "MinimizationError: skipping minimization of one conformation of ligand " 

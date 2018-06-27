@@ -487,7 +487,7 @@ size_t initialize_plugins(const char *plugin_dir)
         }
 }
 
-size_t initialize_ffield(const char *data_dir)
+size_t initialize_ffield(const char *data_dir, double dist_cutoff)
 {
 
         if (__score == nullptr)
@@ -504,7 +504,7 @@ size_t initialize_ffield(const char *data_dir)
                 __ffield = std::unique_ptr<OMMIface::ForceField>(new OMMIface::ForceField);
 
                 __ffield->parse_gaff_dat_file((p / "gaff.dat").string())
-                    .add_kb_forcefield(*__score, 6.0)
+                    .add_kb_forcefield(*__score, dist_cutoff)
                     .parse_forcefield_file((p / "amber10.xml").string())
                     .parse_forcefield_file((p / "tip3p.xml").string());
 
@@ -529,11 +529,7 @@ size_t initialize_modeler(const char* platform, const char* precision, const cha
                 return 0;
         }
         try {
-                __modeler = std::unique_ptr<OMMIface::Modeler>(new OMMIface::Modeler(
-                        *__ffield, "kb", 6,
-                        0.0001, 100,
-                        10, 0.00000000001, false, 2.0, 300, 91
-                ));
+                __modeler = std::unique_ptr<OMMIface::Modeler>(new OMMIface::Modeler(*__ffield));
 
                 Molib::Atom::Vec rec_atoms = __receptor->get_atoms();
                 Molib::Atom::Vec lig_atoms = __ligand->get_atoms();
@@ -639,7 +635,7 @@ size_t set_positions_receptor(const size_t *atoms, const float *positions, size_
         }
 }
 
-size_t minimize_complex(size_t max_iter, size_t update_freq)
+size_t minimize_complex(size_t max_iter)
 {
 
         if (__modeler == nullptr)
@@ -651,7 +647,6 @@ size_t minimize_complex(size_t max_iter, size_t update_freq)
         try
         {
                 __modeler->set_max_iterations(max_iter);
-                __modeler->set_update_frequency(update_freq);
 
                 Molib::Atom::Vec rec_atoms = __receptor->get_atoms();
                 Molib::Atom::Vec lig_atoms = __ligand->get_atoms();

@@ -10,7 +10,16 @@ namespace Molib {
 	
 	class Residue : public template_map_container<Atom, Residue, Chain, int> {
 	public:
-		typedef enum {notassigned=1, protein=2, nucleic=4, ion=8, water=16, hetero=32} res_type;
+		typedef enum {
+			notassigned=1,
+			protein=2,
+			nucleic=4,
+			modres=8,
+			ion=16,
+			water=32,
+			hetero=64
+		} res_type;
+
 		typedef tuple<char,std::string, int, char> res_tuple2;
 		typedef pair<int, char> res_pair;
 		typedef vector<Residue*> Vec;

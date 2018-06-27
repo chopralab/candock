@@ -52,7 +52,7 @@ CANDOCK_EXPORT size_t initialize_scoring_full(const char* obj_dir,
                                               float cutoff, float step, float scale);
 
 CANDOCK_EXPORT size_t initialize_plugins(const char* plugin_dir);
-CANDOCK_EXPORT size_t initialize_ffield(const char* data_dir);
+CANDOCK_EXPORT size_t initialize_ffield(const char* data_dir, double dist_cutoff);
 CANDOCK_EXPORT size_t initialize_modeler(const char* platform, const char* precision, const char* accelerators);
 
 CANDOCK_EXPORT float calculate_score();
@@ -60,7 +60,7 @@ CANDOCK_EXPORT float calculate_score();
 CANDOCK_EXPORT size_t set_positions_ligand  (const size_t* atoms, const float* positions, size_t size);
 CANDOCK_EXPORT size_t set_positions_receptor(const size_t* atoms, const float* positions, size_t size);
 
-CANDOCK_EXPORT size_t minimize_complex(size_t max_iter, size_t update_freq);
+CANDOCK_EXPORT size_t minimize_complex(size_t max_iter);
 
 #ifdef __cplusplus
 }

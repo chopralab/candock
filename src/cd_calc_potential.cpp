@@ -11,7 +11,6 @@ int main(int argc, char *argv[])
 {
         try
         {
-#ifndef _WINDOWS
 
                 Inout::Logger::set_all_stderr(true);
 
@@ -24,7 +23,10 @@ int main(int argc, char *argv[])
                         return 1;
                 }
 
-                Parser::FileParser mol1(argv[1], Parser::pdb_read_options::docked_poses_only | Parser::pdb_read_options::skip_atom | Parser::pdb_read_options::all_models);
+                Parser::FileParser mol1(
+                        argv[1],
+                        Parser::pdb_read_options::docked_poses_only | Parser::pdb_read_options::skip_atom | Parser::pdb_read_options::all_models
+                );
 
                 Molib::Molecules mols1;
                 mol1.parse_molecule(mols1);
@@ -57,12 +59,7 @@ int main(int argc, char *argv[])
                                 for (size_t i = thread_id; i < mols1.size(); i += num_threads)
                                 {
 
-                                        OMMIface::Modeler modeler(ffield,
-                                                                  cmdl.get_string_option("fftype"), cmdl.get_int_option("cutoff"),
-                                                                  cmdl.get_double_option("mini_tol"), cmdl.get_int_option("max_iter"),
-                                                                  cmdl.get_int_option("update_freq"), cmdl.get_double_option("pos_tol"),
-                                                                  false, cmdl.get_double_option("dynamic_step_size"),
-                                                                  cmdl.get_double_option("temperature"), cmdl.get_double_option("friction"));
+                                        OMMIface::Modeler modeler(ffield, "none");
 
                                         modeler.add_topology(mols1[i].get_atoms());
 
@@ -87,7 +84,7 @@ int main(int argc, char *argv[])
                 {
                         cout << poten << endl;
                 }
-#endif
+
         }
         catch (exception &e)
         {

@@ -29,7 +29,7 @@ int main( int argc, char **argv) {
                 return 1;
         }
         
-        if (! initialize_ffield(argv[4])) {
+        if (! initialize_ffield(argv[4], 6.0)) {
                 printf("%s\n", cd_get_error());
                 return 1;
         }
@@ -103,7 +103,7 @@ int main( int argc, char **argv) {
         printf("Time to score again: %f\n", (double) ( clock() - start) / CLOCKS_PER_SEC );
 
         start = clock();
-        if (! minimize_complex(100,100)) {
+        if (! minimize_complex(100)) {
                 printf("%s\n", cd_get_error());
                 return 1;
         }
@@ -112,7 +112,7 @@ int main( int argc, char **argv) {
         printf("Score after minimize: %f\n", calculate_score());
 
         start = clock();
-        if (! minimize_complex(100,100)) {
+        if (! minimize_complex(100)) {
                 printf("%s\n", cd_get_error());
                 return 1;
         }

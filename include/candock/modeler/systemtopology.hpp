@@ -135,7 +135,7 @@ class SystemTopology
         vector<OpenMM::Vec3> get_positions_in_nm();
         vector<OpenMM::Vec3> get_forces();
         double get_potential_energy();
-        void minimize(const double tolerance, const int update_freq, const int max_iterations);
+        void minimize(const double tolerance, const int max_iterations);
         void dynamics(const int steps);
         void set_forcefield(const ForceField &ffield)
         {

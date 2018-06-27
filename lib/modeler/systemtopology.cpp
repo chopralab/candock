@@ -399,7 +399,7 @@ void SystemTopology::init_knowledge_based_force(Topology &topology)
 
         std::set<int> used_atom_types;
 
-        forcefield = new OpenMM::CustomNonbondedForce("kbpot( r / ffstep, idatm2 , idatm1); ");
+        forcefield = new OpenMM::CustomNonbondedForce("kbpot( r / ffstep, idatm2 , idatm1) * 1000.0; ");
         forcefield->setNonbondedMethod(OpenMM::CustomNonbondedForce::CutoffNonPeriodic);
         forcefield->setCutoffDistance(__ffield->kb_cutoff);
         forcefield->addGlobalParameter("ffstep", __ffield->step);
@@ -824,8 +824,9 @@ double SystemTopology::get_potential_energy()
         return context->getState(OpenMM::State::Energy).getPotentialEnergy();
 }
 
-void SystemTopology::minimize(const double tolerance, const int update_freq, const int max_iterations)
+void SystemTopology::minimize(const double tolerance, const int max_iterations)
 {
+        log_note << "Minimizing with " << max_iterations << " iterations with a tolerence of " << tolerance << " " << __kbforce_idx << "\n";
         OpenMM::LocalEnergyMinimizer::minimize(*context, tolerance, max_iterations);
 }
 

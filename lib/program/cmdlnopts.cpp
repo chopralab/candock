@@ -154,7 +154,7 @@ namespace Program {
                         ("max_iter_final", po::value<int> ()->default_value (100),
                          "Maximum iterations for final minimization")
                         ("update_freq", po::value<int> ()->default_value (10),
-                         "Update non-bond frequency")
+                         "(Ignored) Update non-bond frequency")
                         ("temperature", po::value<double>()->default_value(300.0f, "300"),
                          "Temperature to run the dynamic simulation at.")
                         ("friction",    po::value<double>()->default_value(91.f, "91.0"),
@@ -194,9 +194,8 @@ namespace Program {
 			("step",    po::value<double> ()->default_value (0.01, "0.01"),
 			 "Step for spline generation of non-bonded knowledge-based potential [0.0-1.0]")
 			("pos_tol",   po::value<double> ()->default_value (0.00000000001, "0.00000000001"),
-			 "Minimization position tolerance in Angstroms - only for KB")
+			 "(Ignored) Minimization position tolerance in Angstroms - only for KB")
 			;
-
 
 			po::options_description linking_step ("Fragment Linking Options");
 			linking_step.add_options()
