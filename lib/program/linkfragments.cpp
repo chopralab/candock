@@ -130,7 +130,7 @@ namespace Program {
                                                cmdl.get_int_option ("link_iter"),
                                                cmdl.get_double_option ("clash_coeff"), cmdl.get_double_option ("docked_clus_rad"),
                                                cmdl.get_double_option ("max_allow_energy"), cmdl.get_int_option ("max_num_possibles"),
-                                               cmdl.get_int_option ("max_clique_size"), cmdl.get_int_option ("max_iter_final"),
+                                               cmdl.get_int_option ("max_clique_size"), cmdl.get_int_option ("max_iter_final"), cmdl.get_int_option ("max_iter_pre"),
                                                cmdl.get_string_option("platform"), cmdl.get_string_option("precision"), cmdl.get_string_option("accelerators"));
 
                         Molib::Atom::Graph cryst_graph =  Molib::Atom::create_graph(crystal_ligand.get_atoms());

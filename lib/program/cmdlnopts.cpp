@@ -151,6 +151,8 @@ namespace Program {
                          "Minimization tolerance")
                         ("max_iter",  po::value<int> ()->default_value (10),
                          "Maximum iterations for minimization during linking")
+			("max_iter_pre", po::value<int> ()->default_value(20),
+			 "Maximum iterations for ligand only optimization")
                         ("max_iter_final", po::value<int> ()->default_value (100),
                          "Maximum iterations for final minimization")
                         ("update_freq", po::value<int> ()->default_value (10),

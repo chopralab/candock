@@ -207,7 +207,7 @@ namespace Linker {
 
 
 				// Do a quick energy minization:
-				{
+				if (__max_iterations_pre > 0) {
 					OMMIface::Modeler modeler (
 						__modeler.get_forcefield()
 					);
@@ -217,10 +217,14 @@ namespace Linker {
 					modeler.add_crds(__ligand.get_atoms(), docked.get_ligand().get_crds());
 					modeler.init_openmm_positions();
 					modeler.unmask(__ligand.get_atoms());
+					modeler.set_max_iterations(__max_iterations_pre);
 					modeler.minimize_state();
 
 					__modeler.add_crds(__receptor.get_atoms(), docked.get_receptor().get_crds());
 					__modeler.add_crds(__ligand.get_atoms(), modeler.get_state(__ligand.get_atoms()));
+				} else {
+					__modeler.add_crds(__receptor.get_atoms(), docked.get_receptor().get_crds());
+					__modeler.add_crds(__ligand.get_atoms(), docked.get_ligand().get_crds());
 				}
 
 				__modeler.init_openmm_positions();
@@ -243,13 +247,11 @@ namespace Linker {
 				
 				Molib::Atom::Grid gridrec(minimized_receptor.get_atoms());
 
+                __modeler.mask(__receptor.get_atoms());
 				const double potential_energy = __modeler.potential_energy();
 
 				minimized_conformations.push_back(DockedConformation(minimized_ligand, minimized_receptor,
-					__score.non_bonded_energy(gridrec, minimized_ligand), potential_energy, ++max_clq_identity));
-
-                __modeler.mask(__receptor.get_atoms());
-		
+					__score.non_bonded_energy(gridrec, minimized_ligand), potential_energy, ++max_clq_identity));		
 			} catch(OMMIface::Modeler::MinimizationError &e) {
 				log_error << "MinimizationError: skipping minimization of one conformation of ligand " 
 					<< __ligand.name() << " due to : " << e.what() << endl;

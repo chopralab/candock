@@ -71,6 +71,7 @@ namespace Linker {
 			const int __max_clique_size;
 	
 			const int __max_iterations_final;
+			const int __max_iterations_pre;
 
 			const std::string& __platform, __precision, __accelerators;
 			
@@ -117,7 +118,7 @@ namespace Linker {
 				const int link_iter, const double clash_coeff, 
 				const double docked_clus_rad, const double max_allow_energy, 
 				const int max_num_possibles, 
-				const int max_clique_size, const int max_iterations_final,
+				const int max_clique_size, const int max_iterations_final, const int max_iterations_pre,
 				const std::string& platform, const std::string& precision, const std::string& accelerators) : 
 				__ic(ligand.get_atoms()), __modeler(modeler), __receptor(receptor), 
 				__ligand(ligand), __top_seeds(top_seeds), __gridrec(gridrec), 
@@ -128,7 +129,7 @@ namespace Linker {
 				__docked_clus_rad(docked_clus_rad), __max_allow_energy(max_allow_energy),
 				__max_possible_conf(max_possible_conf), __link_iter(link_iter),
 				__max_num_possibles(max_num_possibles), 
-				__max_clique_size(max_clique_size), __max_iterations_final(max_iterations_final),
+				__max_clique_size(max_clique_size), __max_iterations_final(max_iterations_final), __max_iterations_pre(max_iterations_pre),
 				__platform(platform), __precision(precision), __accelerators(accelerators)
 			{}
 
@@ -170,7 +171,7 @@ namespace Linker {
 			const int max_possible_conf, const int link_iter,
 			const double clash_coeff, const double docked_clus_rad,
 			const double max_allow_energy, const int max_num_possibles,
-			const int max_clique_size, const int max_iterations_final,
+			const int max_clique_size, const int max_iterations_final, const int max_iterations_pre,
 			const std::string& platform, const std::string& precision, const std::string& accelerators);
 			
 		~Linker() { delete l; }
