@@ -134,7 +134,7 @@ namespace Program {
                                                          );
                 }
 
-                __ffield->add_kb_forcefield(*__ff_score);
+                __ffield->add_kb_forcefield(*__ff_score, cmdl.get_double_option("dist_cutoff"));
         }
 
         std::set<int> Target::get_idatm_types(const std::set<int>& previous) const {

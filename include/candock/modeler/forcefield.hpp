@@ -73,7 +73,7 @@ namespace OMMIface {
 		ForceField& parse_gaff_dat_file(const string&);
 		ForceField& insert_topology(const Molib::Molecule&);
 		ForceField& erase_topology(const Molib::Molecule&);
-		ForceField& add_kb_forcefield(const Score::KBFF&);
+		ForceField& add_kb_forcefield(const Score::KBFF&, double);
 		
 		bool residue_exists(const string &name) const { return residue_topology.count(name); }
 	};

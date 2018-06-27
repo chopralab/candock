@@ -76,7 +76,7 @@ int main(int argc, char *argv[])
                 OMMIface::ForceField ffield;
 
                 ffield.parse_gaff_dat_file(cmdl.get_string_option("gaff_dat"))
-                    .add_kb_forcefield(score)
+                    .add_kb_forcefield(score, cmdl.get_double_option("dist_cutoff"))
                     .parse_forcefield_file(cmdl.get_string_option("amber_xml"))
                     .parse_forcefield_file(cmdl.get_string_option("water_xml"));
 

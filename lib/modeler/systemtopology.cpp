@@ -826,9 +826,7 @@ double SystemTopology::get_potential_energy()
 
 void SystemTopology::minimize(const double tolerance, const int update_freq, const int max_iterations)
 {
-        for (int i = 0; i < max_iterations; i += update_freq) {
-                OpenMM::LocalEnergyMinimizer::minimize(*context, tolerance, update_freq);
-        }
+        OpenMM::LocalEnergyMinimizer::minimize(*context, tolerance, max_iterations);
 }
 
 void SystemTopology::dynamics(const int steps)

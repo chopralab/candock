@@ -145,6 +145,8 @@ namespace Program {
                          "Gaff DAT file to use for Heme groups")
                         ("fftype"   , po::value<std::string> ()->default_value ("kb"),
                          "Forcefield to use 'kb' (knowledge-based), 'phy' (physics-based), or 'none' (do not calculate intermolecular forces)")
+			("dist_cutoff", po::value<double> ()->default_value(6.0),
+			 "Distance cutoff for intermolecular forces")
                         ("mini_tol",  po::value<double> ()->default_value (0.0001),
                          "Minimization tolerance")
                         ("max_iter",  po::value<int> ()->default_value (10),
@@ -191,7 +193,7 @@ namespace Program {
                          "Default(empty string) causes the objective function to be recalculated.")
 			("step",    po::value<double> ()->default_value (0.01, "0.01"),
 			 "Step for spline generation of non-bonded knowledge-based potential [0.0-1.0]")
-                        ("pos_tol",   po::value<double> ()->default_value (0.00000000001, "0.00000000001"),
+			("pos_tol",   po::value<double> ()->default_value (0.00000000001, "0.00000000001"),
 			 "Minimization position tolerance in Angstroms - only for KB")
 			;
 

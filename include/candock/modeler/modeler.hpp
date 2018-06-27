@@ -52,9 +52,18 @@ private:
   int __dynamics_steps;
 
 public:
-  Modeler(const ForceField &ffield, const string &fftype, double dist_cutoff,
-          double tolerance, int max_iterations, int update_freq, double position_tolerance,
-          bool use_constraints, double step_size_in_fs, double temperature, double friction);
+  Modeler(const ForceField &ffield,
+          const string &fftype = "none",
+          double dist_cutoff = 6.0,
+          double tolerance = 0.0001,
+          int max_iterations = 100,
+          int update_freq = 10,
+          double position_tolerance = 0.00000000001,
+          bool use_constraints = false,
+          double step_size_in_fs = 2.0,
+          double temperature = 300.0,
+          double friction = 91.0
+  );
 
   void mask(const Molib::Atom::Vec &atoms);
   void unmask(const Molib::Atom::Vec &atoms);
@@ -85,6 +94,10 @@ public:
   void set_num_steps_to_run(const int num_steps_to_run) { __dynamics_steps = num_steps_to_run; }
 
   double potential_energy();
+
+  const ForceField& get_forcefield() {
+    return *__ffield;
+  }
 };
 }
 

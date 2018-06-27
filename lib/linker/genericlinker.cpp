@@ -205,8 +205,21 @@ namespace Linker {
 		
 			try {
 
+
+				// Do a quick energy minization:
+				OMMIface::Modeler modeler (
+					__modeler.get_forcefield()
+				);
+
+				modeler.add_topology(__ligand.get_atoms());
+				modeler.init_openmm(__platform, __precision, __accelerators);
+				modeler.add_crds(__ligand.get_atoms(), docked.get_ligand().get_crds());
+				modeler.init_openmm_positions();
+				modeler.unmask(__ligand.get_atoms());
+				modeler.minimize_state();
+
 				__modeler.add_crds(__receptor.get_atoms(), docked.get_receptor().get_crds());
-				__modeler.add_crds(__ligand.get_atoms(), docked.get_ligand().get_crds());
+				__modeler.add_crds(__ligand.get_atoms(), modeler.get_state(__ligand.get_atoms()));
 				
 				__modeler.init_openmm_positions();
 				

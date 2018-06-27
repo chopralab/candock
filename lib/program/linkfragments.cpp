@@ -106,10 +106,16 @@ namespace Program {
                         /* Init minization options and constants, including ligand and receptor topology
                          *
                          */
-                        OMMIface::Modeler modeler (ffcopy, cmdl.get_string_option ("fftype"), cmdl.get_int_option ("cutoff"),
-                                                   cmdl.get_double_option ("mini_tol"), cmdl.get_int_option ("max_iter"), cmdl.get_int_option ("update_freq"),
-                                                   cmdl.get_double_option ("pos_tol"), false, cmdl.get_double_option("dynamic_step_size"),
-                                                   cmdl.get_double_option("temperature"), cmdl.get_double_option("friction"));
+                        OMMIface::Modeler modeler (
+                                ffcopy,
+                                cmdl.get_string_option ("fftype"),
+                                cmdl.get_double_option ("dist_cutoff"),
+                                cmdl.get_double_option ("mini_tol"),
+                                cmdl.get_int_option ("max_iter"),
+                                cmdl.get_int_option ("update_freq"),
+                                cmdl.get_double_option ("pos_tol"),
+                                false
+                        );
 
                         /**
                          * Connect seeds with rotatable linkers, account for symmetry, optimize

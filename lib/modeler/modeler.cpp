@@ -107,6 +107,8 @@ void Modeler::minimize_state()
                 knowledge_based_calculation();
         else if (__fftype == "phy")
                 physical_calculation();
+        else
+                physical_calculation();
 }
 
 void Modeler::dynamics()
