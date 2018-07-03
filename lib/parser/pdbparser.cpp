@@ -1,4 +1,4 @@
-#include "fileparser.hpp"
+#include "candock/parser/fileparser.hpp"
 
 #include <boost/regex.hpp>
 #include <boost/algorithm/string.hpp>
@@ -69,7 +69,7 @@ namespace Parser {
                                 double x_coord = stof (line.substr (30, 8));
                                 double y_coord = stof (line.substr (38, 8));
                                 double z_coord = stof (line.substr (46, 8));
-                                Geom3D::Coordinate crd (x_coord, y_coord, z_coord);
+                                geometry::Coordinate crd (x_coord, y_coord, z_coord);
                                 string element = line.size() > 77 ? boost::algorithm::trim_copy (line.substr (76,2)) : "";
 
                                 if (element.empty()) {
@@ -93,73 +93,73 @@ namespace Parser {
                                 if ( (__hm & hydrogens) || !hydrogen) {
                                         if (alt_loc == ' ' || alt_loc == 'A') {
 
-                                                if (!mols.last().is_modified (Residue::res_tuple2 (chain_id, resn, resi, ins_code))) {
-                                                        Residue::res_type rest;
+                                                Residue::res_type rest;
 
-                                                        if (help::amino_acids.find (resn) != help::amino_acids.end()) {
-                                                                rest = Residue::protein;
-                                                        } else if (help::nucleic_acids.find (resn) != help::nucleic_acids.end()) {
-                                                                rest = Residue::nucleic;
-                                                        } else if (help::ions.find (resn) != help::ions.end()) {
-                                                                rest = Residue::ion;
-                                                        } else if (resn == "HOH" || resn == "WAT" || resn == "WAM" || resn == "WAU") {
-                                                                resn = "HOH";
-                                                                rest = Residue::water;
-                                                        } else {
-                                                                // if nothing known then hetero...
-                                                                rest = Residue::hetero;
-                                                        }
+                                                if (help::amino_acids.find (resn) != help::amino_acids.end()) {
+                                                        rest = Residue::protein;
+                                                } else if (help::nucleic_acids.find (resn) != help::nucleic_acids.end()) {
+                                                        rest = Residue::nucleic;
+                                                } else if (mols.last().is_modified (Residue::res_tuple2 (chain_id, resn, resi, ins_code))) {
+                                                        rest = Residue::modres;
+                                                } else if (help::ions.find (resn) != help::ions.end()) {
+                                                        rest = Residue::ion;
+                                                } else if (resn == "HOH" || resn == "WAT" || resn == "WAM" || resn == "WAU") {
+                                                        resn = "HOH";
+                                                        rest = Residue::water;
+                                                } else {
+                                                        // if nothing known then hetero...
+                                                        rest = Residue::hetero;
+                                                }
 
-                                                        if (rest == Residue::water && __hm & skip_atom) {
-                                                                continue;
-                                                        }
+                                                if (rest == Residue::water && __hm & skip_atom) {
+                                                        continue;
+                                                }
 
-                                                        if ( (__hm & sparse_macromol) &&
-                                                                        ( (rest == Residue::protein && atom_name != "CA")
-                                                                          || (rest == Residue::nucleic && atom_name != "P"))) {
-                                                                continue;
-                                                        }
+                                                if ( (__hm & sparse_macromol) &&
+                                                   ( (rest == Residue::protein && atom_name != "CA")
+                                                  || (rest == Residue::nucleic && atom_name != "P"))) {
+                                                        continue;
+                                                }
 
-                                                        if (!__giant_molecule || rest != Residue::protein || atom_name == "CA") {
-                                                                Model &model = mols.last().last().last();
+                                                if (!__giant_molecule || rest != Residue::protein || atom_name == "CA") {
+                                                        Model &model = mols.last().last().last();
 
-                                                                if ( chain_id == ' ' ) {
-                                                                        chain_id = chain_id_replacement;
-                                                                        if ( model.has_chain(chain_id) 
-                                                                                && model.chain(chain_id).size() > 0
-                                                                                && model.chain(chain_id).last().resi() > resi ) {
-                                                                                chain_id = ++chain_id_replacement;
-                                                                        }
+                                                        if ( chain_id == ' ' ) {
+                                                                chain_id = chain_id_replacement;
+                                                                if ( model.has_chain(chain_id) 
+                                                                        && model.chain(chain_id).size() > 0
+                                                                        && model.chain(chain_id).last().resi() > resi ) {
+                                                                        chain_id = ++chain_id_replacement;
                                                                 }
+                                                        }
                                                                 
-                                                                // chains may alternate : A B A ...
-                                                                if (!model.has_chain (chain_id)) {
-                                                                        chain = &model.add (new Chain (chain_id));
-                                                                } else {
-                                                                        chain = &model.chain (chain_id);
-                                                                }
-
-                                                                if (!chain->has_residue (Residue::res_pair (resi, ins_code))) {
-                                                                        residue = &chain->add (new Residue (resn, resi, ins_code, rest));
-                                                                }
-
-                                                                Atom &a = residue->add (new Atom (atom_number,
-                                                                                                  atom_name,
-                                                                                                  crd,
-                                                                                                  help::idatm_mask.at (idatm_type),
-                                                                                                  element
-                                                                                                 ));
-
-                                                                if (gaff_type != "???") {
-                                                                        a.set_gaff_type (gaff_type);
-                                                                }
-
-                                                                if (rest_of_line != "") {
-                                                                        a.set_members (rest_of_line);
-                                                                }
-
-                                                                atom_number_to_atom[&model][atom_number] = &a;
+                                                        // chains may alternate : A B A ...
+                                                        if (!model.has_chain (chain_id)) {
+                                                                chain = &model.add (new Chain (chain_id));
+                                                        } else {
+                                                                chain = &model.chain (chain_id);
                                                         }
+
+                                                        if (!chain->has_residue (Residue::res_pair (resi, ins_code))) {
+                                                                residue = &chain->add (new Residue (resn, resi, ins_code, rest));
+                                                        }
+
+                                                        Atom &a = residue->add (new Atom (atom_number,
+                                                                                          atom_name,
+                                                                                          crd,
+                                                                                          help::idatm_mask.at (idatm_type),
+                                                                                          element
+                                                                                ));
+
+                                                        if (gaff_type != "???") {
+                                                                a.set_gaff_type (gaff_type);
+                                                        }
+
+                                                        if (rest_of_line != "") {
+                                                                a.set_members (rest_of_line);
+                                                        }
+
+                                                        atom_number_to_atom[&model][atom_number] = &a;
                                                 }
                                         }
                                 }
@@ -290,7 +290,7 @@ namespace Parser {
                                         __generate_molecule (mols, found_molecule, "");
 
                                         // modified 'standard' residue gets saved,e.g., MET --> MSE, glycosylated...
-                                        //mols.last().add_modified (Residue::res_tuple2 (chain_id, resn_mod, resi, ins_code));
+                                        mols.last().add_modified (Residue::res_tuple2 (chain_id, resn_mod, resi, ins_code));
                                 }
                         } else if (line.compare (0, 4, "SITE") == 0 && boost::regex_search (line, m, boost::regex ("SITE\\s+\\d+\\s+(\\S+)\\s+\\S+(\\s+\\S+\\s?\\S{1}\\s{0,3}\\d{1,4}\\S?)?(\\s+\\S+\\s?\\S{1}\\s{0,3}\\d{1,4}\\S?)?(\\s+\\S+\\s?\\S{1}\\s{0,3}\\d{1,4}\\S?)?(\\s+\\S+\\s?\\S{1}\\s{0,3}\\d{1,4}\\S?)?"))) {
                                 if (m.empty()) {

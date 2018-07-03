@@ -1,9 +1,9 @@
-#include "topology.hpp"
-#include "forcefield.hpp"
-#include "molib/molecule.hpp"
-#include "helper/inout.hpp"
-#include "helper/debug.hpp"
-#include "helper/error.hpp"
+#include "candock/modeler/topology.hpp"
+#include "candock/modeler/forcefield.hpp"
+#include "candock/molib/molecule.hpp"
+#include "candock/helper/inout.hpp"
+#include "candock/helper/debug.hpp"
+#include "candock/helper/error.hpp"
 #include <boost/regex.hpp>
 #include <boost/algorithm/string.hpp>
 #include <boost/filesystem.hpp>

@@ -1,4 +1,4 @@
-#include "smiles.hpp"
+#include "candock/helper/smiles.hpp"
 
 namespace help {
 	ostream& operator<<(ostream& os, const smiles& edges) {

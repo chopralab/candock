@@ -1,9 +1,9 @@
 #include <iostream>
-#include "program/target.hpp"
-#include "program/fragmentligands.hpp"
-#include "program/cmdlnopts.hpp"
+#include "candock/program/target.hpp"
+#include "candock/program/fragmentligands.hpp"
+#include "candock/program/cmdlnopts.hpp"
 #include "version.hpp"
-#include "drm/drm.hpp"
+#include "candock/drm/drm.hpp"
 ////////////////// DOCKING OF FRAGMENTS ///////////////////////////
 
 using namespace std;

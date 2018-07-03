@@ -1,11 +1,11 @@
-#include "fragmentligands.hpp"
+#include "candock/program/fragmentligands.hpp"
 
 #include <boost/filesystem.hpp>
 #include <mutex>
 
-#include "helper/inout.hpp"
-#include "molib/molecules.hpp"
-#include "options.hpp"
+#include "candock/helper/inout.hpp"
+#include "candock/molib/molecules.hpp"
+#include "candock/program/options.hpp"
 
 using namespace std;
 

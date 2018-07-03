@@ -1,10 +1,10 @@
-#include "forcefield.hpp"
-#include "molib/molecule.hpp"
-#include "score/score.hpp"
-#include "helper/inout.hpp"
-#include "helper/error.hpp"
-#include "rapidxml/rapidxml.hpp"
-#include "rapidxml/rapidxml_print.hpp"
+#include "candock/modeler/forcefield.hpp"
+#include "candock/molib/molecule.hpp"
+#include "candock/score/kbff.hpp"
+#include "candock/helper/inout.hpp"
+#include "candock/helper/error.hpp"
+#include "candock/external/rapidxml/rapidxml.hpp"
+#include "candock/external/rapidxml/rapidxml_print.hpp"
 #include <boost/regex.hpp>
 #include <boost/algorithm/string.hpp>
 #include <boost/filesystem.hpp>
@@ -360,8 +360,8 @@ namespace OMMIface {
 		return *this;
 	}
 
-	ForceField& ForceField::add_kb_forcefield(const Score::Score &score) {
-                this->kb_cutoff = score.get_dist_cutoff()  * OpenMM::NmPerAngstrom;
+	ForceField& ForceField::add_kb_forcefield(const Score::KBFF &score, double kb_cutoff) {
+                this->kb_cutoff = kb_cutoff * OpenMM::NmPerAngstrom;
 		this->step      = score.get_step_nonbond() * OpenMM::NmPerAngstrom;
 		for (auto &kv : score.get_energies()) {
 			auto &atom_pair = kv.first;

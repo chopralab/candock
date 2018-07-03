@@ -7,3 +7,10 @@ make candock
 For release compile (with optimization):
 
 cmake3 . -Bbuild -DCMAKE_BUILD_TYPE=Release
+
+Note: CANDOCK's build system now downloads and builds GSL and OpenMM automatically and
+if you choose to use this feature, make sure you set CMAKE_INSTALL_PREFIX as these 
+packages whish to install themselves before the CANDOCK build begins.
+
+cmake3 . -Bbuild -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/some/directory/I/have/access/to
+

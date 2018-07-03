@@ -1,5 +1,5 @@
-#include "targetgroup.hpp"
-#include "fileout/fileout.hpp"
+#include "candock/program/targetgroup.hpp"
+#include "candock/fileout/fileout.hpp"
 
 namespace Program {
 

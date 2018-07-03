@@ -4,20 +4,20 @@
 #include <algorithm>
 #include <stdlib.h>     /* srand, rand */
 #include <time.h>       /* time */
-#include "molib/grid.hpp"
-#include "molib/nrset.hpp"
-#include "parser/fileparser.hpp"
-#include "helper/help.hpp"
-#include "geom3d/matrix.hpp"
-#include "helper/error.hpp"
-#include "helper/inout.hpp"
-#include "helper/debug.hpp"
-#include "helper/path.hpp"
-#include "cluster/optics.hpp"
-#include "jsonreader.hpp"
-#include "nosqlreader.hpp"
-#include "common.hpp"
-#include "genclus.hpp"
+#include "candock/molib/grid.hpp"
+#include "candock/molib/nrset.hpp"
+#include "candock/parser/fileparser.hpp"
+#include "candock/helper/help.hpp"
+#include "candock/geometry/matrix.hpp"
+#include "candock/helper/error.hpp"
+#include "candock/helper/inout.hpp"
+#include "candock/helper/debug.hpp"
+#include "candock/helper/path.hpp"
+#include "candock/cluster/optics.hpp"
+#include "candock/ligands/jsonreader.hpp"
+#include "candock/ligands/nosqlreader.hpp"
+#include "candock/ligands/common.hpp"
+#include "candock/ligands/genclus.hpp"
 using namespace std;
 
 namespace genclus {
@@ -89,7 +89,7 @@ namespace genclus {
 			for (auto &assembly : molecule) {
 				for (auto &model : assembly) {
 					for (auto &chain : model) {
-						Geom3D::Coordinate::Vec crdp, crdn;
+						geometry::Coordinate::Vec crdp, crdn;
 						// remove protein and nucleic ligands
 						for (auto &residue : chain)	residue.set_crd(); // they really need to be set!!!
 						chain.remove_if([&chain, &model, &crdp, &crdn](const Molib::Residue &r) {
@@ -105,11 +105,11 @@ namespace genclus {
 						// add PPP or NNN instead
 						if (!crdp.empty()) {
 								Molib::Residue &residue = chain.add(new Molib::Residue("PPP", 1, ' ', Molib::Residue::protein));
-								residue.add(new Molib::Atom(1, "CA", Geom3D::compute_geometric_center(crdp), help::idatm_mask.at("???")));
+								residue.add(new Molib::Atom(1, "CA", geometry::compute_geometric_center(crdp), help::idatm_mask.at("???")));
 						}
 						if (!crdn.empty()) {
 								Molib::Residue &residue = chain.add(new Molib::Residue("NNN", 1, ' ', Molib::Residue::nucleic));
-								residue.add(new Molib::Atom(1, "P", Geom3D::compute_geometric_center(crdn), help::idatm_mask.at("???")));
+								residue.add(new Molib::Atom(1, "P", geometry::compute_geometric_center(crdn), help::idatm_mask.at("???")));
 						}
 					}
 				}
@@ -261,7 +261,7 @@ namespace genclus {
 				dbgmsg("from genclus : " << mols.name());
 				if (neighb) remove_ligands_not_in_aligned_region(mols, 
 					d["alignment"][0]["aligned_residues"]); // remove ligands that are not near aligned residues
-				mols.rotate(Geom3D::Matrix(d["alignment"][0]["rotation_matrix"], 
+				mols.rotate(geometry::Matrix(d["alignment"][0]["rotation_matrix"], 
 					d["alignment"][0]["translation_vector"]), true); // inverse rotation
 			}
 			catch (exception& e) {

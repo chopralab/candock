@@ -3,8 +3,8 @@
 
 #include <tuple>
 #include <map>
-#include "molib/atom.hpp"
-#include "molib/molecule.hpp"
+#include "candock/molib/atom.hpp"
+#include "candock/molib/molecule.hpp"
 #include "atominfotypes.hpp"
 
 namespace AtomInfo {

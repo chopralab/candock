@@ -1,13 +1,13 @@
-#include "linker.hpp"
-#include "score/score.hpp"
-#include "molib/nrset.hpp"
-#include "helper/benchmark.hpp"
-#include "helper/help.hpp"
-#include "helper/array2d.hpp"
-#include "modeler/modeler.hpp"
-#include "geom3d/quaternion.hpp"
-#include "poses.hpp"
-#include "molib/internal.hpp"
+#include "candock/linker/linker.hpp"
+#include "candock/score/score.hpp"
+#include "candock/molib/nrset.hpp"
+#include "candock/helper/benchmark.hpp"
+#include "candock/helper/help.hpp"
+#include "candock/helper/array2d.hpp"
+#include "candock/modeler/modeler.hpp"
+#include "candock/geometry/quaternion.hpp"
+#include "candock/linker/poses.hpp"
+#include "candock/molib/internal.hpp"
 #include <queue>
 
 using namespace std;
@@ -44,7 +44,7 @@ namespace Linker {
 					auto &vertices2 = mv.second;
 					// for every docked rigid fragment
 					for (auto &seed_molecule : seed_mols) {
-						Geom3D::Point::Vec crds(vertices2.size());
+						geometry::Point::Vec crds(vertices2.size());
 						const Molib::Atom::Vec &seed_atoms = seed_molecule.get_atoms();
 						for (size_t i = 0; i < vertices2.size(); ++i) {
 							crds[vertices1[i]] = seed_atoms.at(vertices2[i])->crd();
@@ -75,7 +75,7 @@ namespace Linker {
 		__modeler.add_topology(__receptor.get_atoms());
 		__modeler.add_topology(__ligand.get_atoms());
 		
-		__modeler.init_openmm();
+		__modeler.init_openmm(__platform, __precision, __accelerators);
 
 		__modeler.add_random_crds(__ligand.get_atoms());
 	}
@@ -205,23 +205,39 @@ namespace Linker {
 		
 			try {
 
-				__modeler.add_crds(__receptor.get_atoms(), docked.get_receptor().get_crds());
-				__modeler.add_crds(__ligand.get_atoms(), docked.get_ligand().get_crds());
-				
+
+				// Do a quick energy minization:
+				if (__max_iterations_pre > 0) {
+					OMMIface::Modeler modeler (
+						__modeler.get_forcefield()
+					);
+
+					modeler.add_topology(__ligand.get_atoms());
+					modeler.init_openmm(__platform, __precision, __accelerators);
+					modeler.add_crds(__ligand.get_atoms(), docked.get_ligand().get_crds());
+					modeler.init_openmm_positions();
+					modeler.unmask(__ligand.get_atoms());
+					modeler.set_max_iterations(__max_iterations_pre);
+					modeler.minimize_state();
+
+					__modeler.add_crds(__receptor.get_atoms(), docked.get_receptor().get_crds());
+					__modeler.add_crds(__ligand.get_atoms(), modeler.get_state(__ligand.get_atoms()));
+				} else {
+					__modeler.add_crds(__receptor.get_atoms(), docked.get_receptor().get_crds());
+					__modeler.add_crds(__ligand.get_atoms(), docked.get_ligand().get_crds());
+				}
+
 				__modeler.init_openmm_positions();
 				
 				__modeler.unmask(__receptor.get_atoms());
 				__modeler.unmask(__ligand.get_atoms());
 		
-                __modeler.set_max_iterations(__max_iterations_final); // until converged
+                __modeler.set_max_iterations(__max_iterations_final);
 
                 log_benchmark << "Starting minimization of " << __ligand.name()
                               << " and " << __receptor.name() << "\n";
 
                 __modeler.minimize_state();
-
-                __modeler.mask(__receptor.get_atoms());
-                const double potential_energy = __modeler.potential_energy();
 
 				// init with minimized coordinates
 				Molib::Molecule minimized_receptor(__receptor, __modeler.get_state(__receptor.get_atoms()));
@@ -230,10 +246,12 @@ namespace Linker {
 				minimized_receptor.undo_mm_specific();
 				
 				Molib::Atom::Grid gridrec(minimized_receptor.get_atoms());
-		
+
+                __modeler.mask(__receptor.get_atoms());
+				const double potential_energy = __modeler.potential_energy();
+
 				minimized_conformations.push_back(DockedConformation(minimized_ligand, minimized_receptor,
-					__score.non_bonded_energy(gridrec, minimized_ligand), potential_energy, ++max_clq_identity));
-		
+					__score.non_bonded_energy(gridrec, minimized_ligand), potential_energy, ++max_clq_identity));		
 			} catch(OMMIface::Modeler::MinimizationError &e) {
 				log_error << "MinimizationError: skipping minimization of one conformation of ligand " 
 					<< __ligand.name() << " due to : " << e.what() << endl;
@@ -245,7 +263,7 @@ namespace Linker {
 	bool Linker::GenericLinker::__clashes_receptor(const State &current) const {
 		for (size_t i = 0; i < current.get_crds().size(); ++i) {
 			const Molib::Atom &a = current.get_segment().get_atom(i); 
-			const Geom3D::Coordinate &c = current.get_crd(i); 
+			const geometry::Coordinate &c = current.get_crd(i); 
 			dbgmsg("in clashes_receptor test coordinate = " << c);
 			if (__gridrec.clashes(Molib::Atom(c, a.idatm_type()), __clash_coeff)) return true;
 		}
@@ -272,15 +290,15 @@ namespace Linker {
 			.get_bond(start_segment.get_next(goal_segment)).idx1();
 		const int goal_atom_idx = goal_segment
 			.get_bond(goal_segment.get_next(start_segment)).idx1();
-		const Geom3D::Coordinate &first_crd = start.get_crd(start_atom_idx);
-		const Geom3D::Coordinate &last_crd = goal.get_crd(goal_atom_idx);
+		const geometry::Coordinate &first_crd = start.get_crd(start_atom_idx);
+		const geometry::Coordinate &last_crd = goal.get_crd(goal_atom_idx);
 		return first_crd.distance(last_crd);
 	}
 	
-	Geom3D::Point::Vec Linker::GenericLinker::__rotate(const Geom3D::Quaternion &q, 
-		const Geom3D::Point &p1, const Geom3D::Point::Vec &crds) {
+	geometry::Point::Vec Linker::GenericLinker::__rotate(const geometry::Quaternion &q, 
+		const geometry::Point &p1, const geometry::Point::Vec &crds) {
 
-		Geom3D::Point::Vec rotated;
+		geometry::Point::Vec rotated;
 		for (auto &crd : crds) {	
 			rotated.push_back(q.rotatedVector(crd - p1) + p1); 
 		}
@@ -305,11 +323,11 @@ namespace Linker {
 		const Molib::Atom *a4 = &next.get_atom(idx4);
 		
 		dbgmsg("a4 = " << *a4 << " coordinates not set yet!");
-		Geom3D::Coordinate crd3(curr_state.get_crd(idx3));
+		geometry::Coordinate crd3(curr_state.get_crd(idx3));
 		dbgmsg("a3 = " << *a3 << " crd3 = " << curr_state.get_crd(idx3));
-		Geom3D::Coordinate crd2(curr_state.get_crd(idx2));
+		geometry::Coordinate crd2(curr_state.get_crd(idx2));
 		dbgmsg("a2 = " << *a2 << " crd2 = " << curr_state.get_crd(idx2));
-		Geom3D::Coordinate crd1(curr_state.get_crd(idx1));
+		geometry::Coordinate crd1(curr_state.get_crd(idx1));
 		dbgmsg("a1 = " << *a1 << " crd1 = " << curr_state.get_crd(idx1));
 		
 		const double saved_dihedral = __ic.get_dihedral(*a1, *a2, *a3, *a4);
@@ -328,14 +346,14 @@ namespace Linker {
 			<< initial.get_crd(idx4));
 		dbgmsg("rotate next segment on vector = "
 				<< crd2 << " - " << crd3
-				<< " by " << Geom3D::degrees(__spin_degrees) 
+				<< " by " << geometry::degrees(__spin_degrees) 
 				<< " degree increments");
-		const Geom3D::Quaternion q(Geom3D::Vector3(crd3 - crd2).norm()*sin(__spin_degrees), cos(__spin_degrees));
+		const geometry::Quaternion q(geometry::Vector3(crd3 - crd2).norm()*sin(__spin_degrees), cos(__spin_degrees));
 		for (double angle = __spin_degrees; angle < M_PI; angle += __spin_degrees) {
 			State &previous_rotated = *states.back();
 			states.push_back(unique_ptr<State>(new State(next, 
 				__rotate(q, crd2, previous_rotated.get_crds()))));
-			dbgmsg("rotated state at angle = " << Geom3D::degrees(angle)
+			dbgmsg("rotated state at angle = " << geometry::degrees(angle)
 				<< " is " << *states.back());
 		}
 		

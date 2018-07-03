@@ -1,14 +1,14 @@
-#include "findcentroids.hpp"
+#include "candock/program/findcentroids.hpp"
 
 #include <boost/filesystem.hpp>
 
-#include "probis/probis.hpp"
-#include "helper/inout.hpp"
-#include "ligands/genclus.hpp"
-#include "molib/molecules.hpp"
+#include "candock/probis/probis.hpp"
+#include "candock/helper/inout.hpp"
+#include "candock/ligands/genclus.hpp"
+#include "candock/molib/molecules.hpp"
 
-#include "helper/path.hpp"
-#include "options.hpp"
+#include "candock/helper/path.hpp"
+#include "candock/program/options.hpp"
 
 #ifdef _WINDOWS
 #include <direct.h>
@@ -32,7 +32,7 @@ namespace Program {
         void FindCentroids::__read_from_files( ) {
                 log_note << "Reading " << cmdl.get_int_option("num_bsites") << 
                     " binding sites from " << __centroid_file << endl;
-                __result = Centro::set_centroids( __centroid_file, cmdl.get_int_option("num_bsites"));
+                __result = centro::set_centroids( __centroid_file, cmdl.get_int_option("num_bsites"));
         }
 
         void FindCentroids::__continue_from_prev( ) {
@@ -102,7 +102,7 @@ namespace Program {
                 Inout::output_file(binding_sites.first,  Path::join(protein_dir.string(), cmdl.get_string_option("lig_clus_file")));
                 Inout::output_file(binding_sites.second, Path::join(protein_dir.string(), cmdl.get_string_option("z_scores_file")));
 
-                __result = Centro::set_centroids(binding_sites.first, cmdl.get_double_option("centro_clus_rad"));
+                __result = centro::set_centroids(binding_sites.first, cmdl.get_double_option("centro_clus_rad"));
                 Inout::output_file(__result, __centroid_file); // probis local structural alignments
         }
 }

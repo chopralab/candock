@@ -1,5 +1,5 @@
-#include "mcqd.hpp"
-#include "helper/help.hpp"
+#include "candock/graph/mcqd.hpp"
+#include "candock/helper/help.hpp"
 #include <utility>
 
 //~ Maxclique::Maxclique (const Array2d<bool> &conn, const vector<double> &scores, const float tt) : __conn(conn), __scores(scores), pk(0), level(1), Tlimit(tt), V(conn.get_szi()), Q(conn.get_szi()), QMAX(conn.get_szi()) {

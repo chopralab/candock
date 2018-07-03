@@ -119,7 +119,7 @@ void MolecularBondExtractor::addAngle (const Molib::Atom* atom1, const Molib::At
         a_new = make_tuple(a2, a1, a0);
     }
 
-    double angle = Geom3D::angle(atom1->crd(), atom2->crd(), atom3->crd());
+    double angle = geometry::angle(atom1->crd(), atom2->crd(), atom3->crd());
     ba.push_back(make_pair(a_new, angle));
 }
 
@@ -142,7 +142,7 @@ void MolecularBondExtractor::addDihedral (const Molib::Atom* atom1, const Molib:
         d_new = make_tuple(a3, a2, a1, a0);
     }
 
-    double dihedral = Geom3D::dihedral(atom1->crd(), atom2->crd(),
+    double dihedral = geometry::dihedral(atom1->crd(), atom2->crd(),
                                        atom3->crd(), atom4->crd());
 
     bd.push_back(make_pair(d_new, dihedral));
@@ -169,7 +169,7 @@ void MolecularBondExtractor::addImproper (const Molib::Atom* atom1, const Molib:
 
     i_new = make_tuple (lowest, middle, a1, highest);
 
-    double dihedral = Geom3D::dihedral(atom1->crd(), atom2->crd(),
+    double dihedral = geometry::dihedral(atom1->crd(), atom2->crd(),
                                        atom3->crd(), atom4->crd());
 
     bi.push_back(make_pair(i_new, dihedral));

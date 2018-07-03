@@ -4,9 +4,9 @@
 #include <string>
 #include <sstream>
 #include <algorithm>
-#include "nosqlreader.hpp"
-#include "helper/error.hpp"
-#include "helper/inout.hpp"
+#include "candock/ligands/nosqlreader.hpp"
+#include "candock/helper/error.hpp"
+#include "candock/helper/inout.hpp"
 
 void NosqlReader::parse_NOSQL(const string NOSQL_file) {
 	vector<string> vec;

@@ -1,19 +1,19 @@
 #include <iostream>
 #include <exception>
 #include <typeinfo>
-#include "molib/grid.hpp"
-#include "jsonreader.hpp"
-#include "nosqlreader.hpp"
-#include "molib/nrset.hpp"
-#include "parser/fileparser.hpp"
-#include "helper/help.hpp"
-#include "geom3d/matrix.hpp"
-#include "helper/error.hpp"
-#include "helper/inout.hpp"
-#include "helper/debug.hpp"
-#include "helper/path.hpp"
-#include "common.hpp"
-#include "genlig.hpp"
+#include "candock/molib/grid.hpp"
+#include "candock/ligands/jsonreader.hpp"
+#include "candock/ligands/nosqlreader.hpp"
+#include "candock/molib/nrset.hpp"
+#include "candock/parser/fileparser.hpp"
+#include "candock/helper/help.hpp"
+#include "candock/geometry/matrix.hpp"
+#include "candock/helper/error.hpp"
+#include "candock/helper/inout.hpp"
+#include "candock/helper/debug.hpp"
+#include "candock/helper/path.hpp"
+#include "candock/ligands/common.hpp"
+#include "candock/ligands/genlig.hpp"
 using namespace std;
 
 namespace genlig {
@@ -179,10 +179,10 @@ namespace genlig {
 						Parser::all_models|Parser::hydrogens);
 					Molib::Molecules &mols = 
 						nrset.add(new Molib::Molecules(biopdb.parse_molecule()));
-					dbgmsg(Geom3D::Matrix(d["alignment"][0]["rotation_matrix"], 
+					dbgmsg(geometry::Matrix(d["alignment"][0]["rotation_matrix"], 
 						d["alignment"][0]["translation_vector"]));
 					dbgmsg(mols_name);
-					mols.rotate(Geom3D::Matrix(d["alignment"][0]["rotation_matrix"], 
+					mols.rotate(geometry::Matrix(d["alignment"][0]["rotation_matrix"], 
 						d["alignment"][0]["translation_vector"]), true); // inverse rotation
 					ResMap aligned_to_query = common_ligands::json_to_map_reverse(d["alignment"][0]["aligned_residues"]);
 #ifndef NDEBUG
@@ -231,7 +231,7 @@ namespace genlig {
 		dbgmsg("starting generate binding site prediction");
 		// read hetero ligands from json_with_ligs file
 		jr.parse_JSON(json_with_ligs_file);
-		map<string, Geom3D::Matrix> bio_file_to_matrix;
+		map<string, geometry::Matrix> bio_file_to_matrix;
 		struct LigandInfo {
 			int cluster_number;
 			string lig_code;
@@ -239,9 +239,9 @@ namespace genlig {
 		};
 		map<string, vector<LigandInfo>> ligands_by_bio_file;
 		for (auto &d : jr.root()) {
-			dbgmsg(Geom3D::Matrix(d["alignment"][0]["rotation_matrix"], 
+			dbgmsg(geometry::Matrix(d["alignment"][0]["rotation_matrix"], 
 				d["alignment"][0]["translation_vector"]));
-			Geom3D::Matrix mx(d["alignment"][0]["rotation_matrix"], 
+			geometry::Matrix mx(d["alignment"][0]["rotation_matrix"], 
 				d["alignment"][0]["translation_vector"]);
 			const double z_score = d["alignment"][0]["scores"]["z_score"].asDouble();
 			const Json::Value &hetero = d["hetero"];
@@ -275,7 +275,7 @@ namespace genlig {
 		//~ Molib::PDBreader biopdb(Molib::PDBreader::all_models);
 		for (auto &kv1 : ligands_by_bio_file) {
 			const string &bio_file = kv1.first;
-			const Geom3D::Matrix &mx = bio_file_to_matrix[bio_file];
+			const geometry::Matrix &mx = bio_file_to_matrix[bio_file];
 			try { // if something goes wrong, e.g., pdb file is not found, don't exit..
 				//~ biopdb.rewind();
 				Parser::FileParser biopdb(bio_file, 

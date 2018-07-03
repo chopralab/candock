@@ -1,4 +1,4 @@
-#include "fileparser.hpp"
+#include "candock/parser/fileparser.hpp"
 
 #include <memory>
 #include <set>
@@ -6,13 +6,13 @@
 #include <vector>
 #include <string>
 
-#include "geom3d/coordinate.hpp"
-#include "helper/inout.hpp"
-#include "helper/help.hpp"
-#include "helper/debug.hpp"
-#include "molib/nrset.hpp"
-#include "molib/bond.hpp"
-#include "fragmenter/fragmenter.hpp"
+#include "candock/geometry/coordinate.hpp"
+#include "candock/helper/inout.hpp"
+#include "candock/helper/help.hpp"
+#include "candock/helper/debug.hpp"
+#include "candock/molib/nrset.hpp"
+#include "candock/molib/bond.hpp"
+#include "candock/fragmenter/fragmenter.hpp"
 
 using namespace std;
 using namespace Molib;

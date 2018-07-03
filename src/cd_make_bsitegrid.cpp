@@ -1,7 +1,7 @@
-#include "program/fragmentligands.hpp"
-#include "program/findcentroids.hpp"
-#include "program/target.hpp"
-#include "drm/drm.hpp"
+#include "candock/program/fragmentligands.hpp"
+#include "candock/program/findcentroids.hpp"
+#include "candock/program/target.hpp"
+#include "candock/drm/drm.hpp"
 #include "version.hpp"
 
 ////////////////// PRODUCE A GRIDHCP FILE IN PDB FORMAT ///////////////////////////

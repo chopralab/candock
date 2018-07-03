@@ -4,12 +4,12 @@
 
 #include <boost/filesystem.hpp>
 
-#include "program/cmdlnopts.hpp"
-#include "program/targetgroup.hpp"
-#include "program/fragmentligands.hpp"
+#include "candock/program/cmdlnopts.hpp"
+#include "candock/program/targetgroup.hpp"
+#include "candock/program/fragmentligands.hpp"
 
 #include "version.hpp"
-#include "drm/drm.hpp"
+#include "candock/drm/drm.hpp"
 
 using namespace std;
 

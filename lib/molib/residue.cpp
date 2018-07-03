@@ -3,10 +3,10 @@
 #include <map>
 #include <string>
 #include <vector>
-#include "atomtype.hpp"
-#include "bondtype.hpp"
-#include "atom.hpp"
-#include "residue.hpp"
+#include "candock/molib/atomtype.hpp"
+#include "candock/molib/bondtype.hpp"
+#include "candock/molib/atom.hpp"
+#include "candock/molib/residue.hpp"
 using namespace std;
 
 namespace Molib {
@@ -18,13 +18,13 @@ namespace Molib {
 		return stream;
 	}
 
-	void Residue::init_bio(Residue &residue_asym, const Geom3D::Matrix &bio_rota) {
+	void Residue::init_bio(Residue &residue_asym, const geometry::Matrix &bio_rota) {
 		for (Atom &atom : residue_asym) {
 			Atom &last = add(new Atom(atom));
 			last.crd().rotate_inline(bio_rota); // do the actual rotation
 		}
 	}
-	void Residue::rotate(const Geom3D::Matrix &rota, const bool inverse) {
+	void Residue::rotate(const geometry::Matrix &rota, const bool inverse) {
 		if (inverse) for (auto &atom : *this) {	atom.crd().inverse_rotate_inline(rota); }
 		else for (auto &atom : *this) {	atom.crd().rotate_inline(rota); }
 	}

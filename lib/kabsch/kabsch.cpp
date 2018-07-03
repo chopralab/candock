@@ -1,4 +1,4 @@
-#include "kabsch.hpp"
+#include "candock/kabsch/kabsch.hpp"
 
 const double Kabsch::__NORM_EPS = 0.00000001;
 /* gsl does not provide it */

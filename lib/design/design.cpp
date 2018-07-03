@@ -1,11 +1,11 @@
-#include "design.hpp"
+#include "candock/design/design.hpp"
 
 #include <set>
 
-#include "molib/bondtype.hpp"
-#include "molib/atomtype.hpp"
-#include "fragmenter/unique.hpp"
-#include "helper/logger.hpp"
+#include "candock/molib/bondtype.hpp"
+#include "candock/molib/atomtype.hpp"
+#include "candock/fragmenter/unique.hpp"
+#include "candock/helper/logger.hpp"
 
 namespace design {
 
@@ -288,7 +288,7 @@ namespace design {
                                         mod_atom.set_idatm_type(atom_type + "3");
                                 }
                                 
-                                Geom3D::Coordinate crd = (mod_atom.crd() - start_atom->crd());
+                                geometry::Coordinate crd = (mod_atom.crd() - start_atom->crd());
                                 crd.normalize();
                                 mod_atom.set_crd(crd * 1.54 + start_atom->crd());
 
