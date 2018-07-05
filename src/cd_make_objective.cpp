@@ -28,7 +28,7 @@ int main(int argc, char* argv[]) {
                         Version::get_run_info();
                 cout << help::Options::get_options()->configuration_file() << endl;
 
-                Score::KBFF score(cmdl.get_string_option("ref"), "complete",
+                score::KBFF score(cmdl.get_string_option("ref"), "complete",
                                    cmdl.get_string_option("func"), cmdl.get_int_option("cutoff"),
                                    cmdl.get_double_option("step"));
 

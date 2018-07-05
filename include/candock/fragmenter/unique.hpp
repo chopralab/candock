@@ -6,7 +6,7 @@
 
 namespace candock {
 
-namespace Molib {
+namespace molib {
 	class Atom;
 	class Unique {
 		struct SeedData {

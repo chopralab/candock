@@ -5,7 +5,7 @@
 
 namespace candock {
 
-namespace Molib {
+namespace molib {
 	class Element {
 	public:
 		static const std::vector<std::string> symbols;
@@ -54,7 +54,7 @@ namespace Molib {
 		bool    operator>=(const Element &a) const { return as >= a.as; }
 		friend std::ostream& operator<< (std::ostream&, const Element&);
 	};
-}  // namespace Molib
+}  // namespace molib
 
 }
 

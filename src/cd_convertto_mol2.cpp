@@ -26,7 +26,7 @@ int main(int argc, char* argv[]) {
 
                 for (int i = 1; i < argc; ++i) {
                         Parser::FileParser input(argv[i], Parser::pdb_read_options::all_models);
-                        Molib::Molecules mols;
+                        molib::Molecules mols;
                         input.parse_molecule(mols);
 
                         for (const auto &m : mols) {

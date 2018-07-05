@@ -21,7 +21,7 @@ int main(int argc, char* argv[]) {
                                                  Parser::pdb_read_options::skip_atom |
                                                  Parser::pdb_read_options::all_models);
 
-                Molib::Molecules mols1;
+                molib::Molecules mols1;
 
                 mol1.parse_molecule(mols1);
 

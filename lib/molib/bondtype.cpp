@@ -24,7 +24,7 @@
 using namespace std;
 
 namespace candock {
-namespace Molib {
+namespace molib {
 	ostream& operator<< (ostream& os, const ValenceState& valence_state) {
 		for (auto &kv : valence_state) {
 			const Atom &atom = *kv.first;

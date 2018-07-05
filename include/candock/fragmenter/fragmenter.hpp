@@ -10,7 +10,7 @@
 
 namespace candock {
 
-namespace Molib {
+namespace molib {
 	class Unique;
 
 	typedef std::map<int, Atom*> AtomMatch;

@@ -5,38 +5,38 @@
 
 namespace candock {
 
-namespace Linker {
+namespace linker {
 
         class DockedConformation {
         public:
                 typedef vector<DockedConformation> Vec;
         private:
-                unique_ptr<Molib::Molecule> __ligand;
-                unique_ptr<Molib::Molecule> __receptor;
+                unique_ptr<molib::Molecule> __ligand;
+                unique_ptr<molib::Molecule> __receptor;
                 double __energy;
                 double __potential_energy;
                 size_t __max_clq_identity;
         public:
                 DockedConformation() : __ligand (nullptr), __receptor (nullptr), __energy (0), __potential_energy (0), __max_clq_identity(0) {}
 
-                DockedConformation (Molib::Molecule ligand, Molib::Molecule receptor, double energy, double pot, size_t id)
-                        : __ligand (unique_ptr<Molib::Molecule> (new Molib::Molecule (ligand))),
-                          __receptor (unique_ptr<Molib::Molecule> (new Molib::Molecule (receptor))),
+                DockedConformation (molib::Molecule ligand, molib::Molecule receptor, double energy, double pot, size_t id)
+                        : __ligand (unique_ptr<molib::Molecule> (new molib::Molecule (ligand))),
+                          __receptor (unique_ptr<molib::Molecule> (new molib::Molecule (receptor))),
                           __energy (energy), __potential_energy (pot), __max_clq_identity(id) {}
 
-                Molib::Molecule &get_ligand() {
+                molib::Molecule &get_ligand() {
                         return *__ligand;
                 }
 
-                const Molib::Molecule &get_ligand() const {
+                const molib::Molecule &get_ligand() const {
                         return *__ligand;
                 }
 
-                Molib::Molecule &get_receptor() {
+                molib::Molecule &get_receptor() {
                         return *__receptor;
                 }
 
-                const Molib::Molecule &get_receptor() const {
+                const molib::Molecule &get_receptor() const {
                         return *__receptor;
                 }
 

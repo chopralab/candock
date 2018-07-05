@@ -5,7 +5,7 @@
 using namespace std;
 
 namespace candock {
-namespace Molib {
+namespace molib {
         const vector<string> Element::symbols {
 		"LP",  "H", "He", "Li", "Be",  "B",  "C",  "N",  "O",
 		 "F", "Ne", "Na", "Mg", "Al", "Si",  "P",  "S", "Cl",

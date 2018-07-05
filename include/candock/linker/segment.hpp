@@ -13,32 +13,32 @@
 
 namespace candock {
 
-namespace Linker {
+namespace linker {
 
-	class Segment : public template_vector_container<Segment*, Segment> {
+	class Segment : public molib::template_vector_container<Segment*, Segment> {
 	public:
 
 		typedef set<Segment*> Set;
 		typedef set<const Segment*> ConstSet;
 		typedef vector<Segment*> Vec;
 		typedef pair<const Segment*, const Segment*> ConstPair;
-		typedef Glib::Graph<Segment> Graph;
+		typedef graph::Graph<Segment> Graph;
 		typedef map<ConstPair, Graph::Path> Paths;
 		typedef int Id;
 		
 	private:
-		map<const Molib::Atom*, int> __amap;
-		const Molib::Atom::Vec __atoms;
+		map<const molib::Atom*, int> __amap;
+		const molib::Atom::Vec __atoms;
 		int __seed_id; // != -1 if segment is a seed
 		Id __id;
 		vector<unique_ptr<State>> __state; // only seed states here!
 		ConstSet __adjacent_seed_segments;
 		map<const Segment*, double> __max_linker_length;
-		map<const Segment*, Molib::Bond> __bond;
+		map<const Segment*, molib::Bond> __bond;
 		map<const Segment*, Segment*> __next;
 		vector<bool> __join_atom, __common_atom;
 
-		Segment(const Molib::Atom::Vec atoms, const int &seed_id, const Segment::Id idx);
+		Segment(const molib::Atom::Vec atoms, const int &seed_id, const Segment::Id idx);
 		static Paths __find_paths(const vector<unique_ptr<Segment>> &segments);
 		static void __set_branching_rules(const Paths &paths);
 		static bool __link_adjacent(const Graph::Path &path);
@@ -53,10 +53,10 @@ namespace Linker {
 		const ConstSet& get_adjacent_seed_segments() const { return __adjacent_seed_segments; }
 		void set_adjacent_seed_segments(Segment &seed_seg) { __adjacent_seed_segments.insert(&seed_seg); }
 		bool is_seed_adjacent(const Segment &other) const { return __adjacent_seed_segments.count(&other) != 0; }
-		const Molib::Atom::Vec& get_atoms() const { return __atoms; }
-		const Molib::Atom& get_atom(const int i) const { return *__atoms[i]; }
-		bool has_atom(const Molib::Atom &atom) const { return __amap.count(&atom) != 0; }
-                int get_idx(const Molib::Atom &atom) const { return __amap.at(&atom); }
+		const molib::Atom::Vec& get_atoms() const { return __atoms; }
+		const molib::Atom& get_atom(const int i) const { return *__atoms[i]; }
+		bool has_atom(const molib::Atom &atom) const { return __amap.count(&atom) != 0; }
+                int get_idx(const molib::Atom &atom) const { return __amap.at(&atom); }
 		string get_label() const { stringstream ss; ss << *this; return ss.str(); } // graph ostream operator
 		int weight() const { return 0; } // dummy for graph ostream operator
 		void add_state(unique_ptr<State> s) { __state.push_back(std::move(s)); }
@@ -69,17 +69,17 @@ namespace Linker {
 		bool is_adjacent(const Segment &other) const { for (auto &adj : *this) if (&adj == &other) return true; return false; }
 		double get_max_linker_length(const Segment &other) const { return __max_linker_length.at(&other); }
 		void set_max_linker_length(const Segment &other, const double d) {	if (d > __max_linker_length[&other]) __max_linker_length[&other] = d; }
-		const Molib::Bond& get_bond(const Segment &other) const { return __bond.at(&other); }
-		void set_bond(const Segment &other, Molib::Atom &a1, Molib::Atom &a2);
-		int adjacent_in_segment(const Molib::Atom &atom, const Molib::Atom &forbidden) const;
+		const molib::Bond& get_bond(const Segment &other) const { return __bond.at(&other); }
+		void set_bond(const Segment &other, molib::Atom &a1, molib::Atom &a2);
+		int adjacent_in_segment(const molib::Atom &atom, const molib::Atom &forbidden) const;
         Id get_id() const { return __id; }
-		void set_join_atom(const Molib::Atom &atom) { __join_atom[get_idx(atom)] = true; }
+		void set_join_atom(const molib::Atom &atom) { __join_atom[get_idx(atom)] = true; }
 		bool is_join_atom(const int i) const { return __join_atom[i]; }
-		void set_common_atom(const Molib::Atom &atom) { __common_atom[get_idx(atom)] = true; }
+		void set_common_atom(const molib::Atom &atom) { __common_atom[get_idx(atom)] = true; }
 		bool is_common_atom(const int i) const { return __common_atom[i]; }
 		friend ostream& operator<< (ostream& stream, const Segment& s);
 		
-		static Graph create_graph(const Molib::Molecule &molecule);
+		static Graph create_graph(const molib::Molecule &molecule);
 	};
 };
 

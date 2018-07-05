@@ -14,7 +14,7 @@
 using namespace std;
 
 namespace candock{
-namespace Linker {
+namespace linker {
 
 	ostream& operator<<(ostream& os, const Partial &le)	{
 		os << "start link ++++++++++++++++++++++++++++++" << endl;
@@ -35,7 +35,7 @@ namespace Linker {
 
 	//~ double Partial::compute_rmsd_ord(const Partial &other) const {
 		//~ geometry::Point::Vec crds1, crds2;
-		//~ map<const Molib::Atom*, pair<geometry::Point, geometry::Point>> crd_map;
+		//~ map<const molib::Atom*, pair<geometry::Point, geometry::Point>> crd_map;
 		//~ 
 		//~ for (auto &pstate : this->get_states()) {
 			//~ for (int i = 0; i < pstate->get_segment().get_atoms().size(); ++i) {
@@ -117,8 +117,8 @@ namespace Linker {
 		}
 	}
 
-	Molib::Atom::Vec Partial::get_ligand_atoms() { 
-		Molib::Atom::Vec atoms; 
+	molib::Atom::Vec Partial::get_ligand_atoms() { 
+		molib::Atom::Vec atoms; 
 		for (auto &pstate: __states) {
 			for (auto &patom : pstate->get_segment().get_atoms()) {
 				atoms.push_back(patom);

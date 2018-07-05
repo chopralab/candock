@@ -13,7 +13,7 @@
 
 namespace candock {
 
-namespace Glib {
+namespace graph {
 	
 	template<typename T>
 	class Vertex : public template_vector_container<Vertex<T>*, Vertex<T>> {

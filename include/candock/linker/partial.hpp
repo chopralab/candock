@@ -15,7 +15,7 @@
 
 namespace candock {
 
-namespace Linker {
+namespace linker {
 	class State;
 
 	class Partial {
@@ -46,7 +46,7 @@ namespace Linker {
 		void set_ligand_crds(const geometry::Point::Vec &crds); 
 		geometry::Point::Vec get_ligand_crds() const;
 
-		Molib::Atom::Vec get_ligand_atoms();
+		molib::Atom::Vec get_ligand_atoms();
 
 		void set_energy(const double energy) { __energy = energy; }
 		double get_energy() const { return __energy; }

@@ -16,7 +16,7 @@
 using namespace std;
 
 namespace candock {
-namespace Linker {
+namespace linker {
 
         DockedConformation Linker::StaticLinker::__a_star(const int segment_graph_size, const Partial &start_conformation, vector<unique_ptr<State>> &states, int iter) {
 
@@ -43,7 +43,7 @@ namespace Linker {
 #ifdef MOVIE
 			DockedConformation docked = __reconstruct(curr_conformation);
 			docked.get_receptor().undo_mm_specific();
-			inout::output_file(Molib::Molecule::print_complex(docked.get_ligand(), docked.get_receptor(), docked.get_energy()), 
+			inout::output_file(molib::Molecule::print_complex(docked.get_ligand(), docked.get_receptor(), docked.get_energy()), 
 			"movie.pdb", ios_base::app); // output docked molecule conformations
 #endif
 
@@ -176,7 +176,7 @@ namespace Linker {
 		Partial::Vec possibles_w_energy;
 		{
 			// find all maximum cliques, of size k; k...number of seed segments
-			Maxclique m(conn);
+			graph::Maxclique m(conn);
 
 			dbgmsg("largest possible clique (seed_graph.size()) = " << seed_graph.size());
 			dbgmsg("currently searched for clique (__max_clique_size) = " << __max_clique_size);
@@ -277,14 +277,14 @@ namespace Linker {
 		for (auto &pstate : conformation.get_states()) { // convert ligand to new coordinates
 			State &state = *pstate;
 			const Segment &segment = state.get_segment();
-			Molib::Atom::Set overlap;
+			molib::Atom::Set overlap;
 			// deal with atoms that overlap between states
 			for (auto &adjacent : segment) {
-				const Molib::Bond &b = segment.get_bond(adjacent);
+				const molib::Bond &b = segment.get_bond(adjacent);
 				overlap.insert(&b.atom2());
 			}
 			for (size_t i = 0; i < state.get_segment().get_atoms().size(); ++i) {
-				Molib::Atom &atom = const_cast<Molib::Atom&>(state.get_segment().get_atom(i)); // ugly, correct this
+				molib::Atom &atom = const_cast<molib::Atom&>(state.get_segment().get_atom(i)); // ugly, correct this
 				if (!overlap.count(&atom)) {
 					const geometry::Coordinate &crd = state.get_crd(i);
 					atom.set_crd(crd);
@@ -292,7 +292,7 @@ namespace Linker {
 			}
 		}
 		
-		Molib::Molecule ligand(__ligand);
+		molib::Molecule ligand(__ligand);
 		ligand.set_name(__ligand.name() + "_" + std::to_string(++conf_number));
 		
 		log_benchmark << "Reconstruction of molecules took " << bench.seconds_from_start() 

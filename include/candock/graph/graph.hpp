@@ -18,11 +18,11 @@
 
 namespace candock {
 
-namespace Glib {
+namespace graph {
 	typedef vector<vector<bool>> AdjacencyMatrix;
 	
 	template<class Vertex>
-	class Graph : public template_vector_container<Vertex*, Vertex> {
+	class Graph : public molib::template_vector_container<Vertex*, Vertex> {
 	public:
 		typedef set<Vertex*> VertexSet;
 		typedef vector<Vertex*> Path;

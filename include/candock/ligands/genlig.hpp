@@ -7,7 +7,7 @@ using namespace std;
 namespace candock {
 
 namespace genlig {
-	typedef map<int, Molib::Molecules> BindingSiteClusters;
+	typedef map<int, molib::Molecules> BindingSiteClusters;
 	typedef map<int, double> BindingSiteScores;
 	void generate_ligands(const string &receptor_file, const string &receptor_chain_id, 
 		const string &json_file, const string &bio_dir, const string &lig_code,
@@ -20,8 +20,8 @@ namespace genlig {
 // Operator overloading for typedef types can lead to issues.
 // See http://blog.mezeske.com/?p=170 for details.
 
-namespace Molib {
-    ostream& operator<<(ostream& os, const map<int, Molib::Molecules>& bsites);
+namespace molib {
+    ostream& operator<<(ostream& os, const map<int, molib::Molecules>& bsites);
 }
 
 	ostream& operator<<(ostream& os, const map<int, double>& bscores);

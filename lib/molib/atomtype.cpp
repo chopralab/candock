@@ -23,7 +23,7 @@
 using namespace std;
 
 namespace candock {
-namespace Molib {
+namespace molib {
 namespace AtomType {
 	int freeOxygens(const Atom &a, map<const Atom*, int> &heavys) {
 		int freeOxygens = 0;

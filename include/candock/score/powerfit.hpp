@@ -6,7 +6,7 @@
 
 namespace candock {
 
-namespace Score {
+namespace score {
     
         class InterpolationError : public Error {
         public: 

@@ -13,6 +13,8 @@
 
 namespace candock {
 
+namespace molib {
+
 template<class T> // T needs crd(), distance(), and distance(double) interface
 class Grid {
 public:
@@ -71,12 +73,6 @@ private:
         }
 public:
 
-
-        //~ template<typename U>
-        //~ Grid(Grid<U>&& other) noexcept {
-        //~ std::cout << "Grid move constructor" << std::endl;
-        //~ }
-//~
         Grid &operator= (const Grid &rhs) {
                 dbgmsg ("Grid assignment operator");
 
@@ -304,6 +300,7 @@ public:
 
 };
 
+}
 }
 
 #endif

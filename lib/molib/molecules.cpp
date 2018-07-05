@@ -22,7 +22,7 @@
 using namespace std;
 
 namespace candock {
-namespace Molib {
+namespace molib {
 
 	ostream& operator<< (ostream& stream, const Molecules& m) {
 		stream << setw(6) << left << "REMARK   4 NRPDB " << m.name() << endl;
@@ -152,7 +152,7 @@ namespace Molib {
                         if (!(help::standard_residues.count(residue.resn())
                             || help::cofactor_residues.count(residue.resn())
                             || help::ions.count(residue.resn()))) {
-                                candock::Molib::compute_chirality(residue.get_atoms());
+                                candock::molib::compute_chirality(residue.get_atoms());
                         }
                 }
                 return *this; 
@@ -269,7 +269,7 @@ namespace Molib {
 		return *this; 
 	}
 
-        void create_mols_from_seeds(set<int> &added, Molib::Molecules &seeds, const Molib::Molecules &mols) {
+        void create_mols_from_seeds(set<int> &added, molib::Molecules &seeds, const molib::Molecules &mols) {
                 for (auto &molecule : mols)
                 for (auto &assembly : molecule)
                 for (auto &model : assembly) {
@@ -280,13 +280,13 @@ namespace Molib {
                                                 dbgmsg("added " << fragment.get_seed_id());
                                                 added.insert(fragment.get_seed_id());
                                                 // add to new molecules
-                                                Molib::Molecule &seed = seeds.add(new Molib::Molecule(std::to_string(fragment.get_seed_id())));
-                                                Molib::Assembly &a = seed.add(new Molib::Assembly(0));
-                                                Molib::Model &mod = a.add(new Molib::Model(1));
-                                                Molib::Chain &c = mod.add(new Molib::Chain('X'));
-                                                Molib::Residue &r = c.add(new Molib::Residue("XXX", 1, ' ', Molib::Residue::hetero));
-                                                for (const Molib::Atom *atom : fragment.get_all()) {
-                                                        r.add(new Molib::Atom(*atom));
+                                                molib::Molecule &seed = seeds.add(new molib::Molecule(std::to_string(fragment.get_seed_id())));
+                                                molib::Assembly &a = seed.add(new molib::Assembly(0));
+                                                molib::Model &mod = a.add(new molib::Model(1));
+                                                molib::Chain &c = mod.add(new molib::Chain('X'));
+                                                molib::Residue &r = c.add(new molib::Residue("XXX", 1, ' ', molib::Residue::hetero));
+                                                for (const molib::Atom *atom : fragment.get_all()) {
+                                                        r.add(new molib::Atom(*atom));
                                                 }
                                                 seed.regenerate_bonds(molecule);
                                         }

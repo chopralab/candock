@@ -6,7 +6,7 @@ namespace candock{
 namespace fileout {
 
         void print_complex_pdb (std::ostream &ss,
-                                const Molib::Molecule &ligand, const Molib::Molecule &receptor,
+                                const molib::Molecule &ligand, const molib::Molecule &receptor,
                                 const double energy, const double potential,
                                 const int model, const size_t max_clq_id,
                                 const double rmsd) {

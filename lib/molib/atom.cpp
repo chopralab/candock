@@ -14,15 +14,15 @@
 using namespace std;
 
 namespace candock {
-namespace Molib {
+namespace molib {
 	ostream& operator<< (ostream& stream, const Atom& a) {
 		if (!a.__br) {
 			stream << "ATOM " << a.get_label() << " " << a.atom_number() << endl;
 			return stream;
 		}
-		stream << setw(6) << left << (a.br().rest() == Molib::Residue::hetero 
-			|| a.br().rest() == Molib::Residue::ion 
-			|| a.br().rest() == Molib::Residue::water ? "HETATM" : "ATOM");
+		stream << setw(6) << left << (a.br().rest() == molib::Residue::hetero 
+			|| a.br().rest() == molib::Residue::ion 
+			|| a.br().rest() == molib::Residue::water ? "HETATM" : "ATOM");
 		stream << setw(5) << right << a.atom_number();
 		stream << setw(1) << " ";
 		stream << setw(4) << left << (a.atom_name().size() < 4 ? " " + a.atom_name() : a.atom_name().substr(0,4));
@@ -201,7 +201,7 @@ namespace Molib {
 		return num_bwp;
 	}
 
-        double Molib::Atom::compute_rmsd(const Graph& g1, const Graph& g2) {
+        double molib::Atom::compute_rmsd(const Graph& g1, const Graph& g2) {
                 Atom::Graph::Matches m = g1.match(g2);
 
                 // try calculating rmsd of each mapping of molecule to molecule ...

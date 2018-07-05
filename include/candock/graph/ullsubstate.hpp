@@ -7,7 +7,7 @@
 
 namespace candock {
 
-namespace Glib {
+namespace graph {
         typedef unsigned short node_id;
         static const node_id NULL_NODE=0xFFFF;
 
@@ -266,7 +266,6 @@ namespace Glib {
         }
 
 }
-
 }
 
 #endif

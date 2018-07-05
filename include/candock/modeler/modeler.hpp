@@ -16,7 +16,7 @@ using namespace std;
 
 namespace candock {
 
-namespace Score
+namespace score
 {
 class Score;
 };
@@ -60,17 +60,17 @@ public:
           double friction = 91.0
   );
 
-  void mask(const Molib::Atom::Vec &atoms);
-  void unmask(const Molib::Atom::Vec &atoms);
+  void mask(const molib::Atom::Vec &atoms);
+  void unmask(const molib::Atom::Vec &atoms);
 
-  void add_topology(const Molib::Atom::Vec &atoms);
-  void add_crds(const Molib::Atom::Vec &atoms, const geometry::Point::Vec &crds);
-  void add_random_crds(const Molib::Atom::Vec &atoms);
+  void add_topology(const molib::Atom::Vec &atoms);
+  void add_crds(const molib::Atom::Vec &atoms, const geometry::Point::Vec &crds);
+  void add_random_crds(const molib::Atom::Vec &atoms);
 
-  geometry::Point::Vec get_state(const Molib::Atom::Vec &atoms);
+  geometry::Point::Vec get_state(const molib::Atom::Vec &atoms);
 
 #ifndef NDEBUG
-  void minimize_knowledge_based(Molib::Molecule &ligand, Molib::Molecule &receptor, Score::Score &score);
+  void minimize_knowledge_based(molib::Molecule &ligand, molib::Molecule &receptor, score::Score &score);
 #endif
 
   void minimize_state();

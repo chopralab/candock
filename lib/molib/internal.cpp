@@ -11,7 +11,7 @@
 using namespace std;
 
 namespace candock {
-namespace Molib {
+namespace molib {
 	const Torsion empty_torsion(nullptr, nullptr, nullptr, nullptr);
 
 	void Internal::build(const Atom::Vec &atoms) {

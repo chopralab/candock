@@ -16,15 +16,15 @@
 using namespace std;
 
 namespace candock{
-namespace Docker {
+namespace docker {
 
 	ostream& operator<<(ostream& os, const Conformations &conformations) {
-		const Molib::Atom::Vec atoms = conformations.__seed.get_atoms();
+		const molib::Atom::Vec atoms = conformations.__seed.get_atoms();
 		for (auto &conf : conformations.get_conformations()) {
 			os << "MODEL" << endl;
 			for (size_t i = 0; i < conf.size(); ++i) {
 				Gpoints::Gpoint &gpoint0 = *conf[i];
-				Molib::Atom &atom = *atoms[i];
+				molib::Atom &atom = *atoms[i];
 				atom.set_crd(gpoint0.crd());
 				os << atom;
 			}
@@ -33,7 +33,7 @@ namespace Docker {
 		return os;
 	}
 
-	Conformations::Conformations(const Molib::Molecule &seed, const Gpoints &gpoints, 
+	Conformations::Conformations(const molib::Molecule &seed, const Gpoints &gpoints, 
 		const double &conf_spin, const int num_univec) : __seed(seed) {
 
 		try {
@@ -44,10 +44,10 @@ namespace Docker {
 			// get uniform sphere points, i.e., unit vectors
 			geometry::Point::Vec unit_vectors = geometry::uniform_sphere(num_univec);
 	
-			const Molib::Atom &center = seed.get_center_atom();
+			const molib::Atom &center = seed.get_center_atom();
 			
 			// get another atom - neighbor of center
-			const Molib::Atom &another = center.first();
+			const molib::Atom &another = center.first();
 	
 			// calculate vector between the two atoms
 			const geometry::Point bondvec = another.crd() - center.crd();
@@ -104,7 +104,7 @@ namespace Docker {
 			for (auto &point : gpoints.get_gridpoints0()) {
 				pgvec.push_back(const_cast<Gpoints::Gpoint*>(&point));
 			 }
-			Grid<Gpoints::Gpoint> grid(pgvec);
+			molib::Grid<Gpoints::Gpoint> grid(pgvec);
 			dbgmsg("after creating grid");
 			dbgmsg("conformation size = " << confs.size());
 	

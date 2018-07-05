@@ -15,7 +15,7 @@
 #include "candock/fragmenter/fragmenter.hpp"
 
 using namespace std;
-using namespace candock::Molib;
+using namespace candock::molib;
 
 namespace candock {
 namespace Parser {

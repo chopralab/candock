@@ -20,7 +20,7 @@
 #include "candock/score/powerfit.hpp"
 
 namespace candock {
-namespace Score {
+namespace score {
 
         struct data {
                 size_t  n;

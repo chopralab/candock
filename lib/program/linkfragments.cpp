@@ -56,7 +56,7 @@ namespace Program {
 
         }
 
-        void LinkFragments::__link_ligand (Molib::Molecule &ligand) {
+        void LinkFragments::__link_ligand (molib::Molecule &ligand) {
 
                 auto prot_name = boost::filesystem::basename(__receptor.name());
                 boost::filesystem::path p (prot_name);
@@ -77,12 +77,12 @@ namespace Program {
                         /**
                           * Read top seeds for this ligand
                           */
-                        Molib::NRset top_seeds = __seeds_database.get_seeds (ligand, cmdl.get_double_option ("top_percent"));
+                        molib::NRset top_seeds = __seeds_database.get_seeds (ligand, cmdl.get_double_option ("top_percent"));
 
                         ligand.erase_properties(); // required for graph matching
                         top_seeds.erase_properties(); // required for graph matching
 
-                        Molib::Molecule crystal_ligand(ligand);
+                        molib::Molecule crystal_ligand(ligand);
 
                         /**
                          * Jiggle the coordinates by one-thousand'th of an Angstrom to avoid minimization failures
@@ -122,7 +122,7 @@ namespace Program {
                          */
 
                         //FIXME Why does this modify (remove?) the ligand coordinates
-                        Linker::Linker linker (modeler, __receptor, ligand, top_seeds, __gridrec, __score,
+                        linker::Linker linker (modeler, __receptor, ligand, top_seeds, __gridrec, __score,
                                                cmdl.get_bool_option ("cuda"), cmdl.get_bool_option ("iterative"),
                                                cmdl.get_int_option ("cutoff"), cmdl.get_int_option ("spin"),
                                                cmdl.get_double_option ("tol_seed_dist"), cmdl.get_double_option ("lower_tol_seed_dist"),
@@ -134,10 +134,10 @@ namespace Program {
                                                cmdl.get_int_option ("max_clique_size"), cmdl.get_int_option ("max_iter_final"), cmdl.get_int_option ("max_iter_pre"),
                                                cmdl.get_string_option("platform"), cmdl.get_string_option("precision"), cmdl.get_string_option("accelerators"));
 
-                        Molib::Atom::Graph cryst_graph =  Molib::Atom::create_graph(crystal_ligand.get_atoms());
+                        molib::Atom::Graph cryst_graph =  molib::Atom::create_graph(crystal_ligand.get_atoms());
 
-                        Linker::DockedConformation::Vec docks = linker.link();
-                        Linker::DockedConformation::sort (docks);
+                        linker::DockedConformation::Vec docks = linker.link();
+                        linker::DockedConformation::sort (docks);
 
                         int model = 0;
 
@@ -150,7 +150,7 @@ namespace Program {
                                 if (cmdl.get_bool_option ("rmsd_crystal")) {
 
                                         docked.get_ligand().erase_properties();
-                                        Molib::Atom::Vec atoms = docked.get_ligand().get_atoms();
+                                        molib::Atom::Vec atoms = docked.get_ligand().get_atoms();
 
                                         int reenum = 0;
                                         for ( auto &atom : atoms ) {
@@ -158,9 +158,9 @@ namespace Program {
                                                 atom->erase_properties();
                                         }
 
-                                        Molib::Atom::Graph docked_graph = Molib::Atom::create_graph(atoms);
+                                        molib::Atom::Graph docked_graph = molib::Atom::create_graph(atoms);
 
-                                        rmsd = Molib::Atom::compute_rmsd(cryst_graph, docked_graph);
+                                        rmsd = molib::Atom::compute_rmsd(cryst_graph, docked_graph);
                                 }
 
                                 // output docked molecule conformations
@@ -172,7 +172,7 @@ namespace Program {
                                 Inout::output_file (ss.str(), p.string(), ios_base::app);
                         }
 
-                        __all_top_poses.add (new Molib::Molecule (docks[0].get_ligand()));
+                        __all_top_poses.add (new molib::Molecule (docks[0].get_ligand()));
                         ffcopy.erase_topology (ligand);
                 } catch (exception &e) {
                         log_error << "Error: skipping ligand " << ligand.name() << " with " << __receptor.name() << " due to : " << e.what() << endl;
@@ -200,11 +200,11 @@ namespace Program {
 
                 for (int i = 0; i < cmdl.ncpu(); ++i) {
                         threads.push_back (std::thread ([ &,this] {
-                                Molib::Molecules ligands;
+                                molib::Molecules ligands;
 
                                 while (lpdb2.parse_molecule (ligands)) {
 
-                                        Molib::Molecule &ligand = ligands.first();
+                                        molib::Molecule &ligand = ligands.first();
                                         
                                         boost::filesystem::path p (__receptor.name());
                                         p = p / cmdl.get_string_option ("docked_dir") / (ligand.name() + ".pdb");
@@ -239,7 +239,7 @@ namespace Program {
                 log_step << "Linking of fragments is complete" << endl;
         }
 
-        void LinkFragments::link_ligands (const Molib::Molecules &ligands) {
+        void LinkFragments::link_ligands (const molib::Molecules &ligands) {
                 size_t j = 0;
 
                 std::vector<std::thread> threads;
@@ -256,7 +256,7 @@ namespace Program {
                                         if (j >= ligands.size())
                                                 return;
 
-                                        Molib::Molecule &ligand = ligands[j++];
+                                        molib::Molecule &ligand = ligands[j++];
 
                                         guard.unlock();
 

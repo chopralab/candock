@@ -13,7 +13,7 @@
 using namespace std;
 
 namespace candock {
-namespace Molib {
+namespace molib {
 	ostream& operator<< (ostream& stream, const Model& m) {
 		stream << setw(6) << left << "MODEL" << setw(4) << " " << setw(4) 
 			<< right << m.number() << endl;

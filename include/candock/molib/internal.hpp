@@ -11,7 +11,7 @@
 
 namespace candock {
 
-namespace Molib {
+namespace molib {
 	class Atom;
 	struct Torsion {
 		const Atom *a1, *a2, *a3, *a4;

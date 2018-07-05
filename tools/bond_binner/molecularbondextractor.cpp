@@ -4,7 +4,7 @@ using namespace candock;
 
 namespace AtomInfo {
 
-size_t MolecularBondExtractor::__ring_size( const Molib::Atom* atom ) const {
+size_t MolecularBondExtractor::__ring_size( const molib::Atom* atom ) const {
     const std::vector<size_t>& ring_vec = all_rings_sizes.at(atom);
 
     // Not in a ring
@@ -16,7 +16,7 @@ size_t MolecularBondExtractor::__ring_size( const Molib::Atom* atom ) const {
     if (ring_vec.size() > 1) {
 
         // Spiro must be carbon
-        if ( atom->element() != Molib::Element::C)
+        if ( atom->element() != molib::Element::C)
             return 2;
 
         // Spiro must have four non-hydrogen neighbors
@@ -25,8 +25,8 @@ size_t MolecularBondExtractor::__ring_size( const Molib::Atom* atom ) const {
         }
 
         // "Difficult" case, we need to check the neighbors
-        for ( const Molib::Bond* bond : atom->get_bonds() ) {
-            const Molib::Atom& other = bond->second_atom(*atom);
+        for ( const molib::Bond* bond : atom->get_bonds() ) {
+            const molib::Atom& other = bond->second_atom(*atom);
 
             // Spiro must be connected to only rings
             if ( all_rings_sizes.at(&other).size() == 0 ) {
@@ -44,8 +44,8 @@ size_t MolecularBondExtractor::__ring_size( const Molib::Atom* atom ) const {
             for ( const auto& thing : all_rings ) {
 
                 // Are they in the same ring?
-                if ( thing.count( const_cast<Molib::Atom*>(atom) ) &&
-                        thing.count( const_cast<Molib::Atom*>(&other) ) ) {
+                if ( thing.count( const_cast<molib::Atom*>(atom) ) &&
+                        thing.count( const_cast<molib::Atom*>(&other) ) ) {
                     shared_rings++;
                 }
             }
@@ -61,13 +61,13 @@ size_t MolecularBondExtractor::__ring_size( const Molib::Atom* atom ) const {
     return ring_vec.at(0);
 }
 
-void MolecularBondExtractor::__print_atom( const Molib::Atom* atom, std::ostream& os, char delim ) const {
+void MolecularBondExtractor::__print_atom( const molib::Atom* atom, std::ostream& os, char delim ) const {
     os << help::idatm_unmask[ atom->idatm_type() ] << delim;
     os << __ring_size(atom) << delim;
     os << substitutions.at(atom) << delim;
 }
 
-atom_info MolecularBondExtractor::__make_atom_info(const Molib::Atom* atom) {
+atom_info MolecularBondExtractor::__make_atom_info(const molib::Atom* atom) {
     atom_info a = { atom->idatm_type(),
                     __ring_size(atom),
                     substitutions.at(atom)
@@ -82,7 +82,7 @@ void MolecularBondExtractor::reset() {
     all_rings_sizes.clear();
 }
 
-void MolecularBondExtractor::addStretch (const Molib::Atom* atom1, const Molib::Atom* atom2) {
+void MolecularBondExtractor::addStretch (const molib::Atom* atom1, const molib::Atom* atom2) {
 
     // Avoid a double count if starting with a later atom
     if (atom1 >= atom2)
@@ -103,7 +103,7 @@ void MolecularBondExtractor::addStretch (const Molib::Atom* atom1, const Molib::
     bs.push_back(make_pair(s_new,distance));
 }
 
-void MolecularBondExtractor::addAngle (const Molib::Atom* atom1, const Molib::Atom* atom2, const Molib::Atom* atom3) {
+void MolecularBondExtractor::addAngle (const molib::Atom* atom1, const molib::Atom* atom2, const molib::Atom* atom3) {
 
     // Middle and end cases not really possible, but the check is cheap
     if (atom1 >= atom3 || atom1 == atom2 || atom3 == atom2)
@@ -125,7 +125,7 @@ void MolecularBondExtractor::addAngle (const Molib::Atom* atom1, const Molib::At
     ba.push_back(make_pair(a_new, angle));
 }
 
-void MolecularBondExtractor::addDihedral (const Molib::Atom* atom1, const Molib::Atom* atom2, const Molib::Atom* atom3, const Molib::Atom* atom4) {
+void MolecularBondExtractor::addDihedral (const molib::Atom* atom1, const molib::Atom* atom2, const molib::Atom* atom3, const molib::Atom* atom4) {
 
     // Some later checks are probably not needed
     if ( atom1 >= atom4 || atom3 == atom1 || atom4 == atom2 || atom2 == atom3)
@@ -150,7 +150,7 @@ void MolecularBondExtractor::addDihedral (const Molib::Atom* atom1, const Molib:
     bd.push_back(make_pair(d_new, dihedral));
 }
 
-void MolecularBondExtractor::addImproper (const Molib::Atom* atom1, const Molib::Atom* atom2, const Molib::Atom* atom3, const Molib::Atom* atom4) {
+void MolecularBondExtractor::addImproper (const molib::Atom* atom1, const molib::Atom* atom2, const molib::Atom* atom3, const molib::Atom* atom4) {
 
     // Leave atom2 alone, it is the pivot atom
     if (atom1 >= atom3 || atom1 >= atom4 || atom3 >= atom4)
@@ -178,7 +178,7 @@ void MolecularBondExtractor::addImproper (const Molib::Atom* atom1, const Molib:
 }
 
 
-bool MolecularBondExtractor::addMolecule( const Molib::Molecule& mol ) {
+bool MolecularBondExtractor::addMolecule( const molib::Molecule& mol ) {
 
     auto all_my_atoms = mol.get_atoms();
 
@@ -186,7 +186,7 @@ bool MolecularBondExtractor::addMolecule( const Molib::Molecule& mol ) {
         return false;
     }
 
-    Molib::Atom::Graph  graph = Molib::Atom::create_graph(all_my_atoms);
+    molib::Atom::Graph  graph = molib::Atom::create_graph(all_my_atoms);
     auto atom_ring_map = graph.vertex_rings();
     all_rings_sizes.insert( atom_ring_map.begin(), atom_ring_map.end());
     auto atom_all_rings= graph.find_rings();
@@ -199,7 +199,7 @@ bool MolecularBondExtractor::addMolecule( const Molib::Molecule& mol ) {
     for ( const auto& patom1 : all_my_atoms ) {
         for ( const auto& atom2 : *patom1 ) {
 
-            const Molib::Atom& atom1 = *patom1;
+            const molib::Atom& atom1 = *patom1;
 
             addStretch(&atom1, &atom2);
 

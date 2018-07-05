@@ -8,7 +8,7 @@
 #include "candock/graph/graph.hpp"
 
 namespace candock{
-namespace Molib {
+namespace molib {
 	ostream& operator<<(ostream& os, const AtomMatchVec& atom_match_vec) {
 		for (auto &atom_match : atom_match_vec) {
 			os << atom_match << endl;

@@ -18,7 +18,7 @@ using namespace std;
 
 namespace candock{
 namespace genlig {
-	ResidueSet find_neighbor_residues(Molib::Molecule &ligand, Molib::Atom::Grid &grid) {
+	ResidueSet find_neighbor_residues(molib::Molecule &ligand, molib::Atom::Grid &grid) {
 		ResidueSet neighbor_residues;
 		for (auto &assembly : ligand) {
 			for (auto &model : assembly) {
@@ -26,11 +26,11 @@ namespace genlig {
 					for (auto &residue : chain) {
 						for (auto &atom : residue) {
 							dbgmsg("before get neighbors");
-							Molib::Atom::Vec neighbors = grid.get_neighbors(atom.crd(), 4.0);
+							molib::Atom::Vec neighbors = grid.get_neighbors(atom.crd(), 4.0);
 							dbgmsg("number of neighbors = " << neighbors.size());
 							for (auto &pa : neighbors) {
 								dbgmsg("pa = " << *pa);
-								Molib::Residue &query_residue = const_cast<Molib::Residue&>(pa->br());
+								molib::Residue &query_residue = const_cast<molib::Residue&>(pa->br());
 								dbgmsg("query_residue = " << query_residue);
 								neighbor_residues.insert(&query_residue);
 							}
@@ -41,7 +41,7 @@ namespace genlig {
 		}
 		return neighbor_residues;
 	}
-	ResSet find_binding_site(const Molib::Molecules &mols, const string lig_code, 
+	ResSet find_binding_site(const molib::Molecules &mols, const string lig_code, 
 		const ResMap &aligned_to_query) {
 		ResSet binding_site;
 		vector<string> lc = help::ssplit(lig_code, ":");
@@ -54,7 +54,7 @@ namespace genlig {
 							if (model.number() == stoi(lc[3])) {
 								ResMap respair;
 								// correct: ins_code is missing from lig_code !!!
-								if (model.remarks(7, Molib::Residue::res_tuple2(lc[2].at(0), 
+								if (model.remarks(7, molib::Residue::res_tuple2(lc[2].at(0), 
 									lc[0], stoi(lc[1]), ' '), respair)) {
 									for (auto &rp : respair) {
 										dbgmsg(aligned_to_query.count(rp.first));
@@ -70,33 +70,33 @@ namespace genlig {
 		}
 		return binding_site;
 	}
-	Molib::Molecule get_ligand(const Molib::Molecules &mols, const string &lig_code) { // output rotated binding site residues
-		Molib::Molecule ligand(lig_code);
-		Molib::Assembly &lassembly = ligand.add(new Molib::Assembly(0));
-		Molib::Model &lmodel = lassembly.add(new Molib::Model(1));
+	molib::Molecule get_ligand(const molib::Molecules &mols, const string &lig_code) { // output rotated binding site residues
+		molib::Molecule ligand(lig_code);
+		molib::Assembly &lassembly = ligand.add(new molib::Assembly(0));
+		molib::Model &lmodel = lassembly.add(new molib::Model(1));
 		char chain_id = ' ';
-		Molib::Chain *plchain = nullptr;
+		molib::Chain *plchain = nullptr;
 		for (auto &molecule : mols) {
 			for (auto &assembly : molecule) {
 				for (auto &model : assembly) {
 					for (auto &chain : model) {
 						for (auto &residue : chain) {
-							string lresn = (residue.rest() == Molib::Residue::protein ? 
-								"PPP" : (residue.rest() == Molib::Residue::nucleic ? 
+							string lresn = (residue.rest() == molib::Residue::protein ? 
+								"PPP" : (residue.rest() == molib::Residue::nucleic ? 
 								"NNN" : residue.resn()));
-							int lresi = ((residue.rest() == Molib::Residue::protein 
-								|| residue.rest() == Molib::Residue::nucleic) 
+							int lresi = ((residue.rest() == molib::Residue::protein 
+								|| residue.rest() == molib::Residue::nucleic) 
 								? 1 : residue.resi());
 							if (lig_code.find(lresn + ":" + to_string(lresi) + ":" 
 								+ chain.chain_id() + ":" + to_string(model.number()) 
 								+ ":" + to_string(assembly.number()) + ":" + molecule.name() 
 								+ ":" + mols.name()) != string::npos) {
 									if (chain.chain_id() != chain_id) {
-										plchain = &lmodel.add(new Molib::Chain(chain.chain_id()));
+										plchain = &lmodel.add(new molib::Chain(chain.chain_id()));
 										chain_id = chain.chain_id();
 									}
-									Molib::Chain &lchain = *plchain;
-									lchain.add(new Molib::Residue(residue));
+									molib::Chain &lchain = *plchain;
+									lchain.add(new molib::Residue(residue));
 									dbgmsg(lresn + ":" + to_string(lresi) + ":" + chain.chain_id() 
 										+ ":" + to_string(model.number()) + ":" + to_string(assembly.number()) 
 										+ ":" + molecule.name() + ":" + mols.name() + " lig_code = "
@@ -110,21 +110,21 @@ namespace genlig {
 		}
 		return ligand;
 	}
-	Molib::Molecule mark(const ResidueSet &neighbor_residues, 
+	molib::Molecule mark(const ResidueSet &neighbor_residues, 
 		const ResSet &aligned_part_of_binding_site, const string &lig_code) {
-		Molib::Molecule bsite(lig_code);
-		Molib::Assembly &assembly = bsite.add(new Molib::Assembly(0));
-		Molib::Model &model = assembly.add(new Molib::Model(1));
+		molib::Molecule bsite(lig_code);
+		molib::Assembly &assembly = bsite.add(new molib::Assembly(0));
+		molib::Model &model = assembly.add(new molib::Model(1));
 		char chain_id = ' ';
-		Molib::Chain *pchain = nullptr;
+		molib::Chain *pchain = nullptr;
 		for (auto &presidue : neighbor_residues) {
 			if (presidue->br().chain_id() != chain_id) {
-				pchain = &model.add(new Molib::Chain(presidue->br().chain_id()));
+				pchain = &model.add(new molib::Chain(presidue->br().chain_id()));
 				chain_id = presidue->br().chain_id();
 			}
-			Molib::Chain &chain = *pchain;
-			Molib::Residue &residue = chain.add(new Molib::Residue(*presidue));
-			Molib::Residue::res_tuple2 r(residue.br().chain_id(), 
+			molib::Chain &chain = *pchain;
+			molib::Residue &residue = chain.add(new molib::Residue(*presidue));
+			molib::Residue::res_tuple2 r(residue.br().chain_id(), 
 				std::to_string(help::get_one_letter(residue.resn())), 
 				residue.resi(), residue.ins_code());
 			if (aligned_part_of_binding_site.count(r))
@@ -135,32 +135,32 @@ namespace genlig {
 		}
 		return bsite;
 	}
-	//~ Molib::Atom::Grid parse_receptor(const string &receptor_file, const string &receptor_chain_id) {
+	//~ molib::Atom::Grid parse_receptor(const string &receptor_file, const string &receptor_chain_id) {
 		//~ // read query PDB protein
-		//~ Molib::PDBreader qpdb(receptor_file, 
-			//~ Molib::PDBreader::first_model|Molib::PDBreader::hydrogens);
-		//~ Molib::Molecules query_mols = qpdb.parse_molecule();
-		//~ return Molib::Atom::Grid(query_mols[0].get_atoms(receptor_chain_id, 
-			//~ Molib::Residue::protein));
+		//~ molib::PDBreader qpdb(receptor_file, 
+			//~ molib::PDBreader::first_model|molib::PDBreader::hydrogens);
+		//~ molib::Molecules query_mols = qpdb.parse_molecule();
+		//~ return molib::Atom::Grid(query_mols[0].get_atoms(receptor_chain_id, 
+			//~ molib::Residue::protein));
 	//~ }
 	void generate_ligands(const string &receptor_file, const string &receptor_chain_id, 
 		const string &json_file, const string &bio_dir, const string &lig_code,
 		const string &lig_file, const string &bsite_file) {
-	//~ void generate_ligs(Molib::Atom::Grid &gridrec, const string &json_file, 
+	//~ void generate_ligs(molib::Atom::Grid &gridrec, const string &json_file, 
 		//~ const string &bio_dir, const string &lig_code, const string &lig_file, 
 		//~ const string &bsite_file) {
 
 		// read query PDB protein
 		Parser::FileParser qpdb(receptor_file, 
 			Parser::first_model|Parser::hydrogens);
-		Molib::Molecules query_mols = qpdb.parse_molecule();
-		Molib::Atom::Grid gridrec(query_mols[0].get_atoms(receptor_chain_id, 
-			Molib::Residue::protein));
+		molib::Molecules query_mols = qpdb.parse_molecule();
+		molib::Atom::Grid gridrec(query_mols[0].get_atoms(receptor_chain_id, 
+			molib::Residue::protein));
 
 		JsonReader jr;
-		Molib::NRset nrset;
+		molib::NRset nrset;
 		// read bio PDBs
-		//~ Molib::PDBreader biopdb(Molib::PDBreader::all_models|Molib::PDBreader::hydrogens);
+		//~ molib::PDBreader biopdb(molib::PDBreader::all_models|molib::PDBreader::hydrogens);
 		// the aligned files from json
 		jr.parse_JSON(json_file);
 		for (auto &d : jr.root()) {
@@ -173,13 +173,13 @@ namespace genlig {
 				//~ const string pdb_file = bio_dir + "/" + pdb_id + ".pdb";
 				//~ cout << mols_name << " " << pdb_file << endl;
 				if (lig_code.find(mols_name) != string::npos) {
-					//~ Molib::Molecules &mols = nrset.add(new Molib::Molecules());
+					//~ molib::Molecules &mols = nrset.add(new molib::Molecules());
 					//~ biopdb.parse_PDB(mols, pdb_file);
 					//~ biopdb.rewind();
 					Parser::FileParser biopdb(pdb_file, 
 						Parser::all_models|Parser::hydrogens);
-					Molib::Molecules &mols = 
-						nrset.add(new Molib::Molecules(biopdb.parse_molecule()));
+					molib::Molecules &mols = 
+						nrset.add(new molib::Molecules(biopdb.parse_molecule()));
 					dbgmsg(geometry::Matrix(d["alignment"][0]["rotation_matrix"], 
 						d["alignment"][0]["translation_vector"]));
 					dbgmsg(mols_name);
@@ -197,13 +197,13 @@ namespace genlig {
 					}
 #endif
 					ResSet aligned_part_of_binding_site = find_binding_site(mols, lig_code, aligned_to_query);
-					Molib::Molecules ligands;
-					ligands.add(new Molib::Molecule(get_ligand(mols, lig_code)));
+					molib::Molecules ligands;
+					ligands.add(new molib::Molecule(get_ligand(mols, lig_code)));
 					dbgmsg(ligands);
 					ResidueSet neighbor_residues = find_neighbor_residues(ligands.first(), gridrec);
 					dbgmsg(neighbor_residues);
-					Molib::Molecules binding_sites;
-					binding_sites.add(new Molib::Molecule(mark(neighbor_residues, 
+					molib::Molecules binding_sites;
+					binding_sites.add(new molib::Molecule(mark(neighbor_residues, 
 						aligned_part_of_binding_site, lig_code)));
 					Inout::output_file(ligands, lig_file);
 					Inout::output_file(binding_sites, bsite_file);
@@ -273,7 +273,7 @@ namespace genlig {
 			}
 		}
 		// read bio PDBs
-		//~ Molib::PDBreader biopdb(Molib::PDBreader::all_models);
+		//~ molib::PDBreader biopdb(molib::PDBreader::all_models);
 		for (auto &kv1 : ligands_by_bio_file) {
 			const string &bio_file = kv1.first;
 			const geometry::Matrix &mx = bio_file_to_matrix[bio_file];
@@ -281,11 +281,11 @@ namespace genlig {
 				//~ biopdb.rewind();
 				Parser::FileParser biopdb(bio_file, 
 					Parser::all_models);
-				Molib::Molecules mols = biopdb.parse_molecule();
+				molib::Molecules mols = biopdb.parse_molecule();
 				mols.rotate(mx, true); // inverse rotation
 				for (auto &linf : kv1.second) {
 					if (linf.cluster_number <= num_bsites) { // trim number of binding sites
-						bsites[linf.cluster_number].add(new Molib::Molecule(get_ligand(mols, linf.lig_code)));
+						bsites[linf.cluster_number].add(new molib::Molecule(get_ligand(mols, linf.lig_code)));
 						bscores[linf.cluster_number] = max(bscores[linf.cluster_number], linf.z_score);
 					}
 				}
@@ -298,11 +298,11 @@ namespace genlig {
 	}
 }
 
-namespace Molib {
-	ostream& operator<<(ostream& os, const map<int, Molib::Molecules>& bsites) {
+namespace molib {
+	ostream& operator<<(ostream& os, const map<int, molib::Molecules>& bsites) {
 		for (auto &kv : bsites) {
 			const int &cluster_number = kv.first;
-			const Molib::Molecules &ligands = kv.second;
+			const molib::Molecules &ligands = kv.second;
 			os << "REMARK  99 ______________________ BEGINNING CLUSTER #" << cluster_number << " ______________________" << endl;
 			os << ligands;
 		}

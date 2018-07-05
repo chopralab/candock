@@ -13,10 +13,10 @@
 
 using namespace candock;
 
-std::unique_ptr<candock::Molib::Molecules> __receptor;
-std::unique_ptr<candock::Molib::Molecules> __ligand;
-std::unique_ptr<candock::Score::KBFF> __score;
-std::unique_ptr<candock::Molib::Atom::Grid> __gridrec;
+std::unique_ptr<candock::molib::Molecules> __receptor;
+std::unique_ptr<candock::molib::Molecules> __ligand;
+std::unique_ptr<candock::score::KBFF> __score;
+std::unique_ptr<candock::molib::Atom::Grid> __gridrec;
 std::unique_ptr<candock::OMMIface::ForceField> __ffield;
 std::unique_ptr<candock::OMMIface::Modeler> __modeler;
 std::string __error_string = "";
@@ -38,7 +38,7 @@ size_t initialize_complex( const char* filename) {
         try {
                 Parser::FileParser rpdb (filename, Parser::protein_poses_only, 1);
 
-                __receptor = std::unique_ptr<candock::Molib::Molecules> (new candock::Molib::Molecules);
+                __receptor = std::unique_ptr<candock::molib::Molecules> (new candock::molib::Molecules);
 
                 rpdb.parse_molecule (*__receptor);
 
@@ -54,11 +54,11 @@ size_t initialize_complex( const char* filename) {
                 .compute_rotatable_bonds() // relies on hydrogens being assigned
                 .erase_hydrogen()*/;
 
-                __gridrec = std::unique_ptr<candock::Molib::Atom::Grid> (new candock::Molib::Atom::Grid (__receptor->get_atoms()));
+                __gridrec = std::unique_ptr<candock::molib::Atom::Grid> (new candock::molib::Atom::Grid (__receptor->get_atoms()));
                 
                 Parser::FileParser lpdb (filename, Parser::docked_poses_only, 1);
 
-                __ligand = std::unique_ptr<candock::Molib::Molecules> (new candock::Molib::Molecules);
+                __ligand = std::unique_ptr<candock::molib::Molecules> (new candock::molib::Molecules);
 
                 lpdb.parse_molecule (*__ligand);
 
@@ -93,7 +93,7 @@ size_t initialize_receptor(const char* filename) {
         {
                 candock::Parser::FileParser rpdb(filename, candock::Parser::first_model, 1);
 
-                __receptor = std::unique_ptr<candock::Molib::Molecules>(new candock::Molib::Molecules);
+                __receptor = std::unique_ptr<candock::molib::Molecules>(new candock::molib::Molecules);
 
                 rpdb.parse_molecule(*__receptor);
 
@@ -109,7 +109,7 @@ size_t initialize_receptor(const char* filename) {
                 .compute_rotatable_bonds() // relies on hydrogens being assigned
                 .erase_hydrogen();
 
-                __gridrec = std::unique_ptr<candock::Molib::Atom::Grid> (new candock::Molib::Atom::Grid (__receptor->get_atoms()));
+                __gridrec = std::unique_ptr<candock::molib::Atom::Grid> (new candock::molib::Atom::Grid (__receptor->get_atoms()));
 
                 return 1;
         }
@@ -141,7 +141,7 @@ size_t receptor_atoms(size_t *idx, float *pos)
 
         try
         {
-                candock::Molib::Atom::Vec atoms = __receptor->element(0).get_atoms();
+                candock::molib::Atom::Vec atoms = __receptor->element(0).get_atoms();
                 for (size_t i = 0; i < atoms.size(); ++i)
                 {
                         idx[i] = atoms[i]->atom_number();
@@ -168,7 +168,7 @@ size_t receptor_atom_details(char* chain_ids, size_t* resi, size_t* rest, char* 
         }
         
         try {
-                candock::Molib::Atom::Vec atoms = __receptor->element(0).get_atoms();
+                candock::molib::Atom::Vec atoms = __receptor->element(0).get_atoms();
                 for ( size_t i=0; i < atoms.size(); ++i ) {
                         chain_ids[ i ] = atoms[i]->br().br().chain_id();
                         resi[i] = atoms[i]->br().resi();
@@ -198,7 +198,7 @@ size_t receptor_bond_count() {
 
         try
         {
-                candock::Molib::BondSet bondset = candock::Molib::get_bonds_in(__receptor->get_atoms());
+                candock::molib::BondSet bondset = candock::molib::get_bonds_in(__receptor->get_atoms());
                 return bondset.size();
         }
         catch (std::exception &e)
@@ -218,7 +218,7 @@ size_t receptor_bonds(size_t *bonds)
 
         try
         {
-                candock::Molib::BondSet bondset = candock::Molib::get_bonds_in(__receptor->get_atoms());
+                candock::molib::BondSet bondset = candock::molib::get_bonds_in(__receptor->get_atoms());
 
                 size_t i = 0;
 
@@ -259,7 +259,7 @@ size_t initialize_ligand(const char *filename)
         {
                 candock::Parser::FileParser rpdb(filename, candock::Parser::first_model, 1);
 
-                __ligand = std::unique_ptr<candock::Molib::Molecules>(new candock::Molib::Molecules);
+                __ligand = std::unique_ptr<candock::molib::Molecules>(new candock::molib::Molecules);
 
                 rpdb.parse_molecule(*__ligand);
 
@@ -305,7 +305,7 @@ size_t ligand_atoms(size_t *idx, float *pos)
 
         try
         {
-                candock::Molib::Atom::Vec atoms = __ligand->element(0).get_atoms();
+                candock::molib::Atom::Vec atoms = __ligand->element(0).get_atoms();
                 for (size_t i = 0; i < atoms.size(); ++i)
                 {
                         idx[i] = atoms[i]->atom_number();
@@ -332,7 +332,7 @@ size_t ligand_atom_details(char* chain_ids, size_t* resi, size_t* rest, size_t* 
         }
         
         try {
-                candock::Molib::Atom::Vec atoms = __ligand->element(0).get_atoms();
+                candock::molib::Atom::Vec atoms = __ligand->element(0).get_atoms();
                 for ( size_t i=0; i < atoms.size(); ++i ) {
                         chain_ids[ i ] = atoms[i]->br().br().chain_id();
                         resi[i] = atoms[i]->br().resi();
@@ -355,7 +355,7 @@ size_t ligand_bond_count() {
 
         try
         {
-                candock::Molib::BondSet bondset = candock::Molib::get_bonds_in(__ligand->get_atoms());
+                candock::molib::BondSet bondset = candock::molib::get_bonds_in(__ligand->get_atoms());
                 return bondset.size();
         }
         catch (std::exception &e)
@@ -375,7 +375,7 @@ size_t ligand_bonds(size_t *bonds)
 
         try
         {
-                candock::Molib::BondSet bondset = candock::Molib::get_bonds_in(__ligand->get_atoms());
+                candock::molib::BondSet bondset = candock::molib::get_bonds_in(__ligand->get_atoms());
 
                 size_t i = 0;
 
@@ -412,16 +412,16 @@ size_t ligand_get_neighbors( size_t atom_idx, size_t* neighbors ) {
         }
         
         try {
-                candock::Molib::Atom::Vec atoms = __ligand->element(0).get_atoms();
+                candock::molib::Atom::Vec atoms = __ligand->element(0).get_atoms();
                 
                 if (atom_idx >= atoms.size()) {
                         __error_string = std::string("Atom index out of bounds");
                         return 0;
                 }
                 
-                const candock::Molib::Atom* current_atom = atoms[atom_idx];
+                const candock::molib::Atom* current_atom = atoms[atom_idx];
                 
-                candock::Molib::BondVec bdev = current_atom->get_bonds();
+                candock::molib::BondVec bdev = current_atom->get_bonds();
                 
                 for (size_t i = 0; i < bdev.size(); ++i) {
                         const auto& neigh = bdev[i]->second_atom(*current_atom);
@@ -453,8 +453,8 @@ size_t initialize_scoring_full(const char *obj_dir,
 
         try
         {
-                __score = std::unique_ptr<candock::Score::KBFF>(
-                    new candock::Score::KBFF(func, comp, ref, cutoff, step));
+                __score = std::unique_ptr<candock::score::KBFF>(
+                    new candock::score::KBFF(func, comp, ref, cutoff, step));
 
                 boost::filesystem::path p(obj_dir);
                 p /= "csd_complete_distance_distributions.txt";
@@ -573,7 +573,7 @@ size_t set_positions_ligand(const size_t *atoms, const float *positions, size_t 
 
         try
         {
-                candock::Molib::Residue *residue = __ligand->element(0).get_residues().at(0);
+                candock::molib::Residue *residue = __ligand->element(0).get_residues().at(0);
 
                 for (size_t i = 0; i < size; ++i)
                 {
@@ -604,7 +604,7 @@ size_t set_positions_receptor(const size_t *atoms, const float *positions, size_
         {
 
                 size_t resi = 0;
-                candock::Molib::Residue *residue = __receptor->element(0).get_residues().at(resi++);
+                candock::molib::Residue *residue = __receptor->element(0).get_residues().at(resi++);
 
                 for (size_t i = 0; i < size; ++i)
                 {
@@ -625,7 +625,7 @@ size_t set_positions_receptor(const size_t *atoms, const float *positions, size_
                                                                          positions[i * 3 + 2]));
                 }
 
-                __gridrec.reset(new candock::Molib::Atom::Grid(__receptor->get_atoms()));
+                __gridrec.reset(new candock::molib::Atom::Grid(__receptor->get_atoms()));
 
                 return 1;
         }
@@ -670,7 +670,7 @@ size_t minimize_complex(size_t max_iter)
                 for (size_t j = 0; j < lig_atoms.size(); ++j)
                         lig_atoms[j]->set_crd(lig_coords[j]);
 
-                __gridrec.reset(new candock::Molib::Atom::Grid(__receptor->get_atoms()));
+                __gridrec.reset(new candock::molib::Atom::Grid(__receptor->get_atoms()));
 
                 return 1;
         }

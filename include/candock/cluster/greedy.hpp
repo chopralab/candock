@@ -7,11 +7,11 @@
 
 namespace candock {
 
-namespace Score {
+namespace score {
         class Score;
 }
 
-namespace Molib {
+namespace molib {
         class Molecule;
         class Molecules;
 }
@@ -40,12 +40,12 @@ namespace Cluster {
 				}
 			};
 		};
-		friend ostream& operator<<(ostream& os, const set<const LinkedConf<Molib::Molecule>*, LinkedConf<Molib::Molecule>::by_energy> &confs);
-		friend ostream& operator<<(ostream& os, const set<const LinkedConf<Linker::Partial>*, LinkedConf<Linker::Partial>::by_energy> &confs);
+		friend ostream& operator<<(ostream& os, const set<const LinkedConf<molib::Molecule>*, LinkedConf<molib::Molecule>::by_energy> &confs);
+		friend ostream& operator<<(ostream& os, const set<const LinkedConf<linker::Partial>*, LinkedConf<linker::Partial>::by_energy> &confs);
 	public:
 		static geometry::Point::Vec greedy(const geometry::Point::Vec &initial, const double clus_rad);
-		static Molib::Molecules greedy(const Molib::Molecules &initial, const Score::Score &score, Molib::Atom::Grid &gridrec, const double clus_rad);
-		static Linker::Partial::Vec greedy(const Linker::Partial::Vec &initial, const Molib::Atom::Grid &gridrec, const double clus_rad);
+		static molib::Molecules greedy(const molib::Molecules &initial, const score::Score &score, molib::Atom::Grid &gridrec, const double clus_rad);
+		static linker::Partial::Vec greedy(const linker::Partial::Vec &initial, const molib::Atom::Grid &gridrec, const double clus_rad);
 	};
 		
 };

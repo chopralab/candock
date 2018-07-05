@@ -56,29 +56,29 @@ Modeler::Modeler(
 {
 }
 
-        void Modeler::mask(const Molib::Atom::Vec &atoms) {
+        void Modeler::mask(const molib::Atom::Vec &atoms) {
                 dbgmsg("Masking atoms " << atoms);
                 __system_topology.mask(__topology, atoms);
         }
 
-        void Modeler::unmask(const Molib::Atom::Vec &atoms) {
+        void Modeler::unmask(const molib::Atom::Vec &atoms) {
                 dbgmsg("Unmasking atoms " << atoms);
                 __system_topology.unmask(__topology, atoms);
         }
 
-        void Modeler::add_topology(const Molib::Atom::Vec &atoms) {
+        void Modeler::add_topology(const molib::Atom::Vec &atoms) {
                 __topology.add_topology(atoms, *__ffield);
                 __positions.resize(__topology.atoms.size()); // as many positions as there are atoms
         }
 
-        void Modeler::add_crds(const Molib::Atom::Vec &atoms, const geometry::Point::Vec &crds) {
+        void Modeler::add_crds(const molib::Atom::Vec &atoms, const geometry::Point::Vec &crds) {
                 for (size_t i = 0; i < atoms.size(); ++i) {
                         int idx = __topology.get_index(*atoms[i]);
                         __positions[idx] = crds[i];
                 }
         }
 
-        void Modeler::add_random_crds(const Molib::Atom::Vec &atoms) {
+        void Modeler::add_random_crds(const molib::Atom::Vec &atoms) {
                 srand(time(NULL));
                 for (size_t i = 0; i < atoms.size(); ++i) {
                         int idx = __topology.get_index(*atoms[i]);
@@ -93,7 +93,7 @@ Modeler::Modeler(
          * Changes coordinates of atoms
          */
 
-geometry::Point::Vec Modeler::get_state(const Molib::Atom::Vec &atoms)
+geometry::Point::Vec Modeler::get_state(const molib::Atom::Vec &atoms)
 {
 
         const vector<OpenMM::Vec3> &positions_in_nm = __system_topology.get_positions_in_nm();

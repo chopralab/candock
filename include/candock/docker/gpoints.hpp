@@ -8,11 +8,11 @@
 
 namespace candock {
 
-namespace Score {
+namespace score {
         class Score;
 }
 
-namespace Docker {
+namespace docker {
 
         class Gpoints {
         public:
@@ -60,22 +60,22 @@ namespace Docker {
 
                 map<int, GpointVec> __gridpoints;
                 map<int, Array3d<Gpoint *>> __gmap;
-                const Score::Score *__score;
+                const score::Score *__score;
                 const set<int> *__ligand_idatm_types;
 
 
                 void __identify_gridpoints (const double &grid_spacing, const double &radial_check);
-                void __identify_gridpoints (const centro::Centroids &centroids, const Molib::Atom::Grid &grid,
+                void __identify_gridpoints (const centro::Centroids &centroids, const molib::Atom::Grid &grid,
                                             const double &grid_spacing, const int &dist_cutoff, const double &excluded_radius,
                                             const double &max_interatomic_distance);
 
         public:
                 Gpoints (const double &grid_spacing, const double &radial_check);
-                Gpoints (const Score::Score &score, const set<int> &ligand_idatm_types,
-                         const centro::Centroids &centroids, const Molib::Atom::Grid &grid,
+                Gpoints (const score::Score &score, const set<int> &ligand_idatm_types,
+                         const centro::Centroids &centroids, const molib::Atom::Grid &grid,
                          const double &grid_spacing, const int &dist_cutoff,
                          const double &excluded_radius, const double &max_interatomic_distance);
-                Gpoints (const centro::Centroids &centroids, Molib::Atom::Grid &grid,
+                Gpoints (const centro::Centroids &centroids, molib::Atom::Grid &grid,
                          const double &grid_spacing, const int &dist_cutoff,
                          const double &excluded_radius, const double &max_interatomic_distance);
                 GpointVec &get_gridpoints0() {
@@ -107,8 +107,8 @@ namespace Docker {
                 friend ostream &operator<< (ostream &os, const Gpoints &gpoints);
         };
 
-        ostream &operator<< (ostream &os, const Docker::Gpoints::GpointVec &points);
-        ostream &operator<< (ostream &os, const Docker::Gpoints::PGpointVec &points);
+        ostream &operator<< (ostream &os, const docker::Gpoints::GpointVec &points);
+        ostream &operator<< (ostream &os, const docker::Gpoints::PGpointVec &points);
 };
 
 }

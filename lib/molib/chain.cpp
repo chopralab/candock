@@ -9,7 +9,7 @@
 using namespace std;
 
 namespace candock {
-namespace Molib {
+namespace molib {
 	ostream& operator<< (ostream& stream, const Chain& c) {
 		for (auto &residue : c) { 
 			stream << residue;

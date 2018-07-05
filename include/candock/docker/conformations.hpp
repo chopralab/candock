@@ -5,7 +5,7 @@
 
 namespace candock {
 
-namespace Docker {
+namespace docker {
 
 	class Conformations {
 	public:
@@ -14,14 +14,14 @@ namespace Docker {
 		
 	private:
 
-		const Molib::Molecule &__seed;
+		const molib::Molecule &__seed;
 		
 		vector<Gpoints::PGpointVec> __conf_vec;
 		ConfMap __conf_map;
 		Array2d<double> __rmsd_sq;
 		
 	public:
-		Conformations(const Molib::Molecule &seed, const Gpoints &gpoints, const double &conf_spin, const int num_univec);
+		Conformations(const molib::Molecule &seed, const Gpoints &gpoints, const double &conf_spin, const int num_univec);
 			
 		vector<Gpoints::PGpointVec> &get_conformations() { return __conf_vec; }
 		const vector<Gpoints::PGpointVec> &get_conformations() const { return __conf_vec; }

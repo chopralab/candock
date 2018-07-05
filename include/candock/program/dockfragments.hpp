@@ -19,15 +19,15 @@ namespace Program {
                 const FindCentroids& __found_centroids;
                 const FragmentLigands& __fragmented_ligands;
 
-                const Score::Score& __score;
-                const Molib::Atom::Grid& __gridrec;
+                const score::Score& __score;
+                const molib::Atom::Grid& __gridrec;
 
                 const std::string& __name;
                 std::string __top_seeds_location;
 
-                Molib::NRset __all_seeds;
+                molib::NRset __all_seeds;
 
-                void __dock_fragment(int start, const Docker::Gpoints& gpoints, const Docker::Gpoints& gpoints0);
+                void __dock_fragment(int start, const docker::Gpoints& gpoints, const docker::Gpoints& gpoints0);
         protected:
                 virtual bool __can_read_from_files();
                 virtual void __read_from_files();
@@ -36,8 +36,8 @@ namespace Program {
         public:
                 DockFragments ( const FindCentroids& found_centroids,
                                 const FragmentLigands& fragmented_ligands,
-                                const Score::Score& score,
-                                const Molib::Atom::Grid& gridrec,
+                                const score::Score& score,
+                                const molib::Atom::Grid& gridrec,
                                 const std::string& name
                               );
 
@@ -45,11 +45,11 @@ namespace Program {
 
                 std::vector<std::pair<double, std::string>> get_best_seeds () const;
 
-                Molib::NRset get_negative_seeds(const std::set<std::string> &seeds, const double max_value) const;
-                Molib::NRset get_top_seeds(const std::set<std::string> &seeds, const double top_percent) const;
-                Molib::NRset get_seeds(const Molib::Molecule      &ligand, const double top_percent) const;
+                molib::NRset get_negative_seeds(const std::set<std::string> &seeds, const double max_value) const;
+                molib::NRset get_top_seeds(const std::set<std::string> &seeds, const double top_percent) const;
+                molib::NRset get_seeds(const molib::Molecule      &ligand, const double top_percent) const;
 
-                Docker::Gpoints get_gridhcp();
+                docker::Gpoints get_gridhcp();
         };
 
 }

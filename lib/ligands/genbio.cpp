@@ -18,13 +18,13 @@ using namespace std;
 
 namespace candock{
 namespace genbio {
-	void remove_chains(Molib::Molecules &mols, const vector<string> &aligned_chains) {
+	void remove_chains(molib::Molecules &mols, const vector<string> &aligned_chains) {
 		int i = 0;
 		for (auto &molecule : mols) {
 			for (auto &assembly : molecule) {
 				for (char chain_id : aligned_chains[i]) {
 					if (assembly.first().has_chain(chain_id)) {
-						assembly.first().chain(chain_id).remove_if([](const Molib::Residue &r){ return r.rest() == Molib::Residue::protein; }); // remove all protein residues
+						assembly.first().chain(chain_id).remove_if([](const molib::Residue &r){ return r.rest() == molib::Residue::protein; }); // remove all protein residues
 						if (assembly.first().chain(chain_id).empty()) assembly.first().erase(chain_id);
 					}
 				}
@@ -32,9 +32,9 @@ namespace genbio {
 			i++;
 		}
 	}
-	void remove_assemblies(Molib::Molecule &molecule, const string chain_ids) { // remove assemblies that don't have aligned chain_ids
+	void remove_assemblies(molib::Molecule &molecule, const string chain_ids) { // remove assemblies that don't have aligned chain_ids
 		for (size_t i = 0; i < molecule.size(); i++) {
-			Molib::Assembly &assembly = molecule[i];
+			molib::Assembly &assembly = molecule[i];
 			size_t sz = 0;
 			for (char chain_id : chain_ids) {
 				if (!assembly.first().has_chain(chain_id)) {
@@ -47,40 +47,40 @@ namespace genbio {
 		}
 	}
 
-	void remove_asymmetric_unit(Molib::Molecule &molecule) { // remove asymmetric unit if there are biological assembiles
+	void remove_asymmetric_unit(molib::Molecule &molecule) { // remove asymmetric unit if there are biological assembiles
 		if (molecule.size() > 1) {
 			if (molecule.has_element(0))
 				molecule.erase(0);
 		}
 	}
 
-	Molib::Atom::Grid set_grid_query(Molib::Molecule &query_molecule, const string query_chain_ids) {
+	molib::Atom::Grid set_grid_query(molib::Molecule &query_molecule, const string query_chain_ids) {
 		// set grid with query chain atoms
-		return Molib::Atom::Grid(query_molecule.get_atoms(query_chain_ids, 
-			Molib::Residue::protein, 1));
+		return molib::Atom::Grid(query_molecule.get_atoms(query_chain_ids, 
+			molib::Residue::protein, 1));
 	}
-	void find_neighbor_residues(Molib::Molecule &molecule, Molib::Atom::Grid &grid, const map<Molib::Residue::res_tuple2, Molib::Residue::res_tuple2> *aligned_residues=nullptr) {
+	void find_neighbor_residues(molib::Molecule &molecule, molib::Atom::Grid &grid, const map<molib::Residue::res_tuple2, molib::Residue::res_tuple2> *aligned_residues=nullptr) {
 		for (auto &assembly : molecule) {
 			for (auto &model : assembly) {
 				for (auto &chain : model) {
 					for (auto &residue : chain) {
-						const string lresn = (residue.rest() == Molib::Residue::protein ? "PPP" : (residue.rest() == Molib::Residue::nucleic ? "NNN" : residue.resn()));
-						const int lresi = ((residue.rest() == Molib::Residue::protein || residue.rest() == Molib::Residue::nucleic) ? 1 : residue.resi());
+						const string lresn = (residue.rest() == molib::Residue::protein ? "PPP" : (residue.rest() == molib::Residue::nucleic ? "NNN" : residue.resn()));
+						const int lresi = ((residue.rest() == molib::Residue::protein || residue.rest() == molib::Residue::nucleic) ? 1 : residue.resi());
 						const string lig_code = lresn + ":" + std::to_string(lresi) + ":" + chain.chain_id() + ":" + std::to_string(model.number()) 
 							+ ":" + std::to_string(assembly.number()) + ":" + molecule.name() + ":" + molecule.br().name();
 						for (auto &atom : residue) {
-							vector<Molib::Atom*> neighbors = grid.get_neighbors(atom.crd(), 4.0);
-							for (Molib::Atom *query_atom : neighbors) {
-								const Molib::Residue &qr = query_atom->br();
-								const Molib::Chain &qc = query_atom->br().br();
-								const Molib::Residue::res_tuple2 &r1 = Molib::Residue::res_tuple2(qc.chain_id(), std::to_string(help::get_one_letter(qr.resn())), qr.resi(), qr.ins_code());
+							vector<molib::Atom*> neighbors = grid.get_neighbors(atom.crd(), 4.0);
+							for (molib::Atom *query_atom : neighbors) {
+								const molib::Residue &qr = query_atom->br();
+								const molib::Chain &qc = query_atom->br().br();
+								const molib::Residue::res_tuple2 &r1 = molib::Residue::res_tuple2(qc.chain_id(), std::to_string(help::get_one_letter(qr.resn())), qr.resi(), qr.ins_code());
 								if (aligned_residues && aligned_residues->find(r1) != aligned_residues->end()) {
-									const Molib::Residue::res_tuple2 &r2 = aligned_residues->find(r1)->second;
-									model.set_remark(7, Molib::Residue::res_tuple2(chain.chain_id(), lresn, lresi, (residue.rest() == Molib::Residue::protein || residue.rest() == Molib::Residue::nucleic ? ' ' :residue.ins_code())), 
+									const molib::Residue::res_tuple2 &r2 = aligned_residues->find(r1)->second;
+									model.set_remark(7, molib::Residue::res_tuple2(chain.chain_id(), lresn, lresi, (residue.rest() == molib::Residue::protein || residue.rest() == molib::Residue::nucleic ? ' ' :residue.ins_code())), 
 														make_pair(r1, r2));
 								}
 								else if (!aligned_residues) {
-									model.set_remark(7, Molib::Residue::res_tuple2(chain.chain_id(), lresn, lresi, (residue.rest() == Molib::Residue::protein || residue.rest() == Molib::Residue::nucleic ? ' ' :residue.ins_code())), 
+									model.set_remark(7, molib::Residue::res_tuple2(chain.chain_id(), lresn, lresi, (residue.rest() == molib::Residue::protein || residue.rest() == molib::Residue::nucleic ? ' ' :residue.ins_code())), 
 														make_pair(r1, r1));
 								}
 							}
@@ -90,14 +90,14 @@ namespace genbio {
 			}
 		}
 	}
-        void remove_not_ligands(Molib::Molecule &molecule, Molib::Atom::Grid &grid) {
+        void remove_not_ligands(molib::Molecule &molecule, molib::Atom::Grid &grid) {
                 // find atoms in aligned molecules that are neighbors of query chains
                 for (auto &assembly : molecule) {
                         for (auto &model : assembly) {
                                 for (auto &chain : model) {
                                         // remove hetero, ion and water residues that are not close to the query
-                                        chain.remove_if([&grid](const Molib::Residue &r) {
-                                                if (r.rest() == Molib::Residue::hetero || r.rest() == Molib::Residue::ion || r.rest() == Molib::Residue::water) {
+                                        chain.remove_if([&grid](const molib::Residue &r) {
+                                                if (r.rest() == molib::Residue::hetero || r.rest() == molib::Residue::ion || r.rest() == molib::Residue::water) {
                                                         for (auto &atom : r) {
                                                                 if (!grid.get_neighbors(atom.crd(), 4.0).empty()) {
                                                                         return false; // close enough, don't delete
@@ -109,7 +109,7 @@ namespace genbio {
                                         }); // if atom is less than 4.0 A from some query atom, then this residue is a ligand of query, and is to keep
                                         bool keep_chain = false;
                                         for (auto &residue : chain) {
-                                                if (residue.rest() == Molib::Residue::protein || residue.rest() == Molib::Residue::nucleic) {
+                                                if (residue.rest() == molib::Residue::protein || residue.rest() == molib::Residue::nucleic) {
                                                         for (auto &atom : residue) {
                                                                 // if atom is less than 4.0 A from some query atom, then this chain is a ligand of query, and is to keep
                                                                 if (!grid.get_neighbors(atom.crd(), 4.0).empty()) {
@@ -135,9 +135,9 @@ namespace genbio {
 		const string &mols_name, const bool rasym) {
 
 		JsonReader jr;
-		Molib::Atom::Grid query_grid;
+		molib::Atom::Grid query_grid;
 		// the query file
-		Molib::Molecules mols;
+		molib::Molecules mols;
 		if (!mols_name.empty())
 			mols.set_name(mols_name);
 		vector<string> aligned_chains;
@@ -153,7 +153,7 @@ namespace genbio {
 			mols.last().set_name(boost::filesystem::path(qpdb_file).stem().string());
 			query_grid = genbio::set_grid_query(mols.last(), qcid);
 
-			if (bio != "none") mols.last().init_bio(bio == "all" ? Molib::Molecule::all_bio : Molib::Molecule::first_bio);
+			if (bio != "none") mols.last().init_bio(bio == "all" ? molib::Molecule::all_bio : molib::Molecule::first_bio);
 			if (ralch) genbio::remove_assemblies(mols.last(), qcid); // remove assemblies that don't contain query chains
 			if (rnolig) genbio::remove_not_ligands(mols.last(), query_grid); // remove chains that are not near query chains
 			if (neighb) genbio::find_neighbor_residues(mols.last(), query_grid);
@@ -180,11 +180,11 @@ namespace genbio {
 					else
 						mols.last().set_name(pdb_id);  // e.g., for bslib where the pdb_id represents ligand binding site
 						
-					if (bio != "none") mols.last().init_bio(bio == "all" ? Molib::Molecule::all_bio : Molib::Molecule::first_bio);  // make biounits coordinates (optional)
+					if (bio != "none") mols.last().init_bio(bio == "all" ? molib::Molecule::all_bio : molib::Molecule::first_bio);  // make biounits coordinates (optional)
 					mols.last().rotate(geometry::Matrix(d["alignment"][0]["rotation_matrix"], d["alignment"][0]["translation_vector"]), true); // inverse rotation
 					if (ralch) genbio::remove_assemblies(mols.last(), chain_ids); // remove assemblies that don't contain aligned chains
 					if (!qpdb_file.empty() && rnolig) genbio::remove_not_ligands(mols.last(), query_grid); // remove chains that are not near query chains
-					if (!qpdb_file.empty() && neighb) { map<Molib::Residue::res_tuple2, Molib::Residue::res_tuple2> res = common_ligands::json_to_map(d["alignment"][0]["aligned_residues"]); genbio::find_neighbor_residues(mols.last(), query_grid, &res); }
+					if (!qpdb_file.empty() && neighb) { map<molib::Residue::res_tuple2, molib::Residue::res_tuple2> res = common_ligands::json_to_map(d["alignment"][0]["aligned_residues"]); genbio::find_neighbor_residues(mols.last(), query_grid, &res); }
 					aligned_chains.push_back(chain_ids);
 				}
 				catch (exception& e) {

@@ -5,14 +5,14 @@
 
 namespace candock {
 
-namespace Linker {
+namespace linker {
 	ostream& operator<< (ostream& stream, const Segment& s) {
 		stream << "Segment(" << s.__seed_id << ") : atom numbers = ";
 		for (auto &pa : s.__atoms) stream << pa->atom_number() << " ";
 		return stream;
 	}
 
-	Segment::Segment(const Molib::Atom::Vec atoms, const int &seed_id, const Segment::Id idx) 
+	Segment::Segment(const molib::Atom::Vec atoms, const int &seed_id, const Segment::Id idx) 
 		: __atoms(atoms), __seed_id(seed_id), __id(idx), __join_atom(atoms.size(), false), 
 		__common_atom(atoms.size(), false) { 
 
@@ -20,8 +20,8 @@ namespace Linker {
 			__amap[atoms[i]] = i; 
 	}
 
-	//~ const Molib::Atom& Segment::adjacent_in_segment(const Molib::Atom &atom, 
-		//~ const Molib::Atom &forbidden) const { 
+	//~ const molib::Atom& Segment::adjacent_in_segment(const molib::Atom &atom, 
+		//~ const molib::Atom &forbidden) const { 
 		//~ for (auto &adj : atom) {
 			//~ if (&adj != &forbidden && has_atom(adj)) 
 				//~ return adj; 
@@ -29,8 +29,8 @@ namespace Linker {
 		//~ throw Error("die : couldn't find adjacent in segment");
 	//~ }
 //~ 
-	int Segment::adjacent_in_segment(const Molib::Atom &atom, 
-		const Molib::Atom &forbidden) const { 
+	int Segment::adjacent_in_segment(const molib::Atom &atom, 
+		const molib::Atom &forbidden) const { 
 		for (auto &adj : atom) {
 			if (&adj != &forbidden && has_atom(adj)) 
 				return get_idx(adj); 
@@ -38,20 +38,20 @@ namespace Linker {
 		throw Error("die : couldn't find adjacent in segment");
 	}
 
-	void Segment::set_bond(const Segment &other, Molib::Atom &a1, Molib::Atom &a2) { 
-		__bond.insert({&other, Molib::Bond(&a1, &a2, get_idx(a1), get_idx(a2))}); 
+	void Segment::set_bond(const Segment &other, molib::Atom &a1, molib::Atom &a2) { 
+		__bond.insert({&other, molib::Bond(&a1, &a2, get_idx(a1), get_idx(a2))}); 
 	}
 	
-	Segment::Graph Segment::create_graph(const Molib::Molecule &molecule) {
+	Segment::Graph Segment::create_graph(const molib::Molecule &molecule) {
 		dbgmsg("Create segment graph ...");
-		const Molib::Model &model = molecule.first().first();
+		const molib::Model &model = molecule.first().first();
 		vector<unique_ptr<Segment>> vertices;
 		dbgmsg(model.get_rigid());
 		int idx = 0;
 		for (auto &fragment : model.get_rigid()) { // make vertices (segments) of a graph
 			dbgmsg(fragment.get_all());
 			auto all = fragment.get_all();
-			Molib::Atom::Vec fragatoms(all.begin(), all.end());
+			molib::Atom::Vec fragatoms(all.begin(), all.end());
 			//~ vertices.push_back(unique_ptr<Segment>(new Segment(fragatoms, fragment.get_seed_id())));
 			vertices.push_back(unique_ptr<Segment>(new Segment(fragatoms, fragment.get_seed_id(), idx++)));
 		}
@@ -60,7 +60,7 @@ namespace Linker {
 			Segment &s1 = *vertices[i];
 			for (size_t j = i + 1; j < vertices.size(); ++j) {
 				Segment &s2 = *vertices[j];
-				auto inter = Glib::intersection(s1.get_atoms(), s2.get_atoms());
+				auto inter = graph::intersection(s1.get_atoms(), s2.get_atoms());
 				dbgmsg(s1.get_atoms().size() << " " << s2.get_atoms().size() << " " << inter.size());
 				if (inter.size() == 1) {
 
@@ -138,7 +138,7 @@ namespace Linker {
 						<< *pseg2);
 					visited.insert({pseg1, pseg2});
 					visited.insert({pseg2, pseg1});
-					Segment::Graph::Path path = Glib::find_path(*pseg1, *pseg2);
+					Segment::Graph::Path path = graph::find_path(*pseg1, *pseg2);
 					paths.insert({{pseg1, pseg2}, path });
 					dbgmsg("path between first segment " << *pseg1
 						<< " and second segment " << *pseg2);
@@ -178,11 +178,11 @@ namespace Linker {
 			double d = 0.0;
 			size_t i = j;
 			
-			Molib::Atom *front_atom = &path[i]->get_bond(*path[i + 1]).atom1();
+			molib::Atom *front_atom = &path[i]->get_bond(*path[i + 1]).atom1();
 			
 			for (; i < path.size() - 2; i += 2) {
-				const Molib::Bond &b1 = path[i]->get_bond(*path[i + 1]);
-				const Molib::Bond &b2 = path[i + 1]->get_bond(*path[i + 2]);
+				const molib::Bond &b1 = path[i]->get_bond(*path[i + 1]);
+				const molib::Bond &b2 = path[i + 1]->get_bond(*path[i + 2]);
 				path[j]->set_max_linker_length(*path[i + 1], d + b1.length());
 				path[i + 1]->set_max_linker_length(*path[j], d + b1.length());
 				
@@ -199,7 +199,7 @@ namespace Linker {
 					<< *path[i + 2] << " = " << path[j]->get_max_linker_length(*path[i + 2]));
 			}
 			if (i < path.size() - 1) {
-				const Molib::Bond &b = path[i]->get_bond(*path[i + 1]);
+				const molib::Bond &b = path[i]->get_bond(*path[i + 1]);
 
 				d += front_atom->crd().distance(b.atom2().crd());
 				

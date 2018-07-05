@@ -12,7 +12,7 @@ using namespace std;
 
 namespace candock {
 
-namespace Molib {
+namespace molib {
 	class Atom;
 	class Molecule;
 };
@@ -22,25 +22,25 @@ namespace OMMIface {
 
 	class Topology {
 	public:
-		typedef set<pair<Molib::Atom*, Molib::Atom*>> BondedExclusions;
-		typedef vector<pair<Molib::Atom*, Molib::Atom*>> Bonds;
-		typedef vector<tuple<Molib::Atom*, Molib::Atom*, Molib::Atom*>> Angles;
-		typedef vector<tuple<Molib::Atom*, Molib::Atom*, Molib::Atom*, Molib::Atom*>> Dihedrals;
-		Molib::Atom::Vec atoms;
+		typedef set<pair<molib::Atom*, molib::Atom*>> BondedExclusions;
+		typedef vector<pair<molib::Atom*, molib::Atom*>> Bonds;
+		typedef vector<tuple<molib::Atom*, molib::Atom*, molib::Atom*>> Angles;
+		typedef vector<tuple<molib::Atom*, molib::Atom*, molib::Atom*, molib::Atom*>> Dihedrals;
+		molib::Atom::Vec atoms;
 		Bonds bonds;
 		Angles angles;
 		Dihedrals dihedrals, impropers;
 		BondedExclusions bonded_exclusions;
 	private:
-		map<const Molib::Atom*, const int> atom_to_type;
-		map<const Molib::Atom*, const int> atom_to_index;
+		map<const molib::Atom*, const int> atom_to_type;
+		map<const molib::Atom*, const int> atom_to_index;
 
 	public:
 		~Topology() { dbgmsg("calling destructor of Topology"); }
 
-		Topology& add_topology(const Molib::Atom::Vec &atoms, const ForceField &ffield);
-		int get_index(const Molib::Atom &atom) const;
-		int get_type(const Molib::Atom &atom) const;
+		Topology& add_topology(const molib::Atom::Vec &atoms, const ForceField &ffield);
+		int get_index(const molib::Atom &atom) const;
+		int get_type(const molib::Atom &atom) const;
 		
 	};
 

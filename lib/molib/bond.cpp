@@ -2,7 +2,7 @@
 #include "candock/helper/help.hpp"
 
 namespace candock {
-namespace Molib {
+namespace molib {
 	
 	bool Bond::is_adjacent(const Bond &other) { 
 		return atom1().atom_number() == other.atom1().atom_number() 
@@ -265,5 +265,5 @@ namespace Molib {
                 // It's the same bond....
                 return lhs->stereo() < rhs->stereo();
         }
-}; // Molib
+}; // molib
 }

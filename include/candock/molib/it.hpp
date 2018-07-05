@@ -8,6 +8,7 @@
 #include "candock/helper/debug.hpp"
 
 namespace candock {
+namespace molib {
 
 template<class T, class U, class P>
 class template_vector_iterator { // Now define it
@@ -134,7 +135,7 @@ public:
 		}
 	}
 };
-
+}
 }
 
 #endif

@@ -30,9 +30,9 @@ namespace fileout {
                 {"???","ANY"},
         };
 
-        void print_mol2( std::ostream &ss, const Molib::Molecule &ligand ) {
-                const Molib::Atom::Vec all_atoms = ligand.get_atoms();
-                const Molib::BondSet all_bonds = Molib::get_bonds_in(all_atoms);
+        void print_mol2( std::ostream &ss, const molib::Molecule &ligand ) {
+                const molib::Atom::Vec all_atoms = ligand.get_atoms();
+                const molib::BondSet all_bonds = molib::get_bonds_in(all_atoms);
 
                 ss << "@<TRIPOS>MOLECULE\n";
                 ss << ligand.name() << "\n";
@@ -65,7 +65,7 @@ namespace fileout {
 
                 ss << "@<TRIPOS>BOND\n";
                 size_t counter = 0;
-                for ( const Molib::Bond* b : all_bonds) {
+                for ( const molib::Bond* b : all_bonds) {
                         ss << setw(10) << ++counter;
                         ss << setw(10) << atom_mapper.at(b->atom1().atom_number());
                         ss << setw(10) << atom_mapper.at(b->atom2().atom_number());

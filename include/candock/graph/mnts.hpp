@@ -35,13 +35,12 @@
 using namespace std;
 
 namespace candock {
+namespace graph {
 
-namespace Glib {
-	typedef vector<vector<bool>> AdjacencyMatrix;
-};
+typedef vector<vector<bool>> AdjacencyMatrix;
 
 class MNTS {
-	Glib::AdjacencyMatrix &Edge;   // adjacent matrix
+	AdjacencyMatrix &Edge;   // adjacent matrix
 	unique_ptr<int[]> vectex;
 	unique_ptr<int[]> funch;
 	unique_ptr<int[]> address;
@@ -102,7 +101,7 @@ class MNTS {
 	void output();
 	void max_tabu(int);
 public:
-	MNTS(vector<vector<int>> &qm, Glib::AdjacencyMatrix &conn, const int *weight, const int ii=300, const int w=100, 
+	MNTS(vector<vector<int>> &qm, AdjacencyMatrix &conn, const int *weight, const int ii=300, const int w=100, 
 		const int lni=10) : Edge(conn), Max_Vtx(conn.size()), We(weight), TABUL(7),
                 qmax(qm), Waim(w), len_best(0), len_improve(lni), len_time(int (100000000 / lni) + 1), iter(ii) {
 #ifndef NDEBUG
@@ -122,7 +121,7 @@ public:
 	}
 
 };
-
+}
 }
 
 #endif

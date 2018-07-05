@@ -14,11 +14,11 @@
 using namespace std;
 
 namespace candock{
-namespace Linker {
+namespace linker {
 
-	Linker::Linker(OMMIface::Modeler &modeler, const Molib::Molecule &receptor, 
-			const Molib::Molecule &ligand, const Molib::NRset &top_seeds, 
-			const Molib::Atom::Grid &gridrec, const Score::Score &score,
+	Linker::Linker(OMMIface::Modeler &modeler, const molib::Molecule &receptor, 
+			const molib::Molecule &ligand, const molib::NRset &top_seeds, 
+			const molib::Atom::Grid &gridrec, const score::Score &score,
 			const bool cuda, const bool iterative, const double dist_cutoff, 
 			const double spin_degrees, const double tol_seed_dist, 
 			const double lower_tol_seed_dist, const double upper_tol_seed_dist, 

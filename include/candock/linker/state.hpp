@@ -12,11 +12,11 @@ using namespace std;
 
 namespace candock {
 
-namespace Molib {
+namespace molib {
 	class Atom;
 };
 
-namespace Linker {
+namespace linker {
 	class Segment;
 	class State {
 	public:

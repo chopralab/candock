@@ -14,7 +14,7 @@ using namespace std;
 
 namespace candock {
 
-namespace Molib {
+namespace molib {
         class Atom;
         class Bond;
 
@@ -82,7 +82,7 @@ namespace Molib {
 
         typedef std::vector<Bond*> BondVec;
         typedef std::set<Bond*, BondPtrComp> BondSet;
-        typedef Glib::Graph<Bond> BondGraph;
+        typedef graph::Graph<Bond> BondGraph;
 
         void erase_stale_bond_refs(const Bond &deleted_bond, const BondVec &bonds);
 	std::map<std::string, int> decode_smiles_prop(const std::vector<std::string> &s);
@@ -94,7 +94,7 @@ namespace Molib {
 
 	std::ostream& operator<< (std::ostream& stream, const BondVec& bonds);
 	std::ostream& operator<< (std::ostream& stream, const BondSet& bonds);
-} // Molib
+} // molib
 
 }
 

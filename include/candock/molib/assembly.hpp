@@ -12,7 +12,7 @@
 
 namespace candock {
 
-namespace Molib {
+namespace molib {
 	class Chain;
 	class Residue;
 	class Atom;
@@ -47,7 +47,7 @@ namespace Molib {
 	};
 	
 
-} // Molib
+} // molib
 
 }
 

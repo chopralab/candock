@@ -13,12 +13,12 @@ namespace candock {
 namespace Program {
 
         class CANDOCK_EXPORT FragmentLigands : public ProgramStep {
-                Molib::Molecules __seeds;
+                molib::Molecules __seeds;
                 std::set<int> __ligand_idatm_types;
                 std::set<int> __added;
 
                 //Not Used until to ability to avoid rereading from disk is enabled
-                //Molib::Molecules __ligands;
+                //molib::Molecules __ligands;
 
                 std::mutex __prevent_re_read_mtx;
                 std::mutex __add_to_typing_mtx;
@@ -34,11 +34,11 @@ namespace Program {
                 FragmentLigands() { }
                 virtual ~FragmentLigands() {}
 
-                void add_seeds_from_molecules (const Molib::Molecules &molecules);
+                void add_seeds_from_molecules (const molib::Molecules &molecules);
                 void add_seeds_from_file      (const std::string &filename);
                 void write_seeds_to_file      (const std::string &filename);
 
-                const Molib::Molecules &seeds() const {
+                const molib::Molecules &seeds() const {
                         return __seeds;
                 }
 

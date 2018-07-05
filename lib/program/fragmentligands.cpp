@@ -24,12 +24,12 @@ namespace Program {
                         Parser::FileParser lpdb (cmdl.get_string_option ("prep"),
                                                  Parser::all_models, cmdl.get_int_option ("max_num_ligands"));
 
-                        Molib::Molecules ligands;
+                        molib::Molecules ligands;
 
                         while (lpdb.parse_molecule (ligands)) {
                                 __ligand_idatm_types = ligands.get_idatm_types (__ligand_idatm_types);
                                 if (Inout::file_size (cmdl.get_string_option ("seeds_pdb")) <= 0) {
-                                        Molib::create_mols_from_seeds (__added, __seeds, ligands);
+                                        molib::create_mols_from_seeds (__added, __seeds, ligands);
                                 }
                                 ligands.clear();
                         }
@@ -54,7 +54,7 @@ namespace Program {
 
         void FragmentLigands::__fragment_ligands (Parser::FileParser &lpdb, const bool write_out_for_linking, const bool no_rotatable_bond) {
                 bool thread_is_not_done;
-                Molib::Molecules ligands;
+                molib::Molecules ligands;
                 {
                         lock_guard<std::mutex> guard (__prevent_re_read_mtx);
                         thread_is_not_done = lpdb.parse_molecule (ligands);
@@ -86,7 +86,7 @@ namespace Program {
                         ligands.compute_overlapping_rigid_segments (cmdl.get_string_option ("seeds"));
 
                         __ligand_idatm_types = ligands.get_idatm_types (__ligand_idatm_types);
-                        Molib::create_mols_from_seeds (__added, __seeds, ligands);
+                        molib::create_mols_from_seeds (__added, __seeds, ligands);
 
                         if (write_out_for_linking)
                                 Inout::output_file (ligands, cmdl.get_string_option ("prep"), ios_base::app);
@@ -174,9 +174,9 @@ namespace Program {
         }
 
         // TODO: Consider making another function that computes the properties as well.
-        void FragmentLigands::add_seeds_from_molecules (const Molib::Molecules &molecules) {
+        void FragmentLigands::add_seeds_from_molecules (const molib::Molecules &molecules) {
                 __ligand_idatm_types = molecules.get_idatm_types (__ligand_idatm_types);
-                Molib::create_mols_from_seeds (__added, __seeds, molecules);
+                molib::create_mols_from_seeds (__added, __seeds, molecules);
                 __seeds.erase_properties();
         }
 

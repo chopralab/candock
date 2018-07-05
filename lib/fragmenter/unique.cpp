@@ -3,7 +3,7 @@
 #include "candock/fragmenter/fragmenter.hpp"
 
 namespace candock{
-namespace Molib {
+namespace molib {
 	ostream& operator<<(ostream& os, const Unique::USeeds& useeds) {
 		for (auto &kv : useeds) {
 			os << kv.second.seed_id << " " << kv.first << " " 
@@ -101,9 +101,9 @@ namespace Molib {
 
 	size_t Unique::__unique(const Atom::Set &seed) {
 		help::smiles edges;
-		auto bonds = Molib::get_bonds_in(seed);
+		auto bonds = molib::get_bonds_in(seed);
 		for (auto &pbond : bonds) {
-			const Molib::Bond &bond = *pbond;
+			const molib::Bond &bond = *pbond;
 			stringstream vertex1, vertex2;
 			vertex1 << bond.atom1().get_label() << "#" << bond.atom1().atom_number();
 			vertex2 << bond.atom2().get_label() << "#" << bond.atom2().atom_number();
@@ -141,9 +141,9 @@ namespace Molib {
 	}
 	bool Unique::is_seed_unique(const Atom::Set &seed) const {
 		help::smiles edges;
-		auto bonds = Molib::get_bonds_in(seed);
+		auto bonds = molib::get_bonds_in(seed);
 		for (auto &pbond : bonds) {
-			const Molib::Bond &bond = *pbond;
+			const molib::Bond &bond = *pbond;
 			stringstream vertex1, vertex2;
 			vertex1 << bond.atom1().get_label() << "#" << bond.atom1().atom_number();
 			vertex2 << bond.atom2().get_label() << "#" << bond.atom2().atom_number();

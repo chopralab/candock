@@ -56,7 +56,7 @@ namespace OMMIface {
 		return stream;
 	}
 
-        int Topology::get_index(const Molib::Atom &atom) const {
+        int Topology::get_index(const molib::Atom &atom) const {
                 if ( ! atom_to_index.count(&atom) ) {
                         log_error << "Problem with atom index: " << atom << endl;
                 }
@@ -64,7 +64,7 @@ namespace OMMIface {
                 return atom_to_index.at(&atom);
         }
 
-        int Topology::get_type(const Molib::Atom &atom) const {
+        int Topology::get_type(const molib::Atom &atom) const {
                 if ( ! atom_to_type.count(&atom) ) {
                         log_error << "Problem with atom type: " << atom << endl;
                 }
@@ -72,15 +72,15 @@ namespace OMMIface {
                 return atom_to_type.at(&atom);
         }
 
-	Topology& Topology::add_topology(const Molib::Atom::Vec &atoms, const ForceField &ffield) {
+	Topology& Topology::add_topology(const molib::Atom::Vec &atoms, const ForceField &ffield) {
 
 		int sz = this->atoms.size();
 		this->atoms.insert(this->atoms.end(), atoms.begin(), atoms.end());
 		
 		// residue topology
 		for (auto &patom : atoms) {
-			Molib::Atom &atom = *patom;
-			const Molib::Residue &residue = atom.br();
+			molib::Atom &atom = *patom;
+			const molib::Residue &residue = atom.br();
 
 			if (!ffield.residue_topology.count(residue.resn())) 
 				throw Error("die : cannot find topology for residue " + residue.resn());
@@ -98,8 +98,8 @@ namespace OMMIface {
 		}
 		
 		BondedExclusions visited_bonds;
-		set<tuple<Molib::Atom*, Molib::Atom*, Molib::Atom*>> visited_angles;
-		set<tuple<Molib::Atom*, Molib::Atom*, Molib::Atom*, Molib::Atom*>> visited_dihedrals, visited_impropers;
+		set<tuple<molib::Atom*, molib::Atom*, molib::Atom*>> visited_angles;
+		set<tuple<molib::Atom*, molib::Atom*, molib::Atom*, molib::Atom*>> visited_dihedrals, visited_impropers;
 
 		// set the bonds, angles, dihedrals
 		for (auto &patom1 : atoms) {
@@ -153,7 +153,7 @@ namespace OMMIface {
 
 		// set bonded exclusions
 		for (auto &patom1 : atoms) {
-			Molib::Atom &atom1 = *patom1;
+			molib::Atom &atom1 = *patom1;
 			for (auto &atom2 : atom1) {
 				this->bonded_exclusions.insert({&atom1, &atom2});
 				for (auto &atom3 : atom2) {

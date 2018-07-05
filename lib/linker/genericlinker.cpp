@@ -13,13 +13,13 @@
 using namespace std;
 
 namespace candock{
-namespace Linker {
+namespace linker {
 
 	/**
 	 * Each state is a mapping of docked seed atoms to ligands's 
 	 * segment atoms
 	 */
-	void Linker::GenericLinker::__create_states(const Segment::Graph &segment_graph, const Molib::NRset &top_seeds) {
+	void Linker::GenericLinker::__create_states(const Segment::Graph &segment_graph, const molib::NRset &top_seeds) {
 		for (auto &seed_mols : top_seeds) {
 			const int seed_id = stoi(seed_mols.name());
 			dbgmsg("seed id = " << seed_id);
@@ -29,12 +29,12 @@ namespace Linker {
 
 					dbgmsg("segment seed id = " << segment.get_seed_id());
 					// create a graph out of the seed "nm" of "to be" ligand molecule
-					Molib::Atom::Graph gs = Molib::Atom::create_graph(seed_mols.first().get_atoms());
+					molib::Atom::Graph gs = molib::Atom::create_graph(seed_mols.first().get_atoms());
 					dbgmsg("gs = " << endl << gs);
-					Molib::Atom::Graph gd = Molib::Atom::create_graph(segment.get_atoms());
+					molib::Atom::Graph gd = molib::Atom::create_graph(segment.get_atoms());
 					dbgmsg("gd = " << endl << gd);
 					// map seed molecules atom numbers to ligand molecule
-					Molib::Atom::Graph::Matches m = gd.match(gs);
+					molib::Atom::Graph::Matches m = gd.match(gs);
 					dbgmsg("__create_states : m.size() = " << m.size());
 					// consider ONLY THE FIRST mapping of seed to seed (the symmetry has 
 					// been taken care of in the rigid docking itself)...
@@ -46,7 +46,7 @@ namespace Linker {
 					// for every docked rigid fragment
 					for (auto &seed_molecule : seed_mols) {
 						geometry::Point::Vec crds(vertices2.size());
-						const Molib::Atom::Vec &seed_atoms = seed_molecule.get_atoms();
+						const molib::Atom::Vec &seed_atoms = seed_molecule.get_atoms();
 						for (size_t i = 0; i < vertices2.size(); ++i) {
 							crds[vertices1[i]] = seed_atoms.at(vertices2[i])->crd();
 							dbgmsg("adding matched vertex pair " << vertices1[i] 
@@ -239,12 +239,12 @@ namespace Linker {
                 __modeler.minimize_state();
 
 				// init with minimized coordinates
-				Molib::Molecule minimized_receptor(__receptor, __modeler.get_state(__receptor.get_atoms()));
-				Molib::Molecule minimized_ligand(__ligand, __modeler.get_state(__ligand.get_atoms()));
+				molib::Molecule minimized_receptor(__receptor, __modeler.get_state(__receptor.get_atoms()));
+				molib::Molecule minimized_ligand(__ligand, __modeler.get_state(__ligand.get_atoms()));
 		
 				minimized_receptor.undo_mm_specific();
 				
-				Molib::Atom::Grid gridrec(minimized_receptor.get_atoms());
+				molib::Atom::Grid gridrec(minimized_receptor.get_atoms());
 
                 __modeler.mask(__receptor.get_atoms());
 				const double potential_energy = __modeler.potential_energy();
@@ -263,10 +263,10 @@ namespace Linker {
 	
 	bool Linker::GenericLinker::__clashes_receptor(const State &current) const {
 		for (size_t i = 0; i < current.get_crds().size(); ++i) {
-			const Molib::Atom &a = current.get_segment().get_atom(i); 
+			const molib::Atom &a = current.get_segment().get_atom(i); 
 			const geometry::Coordinate &c = current.get_crd(i); 
 			dbgmsg("in clashes_receptor test coordinate = " << c);
-			if (__gridrec.clashes(Molib::Atom(c, a.idatm_type()), __clash_coeff)) return true;
+			if (__gridrec.clashes(molib::Atom(c, a.idatm_type()), __clash_coeff)) return true;
 		}
 		return false;
 	}
@@ -313,15 +313,15 @@ namespace Linker {
 		const Segment &current = curr_state.get_segment();
 		dbgmsg("compute_neighbors : current segment is " << current);
 		dbgmsg("compute_neighbors : next segment is " << next);
-		const Molib::Bond &btorsion = current.get_bond(next);
+		const molib::Bond &btorsion = current.get_bond(next);
 		const int idx3 = btorsion.idx2();
-		const Molib::Atom *a3 = &btorsion.atom2();
+		const molib::Atom *a3 = &btorsion.atom2();
 		const int idx2 = btorsion.idx1(); 
-		const Molib::Atom *a2 = &btorsion.atom1();
+		const molib::Atom *a2 = &btorsion.atom1();
 		const int idx1 = current.adjacent_in_segment(*a2, *a3);	// segments overlap on 1 rotatable bond
-		const Molib::Atom *a1 = &current.get_atom(idx1);
+		const molib::Atom *a1 = &current.get_atom(idx1);
 		const int idx4 = next.adjacent_in_segment(*a3, *a2);
-		const Molib::Atom *a4 = &next.get_atom(idx4);
+		const molib::Atom *a4 = &next.get_atom(idx4);
 		
 		dbgmsg("a4 = " << *a4 << " coordinates not set yet!");
 		geometry::Coordinate crd3(curr_state.get_crd(idx3));
@@ -458,11 +458,11 @@ namespace Linker {
 			for (size_t v = u + 1; v < seed_graph.size(); ++v) {
 				Segment &segment2 = seed_graph[v].get_segment();
 				const double max_linker_length = segment1.get_max_linker_length(segment2);
-				Molib::Atom::Pair jatoms{&segment1.get_bond(segment1.get_next(segment2)).atom1(), 
+				molib::Atom::Pair jatoms{&segment1.get_bond(segment1.get_next(segment2)).atom1(), 
 					&segment2.get_bond(segment2.get_next(segment1)).atom1()};
 #ifndef NDEBUG
-				const Molib::Bond &excluded = (segment1.is_adjacent(segment2) 
-					? segment1.get_bond(segment2) : Molib::Bond());
+				const molib::Bond &excluded = (segment1.is_adjacent(segment2) 
+					? segment1.get_bond(segment2) : molib::Bond());
 				dbgmsg("finding compatible state pairs for segments " << segment1 << " and " 
 					<< segment2 << " with maximum linker length " << max_linker_length << " and "
 					<< " join atom1 = " << jatoms.first->atom_number() << " join atom2 = "

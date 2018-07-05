@@ -52,7 +52,7 @@ int main(int argc, char* argv[]) {
                             input_file,
                             Parser::pdb_read_options::all_models | Parser::pdb_read_options::hydrogens);
 
-                        Molib::Molecules mols;
+                        molib::Molecules mols;
 
                         while (input.parse_molecule(mols)) {
 
@@ -60,7 +60,7 @@ int main(int argc, char* argv[]) {
                                 mols.compute_bond_order();
 
                                 for ( const auto& mol : mols ) {
-                                        Molib::Molecules mods =  design::Design::functionalize_hydrogens_with_single_atoms(mol,atom_types[0]);
+                                        molib::Molecules mods =  design::Design::functionalize_hydrogens_with_single_atoms(mol,atom_types[0]);
 
                                         for (const auto& mol2 : mods)
                                                 fileout::print_mol2(std::cout, mol2);

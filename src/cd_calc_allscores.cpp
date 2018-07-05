@@ -35,8 +35,8 @@ int main(int argc, char* argv[]) {
                         Version::get_run_info();
                 cerr << help::Options::get_options()->configuration_file() << endl;
 
-                Molib::Molecules receptor_mols;
-                Molib::Molecules ligand_mols;
+                molib::Molecules receptor_mols;
+                molib::Molecules ligand_mols;
 
                 Parser::FileParser drpdb (cmdl.get_string_option("receptor"),
                                           Parser::pdb_read_options::protein_poses_only |
@@ -60,14 +60,14 @@ int main(int argc, char* argv[]) {
                 ligand_mols.compute_idatm_type();
                 receptor_mols.erase_hydrogen();
 
-                std::map< std::string, std::unique_ptr<Score::Score> > scoring_map;
+                std::map< std::string, std::unique_ptr<score::Score> > scoring_map;
 
                 for (std::string ref : {"complete","reduced"})
                 for (std::string comp: {"mean","cumulative"})
                 for (std::string func: {"radial","normalized_frequency"})
                 for (auto cutoff:{4,5,6,7,8,9,10,11,12,13,14,15}) {
                         std::string score_name = func + "_" + comp + "_" + ref + "_" + to_string(cutoff);
-                        scoring_map[score_name] = std::unique_ptr<Score::Score>(new Score::Score(comp, ref, func,cutoff));
+                        scoring_map[score_name] = std::unique_ptr<score::Score>(new score::Score(comp, ref, func,cutoff));
 
                         scoring_map[score_name]->define_composition(receptor_mols.get_idatm_types(),
                                                  ligand_mols.get_idatm_types())
@@ -76,7 +76,7 @@ int main(int argc, char* argv[]) {
 
                 }
 
-                Molib::Atom::Grid gridrec(receptor_mols[0].get_atoms());
+                molib::Atom::Grid gridrec(receptor_mols[0].get_atoms());
                 std::map< string, vector<double> > output;
 
                 std::vector<std::thread> threads;
@@ -87,7 +87,7 @@ int main(int argc, char* argv[]) {
                 threads.push_back (std::thread ([&, thread_id] {
                         for (size_t i = thread_id; i < ligand_mols.size(); i+=num_threads) {
                         
-                                Molib::Molecule& ligand  = ligand_mols[i];
+                                molib::Molecule& ligand  = ligand_mols[i];
 
                                 std::vector<double> results_for_molec;
                                 results_for_molec.reserve(96);

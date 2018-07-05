@@ -8,28 +8,28 @@ namespace candock {
 namespace design {
 
 	class Design {
-		Molib::Molecules __designs;
-		Molib::Molecule  __original;
-                Molib::Unique &__existing;
+		molib::Molecules __designs;
+		molib::Molecule  __original;
+                molib::Unique &__existing;
 	public:
 		
-		Design( const Molib::Molecule &start, Molib::Unique &existing );
+		Design( const molib::Molecule &start, molib::Unique &existing );
 		
-		void functionalize_hydrogens_with_fragments(const Molib::NRset& nr,
+		void functionalize_hydrogens_with_fragments(const molib::NRset& nr,
                                                             const double cutoff, const double clash_coeff,
                                                             const std::tuple<double, size_t, size_t, size_t>& lipinski_values
                                                            );
-                static Molib::Molecules functionalize_hydrogens_with_single_atoms( const Molib::Molecule& original, const std::string& atom_type);
+                static molib::Molecules functionalize_hydrogens_with_single_atoms( const molib::Molecule& original, const std::string& atom_type);
 		void functionalize_extremes_with_single_atoms( const std::vector< std::string >& idatms );
 		
-		const Molib::Molecules& get_internal_designs() const {
+		const molib::Molecules& get_internal_designs() const {
 			return __designs;
 		}
 		
                 void change_original_name( const std::string& name );
 		
-		const Molib::Molecules& prepare_designs();
-		const Molib::Molecules& designs() const { return __designs; }
+		const molib::Molecules& prepare_designs();
+		const molib::Molecules& designs() const { return __designs; }
 	};
 }
 

@@ -5,7 +5,7 @@
 #include "candock/helper/help.hpp"
 
 namespace candock {
-namespace Linker {
+namespace linker {
 	
 	State::Vec operator-(const State::Set& left, const State::Set& right) { 
 		State::Vec ret; 
@@ -18,7 +18,7 @@ namespace Linker {
 	string State::pdb() const { 
 		stringstream ss;
 		for (size_t i = 0; i < get_segment().get_atoms().size(); ++i) {
-			Molib::Atom &a = const_cast<Molib::Atom&>(get_segment().get_atom(i));
+			molib::Atom &a = const_cast<molib::Atom&>(get_segment().get_atom(i));
 			a.set_crd(get_crd(i));
 			ss << a;
 		} 
@@ -29,7 +29,7 @@ namespace Linker {
 		const size_t other_size = other.get_crds().size();
 		for (size_t i = 0; i < __crds.size(); ++i) {
 			const geometry::Point &crd1 = get_crd(i);
-			const Molib::Atom &a1 = __segment.get_atom(i);;
+			const molib::Atom &a1 = __segment.get_atom(i);;
 			if (__segment.is_common_atom(i)) {
 				dbgmsg("common state atom = " << a1.atom_number() 
 					<< " is not checked for clashes");
@@ -38,7 +38,7 @@ namespace Linker {
 			const double vdw1 = a1.radius();
 			for (size_t j = 0; j < other_size; ++j) {
 				const geometry::Point &crd2 = other.get_crd(j);
-				const Molib::Atom &a2 = other.get_segment().get_atom(j);
+				const molib::Atom &a2 = other.get_segment().get_atom(j);
 				if (other.get_segment().is_common_atom(j)) { 
 					dbgmsg("common state atom = " << a2.atom_number() 
 						<< " is not checked for clashes");
@@ -57,7 +57,7 @@ namespace Linker {
 			<< " energy = " << setprecision(4) << fixed << s.__energy << " atom_crd =  " ;
 		for (size_t i = 0; i < s.get_crds().size(); ++i) {
 			const geometry::Point &crd = s.get_crd(i);
-			const Molib::Atom &a = s.__segment.get_atom(i);;
+			const molib::Atom &a = s.__segment.get_atom(i);;
 			stream << a.atom_number() << " -> " << crd << " ";
 		}
 		return stream;

@@ -10,7 +10,7 @@
 using namespace std;
 
 namespace candock {
-namespace Molib {
+namespace molib {
 
 	ostream& operator<< (ostream& stream, const Residue& r) {
 		for (auto &atom : r) { 

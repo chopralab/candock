@@ -19,7 +19,7 @@
 using namespace std;
 
 namespace candock {
-namespace Molib {
+namespace molib {
 
 	ostream& operator<< (ostream& stream, const NRset& m) {
 		for (auto &molecules : m) {

@@ -12,7 +12,7 @@
 
 namespace candock {
 
-namespace Molib {
+namespace molib {
 	class Atom;
 	struct AtomParams {
 		int val;

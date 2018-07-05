@@ -13,7 +13,7 @@
 
 namespace candock {
 
-namespace Score {
+namespace score {
 namespace Interpolation {
 	vector<double> derivative(const vector<double> &y, const double step) {
 

@@ -4,7 +4,7 @@
 using namespace std;
 
 namespace candock{
-namespace Linker {	
+namespace linker {	
 	ostream& operator<<(ostream& os, const DockedConformation &conf)	{
 		os << "start link ++++++++++++++++++++++++++++++" << endl;
 		os << "ENERGY = " << conf.get_energy() << endl;

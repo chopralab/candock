@@ -26,18 +26,18 @@ namespace genclus {
 		str.erase(std::remove_if(str.begin(), str.end(), [](const char &c ) { return c==':'||c=='"'||c=='\\';}), str.end());
 		return str;
 	}
-	void add_to_json(JsonReader &jr, cluster::Clusters<Molib::Molecule> ligand_clusters, 
+	void add_to_json(JsonReader &jr, cluster::Clusters<molib::Molecule> ligand_clusters, 
 		string cluster_name, const string &names_dir, const bool for_gclus) {
 
 		map<string, unique_ptr<Json::Value>> ligands;
 		for (auto &kv : ligand_clusters) {
 			int cluster_id = (kv.first == -1 ? 0 : kv.first); // unclustered is cluster #0
-			const Molib::Molecule &molecule = *kv.second;
-			const Molib::Molecules &mols = molecule.br(); // mols.name() is the nr-pdb name
-			const Molib::Assembly &assembly = molecule.first();
-			const Molib::Model &model = assembly.first();
-			const Molib::Chain &chain = model.first();
-			const Molib::Residue &residue = chain.first();
+			const molib::Molecule &molecule = *kv.second;
+			const molib::Molecules &mols = molecule.br(); // mols.name() is the nr-pdb name
+			const molib::Assembly &assembly = molecule.first();
+			const molib::Model &model = assembly.first();
+			const molib::Chain &chain = model.first();
+			const molib::Residue &residue = chain.first();
 			dbgmsg(mols.name());
 			if (ligands.find(mols.name()) == ligands.end()) {
 				ligands.insert(make_pair(mols.name(), unique_ptr<Json::Value>(new Json::Value(Json::arrayValue))));
@@ -46,7 +46,7 @@ namespace genclus {
 			try {
 				Inout::read_file(Path::join(names_dir, 
 				(
-					(residue.rest() == Molib::Residue::protein || residue.rest() == Molib::Residue::nucleic) ? 
+					(residue.rest() == molib::Residue::protein || residue.rest() == molib::Residue::nucleic) ? 
 						(molecule.name().substr(0,4) + molecule.name().substr(4,1)) 
 					: 
 						residue.resn()
@@ -85,7 +85,7 @@ namespace genclus {
 			}
 		}
 	}
-	void squeeze_proteins_nucleic(Molib::Molecules &mols) {
+	void squeeze_proteins_nucleic(molib::Molecules &mols) {
 		for (auto &molecule : mols) {
 			for (auto &assembly : molecule) {
 				for (auto &model : assembly) {
@@ -93,24 +93,24 @@ namespace genclus {
 						geometry::Coordinate::Vec crdp, crdn;
 						// remove protein and nucleic ligands
 						for (auto &residue : chain)	residue.set_crd(); // they really need to be set!!!
-						chain.remove_if([&chain, &model, &crdp, &crdn](const Molib::Residue &r) {
-							if (r.rest() == Molib::Residue::protein) {
+						chain.remove_if([&chain, &model, &crdp, &crdn](const molib::Residue &r) {
+							if (r.rest() == molib::Residue::protein) {
 								crdp.push_back(r.crd());
 								return true;
 							}
-							if (r.rest() == Molib::Residue::nucleic) {
+							if (r.rest() == molib::Residue::nucleic) {
 								crdn.push_back(r.crd());
 							}
 							return false;
 						});
 						// add PPP or NNN instead
 						if (!crdp.empty()) {
-								Molib::Residue &residue = chain.add(new Molib::Residue("PPP", 1, ' ', Molib::Residue::protein));
-								residue.add(new Molib::Atom(1, "CA", geometry::compute_geometric_center(crdp), help::idatm_mask.at("???")));
+								molib::Residue &residue = chain.add(new molib::Residue("PPP", 1, ' ', molib::Residue::protein));
+								residue.add(new molib::Atom(1, "CA", geometry::compute_geometric_center(crdp), help::idatm_mask.at("???")));
 						}
 						if (!crdn.empty()) {
-								Molib::Residue &residue = chain.add(new Molib::Residue("NNN", 1, ' ', Molib::Residue::nucleic));
-								residue.add(new Molib::Atom(1, "P", geometry::compute_geometric_center(crdn), help::idatm_mask.at("???")));
+								molib::Residue &residue = chain.add(new molib::Residue("NNN", 1, ' ', molib::Residue::nucleic));
+								residue.add(new molib::Atom(1, "P", geometry::compute_geometric_center(crdn), help::idatm_mask.at("???")));
 						}
 					}
 				}
@@ -118,17 +118,17 @@ namespace genclus {
 		}
 	}
 
-	void remove_ligands_not_in_aligned_region(Molib::Molecules &mols, Json::Value aligned_residues) {
-		set<Molib::Residue::res_tuple2> a = common_ligands::json_to_set(aligned_residues).second;
+	void remove_ligands_not_in_aligned_region(molib::Molecules &mols, Json::Value aligned_residues) {
+		set<molib::Residue::res_tuple2> a = common_ligands::json_to_set(aligned_residues).second;
 		for (auto &molecule : mols) {
 			for (auto &assembly : molecule) {
 				for (auto &model : assembly) {
 					for (auto &chain : model) {
 						// remove hetero, ion and water residues that are not close to the query
-						chain.remove_if([&a, &chain, &model](const Molib::Residue &r) {
-							map<Molib::Residue::res_tuple2, Molib::Residue::res_tuple2> respair;
-							model.remarks(7, Molib::Residue::res_tuple2(chain.chain_id(), r.resn(), r.resi(), r.ins_code()), respair);
-							set<Molib::Residue::res_tuple2> b;
+						chain.remove_if([&a, &chain, &model](const molib::Residue &r) {
+							map<molib::Residue::res_tuple2, molib::Residue::res_tuple2> respair;
+							model.remarks(7, molib::Residue::res_tuple2(chain.chain_id(), r.resn(), r.resi(), r.ins_code()), respair);
+							set<molib::Residue::res_tuple2> b;
 							for (auto &i : respair) { b.insert(i.first); }
 							dbgmsg("LIGAND " << chain.chain_id() << ":" << r.resn() << ":" << r.resi() << ":" << r.ins_code());
 #ifndef NDEBUG
@@ -136,8 +136,8 @@ namespace genclus {
 								dbgmsg("B " << get<0>(i) << ":" << get<1>(i) << ":" << get<2>(i) << ":" << get<3>(i));
 							}
 #endif
-							vector<Molib::Residue::res_tuple2> v(b.size());
-							vector<Molib::Residue::res_tuple2>::iterator it = set_intersection(a.begin(), a.end(), b.begin(), b.end(), v.begin());
+							vector<molib::Residue::res_tuple2> v(b.size());
+							vector<molib::Residue::res_tuple2>::iterator it = set_intersection(a.begin(), a.end(), b.begin(), b.end(), v.begin());
 							v.resize(it - v.begin());
 #ifndef NDEBUG
 							for (auto &iv : v) {
@@ -145,10 +145,10 @@ namespace genclus {
 							}
 #endif
                                                         // delete if less than 2 residues are in intersection
-                                                        const bool is_prot_res = r.rest() == Molib::Residue::protein && v.size() < 5;
-                                                        const bool is_nuca_res = r.rest() == Molib::Residue::nucleic && v.size() < 4;
-                                                        const bool is_hetr_res = r.rest() == Molib::Residue::hetero  && v.size() < 3;
-                                                        const bool is_ionc_res = r.rest() == Molib::Residue::ion     && v.size() < 3;
+                                                        const bool is_prot_res = r.rest() == molib::Residue::protein && v.size() < 5;
+                                                        const bool is_nuca_res = r.rest() == molib::Residue::nucleic && v.size() < 4;
+                                                        const bool is_hetr_res = r.rest() == molib::Residue::hetero  && v.size() < 3;
+                                                        const bool is_ionc_res = r.rest() == molib::Residue::ion     && v.size() < 3;
                                                         if ( is_prot_res || is_nuca_res || is_hetr_res || is_ionc_res ) {
                                                                 return true;
                                                         }
@@ -164,25 +164,25 @@ namespace genclus {
 	 * Calculate shortest distance between any two molecules.
 	 * 
 	 */
-	cluster::PairwiseDistances<Molib::Molecule> create_pairwise_distances(const Molib::Molecule::Vec &ligands, const double eps) {
+	cluster::PairwiseDistances<molib::Molecule> create_pairwise_distances(const molib::Molecule::Vec &ligands, const double eps) {
 
-		cluster::PairwiseDistances<Molib::Molecule> pairwise_distances;
-		Molib::Atom::Vec atoms;
+		cluster::PairwiseDistances<molib::Molecule> pairwise_distances;
+		molib::Atom::Vec atoms;
 
 		for (auto &pmolecule : ligands)
 			for (auto &patom : pmolecule->get_atoms()) {
 				atoms.push_back(patom);
-				dbgmsg("&molecule = " << &const_cast<Molib::Molecule&>(patom->br().br().br().br().br()) 
-					<< " molecule = " << const_cast<Molib::Molecule&>(patom->br().br().br().br().br()).name() 
+				dbgmsg("&molecule = " << &const_cast<molib::Molecule&>(patom->br().br().br().br().br()) 
+					<< " molecule = " << const_cast<molib::Molecule&>(patom->br().br().br().br().br()).name() 
 					<< " (pmolecule = " << pmolecule << " should be " << pmolecule->name() << ") atom = " << *patom);
 			}
 
-		Molib::Atom::Grid grid(atoms);
+		molib::Atom::Grid grid(atoms);
 		
 		for (auto &patom : atoms) {
-			Molib::Molecule &molecule1 = const_cast<Molib::Molecule&>(patom->br().br().br().br().br());
+			molib::Molecule &molecule1 = const_cast<molib::Molecule&>(patom->br().br().br().br().br());
 			for (auto &pneighbor : grid.get_neighbors_including_self(patom->crd(), eps)) {
-				Molib::Molecule &molecule2 = const_cast<Molib::Molecule&>(pneighbor->br().br().br().br().br());
+				molib::Molecule &molecule2 = const_cast<molib::Molecule&>(pneighbor->br().br().br().br().br());
 				const double distance = patom->crd().distance(pneighbor->crd());
 				if (pairwise_distances[&molecule1][&molecule2] < 0.0000000001
 					|| distance < pairwise_distances[&molecule1][&molecule2]) {
@@ -198,25 +198,25 @@ namespace genclus {
 	 * Split read molecules into smaller pieces (i.e., protein chain A and its ligands
 	 * also chain A are outputted as separate molecules)
 	 */
-	Molib::NRset split_into_molecules(Molib::NRset &nrset) {
-		Molib::NRset cnrset;
+	molib::NRset split_into_molecules(molib::NRset &nrset) {
+		molib::NRset cnrset;
 		for (auto &mols : nrset) {
-			Molib::Molecules &cmols = cnrset.add(new Molib::Molecules(mols.name()));
+			molib::Molecules &cmols = cnrset.add(new molib::Molecules(mols.name()));
 			for (auto &molecule : mols) {
 				for (auto &assembly : molecule) {
 					for (auto &model : assembly) {
 						for (auto &chain : model) {
-							Molib::Residue::res_type prev_rest(Molib::Residue::notassigned);
+							molib::Residue::res_type prev_rest(molib::Residue::notassigned);
 							for (auto &residue : chain) {
-								if (prev_rest != residue.rest() || residue.rest() == Molib::Residue::water 
-									|| residue.rest() == Molib::Residue::ion || residue.rest() == Molib::Residue::hetero) {
+								if (prev_rest != residue.rest() || residue.rest() == molib::Residue::water 
+									|| residue.rest() == molib::Residue::ion || residue.rest() == molib::Residue::hetero) {
 
-									Molib::Molecule &cmolecule = cmols.add(new Molib::Molecule(molecule.name()));
-									Molib::Assembly &cassembly = cmolecule.add(new Molib::Assembly(assembly.number()));
-									Molib::Model &cmodel = cassembly.add(new Molib::Model(model.number()));
-									cmodel.add(new Molib::Chain(chain.chain_id()));
+									molib::Molecule &cmolecule = cmols.add(new molib::Molecule(molecule.name()));
+									molib::Assembly &cassembly = cmolecule.add(new molib::Assembly(assembly.number()));
+									molib::Model &cmodel = cassembly.add(new molib::Model(model.number()));
+									cmodel.add(new molib::Chain(chain.chain_id()));
 								}
-								cmols.last().first().first().first().add(new Molib::Residue(residue));
+								cmols.last().first().first().first().add(new molib::Residue(residue));
 								prev_rest = residue.rest();
 							}
 							chain.clear();
@@ -232,7 +232,7 @@ namespace genclus {
 		const string &bio_dir, const string &names_dir, const bool neighb, const double hetero_clus_rad, 
 		const int hetero_min_pts, const double min_z_score, const bool for_gclus) {
 		JsonReader jr;
-		Molib::NRset nrset;
+		molib::NRset nrset;
 		map<string, double> scr;
 		// the aligned files from json
 		jr.parse_JSON(json_file);
@@ -251,7 +251,7 @@ namespace genclus {
 				dbgmsg(pdb_id + " " + chain_ids);
 
 				Parser::FileParser pr(pdb_file, Parser::all_models|Parser::sparse_macromol);
-				Molib::Molecules &mols = nrset.add(new Molib::Molecules(pr.parse_molecule()));
+				molib::Molecules &mols = nrset.add(new molib::Molecules(pr.parse_molecule()));
 
 				squeeze_proteins_nucleic(mols);
 				
@@ -275,17 +275,17 @@ namespace genclus {
 			dbgmsg("molecules name = " << mols.name());
 		}
 #endif
-		Molib::NRset splitted = split_into_molecules(nrset);
+		molib::NRset splitted = split_into_molecules(nrset);
 		
-		cluster::MapD<Molib::Molecule> scores;
+		cluster::MapD<molib::Molecule> scores;
 		for (auto &mols : splitted) 
 			for (auto &molecule : mols)
 				scores[&molecule] = scr.at(molecule.name());
 		
-		Molib::Molecule::Vec protein_ligands = splitted.get_molecules(Molib::Residue::protein);
-		Molib::Molecule::Vec nucleic_ligands = splitted.get_molecules(Molib::Residue::nucleic);
-		Molib::Molecule::Vec hetero_ligands = splitted.get_molecules(Molib::Residue::hetero);
-		Molib::Molecule::Vec ion_ligands = splitted.get_molecules(Molib::Residue::ion);
+		molib::Molecule::Vec protein_ligands = splitted.get_molecules(molib::Residue::protein);
+		molib::Molecule::Vec nucleic_ligands = splitted.get_molecules(molib::Residue::nucleic);
+		molib::Molecule::Vec hetero_ligands = splitted.get_molecules(molib::Residue::hetero);
+		molib::Molecule::Vec ion_ligands = splitted.get_molecules(molib::Residue::ion);
 
 #ifndef NDEBUG
 		for (auto &pmol : protein_ligands) {
@@ -296,18 +296,18 @@ namespace genclus {
 		}
 #endif
 		
-		cluster::PairwiseDistances<Molib::Molecule> pd_protein = create_pairwise_distances(protein_ligands, 4.1);
-		cluster::Optics<Molib::Molecule> op(pd_protein, scores, 4.1, 3);
+		cluster::PairwiseDistances<molib::Molecule> pd_protein = create_pairwise_distances(protein_ligands, 4.1);
+		cluster::Optics<molib::Molecule> op(pd_protein, scores, 4.1, 3);
 
-		cluster::PairwiseDistances<Molib::Molecule> pd_nucleic = create_pairwise_distances(nucleic_ligands, 4.1);
-		cluster::Optics<Molib::Molecule> on(pd_nucleic, scores, 4.1, 3);
+		cluster::PairwiseDistances<molib::Molecule> pd_nucleic = create_pairwise_distances(nucleic_ligands, 4.1);
+		cluster::Optics<molib::Molecule> on(pd_nucleic, scores, 4.1, 3);
 
-		//~ cluster::PairwiseDistances<Molib::Molecule> pd_hetero = create_pairwise_distances(hetero_ligands, 3.1);
-		cluster::PairwiseDistances<Molib::Molecule> pd_hetero = create_pairwise_distances(hetero_ligands, hetero_clus_rad + 0.1);
-		cluster::Optics<Molib::Molecule> oh(pd_hetero, scores, hetero_clus_rad + 0.1, hetero_min_pts);
+		//~ cluster::PairwiseDistances<molib::Molecule> pd_hetero = create_pairwise_distances(hetero_ligands, 3.1);
+		cluster::PairwiseDistances<molib::Molecule> pd_hetero = create_pairwise_distances(hetero_ligands, hetero_clus_rad + 0.1);
+		cluster::Optics<molib::Molecule> oh(pd_hetero, scores, hetero_clus_rad + 0.1, hetero_min_pts);
 
-		cluster::PairwiseDistances<Molib::Molecule> pd_ion = create_pairwise_distances(ion_ligands, 3.1);
-		cluster::Optics<Molib::Molecule> oi(pd_ion, scores, 3.1, 4);
+		cluster::PairwiseDistances<molib::Molecule> pd_ion = create_pairwise_distances(ion_ligands, 3.1);
+		cluster::Optics<molib::Molecule> oi(pd_ion, scores, 3.1, 4);
 
 		auto protein_clusters = op.extract_dbscan(4.0);
 		auto nucleic_clusters = on.extract_dbscan(4.0);

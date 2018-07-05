@@ -4,7 +4,7 @@
 
 namespace candock {
 
-namespace Score {
+namespace score {
     class KBFF : public Score {
         AtomPairValues __energies, __derivatives; // objective function
         double __step_non_bond;

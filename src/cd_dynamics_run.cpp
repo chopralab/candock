@@ -31,14 +31,14 @@ int main(int argc, char *argv[])
                 cerr << Version::get_banner() << Version::get_version() << Version::get_run_info();
                 cerr << help::Options::get_options()->configuration_file() << endl;
 
-                Molib::Molecules starting_mol;
+                molib::Molecules starting_mol;
 
                 Parser::FileParser drpdb(cmdl.get_string_option("receptor"),
                                          Parser::pdb_read_options::first_model);
 
                 drpdb.parse_molecule(starting_mol);
 
-                Score::KBFF score(cmdl.get_string_option("ff_ref"), cmdl.get_string_option("ff_comp"),
+                score::KBFF score(cmdl.get_string_option("ff_ref"), cmdl.get_string_option("ff_comp"),
                                    cmdl.get_string_option("ff_func"), cmdl.get_int_option("ff_cutoff"),
                                    cmdl.get_double_option("step"));
 
@@ -73,9 +73,9 @@ int main(int argc, char *argv[])
 
                 OMMIface::SystemTopology::loadPlugins();
 
-                Molib::Molecule &starting = starting_mol[0];
+                molib::Molecule &starting = starting_mol[0];
 
-                Molib::Atom::Grid gridrec(starting.get_atoms());
+                molib::Atom::Grid gridrec(starting.get_atoms());
                 starting_mol[0].prepare_for_mm(ffield, gridrec);
 
                 ffield.insert_topology(starting);
@@ -126,7 +126,7 @@ int main(int argc, char *argv[])
                 modeler.dynamics();
 
                 // init with minimized coordinates
-                Molib::Molecule final_state(starting, modeler.get_state(starting.get_atoms()));
+                molib::Molecule final_state(starting, modeler.get_state(starting.get_atoms()));
 
                 final_state.undo_mm_specific();
 

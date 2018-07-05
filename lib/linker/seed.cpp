@@ -5,7 +5,7 @@
 #include "candock/helper/help.hpp"
 
 namespace candock{
-namespace Linker {
+namespace linker {
 	ostream& operator<< (ostream& stream, const Seed& s) {
 		return stream << "Seed = " << s.get_segment().get_seed_id() << endl;
 	}

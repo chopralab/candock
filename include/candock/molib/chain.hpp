@@ -8,7 +8,7 @@
 
 namespace candock {
 
-namespace Molib {
+namespace molib {
 	class Residue;
 	class Atom;
 	class Model;
@@ -41,7 +41,7 @@ namespace Molib {
 		friend ostream& operator<< (ostream& stream, const Chain& c);
 	};
 
-} // Molib
+} // molib
 
 }
 

@@ -13,7 +13,7 @@
 
 namespace candock {
 
-namespace Molib {
+namespace molib {
 	class NRset;
 	
 	class Molecules : public template_map_container<Molecule, Molecules, NRset> {
@@ -58,9 +58,9 @@ namespace Molib {
 	};
 
 
-        void create_mols_from_seeds(set<int> &added, Molib::Molecules &seeds, const Molib::Molecules &mols);
+        void create_mols_from_seeds(set<int> &added, molib::Molecules &seeds, const molib::Molecules &mols);
 
-} // Molib
+} // molib
 
 }
 

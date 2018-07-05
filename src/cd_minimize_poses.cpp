@@ -35,8 +35,8 @@ int main(int argc, char *argv[])
                 cerr << Version::get_banner() << Version::get_version() << Version::get_run_info();
                 cerr << help::Options::get_options()->configuration_file() << endl;
 
-                Molib::Molecules receptor_mols;
-                Molib::Molecules ligand_mols;
+                molib::Molecules receptor_mols;
+                molib::Molecules ligand_mols;
 
                 Parser::FileParser drpdb(cmdl.get_string_option("receptor"),
                                          Parser::pdb_read_options::protein_poses_only |
@@ -54,7 +54,7 @@ int main(int argc, char *argv[])
 
                 dlpdb.parse_molecule(ligand_mols);
 
-                Score::KBFF score(cmdl.get_string_option("ff_ref"),  cmdl.get_string_option("ff_comp"),
+                score::KBFF score(cmdl.get_string_option("ff_ref"),  cmdl.get_string_option("ff_comp"),
                                    cmdl.get_string_option("ff_func"), cmdl.get_int_option("ff_cutoff"),
                                    cmdl.get_double_option("step"));
 
@@ -92,10 +92,10 @@ int main(int argc, char *argv[])
                 for (size_t i = 0; i < receptor_mols.size(); ++i)
                 {
 
-                        Molib::Molecule &protein = receptor_mols[i];
-                        Molib::Molecule &ligand = ligand_mols[i];
+                        molib::Molecule &protein = receptor_mols[i];
+                        molib::Molecule &ligand = ligand_mols[i];
 
-                        Molib::Atom::Grid gridrec(protein.get_atoms());
+                        molib::Atom::Grid gridrec(protein.get_atoms());
                         protein.prepare_for_mm(ffield, gridrec);
 
                         ffield.insert_topology(protein);
@@ -127,12 +127,12 @@ int main(int argc, char *argv[])
                         modeler.minimize_state();
 
                         // init with minimized coordinates
-                        Molib::Molecule minimized_receptor(protein, modeler.get_state(protein.get_atoms()));
-                        Molib::Molecule minimized_ligand(ligand, modeler.get_state(ligand.get_atoms()));
+                        molib::Molecule minimized_receptor(protein, modeler.get_state(protein.get_atoms()));
+                        molib::Molecule minimized_ligand(ligand, modeler.get_state(ligand.get_atoms()));
 
                         minimized_receptor.undo_mm_specific();
 
-                        Molib::Atom::Grid gridrec_min(minimized_receptor.get_atoms());
+                        molib::Atom::Grid gridrec_min(minimized_receptor.get_atoms());
                         const double energy = score.non_bonded_energy(gridrec_min, minimized_ligand);
                         modeler.mask(protein.get_atoms());
                         const double potential = modeler.potential_energy();

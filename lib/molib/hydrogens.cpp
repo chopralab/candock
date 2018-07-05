@@ -21,7 +21,7 @@
 using namespace std;
 
 namespace candock {
-namespace Molib {
+namespace molib {
 	void Residue::compute_hydrogen() {
 		try {
 			if (this->empty()) {

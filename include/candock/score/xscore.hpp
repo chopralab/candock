@@ -6,9 +6,9 @@
 
 namespace candock {
 
-namespace Score {
+namespace score {
 
-        std::array<double, 5> vina_xscore(const Molib::Atom::Grid &gridrec, const Molib::Atom::Vec &atoms);
+        std::array<double, 5> vina_xscore(const molib::Atom::Grid &gridrec, const molib::Atom::Vec &atoms);
 
 }
 

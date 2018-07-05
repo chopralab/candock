@@ -9,7 +9,7 @@
 
 namespace candock {
 
-namespace Molib {
+namespace molib {
 	
 	class NRset : public template_map_container<Molecules, NRset, NRset> {
 	public:
@@ -21,7 +21,7 @@ namespace Molib {
 		friend ostream& operator<< (ostream& stream, const NRset& m);
 	};
 
-} // Molib
+} // molib
 
 }
 

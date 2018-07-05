@@ -15,7 +15,7 @@ namespace OMMIface {
 	struct ForceField;
 };
 
-namespace Molib {
+namespace molib {
 	class Molecules;
 	class Molecule;
 	class Assembly;
@@ -63,7 +63,7 @@ namespace Molib {
 			return *this;
 		}
 
-		Molecule(const Molib::Molecule &rhs, const geometry::Point::Vec &crds);
+		Molecule(const molib::Molecule &rhs, const geometry::Point::Vec &crds);
 		typedef enum {first_bio, all_bio} bio_how_many;
 
                 std::string get_chain_ids(const unsigned int hm) const;
@@ -111,7 +111,7 @@ namespace Molib {
 		friend ostream& operator<< (ostream& stream, const Molecule& m);
 	};
 	
-} // Molib
+} // molib
 
 }
 

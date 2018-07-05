@@ -7,11 +7,11 @@
 
 namespace candock {
 
-namespace Molib {
+namespace molib {
 	class Molecule;
 }
 
-namespace Docker {
+namespace docker {
 	
 	class Dock {
 
@@ -46,15 +46,15 @@ namespace Docker {
 
 		const Gpoints &__gpoints;
 		Conformations &__conformations;
-		const Molib::Molecule &__seed;
+		const molib::Molecule &__seed;
 		double __rmsd_tol_sq;
                 double __rmsd_tol;
 
-		Molib::Molecules __docked;
+		molib::Molecules __docked;
 
 #ifndef NDEBUG
-		const Score::Score &__score;
-		const Molib::Atom::Grid &__gridrec;
+		const score::Score &__score;
+		const molib::Atom::Grid &__gridrec;
 #endif
 		DockedConf::Vec __dock();
 		DockedConf::Vec __cluster(const DockedConf::Vec &confs);
@@ -63,15 +63,15 @@ namespace Docker {
 		
 	public:
 #ifndef NDEBUG
-		Dock(const Gpoints &gpoints, Conformations &conformations, const Molib::Molecule &seed, const Score::Score &score, 
-			 const Molib::Atom::Grid &gridrec, const double rmsd_tol=2.0) : __gpoints(gpoints), __conformations(conformations), 
+		Dock(const Gpoints &gpoints, Conformations &conformations, const molib::Molecule &seed, const score::Score &score, 
+			 const molib::Atom::Grid &gridrec, const double rmsd_tol=2.0) : __gpoints(gpoints), __conformations(conformations), 
 			__seed(seed), __rmsd_tol_sq(rmsd_tol * rmsd_tol), __rmsd_tol(rmsd_tol), __score(score), __gridrec(gridrec) {}
 #else
-		Dock(const Gpoints &gpoints, Conformations &conformations, Molib::Molecule &seed, const double rmsd_tol=2.0) 
+		Dock(const Gpoints &gpoints, Conformations &conformations, molib::Molecule &seed, const double rmsd_tol=2.0) 
 			: __gpoints(gpoints), __conformations(conformations), __seed(seed), __rmsd_tol_sq(rmsd_tol * rmsd_tol), __rmsd_tol(rmsd_tol) {}
 #endif
 		void run();
-		Molib::Molecules& get_docked() { return __docked; };
+		molib::Molecules& get_docked() { return __docked; };
 	};
 }
 

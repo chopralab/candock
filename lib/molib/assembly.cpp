@@ -14,7 +14,7 @@
 using namespace std;
 
 namespace candock {
-namespace Molib {
+namespace molib {
 	ostream& operator<< (ostream& stream, const Assembly& a) {
 		stream << setw(6) << left << "REMARK   6 " << a.name() << " " << a.number() << endl;
 		for (auto &model : a) { 

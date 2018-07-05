@@ -7,7 +7,7 @@
 #include <boost/algorithm/string.hpp>
 
 using namespace std;
-using namespace candock::Molib;
+using namespace candock::molib;
 
 namespace candock {
 namespace Parser {

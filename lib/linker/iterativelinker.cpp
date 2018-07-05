@@ -16,7 +16,7 @@
 using namespace std;
 
 namespace candock {
-namespace Linker {
+namespace linker {
 
 /**
 	 * Iterative minimization starts from each seed in the docked molecule. 
@@ -115,12 +115,12 @@ DockedConformation Linker::IterativeLinker::__a_star(const int segment_graph_siz
 #endif
 
 						// init with minimized coordinates
-						Molib::Molecule minimized_receptor(__receptor, __modeler.get_state(__receptor.get_atoms()));
+						molib::Molecule minimized_receptor(__receptor, __modeler.get_state(__receptor.get_atoms()));
 						next_conformation.set_receptor_crds(minimized_receptor.get_crds());
 						next_conformation.set_ligand_crds(__modeler.get_state(next_conformation.get_ligand_atoms()));
 
 						// compute energy after minimization
-						Molib::Atom::Grid gridrec(minimized_receptor.get_atoms());
+						molib::Atom::Grid gridrec(minimized_receptor.get_atoms());
 						const double energy = __score.non_bonded_energy(gridrec, next_conformation.get_ligand_atoms(), next_conformation.get_ligand_crds());
 
 						next_conformation.set_energy(energy);
@@ -185,7 +185,7 @@ Partial::Vec Linker::IterativeLinker::__generate_rigid_conformations(const Seed:
 	Partial::Vec possibles_w_energy;
 	{
 		// find all maximum cliques with the number of seed segments of __max_clique_size
-		Maxclique m(conn);
+		graph::Maxclique m(conn);
 
 		const int mcq_size = std::min(__max_clique_size, static_cast<int>(seed_graph.size()));
 		const vector<vector<unsigned short int>> &qmaxes = m.mcq(mcq_size);
@@ -263,16 +263,16 @@ DockedConformation Linker::IterativeLinker::__reconstruct(const Partial &conform
 	{ // convert ligand to new coordinates
 		State &state = *pstate;
 		const Segment &segment = state.get_segment();
-		Molib::Atom::Set overlap;
+		molib::Atom::Set overlap;
 		// deal with atoms that overlap between states
 		for (auto &adjacent : segment)
 		{
-			const Molib::Bond &b = segment.get_bond(adjacent);
+			const molib::Bond &b = segment.get_bond(adjacent);
 			overlap.insert(&b.atom2());
 		}
 		for (size_t i = 0; i < state.get_segment().get_atoms().size(); ++i)
 		{
-			Molib::Atom &atom = const_cast<Molib::Atom &>(state.get_segment().get_atom(i)); // ugly, correct this
+			molib::Atom &atom = const_cast<molib::Atom &>(state.get_segment().get_atom(i)); // ugly, correct this
 			if (!overlap.count(&atom))
 			{
 				const geometry::Coordinate &crd = state.get_crd(i);
@@ -281,11 +281,11 @@ DockedConformation Linker::IterativeLinker::__reconstruct(const Partial &conform
 		}
 	}
 
-	Molib::Molecule ligand(__ligand);
+	molib::Molecule ligand(__ligand);
 	ligand.set_name(__ligand.name() + "_" + std::to_string(++conf_number));
 
 	// receptor
-	Molib::Molecule receptor(__receptor);
+	molib::Molecule receptor(__receptor);
 	const geometry::Point::Vec &crds = conformation.get_receptor_crds();
 	int i = 0;
 	for (auto &patom : receptor.get_atoms())

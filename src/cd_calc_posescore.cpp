@@ -33,8 +33,8 @@ int main(int argc, char* argv[]) {
                         Version::get_run_info();
                 cerr << help::Options::get_options()->configuration_file() << endl;
 
-                Molib::Molecules receptor_mols;
-                Molib::Molecules ligand_mols;
+                molib::Molecules receptor_mols;
+                molib::Molecules ligand_mols;
 
                 Parser::FileParser drpdb (cmdl.get_string_option("receptor"),
                                           Parser::pdb_read_options::protein_poses_only |
@@ -56,7 +56,7 @@ int main(int argc, char* argv[]) {
                         dlpdb.parse_molecule(ligand_mols);
                 }
 
-                Score::Score score(cmdl.get_string_option("ref"), cmdl.get_string_option("comp"),
+                score::Score score(cmdl.get_string_option("ref"), cmdl.get_string_option("comp"),
                                    cmdl.get_string_option("func"),cmdl.get_int_option("cutoff"));
 
                 if (receptor_mols.get_idatm_types().size() == 1) {
@@ -87,10 +87,10 @@ int main(int argc, char* argv[]) {
                 threads.push_back (std::thread ([&, thread_id] {
                         for (size_t i = thread_id; i < receptor_mols.size(); i+=num_threads) {
                         
-                                Molib::Molecule& protein = receptor_mols[i];
-                                Molib::Molecule& ligand  = ligand_mols[i];
+                                molib::Molecule& protein = receptor_mols[i];
+                                molib::Molecule& ligand  = ligand_mols[i];
 
-                                Molib::Atom::Grid gridrec(protein.get_atoms());                        
+                                molib::Atom::Grid gridrec(protein.get_atoms());                        
 
                                 output[i] = score.non_bonded_energy (gridrec, ligand);
                 } } ));

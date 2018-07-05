@@ -63,7 +63,7 @@ void SystemTopology::loadPlugins(const std::string &extra_dir)
         }
 }
 
-void SystemTopology::mask(Topology &topology, const Molib::Atom::Vec &atoms)
+void SystemTopology::mask(Topology &topology, const molib::Atom::Vec &atoms)
 {
         set<int> substruct;
 
@@ -87,7 +87,7 @@ void SystemTopology::mask(Topology &topology, const Molib::Atom::Vec &atoms)
         bondTorsion->updateParametersInContext(*context);
 }
 
-void SystemTopology::unmask(Topology &topology, const Molib::Atom::Vec &atoms)
+void SystemTopology::unmask(Topology &topology, const molib::Atom::Vec &atoms)
 {
         set<int> substruct;
 
@@ -277,7 +277,7 @@ void SystemTopology::init_particles(Topology &topology)
 
         for (auto &patom : topology.atoms)
         {
-                const Molib::Atom &atom = *patom;
+                const molib::Atom &atom = *patom;
                 const int type = topology.get_type(atom);
 
                 try
@@ -340,7 +340,7 @@ void SystemTopology::init_physics_based_force(Topology &topology)
 
         for (auto &patom : topology.atoms)
         {
-                const Molib::Atom &atom = *patom;
+                const molib::Atom &atom = *patom;
                 const int type = topology.get_type(atom);
 
                 try
@@ -365,9 +365,9 @@ void SystemTopology::init_physics_based_force(Topology &topology)
         for (auto &bond : topology.bonds)
         {
                 dbgmsg("checkpoint0");
-                const Molib::Atom &atom1 = *bond.first;
+                const molib::Atom &atom1 = *bond.first;
                 dbgmsg(atom1);
-                const Molib::Atom &atom2 = *bond.second;
+                const molib::Atom &atom2 = *bond.second;
                 dbgmsg(atom2);
                 const int idx1 = topology.get_index(atom1);
                 dbgmsg(idx1);
@@ -460,8 +460,8 @@ void SystemTopology::init_knowledge_based_force(Topology &topology)
 
                 for (auto &bond : topology.bonds)
                 {
-                        const Molib::Atom &atom1 = *bond.first;
-                        const Molib::Atom &atom2 = *bond.second;
+                        const molib::Atom &atom1 = *bond.first;
+                        const molib::Atom &atom2 = *bond.second;
                         const int idx1 = topology.get_index(atom1);
                         const int idx2 = topology.get_index(atom2);
                         bondPairs.push_back({idx1, idx2});
@@ -479,20 +479,20 @@ void SystemTopology::init_knowledge_based_force(Topology &topology)
         __kbforce_idx = system->addForce(forcefield);
 }
 
-void SystemTopology::retype_amber_protein_atom_to_gaff(const Molib::Atom &atom, int &type)
+void SystemTopology::retype_amber_protein_atom_to_gaff(const molib::Atom &atom, int &type)
 {
 
         // Only retype protein atoms to gaff atoms
-        if (atom.br().rest() != Molib::Residue::protein)
+        if (atom.br().rest() != molib::Residue::protein)
         {
                 // Its the N in the peptide bond needs to be N, not n3....
-                if (atom.element() == Molib::Element::N)
+                if (atom.element() == molib::Element::N)
                 {
                         type = __ffield->gaff_name_to_type.at("n");
                 }
         }
 
-        if (atom.element() == Molib::Element::C)
+        if (atom.element() == molib::Element::C)
         {
                 // C2 == 18 aka the carbon is in the carbonyl
                 if (atom.idatm_type() == 18)
@@ -503,13 +503,13 @@ void SystemTopology::retype_amber_protein_atom_to_gaff(const Molib::Atom &atom, 
         }
 
         // Its the N in the peptide bond
-        if (atom.element() == Molib::Element::N)
+        if (atom.element() == molib::Element::N)
         {
                 type = __ffield->gaff_name_to_type.at("n");
         }
 
         // Its the O in the peptide bond
-        if (atom.element() == Molib::Element::O)
+        if (atom.element() == molib::Element::O)
         {
                 type = __ffield->gaff_name_to_type.at("o");
         }
@@ -546,9 +546,9 @@ void SystemTopology::init_bonded(Topology &topology, const bool use_constraints)
         {
                 dbgmsg("checkpoint0");
 
-                const Molib::Atom &atom1 = *bond.first;
+                const molib::Atom &atom1 = *bond.first;
                 dbgmsg(atom1);
-                const Molib::Atom &atom2 = *bond.second;
+                const molib::Atom &atom2 = *bond.second;
                 dbgmsg(atom2);
                 const int idx1 = topology.get_index(atom1);
                 dbgmsg(idx1);
@@ -560,7 +560,7 @@ void SystemTopology::init_bonded(Topology &topology, const bool use_constraints)
                 dbgmsg(type2);
 
                 // Check for modified residues
-                int number_protein = (atom1.br().rest() == Molib::Residue::protein) + (atom2.br().rest() == Molib::Residue::protein);
+                int number_protein = (atom1.br().rest() == molib::Residue::protein) + (atom2.br().rest() == molib::Residue::protein);
 
                 int number_not_set = (atom1.gaff_type() != "???") + (atom2.gaff_type() != "???");
 
@@ -610,9 +610,9 @@ void SystemTopology::init_bonded(Topology &topology, const bool use_constraints)
         for (auto &angle : topology.angles)
         {
                 dbgmsg("checkpoint4");
-                const Molib::Atom &atom1 = *get<0>(angle);
-                const Molib::Atom &atom2 = *get<1>(angle);
-                const Molib::Atom &atom3 = *get<2>(angle);
+                const molib::Atom &atom1 = *get<0>(angle);
+                const molib::Atom &atom2 = *get<1>(angle);
+                const molib::Atom &atom3 = *get<2>(angle);
                 const int idx1 = topology.get_index(atom1);
                 const int idx2 = topology.get_index(atom2);
                 dbgmsg("checkpoint5");
@@ -623,7 +623,7 @@ void SystemTopology::init_bonded(Topology &topology, const bool use_constraints)
                 dbgmsg("checkpoint6");
 
                 // Check for modified residues
-                int number_protein = (atom1.br().rest() == Molib::Residue::protein) + (atom2.br().rest() == Molib::Residue::protein) + (atom3.br().rest() == Molib::Residue::protein);
+                int number_protein = (atom1.br().rest() == molib::Residue::protein) + (atom2.br().rest() == molib::Residue::protein) + (atom3.br().rest() == molib::Residue::protein);
 
                 int number_not_set = (atom1.gaff_type() != "???") + (atom2.gaff_type() != "???") +
                                      (atom3.gaff_type() != "???");
@@ -671,10 +671,10 @@ void SystemTopology::init_bonded(Topology &topology, const bool use_constraints)
         for (auto &dihedral : topology.dihedrals)
         {
                 dbgmsg("checkpoint9");
-                const Molib::Atom &atom1 = *get<0>(dihedral);
-                const Molib::Atom &atom2 = *get<1>(dihedral);
-                const Molib::Atom &atom3 = *get<2>(dihedral);
-                const Molib::Atom &atom4 = *get<3>(dihedral);
+                const molib::Atom &atom1 = *get<0>(dihedral);
+                const molib::Atom &atom2 = *get<1>(dihedral);
+                const molib::Atom &atom3 = *get<2>(dihedral);
+                const molib::Atom &atom4 = *get<3>(dihedral);
                 const int idx1 = topology.get_index(atom1);
                 const int idx2 = topology.get_index(atom2);
                 const int idx3 = topology.get_index(atom3);
@@ -685,7 +685,7 @@ void SystemTopology::init_bonded(Topology &topology, const bool use_constraints)
                 int type4 = topology.get_type(atom4);
 
                 // Check for modified residues
-                int number_protein = (atom1.br().rest() == Molib::Residue::protein) + (atom2.br().rest() == Molib::Residue::protein) + (atom3.br().rest() == Molib::Residue::protein) + (atom4.br().rest() == Molib::Residue::protein);
+                int number_protein = (atom1.br().rest() == molib::Residue::protein) + (atom2.br().rest() == molib::Residue::protein) + (atom3.br().rest() == molib::Residue::protein) + (atom4.br().rest() == molib::Residue::protein);
 
                 int number_not_set = (atom1.gaff_type() != "???") + (atom2.gaff_type() != "???") +
                                      (atom3.gaff_type() != "???") + (atom4.gaff_type() != "???");
@@ -736,10 +736,10 @@ void SystemTopology::init_bonded(Topology &topology, const bool use_constraints)
         for (auto &dihedral : topology.impropers)
         {
                 dbgmsg("checkpoint10");
-                const Molib::Atom &atom1 = *get<0>(dihedral);
-                const Molib::Atom &atom2 = *get<1>(dihedral);
-                const Molib::Atom &atom3 = *get<2>(dihedral);
-                const Molib::Atom &atom4 = *get<3>(dihedral);
+                const molib::Atom &atom1 = *get<0>(dihedral);
+                const molib::Atom &atom2 = *get<1>(dihedral);
+                const molib::Atom &atom3 = *get<2>(dihedral);
+                const molib::Atom &atom4 = *get<3>(dihedral);
                 const int idx1 = topology.get_index(atom1);
                 const int idx2 = topology.get_index(atom2);
                 const int idx3 = topology.get_index(atom3);
@@ -750,7 +750,7 @@ void SystemTopology::init_bonded(Topology &topology, const bool use_constraints)
                 int type4 = topology.get_type(atom4);
 
                 // Check for modified residues
-                int number_protein = (atom1.br().rest() == Molib::Residue::protein) + (atom2.br().rest() == Molib::Residue::protein) + (atom3.br().rest() == Molib::Residue::protein) + (atom4.br().rest() == Molib::Residue::protein);
+                int number_protein = (atom1.br().rest() == molib::Residue::protein) + (atom2.br().rest() == molib::Residue::protein) + (atom3.br().rest() == molib::Residue::protein) + (atom4.br().rest() == molib::Residue::protein);
 
                 int number_not_set = (atom1.gaff_type() != "???") + (atom2.gaff_type() != "???") +
                                      (atom3.gaff_type() != "???") + (atom4.gaff_type() != "???");

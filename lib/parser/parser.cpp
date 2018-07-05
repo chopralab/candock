@@ -1,6 +1,6 @@
 #include "candock/parser/parser.hpp"
 
-using namespace candock::Molib;
+using namespace candock::molib;
 
 namespace candock {
 namespace Parser {

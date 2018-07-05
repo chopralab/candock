@@ -20,14 +20,14 @@ namespace geometry {
         class Quaternion;
 };
 
-namespace Molib {
+namespace molib {
         class Atom;
         class Molecule;
         class Molecules;
         class NRset;
 }
 
-namespace Score {
+namespace score {
         class Score;
 }
 
@@ -35,7 +35,7 @@ namespace OMMIface {
         class Modeler;
 }
 
-namespace Linker {
+namespace linker {
 	class State;
 	
 	class Linker {
@@ -45,7 +45,7 @@ namespace Linker {
             typedef map<const Segment*, State*> SegStateMap;
             
 		protected:
-			typedef map<const Molib::Atom*, Segment*> AtomToSegment;
+			typedef map<const molib::Atom*, Segment*> AtomToSegment;
 			
 			static const int MAX_ENERGY = 999999;
 			typedef multiset<Partial, Partial::comp> PriorityQueue;
@@ -57,12 +57,12 @@ namespace Linker {
 				const set<State::ConstPair>& get_failed_state_pairs() const { return __fs; }
 			};
 			
-			Molib::Internal __ic;
+			molib::Internal __ic;
 			OMMIface::Modeler &__modeler;
-			const Molib::Molecule &__receptor, &__ligand;
-			const Molib::NRset &__top_seeds;
-			const Molib::Atom::Grid &__gridrec;
-			const Score::Score &__score;
+			const molib::Molecule &__receptor, &__ligand;
+			const molib::NRset &__top_seeds;
+			const molib::Atom::Grid &__gridrec;
+			const score::Score &__score;
 			const double __dist_cutoff, __spin_degrees,
 				__tol_seed_dist, __lower_tol_seed_dist, __upper_tol_seed_dist, 
 				__clash_coeff, __docked_clus_rad,
@@ -104,16 +104,16 @@ namespace Linker {
 			State* __is_seed(const Segment &seg, const SegStateMap &docked_seeds);
 
 			DockedConformation::Vec __minimize_final(DockedConformation::Vec &docked_conformations);
-			void __create_states(const Segment::Graph &segment_graph, const Molib::NRset &top_seeds);
+			void __create_states(const Segment::Graph &segment_graph, const molib::NRset &top_seeds);
 			
 			virtual DockedConformation __a_star(const int segment_graph_size, const Partial &start_conformation, vector<unique_ptr<State>> &states, int iter) = 0;
 			virtual Partial::Vec __generate_rigid_conformations(const Seed::Graph &seed_graph) = 0;
 			virtual DockedConformation __reconstruct(const Partial &conformation) = 0;
 
 		public:
-			GenericLinker(OMMIface::Modeler &modeler, const Molib::Molecule &receptor, 
-				const Molib::Molecule &ligand, const Molib::NRset &top_seeds, 
-				const Molib::Atom::Grid &gridrec, const Score::Score &score, 
+			GenericLinker(OMMIface::Modeler &modeler, const molib::Molecule &receptor, 
+				const molib::Molecule &ligand, const molib::NRset &top_seeds, 
+				const molib::Atom::Grid &gridrec, const score::Score &score, 
 				const double dist_cutoff, const double spin_degrees, 
 				const double tol_seed_dist, const double lower_tol_seed_dist, 
 				const double upper_tol_seed_dist, const int max_possible_conf, 
@@ -165,9 +165,9 @@ namespace Linker {
 		
 		
 	public:
-		Linker(OMMIface::Modeler &modeler, const Molib::Molecule &receptor, const Molib::Molecule &ligand,
-			const Molib::NRset &top_seeds, const Molib::Atom::Grid &gridrec,
-			const Score::Score &score, const bool cuda, const bool iterative, const double dist_cutoff,
+		Linker(OMMIface::Modeler &modeler, const molib::Molecule &receptor, const molib::Molecule &ligand,
+			const molib::NRset &top_seeds, const molib::Atom::Grid &gridrec,
+			const score::Score &score, const bool cuda, const bool iterative, const double dist_cutoff,
 			const double spin_degrees, const double tol_seed_dist,
 			const double lower_tol_seed_dist, const double upper_tol_seed_dist,
 			const int max_possible_conf, const int link_iter,

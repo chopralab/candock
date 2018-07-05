@@ -19,12 +19,12 @@ namespace Parser {
                 class PdbParser : public Parser {
                 public:
                         using Parser::Parser;
-                        void parse_molecule (Molib::Molecules &);
+                        void parse_molecule (molib::Molecules &);
                 };
                 class Mol2Parser : public Parser {
                 public:
                         using Parser::Parser;
-                        void parse_molecule (Molib::Molecules &);
+                        void parse_molecule (molib::Molecules &);
                 };
                 std::shared_ptr<std::istream> molecule_stream;
                 std::unique_ptr<Parser> p;
@@ -37,8 +37,8 @@ namespace Parser {
                 void prepare_parser (std::shared_ptr<std::istream>& stream, const std::string &extension,
                                      unsigned int hm=all_models, const int num_occur=-1);
                 void set_flags (unsigned int hm);
-                bool parse_molecule (Molib::Molecules &mols);
-                Molib::Molecules parse_molecule();
+                bool parse_molecule (molib::Molecules &mols);
+                molib::Molecules parse_molecule();
         };
 }
 

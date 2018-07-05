@@ -7,7 +7,7 @@
 
 namespace candock {
 
-namespace Score
+namespace score
 {
 
 ostream &operator<<(ostream &stream, const KBFF &score)

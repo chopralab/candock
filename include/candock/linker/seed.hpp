@@ -13,15 +13,15 @@
 
 namespace candock {
 
-namespace Linker {
+namespace linker {
 	class State;
 	class Segment;
 	
-	class Seed : public template_vector_container<Seed*, Seed> {
+	class Seed : public molib::template_vector_container<Seed*, Seed> {
 		Segment &__seg;
 	public:
 
-		typedef Glib::Graph<Seed> Graph;
+		typedef graph::Graph<Seed> Graph;
 
 		Seed(Segment &seg) : __seg(seg) {}
 		Segment& get_segment() const { return __seg; } 

@@ -9,7 +9,7 @@
 #include <exception>
 #include "candock/helper/logger.hpp"
 
-using namespace candock::Molib;
+using namespace candock::molib;
 
 namespace candock{
 namespace Cluster {
@@ -47,7 +47,7 @@ namespace Cluster {
 		return reps;
 	}
 
-	Molib::Molecules Cluster::greedy(const Molib::Molecules &initial, const Score::Score &score, Molib::Atom::Grid &gridrec, const double clus_rad) {
+	molib::Molecules Cluster::greedy(const molib::Molecules &initial, const score::Score &score, molib::Atom::Grid &gridrec, const double clus_rad) {
 
 		Benchmark bench;
 
@@ -62,12 +62,12 @@ namespace Cluster {
 	
 		Grid<const LinkedConf<Molecule>> grid(confs); // grid of docked conformations
 
-		Molib::Molecules reps;
+		molib::Molecules reps;
 
 		while (!confs.empty()) {
 			// accept lowest energy conformation as representative
 			const LinkedConf<Molecule> &lowest_point = **confs.begin();
-			reps.add(new Molib::Molecule(lowest_point.get_molecule()));
+			reps.add(new molib::Molecule(lowest_point.get_molecule()));
 			confs.erase(confs.begin());
 			// delete all conformations within RMSD tolerance of this lowest energy yconformation
 			for (auto &pconf : grid.get_neighbors(lowest_point.crd(), clus_rad)) {
@@ -82,27 +82,27 @@ namespace Cluster {
 		return reps;
 	}
 
-	Linker::Partial::Vec Cluster::greedy(const Linker::Partial::Vec &initial, const Molib::Atom::Grid&, const double clus_rad) {
+	linker::Partial::Vec Cluster::greedy(const linker::Partial::Vec &initial, const molib::Atom::Grid&, const double clus_rad) {
 
 		Benchmark bench;
 
-		LinkedConf<Linker::Partial>::UPVec conformations;
+		LinkedConf<linker::Partial>::UPVec conformations;
 		for (auto &molecule : initial) {
-			conformations.push_back(unique_ptr<LinkedConf<Linker::Partial>>(new LinkedConf<Linker::Partial>(const_cast<Linker::Partial&>(molecule), molecule.compute_geometric_center(), molecule.get_energy())));
+			conformations.push_back(unique_ptr<LinkedConf<linker::Partial>>(new LinkedConf<linker::Partial>(const_cast<linker::Partial&>(molecule), molecule.compute_geometric_center(), molecule.get_energy())));
 		}
 
-		set<const LinkedConf<Linker::Partial>*, LinkedConf<Linker::Partial>::by_energy> confs;
+		set<const LinkedConf<linker::Partial>*, LinkedConf<linker::Partial>::by_energy> confs;
 		for (auto &conf : conformations) confs.insert(&*conf);
 
 		dbgmsg("number of conformations to cluster = " << confs.size() << endl << confs);
 	
-		Grid<const LinkedConf<Linker::Partial>> grid(confs); // grid of docked conformations
+		Grid<const LinkedConf<linker::Partial>> grid(confs); // grid of docked conformations
 
-		Linker::Partial::Vec reps;
+		linker::Partial::Vec reps;
 
 		while (!confs.empty()) {
 			// accept lowest energy conformation as representative
-			const LinkedConf<Linker::Partial> &lowest_point = **confs.begin();
+			const LinkedConf<linker::Partial> &lowest_point = **confs.begin();
 			reps.push_back(lowest_point.get_molecule());
 			confs.erase(confs.begin());
 			// delete all conformations within RMSD tolerance of this lowest energy conformation
@@ -137,7 +137,7 @@ namespace Cluster {
 		return os;
 	}
 
-	ostream& operator<<(ostream& os, const set<const Cluster::LinkedConf<Linker::Partial>*, Cluster::LinkedConf<Linker::Partial>::by_energy> &confs)	{
+	ostream& operator<<(ostream& os, const set<const Cluster::LinkedConf<linker::Partial>*, Cluster::LinkedConf<linker::Partial>::by_energy> &confs)	{
 		for (auto &pconf : confs) {
 			os << "linked conformation : " << " crd = " << pconf->crd() 
 				<< " energy = "	<< setprecision(2) 

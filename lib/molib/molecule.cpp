@@ -20,7 +20,7 @@
 using namespace std;
 
 namespace candock {
-namespace Molib {
+namespace molib {
 
         set<int> Molecule::get_idatm_types(set<int> previous) const {
                 for (auto &pa : get_atoms()) {
@@ -396,7 +396,7 @@ namespace Molib {
 	/**
 	 * Copy molecule with new coordinates
 	 */
-	Molecule::Molecule(const Molib::Molecule &rhs, const geometry::Point::Vec &crds) : Molecule(rhs) {
+	Molecule::Molecule(const molib::Molecule &rhs, const geometry::Point::Vec &crds) : Molecule(rhs) {
 
 		auto atoms = get_atoms();
 		for (size_t i = 0; i < atoms.size(); ++i) {

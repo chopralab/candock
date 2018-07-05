@@ -9,13 +9,13 @@ using namespace std;
 
 namespace candock {
 
-namespace Molib {
+namespace molib {
 	class Atom;
 	class Molecule;
 	class Molecules;
 }
 
-namespace Score {
+namespace score {
         class KBFF;
 }
 
@@ -63,7 +63,7 @@ namespace OMMIface {
                 bool has_angle_type(     const string &aclass1, const string &aclass2, const string &aclass3) const;
                 bool has_dihedral_type(  const string &aclass1, const string &aclass2, const string &aclass3, const string &aclass4) const;
                 bool has_improper_type(  const string &aclass1, const string &aclass2, const string &aclass3, const string &aclass4) const;
-                const KBType& get_kb_force_type(const Molib::Atom &atom1, const Molib::Atom &atom2) const;
+                const KBType& get_kb_force_type(const molib::Atom &atom1, const molib::Atom &atom2) const;
                 const KBType& get_kb_force_type(int aclass1, int aclass2) const;
                 const AtomType& get_atom_type(const int type) const;
                 const BondType& get_bond_type(const int type1, const int type2) const;
@@ -73,9 +73,9 @@ namespace OMMIface {
 		ForceField& parse_forcefield_file(const string&);
 		void output_forcefield_file(const string&);
 		ForceField& parse_gaff_dat_file(const string&);
-		ForceField& insert_topology(const Molib::Molecule&);
-		ForceField& erase_topology(const Molib::Molecule&);
-		ForceField& add_kb_forcefield(const Score::KBFF&, double);
+		ForceField& insert_topology(const molib::Molecule&);
+		ForceField& erase_topology(const molib::Molecule&);
+		ForceField& add_kb_forcefield(const score::KBFF&, double);
 		
 		bool residue_exists(const string &name) const { return residue_topology.count(name); }
 	};

@@ -27,7 +27,7 @@ void run_extraction(
     std::ofstream& dihedral_file,
     std::ofstream& improper_file ) {
 
-    Molib::Molecules mols;
+    molib::Molecules mols;
 
     while (input.parse_molecule(mols)) {
 

@@ -33,7 +33,7 @@ namespace Program {
 
                 // If the option given is a regular file, act like previous versions
                 Parser::FileParser rpdb (input_name, Parser::first_model);
-                Molib::Molecules receptors = rpdb.parse_molecule();
+                molib::Molecules receptors = rpdb.parse_molecule();
 
                 /* Compute atom types for receptor and cofactor(s): gaff types for protein,
                  * Mg ions, and water are read from the forcefield xml file later on while
@@ -52,7 +52,7 @@ namespace Program {
                 .compute_rotatable_bonds() // relies on hydrogens being assigned
                 .erase_hydrogen();
 
-                __protein = unique_ptr<Molib::Molecule> ( new Molib::Molecule (std::move (receptors[0])));
+                __protein = unique_ptr<molib::Molecule> ( new molib::Molecule (std::move (receptors[0])));
 
                 // Emulate the original version of candock
                 __protein->set_name (input_name.substr (0, input_name.length() - 4));
@@ -61,12 +61,12 @@ namespace Program {
                 /* Create receptor grid
                  *
                  */
-                Molib::Atom::Grid *gridrec = new Molib::Atom::Grid (__protein->get_atoms());
-                __gridrec = std::unique_ptr<Molib::Atom::Grid> (gridrec);
+                molib::Atom::Grid *gridrec = new molib::Atom::Grid (__protein->get_atoms());
+                __gridrec = std::unique_ptr<molib::Atom::Grid> (gridrec);
 
                 //Just initialize, here (copies strings only) and do not run the calculation
                 Program::FindCentroids *centroids = new FindCentroids(input_name,
-                                                                      __protein->get_chain_ids(Molib::Residue::protein),
+                                                                      __protein->get_chain_ids(molib::Residue::protein),
                                                                       __protein->name());
                 __centroids = std::unique_ptr<Program::FindCentroids>(centroids);
 
@@ -81,9 +81,9 @@ namespace Program {
                         return;
                 }
 
-                Score::Score *score = new Score::Score(cmdl.get_string_option("ref"), cmdl.get_string_option("comp"),
+                score::Score *score = new score::Score(cmdl.get_string_option("ref"), cmdl.get_string_option("comp"),
                                             cmdl.get_string_option("func"),cmdl.get_int_option("cutoff"));
-                __score = std::unique_ptr<Score::Score> (score);
+                __score = std::unique_ptr<score::Score> (score);
 
                 __score->define_composition(__protein->get_idatm_types(),
                                           ligand_fragments.ligand_idatm_types())
@@ -115,11 +115,11 @@ namespace Program {
         void Target::__initialize_kbforce(const FragmentLigands &ligand_fragments) {
                 OMMIface::SystemTopology::loadPlugins();
 
-                Score::KBFF *score = new Score::KBFF(cmdl.get_string_option("ff_ref"), cmdl.get_string_option("ff_comp"),
+                score::KBFF *score = new score::KBFF(cmdl.get_string_option("ff_ref"), cmdl.get_string_option("ff_comp"),
                                             cmdl.get_string_option("ff_func"),cmdl.get_int_option("ff_cutoff"),
                                             cmdl.get_double_option("step"));
 
-                __ff_score = std::unique_ptr<Score::KBFF> (score);
+                __ff_score = std::unique_ptr<score::KBFF> (score);
 
                 __ff_score->define_composition(__protein->get_idatm_types(),
                                           ligand_fragments.ligand_idatm_types())
@@ -164,7 +164,7 @@ namespace Program {
                         __prepseeds = std::unique_ptr<Program::DockFragments> (prepseeds);
                 }
 
-                Docker::Gpoints gpoints = __prepseeds->get_gridhcp();
+                docker::Gpoints gpoints = __prepseeds->get_gridhcp();
                 Inout::output_file(gpoints, Path::join(__protein->name(), cmdl.get_string_option("gridpdb_hcp")));
 
         }
@@ -198,7 +198,7 @@ namespace Program {
                 __dockedlig->run_step();
         }
 
-        void Target::link_fragments(const Molib::Molecules& ligands) {
+        void Target::link_fragments(const molib::Molecules& ligands) {
                 if (__prepseeds == nullptr) {
                         throw Error("You must run dock_fragments first!");
                 }
@@ -212,11 +212,11 @@ namespace Program {
                 __dockedlig->link_ligands(ligands);
         }
 
-        void Target::make_scaffolds(const std::set<std::string>& seeds_to_add, Molib::Molecules& all_designs_out) {
+        void Target::make_scaffolds(const std::set<std::string>& seeds_to_add, molib::Molecules& all_designs_out) {
 
-                Molib::Unique created_design("designed.txt");
+                molib::Unique created_design("designed.txt");
 
-                Molib::NRset nr = __prepseeds->get_top_seeds(seeds_to_add, cmdl.get_double_option("top_percent") );
+                molib::NRset nr = __prepseeds->get_top_seeds(seeds_to_add, cmdl.get_double_option("top_percent") );
                 for ( auto &molecules : nr ) {
                         design::Design designer (molecules.first(), created_design);
                         designer.change_original_name(molecules.name());
@@ -243,9 +243,9 @@ namespace Program {
                 created_design.write_out();
         }
 
-        void Target::design_ligands(const std::set<std::string>& seeds_to_add, Molib::Molecules& all_designs_out) {
+        void Target::design_ligands(const std::set<std::string>& seeds_to_add, molib::Molecules& all_designs_out) {
 
-                Molib::Unique created_design("designed.txt");
+                molib::Unique created_design("designed.txt");
 
                 for ( auto &molecule : __dockedlig->top_poses() ) {
                         design::Design designer ( molecule, created_design);

@@ -91,14 +91,14 @@ namespace Program {
 
                 Inout::output_file (used_seeds.str(),"new_scaffold_seeds.lst");
 
-                Molib::Molecules all_designs;
+                molib::Molecules all_designs;
 
                 log_step << "Starting iteration #0 (making a scaffold)" << endl;
                 const string design_file = "designed_0.pdb";
                 if ( Inout::file_size(design_file) ) {
                         log_note << design_file << " found -- skipping generation of new designs this iteration" << endl;
                         Parser::FileParser dpdb (design_file, Parser::all_models );
-                        Molib::Molecules designs;
+                        molib::Molecules designs;
                         dpdb.parse_molecule(designs);
 
                         all_designs.add(designs);
@@ -157,12 +157,12 @@ namespace Program {
 
                         string design_file = "designed_" + std::to_string(n) + ".pdb";
 
-                        Molib::Molecules all_designs;
+                        molib::Molecules all_designs;
 
                         if ( Inout::file_size(design_file) ) {
                                 log_note << design_file << " found -- skipping generation of new designs this iteration" << endl;
                                 Parser::FileParser dpdb (design_file, Parser::all_models );
-                                Molib::Molecules designs;
+                                molib::Molecules designs;
                                 dpdb.parse_molecule(designs);
 
                                 all_designs.add(designs);

@@ -13,7 +13,7 @@ namespace centro {
 	/* Centroid stuff
 	 * 
 	 */
-	vector<Centroid> split_binding_site(const Molib::Molecules &binding_site_ligands, const double centro_clus_rad) {
+	vector<Centroid> split_binding_site(const molib::Molecules &binding_site_ligands, const double centro_clus_rad) {
 
 		vector<Centroid> centroids;
 		geometry::Point::Vec crds = binding_site_ligands.get_crds();
@@ -41,7 +41,7 @@ namespace centro {
 			throw Error("die : no binding sites could be predicted for this protein - define its binding site(s) using the centroid option");
 		for (auto &kv : binding_site_clusters) {
 			const int bsite_id = kv.first;
-			const Molib::Molecules &binding_site_ligands = kv.second;
+			const molib::Molecules &binding_site_ligands = kv.second;
 			centroids[bsite_id] = split_binding_site(binding_site_ligands, centro_clus_rad);
 			dbgmsg("to better capture the shape of the binding site "
 				<< " it has been split into " << centroids[bsite_id].size() << " centroids");

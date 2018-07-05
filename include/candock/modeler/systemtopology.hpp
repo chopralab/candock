@@ -26,7 +26,7 @@ class PeriodicTorsionForce;
 
 namespace candock {
 
-namespace Molib
+namespace molib
 {
 class Atom;
 class Molecule;
@@ -70,15 +70,15 @@ class SystemTopology
         {
               private:
                 const geometry::Point __crd;
-                Molib::Atom &__atom;
+                molib::Atom &__atom;
 
               public:
-                AtomPoint(const geometry::Point &crd, Molib::Atom &atom) : __crd(crd), __atom(atom) {}
+                AtomPoint(const geometry::Point &crd, molib::Atom &atom) : __crd(crd), __atom(atom) {}
                 const geometry::Point &crd() const
                 {
                         return __crd;
                 }
-                Molib::Atom &get_atom()
+                molib::Atom &get_atom()
                 {
                         return __atom;
                 }
@@ -86,7 +86,7 @@ class SystemTopology
 
                 typedef vector<unique_ptr<AtomPoint>> UPVec;
                 typedef vector<AtomPoint *> PVec;
-                typedef candock::Grid<AtomPoint> Grid;
+                typedef candock::molib::Grid<AtomPoint> Grid;
         };
 
         struct ForceData
@@ -98,15 +98,15 @@ class SystemTopology
         };
         vector<vector<ForceData>> bondStretchData, bondBendData, bondTorsionData;
 
-        void retype_amber_protein_atom_to_gaff(const Molib::Atom &atom, int &type);
+        void retype_amber_protein_atom_to_gaff(const molib::Atom &atom, int &type);
 
       public:
         SystemTopology() : system(nullptr), integrator(nullptr), context(nullptr),
                            __integrator_used(integrator_type::none), __thermostat_idx(-1), __kbforce_idx(-1) {}
         ~SystemTopology();
         static void loadPlugins(const std::string &extra_dir = "");
-        void mask(Topology &topology, const Molib::Atom::Vec &atoms);
-        void unmask(Topology &topology, const Molib::Atom::Vec &atoms);
+        void mask(Topology &topology, const molib::Atom::Vec &atoms);
+        void unmask(Topology &topology, const molib::Atom::Vec &atoms);
 
         void mask_forces(const int atom_idx, const set<int> &substruct);
         void unmask_forces(const int atom_idx, const set<int> &substruct);

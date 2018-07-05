@@ -12,7 +12,7 @@
 #include <exception>
 
 namespace candock{
-namespace Docker {
+namespace docker {
 
         double Dock::DockedConf::compute_rmsd_sq(const Dock::DockedConf &other) const {
         
@@ -43,7 +43,7 @@ namespace Docker {
 		auto &conformations = __conformations.get_conformations();
 		Array1d<bool> rejected(conformations.size());
 
-		Molib::Atom::Vec seed_atoms = __seed.get_atoms();
+		molib::Atom::Vec seed_atoms = __seed.get_atoms();
 
 		// go over all cavity points
 		for (auto &kv : __gpoints.get_gridpoints()) {
@@ -63,8 +63,8 @@ namespace Docker {
 						dbgmsg("testing conformation " << c);
 
 						for (size_t i = 0; i < conf.size(); ++i) {
-							Docker::Gpoints::Gpoint &gpoint0 = *conf[i];
-							Docker::Gpoints::IJK confijk = cavpoint.ijk() + gpoint0.ijk();
+							docker::Gpoints::Gpoint &gpoint0 = *conf[i];
+							docker::Gpoints::IJK confijk = cavpoint.ijk() + gpoint0.ijk();
 
 							dbgmsg("cavpoint.ijk() = " << cavpoint.ijk());
 							dbgmsg("gpoint.ijk() = " << gpoint0.ijk());
@@ -84,26 +84,26 @@ namespace Docker {
 								reje = true;
 								break;
 							}
-							Docker::Gpoints::Gpoint *pgpoint = gmap.data[confijk.i][confijk.j][confijk.k];
-							Molib::Atom &atom = *seed_atoms[i];
+							docker::Gpoints::Gpoint *pgpoint = gmap.data[confijk.i][confijk.j][confijk.k];
+							molib::Atom &atom = *seed_atoms[i];
 							energy_sum += pgpoint->energy(atom.idatm_type());
 							dbgmsg("energy of pgpoint at crd = " << pgpoint->crd() 
 								<< " is " << pgpoint->energy(atom.idatm_type()) 
 								<< " for idatm_type = " << atom.idatm_type());
 							dbgmsg("energy calculated at crd = " << pgpoint->crd() 
 								<< " is " << __score.non_bonded_energy(__gridrec, 
-								Molib::Atom::Vec{&atom}, geometry::Point::Vec{pgpoint->crd()}));
+								molib::Atom::Vec{&atom}, geometry::Point::Vec{pgpoint->crd()}));
 						}
 						// if no clashes were found ...
 						if (!reje) {
 							accepted_tmp.push_back(Dock::DockedConf(cavpoint, conf, energy_sum, c, bsite_id));
 #ifndef NDEBUG
-							Molib::Atom::Vec seed_atoms = __seed.get_atoms();
+							molib::Atom::Vec seed_atoms = __seed.get_atoms();
 							const Gpoints::PGpointVec &points = accepted_tmp.back().get_conf0();
 
 							for (size_t i = 0; i < points.size(); ++i) {
 								
-								Molib::Atom &atom = *seed_atoms[i];
+								molib::Atom &atom = *seed_atoms[i];
 								Docker::Gpoints::Gpoint &gpoint0 = *points[i];
 								Docker::Gpoints::IJK confijk = accepted_tmp.back().get_cavpoint().ijk() + gpoint0.ijk();
 								Docker::Gpoints::Gpoint *pgpoint = gmap.data[confijk.i][confijk.j][confijk.k];
@@ -154,7 +154,7 @@ namespace Docker {
 		set<const Dock::DockedConf*, Dock::DockedConf::by_energy> confs;
 		for (auto &conf : conformations) confs.insert(&conf);
 	
-		Grid<const Dock::DockedConf> cgrid(confs); // grid of docked conformations
+		molib::Grid<const Dock::DockedConf> cgrid(confs); // grid of docked conformations
 
 		while (!confs.empty()) {
 			// accept lowest energy conformation as representative
@@ -179,7 +179,7 @@ namespace Docker {
 
 		__docked.set_name(__seed.name()); // molecules(!) name is seed_id
 		
-		Molib::Atom::Vec seed_atoms = __seed.get_atoms();
+		molib::Atom::Vec seed_atoms = __seed.get_atoms();
 
 		// go over all accepted conformations
 		for (auto &conf : confs) {
@@ -191,16 +191,16 @@ namespace Docker {
 			const Gpoints::PGpointVec &points = conf.get_conf0();
 			for (size_t i = 0; i < points.size(); ++i) {
 
-				Molib::Atom &atom = *seed_atoms[i];
-				Docker::Gpoints::Gpoint &gpoint0 = *points[i];
+				molib::Atom &atom = *seed_atoms[i];
+				docker::Gpoints::Gpoint &gpoint0 = *points[i];
 	
-				Docker::Gpoints::IJK confijk = conf.get_cavpoint().ijk() + gpoint0.ijk();
-				Docker::Gpoints::Gpoint *pgpoint = gmap.data[confijk.i][confijk.j][confijk.k];
+				docker::Gpoints::IJK confijk = conf.get_cavpoint().ijk() + gpoint0.ijk();
+				docker::Gpoints::Gpoint *pgpoint = gmap.data[confijk.i][confijk.j][confijk.k];
 
 				atom.set_crd(pgpoint->crd());
 			}
 			// save the conformation
-			__docked.add(new Molib::Molecule(__seed)).set_name(std::to_string(conf.get_energy())); // molecule name is energy
+			__docked.add(new molib::Molecule(__seed)).set_name(std::to_string(conf.get_energy())); // molecule name is energy
 			dbgmsg("conformation energy = " << conf.get_energy() 
 				<< " calculated energy = " << __score.non_bonded_energy(__gridrec, __seed));
 
@@ -210,5 +210,5 @@ namespace Docker {
 			<< bench.seconds_from_start() << " seconds");
 	}
 
-};
+}
 }

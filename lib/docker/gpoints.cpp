@@ -13,9 +13,9 @@
 using namespace std;
 
 namespace candock{
-namespace Docker {
+namespace docker {
 
-	ostream& operator<<(ostream& os, const candock::Docker::Gpoints::PGpointVec &points)	{
+	ostream& operator<<(ostream& os, const candock::docker::Gpoints::PGpointVec &points)	{
 		for (auto &ppoint : points) {
 			// to add : output of energies
 			os << "ATOM      1   U  DIK     1    " << ppoint->crd().pdb() << endl; 
@@ -23,7 +23,7 @@ namespace Docker {
 		return os;
 	}	
 
-	ostream& operator<<(ostream& os, const candock::Docker::Gpoints::GpointVec &points)	{
+	ostream& operator<<(ostream& os, const candock::docker::Gpoints::GpointVec &points)	{
 		for (auto &point : points) {
 			os << "ATOM      1   U  DIK     1    " << point.crd().pdb() << endl; 
 		}
@@ -50,8 +50,8 @@ namespace Docker {
 			throw;
 		}
 	}
-	Gpoints::Gpoints(const Score::Score &score, const set<int> &ligand_idatm_types, 
-		const centro::Centroids &centroids, const Molib::Atom::Grid &grid, const double &grid_spacing, 
+	Gpoints::Gpoints(const score::Score &score, const set<int> &ligand_idatm_types, 
+		const centro::Centroids &centroids, const molib::Atom::Grid &grid, const double &grid_spacing, 
 		const int &dist_cutoff, const double &excluded_radius, const double &max_interatomic_distance)
 		: __score(&score), __ligand_idatm_types(&ligand_idatm_types) {
 		try {
@@ -63,7 +63,7 @@ namespace Docker {
 		}
 	}
 
-	Gpoints::Gpoints(const centro::Centroids &centroids, Molib::Atom::Grid &grid, const double &grid_spacing, 
+	Gpoints::Gpoints(const centro::Centroids &centroids, molib::Atom::Grid &grid, const double &grid_spacing, 
 		const int &dist_cutoff, const double &excluded_radius, const double &max_interatomic_distance)
 		: __score(nullptr), __ligand_idatm_types(nullptr) {
 		try {
@@ -91,7 +91,7 @@ namespace Docker {
 		return *center_point;
 	}
 
-        void Gpoints::__identify_gridpoints(const centro::Centroids &centroids, const Molib::Atom::Grid &grid, 
+        void Gpoints::__identify_gridpoints(const centro::Centroids &centroids, const molib::Atom::Grid &grid, 
                 const double &grid_spacing, const int &dist_cutoff, const double &excluded_radius, 
                 const double &max_interatomic_distance) {
 #ifndef NDEGUG
@@ -171,8 +171,8 @@ namespace Docker {
                                                                         }
                                                                 }
                                                                 if (is_within_r_of_c) {
-                                                                        for (Molib::Atom *a : grid.get_neighbors(eval, dist_cutoff)) {
-                                                                                Molib::Atom &atom = *a;
+                                                                        for (molib::Atom *a : grid.get_neighbors(eval, dist_cutoff)) {
+                                                                                molib::Atom &atom = *a;
                                                                                 //~ dbgmsg("before getting atom radius");
                                                                                 const double vdW = atom.radius();
                                                                                 //~ dbgmsg("vdW = " << vdW);
@@ -317,5 +317,5 @@ namespace Docker {
 			<< " total gridpoints\n";
 	}
 
-};
+}
 }

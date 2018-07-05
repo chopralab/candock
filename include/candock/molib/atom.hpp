@@ -11,7 +11,7 @@
 
 namespace candock {
 
-namespace Molib {
+namespace molib {
 	class Residue;
 	
 	class Atom : public template_vector_container<Atom*, Atom> {
@@ -22,8 +22,8 @@ namespace Molib {
                 typedef vector<const Atom*> ConstVec;
 		typedef set<Atom*> Set;
                 typedef set<const Atom*> CSet;
-		typedef candock::Grid<Atom> Grid;
-		typedef Glib::Graph<Atom> Graph;
+		typedef candock::molib::Grid<Atom> Grid;
+		typedef graph::Graph<Atom> Graph;
 
 	private:
 		int __atom_number;

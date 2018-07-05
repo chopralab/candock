@@ -56,8 +56,8 @@ namespace OMMIface {
 		return os;
 	}
 
-        const ForceField::KBType& ForceField::get_kb_force_type(const Molib::Atom &atom1, 
-                const Molib::Atom &atom2) const {
+        const ForceField::KBType& ForceField::get_kb_force_type(const molib::Atom &atom1, 
+                const molib::Atom &atom2) const {
                 const int &aclass1 = atom1.idatm_type(); 
                 const int &aclass2 = atom2.idatm_type();
 #ifndef NDEBUG
@@ -309,7 +309,7 @@ namespace OMMIface {
                                      + "-" + aclass2 + "-" + aclass3 + "-" + aclass4);
         }
 
-	ForceField& ForceField::insert_topology(const Molib::Molecule &molecule) {
+	ForceField& ForceField::insert_topology(const molib::Molecule &molecule) {
 		map<const string, const int> atom_name_to_type;
 		for (auto &kv : this->atom_type) {
 			const int &type = kv.first;
@@ -351,7 +351,7 @@ namespace OMMIface {
 		return *this;
 	}
 
-	ForceField& ForceField::erase_topology(const Molib::Molecule &molecule) {
+	ForceField& ForceField::erase_topology(const molib::Molecule &molecule) {
 		for (auto &presidue : molecule.get_residues()) {
 			auto &residue = *presidue;
 			dbgmsg("erasing topology for residue " << residue.resn()
@@ -361,7 +361,7 @@ namespace OMMIface {
 		return *this;
 	}
 
-	ForceField& ForceField::add_kb_forcefield(const Score::KBFF &score, double kb_cutoff) {
+	ForceField& ForceField::add_kb_forcefield(const score::KBFF &score, double kb_cutoff) {
                 this->kb_cutoff = kb_cutoff * OpenMM::NmPerAngstrom;
 		this->step      = score.get_step_nonbond() * OpenMM::NmPerAngstrom;
 		for (auto &kv : score.get_energies()) {

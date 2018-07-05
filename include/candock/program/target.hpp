@@ -21,11 +21,11 @@ namespace Program {
 
         class CANDOCK_EXPORT Target {
 
-                std::unique_ptr <Molib::Molecule>         __protein;
-                std::unique_ptr <Score::Score>            __score;
-                std::unique_ptr <Score::KBFF>             __ff_score;
+                std::unique_ptr <molib::Molecule>         __protein;
+                std::unique_ptr <score::Score>            __score;
+                std::unique_ptr <score::KBFF>             __ff_score;
                 std::unique_ptr <OMMIface::ForceField>    __ffield;
-                std::unique_ptr <Molib::Atom::Grid>       __gridrec;
+                std::unique_ptr <molib::Atom::Grid>       __gridrec;
                 std::unique_ptr <Program::FindCentroids>  __centroids;
                 std::unique_ptr <Program::DockFragments>  __prepseeds;
                 std::unique_ptr <Program::LinkFragments>  __dockedlig;
@@ -45,9 +45,9 @@ namespace Program {
                 void make_gridhcp   (const FragmentLigands &ligand_fragments);
                 void dock_fragments (const FragmentLigands &ligand_fragments);
                 void link_fragments (const FragmentLigands &ligand_fragments);
-                void link_fragments (const Molib::Molecules &ligand_fragments);
-                void make_scaffolds (const std::set<std::string>& seeds_to_add, Molib::Molecules& all_designs_out );
-                void design_ligands (const std::set<std::string>& seeds_to_add, Molib::Molecules& all_designs_out );
+                void link_fragments (const molib::Molecules &ligand_fragments);
+                void make_scaffolds (const std::set<std::string>& seeds_to_add, molib::Molecules& all_designs_out );
+                void design_ligands (const std::set<std::string>& seeds_to_add, molib::Molecules& all_designs_out );
 
                 const DockFragments& get_seeds() const {
                         return *__prepseeds;
