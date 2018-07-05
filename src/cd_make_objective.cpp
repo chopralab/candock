@@ -7,6 +7,7 @@
 #include "candock/drm/drm.hpp"
 
 using namespace std;
+using namespace candock;
 
 ////////////////// GENERATE POTENTIAL FUNCTIONS ///////////////////////////
 

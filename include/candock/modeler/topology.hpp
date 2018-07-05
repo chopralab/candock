@@ -10,6 +10,8 @@
 #include "candock/molib/molecule.hpp"
 using namespace std;
 
+namespace candock {
+
 namespace Molib {
 	class Atom;
 	class Molecule;
@@ -46,7 +48,8 @@ namespace OMMIface {
 	ostream& operator<< (ostream& stream, const Topology::Bonds &bonds);
 	ostream& operator<< (ostream& stream, const Topology::Angles &angles);
 	ostream& operator<< (ostream& stream, const Topology::Dihedrals &dihedrals);
-
-
 };
+
+}
+
 #endif

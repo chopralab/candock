@@ -11,6 +11,8 @@
 #include "candock/helper/debug.hpp"
 #include "candock/helper/help.hpp"
 
+namespace candock {
+
 template<class T> // T needs crd(), distance(), and distance(double) interface
 class Grid {
 public:
@@ -301,4 +303,7 @@ public:
         }
 
 };
+
+}
+
 #endif

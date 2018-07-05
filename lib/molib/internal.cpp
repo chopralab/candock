@@ -10,6 +10,7 @@
 #include "candock/molib/internal.hpp"
 using namespace std;
 
+namespace candock {
 namespace Molib {
 	const Torsion empty_torsion(nullptr, nullptr, nullptr, nullptr);
 
@@ -108,3 +109,4 @@ namespace Molib {
 		return crds;
 	}
 };
+}

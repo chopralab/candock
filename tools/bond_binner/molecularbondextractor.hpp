@@ -17,26 +17,26 @@ private:
     VBondDihedralValues bd;
     VBondDihedralValues bi; // Impropers
 
-    Glib::Graph<Molib::Atom>::Cycles all_rings;
-    Glib::Graph<Molib::Atom>::VertexRingMap all_rings_sizes;
-    std::map<const Molib::Atom*, size_t> substitutions;
+    candock::Glib::Graph<candock::Molib::Atom>::Cycles all_rings;
+    candock::Glib::Graph<candock::Molib::Atom>::VertexRingMap all_rings_sizes;
+    std::map<const candock::Molib::Atom*, size_t> substitutions;
 
-    size_t __ring_size( const Molib::Atom* atom ) const;
+    size_t __ring_size( const candock::Molib::Atom* atom ) const;
 
-    void __print_atom( const Molib::Atom* atom, std::ostream& os, char delim ) const;
+    void __print_atom( const candock::Molib::Atom* atom, std::ostream& os, char delim ) const;
 
-    atom_info __make_atom_info( const Molib::Atom* atom);
+    atom_info __make_atom_info( const candock::Molib::Atom* atom);
     
-    void addStretch (const Molib::Atom* atom1, const Molib::Atom* atom2 );
-    void addAngle   (const Molib::Atom* atom1, const Molib::Atom* atom2, const Molib::Atom* atom3);
-    void addDihedral(const Molib::Atom* atom1, const Molib::Atom* atom2, const Molib::Atom* atom3, const Molib::Atom* atom4);
-    void addImproper(const Molib::Atom* atom1, const Molib::Atom* atom2, const Molib::Atom* atom3, const Molib::Atom* atom4);
+    void addStretch (const candock::Molib::Atom* atom1, const candock::Molib::Atom* atom2 );
+    void addAngle   (const candock::Molib::Atom* atom1, const candock::Molib::Atom* atom2, const candock::Molib::Atom* atom3);
+    void addDihedral(const candock::Molib::Atom* atom1, const candock::Molib::Atom* atom2, const candock::Molib::Atom* atom3, const candock::Molib::Atom* atom4);
+    void addImproper(const candock::Molib::Atom* atom1, const candock::Molib::Atom* atom2, const candock::Molib::Atom* atom3, const candock::Molib::Atom* atom4);
 
 public:
 
     void reset();
 
-    bool addMolecule( const Molib::Molecule& mol );
+    bool addMolecule( const candock::Molib::Molecule& mol );
 
     const VBondStretchValues& stretches() const;
     const VBondAngleValues&    angles() const;

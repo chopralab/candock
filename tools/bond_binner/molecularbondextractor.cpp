@@ -1,5 +1,7 @@
 #include "molecularbondextractor.hpp"
 
+using namespace candock;
+
 namespace AtomInfo {
 
 size_t MolecularBondExtractor::__ring_size( const Molib::Atom* atom ) const {

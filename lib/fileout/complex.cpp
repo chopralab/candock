@@ -2,7 +2,8 @@
 
 #include "candock/molib/bond.hpp"
 
-namespace Fileout {
+namespace candock{
+namespace fileout {
 
         void print_complex_pdb (std::ostream &ss,
                                 const Molib::Molecule &ligand, const Molib::Molecule &receptor,
@@ -58,4 +59,5 @@ namespace Fileout {
 
                 ss << "ENDMDL" << "\n";
         }
+}
 }

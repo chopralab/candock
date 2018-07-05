@@ -5,6 +5,7 @@
 #include <math.h>
 #include "candock/helper/renamerules.hpp"
 
+namespace candock{
 namespace help {
 
 	const IdatmEntry &get_info_map(const string &name) { 
@@ -638,3 +639,4 @@ namespace help {
         }
 
 };
+}

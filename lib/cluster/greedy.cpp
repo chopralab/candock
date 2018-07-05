@@ -9,8 +9,9 @@
 #include <exception>
 #include "candock/helper/logger.hpp"
 
-using namespace Molib;
+using namespace candock::Molib;
 
+namespace candock{
 namespace Cluster {
 
 	/**
@@ -145,4 +146,5 @@ namespace Cluster {
 		return os;
 	}
 
-};
+}
+}

@@ -43,7 +43,7 @@ namespace AtomInfo {
         }
 
         friend std::ostream& operator<< (std::ostream& os, const atom_info& ai) {
-            os << std::setw(3) << help::idatm_unmask[ ai.idatm_type ] << ' ';
+            os << std::setw(3) << candock::help::idatm_unmask[ ai.idatm_type ] << ' ';
             os << ai.ring_size << ' ';
             os << ai.substitutions << ' ';
             return os;

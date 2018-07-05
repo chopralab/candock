@@ -13,7 +13,8 @@
 #include "candock/modeler/systemtopology.hpp"
 
 using namespace std;
-using namespace Program;
+using namespace candock;
+using namespace candock::Program;
 
 ////////////////// TEST SINGLEPOINT ENERGY CALCULATION OF COMPLEX ///////////////////////////
 
@@ -136,7 +137,7 @@ int main(int argc, char *argv[])
                         modeler.mask(protein.get_atoms());
                         const double potential = modeler.potential_energy();
 
-                        Fileout::print_complex_pdb(
+                        fileout::print_complex_pdb(
                                 std::cout,
                                 minimized_ligand,
                                 minimized_receptor,

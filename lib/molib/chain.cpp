@@ -8,6 +8,7 @@
 #include "candock/molib/chain.hpp"
 using namespace std;
 
+namespace candock {
 namespace Molib {
 	ostream& operator<< (ostream& stream, const Chain& c) {
 		for (auto &residue : c) { 
@@ -55,3 +56,4 @@ namespace Molib {
 	}
 
 };
+}

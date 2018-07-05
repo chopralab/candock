@@ -13,6 +13,8 @@
 #include <tuple>
 #include <functional>
 
+namespace candock {
+
 namespace Linker {
 	class State;
 
@@ -63,6 +65,8 @@ namespace Linker {
 		
 
 	};
+}
+
 }
 
 #endif

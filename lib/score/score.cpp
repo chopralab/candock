@@ -8,6 +8,7 @@
 #include <math.h>
 #include <string>
 
+namespace candock {
 namespace Score {
 	ostream& operator<< (ostream& stream, const vector<double> &energy) {
 		for (size_t i = 0; i < energy.size(); ++i) {
@@ -295,4 +296,5 @@ namespace Score {
 		return energy_sum;
 	}
 
-};
+}
+}

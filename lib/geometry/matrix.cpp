@@ -1,6 +1,7 @@
 #include "candock/geometry/matrix.hpp"
 #include "candock/external/json/json.h"
 
+namespace candock{
 namespace geometry {
 
     Matrix::Matrix(const Json::Value& rota, const Json::Value& trans) { // c++11 :-)
@@ -18,5 +19,5 @@ namespace geometry {
             gsl_vector_set(__matrix.second, 1, trans[1].asDouble());
             gsl_vector_set(__matrix.second, 2, trans[2].asDouble());
     }
-
+}
 }

@@ -7,6 +7,8 @@
 
 #include <random>
 
+namespace candock {
+
 namespace Molib {
 	
 	class NRset : public template_map_container<Molecules, NRset, NRset> {
@@ -20,5 +22,7 @@ namespace Molib {
 	};
 
 } // Molib
+
+}
+
 #endif
-	

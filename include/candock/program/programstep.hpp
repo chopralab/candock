@@ -3,6 +3,8 @@
 
 #include "candock/program/cmdlnopts.hpp"
 
+namespace candock {
+
 namespace Program {
 
 	// TODO: Possibly introduce an iterator function to iterator over results
@@ -23,6 +25,8 @@ namespace Program {
 		}
 
 	};
+
+}
 
 }
 

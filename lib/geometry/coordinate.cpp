@@ -11,6 +11,7 @@
 #include "candock/geometry/coordinate.hpp"
 using namespace std;
 
+namespace candock{
 namespace geometry {
 	void Coordinate::rotate_inline(const Matrix &matrix) {
 		gsl_vector *vec1 = gsl_vector_alloc(3);
@@ -54,3 +55,4 @@ namespace geometry {
 		return c;
 	}
 };
+}

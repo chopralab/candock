@@ -3,6 +3,7 @@
 
 using namespace std;
 
+namespace candock{
 namespace Linker {	
 	ostream& operator<<(ostream& os, const DockedConformation &conf)	{
 		os << "start link ++++++++++++++++++++++++++++++" << endl;
@@ -17,4 +18,5 @@ namespace Linker {
 		std::sort(v.begin(), v.end());
 	}
 
-};
+}
+}

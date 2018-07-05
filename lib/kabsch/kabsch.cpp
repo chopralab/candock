@@ -1,5 +1,7 @@
 #include "candock/kabsch/kabsch.hpp"
 
+using namespace candock;
+
 const double Kabsch::__NORM_EPS = 0.00000001;
 /* gsl does not provide it */
 void Kabsch::__gsl_vector_cross(const gsl_vector *a, const gsl_vector *b, gsl_vector *c) {

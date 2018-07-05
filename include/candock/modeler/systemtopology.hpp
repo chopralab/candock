@@ -14,12 +14,6 @@
 
 using namespace std;
 
-namespace Molib
-{
-class Atom;
-class Molecule;
-};
-
 namespace OpenMM
 {
 class System;
@@ -30,9 +24,12 @@ class HarmonicBondForce;
 class PeriodicTorsionForce;
 };
 
-namespace KBPlugin
+namespace candock {
+
+namespace Molib
 {
-class KBForce;
+class Atom;
+class Molecule;
 };
 
 namespace OMMIface
@@ -89,7 +86,7 @@ class SystemTopology
 
                 typedef vector<unique_ptr<AtomPoint>> UPVec;
                 typedef vector<AtomPoint *> PVec;
-                typedef ::Grid<AtomPoint> Grid;
+                typedef candock::Grid<AtomPoint> Grid;
         };
 
         struct ForceData
@@ -143,4 +140,7 @@ class SystemTopology
         }
 };
 };
+
+}
+
 #endif

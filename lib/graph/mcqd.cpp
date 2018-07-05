@@ -2,6 +2,7 @@
 #include "candock/helper/help.hpp"
 #include <utility>
 
+namespace candock{
 //~ Maxclique::Maxclique (const Array2d<bool> &conn, const vector<double> &scores, const float tt) : __conn(conn), __scores(scores), pk(0), level(1), Tlimit(tt), V(conn.get_szi()), Q(conn.get_szi()), QMAX(conn.get_szi()) {
 Maxclique::Maxclique (const Array2d<bool> &conn, const float tt) : __conn(conn), pk(0), level(1), Tlimit(tt), V(conn.get_szi()), QMAX(conn.get_szi()), Q(conn.get_szi()) {
   if (conn.get_szi()==0) throw Error("Error: Graph is empty."); // fixes issue #116
@@ -226,4 +227,4 @@ void Maxclique::expand_dyn(Vertices R) {
     R.pop();
   }
 }
-
+}

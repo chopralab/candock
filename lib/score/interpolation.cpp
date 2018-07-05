@@ -11,6 +11,8 @@
 #include <assert.h>
 #include "candock/score/interpolation.hpp"
 
+namespace candock {
+
 namespace Score {
 namespace Interpolation {
 	vector<double> derivative(const vector<double> &y, const double step) {
@@ -147,4 +149,6 @@ namespace Interpolation {
 
         }
 }
+}
+
 }

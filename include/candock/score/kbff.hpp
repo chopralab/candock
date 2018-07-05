@@ -2,6 +2,8 @@
 #define KBFF_H
 #include "candock/score/score.hpp"
 
+namespace candock {
+
 namespace Score {
     class KBFF : public Score {
         AtomPairValues __energies, __derivatives; // objective function
@@ -22,6 +24,7 @@ namespace Score {
 
         friend ostream& operator<< (ostream& stream, const KBFF &kbff);
     };
+}
 }
 
 #endif

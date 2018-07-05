@@ -8,6 +8,7 @@
 #include "candock/fragmenter/unique.hpp"
 
 using namespace std;
+using namespace candock;
 
 namespace po = boost::program_options;
 
@@ -62,7 +63,7 @@ int main(int argc, char* argv[]) {
                                         Molib::Molecules mods =  design::Design::functionalize_hydrogens_with_single_atoms(mol,atom_types[0]);
 
                                         for (const auto& mol2 : mods)
-                                                Fileout::print_mol2(std::cout, mol2);
+                                                fileout::print_mol2(std::cout, mol2);
                                 }
 
                                 mols.clear();

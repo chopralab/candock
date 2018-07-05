@@ -3,6 +3,8 @@
 #include "candock/ligands/common.hpp"
 #include "candock/external/json/json.h"
 
+namespace candock{
+
 ostream& operator<< (ostream& stream, const ResidueSet& residues) {
 	for (auto &presidue : residues)
 		stream << *presidue << endl;
@@ -50,4 +52,5 @@ namespace common_ligands {
 		//~ return {a, b};
 		return result;
 	}
+}
 }

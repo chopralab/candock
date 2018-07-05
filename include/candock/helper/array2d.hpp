@@ -7,6 +7,8 @@
 
 using namespace std;
 
+namespace candock {
+
 template<typename T>
 struct Array2d {
         T **data;
@@ -191,5 +193,7 @@ public:
         }
 
 };
+
+}
 
 #endif

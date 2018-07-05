@@ -1,9 +1,10 @@
 #ifndef CENTROIDS_H
 #define CENTROIDS_H
 
-
 #include "candock/geometry/coordinate.hpp"
 #include "candock/ligands/genlig.hpp"
+
+namespace candock {
 
 namespace centro {
 
@@ -27,6 +28,8 @@ namespace centro {
 	// object they are overloading
 	// See http://clang.llvm.org/compatibility.html#dep_lookup for details
 	ostream& operator<<(ostream& os, const centro::Centroids& centroids);
+}
+
 }
 
 #endif

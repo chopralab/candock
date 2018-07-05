@@ -5,6 +5,8 @@
 #include <assert.h>
 #include "candock/helper/debug.hpp"
 
+namespace candock {
+
 namespace Glib {
         typedef unsigned short node_id;
         static const node_id NULL_NODE=0xFFFF;
@@ -262,6 +264,8 @@ namespace Glib {
 
                 return stream;
         }
+
+}
 
 }
 

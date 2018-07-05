@@ -4,6 +4,8 @@
 #include "candock/molib/molecule.hpp"
 using namespace std;
 
+namespace candock {
+
 namespace genlig {
 	typedef map<int, Molib::Molecules> BindingSiteClusters;
 	typedef map<int, double> BindingSiteScores;
@@ -22,7 +24,6 @@ namespace Molib {
     ostream& operator<<(ostream& os, const map<int, Molib::Molecules>& bsites);
 }
 
-namespace std {
 	ostream& operator<<(ostream& os, const map<int, double>& bscores);
 }
 

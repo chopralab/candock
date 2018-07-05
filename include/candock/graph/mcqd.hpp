@@ -35,6 +35,8 @@
 
 using namespace std;
 
+namespace candock {
+
 class Maxclique {
 public:
 
@@ -138,4 +140,7 @@ public:
   //~ set<pair<vector<unsigned short int>, double>, Maxclique::comp>& mcqw(const int minsz);
 
 };
+
+}
+
 #endif

@@ -10,6 +10,8 @@
 #include "candock/molib/it.hpp"
 #include "candock/molib/atom.hpp"
 
+namespace candock {
+
 namespace Molib {
 	class Atom;
 	class Molecule;
@@ -23,4 +25,7 @@ namespace Molib {
                 std::tuple<double, size_t, size_t, size_t> determine_lipinski(const Atom::Vec &atoms);
 	};
 };
+
+}
+
 #endif

@@ -9,6 +9,8 @@
 #include "candock/molib/bond.hpp"
 #include "candock/graph/graph.hpp"
 
+namespace candock {
+
 namespace Molib {
 	class Residue;
 	
@@ -20,7 +22,7 @@ namespace Molib {
                 typedef vector<const Atom*> ConstVec;
 		typedef set<Atom*> Set;
                 typedef set<const Atom*> CSet;
-		typedef ::Grid<Atom> Grid;
+		typedef candock::Grid<Atom> Grid;
 		typedef Glib::Graph<Atom> Graph;
 
 	private:
@@ -127,4 +129,7 @@ namespace Molib {
         ostream& operator<< (ostream& stream, const Atom::Set &atoms);
         ostream& operator<< (ostream& stream, const Atom::Vec &atoms);
 };
+
+}
+
 #endif

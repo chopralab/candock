@@ -17,6 +17,8 @@
 #include "candock/helper/error.hpp"
 using namespace std;
 
+namespace candock {
+
 namespace geometry {
 	class Matrix;
 	class Coordinate {
@@ -76,6 +78,8 @@ namespace geometry {
 			return stream;
 		}
 	};
+}
+
 }
 
 #endif

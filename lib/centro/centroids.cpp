@@ -7,6 +7,7 @@
 #include "candock/parser/fileparser.hpp"
 #include "candock/cluster/greedy.hpp"
 
+namespace candock{
 namespace centro {
 
 	/* Centroid stuff
@@ -80,4 +81,5 @@ namespace centro {
 		return os;
 	}
 
-};
+}
+}

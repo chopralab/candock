@@ -18,6 +18,7 @@
 
 using namespace std;
 
+namespace candock {
 namespace Molib {
 
 	ostream& operator<< (ostream& stream, const NRset& m) {
@@ -60,3 +61,4 @@ namespace Molib {
 
 
 };
+}

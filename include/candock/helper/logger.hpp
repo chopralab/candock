@@ -6,6 +6,8 @@
 
 #include "candock/candockexport.hpp"
 
+namespace candock {
+
 namespace Inout {
 
         enum Severity {
@@ -67,6 +69,8 @@ namespace Inout {
                 }
 
         };
+}
+
 }
 
 #define log_note      Inout::Logger::log<Inout::Severity::CD_NOTE>()

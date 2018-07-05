@@ -1,7 +1,8 @@
 #include "candock/parser/fileparser.hpp"
 
-using namespace Molib;
+using namespace candock::Molib;
 
+namespace candock {
 namespace Parser {
         void FileParser::Mol2Parser::parse_molecule (Molecules &mols) {
                 vector<string> mol2_raw;
@@ -129,4 +130,5 @@ namespace Parser {
                         }
                 }
         }
+}
 }

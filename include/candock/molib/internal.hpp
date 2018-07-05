@@ -9,6 +9,8 @@
 #include <queue>
 #include <algorithm>
 
+namespace candock {
+
 namespace Molib {
 	class Atom;
 	struct Torsion {
@@ -41,4 +43,7 @@ namespace Molib {
 		double get_dihedral(const Torsion &t) const { return __ic_dihedral.at(t.a1).at(t.a2).at(t.a3).at(t.a4); }
 	};
 };
+
+}
+
 #endif

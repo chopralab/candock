@@ -15,8 +15,8 @@
 
 using namespace std;
 
-namespace Linker
-{
+namespace candock {
+namespace Linker {
 
 /**
 	 * Iterative minimization starts from each seed in the docked molecule. 
@@ -297,3 +297,4 @@ DockedConformation Linker::IterativeLinker::__reconstruct(const Partial &conform
 	return DockedConformation(ligand, receptor, conformation.get_energy(), 0, 0);
 }
 };
+}

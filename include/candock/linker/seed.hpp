@@ -11,6 +11,8 @@
 #include <tuple>
 #include <functional>
 
+namespace candock {
+
 namespace Linker {
 	class State;
 	class Segment;
@@ -30,4 +32,7 @@ namespace Linker {
 	
 	};
 };
+
+}
+
 #endif

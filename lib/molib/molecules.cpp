@@ -21,6 +21,7 @@
 
 using namespace std;
 
+namespace candock {
 namespace Molib {
 
 	ostream& operator<< (ostream& stream, const Molecules& m) {
@@ -151,7 +152,7 @@ namespace Molib {
                         if (!(help::standard_residues.count(residue.resn())
                             || help::cofactor_residues.count(residue.resn())
                             || help::ions.count(residue.resn()))) {
-                                ::Molib::compute_chirality(residue.get_atoms());
+                                candock::Molib::compute_chirality(residue.get_atoms());
                         }
                 }
                 return *this; 
@@ -295,3 +296,4 @@ namespace Molib {
         }
 
 };
+}

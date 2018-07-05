@@ -3,6 +3,8 @@
 
 #include "candock/helper/array2d.hpp"
 
+namespace candock {
+
 namespace Docker {
 
 	class Conformations {
@@ -29,6 +31,8 @@ namespace Docker {
 
 		friend ostream& operator<<(ostream& os, const Conformations &conformations);
 	};
-};
+}
+
+}
 
 #endif

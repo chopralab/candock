@@ -16,6 +16,7 @@
 #include "candock/ligands/genlig.hpp"
 using namespace std;
 
+namespace candock{
 namespace genlig {
 	ResidueSet find_neighbor_residues(Molib::Molecule &ligand, Molib::Atom::Grid &grid) {
 		ResidueSet neighbor_residues;
@@ -309,13 +310,12 @@ namespace Molib {
 	}
 }
 
-namespace std {
-	ostream& operator<<(ostream& os, const map<int, double>& bscores) {
-		for (auto &kv : bscores) {
-			const int &cluster_number = kv.first;
-			const double &z_score = kv.second;
-			os << cluster_number << " " << z_score << endl;
-		}
-		return os;
+ostream& operator<<(ostream& os, const map<int, double>& bscores) {
+	for (auto &kv : bscores) {
+		const int &cluster_number = kv.first;
+		const double &z_score = kv.second;
+		os << cluster_number << " " << z_score << endl;
 	}
+	return os;
+}
 }

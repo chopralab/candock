@@ -19,6 +19,7 @@
 #include "candock/helper/error.hpp"
 #include "candock/score/powerfit.hpp"
 
+namespace candock {
 namespace Score {
 
         struct data {
@@ -276,4 +277,5 @@ namespace Score {
                 return std::make_tuple (best_sigma, best_b, best_p);
         }
 
+}
 }

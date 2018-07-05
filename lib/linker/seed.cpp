@@ -4,6 +4,7 @@
 #include "candock/helper/benchmark.hpp"
 #include "candock/helper/help.hpp"
 
+namespace candock{
 namespace Linker {
 	ostream& operator<< (ostream& stream, const Seed& s) {
 		return stream << "Seed = " << s.get_segment().get_seed_id() << endl;
@@ -34,6 +35,5 @@ namespace Linker {
 		}
 		return Seed::Graph(std::move(vertices), true, false);
 	}
-
-
 };
+}

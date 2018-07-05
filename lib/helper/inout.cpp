@@ -27,6 +27,7 @@
 #include "candock/helper/debug.hpp"
 #include "candock/helper/logger.hpp"
 
+namespace candock{
 namespace Inout {
 
         int Logger::__application_setting = Severity::CD_ERROR;
@@ -207,3 +208,4 @@ namespace Inout {
                 return filenames;
 	}
 };
+}

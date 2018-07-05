@@ -7,6 +7,8 @@
 #include "candock/fragmenter/unique.hpp"
 #include "candock/helper/logger.hpp"
 
+namespace candock {
+
 namespace design {
 
 	Design::Design(const Molib::Molecule &start, Molib::Unique &existing) : __original(start), __existing(existing) {
@@ -338,6 +340,6 @@ namespace design {
         void design::Design::change_original_name(const std::string& name) {
                 __original.set_name(name);
         }
-
+}
 
 }

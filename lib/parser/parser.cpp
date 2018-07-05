@@ -1,7 +1,8 @@
 #include "candock/parser/parser.hpp"
 
-using namespace Molib;
+using namespace candock::Molib;
 
+namespace candock {
 namespace Parser {
 
         void Parser::__generate_molecule(Molecules &mols, bool &found_molecule, const std::string &name) {
@@ -45,4 +46,5 @@ namespace Parser {
         void Parser::set_hm(unsigned int hm) {
             __hm = hm;
         }
+}
 }

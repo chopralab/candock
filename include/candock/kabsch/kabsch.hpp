@@ -10,6 +10,8 @@
 #include "candock/geometry/matrix.hpp"
 #include "candock/geometry/coordinate.hpp"
 
+namespace candock {
+
 class Kabsch {
 	gsl_matrix *__X, *__Y;
 	gsl_matrix *__U;
@@ -38,5 +40,8 @@ public:
 	}
 	geometry::Matrix get_rota() const { return geometry::Matrix(__U, __t); }
 };
+
+}
+
 #endif // KABSCH_H
 

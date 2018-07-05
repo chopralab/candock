@@ -5,10 +5,11 @@
 #include <math.h>
 #include <boost/filesystem.hpp>
 
-
+namespace candock{
 string Path::join(const string &str1, const string &str2) {
 	boost::filesystem::path p1 (str1);
 	boost::filesystem::path p2 (str2);
 	p1 /= p2;
 	return  p1.string();
+}
 }

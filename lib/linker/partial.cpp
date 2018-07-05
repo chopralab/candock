@@ -13,6 +13,7 @@
 
 using namespace std;
 
+namespace candock{
 namespace Linker {
 
 	ostream& operator<<(ostream& os, const Partial &le)	{
@@ -126,4 +127,5 @@ namespace Linker {
 		return atoms;
 	}
 
+}
 }

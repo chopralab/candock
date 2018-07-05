@@ -23,6 +23,7 @@
 #include "candock/molib/bondtype.hpp"
 using namespace std;
 
+namespace candock {
 namespace Molib {
 	ostream& operator<< (ostream& os, const ValenceState& valence_state) {
 		for (auto &kv : valence_state) {
@@ -366,3 +367,4 @@ namespace Molib {
 		throw BondOrderError("exception : discrepancies happened for all 3 bond orders");	
 	}
 };
+}

@@ -13,6 +13,7 @@
 #include "candock/molib/assembly.hpp"
 using namespace std;
 
+namespace candock {
 namespace Molib {
 	ostream& operator<< (ostream& stream, const Assembly& a) {
 		stream << setw(6) << left << "REMARK   6 " << a.name() << " " << a.number() << endl;
@@ -52,3 +53,4 @@ namespace Molib {
 
 
 };
+}

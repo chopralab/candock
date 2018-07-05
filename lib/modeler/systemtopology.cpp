@@ -29,6 +29,7 @@
 
 using namespace std;
 
+namespace candock {
 namespace OMMIface
 {
 
@@ -838,3 +839,4 @@ void SystemTopology::dynamics(const int steps)
         integrator->step(steps);
 }
 };
+}

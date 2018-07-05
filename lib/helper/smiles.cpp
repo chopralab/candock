@@ -1,5 +1,6 @@
 #include "candock/helper/smiles.hpp"
 
+namespace candock{
 namespace help {
 	ostream& operator<<(ostream& os, const smiles& edges) {
 		for (auto &e : edges)
@@ -16,4 +17,5 @@ namespace help {
 		//~ os << endl;
 		return os;
 	}
+}
 }

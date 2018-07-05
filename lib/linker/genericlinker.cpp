@@ -12,6 +12,7 @@
 
 using namespace std;
 
+namespace candock{
 namespace Linker {
 
 	/**
@@ -504,3 +505,4 @@ namespace Linker {
 	}
 
 };
+}

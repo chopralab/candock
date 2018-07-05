@@ -8,6 +8,7 @@
 #include "candock/helper/error.hpp"
 #include "candock/helper/inout.hpp"
 
+namespace candock{
 JsonReader::iterator JsonReader::find(const vector<pair<const string, const string> > &kv) {
 	for(Json::ValueIterator itr = __root.begin() ; itr != __root.end() ; itr++ ) {
 		unsigned int i = 0;
@@ -76,4 +77,4 @@ void JsonReader::parse_JSON(const string JSON_file) {
 		throw Error("die : need a .json file");
 	}	
 }
-
+}

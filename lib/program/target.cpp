@@ -18,6 +18,7 @@
 
 #include "candock/fileout/fileout.hpp"
 
+namespace candock {
 namespace Program {
 
         Target::Target (const std::string &input_name) {
@@ -274,4 +275,5 @@ namespace Program {
 
                 created_design.write_out();
         }
+}
 }

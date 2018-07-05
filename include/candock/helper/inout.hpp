@@ -5,6 +5,8 @@
 #include <sstream>
 #include <vector>
 
+namespace candock {
+
 namespace Inout {
         enum f_not_found {panic=0, no_panic=1};
         size_t  file_size(const std::string &name);
@@ -44,4 +46,7 @@ namespace Inout {
                 file_open_put_stream(filename, ss, mode);
 	}
 };
+
+}
+
 #endif

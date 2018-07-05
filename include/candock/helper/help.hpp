@@ -11,6 +11,8 @@
 #include "candock/helper/debug.hpp"
 using namespace std;
 
+namespace candock {
+
 namespace help {
 	string memusage(const string&);
 	std::tuple<double, double, double> gnuplot(const double &x1, const double &x2, const string &datapoints);
@@ -1000,5 +1002,8 @@ namespace help {
 
 	vector<vector<string>> get_replacement(const vector<string> &initial);
 
-};
+}
+
+}
+
 #endif

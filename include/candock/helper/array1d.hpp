@@ -4,6 +4,8 @@
 #include <stdio.h>
 #include <string.h>
 
+namespace candock {
+
 template<typename T>
 struct Array1d {
         T *data;
@@ -47,6 +49,8 @@ ostream &operator<< (ostream &stream, const Array1d<T> &s) {
         }
 
         return stream;
+}
+
 }
 
 #endif

@@ -1,5 +1,6 @@
 #include "candock/helper/grep.hpp"
 
+namespace candock{
 size_t Grep::count_matches(std::istream& stream, const boost::regex& regex) {
 	size_t count = 0;
 
@@ -54,4 +55,5 @@ std::vector<std::string> Grep::search_stream(std::istream& stream, const boost::
 	}
 
 	return all_matches;
+}
 }

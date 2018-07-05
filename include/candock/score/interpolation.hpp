@@ -5,6 +5,8 @@
 #include <gsl/gsl_bspline.h>
 #include <gsl/gsl_multifit.h>
 
+namespace candock {
+
 namespace Score {
         namespace Interpolation {
                 std::vector<double> derivative(const std::vector<double> &y, const double step);
@@ -31,6 +33,8 @@ namespace Score {
                         std::vector<double> interpolate_bspline( const double start, const double end, const double step );
                 };
         }
+}
+
 }
 
 #endif

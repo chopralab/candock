@@ -7,8 +7,9 @@
 #include <boost/algorithm/string.hpp>
 
 using namespace std;
-using namespace Molib;
+using namespace candock::Molib;
 
+namespace candock {
 namespace Parser {
 
         void FileParser::PdbParser::parse_molecule (Molecules &mols) {
@@ -482,4 +483,5 @@ namespace Parser {
                         }
                 }
         }
+}
 }

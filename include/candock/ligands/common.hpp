@@ -3,6 +3,8 @@
 
 #include "candock/molib/residue.hpp"
 
+namespace candock {
+
 namespace Molib {
 	class Residue;
 	class Molecules;
@@ -21,5 +23,7 @@ namespace common_ligands {
 	pair<ResSet, ResSet> json_to_set(Json::Value aligned_residues);
 	ResMap json_to_map_reverse(Json::Value aligned_residues);
 };
+
+}
 
 #endif

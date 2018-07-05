@@ -10,6 +10,8 @@
 #include "candock/docker/dock.hpp"
 #include "candock/molib/nrset.hpp"
 
+namespace candock {
+
 namespace Program {
 
         class DockFragments : public ProgramStep
@@ -49,6 +51,8 @@ namespace Program {
 
                 Docker::Gpoints get_gridhcp();
         };
+
+}
 
 }
 

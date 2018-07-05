@@ -11,7 +11,8 @@
 #include "candock/fileout/fileout.hpp"
 
 using namespace std;
-using namespace Program;
+using namespace candock;
+using namespace candock::Program;
 
 ////////////////// TEST SINGLEPOINT ENERGY CALCULATION OF COMPLEX ///////////////////////////
 
@@ -29,7 +30,7 @@ int main(int argc, char* argv[]) {
                         input.parse_molecule(mols);
 
                         for (const auto &m : mols) {
-                                Fileout::print_mol2(std::cout,m);
+                                fileout::print_mol2(std::cout,m);
                         }
                 }
 

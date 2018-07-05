@@ -8,6 +8,8 @@
 #include "candock/molib/molecules.hpp"
 #include "candock/parser/fileparser.hpp"
 
+namespace candock {
+
 namespace Program {
 
         class CANDOCK_EXPORT FragmentLigands : public ProgramStep {
@@ -49,6 +51,8 @@ namespace Program {
                 }
 
         };
+
+}
 
 }
 

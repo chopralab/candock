@@ -14,6 +14,8 @@
 #include "candock/linker/partial.hpp"
 #include "candock/linker/dockedconformation.hpp"
 
+namespace candock {
+
 namespace geometry {
         class Quaternion;
 };
@@ -179,4 +181,7 @@ namespace Linker {
 	};
 
 };
+
+}
+
 #endif

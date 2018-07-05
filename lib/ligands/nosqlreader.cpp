@@ -8,6 +8,7 @@
 #include "candock/helper/error.hpp"
 #include "candock/helper/inout.hpp"
 
+namespace candock{
 void NosqlReader::parse_NOSQL(const string NOSQL_file) {
 	vector<string> vec;
 	boost::smatch m;
@@ -31,4 +32,5 @@ void NosqlReader::parse_dir_of_NOSQL(const string NOSQL_dir) {
 		//~ cout << f << endl;
 		parse_NOSQL(f);
 	}
+}
 }

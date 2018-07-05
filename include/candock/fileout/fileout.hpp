@@ -5,8 +5,9 @@
 #include <cmath>
 #include "candock/molib/molecule.hpp"
 
-namespace Fileout {
+namespace candock {
 
+namespace fileout {
     void print_complex_pdb( std::ostream &ss,
                         const Molib::Molecule &ligand, const Molib::Molecule &receptor,
                         const double energy, const double potential = 0.0,
@@ -14,6 +15,8 @@ namespace Fileout {
                         const double rmsd = std::nan(""));
 
     void print_mol2( std::ostream &ss, const Molib::Molecule &ligand );
-};
+}
+
+}
 
 #endif

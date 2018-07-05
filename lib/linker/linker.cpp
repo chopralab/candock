@@ -13,6 +13,7 @@
 
 using namespace std;
 
+namespace candock{
 namespace Linker {
 
 	Linker::Linker(OMMIface::Modeler &modeler, const Molib::Molecule &receptor, 
@@ -52,3 +53,4 @@ namespace Linker {
 	}
 
 };
+}

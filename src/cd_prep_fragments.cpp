@@ -7,6 +7,7 @@
 ////////////////// FRAGMENTING OF LIGANDS ///////////////////////////
 
 using namespace std;
+using namespace candock;
 
 int main(int argc, char* argv[]) {
         try {

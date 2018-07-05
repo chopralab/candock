@@ -13,6 +13,8 @@
 #include <cmath>
 #include "candock/helper/array1d.hpp"
 
+namespace candock {
+
 namespace Molib {
         class Molecule;
         class Molecules;
@@ -67,6 +69,8 @@ namespace Score {
                 friend ostream& operator<< (ostream& stream, const Score::AtomPairValues &energies);
                 friend ostream& operator<< (ostream& stream, const Score &score);
         };
+}
+
 }
 
 #endif

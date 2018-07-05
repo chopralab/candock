@@ -2,6 +2,7 @@
 #include "candock/molib/molecule.hpp"
 #include "candock/fragmenter/fragmenter.hpp"
 
+namespace candock{
 namespace Molib {
 	ostream& operator<<(ostream& os, const Unique::USeeds& useeds) {
 		for (auto &kv : useeds) {
@@ -179,4 +180,5 @@ namespace Molib {
                 }
         }
 
+}
 }

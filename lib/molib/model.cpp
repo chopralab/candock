@@ -12,6 +12,7 @@
 #include "candock/molib/model.hpp"
 using namespace std;
 
+namespace candock {
 namespace Molib {
 	ostream& operator<< (ostream& stream, const Model& m) {
 		stream << setw(6) << left << "MODEL" << setw(4) << " " << setw(4) 
@@ -124,3 +125,4 @@ namespace Molib {
 	}
 
 };
+}

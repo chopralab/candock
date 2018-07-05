@@ -4,6 +4,7 @@
 #include "candock/helper/benchmark.hpp"
 #include "candock/helper/help.hpp"
 
+namespace candock {
 namespace Linker {
 	
 	State::Vec operator-(const State::Set& left, const State::Set& right) { 
@@ -67,3 +68,4 @@ namespace Linker {
 		return stream;
 	}
 };
+}

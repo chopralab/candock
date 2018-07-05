@@ -7,6 +7,8 @@
 
 using namespace std;
 
+namespace candock {
+
 namespace help {
 	struct edge { 
 		string atom_property1;
@@ -23,6 +25,8 @@ namespace help {
 
 	ostream& operator<<(ostream& os, const smiles& edges);
 	ostream& operator<<(ostream& os, const rename_rule& rule);
+}
+
 }
 
 #endif

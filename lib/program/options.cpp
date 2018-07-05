@@ -1,5 +1,6 @@
 #include "candock/program/options.hpp"
 
+namespace candock {
 namespace help {
         std::unique_ptr<Options> Options::__current_options(nullptr);
 
@@ -16,4 +17,5 @@ namespace help {
                 __current_options.reset(opts);
         }
 
+}
 }

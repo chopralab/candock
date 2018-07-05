@@ -1,5 +1,6 @@
 #include "candock/graph/mnts.hpp"
 
+namespace candock{
 void MNTS::initialize() {
 	srand( (unsigned) time( NULL ) );
 	Iteration = unique_ptr<int[]>(new int [iter]);
@@ -624,4 +625,5 @@ void MNTS::max_tabu(int ii) {
 	dbgmsg("i = " << ii << " l = " << lbest);
 	//~ return lbest;
 	//~ cout << "time to find one max.weight clique " << Benchmark::seconds_from_start() << " wallclock seconds" << endl;
+}
 }

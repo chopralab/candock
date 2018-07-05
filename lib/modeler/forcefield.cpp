@@ -16,7 +16,8 @@
 #include <string>
 #include <sstream>
 using namespace std;
-//
+
+namespace candock {
 namespace OMMIface {
 	ostream& operator<< (ostream& stream, const ForceField::ResidueTopology& r) {
 		for (auto &kv : r.atom) {
@@ -846,4 +847,5 @@ namespace OMMIface {
 		delete [] c_ff_file;
 		return *this;
 	}
+}
 }

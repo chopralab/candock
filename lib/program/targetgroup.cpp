@@ -1,6 +1,7 @@
 #include "candock/program/targetgroup.hpp"
 #include "candock/fileout/fileout.hpp"
 
+namespace candock {
 namespace Program {
 
         TargetGroup::TargetGroup(const std::string& input_name) {
@@ -123,7 +124,7 @@ namespace Program {
                 
                 std::stringstream ss;
                 for (const auto &m : all_designs) {
-                        Fileout::print_mol2(ss,m);
+                        fileout::print_mol2(ss,m);
                 }
                 Inout::output_file(ss.str(), "designed_0.mol2");
 
@@ -192,7 +193,7 @@ namespace Program {
 
                         std::stringstream ss;
                         for (const auto &m : all_designs) {
-                                Fileout::print_mol2(ss,m);
+                                fileout::print_mol2(ss,m);
                         }
                         Inout::output_file(ss.str(), "designed_" + std::to_string(n) + ".mol2");
 
@@ -208,4 +209,5 @@ namespace Program {
                 }
 
         }
+}
 }

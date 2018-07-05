@@ -12,9 +12,10 @@
 
 using namespace std;
 
+namespace candock{
 namespace Docker {
 
-	ostream& operator<<(ostream& os, const Docker::Gpoints::PGpointVec &points)	{
+	ostream& operator<<(ostream& os, const candock::Docker::Gpoints::PGpointVec &points)	{
 		for (auto &ppoint : points) {
 			// to add : output of energies
 			os << "ATOM      1   U  DIK     1    " << ppoint->crd().pdb() << endl; 
@@ -22,13 +23,9 @@ namespace Docker {
 		return os;
 	}	
 
-	ostream& operator<<(ostream& os, const Docker::Gpoints::GpointVec &points)	{
+	ostream& operator<<(ostream& os, const candock::Docker::Gpoints::GpointVec &points)	{
 		for (auto &point : points) {
-			// to add : output of energies
 			os << "ATOM      1   U  DIK     1    " << point.crd().pdb() << endl; 
-			//~ os << "ATOM      1   U  DIK     1    " << point.crd().pdb() 
-				//~ setw(6) << 1.0 << setw(6) << setprecision(2) << fixed
-				//~ << point.energy(<< endl;
 		}
 		return os;
 	}	
@@ -321,3 +318,4 @@ namespace Docker {
 	}
 
 };
+}

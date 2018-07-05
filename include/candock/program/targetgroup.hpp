@@ -4,6 +4,8 @@
 #include "candock/molib/it.hpp"
 #include "candock/program/target.hpp"
 
+namespace candock {
+
 namespace Program {
         class CANDOCK_EXPORT TargetGroup {
                 std::vector< Target* > __targets;
@@ -19,6 +21,7 @@ namespace Program {
                 void make_scaffolds(const TargetGroup& antitargets, FragmentLigands& ligands);
                 void design_ligands(const TargetGroup& antitargets, FragmentLigands& ligands);
         };
+}
 }
 
 #endif

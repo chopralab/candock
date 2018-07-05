@@ -9,6 +9,7 @@
 
 #include "candock/fileout/fileout.hpp"
 
+namespace candock {
 namespace Program {
 
         bool LinkFragments::__can_read_from_files () {
@@ -165,7 +166,7 @@ namespace Program {
                                 // output docked molecule conformations
                                 std::stringstream ss;
                                 ss << "REMARK   4 SEED USED FOR " << ligand.name() << " IS " << seed << "\n";
-                                Fileout::print_complex_pdb (ss, docked.get_ligand(), docked.get_receptor(),
+                                fileout::print_complex_pdb (ss, docked.get_ligand(), docked.get_receptor(),
                                                         docked.get_energy(), docked.get_potential_energy(),
                                                         ++model, docked.get_max_clq_identity(), rmsd);
                                 Inout::output_file (ss.str(), p.string(), ios_base::app);
@@ -286,4 +287,5 @@ namespace Program {
                         thread.join();
                 }
         }
+}
 }

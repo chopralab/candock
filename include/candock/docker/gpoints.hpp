@@ -6,6 +6,8 @@
 #include "candock/helper/error.hpp"
 #include "candock/centro/centroids.hpp"
 
+namespace candock {
+
 namespace Score {
         class Score;
 }
@@ -109,5 +111,6 @@ namespace Docker {
         ostream &operator<< (ostream &os, const Docker::Gpoints::PGpointVec &points);
 };
 
+}
 
 #endif

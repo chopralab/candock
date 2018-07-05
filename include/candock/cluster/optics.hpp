@@ -25,6 +25,8 @@ using namespace std;
  * and min_pts (the number of points require to form a cluster)
  */
 
+namespace candock {
+
 namespace cluster {
 	//~ template <typename T> using PairwiseDistances = unordered_map<T*, unordered_map<T*, double>>;
 	template <typename T> using PairwiseDistances = map<T*, map<T*, double>>;
@@ -367,4 +369,7 @@ namespace cluster {
 		}
 	};
 };
+
+}
+
 #endif

@@ -12,6 +12,9 @@
  * Taken from : http://www.stanford.edu/~acoates/quaternion.h
  * 
  */ 
+
+namespace candock {
+
 namespace geometry {
 	class Quaternion {
 		double mData[4];
@@ -244,6 +247,8 @@ namespace geometry {
 		}
 		
 	};
+}
+
 }
 
 #endif

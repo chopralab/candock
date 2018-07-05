@@ -10,6 +10,8 @@
 #include "candock/molib/chain.hpp"
 #include "candock/molib/model.hpp"
 
+namespace candock {
+
 namespace Molib {
 	class Chain;
 	class Residue;
@@ -46,5 +48,8 @@ namespace Molib {
 	
 
 } // Molib
+
+}
+
 #endif
 	

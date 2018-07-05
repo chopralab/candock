@@ -18,6 +18,8 @@ namespace Json {
     class Value;
 }
 
+namespace candock {
+
 namespace geometry {
 	class Matrix {
 		typedef pair<gsl_matrix*, gsl_vector*> matrix_pair;
@@ -50,6 +52,8 @@ namespace geometry {
 			return stream;
 		}
 	};
+}
+
 }
 
 #endif

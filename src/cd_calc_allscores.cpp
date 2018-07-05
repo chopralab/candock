@@ -11,7 +11,8 @@
 #include <memory>
 
 using namespace std;
-using namespace Program;
+using namespace candock;
+using namespace candock::Program;
 
 ////////////////// TEST SINGLEPOINT ENERGY CALCULATION OF COMPLEX ///////////////////////////
 

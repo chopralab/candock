@@ -10,6 +10,7 @@
 
 namespace po = boost::program_options;
 
+namespace candock {
 namespace Program {
 
         void CmdLnOpts::__init (int argc, char *argv[], int opts_to_parse) {
@@ -488,4 +489,5 @@ namespace Program {
 
                 return stream;
         }
+}
 }

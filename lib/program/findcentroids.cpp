@@ -14,6 +14,7 @@
 #include <direct.h>
 #endif
 
+namespace candock {
 namespace Program {
 
         FindCentroids::FindCentroids(const std::string &filename, const std::string &chain_ids, const std::string& out_dir) :
@@ -105,4 +106,5 @@ namespace Program {
                 __result = centro::set_centroids(binding_sites.first, cmdl.get_double_option("centro_clus_rad"));
                 Inout::output_file(__result, __centroid_file); // probis local structural alignments
         }
+}
 }

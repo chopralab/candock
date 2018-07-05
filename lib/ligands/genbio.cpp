@@ -16,6 +16,7 @@
 #include "candock/ligands/genbio.hpp"
 using namespace std;
 
+namespace candock{
 namespace genbio {
 	void remove_chains(Molib::Molecules &mols, const vector<string> &aligned_chains) {
 		int i = 0;
@@ -203,3 +204,4 @@ namespace genbio {
 		if (!bio_file.empty()) Inout::output_file(mols, bio_file); // output rotated bio assemblies (or asymmetric units if NO bioassembly)
 	}
 };
+}

@@ -4,6 +4,8 @@
 #include <vector>
 #include <map>
 
+namespace candock {
+
 namespace geometry {
         typedef Coordinate Point;
         typedef Coordinate Vector3;
@@ -25,6 +27,8 @@ namespace geometry {
 
         ostream& operator<<(ostream& os, const geometry::Point::Vec &points);
         ostream& operator<<(ostream& os, const geometry::Point::ConstSet &points);
+}
+
 }
 
 #endif

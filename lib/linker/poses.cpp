@@ -11,6 +11,7 @@
 
 using namespace std;
 
+namespace candock{
 namespace Linker {
 	Poses::Poses(const Seed::Graph &seed_graph) {
 		try {
@@ -56,3 +57,4 @@ namespace Linker {
 		return join;
 	}
 };
+}

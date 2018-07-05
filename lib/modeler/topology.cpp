@@ -13,6 +13,7 @@
 #include <boost/asio/ip/host_name.hpp>
 using namespace std;
 
+namespace candock {
 namespace OMMIface {
 	ostream& operator<< (ostream& stream, const Topology::BondedExclusions &bonded_exclusions) {
 		for (auto &atom_pair : bonded_exclusions) {
@@ -178,3 +179,4 @@ namespace OMMIface {
 	}
 
 };
+}

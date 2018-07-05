@@ -15,6 +15,8 @@
 #include <iostream>
 using namespace std;
 
+namespace candock {
+
 class NosqlReader {
 	map<string, unsigned int> __hash;
 	unsigned int __num;
@@ -24,4 +26,7 @@ public:
 	void parse_NOSQL(const string);
 	void parse_dir_of_NOSQL(const string);
 };
+
+}
+
 #endif

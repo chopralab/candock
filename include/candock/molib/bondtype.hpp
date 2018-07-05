@@ -10,6 +10,8 @@
 #include <cstdlib>
 #include "candock/molib/it.hpp"
 
+namespace candock {
+
 namespace Molib {
 	class Atom;
 	struct AtomParams {
@@ -46,8 +48,9 @@ namespace Molib {
         
 	ostream& operator<< (ostream& stream, const ValenceState& valence_state);
 	ostream& operator<< (ostream& stream, const ValenceStateVec& valence_states);
-	ostream& operator<< (ostream& os, const BondToOrder& bond_orders);
-        
-        
+	ostream& operator<< (ostream& os, const BondToOrder& bond_orders);       
 };
+
+}
+
 #endif

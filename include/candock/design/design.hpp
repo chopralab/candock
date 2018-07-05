@@ -3,6 +3,8 @@
 
 #include "candock/molib/nrset.hpp"
 
+namespace candock {
+
 namespace design {
 
 	class Design {
@@ -29,6 +31,8 @@ namespace design {
 		const Molib::Molecules& prepare_designs();
 		const Molib::Molecules& designs() const { return __designs; }
 	};
+}
+
 }
 
 #endif // DESIGN_DESIGN_H

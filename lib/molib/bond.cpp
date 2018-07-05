@@ -1,6 +1,7 @@
 #include "candock/molib/molecule.hpp"
 #include "candock/helper/help.hpp"
 
+namespace candock {
 namespace Molib {
 	
 	bool Bond::is_adjacent(const Bond &other) { 
@@ -265,3 +266,4 @@ namespace Molib {
                 return lhs->stereo() < rhs->stereo();
         }
 }; // Molib
+}

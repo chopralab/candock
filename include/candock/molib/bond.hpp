@@ -12,6 +12,8 @@
 
 using namespace std;
 
+namespace candock {
+
 namespace Molib {
         class Atom;
         class Bond;
@@ -93,4 +95,7 @@ namespace Molib {
 	std::ostream& operator<< (std::ostream& stream, const BondVec& bonds);
 	std::ostream& operator<< (std::ostream& stream, const BondSet& bonds);
 } // Molib
+
+}
+
 #endif

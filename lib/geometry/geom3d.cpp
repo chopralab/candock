@@ -3,6 +3,7 @@
 #include <assert.h>
 #include <algorithm>
 
+namespace candock{
 namespace geometry {
         
         double degrees(double radians) { return radians * 57.29577951308232286465; }
@@ -109,4 +110,5 @@ namespace geometry {
 		return os;
 	}	
 
-};
+}
+}

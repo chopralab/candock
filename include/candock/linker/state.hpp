@@ -10,6 +10,8 @@
 
 using namespace std;
 
+namespace candock {
+
 namespace Molib {
 	class Atom;
 };
@@ -59,4 +61,7 @@ namespace Linker {
 	
 	State::Vec operator-(const State::Set& left, const State::Set& right);
 };
+
+}
+
 #endif

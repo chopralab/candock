@@ -4,6 +4,8 @@
 #include "candock/program/programstep.hpp"
 #include "candock/centro/centroids.hpp"
 
+namespace candock {
+
 namespace Program {
 
         class FindCentroids : public ProgramStep {
@@ -28,6 +30,8 @@ namespace Program {
                 }
 
         };
+
+}
 
 }
 

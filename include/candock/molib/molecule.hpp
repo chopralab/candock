@@ -9,10 +9,11 @@
 
 #include <mutex>
 
+namespace candock {
+
 namespace OMMIface {
 	struct ForceField;
 };
-
 
 namespace Molib {
 	class Molecules;
@@ -111,5 +112,7 @@ namespace Molib {
 	};
 	
 } // Molib
+
+}
+
 #endif
-	

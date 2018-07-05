@@ -15,6 +15,7 @@
 
 using namespace std;
 
+namespace candock{
 namespace Docker {
 
 	ostream& operator<<(ostream& os, const Conformations &conformations) {
@@ -153,4 +154,5 @@ namespace Docker {
 	}
 
 	
-};
+}
+}

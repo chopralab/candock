@@ -34,6 +34,8 @@
 
 using namespace std;
 
+namespace candock {
+
 namespace Glib {
 	typedef vector<vector<bool>> AdjacencyMatrix;
 };
@@ -118,38 +120,9 @@ public:
 		output();
 #endif
 	}
-	//~ MNTS(vector<vector<int>> &qm, Glib::AdjacencyMatrix &conn, const int *weight, 
-		//~ const unique_ptr<unique_ptr<int[]>[]> &adjacMatrix, 
-		//~ const unique_ptr<int[]> &adjaclen, const int ii=300, const int w=600, 
-		//~ const int lni=10) : qmax(qm), Edge(conn), Max_Vtx(conn.size()), We(weight), 
-		//~ adjacMatrix(adjacMatrix), adjaclen(adjaclen), iter(ii), Waim(w), 
-		//~ len_improve(lni), len_time(int (100000000 / lni) + 1), TABUL(7), len_best(0) {
-//~ #ifndef NDEBUG
-		//~ stringstream ss;
-		//~ for (int i=0; i < Max_Vtx; i++) ss << We[i] << " ";
-		//~ dbgmsg("weight = " << ss.str());
-		//~ for (int i=0; i < Max_Vtx; i++) {
-			//~ for (int j=0; j < Max_Vtx; j++) {
-				//~ dbgmsg("conn[" << i << "][" << j << "] = " 
-					//~ << boolalpha << conn[i][j]);
-			//~ }
-		//~ }
-		//~ for (int i=0; i < Max_Vtx; i++) {
-			//~ for (int j=0; j < adjaclen[i]; j++) {
-				//~ dbgmsg("adjaclen[" << i << "] = " << adjaclen[i] << " adjacMatrix["
-					//~ << i << "][" << j << "] = " << adjacMatrix[i][j]);
-			//~ }
-		//~ }
-//~ #endif
-		//~ initialize();
-		//~ dbgmsg("after initialize num. of iter = " << iter);
-		//~ for(int i = 0; i < iter; i++ ) {
-			//~ dbgmsg("doing iter " << i);
-			//~ max_tabu(i);
-		//~ }
-//~ #ifndef NDEBUG
-		//~ output();
-//~ #endif
-	//~ }
+
 };
+
+}
+
 #endif

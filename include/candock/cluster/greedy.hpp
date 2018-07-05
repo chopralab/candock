@@ -5,6 +5,8 @@
 #include "candock/linker/partial.hpp"
 #include "candock/score/score.hpp"
 
+namespace candock {
+
 namespace Score {
         class Score;
 }
@@ -47,5 +49,7 @@ namespace Cluster {
 	};
 		
 };
+
+}
 
 #endif

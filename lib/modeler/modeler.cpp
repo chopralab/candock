@@ -23,6 +23,7 @@
 
 using namespace std;
 
+namespace candock {
 namespace OMMIface
 {
 ostream &operator<<(ostream &os, const vector<OpenMM::Vec3> &positions)
@@ -159,3 +160,4 @@ double Modeler::potential_energy()
         return __system_topology.get_potential_energy();
 }
 };
+}

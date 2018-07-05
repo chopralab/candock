@@ -4,6 +4,8 @@
 #include <string>
 #include "candock/molib/molecules.hpp"
 
+namespace candock {
+
 namespace Parser {
         enum pdb_read_options {
                 first_model=        1 << 0,
@@ -36,6 +38,8 @@ namespace Parser {
                 virtual void set_pos(std::streampos pos);
                 virtual void set_hm(unsigned int hm);
         };
+}
+
 }
 
 #endif // PARSER_H

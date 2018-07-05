@@ -3,6 +3,8 @@
 #include <iostream>
 #include <vector>
 
+namespace candock {
+
 namespace Molib {
 	class Element {
 	public:
@@ -53,4 +55,7 @@ namespace Molib {
 		friend std::ostream& operator<< (std::ostream&, const Element&);
 	};
 }  // namespace Molib
+
+}
+
 #endif

@@ -6,6 +6,8 @@
 #include "candock/linker/segment.hpp"
 #include "candock/linker/seed.hpp"
 
+namespace candock {
+
 namespace Molib {
 	class Atom;
 };
@@ -28,7 +30,7 @@ namespace Linker {
 			
 			typedef vector<unique_ptr<AtomPoint>> UPVec;
 			typedef vector<AtomPoint*> PVec;
-			typedef ::Grid<AtomPoint> Grid;
+			typedef candock::Grid<AtomPoint> Grid;
 		};
 		
 		map<Segment::Id, AtomPoint::UPVec> __atompoints;
@@ -40,4 +42,7 @@ namespace Linker {
 			const double max_linker_length, const double lower_tol_seed_dist, const double upper_tol_seed_dist);
 	};
 }
+
+}
+
 #endif

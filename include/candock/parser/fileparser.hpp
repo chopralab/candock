@@ -11,6 +11,8 @@
 
 using namespace std;
 
+namespace candock {
+
 namespace Parser {
         class FileParser {
         private:
@@ -38,6 +40,8 @@ namespace Parser {
                 bool parse_molecule (Molib::Molecules &mols);
                 Molib::Molecules parse_molecule();
         };
+}
+
 }
 
 #endif

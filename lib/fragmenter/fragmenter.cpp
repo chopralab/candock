@@ -7,6 +7,7 @@
 #include "candock/helper/help.hpp"
 #include "candock/graph/graph.hpp"
 
+namespace candock{
 namespace Molib {
 	ostream& operator<<(ostream& os, const AtomMatchVec& atom_match_vec) {
 		for (auto &atom_match : atom_match_vec) {
@@ -290,4 +291,4 @@ namespace Molib {
 		return fragments;
 	}
 };
-
+}

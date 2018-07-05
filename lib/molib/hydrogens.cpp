@@ -20,6 +20,7 @@
 #include "candock/helper/benchmark.hpp"
 using namespace std;
 
+namespace candock {
 namespace Molib {
 	void Residue::compute_hydrogen() {
 		try {
@@ -161,3 +162,4 @@ namespace Molib {
 
 };
 
+}

@@ -16,6 +16,8 @@
 #include <set>
 #include <boost/regex.hpp>
 
+namespace candock {
+
 namespace Glib {
 	typedef vector<vector<bool>> AdjacencyMatrix;
 	
@@ -451,4 +453,7 @@ namespace Glib {
 		return stream;
 	}
 };
+
+}
+
 #endif

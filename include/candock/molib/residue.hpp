@@ -4,6 +4,8 @@
 #include "candock/molib/it.hpp"
 #include "candock/molib/atom.hpp"
 
+namespace candock {
+
 namespace Molib {
 	class Atom;
 	class Chain;
@@ -71,5 +73,7 @@ namespace Molib {
 
 
 } // Molib
+
+}
+
 #endif
-	

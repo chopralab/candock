@@ -13,7 +13,8 @@
 #include "molecularbondbinner.hpp"
 
 using namespace std;
-using namespace Program;
+using namespace candock;
+using namespace candock::Program;
 
 namespace po = boost::program_options;
 

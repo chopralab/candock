@@ -9,6 +9,7 @@
 
 using namespace std;
 
+namespace candock {
 namespace Program {
 
         bool FragmentLigands::__can_read_from_files() {
@@ -194,4 +195,5 @@ namespace Program {
         void FragmentLigands::write_seeds_to_file(const std::string &filename) {
                 Inout::output_file (__seeds, filename, ios_base::out);
         }
+}
 }

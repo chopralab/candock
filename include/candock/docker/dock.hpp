@@ -5,9 +5,11 @@
 #include "candock/docker/conformations.hpp"
 #include "candock/molib/molecules.hpp"
 
+namespace candock {
+
 namespace Molib {
 	class Molecule;
-};
+}
 
 namespace Docker {
 	
@@ -71,6 +73,8 @@ namespace Docker {
 		void run();
 		Molib::Molecules& get_docked() { return __docked; };
 	};
-};
+}
+
+}
 
 #endif

@@ -14,6 +14,8 @@
 
 using namespace std;
 
+namespace candock {
+
 namespace Score
 {
 class Score;
@@ -88,6 +90,8 @@ public:
     return *__ffield;
   }
 };
+}
+
 }
 
 #endif

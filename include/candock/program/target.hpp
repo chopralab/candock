@@ -15,6 +15,8 @@
 
 #include <string>
 
+namespace candock {
+
 namespace Program {
 
         class CANDOCK_EXPORT Target {
@@ -55,6 +57,8 @@ namespace Program {
                         return __protein->name();
                 }
         };
+
+}
 
 }
 

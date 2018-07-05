@@ -15,6 +15,7 @@
 
 using namespace std;
 
+namespace candock {
 namespace Linker {
 
         DockedConformation Linker::StaticLinker::__a_star(const int segment_graph_size, const Partial &start_conformation, vector<unique_ptr<State>> &states, int iter) {
@@ -304,3 +305,4 @@ namespace Linker {
 		return DockedConformation(ligand, __receptor, conformation.get_energy(), 0, 0);
 	}
 };
+}

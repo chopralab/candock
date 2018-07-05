@@ -1,6 +1,8 @@
 #ifndef ARRAY3D_H
 #define ARRAY3D_H
 
+namespace candock {
+
 template<typename T>
 struct Array3d {
         T ** *data;
@@ -67,5 +69,7 @@ struct Array3d {
                 }
         }
 };
+
+}
 
 #endif

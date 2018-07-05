@@ -11,6 +11,8 @@
 #include <math.h>
 using namespace std;
 
+namespace candock {
+
 class JsonReader {
 	Json::Value __root;   // will contains the root value after parsing.
 public:
@@ -28,4 +30,7 @@ public:
 		return writer.write(__root);
 	}
 };
+
+}
+
 #endif

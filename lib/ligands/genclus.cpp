@@ -20,6 +20,7 @@
 #include "candock/ligands/genclus.hpp"
 using namespace std;
 
+namespace candock{
 namespace genclus {
 	string remove_special_characters(string str) {
 		str.erase(std::remove_if(str.begin(), str.end(), [](const char &c ) { return c==':'||c=='"'||c=='\\';}), str.end());
@@ -320,4 +321,4 @@ namespace genclus {
 		Inout::file_open_put_stream(json_with_ligs_file, stringstream(jr.output_json()));
 	}
 }
-
+}

@@ -5,6 +5,8 @@
 #include "candock/score/powerfit.hpp"
 #include "candock/helper/path.hpp"
 
+namespace candock {
+
 namespace Score
 {
 
@@ -418,5 +420,6 @@ KBFF &KBFF::compile_objective_function(const double scale_non_bond)
     dbgmsg("out of loop");
     log_benchmark << "Time to compile the objective function: " << bench.seconds_from_start() << "\n";
     return *this;
+}
 }
 }

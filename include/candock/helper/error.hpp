@@ -5,6 +5,8 @@
 #include <exception>
 using namespace std;
 
+namespace candock {
+
 class Error : public exception {
 	const string __msg;
 public:
@@ -12,5 +14,7 @@ public:
 	~Error() throw() {}
 	const char* what() const noexcept {return __msg.c_str();}
 };
+
+}
 
 #endif

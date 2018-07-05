@@ -13,6 +13,7 @@
 #include "candock/molib/chain.hpp"
 using namespace std;
 
+namespace candock {
 namespace Molib {
 	ostream& operator<< (ostream& stream, const Atom& a) {
 		if (!a.__br) {
@@ -253,3 +254,4 @@ namespace Molib {
 
 
 };
+}

@@ -11,6 +11,7 @@
 #include "candock/helper/logger.hpp"
 
 using namespace std;
+namespace candock{
 
 #ifdef CANDOCK_DRM
 
@@ -223,3 +224,4 @@ bool drm::check_drm(const std::string& ) {
 }
 
 #endif /*CANDOCK_DRM*/
+}

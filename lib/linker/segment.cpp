@@ -3,6 +3,8 @@
 #include "candock/helper/benchmark.hpp"
 #include "candock/helper/help.hpp"
 
+namespace candock {
+
 namespace Linker {
 	ostream& operator<< (ostream& stream, const Segment& s) {
 		stream << "Segment(" << s.__seed_id << ") : atom numbers = ";
@@ -251,3 +253,4 @@ namespace Linker {
 	
 
 };
+}

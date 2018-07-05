@@ -4,6 +4,8 @@
 #include "candock/molib/bond.hpp"
 #include "candock/molib/molecule.hpp"
 
+namespace candock {
+
 namespace Molib {
 	class Atom;
 	class Unique {
@@ -36,4 +38,7 @@ namespace Molib {
 		friend ostream& operator<<(ostream& os, const USeeds& useeds);
 	};
 }
+
+}
+
 #endif

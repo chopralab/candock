@@ -8,6 +8,7 @@
 #include "candock/helper/grep.hpp"
 #include "candock/molib/atomtype.hpp"
 
+namespace candock {
 namespace Program {
 
         DockFragments::DockFragments( const FindCentroids& found_centroids,
@@ -254,4 +255,5 @@ namespace Program {
                                         cmdl.get_double_option("interatomic"));
                 return gpoints;
         }
+}
 }

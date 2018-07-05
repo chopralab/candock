@@ -9,6 +9,8 @@
 #include "candock/parser/fileparser.hpp"
 #include "candock/program/dockfragments.hpp"
 
+namespace candock {
+
 namespace Program {
 
         class LinkFragments : public ProgramStep
@@ -43,6 +45,8 @@ namespace Program {
                 const Molib::Molecules& top_poses() const { return __all_top_poses; }
                 void clear_top_poses() { __all_top_poses.clear(); };
         };
+}
+
 }
 
 #endif // LINKFRAGMENTSSTEP_H

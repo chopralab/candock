@@ -14,6 +14,7 @@
 
 using namespace std;
 
+namespace candock{
 namespace geometry {
 #ifndef NDEBUG
 	string print_matrix(const string &msg, const gsl_matrix *data) {
@@ -126,3 +127,4 @@ namespace geometry {
 	    return make_tuple(projection, eigenmatrix, mean);
 	}	
 };
+}

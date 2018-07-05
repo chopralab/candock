@@ -7,6 +7,8 @@
 #include "candock/geometry/coordinate.hpp"
 using namespace std;
 
+namespace candock {
+
 namespace Molib {
 	class Atom;
 	class Molecule;
@@ -80,4 +82,7 @@ namespace OMMIface {
 	ostream& operator<< (ostream& stream, const ForceField::ResidueTopology& r);
 	ostream& operator<< (ostream& stream, const ForceField& ff);
 }
+
+}
+
 #endif

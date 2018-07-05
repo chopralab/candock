@@ -19,6 +19,7 @@
 
 using namespace std;
 
+namespace candock {
 namespace Molib {
 
         set<int> Molecule::get_idatm_types(set<int> previous) const {
@@ -239,8 +240,6 @@ namespace Molib {
 		return residues;
 	}
 
-
-
 	void Molecule::prepare_for_mm(const OMMIface::ForceField &ffield, const Atom::Grid &grid) {
 		/* Rename some residues
 		 */
@@ -406,3 +405,4 @@ namespace Molib {
 	}
 
 };
+}

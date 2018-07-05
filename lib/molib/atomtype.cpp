@@ -22,6 +22,7 @@
 #include "candock/molib/atomtype.hpp"
 using namespace std;
 
+namespace candock {
 namespace Molib {
 namespace AtomType {
 	int freeOxygens(const Atom &a, map<const Atom*, int> &heavys) {
@@ -955,3 +956,4 @@ namespace AtomType {
         }
 }
 };
+}

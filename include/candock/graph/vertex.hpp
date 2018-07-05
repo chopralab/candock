@@ -11,6 +11,8 @@
 #include <set>
 #include <boost/regex.hpp>
 
+namespace candock {
+
 namespace Glib {
 	
 	template<typename T>
@@ -30,5 +32,7 @@ namespace Glib {
 		const int weight() const { return __vertex.weight; }
 	};
 };
+
+}
 
 #endif

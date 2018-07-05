@@ -6,6 +6,8 @@
 #include "candock/molib/atom.hpp"
 #include "candock/molib/residue.hpp"
 
+namespace candock {
+
 namespace Molib {
 	class Residue;
 	class Atom;
@@ -40,5 +42,7 @@ namespace Molib {
 	};
 
 } // Molib
-#endif
-	
+
+}
+
+#endif	

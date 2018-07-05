@@ -11,6 +11,8 @@
 #include <functional>
 #include "candock/linker/state.hpp"
 
+namespace candock {
+
 namespace Linker {
 
 	class Segment : public template_vector_container<Segment*, Segment> {
@@ -80,4 +82,7 @@ namespace Linker {
 		static Graph create_graph(const Molib::Molecule &molecule);
 	};
 };
+
+}
+
 #endif

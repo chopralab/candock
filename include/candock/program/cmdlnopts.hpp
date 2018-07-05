@@ -11,6 +11,8 @@
 
 #include "candock/candockexport.hpp"
 
+namespace candock {
+
 namespace Program {
 
         class CANDOCK_EXPORT CmdLnOpts : public help::Options {
@@ -67,6 +69,8 @@ namespace Program {
                 friend CANDOCK_EXPORT std::ostream &operator<< (std::ostream &stream, const CmdLnOpts &cmdl_);
 
 	};
+}
+
 }
 
 #endif

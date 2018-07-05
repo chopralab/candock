@@ -7,6 +7,8 @@
 #include "candock/helper/error.hpp"
 #include "candock/helper/debug.hpp"
 
+namespace candock {
+
 template<class T, class U, class P>
 class template_vector_iterator { // Now define it
 	T& __mols;
@@ -132,4 +134,7 @@ public:
 		}
 	}
 };
+
+}
+
 #endif

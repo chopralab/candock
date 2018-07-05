@@ -13,7 +13,7 @@ namespace probis {
 		const string &receptor_chain_id, const string &bslib_file, const int ncpu, 
 		const string &nosql_file, const string &json_file) {
 		try {
-			Benchmark bench;
+			candock::Benchmark bench;
 			cout << "Starting ProBiS for binding sites prediction" << endl;
 		    Args args;
 		    _longnames = true;
@@ -42,7 +42,7 @@ namespace probis {
 		}  // .. konec try bloka
 		catch (Err e) {
 			cout << e.what() << endl;
-			throw Error("die : something went wrong in probis ...");
+			throw candock::Error("die : something went wrong in probis ...");
 		}
 	}
 	

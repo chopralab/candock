@@ -6,6 +6,8 @@
 
 #include "candock/candockexport.hpp"
 
+namespace candock {
+
 namespace help {
         class CANDOCK_EXPORT Options {
         private:
@@ -30,6 +32,8 @@ namespace help {
         };
 }
 
-#define cmdl (*help::Options::get_options())
+#define cmdl (*candock::help::Options::get_options())
+
+}
 
 #endif

@@ -7,6 +7,8 @@
 #include <chrono>
 #include <iostream>
 
+namespace candock {
+
 class Benchmark {
         std::chrono::time_point<std::chrono::system_clock> start;
 public:
@@ -24,5 +26,7 @@ public:
                 std::cout << "Clock is at " << seconds_from_start() << std::endl;
         }
 };
+
+}
 
 #endif

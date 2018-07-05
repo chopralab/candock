@@ -4,6 +4,7 @@
 
 using namespace std;
 
+namespace candock {
 namespace Molib {
         const vector<string> Element::symbols {
 		"LP",  "H", "He", "Li", "Be",  "B",  "C",  "N",  "O",
@@ -145,4 +146,5 @@ namespace Molib {
             return masses[number()];
         }
 
+}
 }

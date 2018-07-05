@@ -8,6 +8,8 @@
 #include <vector>
 #include <set>
 
+namespace candock {
+
 namespace Molib {
 	class Unique;
 
@@ -60,4 +62,7 @@ namespace Molib {
 	ostream& operator<<(ostream& os, const AtomMatch& atom_match);
 	ostream& operator<<(ostream& os, const std::map<Bond*, Bond*>& bond_match);
 }
+
+}
+
 #endif

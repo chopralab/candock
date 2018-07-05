@@ -15,8 +15,9 @@
 #include "candock/fragmenter/fragmenter.hpp"
 
 using namespace std;
-using namespace Molib;
+using namespace candock::Molib;
 
+namespace candock {
 namespace Parser {
         void FileParser::set_flags (unsigned int hm) {
                 p->set_hm (hm);
@@ -83,3 +84,4 @@ namespace Parser {
                 }
         }
 };
+}

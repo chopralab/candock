@@ -1,6 +1,7 @@
 #include "candock/fileout/fileout.hpp"
 
-namespace Fileout {
+namespace candock{
+namespace fileout {
     
         const map<const string, const string> id_atom_to_sybyl {
                 {"C3", "C.3"},
@@ -72,4 +73,5 @@ namespace Fileout {
                 }
                 ss << "\n";
         }
+}
 }

@@ -11,6 +11,7 @@
 #include <iostream>
 #include <exception>
 
+namespace candock{
 namespace Docker {
 
         double Dock::DockedConf::compute_rmsd_sq(const Dock::DockedConf &other) const {
@@ -210,3 +211,4 @@ namespace Docker {
 	}
 
 };
+}

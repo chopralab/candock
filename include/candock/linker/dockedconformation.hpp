@@ -3,6 +3,8 @@
 #include "candock/molib/molecule.hpp"
 #include <memory>
 
+namespace candock {
+
 namespace Linker {
 
         class DockedConformation {
@@ -65,5 +67,7 @@ namespace Linker {
         };
 
 };
+
+}
 
 #endif

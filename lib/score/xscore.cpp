@@ -2,6 +2,8 @@
 
 #include "candock/helper/help.hpp"
 
+using namespace candock;
+
 inline double get_xs_radius(const Molib::Atom& xs) {
     switch (xs.element().number()) {
         case Molib::Element::C:

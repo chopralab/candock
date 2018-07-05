@@ -3,6 +3,8 @@
 
 #include "candock/helper/smiles.hpp"
 
+namespace candock {
+
 namespace help {
 
 	const rename_rules special { // idatm rules for complicated groups
@@ -640,4 +642,7 @@ namespace help {
 	};
 
 }
+
+}
+
 #endif
