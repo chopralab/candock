@@ -76,7 +76,7 @@ namespace Program {
                         /**
                           * Read top seeds for this ligand
                           */
-                        Molib::NRset top_seeds = __seeds_database.get_top_seeds (ligand, cmdl.get_double_option ("top_percent"));
+                        Molib::NRset top_seeds = __seeds_database.get_seeds (ligand, cmdl.get_double_option ("top_percent"));
 
                         ligand.erase_properties(); // required for graph matching
                         top_seeds.erase_properties(); // required for graph matching
