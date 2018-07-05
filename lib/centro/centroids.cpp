@@ -17,7 +17,7 @@ namespace centro {
 
 		vector<Centroid> centroids;
 		geometry::Point::Vec crds = binding_site_ligands.get_crds();
-		geometry::Point::Vec clustered = Cluster::Cluster::greedy(crds, centro_clus_rad);
+		geometry::Point::Vec clustered = cluster::Cluster::greedy(crds, centro_clus_rad);
 		for (auto &point : clustered) {
 			// find closest point and calculate distance to this point
 			geometry::Point closest;

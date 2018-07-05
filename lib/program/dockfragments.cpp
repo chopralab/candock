@@ -146,7 +146,7 @@ namespace Program {
                                 boost::filesystem::path p (__top_seeds_location);
                                 p = p / seed.name();
                                 p += ".pdb";
-                                Parser::FileParser spdb (p.string(), Parser::first_model, 1);
+                                parser::FileParser spdb (p.string(), parser::first_model, 1);
 
                                 molib::Molecules seed_molec = spdb.parse_molecule();
                                 
@@ -182,7 +182,7 @@ namespace Program {
 
                         const size_t number_of_seeds = Grep::find_first_case_greater_than(file, regex, max_value);
 
-                        Parser::FileParser pdb( file_to_read.string(), Parser::all_models, number_of_seeds);
+                        parser::FileParser pdb( file_to_read.string(), parser::all_models, number_of_seeds);
 
                         dbgmsg("reading top_seeds_file for seed id = " << fragment);
                         molib::Molecules all = pdb.parse_molecule();
@@ -218,7 +218,7 @@ namespace Program {
                         dbgmsg("taking " << sz << " top seeds for seed " << fragment);
 
                         // Add one in case the user is silly enough to select a top_percent of 0.000
-                        Parser::FileParser pdb( file_to_read.string(), Parser::all_models, sz + 1 );
+                        parser::FileParser pdb( file_to_read.string(), parser::all_models, sz + 1 );
 
                         dbgmsg("reading top_seeds_file for seed id = " << fragment);
                         molib::Molecules all = pdb.parse_molecule();

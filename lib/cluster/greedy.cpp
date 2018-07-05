@@ -12,7 +12,7 @@
 using namespace candock::molib;
 
 namespace candock{
-namespace Cluster {
+namespace cluster {
 
 	/**
 	 * Cluter points

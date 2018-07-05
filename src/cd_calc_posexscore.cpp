@@ -36,9 +36,9 @@ int main(int argc, char* argv[]) {
                 molib::Molecules receptor_mols;
                 molib::Molecules ligand_mols;
 
-                Parser::FileParser drpdb (cmdl.get_string_option("receptor"),
-                                          Parser::pdb_read_options::protein_poses_only |
-                                          Parser::pdb_read_options::all_models);
+                parser::FileParser drpdb (cmdl.get_string_option("receptor"),
+                                          parser::pdb_read_options::protein_poses_only |
+                                          parser::pdb_read_options::all_models);
 
                 drpdb.parse_molecule(receptor_mols);
 
@@ -47,10 +47,10 @@ int main(int argc, char* argv[]) {
                                                     cmdl.get_string_option("receptor") :
                                                     cmdl.get_string_option("ligand");
 
-                Parser::FileParser dlpdb (ligand_file,
-                                          Parser::pdb_read_options::docked_poses_only |
-                                          Parser::pdb_read_options::skip_atom |
-                                          Parser::pdb_read_options::all_models);
+                parser::FileParser dlpdb (ligand_file,
+                                          parser::pdb_read_options::docked_poses_only |
+                                          parser::pdb_read_options::skip_atom |
+                                          parser::pdb_read_options::all_models);
 
                 dlpdb.parse_molecule(ligand_mols);
 

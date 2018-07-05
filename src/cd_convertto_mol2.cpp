@@ -25,7 +25,7 @@ int main(int argc, char* argv[]) {
                 Inout::Logger::set_all_stderr(true);
 
                 for (int i = 1; i < argc; ++i) {
-                        Parser::FileParser input(argv[i], Parser::pdb_read_options::all_models);
+                        parser::FileParser input(argv[i], parser::pdb_read_options::all_models);
                         molib::Molecules mols;
                         input.parse_molecule(mols);
 

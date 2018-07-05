@@ -151,8 +151,8 @@ namespace genlig {
 		//~ const string &bsite_file) {
 
 		// read query PDB protein
-		Parser::FileParser qpdb(receptor_file, 
-			Parser::first_model|Parser::hydrogens);
+		parser::FileParser qpdb(receptor_file, 
+			parser::first_model|parser::hydrogens);
 		molib::Molecules query_mols = qpdb.parse_molecule();
 		molib::Atom::Grid gridrec(query_mols[0].get_atoms(receptor_chain_id, 
 			molib::Residue::protein));
@@ -176,8 +176,8 @@ namespace genlig {
 					//~ molib::Molecules &mols = nrset.add(new molib::Molecules());
 					//~ biopdb.parse_PDB(mols, pdb_file);
 					//~ biopdb.rewind();
-					Parser::FileParser biopdb(pdb_file, 
-						Parser::all_models|Parser::hydrogens);
+					parser::FileParser biopdb(pdb_file, 
+						parser::all_models|parser::hydrogens);
 					molib::Molecules &mols = 
 						nrset.add(new molib::Molecules(biopdb.parse_molecule()));
 					dbgmsg(geometry::Matrix(d["alignment"][0]["rotation_matrix"], 
@@ -279,8 +279,8 @@ namespace genlig {
 			const geometry::Matrix &mx = bio_file_to_matrix[bio_file];
 			try { // if something goes wrong, e.g., pdb file is not found, don't exit..
 				//~ biopdb.rewind();
-				Parser::FileParser biopdb(bio_file, 
-					Parser::all_models);
+				parser::FileParser biopdb(bio_file, 
+					parser::all_models);
 				molib::Molecules mols = biopdb.parse_molecule();
 				mols.rotate(mx, true); // inverse rotation
 				for (auto &linf : kv1.second) {

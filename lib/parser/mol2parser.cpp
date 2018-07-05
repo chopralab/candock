@@ -3,7 +3,7 @@
 using namespace candock::molib;
 
 namespace candock {
-namespace Parser {
+namespace parser {
         void FileParser::Mol2Parser::parse_molecule (Molecules &mols) {
                 vector<string> mol2_raw;
                 {

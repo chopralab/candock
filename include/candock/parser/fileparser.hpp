@@ -13,7 +13,7 @@ using namespace std;
 
 namespace candock {
 
-namespace Parser {
+namespace parser {
         class FileParser {
         private:
                 class PdbParser : public Parser {

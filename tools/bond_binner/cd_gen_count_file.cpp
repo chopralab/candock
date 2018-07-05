@@ -19,7 +19,7 @@ using namespace candock::Program;
 namespace po = boost::program_options;
 
 void run_extraction(
-    Parser::FileParser& input,
+    parser::FileParser& input,
     AtomInfo::MolecularBondBinner& MBB,
     bool extract_only,
     std::ofstream& stretch_file,
@@ -147,9 +147,9 @@ int main(int argc, char* argv[]) {
 
                 if (!vm.count("bin_only"))
                 for (const auto& input_file : inputs) {
-                        Parser::FileParser input(
+                        parser::FileParser input(
                             input_file,
-                            Parser::pdb_read_options::all_models,
+                            parser::pdb_read_options::all_models,
                             num_mols_to_read );
 
                         run_extraction(

@@ -18,7 +18,7 @@ using namespace std;
 using namespace candock::molib;
 
 namespace candock {
-namespace Parser {
+namespace parser {
         void FileParser::set_flags (unsigned int hm) {
                 p->set_hm (hm);
         }

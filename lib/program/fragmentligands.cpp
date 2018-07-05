@@ -21,8 +21,8 @@ namespace Program {
         void FragmentLigands::__read_from_files() {
 
                 if (Inout::file_size(cmdl.get_string_option("prep")) > 0 ) {
-                        Parser::FileParser lpdb (cmdl.get_string_option ("prep"),
-                                                 Parser::all_models, cmdl.get_int_option ("max_num_ligands"));
+                        parser::FileParser lpdb (cmdl.get_string_option ("prep"),
+                                                 parser::all_models, cmdl.get_int_option ("max_num_ligands"));
 
                         molib::Molecules ligands;
 
@@ -52,7 +52,7 @@ namespace Program {
                 }
         }
 
-        void FragmentLigands::__fragment_ligands (Parser::FileParser &lpdb, const bool write_out_for_linking, const bool no_rotatable_bond) {
+        void FragmentLigands::__fragment_ligands (parser::FileParser &lpdb, const bool write_out_for_linking, const bool no_rotatable_bond) {
                 bool thread_is_not_done;
                 molib::Molecules ligands;
                 {
@@ -103,8 +103,8 @@ namespace Program {
                 if (Inout::file_size (ligand) > 0) {
                         log_step << "Fragmenting files in " << ligand << endl;
 
-                        Parser::FileParser lpdb (ligand,
-                                                 Parser::all_models|Parser::hydrogens,
+                        parser::FileParser lpdb (ligand,
+                                                 parser::all_models|parser::hydrogens,
                                                  cmdl.get_int_option ("max_num_ligands"));
 
                         std::vector<std::thread> threads1;
@@ -124,8 +124,8 @@ namespace Program {
 
                         log_note << "Adding fragments from " << fragment_bag << endl;
 
-                        Parser::FileParser lpdb_additional (fragment_bag,
-                                                            Parser::all_models|Parser::hydrogens,
+                        parser::FileParser lpdb_additional (fragment_bag,
+                                                            parser::all_models|parser::hydrogens,
                                                             cmdl.get_int_option ("max_num_ligands"));
 
                         std::vector<std::thread> threads2;
@@ -144,8 +144,8 @@ namespace Program {
                 if (Inout::file_size (molecular_fragments) > 0) {
                         log_note << "Adding molecular fragments from " << molecular_fragments << endl;
 
-                        Parser::FileParser lpdb_additional (molecular_fragments,
-                                                            Parser::all_models|Parser::hydrogens,
+                        parser::FileParser lpdb_additional (molecular_fragments,
+                                                            parser::all_models|parser::hydrogens,
                                                             cmdl.get_int_option ("max_num_ligands"));
 
                         std::vector<std::thread> threads3;
@@ -183,7 +183,7 @@ namespace Program {
         void FragmentLigands::add_seeds_from_file(const std::string &filename) {
                 log_note << "Reading seeds from: " << filename << endl;
 
-                Parser::FileParser lpdb (filename, Parser::all_models);
+                parser::FileParser lpdb (filename, parser::all_models);
                 lpdb.parse_molecule (__seeds);
                 __ligand_idatm_types = __seeds.get_idatm_types (__ligand_idatm_types);
 

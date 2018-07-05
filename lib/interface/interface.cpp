@@ -36,7 +36,7 @@ size_t initialize_complex( const char* filename) {
         }
 
         try {
-                Parser::FileParser rpdb (filename, Parser::protein_poses_only, 1);
+                parser::FileParser rpdb (filename, parser::protein_poses_only, 1);
 
                 __receptor = std::unique_ptr<candock::molib::Molecules> (new candock::molib::Molecules);
 
@@ -56,7 +56,7 @@ size_t initialize_complex( const char* filename) {
 
                 __gridrec = std::unique_ptr<candock::molib::Atom::Grid> (new candock::molib::Atom::Grid (__receptor->get_atoms()));
                 
-                Parser::FileParser lpdb (filename, Parser::docked_poses_only, 1);
+                parser::FileParser lpdb (filename, parser::docked_poses_only, 1);
 
                 __ligand = std::unique_ptr<candock::molib::Molecules> (new candock::molib::Molecules);
 
@@ -91,7 +91,7 @@ size_t initialize_receptor(const char* filename) {
 
 		try
         {
-                candock::Parser::FileParser rpdb(filename, candock::Parser::first_model, 1);
+                candock::parser::FileParser rpdb(filename, candock::parser::first_model, 1);
 
                 __receptor = std::unique_ptr<candock::molib::Molecules>(new candock::molib::Molecules);
 
@@ -257,7 +257,7 @@ size_t initialize_ligand(const char *filename)
 
         try
         {
-                candock::Parser::FileParser rpdb(filename, candock::Parser::first_model, 1);
+                candock::parser::FileParser rpdb(filename, candock::parser::first_model, 1);
 
                 __ligand = std::unique_ptr<candock::molib::Molecules>(new candock::molib::Molecules);
 

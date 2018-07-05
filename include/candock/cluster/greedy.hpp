@@ -16,7 +16,7 @@ namespace molib {
         class Molecules;
 }
 
-namespace Cluster {
+namespace cluster {
 	class Cluster {
 		template<typename T>
 		class LinkedConf {

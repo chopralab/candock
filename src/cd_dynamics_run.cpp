@@ -33,8 +33,8 @@ int main(int argc, char *argv[])
 
                 molib::Molecules starting_mol;
 
-                Parser::FileParser drpdb(cmdl.get_string_option("receptor"),
-                                         Parser::pdb_read_options::first_model);
+                parser::FileParser drpdb(cmdl.get_string_option("receptor"),
+                                         parser::pdb_read_options::first_model);
 
                 drpdb.parse_molecule(starting_mol);
 

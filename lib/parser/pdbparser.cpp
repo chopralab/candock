@@ -10,7 +10,7 @@ using namespace std;
 using namespace candock::molib;
 
 namespace candock {
-namespace Parser {
+namespace parser {
 
         void FileParser::PdbParser::parse_molecule (Molecules &mols) {
                 dbgmsg ("num_occur = " << __num_occur);

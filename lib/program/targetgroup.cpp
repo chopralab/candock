@@ -97,7 +97,7 @@ namespace Program {
                 const string design_file = "designed_0.pdb";
                 if ( Inout::file_size(design_file) ) {
                         log_note << design_file << " found -- skipping generation of new designs this iteration" << endl;
-                        Parser::FileParser dpdb (design_file, Parser::all_models );
+                        parser::FileParser dpdb (design_file, parser::all_models );
                         molib::Molecules designs;
                         dpdb.parse_molecule(designs);
 
@@ -161,7 +161,7 @@ namespace Program {
 
                         if ( Inout::file_size(design_file) ) {
                                 log_note << design_file << " found -- skipping generation of new designs this iteration" << endl;
-                                Parser::FileParser dpdb (design_file, Parser::all_models );
+                                parser::FileParser dpdb (design_file, parser::all_models );
                                 molib::Molecules designs;
                                 dpdb.parse_molecule(designs);
 

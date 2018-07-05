@@ -49,7 +49,7 @@ namespace Program {
                 for (auto molec : all_names) {
                         boost::filesystem::path p2 = p / (molec + ".pdb");
 
-                        Parser::FileParser conf (p2.string(), Parser::skip_atom | Parser::first_model, 1);
+                        parser::FileParser conf (p2.string(), parser::skip_atom | parser::first_model, 1);
                         conf.parse_molecule (__all_top_poses);
                         __all_top_poses.last().set_name (molec);
                 }
@@ -192,7 +192,7 @@ namespace Program {
                         return;
                 }
 
-                Parser::FileParser lpdb2 (cmdl.get_string_option ("prep"), Parser::all_models, 1);
+                parser::FileParser lpdb2 (cmdl.get_string_option ("prep"), parser::all_models, 1);
 
                 std::mutex concurrent_numbering;
                 std::mutex additon_to_top_dock;
@@ -213,7 +213,7 @@ namespace Program {
                                                 std::lock_guard<std::mutex> guard(additon_to_top_dock);
                                                 log_note << ligand.name() << " is alread docked to " << __receptor.name() << ", skipping." << endl;
 
-                                                Parser::FileParser conf (p.string(), Parser::skip_atom | Parser::first_model | Parser::docked_poses_only, 1);
+                                                parser::FileParser conf (p.string(), parser::skip_atom | parser::first_model | parser::docked_poses_only, 1);
                                                 conf.parse_molecule (__all_top_poses);
                                                 __all_top_poses.last().set_name (ligand.name());
                                                 ligands.clear();
@@ -267,7 +267,7 @@ namespace Program {
                                                 std::lock_guard<std::mutex> guard(additon_to_top_dock);
                                                 log_note << ligand.name() << " is alread docked to " << __receptor.name() << ", skipping." << endl;
 
-                                                Parser::FileParser conf (p.string(), Parser::skip_atom | Parser::first_model, 1);
+                                                parser::FileParser conf (p.string(), parser::skip_atom | parser::first_model, 1);
                                                 conf.parse_molecule (__all_top_poses);
                                                 __all_top_poses.last().set_name (ligand.name());
 

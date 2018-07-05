@@ -226,7 +226,7 @@ Partial::Vec Linker::IterativeLinker::__generate_rigid_conformations(const Seed:
 	dbgmsg("number of possibles_w_energy = " << possibles_w_energy.size());
 
 	// cluster rigid conformations and take only cluster representatives for further linking
-	Partial::Vec clustered_possibles_w_energy = Cluster::Cluster::greedy(
+	Partial::Vec clustered_possibles_w_energy = cluster::Cluster::greedy(
 		possibles_w_energy, __gridrec, __docked_clus_rad);
 
 	//help::memusage("after greedy");

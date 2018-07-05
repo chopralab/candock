@@ -48,9 +48,9 @@ int main(int argc, char* argv[]) {
                 }
 
                 for (auto input_file : inputs) {
-                        Parser::FileParser input(
+                        parser::FileParser input(
                             input_file,
-                            Parser::pdb_read_options::all_models | Parser::pdb_read_options::hydrogens);
+                            parser::pdb_read_options::all_models | parser::pdb_read_options::hydrogens);
 
                         molib::Molecules mols;
 

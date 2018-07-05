@@ -3,7 +3,7 @@
 using namespace candock::molib;
 
 namespace candock {
-namespace Parser {
+namespace parser {
 
         void Parser::__generate_molecule(Molecules &mols, bool &found_molecule, const std::string &name) {
                 // if there were no REMARK or BIOMOLECULE...

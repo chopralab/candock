@@ -24,9 +24,9 @@ int main(int argc, char *argv[])
                         return 1;
                 }
 
-                Parser::FileParser mol1(
+                parser::FileParser mol1(
                         argv[1],
-                        Parser::pdb_read_options::docked_poses_only | Parser::pdb_read_options::skip_atom | Parser::pdb_read_options::all_models
+                        parser::pdb_read_options::docked_poses_only | parser::pdb_read_options::skip_atom | parser::pdb_read_options::all_models
                 );
 
                 molib::Molecules mols1;

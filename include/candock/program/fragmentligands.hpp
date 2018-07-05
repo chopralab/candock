@@ -23,7 +23,7 @@ namespace Program {
                 std::mutex __prevent_re_read_mtx;
                 std::mutex __add_to_typing_mtx;
 
-                void __fragment_ligands (Parser::FileParser &lpdb, const bool write_out_for_linking, const bool no_rotatable_bond);
+                void __fragment_ligands (parser::FileParser &lpdb, const bool write_out_for_linking, const bool no_rotatable_bond);
 
         protected:
                 virtual bool __can_read_from_files();

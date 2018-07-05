@@ -32,7 +32,7 @@ namespace Program {
                 }
 
                 // If the option given is a regular file, act like previous versions
-                Parser::FileParser rpdb (input_name, Parser::first_model);
+                parser::FileParser rpdb (input_name, parser::first_model);
                 molib::Molecules receptors = rpdb.parse_molecule();
 
                 /* Compute atom types for receptor and cofactor(s): gaff types for protein,

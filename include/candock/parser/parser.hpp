@@ -6,7 +6,7 @@
 
 namespace candock {
 
-namespace Parser {
+namespace parser {
         enum pdb_read_options {
                 first_model=        1 << 0,
                 all_models=         1 << 1,

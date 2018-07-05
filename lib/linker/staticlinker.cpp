@@ -245,7 +245,7 @@ namespace linker {
 			return possibles_w_energy;
 		}
 
-		Partial::Vec clustered_possibles_w_energy = Cluster::Cluster::greedy(
+		Partial::Vec clustered_possibles_w_energy = cluster::Cluster::greedy(
 			possibles_w_energy, __gridrec, __docked_clus_rad);
 			
 		//help::memusage("after greedy");
