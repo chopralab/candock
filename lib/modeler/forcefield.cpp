@@ -5,7 +5,7 @@
 #include "candock/helper/error.hpp"
 #include "candock/external/rapidxml/rapidxml.hpp"
 #include "candock/external/rapidxml/rapidxml_print.hpp"
-#include <boost/regex.hpp>
+#include <regex>
 #include <boost/algorithm/string.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
@@ -378,7 +378,7 @@ namespace OMMIface {
 	}
 
 	ForceField& ForceField::parse_gaff_dat_file(const string &gaff_dat_file) {
-		boost::smatch m;
+		std::smatch m;
 		vector<string> gdf;
 		dbgmsg("reading gaff file = " << gaff_dat_file);
 		Inout::read_file(gaff_dat_file, gdf);
@@ -400,7 +400,7 @@ namespace OMMIface {
 			if (line.compare(0, 3, "END") == 0)
 				break;
 			// read atom types
-			if (semaphore == 0 && boost::regex_search(line, m, boost::regex("^(\\S{1,2})\\s+(\\S+)\\s+(\\S+)"))) {
+			if (semaphore == 0 && std::regex_search(line, m, std::regex("^(\\S{1,2})\\s+(\\S+)\\s+(\\S+)"))) {
 				if (m[1].matched && m[2].matched && m[3].matched) {
 					AtomType &at = this->atom_type[type];
 					at.cl = m[1].str();
@@ -414,7 +414,7 @@ namespace OMMIface {
 				}
 			}
 			// parse harmonic bonds
-			if (semaphore == 1 && boost::regex_search(line, m, boost::regex("^(\\S{1,2})\\s*-(\\S{1,2})\\s+(\\S+)\\s+(\\S+)"))) {
+			if (semaphore == 1 && std::regex_search(line, m, std::regex("^(\\S{1,2})\\s*-(\\S{1,2})\\s+(\\S+)\\s+(\\S+)"))) {
 				if (m[1].matched && m[2].matched && m[3].matched && m[4].matched) {
 					const string cl1 = m[1].str();
 					const string cl2 = m[2].str();
@@ -430,7 +430,7 @@ namespace OMMIface {
 				}
 			}
 			// parse harmonic angles
-			if (semaphore == 2 && boost::regex_search(line, m, boost::regex("^(\\S{1,2})\\s*-(\\S{1,2})\\s*-(\\S{1,2})\\s+(\\S+)\\s+(\\S+)"))) {
+			if (semaphore == 2 && std::regex_search(line, m, std::regex("^(\\S{1,2})\\s*-(\\S{1,2})\\s*-(\\S{1,2})\\s+(\\S+)\\s+(\\S+)"))) {
 				if (m[1].matched && m[2].matched && m[3].matched && m[4].matched && m[5].matched) {
 					const string cl1 = m[1].str();
 					const string cl2 = m[2].str();
@@ -444,7 +444,7 @@ namespace OMMIface {
 				}
 			}
 			// parse proper torsions
-			if (semaphore == 3 && boost::regex_search(line, m, boost::regex("^(\\S{1,2})\\s*-(\\S{1,2})\\s*-(\\S{1,2})\\s*-(\\S{1,2})\\s+(\\S+)\\s+(\\S+)\\s+(\\S+)\\s+(\\S+)"))) {
+			if (semaphore == 3 && std::regex_search(line, m, std::regex("^(\\S{1,2})\\s*-(\\S{1,2})\\s*-(\\S{1,2})\\s*-(\\S{1,2})\\s+(\\S+)\\s+(\\S+)\\s+(\\S+)\\s+(\\S+)"))) {
 				if (m[1].matched && m[2].matched && m[3].matched && m[4].matched 
 					&& m[5].matched && m[6].matched && m[7].matched && m[8].matched) {
 					const string cl1 = m[1].str();
@@ -465,7 +465,7 @@ namespace OMMIface {
 				}
 			}
 			// parse improper torsions (there is no IDIVF)
-			if (semaphore == 4 && boost::regex_search(line, m, boost::regex("^(\\S{1,2})\\s*-(\\S{1,2})\\s*-(\\S{1,2})\\s*-(\\S{1,2})\\s+(\\S+)\\s+(\\S+)\\s+(\\S+)"))) {
+			if (semaphore == 4 && std::regex_search(line, m, std::regex("^(\\S{1,2})\\s*-(\\S{1,2})\\s*-(\\S{1,2})\\s*-(\\S{1,2})\\s+(\\S+)\\s+(\\S+)\\s+(\\S+)"))) {
 				if (m[1].matched && m[2].matched && m[3].matched && m[4].matched 
 					&& m[5].matched && m[6].matched && m[7].matched) {
 					const string cl1 = m[1].str();
@@ -484,7 +484,7 @@ namespace OMMIface {
 							<< " k" << improper.size() << " = " << k);
 				}
 			}
-			if (non_bonded && boost::regex_search(line, m, boost::regex("^\\s{2}(\\S{1,2})\\s+(\\S+)\\s+(\\S+)"))) {
+			if (non_bonded && std::regex_search(line, m, std::regex("^\\s{2}(\\S{1,2})\\s+(\\S+)\\s+(\\S+)"))) {
 				if (m[1].matched && m[2].matched && m[3].matched) {
 					const int type = gaff_name_to_type.at(m[1].str());
 					AtomType &at = this->atom_type[type];

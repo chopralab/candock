@@ -6,7 +6,7 @@
 #include "candock/helper/debug.hpp"
 #include "candock/helper/error.hpp"
 #include "candock/score/score.hpp"
-#include <boost/regex.hpp>
+#include <regex>
 #include <boost/algorithm/string.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>

@@ -6,7 +6,7 @@
 #include <vector>
 #include <cstdlib>
 #include <numeric>  
-#include <boost/regex.hpp>
+#include <regex>
 #include <boost/algorithm/string.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>

@@ -13,7 +13,7 @@ namespace candock {
 namespace Program {
 
         bool LinkFragments::__can_read_from_files () {
-                boost::regex regex;
+                std::regex regex;
                 regex.assign ("REMARK   5 MOLECULE (\\w*)");
                 std::ifstream file (cmdl.get_string_option ("prep"));
 
@@ -37,7 +37,7 @@ namespace Program {
 
         void LinkFragments::__read_from_files () {
 
-                boost::regex regex;
+                std::regex regex;
                 regex.assign ("REMARK   5 MOLECULE (\\w*)");
                 std::ifstream file (cmdl.get_string_option ("prep"));
 

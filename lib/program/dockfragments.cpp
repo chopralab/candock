@@ -170,7 +170,7 @@ namespace Program {
         molib::NRset DockFragments::get_negative_seeds(const std::set<std::string> &seeds, const double max_value) const {
                 molib::NRset top_seeds;
                 
-                boost::regex regex("REMARK   5 MOLECULE (\\S*)");
+                std::regex regex("REMARK   5 MOLECULE (\\S*)");
 
                 for ( auto &fragment : seeds ) {
 
@@ -202,8 +202,8 @@ namespace Program {
         molib::NRset DockFragments::get_top_seeds(const std::set<std::string> &seeds, const double top_percent) const {
                 molib::NRset top_seeds;
                 
-                boost::regex regex;
-                regex.assign("REMARK   5 MOLECULE ", boost::regex_constants::basic);
+                std::regex regex;
+                regex.assign("REMARK   5 MOLECULE ", std::regex_constants::basic);
 
                 for ( auto &fragment : seeds ) {
 

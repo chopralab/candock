@@ -1,6 +1,5 @@
 #ifndef NOSQLREADER_H
 #define NOSQLREADER_H
-#include <boost/regex.hpp>
 #include <boost/algorithm/string.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>

@@ -4,6 +4,7 @@
 #include <string>
 #include <sstream>
 #include <algorithm>
+#include <regex>
 #include "candock/ligands/jsonreader.hpp"
 #include "candock/helper/error.hpp"
 #include "candock/helper/inout.hpp"
@@ -63,7 +64,7 @@ bool JsonReader::print_JSON_tree(const Json::Value &root, const unsigned short d
 }
 
 void JsonReader::parse_JSON(const string JSON_file) {
-	if (boost::regex_search(JSON_file, boost::regex(".json$"))) {
+	if (std::regex_search(JSON_file, std::regex(".json$"))) {
 		Json::Reader reader;
 		vector<string> vec;
 		Inout::read_file(JSON_file, vec);

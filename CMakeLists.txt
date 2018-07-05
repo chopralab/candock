@@ -41,7 +41,7 @@ endif(CANDOCK_CUDA_SUPPORT)
 #DRM Module
 set(CANDOCK_DRM OFF CACHE BOOL "Build DRM into Candock")
 
-find_package(Boost    REQUIRED  COMPONENTS filesystem system regex program_options)
+find_package(Boost    REQUIRED  COMPONENTS filesystem system program_options)
 find_package(Git      REQUIRED)
 
 set(JSONCPP_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/include/candock/external ${CMAKE_CURRENT_SOURCE_DIR}/lib/json )

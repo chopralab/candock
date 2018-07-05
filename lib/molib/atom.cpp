@@ -5,7 +5,7 @@
 #include <string>
 #include <vector>
 #include <cstdlib>
-#include <boost/regex.hpp>
+#include <regex>
 #include "candock/molib/bond.hpp"
 #include "candock/geometry/geometry.hpp"
 #include "candock/molib/atom.hpp"
@@ -115,15 +115,15 @@ namespace molib {
 	}
 	void Atom::set_members(const string &str) {
 		// set atomic penalty scores
-		boost::smatch m;
+		std::smatch m;
 		dbgmsg("set members for atom " << this->atom_name() << " " << this->atom_number());
-		if (boost::regex_search(str, m, boost::regex("aps=(\\S+)"))) {
+		if (std::regex_search(str, m, std::regex("aps=(\\S+)"))) {
 			if (m[1].matched) {
 				string aps_str = m[1].str();
 				dbgmsg("aps_str = " << aps_str);
-				boost::match_results<string::const_iterator> matches;
+				std::match_results<string::const_iterator> matches;
 				string::const_iterator begin = aps_str.begin(), end = aps_str.end();
-				while (boost::regex_search(begin, end, matches, boost::regex("\\{(\\d+,\\d+)\\}"))) {
+				while (std::regex_search(begin, end, matches, std::regex("\\{(\\d+,\\d+)\\}"))) {
 					string s(matches[1].first, matches[1].second);
 					auto vec = help::ssplit(s, ",");
 					int val = stoi(vec[0]);
@@ -134,13 +134,13 @@ namespace molib {
 			}
 		}
 		// set properties
-		if (boost::regex_search(str, m, boost::regex("prop=(\\S+)"))) {
+		if (std::regex_search(str, m, std::regex("prop=(\\S+)"))) {
 			if (m[1].matched) {
 				string prop_str = m[1].str();
 				dbgmsg("prop = " << prop_str);
-				boost::match_results<string::const_iterator> matches;
+				std::match_results<string::const_iterator> matches;
 				string::const_iterator begin = prop_str.begin(), end = prop_str.end();
-				while (boost::regex_search(begin, end, matches, boost::regex("\\{(\\w+,\\d+)\\}"))) {
+				while (std::regex_search(begin, end, matches, std::regex("\\{(\\w+,\\d+)\\}"))) {
 					string s(matches[1].first, matches[1].second);
 					auto vec = help::ssplit(s, ",");
 					string val = vec[0];
@@ -151,14 +151,14 @@ namespace molib {
 			}
 		}
 		// set gaff type
-		if (boost::regex_search(str, m, boost::regex("gaff=([^,$]+)"))) {
+		if (std::regex_search(str, m, std::regex("gaff=([^,$]+)"))) {
 			if (m[1].matched) {
 				dbgmsg(m[1].str());
 				set_gaff_type(m[1].str());
 			}
 		}
 		// set idatm type
-		if (boost::regex_search(str, m, boost::regex("idatm=([^,$]+)"))) {
+		if (std::regex_search(str, m, std::regex("idatm=([^,$]+)"))) {
 			if (m[1].matched) {
 				dbgmsg(m[1].str());
 				set_idatm_type(m[1].str());
@@ -168,7 +168,7 @@ namespace molib {
 
 	bool Atom::compatible(const Atom &other) const {
 		/* this is "smiles" atom and other is real atom */
-		if (!boost::regex_search(other.get_label(), boost::regex(this->get_label())))
+		if (!std::regex_search(other.get_label(), std::regex(this->get_label())))
 			return false;
 		for (auto &kv : this->__smiles_prop) {
 			auto &p = kv.first;

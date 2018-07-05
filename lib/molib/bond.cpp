@@ -1,5 +1,6 @@
 #include "candock/molib/molecule.hpp"
 #include "candock/helper/help.hpp"
+#include <regex>
 
 namespace candock {
 namespace molib {
@@ -61,11 +62,11 @@ namespace molib {
 
 	void Bond::set_members(const string &str) {
 		// set angles
-		boost::match_results<string::const_iterator> matches;
+		std::match_results<string::const_iterator> matches;
 		auto i = str.find("angles");
 		if (i != string::npos) {
 			string::const_iterator begin = str.begin() + i, end = str.end();
-			while (boost::regex_search(begin, end, matches, boost::regex("([-]*\\d+)[,}]"))) {
+			while (std::regex_search(begin, end, matches, std::regex("([-]*\\d+)[,}]"))) {
 				string s(matches[1].first, matches[1].second);
 				int angle = stoi(s);
 				set_angle(angle);
@@ -74,26 +75,26 @@ namespace molib {
 			}
 		}
 		// set rotatable type
-		boost::smatch m;
-		if (boost::regex_search(str, m, boost::regex("rota=([^,$]+)"))) {
+		std::smatch m;
+		if (std::regex_search(str, m, std::regex("rota=([^,$]+)"))) {
 			if (m[1].matched) {
 				set_rotatable(m[1].str());
 			}
 		}
 		// set drive_id
-		if (boost::regex_search(str, m, boost::regex("drive_id=(\\w+)"))) {
+		if (std::regex_search(str, m, std::regex("drive_id=(\\w+)"))) {
 			if (m[1].matched) {
 				set_drive_id(stoi(m[1].str()));
 			}
 		}
 		// set gaff bond type
-		if (boost::regex_search(str, m, boost::regex("bond_gaff_type=(\\w+)"))) {
+		if (std::regex_search(str, m, std::regex("bond_gaff_type=(\\w+)"))) {
 			if (m[1].matched) {
 				set_bond_gaff_type(m[1].str());
 			}
 		}
 		// set bond order
-		if (boost::regex_search(str, m, boost::regex("bo=(\\w+)"))) {
+		if (std::regex_search(str, m, std::regex("bo=(\\w+)"))) {
 			if (m[1].matched) {
 				set_bo(stoi(m[1].str()));
 			}

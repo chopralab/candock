@@ -10,6 +10,7 @@
 
 #include <boost/filesystem/path.hpp>
 #include <memory>
+#include <regex>
 
 using namespace candock;
 

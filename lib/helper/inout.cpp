@@ -1,6 +1,6 @@
 #include "candock/helper/inout.hpp"
 
-#include <boost/regex.hpp>
+#include <regex>
 #include <boost/algorithm/string.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
@@ -199,7 +199,7 @@ namespace Inout {
                 }
                 vector<string> filenames;
                 for(string &s : fn) {
-                        if (boost::regex_search(s, boost::regex(pattern))) {
+                        if (std::regex_search(s, std::regex(pattern))) {
                                 filenames.push_back(s);
                         }
                 }

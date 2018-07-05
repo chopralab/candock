@@ -9,7 +9,6 @@
 #include <functional>
 #include <queue>
 #include <set>
-#include <boost/regex.hpp>
 
 namespace candock {
 

@@ -1,6 +1,6 @@
 #include "candock/parser/fileparser.hpp"
 
-#include <boost/regex.hpp>
+#include <regex>
 #include <boost/algorithm/string.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/algorithm/string/split.hpp>
@@ -19,7 +19,7 @@ namespace parser {
                         std::lock_guard<std::mutex> gaurd(__concurrent_read_mtx);
                         Inout::read_stream( __stream, pdb_raw, __num_occur, "REMARK   5 MOLECULE");
                 }
-                boost::smatch m;
+                std::smatch m;
                 set<char> bio_chain;
                 int biomolecule_number = -1;
                 bool found_molecule = false, found_assembly = false, found_model = false;
@@ -167,7 +167,7 @@ namespace parser {
                         } else if (line.compare (0, 14, "REMARK   4 NRP") == 0) {
                                 string name = "";
 
-                                if (boost::regex_search (line, m, boost::regex ("REMARK   4 NRPDB\\s+(.*)"))) {
+                                if (std::regex_search (line, m, std::regex ("REMARK   4 NRPDB\\s+(.*)"))) {
                                         if (m[1].matched) {
                                                 name = m[1].str();
                                                 dbgmsg (name);
@@ -178,7 +178,7 @@ namespace parser {
                         } else if (line.compare (0, 14, "REMARK   5 MOL") == 0) {
                                 string name = "";
 
-                                if (boost::regex_search (line, m, boost::regex ("REMARK   5 MOLECULE\\s+(.*)"))) {
+                                if (std::regex_search (line, m, std::regex ("REMARK   5 MOLECULE\\s+(.*)"))) {
                                         if (m[1].matched) {
                                                 name = m[1].str();
                                                 dbgmsg (name);
@@ -191,7 +191,7 @@ namespace parser {
                                 int number = 0;
                                 string name = "";
 
-                                if (boost::regex_search (line, m, boost::regex ("REMARK   6 (\\S+ \\S+)\\s+(\\d+)"))) {
+                                if (std::regex_search (line, m, std::regex ("REMARK   6 (\\S+ \\S+)\\s+(\\d+)"))) {
                                         if (m[1].matched && m[2].matched) {
                                                 name = m[1].str();
                                                 number = stoi (m[2].str());
@@ -201,7 +201,7 @@ namespace parser {
                                 found_assembly = false;
                                 __generate_assembly (mols, found_assembly, number, name);
                         } else if (line.compare (0, 5, "MODEL") == 0) {
-                                if (boost::regex_search (line, m, boost::regex ("MODEL\\s+(\\d+)"))) {
+                                if (std::regex_search (line, m, std::regex ("MODEL\\s+(\\d+)"))) {
                                         if (m[1].matched) {
                                                 
                                                 if ( __hm & skip_atom || __hm & protein_poses_only) {
@@ -229,7 +229,7 @@ namespace parser {
                         } else if (line.compare (0, 3, "TER") == 0) {
                                 ter_found = true;
                         } else if (line.compare (0, 10, "REMARK 350") == 0) {
-                                if (boost::regex_search (line, m, boost::regex ("REMARK 350 BIOMOLECULE:\\s*(\\d+)"))) {
+                                if (std::regex_search (line, m, std::regex ("REMARK 350 BIOMOLECULE:\\s*(\\d+)"))) {
                                         if (m[1].matched) {
                                                 biomolecule_number = stoi (m[1].str());
 
@@ -240,8 +240,8 @@ namespace parser {
                                         }
 
                                         bio_chain.clear();
-                                } else if (boost::regex_search (line, m, boost::regex ("REMARK 350 APPLY THE FOLLOWING TO CHAINS:\\s?(\\S{1})?,?\\s?(\\S{1})?,?\\s?(\\S{1})?,?\\s?(\\S{1})?,?\\s?(\\S{1})?,?\\s?(\\S{1})?,?\\s?(\\S{1})?,?\\s?(\\S{1})?,?\\s?(\\S{1})?,?"))
-                                                || boost::regex_search (line, m, boost::regex ("REMARK 350                    AND CHAINS:\\s?(\\S{1})?,?\\s?(\\S{1})?,?\\s?(\\S{1})?,?\\s?(\\S{1})?,?\\s?(\\S{1})?,?\\s?(\\S{1})?,?\\s?(\\S{1})?,?\\s?(\\S{1})?,?\\s?(\\S{1})?,?"))) {
+                                } else if (std::regex_search (line, m, std::regex ("REMARK 350 APPLY THE FOLLOWING TO CHAINS:\\s?(\\S{1})?,?\\s?(\\S{1})?,?\\s?(\\S{1})?,?\\s?(\\S{1})?,?\\s?(\\S{1})?,?\\s?(\\S{1})?,?\\s?(\\S{1})?,?\\s?(\\S{1})?,?\\s?(\\S{1})?,?"))
+                                                || std::regex_search (line, m, std::regex ("REMARK 350                    AND CHAINS:\\s?(\\S{1})?,?\\s?(\\S{1})?,?\\s?(\\S{1})?,?\\s?(\\S{1})?,?\\s?(\\S{1})?,?\\s?(\\S{1})?,?\\s?(\\S{1})?,?\\s?(\\S{1})?,?\\s?(\\S{1})?,?"))) {
                                         if (m.empty()) {
                                                 throw Error ("die : problem in REMARK 350 APPLY");
                                         }
@@ -251,7 +251,7 @@ namespace parser {
                                                         bio_chain.insert (el.str().at (0));
                                                 }
                                         }
-                                } else if (boost::regex_search (line, m, boost::regex ("REMARK 350   BIOMT(\\d+)\\s+(\\d+)\\s+(\\S+)\\s+(\\S+)\\s+(\\S+)\\s+(\\S+)"))) {
+                                } else if (std::regex_search (line, m, std::regex ("REMARK 350   BIOMT(\\d+)\\s+(\\d+)\\s+(\\S+)\\s+(\\S+)\\s+(\\S+)\\s+(\\S+)"))) {
                                         if (m.empty()) {
                                                 throw Error ("die : problem in REMARK 350   BIOMT");
                                         }
@@ -293,7 +293,7 @@ namespace parser {
                                         // modified 'standard' residue gets saved,e.g., MET --> MSE, glycosylated...
                                         mols.last().add_modified (Residue::res_tuple2 (chain_id, resn_mod, resi, ins_code));
                                 }
-                        } else if (line.compare (0, 4, "SITE") == 0 && boost::regex_search (line, m, boost::regex ("SITE\\s+\\d+\\s+(\\S+)\\s+\\S+(\\s+\\S+\\s?\\S{1}\\s{0,3}\\d{1,4}\\S?)?(\\s+\\S+\\s?\\S{1}\\s{0,3}\\d{1,4}\\S?)?(\\s+\\S+\\s?\\S{1}\\s{0,3}\\d{1,4}\\S?)?(\\s+\\S+\\s?\\S{1}\\s{0,3}\\d{1,4}\\S?)?"))) {
+                        } else if (line.compare (0, 4, "SITE") == 0 && std::regex_search (line, m, std::regex ("SITE\\s+\\d+\\s+(\\S+)\\s+\\S+(\\s+\\S+\\s?\\S{1}\\s{0,3}\\d{1,4}\\S?)?(\\s+\\S+\\s?\\S{1}\\s{0,3}\\d{1,4}\\S?)?(\\s+\\S+\\s?\\S{1}\\s{0,3}\\d{1,4}\\S?)?(\\s+\\S+\\s?\\S{1}\\s{0,3}\\d{1,4}\\S?)?"))) {
                                 if (m.empty()) {
                                         throw Error ("die : problem in SITE");
                                 }
