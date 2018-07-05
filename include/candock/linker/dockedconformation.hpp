@@ -50,6 +50,11 @@ namespace Linker {
                         return __max_clq_identity;
                 }
 
+                void free_memory() {
+                        __ligand.reset(nullptr);
+                        __receptor.reset(nullptr);
+                }
+
                 friend bool operator< (const DockedConformation &other, const DockedConformation &other2) {
                         return other.get_energy() < other2.get_energy();
                 }

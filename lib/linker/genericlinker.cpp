@@ -204,8 +204,6 @@ namespace Linker {
 		for (auto &docked : docked_conformations) {
 		
 			try {
-
-
 				// Do a quick energy minization:
 				if (__max_iterations_pre > 0) {
 					OMMIface::Modeler modeler (
@@ -256,6 +254,8 @@ namespace Linker {
 				log_error << "MinimizationError: skipping minimization of one conformation of ligand " 
 					<< __ligand.name() << " due to : " << e.what() << endl;
 			}
+
+			docked.free_memory();
 		}
 		return minimized_conformations;
 	}
