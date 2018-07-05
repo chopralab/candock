@@ -1,15 +1,15 @@
-#include "helper/inout.hpp"
-#include "helper/debug.hpp"
-#include "helper/benchmark.hpp"
-#include "helper/logger.hpp"
-#include "molib/grid.hpp"
-#include "molib/molecule.hpp"
-#include "geom3d/geom3d.hpp"
-#include "geom3d/quaternion.hpp"
-#include "graph/mcqd.hpp"
-#include "helper/array2d.hpp"
-#include "gpoints.hpp"
-#include "conformations.hpp"
+#include "candock/helper/inout.hpp"
+#include "candock/helper/debug.hpp"
+#include "candock/helper/benchmark.hpp"
+#include "candock/helper/logger.hpp"
+#include "candock/molib/grid.hpp"
+#include "candock/molib/molecule.hpp"
+#include "candock/geometry/geometry.hpp"
+#include "candock/geometry/quaternion.hpp"
+#include "candock/graph/mcqd.hpp"
+#include "candock/helper/array2d.hpp"
+#include "candock/docker/gpoints.hpp"
+#include "candock/docker/conformations.hpp"
 #include <iostream>
 #include <exception>
 
@@ -36,12 +36,12 @@ namespace Docker {
 		const double &conf_spin, const int num_univec) : __seed(seed) {
 
 		try {
-			const double conf_spin_in_radians = Geom3D::radians(conf_spin / 2);
+			const double conf_spin_in_radians = geometry::radians(conf_spin / 2);
 			
 			Benchmark bench;
 	
 			// get uniform sphere points, i.e., unit vectors
-			Geom3D::Point::Vec unit_vectors = Geom3D::uniform_sphere(num_univec);
+			geometry::Point::Vec unit_vectors = geometry::uniform_sphere(num_univec);
 	
 			const Molib::Atom &center = seed.get_center_atom();
 			
@@ -49,25 +49,25 @@ namespace Docker {
 			const Molib::Atom &another = center.first();
 	
 			// calculate vector between the two atoms
-			const Geom3D::Point bondvec = another.crd() - center.crd();
+			const geometry::Point bondvec = another.crd() - center.crd();
 			
-			Geom3D::Point::Vec seed_crds = seed.get_crds();
+			geometry::Point::Vec seed_crds = seed.get_crds();
 	
 			// translate points so that the central atom is at origin
 			for (auto &crd : seed_crds)
 				crd = crd - center.crd();
 			
 			// rotate seed on each unit_vector by increments of conf_spin_in_radians degrees (in radians)
-			vector<Geom3D::Point::Vec> confs;
+			vector<geometry::Point::Vec> confs;
 			for (auto &unitvec : unit_vectors) {
 	
-				Geom3D::Vector3 ortho = Geom3D::Coordinate::cross(bondvec, unitvec);
-				const double rotangl = Geom3D::angle(unitvec, bondvec) / 2;
-				dbgmsg("rotangl = " << Geom3D::degrees(rotangl) << " seed = " << seed.name());
-				const Geom3D::Quaternion q0(ortho.norm()*sin(rotangl), cos(rotangl));
+				geometry::Vector3 ortho = geometry::Coordinate::cross(bondvec, unitvec);
+				const double rotangl = geometry::angle(unitvec, bondvec) / 2;
+				dbgmsg("rotangl = " << geometry::degrees(rotangl) << " seed = " << seed.name());
+				const geometry::Quaternion q0(ortho.norm()*sin(rotangl), cos(rotangl));
 	
 				// align seed crds along unit vector
-				Geom3D::Point::Vec previous;
+				geometry::Point::Vec previous;
 				for (auto &crd : seed_crds) {
 					previous.push_back(q0.rotatedVector(crd)); 
 				}
@@ -87,10 +87,10 @@ namespace Docker {
 				Inout::output_file(ss.str(), "unit_" + seed.name() + ".pdb", ios_base::app); 
 #endif				
 
-				const Geom3D::Quaternion q(Geom3D::Vector3(unitvec)*sin(conf_spin_in_radians), cos(conf_spin_in_radians));
+				const geometry::Quaternion q(geometry::Vector3(unitvec)*sin(conf_spin_in_radians), cos(conf_spin_in_radians));
 	
 				for (double angle = 2 * conf_spin_in_radians; angle < M_PI; angle += conf_spin_in_radians) {
-					Geom3D::Point::Vec rotated;
+					geometry::Point::Vec rotated;
 					for (auto &crd : previous) {	
 						rotated.push_back(q.rotatedVector(crd)); 
 					}
@@ -111,7 +111,7 @@ namespace Docker {
 			__rmsd_sq.init(confs.size(), confs.size());
 			for (size_t i = 0; i < confs.size(); ++i) {
 				for (size_t j = i + 1; j < confs.size(); ++j) {
-					__rmsd_sq.data[i][j] = __rmsd_sq.data[j][i] = Geom3D::compute_rmsd_sq(confs[i], confs[j]);
+					__rmsd_sq.data[i][j] = __rmsd_sq.data[j][i] = geometry::compute_rmsd_sq(confs[i], confs[j]);
 				}
 			}
 			dbgmsg("after rmsd calculation");

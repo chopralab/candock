@@ -1,13 +1,13 @@
-#include "linkfragments.hpp"
+#include "candock/program/linkfragments.hpp"
 
 #include <boost/filesystem.hpp>
 
-#include "linker/linker.hpp"
-#include "modeler/modeler.hpp"
-#include "helper/path.hpp"
-#include "helper/grep.hpp"
+#include "candock/linker/linker.hpp"
+#include "candock/modeler/modeler.hpp"
+#include "candock/helper/path.hpp"
+#include "candock/helper/grep.hpp"
 
-#include "fileout/fileout.hpp"
+#include "candock/fileout/fileout.hpp"
 
 namespace Program {
 
@@ -57,7 +57,8 @@ namespace Program {
 
         void LinkFragments::__link_ligand (Molib::Molecule &ligand) {
 
-                boost::filesystem::path p (__receptor.name());
+                auto prot_name = boost::filesystem::basename(__receptor.name());
+                boost::filesystem::path p (prot_name);
                 p = p / cmdl.get_string_option ("docked_dir") / (ligand.name() + ".pdb");
 
                 OMMIface::ForceField ffcopy (__ffield);
@@ -75,7 +76,7 @@ namespace Program {
                         /**
                           * Read top seeds for this ligand
                           */
-                        Molib::NRset top_seeds = __seeds_database.get_top_seeds (ligand, cmdl.get_double_option ("top_percent"));
+                        Molib::NRset top_seeds = __seeds_database.get_seeds (ligand, cmdl.get_double_option ("top_percent"));
 
                         ligand.erase_properties(); // required for graph matching
                         top_seeds.erase_properties(); // required for graph matching
@@ -105,10 +106,13 @@ namespace Program {
                         /* Init minization options and constants, including ligand and receptor topology
                          *
                          */
-                        OMMIface::Modeler modeler (ffcopy, cmdl.get_string_option ("fftype"), cmdl.get_int_option ("cutoff"),
-                                                   cmdl.get_double_option ("mini_tol"), cmdl.get_int_option ("max_iter"), cmdl.get_int_option ("update_freq"),
-                                                   cmdl.get_double_option ("pos_tol"), false, cmdl.get_double_option("dynamic_step_size"),
-                                                   cmdl.get_double_option("temperature"), cmdl.get_double_option("friction"));
+                        OMMIface::Modeler modeler (
+                                ffcopy,
+                                cmdl.get_string_option ("fftype"),
+                                cmdl.get_double_option ("mini_tol"),
+                                cmdl.get_int_option ("max_iter"),
+                                false
+                        );
 
                         /**
                          * Connect seeds with rotatable linkers, account for symmetry, optimize
@@ -126,7 +130,8 @@ namespace Program {
                                                cmdl.get_int_option ("link_iter"),
                                                cmdl.get_double_option ("clash_coeff"), cmdl.get_double_option ("docked_clus_rad"),
                                                cmdl.get_double_option ("max_allow_energy"), cmdl.get_int_option ("max_num_possibles"),
-                                               cmdl.get_int_option ("max_clique_size"), cmdl.get_int_option ("max_iter_final"));
+                                               cmdl.get_int_option ("max_clique_size"), cmdl.get_int_option ("max_iter_final"), cmdl.get_int_option ("max_iter_pre"),
+                                               cmdl.get_string_option("platform"), cmdl.get_string_option("precision"), cmdl.get_string_option("accelerators"));
 
                         Molib::Atom::Graph cryst_graph =  Molib::Atom::create_graph(crystal_ligand.get_atoms());
 

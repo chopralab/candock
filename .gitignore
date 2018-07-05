@@ -1,10 +1,7 @@
 *.o
 *.geany
 *.DS_Store
-build/
-build_intel/
-build_clang/
-external/
+build*
 .project
 .cproject
 .idea/
@@ -12,4 +9,4 @@ external/
 *.kdev4
 *.swp
 .vscode/
-candock.code-workspace
+*.code-workspace

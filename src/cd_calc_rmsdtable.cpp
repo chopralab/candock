@@ -1,4 +1,4 @@
-#include "program/fragmentligands.hpp"
+#include "candock/program/fragmentligands.hpp"
 #include "version.hpp"
 
 ////////////////// FRAGMENTING OF LIGANDS ///////////////////////////

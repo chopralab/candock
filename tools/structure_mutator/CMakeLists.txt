@@ -2,7 +2,12 @@ add_executable( structure_mutator
                 structure_mutator.cpp
             )
 
-target_link_libraries( structure_mutator candock ${Boost_LIBRARIES} )
+target_link_libraries( structure_mutator
+    candock
+    ${Boost_LIBRARIES}
+    ${OPENMM_LIBRARY}
+    ${GSL_LIBRARIES}
+)
 
 install(
     TARGETS

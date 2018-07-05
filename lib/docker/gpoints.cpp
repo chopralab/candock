@@ -1,14 +1,14 @@
-#include "helper/inout.hpp"
-#include "molib/grid.hpp"
-#include "molib/molecule.hpp"
-#include "helper/benchmark.hpp"
-#include "geom3d/geom3d.hpp"
-#include "centro/centroids.hpp"
-#include "score/score.hpp"
-#include "gpoints.hpp"
+#include "candock/helper/inout.hpp"
+#include "candock/molib/grid.hpp"
+#include "candock/molib/molecule.hpp"
+#include "candock/helper/benchmark.hpp"
+#include "candock/geometry/geometry.hpp"
+#include "candock/centro/centroids.hpp"
+#include "candock/score/score.hpp"
+#include "candock/docker/gpoints.hpp"
 #include <iostream>
 #include <exception>
-#include "helper/logger.hpp"
+#include "candock/helper/logger.hpp"
 
 using namespace std;
 
@@ -54,7 +54,7 @@ namespace Docker {
 		}
 	}
 	Gpoints::Gpoints(const Score::Score &score, const set<int> &ligand_idatm_types, 
-		const Centro::Centroids &centroids, const Molib::Atom::Grid &grid, const double &grid_spacing, 
+		const centro::Centroids &centroids, const Molib::Atom::Grid &grid, const double &grid_spacing, 
 		const int &dist_cutoff, const double &excluded_radius, const double &max_interatomic_distance)
 		: __score(&score), __ligand_idatm_types(&ligand_idatm_types) {
 		try {
@@ -66,7 +66,7 @@ namespace Docker {
 		}
 	}
 
-	Gpoints::Gpoints(const Centro::Centroids &centroids, Molib::Atom::Grid &grid, const double &grid_spacing, 
+	Gpoints::Gpoints(const centro::Centroids &centroids, Molib::Atom::Grid &grid, const double &grid_spacing, 
 		const int &dist_cutoff, const double &excluded_radius, const double &max_interatomic_distance)
 		: __score(nullptr), __ligand_idatm_types(nullptr) {
 		try {
@@ -79,7 +79,7 @@ namespace Docker {
 	}
 
 	const Gpoints::Gpoint& Gpoints::get_center_point() const {
-		Geom3D::Point center(0,0,0);
+		geometry::Point center(0,0,0);
 		double min_d = HUGE_VAL;
 		const Gpoints::Gpoint *center_point = nullptr;
 		for (auto &p : get_gridpoints0()) {
@@ -94,7 +94,7 @@ namespace Docker {
 		return *center_point;
 	}
 
-        void Gpoints::__identify_gridpoints(const Centro::Centroids &centroids, const Molib::Atom::Grid &grid, 
+        void Gpoints::__identify_gridpoints(const centro::Centroids &centroids, const Molib::Atom::Grid &grid, 
                 const double &grid_spacing, const int &dist_cutoff, const double &excluded_radius, 
                 const double &max_interatomic_distance) {
 #ifndef NDEGUG
@@ -106,12 +106,12 @@ namespace Docker {
                 // find the absolute minimium and maximum coordinates of all centroids
                 // find the absolute minimium and maximum coordinates of all centroids
                 for (auto &kv : centroids) {
-                        Geom3D::Coordinate min(10000,10000,10000);
-                        Geom3D::Coordinate max(-10000,-10000,-10000);
+                        geometry::Coordinate min(10000,10000,10000);
+                        geometry::Coordinate max(-10000,-10000,-10000);
                         const int bsite_id = kv.first;
                         for (auto &centroid : kv.second) {
-                                Geom3D::Coordinate min2 = centroid.get_centroid() - ceil(centroid.get_radial_check());
-                                Geom3D::Coordinate max2 = centroid.get_centroid() + ceil(centroid.get_radial_check());
+                                geometry::Coordinate min2 = centroid.get_centroid() - ceil(centroid.get_radial_check());
+                                geometry::Coordinate max2 = centroid.get_centroid() + ceil(centroid.get_radial_check());
                                 if (min2.x() < min.x()) min.set_x(min2.x());
                                 if (min2.y() < min.y()) min.set_y(min2.y());
                                 if (min2.z() < min.z()) min.set_z(min2.z());
@@ -137,7 +137,7 @@ namespace Docker {
                         // initialize mapping between gridpoints and discretized 3D space
                         __gmap[bsite_id].init(last_column + 1, last_row + 1, last_layer + 1);
                         //dbgmsg("gmap szi = " << __gmap.szi << " szj = " << __gmap.szj << " szk = " << __gmap.szk);
-                        Geom3D::Coordinate eval;
+                        geometry::Coordinate eval;
                         for(int column=0;column<=last_column;column++) {
                                 int even_column=(column%2==0) ? 1 : 0; // 1 if odd, 0 if even
                                 for(int row=0;row<=last_row;row++) {
@@ -242,10 +242,10 @@ namespace Docker {
 		Benchmark bench;
 #endif
 		// find the minimium and maximum coordinates
-		Geom3D::Point center(0,0,0);
+		geometry::Point center(0,0,0);
 	
-		Geom3D::Coordinate min = center - ceil(radial_check);
-		Geom3D::Coordinate max = center + ceil(radial_check);
+		geometry::Coordinate min = center - ceil(radial_check);
+		geometry::Coordinate max = center + ceil(radial_check);
 		dbgmsg("min point = " << min.pdb());
 		dbgmsg("max point = " << max.pdb());
 		const int total_gridpoints = 3*ceil((max.x()-min.x())/grid_spacing)
@@ -260,7 +260,7 @@ namespace Docker {
 		const int last_row = ceil(max_d/(sqrt(3)*r));
 		const int last_layer = ceil(max_d/(2*r*sqrt(6)/3));
 
-		Geom3D::Coordinate eval;
+		geometry::Coordinate eval;
 		for(int column=0;column<=last_column;column++) {
 			int even_column=(column%2==0) ? 1 : 0; // 1 if odd, 0 if even
 			for(int row=0;row<=last_row;row++) {

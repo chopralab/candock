@@ -1,11 +1,11 @@
-#include "fragmenter.hpp"
-#include "unique.hpp"
-#include "helper/renamerules.hpp"
+#include "candock/fragmenter/fragmenter.hpp"
+#include "candock/fragmenter/unique.hpp"
+#include "candock/helper/renamerules.hpp"
 #include <queue>
 #include <iterator>
-#include "molib/molecule.hpp"
-#include "helper/help.hpp"
-#include "graph/graph.hpp"
+#include "candock/molib/molecule.hpp"
+#include "candock/helper/help.hpp"
+#include "candock/graph/graph.hpp"
 
 namespace Molib {
 	ostream& operator<<(ostream& os, const AtomMatchVec& atom_match_vec) {

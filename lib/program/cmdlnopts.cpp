@@ -1,8 +1,8 @@
-#include "cmdlnopts.hpp"
+#include "candock/program/cmdlnopts.hpp"
 #include <boost/program_options/cmdline.hpp>
 #include <boost/program_options/errors.hpp>
 
-#include "helper/logger.hpp"
+#include "candock/helper/logger.hpp"
 
 #include <iostream>
 #include <fstream>
@@ -129,12 +129,6 @@ namespace Program {
 			 "Function for calculating scores 'radial' or 'normalized_frequency'")
 			("cutoff",  po::value<int> ()->default_value (6),
 			 "Cutoff length [4-15].")
-			("step",    po::value<double> ()->default_value (0.01, "0.01"),
-			 "Step for spline generation of non-bonded knowledge-based potential [0.0-1.0]")
-			("scale",   po::value<double> ()->default_value (10.0, "10.0"),
-			 "Scale non-bonded forces and energy for knowledge-based potential [0.0-1000.0]")
-			("potential_file", po::value<std::string> ()->default_value ("potentials.txt"),
-			 "Output file for potentials and derivatives")
 			;
 
                         po::options_description force_field_min ("Forcefield and Minimization Options");
@@ -151,19 +145,18 @@ namespace Program {
                          "Gaff DAT file to use for Heme groups")
                         ("fftype"   , po::value<std::string> ()->default_value ("kb"),
                          "Forcefield to use 'kb' (knowledge-based), 'phy' (physics-based), or 'none' (do not calculate intermolecular forces)")
-                        ("obj_dir", po::value<std::string> ()->default_value (""),
-                         "Output directory for objective function. Setting this value will cause the KB potential to be read from disk."
-                         "Default(empty string) causes the objective function to be recalculated.")
-                        ("pos_tol",   po::value<double> ()->default_value (0.00000000001, "0.00000000001"),
-                         "Minimization position tolerance in Angstroms - only for KB")
+			("dist_cutoff", po::value<double> ()->default_value(6.0),
+			 "Distance cutoff for intermolecular forces")
                         ("mini_tol",  po::value<double> ()->default_value (0.0001),
                          "Minimization tolerance")
                         ("max_iter",  po::value<int> ()->default_value (10),
                          "Maximum iterations for minimization during linking")
+			("max_iter_pre", po::value<int> ()->default_value(20),
+			 "Maximum iterations for ligand only optimization")
                         ("max_iter_final", po::value<int> ()->default_value (100),
                          "Maximum iterations for final minimization")
                         ("update_freq", po::value<int> ()->default_value (10),
-                         "Update non-bond frequency")
+                         "(Ignored) Update non-bond frequency")
                         ("temperature", po::value<double>()->default_value(300.0f, "300"),
                          "Temperature to run the dynamic simulation at.")
                         ("friction",    po::value<double>()->default_value(91.f, "91.0"),
@@ -174,7 +167,37 @@ namespace Program {
                          "Step size (in fempto seconds)")
                         ("dynamic_steps", po::value<int>()->default_value(1000),
                          "Number of steps to do a dynamic simulation for.")
+			("platform", po::value<std::string> () ->default_value ("CPU"),
+                         "Platform to run KBForce on. Options are CPU, GPU, and OpenCL.")
+			("precision", po::value<std::string> () ->default_value ("double"),
+                         "Precision to run KBForce on. Options are single, mixed, double. Only works using CUDA or OpenCL platform")
+			("accelerators", po::value<std::string> () ->default_value ("double"),
+                         "Precision to run KBForce on. Options are single, mixed, double. Only works using CUDA or OpenCL platform")
                         ;
+
+                        po::options_description kb_ff ("Knowledge-Based Forcefield Options");
+			force_field_min.add_options()
+			("ff_ref",     po::value<std::string> ()->default_value ("mean"),
+			 "Normalization method for the reference state ('mean' is averaged over all atom type pairs, whereas 'cumulative' is a summation for atom type pairs)")
+			("ff_comp",    po::value<std::string> ()->default_value ("complete"),
+			 "Atom types used in calculating reference state 'reduced' or 'complete'"
+                         "('reduced' includes only those atom types present in the specified receptor and small molecule, whereas 'complete' includes all atom types)")
+			("ff_func",    po::value<std::string> ()->default_value ("radial"),
+			 "Function for calculating scores 'radial' or 'normalized_frequency'")
+			("ff_cutoff",  po::value<int> ()->default_value (15),
+			 "Cutoff length [4-15].")
+			("scale",   po::value<double> ()->default_value (10.0, "10.0"),
+			 "Scale non-bonded forces and energy for knowledge-based potential [0.0-1000.0]")
+			("potential_file", po::value<std::string> ()->default_value ("potentials.txt"),
+			 "Output file for potentials and derivatives")
+			("obj_dir", po::value<std::string> ()->default_value (""),
+                         "Output directory for objective function. Setting this value will cause the KB potential to be read from disk."
+                         "Default(empty string) causes the objective function to be recalculated.")
+			("step",    po::value<double> ()->default_value (0.01, "0.01"),
+			 "Step for spline generation of non-bonded knowledge-based potential [0.0-1.0]")
+			("pos_tol",   po::value<double> ()->default_value (0.00000000001, "0.00000000001"),
+			 "(Ignored) Minimization position tolerance in Angstroms - only for KB")
+			;
 
 			po::options_description linking_step ("Fragment Linking Options");
 			linking_step.add_options()
@@ -262,6 +285,7 @@ namespace Program {
 			              .add(frag_dock_options)
 			              .add(scoring_options)
 			              .add(force_field_min)
+				      .add(kb_ff)
 			              .add(linking_step)
 			              .add(design_step);
 

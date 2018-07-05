@@ -1,13 +1,13 @@
-#include "helper/inout.hpp"
-#include "molib/grid.hpp"
-#include "score/score.hpp"
-#include "helper/benchmark.hpp"
-#include "helper/debug.hpp"
-#include "geom3d/geom3d.hpp"
-#include "helper/array1d.hpp"
-#include "gpoints.hpp"
-#include "conformations.hpp"
-#include "dock.hpp"
+#include "candock/helper/inout.hpp"
+#include "candock/molib/grid.hpp"
+#include "candock/score/score.hpp"
+#include "candock/helper/benchmark.hpp"
+#include "candock/helper/debug.hpp"
+#include "candock/geometry/geometry.hpp"
+#include "candock/helper/array1d.hpp"
+#include "candock/docker/gpoints.hpp"
+#include "candock/docker/conformations.hpp"
+#include "candock/docker/dock.hpp"
 #include <iostream>
 #include <exception>
 
@@ -91,7 +91,7 @@ namespace Docker {
 								<< " for idatm_type = " << atom.idatm_type());
 							dbgmsg("energy calculated at crd = " << pgpoint->crd() 
 								<< " is " << __score.non_bonded_energy(__gridrec, 
-								Molib::Atom::Vec{&atom}, Geom3D::Point::Vec{pgpoint->crd()}));
+								Molib::Atom::Vec{&atom}, geometry::Point::Vec{pgpoint->crd()}));
 						}
 						// if no clashes were found ...
 						if (!reje) {

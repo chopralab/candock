@@ -1,12 +1,12 @@
-#include "partial.hpp"
-#include "state.hpp"
-#include "score/score.hpp"
-#include "molib/molecule.hpp"
-#include "molib/bond.hpp"
-#include "helper/benchmark.hpp"
-#include "helper/help.hpp"
-#include "helper/array2d.hpp"
-#include "graph/mcqd.hpp"
+#include "candock/linker/partial.hpp"
+#include "candock/linker/state.hpp"
+#include "candock/score/score.hpp"
+#include "candock/molib/molecule.hpp"
+#include "candock/molib/bond.hpp"
+#include "candock/helper/benchmark.hpp"
+#include "candock/helper/help.hpp"
+#include "candock/helper/array2d.hpp"
+#include "candock/graph/mcqd.hpp"
 #include <queue>
 #include <map>
 #include <algorithm>
@@ -33,8 +33,8 @@ namespace Linker {
 	}
 
 	//~ double Partial::compute_rmsd_ord(const Partial &other) const {
-		//~ Geom3D::Point::Vec crds1, crds2;
-		//~ map<const Molib::Atom*, pair<Geom3D::Point, Geom3D::Point>> crd_map;
+		//~ geometry::Point::Vec crds1, crds2;
+		//~ map<const Molib::Atom*, pair<geometry::Point, geometry::Point>> crd_map;
 		//~ 
 		//~ for (auto &pstate : this->get_states()) {
 			//~ for (int i = 0; i < pstate->get_segment().get_atoms().size(); ++i) {
@@ -51,12 +51,12 @@ namespace Linker {
 		//~ for (auto &kv : crd_map) {
 			//~ auto &crd1 = kv.second.first;
 			//~ auto &crd2 = kv.second.second;
-			//~ if (crd1 == Geom3D::Point() || crd2 == Geom3D::Point())
+			//~ if (crd1 == geometry::Point() || crd2 == geometry::Point())
 				//~ throw Error("die : cannot compute rmsd between two partial conformations, which have different compositions");
 			//~ crds1.push_back(crd1);
 			//~ crds2.push_back(crd2);
 		//~ }
-		//~ return Geom3D::compute_rmsd(crds1, crds2);
+		//~ return geometry::compute_rmsd(crds1, crds2);
 	//~ }
 
 	double Partial::compute_rmsd_ord(const Partial &other) const {
@@ -89,16 +89,16 @@ namespace Linker {
 		return sqrt(sum_squared / sz);
 	}
 
-	Geom3D::Point Partial::compute_geometric_center() const { 
-		return Geom3D::compute_geometric_center(this->get_ligand_crds()); 
+	geometry::Point Partial::compute_geometric_center() const { 
+		return geometry::compute_geometric_center(this->get_ligand_crds()); 
 	}
 
 	void Partial::sort(Partial::Vec &v) {
 		std::sort(v.begin(), v.end(), Partial::comp());
 	}
 
-	Geom3D::Point::Vec Partial::get_ligand_crds() const { 
-		Geom3D::Point::Vec crds;
+	geometry::Point::Vec Partial::get_ligand_crds() const { 
+		geometry::Point::Vec crds;
 		for (auto &pstate: __states) {
 			for (auto &crd : pstate->get_crds()) {
 				crds.push_back(crd);
@@ -107,7 +107,7 @@ namespace Linker {
 		return crds; 
 	}
 
-	void Partial::set_ligand_crds(const Geom3D::Point::Vec &crds) { 
+	void Partial::set_ligand_crds(const geometry::Point::Vec &crds) { 
 		int i = 0;
 		for (auto &pstate: __states) {
 			for (auto &crd : pstate->get_crds()) {

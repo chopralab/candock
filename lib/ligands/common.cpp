@@ -1,7 +1,7 @@
-#include "molib/molecule.hpp"
-#include "parser/fileparser.hpp"
-#include "common.hpp"
-#include <json/json.h>
+#include "candock/molib/molecule.hpp"
+#include "candock/parser/fileparser.hpp"
+#include "candock/ligands/common.hpp"
+#include "candock/external/json/json.h"
 
 ostream& operator<< (ostream& stream, const ResidueSet& residues) {
 	for (auto &presidue : residues)

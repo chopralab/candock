@@ -1,12 +1,12 @@
-#include "dockfragments.hpp"
+#include "candock/program/dockfragments.hpp"
 
 #include <boost/filesystem/path.hpp>
 
-#include "helper/path.hpp"
-#include "helper/inout.hpp"
-#include "program/options.hpp"
-#include "helper/grep.hpp"
-#include "molib/atomtype.hpp"
+#include "candock/helper/path.hpp"
+#include "candock/helper/inout.hpp"
+#include "candock/program/options.hpp"
+#include "candock/helper/grep.hpp"
+#include "candock/molib/atomtype.hpp"
 
 namespace Program {
 
@@ -166,6 +166,38 @@ namespace Program {
                 return seed_score_map;
         }
 
+        Molib::NRset DockFragments::get_negative_seeds(const std::set<std::string> &seeds, const double max_value) const {
+                Molib::NRset top_seeds;
+                
+                boost::regex regex("REMARK   5 MOLECULE (\\S*)");
+
+                for ( auto &fragment : seeds ) {
+
+                        boost::filesystem::path file_to_read(__top_seeds_location);
+                        file_to_read /= fragment;
+                        file_to_read += ".pdb";
+
+                        std::ifstream file( file_to_read.c_str() );
+
+                        const size_t number_of_seeds = Grep::find_first_case_greater_than(file, regex, max_value);
+
+                        Parser::FileParser pdb( file_to_read.string(), Parser::all_models, number_of_seeds);
+
+                        dbgmsg("reading top_seeds_file for seed id = " << fragment);
+                        Molib::Molecules all = pdb.parse_molecule();
+
+                        dbgmsg("number of top seeds left = " << all.size());
+
+                        Molib::Molecules &last = top_seeds.add(new Molib::Molecules(all));
+
+                        if (last.empty()) {
+                                throw Error("die : there are no docked conformations for seed " + fragment);
+                        }
+                }
+
+                return top_seeds;
+        }
+
         Molib::NRset DockFragments::get_top_seeds(const std::set<std::string> &seeds, const double top_percent) const {
                 Molib::NRset top_seeds;
                 
@@ -202,7 +234,7 @@ namespace Program {
                 return top_seeds;
         }
 
-        Molib::NRset DockFragments::get_top_seeds(const Molib::Molecule &ligand, const double top_percent) const {
+        Molib::NRset DockFragments::get_seeds(const Molib::Molecule &ligand, const double top_percent) const {
                 std::set<string> seeds_to_read;
                 const Molib::Model &model = ligand.first().first();
                 for (auto &fragment : model.get_rigid()) { // iterate over seeds
@@ -210,7 +242,9 @@ namespace Program {
                                 seeds_to_read.insert(std::to_string(fragment.get_seed_id()));
                         }
                 }
-                return get_top_seeds(seeds_to_read, top_percent);
+                return top_percent <= 0?
+                        get_negative_seeds(seeds_to_read, top_percent) :
+                        get_top_seeds(seeds_to_read, top_percent);
         }
 
         Docker::Gpoints DockFragments::get_gridhcp() {

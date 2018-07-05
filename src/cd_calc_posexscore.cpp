@@ -1,12 +1,12 @@
-#include "program/cmdlnopts.hpp"
-#include "program/fragmentligands.hpp"
-#include "program/target.hpp"
+#include "candock/program/cmdlnopts.hpp"
+#include "candock/program/fragmentligands.hpp"
+#include "candock/program/target.hpp"
 
 #include "version.hpp"
-#include "drm/drm.hpp"
+#include "candock/drm/drm.hpp"
 
-#include "score/xscore.hpp"
-#include "modeler/forcefield.hpp"
+#include "candock/score/xscore.hpp"
+#include "candock/modeler/forcefield.hpp"
 
 using namespace std;
 using namespace Program;

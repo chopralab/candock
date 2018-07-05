@@ -1,9 +1,9 @@
-#include "help.hpp"
+#include "candock/helper/help.hpp"
 #include <string>
 #include <iostream>
 #include <stdio.h>
 #include <math.h>
-#include "renamerules.hpp"
+#include "candock/helper/renamerules.hpp"
 
 namespace help {
 

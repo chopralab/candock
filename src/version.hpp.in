@@ -7,7 +7,7 @@
 
 #include <thread>
 #include <string>
-#include "program/options.hpp"
+#include "candock/program/options.hpp"
 
 namespace Version {
 

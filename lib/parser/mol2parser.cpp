@@ -1,4 +1,4 @@
-#include "fileparser.hpp"
+#include "candock/parser/fileparser.hpp"
 
 using namespace Molib;
 
@@ -51,7 +51,7 @@ namespace Parser {
                                                 << " sybyl_type = " << sybyl_type << " subst_id = " << subst_id
                                                 << " subst_name = " << subst_name << " charge = " << charge
                                                 << " element = " << element << " hydrogen = " << hydrogen);
-                                        Geom3D::Coordinate crd (x, y, z);
+                                        geometry::Coordinate crd (x, y, z);
 
                                         if ( (__hm & hydrogens) || !hydrogen) {
                                                 Residue::res_type rest (Residue::hetero);

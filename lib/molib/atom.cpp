@@ -6,11 +6,11 @@
 #include <vector>
 #include <cstdlib>
 #include <boost/regex.hpp>
-#include "bond.hpp"
-#include "geom3d/geom3d.hpp"
-#include "atom.hpp"
-#include "residue.hpp"
-#include "chain.hpp"
+#include "candock/molib/bond.hpp"
+#include "candock/geometry/geometry.hpp"
+#include "candock/molib/atom.hpp"
+#include "candock/molib/residue.hpp"
+#include "candock/molib/chain.hpp"
 using namespace std;
 
 namespace Molib {

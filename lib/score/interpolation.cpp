@@ -1,5 +1,5 @@
-#include "helper/inout.hpp"
-#include "helper/help.hpp"
+#include "candock/helper/inout.hpp"
+#include "candock/helper/help.hpp"
 #include <functional>
 #include <gsl/gsl_errno.h>
 #include <gsl/gsl_spline.h>
@@ -9,7 +9,7 @@
 #include <gsl/gsl_randist.h>
 #include <gsl/gsl_statistics.h>
 #include <assert.h>
-#include "interpolation.hpp"
+#include "candock/score/interpolation.hpp"
 
 namespace Score {
 namespace Interpolation {

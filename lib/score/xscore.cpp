@@ -1,6 +1,6 @@
-#include "xscore.hpp"
+#include "candock/score/xscore.hpp"
 
-#include "helper/help.hpp"
+#include "candock/helper/help.hpp"
 
 inline double get_xs_radius(const Molib::Atom& xs) {
     switch (xs.element().number()) {

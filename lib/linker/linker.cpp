@@ -1,14 +1,14 @@
-#include "linker.hpp"
-#include "score/score.hpp"
-#include "molib/nrset.hpp"
-#include "molib/bond.hpp"
-#include "helper/benchmark.hpp"
-#include "helper/help.hpp"
-#include "helper/array2d.hpp"
-#include "graph/mcqd.hpp"
-#include "modeler/modeler.hpp"
-#include "geom3d/geom3d.hpp"
-#include "cluster/greedy.hpp"
+#include "candock/linker/linker.hpp"
+#include "candock/score/score.hpp"
+#include "candock/molib/nrset.hpp"
+#include "candock/molib/bond.hpp"
+#include "candock/helper/benchmark.hpp"
+#include "candock/helper/help.hpp"
+#include "candock/helper/array2d.hpp"
+#include "candock/graph/mcqd.hpp"
+#include "candock/modeler/modeler.hpp"
+#include "candock/geometry/geometry.hpp"
+#include "candock/cluster/greedy.hpp"
 #include <queue>
 
 using namespace std;
@@ -24,7 +24,8 @@ namespace Linker {
 			const int max_possible_conf, const int link_iter,
 			const double clash_coeff, const double docked_clus_rad,
 			const double max_allow_energy, const int max_num_possibles, 
-			const int max_clique_size, const int max_iterations_final) { 
+			const int max_clique_size, const int max_iterations_final, const int max_iterations_pre,
+			const std::string& platform, const std::string& precision, const std::string& accelerators) { 
 
 		
 		if (iterative) {
@@ -32,13 +33,15 @@ namespace Linker {
 				gridrec, score, dist_cutoff, spin_degrees, tol_seed_dist, 
 				lower_tol_seed_dist, upper_tol_seed_dist, max_possible_conf, link_iter, 
 				clash_coeff, docked_clus_rad, max_allow_energy, max_num_possibles, 
-				max_clique_size, max_iterations_final);
+				max_clique_size, max_iterations_final, max_iterations_pre,
+				platform, precision, accelerators);
 		} else {
 			l = new StaticLinker(modeler, receptor, ligand, top_seeds, 
 				gridrec, score, dist_cutoff, spin_degrees, tol_seed_dist, 
 				lower_tol_seed_dist, upper_tol_seed_dist, max_possible_conf, link_iter, 
 				clash_coeff, docked_clus_rad, max_allow_energy, max_num_possibles, 
-				max_clique_size, max_iterations_final);
+				max_clique_size, max_iterations_final, max_iterations_pre,
+				platform, precision, accelerators);
 		}
 	}
 	

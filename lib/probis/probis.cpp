@@ -1,10 +1,10 @@
-#include "probis.hpp"
+#include "candock/probis/probis.hpp"
 #include "const.h"
 #include "args.h"
 #include "states.h"
-#include "helper/error.hpp"
-#include "helper/debug.hpp"
-#include "helper/benchmark.hpp"
+#include "candock/helper/error.hpp"
+#include "candock/helper/debug.hpp"
+#include "candock/helper/benchmark.hpp"
 
 using namespace std;
 

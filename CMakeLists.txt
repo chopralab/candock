@@ -3,10 +3,10 @@ project(candock)
 cmake_minimum_required(VERSION 3.2 FATAL_ERROR)
 
 set( CANDOCK_MAJOR_VERSION 0 )
-set( CANDOCK_MINOR_VERSION 6 )
+set( CANDOCK_MINOR_VERSION 7 )
 set( CANDOCK_TWEAK_VERSION 0 )
 
-set(CANDOCK_VERSION "v${CANDOCK_MAJOR_VERSION}.${CANDOCK_MINOR_VERSION}.${CANDOCK_TWEAK_VERSION}"
+set(CANDOCK_VERSION "v${CANDOCK_MAJOR_VERSION}.${CANDOCK_MINOR_VERSION}.${CANDOCK_TWEAK_VERSION}_dev"
      CACHE STRING "CANDOCK version." FORCE
 )
 
@@ -23,11 +23,6 @@ if(${CANDOCK_BUILD_STATIC_EXECUTABLE})
         set(CMAKE_FIND_LIBRARY_SUFFIXES .a ${CMAKE_FIND_LIBRARY_SUFFIXES})
     endif(WIN32)
 endif(${CANDOCK_BUILD_STATIC_EXECUTABLE})
-
-#Use included version if not installed on compile machine
-if ( NOT RAPIDXML_ROOT )
-    set( RAPIDXML_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/foreign/ )
-endif( NOT RAPIDXML_ROOT )
 
 set(CANDOCK_CUDA_SUPPORT OFF CACHE BOOL "Build CUDA support")
 
@@ -47,10 +42,9 @@ endif(CANDOCK_CUDA_SUPPORT)
 set(CANDOCK_DRM OFF CACHE BOOL "Build DRM into Candock")
 
 find_package(Boost    REQUIRED  COMPONENTS filesystem system regex program_options)
-find_package(RapidXML REQUIRED)
 find_package(Git      REQUIRED)
 
-set(JSONCPP_INCLUDE_DIR "foreign/jsoncpp/include" "foreign/jsoncpp/src" )
+set(JSONCPP_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/include/candock/external ${CMAKE_CURRENT_SOURCE_DIR}/lib/json )
 
 if (WIN32)
 
@@ -78,7 +72,6 @@ endif(WIN32)
 
 include_directories(${Boost_INCLUDE_DIRS})
 include_directories(${JSONCPP_INCLUDE_DIR})
-include_directories(${RAPIDXML_DIR})
 
 set(CANDOCK_ADDITIONAL_LD_PATH "" CACHE PATH "Additional Library Paths")
 list(APPEND CANDOCK_ADDITIONAL_LD_PATH ${Boost_LIBRARY_DIR_RELEASE})
@@ -86,9 +79,7 @@ list(APPEND CANDOCK_ADDITIONAL_LD_PATH ${Boost_LIBRARY_DIR_RELEASE})
 if (NOT OPENMM_ROOT_DIR)
     include(BuildOpenMM)
 else()
-    find_package(OpenMM REQUIRED COMPONENTS openmm kbforce)
-    set(OPENMM_KBPLUGIN_INCLUDE ${OPENMM_INCLUDE_DIR})
-    set(OPENMM_PLUGIN_DIR ${OPENMM_ROOT_DIR}/lib/plugins CACHE STRING "OpenMM Plugin Location")
+    find_package(OpenMM REQUIRED COMPONENTS openmm)
     list(APPEND CANDOCK_ADDITIONAL_LD_PATH ${OPENMM_ROOT_DIR}/lib/)
 endif()
 
@@ -115,7 +106,7 @@ if( ${CANDOCK_DRM} )
     
 endif( ${CANDOCK_DRM} )
 
-include_directories(lib)
+include_directories(BEFORE include)
 
 execute_process(
     COMMAND ${GIT_EXECUTABLE} log --pretty=format:%H -n 1
@@ -143,10 +134,6 @@ add_subdirectory(src)
 add_subdirectory(tools)
 add_subdirectory(tests)
 
-set(CANDOCK_BUILD_GUI OFF CACHE BOOL "Build the CANDOCK gui")
-
-if (CANDOCK_BUILD_GUI)
-    add_subdirectory(gui)
-endif (CANDOCK_BUILD_GUI)
+install(DIRECTORY include/ DESTINATION ${CANDOCK_VERSION}/include)
 
 add_subdirectory(doc)

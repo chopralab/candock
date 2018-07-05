@@ -15,7 +15,6 @@
 # targets::
 #
 #  OPENMM::openmm      - The main OPENMM library.
-#  OPENMM::kbforce     - The KBFORCE support library used by OPENMM.
 #
 # Result Variables
 # ^^^^^^^^^^^^^^^^
@@ -42,8 +41,6 @@
 # of OPENMM installation discovered.  These variables may optionally be set to
 # help this module find the correct files::
 #
-#  OPENMM_KBFORCE_LIBRARY       - Location of the OPENMM KBFORCE library.
-#  OPENMM_KBFORCE_LIBRARY_DEBUG - Location of the debug OPENMM KBFORCE library (if any).
 #  OPENMM_LIBRARY             - Location of the OPENMM library.
 #  OPENMM_LIBRARY_DEBUG       - Location of the debug OPENMM library (if any).
 #
@@ -89,26 +86,14 @@ find_library( OPENMM_LIBRARY
   HINTS ${OPENMM_ROOT_DIR}/lib
   PATH_SUFFIXES Release Debug
 )
-find_library( OPENMM_KBFORCE_LIBRARY
-  NAMES KBPlugin
-  HINTS ${OPENMM_ROOT_DIR}/lib
-  PATH_SUFFIXES Release Debug
-)
 # Do we also have debug versions?
 find_library( OPENMM_LIBRARY_DEBUG
   NAMES OpenMM
   HINTS ${OPENMM_ROOT_DIR}/lib
   PATH_SUFFIXES Debug
 )
-find_library( OPENMM_KBFORCE_LIBRARY_DEBUG
-  NAMES KBPlugin
-  HINTS ${OPENMM_ROOT_DIR}/lib
-  PATH_SUFFIXES Debug
-)
 
-
-
-set( OPENMM_LIBRARIES ${OPENMM_LIBRARY} ${OPENMM_KBFORCE_LIBRARY} )
+set( OPENMM_LIBRARIES ${OPENMM_LIBRARY} )
 
 IF(CANDOCK_CUDA_SUPPORT)
 
@@ -119,7 +104,7 @@ IF(CANDOCK_CUDA_SUPPORT)
         DOC "openmm library cuda"
     )
 
-    set( OPENMM_LIBRARIES ${OPENMM_LIBRARY} ${OPENMM_LIBRARY_CUDA} ${OPENMM_KBFORCE_LIBRARY})
+    set( OPENMM_LIBRARIES ${OPENMM_LIBRARY} ${OPENMM_LIBRARY_CUDA} )
 
 ENDIF(CANDOCK_CUDA_SUPPORT)
 
@@ -134,11 +119,10 @@ find_package_handle_standard_args( OPENMM
   REQUIRED_VARS
     OPENMM_INCLUDE_DIR
     OPENMM_LIBRARY
-    OPENMM_KBFORCE_LIBRARY
     )
 
 mark_as_advanced( OPENMM_ROOT_DIR OPENMM_LIBRARY OPENMM_INCLUDE_DIR
-  OPENMM_KBFORCE_LIBRARY OPENMM_LIBRARY_DEBUG OPENMM_KBFORCE_LIBRARY_DEBUG
+  OPENMM_LIBRARY_DEBUG
   OPENMM_USE_PKGCONFIG OPENMM_CONFIG )
 
 #=============================================================================
@@ -151,39 +135,25 @@ mark_as_advanced( OPENMM_ROOT_DIR OPENMM_LIBRARY OPENMM_INCLUDE_DIR
 # Look for dlls, or Release and Debug libraries.
 if(WIN32)
   string( REPLACE ".lib" ".dll" OPENMM_LIBRARY_DLL       "${OPENMM_LIBRARY}" )
-  string( REPLACE ".lib" ".dll" OPENMM_KBFORCE_LIBRARY_DLL "${OPENMM_KBFORCE_LIBRARY}" )
   string( REPLACE ".lib" ".dll" OPENMM_LIBRARY_DEBUG_DLL "${OPENMM_LIBRARY_DEBUG}" )
-  string( REPLACE ".lib" ".dll" OPENMM_KBFORCE_LIBRARY_DEBUG_DLL "${OPENMM_KBFORCE_LIBRARY_DEBUG}" )
 endif()
 
 if( OPENMM_FOUND AND NOT TARGET OPENMM::openmm )
-  if( EXISTS "${OPENMM_LIBRARY_DLL}" AND EXISTS "${OPENMM_KBFORCE_LIBRARY_DLL}")
+  if( EXISTS "${OPENMM_LIBRARY_DLL}" )
 
     # Windows systems with dll libraries.
     add_library( OPENMM::openmm      SHARED IMPORTED )
-    add_library( OPENMM::kbforce SHARED IMPORTED )
 
     # Windows with dlls, but only Release libraries.
-    set_target_properties( OPENMM::kbforce PROPERTIES
-      IMPORTED_LOCATION_RELEASE         "${OPENMM_KBFORCE_LIBRARY_DLL}"
-      IMPORTED_IMPLIB                   "${OPENMM_KBFORCE_LIBRARY}"
-      INTERFACE_INCLUDE_DIRECTORIES     "${OPENMM_INCLUDE_DIRS}"
-      IMPORTED_CONFIGURATIONS           Release
-      IMPORTED_LINK_INTERFACE_LANGUAGES "C" )
     set_target_properties( OPENMM::openmm PROPERTIES
       IMPORTED_LOCATION_RELEASE         "${OPENMM_LIBRARY_DLL}"
       IMPORTED_IMPLIB                   "${OPENMM_LIBRARY}"
       INTERFACE_INCLUDE_DIRECTORIES     "${OPENMM_INCLUDE_DIRS}"
       IMPORTED_CONFIGURATIONS           Release
-      IMPORTED_LINK_INTERFACE_LANGUAGES "C"
-      INTERFACE_LINK_LIBRARIES          OPENMM::kbforce )
+      IMPORTED_LINK_INTERFACE_LANGUAGES "C")
 
     # If we have both Debug and Release libraries
-    if( EXISTS "${OPENMM_LIBRARY_DEBUG_DLL}" AND EXISTS "${OPENMM_KBFORCE_LIBRARY_DEBUG_DLL}")
-      set_property( TARGET OPENMM::kbforce APPEND PROPERTY IMPORTED_CONFIGURATIONS Debug )
-      set_target_properties( OPENMM::kbforce PROPERTIES
-        IMPORTED_LOCATION_DEBUG           "${OPENMM_KBFORCE_LIBRARY_DEBUG_DLL}"
-        IMPORTED_IMPLIB_DEBUG             "${OPENMM_KBFORCE_LIBRARY_DEBUG}" )
+    if( EXISTS "${OPENMM_LIBRARY_DEBUG_DLL}")
       set_property( TARGET OPENMM::openmm APPEND PROPERTY IMPORTED_CONFIGURATIONS Debug )
       set_target_properties( OPENMM::openmm PROPERTIES
         IMPORTED_LOCATION_DEBUG           "${OPENMM_LIBRARY_DEBUG_DLL}"
@@ -195,15 +165,9 @@ if( OPENMM_FOUND AND NOT TARGET OPENMM::openmm )
     # For all other environments (ones without dll libraries), create
     # the imported library targets.
     add_library( OPENMM::openmm      UNKNOWN IMPORTED )
-    add_library( OPENMM::kbforce UNKNOWN IMPORTED )
-    set_target_properties( OPENMM::kbforce PROPERTIES
-      IMPORTED_LOCATION                 "${OPENMM_KBFORCE_LIBRARY}"
-      INTERFACE_INCLUDE_DIRECTORIES     "${OPENMM_INCLUDE_DIRS}"
-      IMPORTED_LINK_INTERFACE_LANGUAGES "C" )
     set_target_properties( OPENMM::openmm PROPERTIES
       IMPORTED_LOCATION                 "${OPENMM_LIBRARY}"
       INTERFACE_INCLUDE_DIRECTORIES     "${OPENMM_INCLUDE_DIRS}"
-      IMPORTED_LINK_INTERFACE_LANGUAGES "C"
-      INTERFACE_LINK_LIBRARIES          OPENMM::kbforce )
+      IMPORTED_LINK_INTERFACE_LANGUAGES "C" )
   endif()
 endif()

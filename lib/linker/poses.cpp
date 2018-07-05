@@ -1,12 +1,12 @@
-#include "poses.hpp"
-#include "state.hpp"
-#include "segment.hpp"
-#include "molib/molecule.hpp"
-#include "molib/bond.hpp"
-#include "helper/benchmark.hpp"
-#include "helper/help.hpp"
-#include "helper/array2d.hpp"
-#include "graph/mcqd.hpp"
+#include "candock/linker/poses.hpp"
+#include "candock/linker/state.hpp"
+#include "candock/linker/segment.hpp"
+#include "candock/molib/molecule.hpp"
+#include "candock/molib/bond.hpp"
+#include "candock/helper/benchmark.hpp"
+#include "candock/helper/help.hpp"
+#include "candock/helper/array2d.hpp"
+#include "candock/graph/mcqd.hpp"
 #include <queue>
 
 using namespace std;

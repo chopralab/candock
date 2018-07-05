@@ -6,3 +6,4 @@ endif(WIN32)
 
 add_subdirectory( interface_test )
 add_subdirectory( interface_test_2 )
+add_subdirectory( interface_test_3 )

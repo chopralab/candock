@@ -1,10 +1,10 @@
 #include <iostream>
-#include "program/cmdlnopts.hpp"
-#include "helper/benchmark.hpp"
-#include "program/target.hpp"
+#include "candock/program/cmdlnopts.hpp"
+#include "candock/helper/benchmark.hpp"
+#include "candock/program/target.hpp"
 
 #include "version.hpp"
-#include "drm/drm.hpp"
+#include "candock/drm/drm.hpp"
 
 using namespace std;
 
@@ -27,7 +27,7 @@ int main(int argc, char* argv[]) {
                         Version::get_run_info();
                 cout << help::Options::get_options()->configuration_file() << endl;
 
-                Score::Score score(cmdl.get_string_option("ref"), "complete",
+                Score::KBFF score(cmdl.get_string_option("ref"), "complete",
                                    cmdl.get_string_option("func"), cmdl.get_int_option("cutoff"),
                                    cmdl.get_double_option("step"));
 
@@ -39,8 +39,9 @@ int main(int argc, char* argv[]) {
                 }
 
                 score.define_composition(all_types, all_types)
-                     .process_distributions_file(cmdl.get_string_option("dist"))
-                     .compile_objective_function(cmdl.get_double_option("scale"));
+                     .process_distributions_file(cmdl.get_string_option("dist"));
+
+                score.compile_objective_function(cmdl.get_double_option("scale"));
 
                 score.output_objective_function(cmdl.get_string_option("obj_dir"));
 
