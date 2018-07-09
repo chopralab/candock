@@ -22,6 +22,7 @@ namespace parser {
                                 __generate_model (mols, found_model, 1);
                                 Chain *chain = nullptr;
                                 Residue *residue = nullptr;
+                                std::set<std::string> used_names;
 
                                 for (i = i + 1; i < mol2_raw.size(); ++i) {
                                         const string &atom_line = mol2_raw[i];
@@ -67,6 +68,12 @@ namespace parser {
                                                         if (!chain->has_residue (Residue::res_pair (subst_id, ' '))) {
                                                                 residue = &chain->add (new Residue (subst_name, subst_id, ' ', rest));
                                                         }
+
+                                                        if (used_names.find(atom_name) != used_names.end()) {
+                                                                atom_name += std::to_string(used_names.size());
+                                                        }
+
+                                                        used_names.insert(atom_name);
 
                                                         Atom &a = residue->add (new Atom (atom_id,
                                                                                           atom_name,
