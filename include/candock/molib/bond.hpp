@@ -10,8 +10,6 @@
 #include "candock/molib/it.hpp"
 #include "candock/graph/graph.hpp"
 
-using namespace std;
-
 namespace candock {
 
 namespace molib {
@@ -27,17 +25,17 @@ namespace molib {
 		int __bo;
 		bool __ring;
 		bool __owns_atoms;
-		set<int> __angles;
+		std::set<int> __angles;
 		int __drive_id;
 	public:
 		Bond() : __atom1(nullptr), __atom2(nullptr), __idx1(0), __idx2(0), __rotatable(""), __bond_gaff_type(""),
-			 __bo(0), __ring(false), __owns_atoms(false),  __angles(set<int>()), __drive_id(0) {}
+			 __bo(0), __ring(false), __owns_atoms(false),  __angles(std::set<int>()), __drive_id(0) {}
 		Bond(Atom *atom1, Atom *atom2, bool owns_atoms=false) : __atom1(atom1), 
 			__atom2(atom2), __idx1(0), __idx2(0), __rotatable(""), __bond_gaff_type(""), __bo(0), __ring(false),
-                        __owns_atoms(owns_atoms),__angles(set<int>()), __drive_id(0){}
+                        __owns_atoms(owns_atoms),__angles(std::set<int>()), __drive_id(0){}
 		Bond(Atom *atom1, Atom *atom2, int idx1, int idx2, bool owns_atoms=false) : __atom1(atom1), 
 			__atom2(atom2), __idx1(idx1), __idx2(idx2), __rotatable(""), __bond_gaff_type(""), __bo(0), __ring(false),
-			 __owns_atoms(owns_atoms), __angles(set<int>()), __drive_id(0) {}
+			 __owns_atoms(owns_atoms), __angles(std::set<int>()), __drive_id(0) {}
 		~Bond();
 		bool is_set() const { return __atom1 != nullptr; }
 		void set_members(const std::string &str);
@@ -67,7 +65,7 @@ namespace molib {
 		int idx1() const { return __idx1; }
 		int idx2() const { return __idx2; }
 		double length() const;
-		friend ostream& operator<< (ostream& stream, const Bond& b);
+		friend std::ostream& operator<< (std::ostream& stream, const Bond& b);
 		// the following are required for BondGraph :-)
 		bool compatible(const Bond &other) const;
                 std::string get_label() const;

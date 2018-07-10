@@ -7,6 +7,7 @@
 #include <functional>
 #include <math.h>
 #include <string>
+using namespace std;
 
 namespace candock {
 namespace score {

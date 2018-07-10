@@ -1,9 +1,10 @@
 #include "candock/fileout/fileout.hpp"
+#include <string>
 
 namespace candock{
 namespace fileout {
     
-        const map<const string, const string> id_atom_to_sybyl {
+        const std::map<const std::string, const std::string> id_atom_to_sybyl {
                 {"C3", "C.3"},
                 {"C2", "C.2"},
                 {"Cac","C.2"},
@@ -66,9 +67,9 @@ namespace fileout {
                 ss << "@<TRIPOS>BOND\n";
                 size_t counter = 0;
                 for ( const molib::Bond* b : all_bonds) {
-                        ss << setw(10) << ++counter;
-                        ss << setw(10) << atom_mapper.at(b->atom1().atom_number());
-                        ss << setw(10) << atom_mapper.at(b->atom2().atom_number());
+                        ss << std::setw(10) << ++counter;
+                        ss << std::setw(10) << atom_mapper.at(b->atom1().atom_number());
+                        ss << std::setw(10) << atom_mapper.at(b->atom2().atom_number());
                         ss << " " << (b->get_bo() == 0? 1 : b->get_bo()) << "\n";
                 }
                 ss << "\n";

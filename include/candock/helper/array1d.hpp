@@ -43,9 +43,9 @@ struct Array1d {
 };
 
 template<typename T>
-ostream &operator<< (ostream &stream, const Array1d<T> &s) {
+std::ostream &operator<< (std::ostream &stream, const Array1d<T> &s) {
         for (size_t i = 0; i < s.sz; ++i) {
-                stream << s.data[i] << endl;
+                stream << s.data[i] << std::endl;
         }
 
         return stream;

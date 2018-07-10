@@ -15,7 +15,6 @@
 #include <vector>
 #include <set>
 #include "candock/helper/error.hpp"
-using namespace std;
 
 namespace candock {
 
@@ -25,9 +24,9 @@ namespace geometry {
 		double __x, __y, __z;
 	public:
 		
-		typedef vector<Coordinate> Vec;
-		typedef set<Coordinate*> Set;
-		typedef set<const Coordinate*> ConstSet;
+		typedef std::vector<Coordinate> Vec;
+		typedef std::set<Coordinate*> Set;
+		typedef std::set<const Coordinate*> ConstSet;
 		
 		Coordinate() : __x(0), __y(0), __z(0) {}
 		Coordinate(double x, double y, double z) : __x(x), __y(y), __z(z) {}
@@ -47,7 +46,7 @@ namespace geometry {
 		int k() const { return (int) ::floor(__z); }
 		const Coordinate& crd() const { return *this; }
 		Coordinate floor() { return Coordinate(::floor(__x), ::floor(__y), ::floor(__z)); } 
-		bool operator==(const Coordinate& right) const { return (fabs(this->x() - right.x()) < numeric_limits<float>::epsilon() && fabs(this->y() - right.y()) < numeric_limits<float>::epsilon() && fabs(this->z() - right.z()) < numeric_limits<float>::epsilon()); }
+		bool operator==(const Coordinate& right) const { return (fabs(this->x() - right.x()) < std::numeric_limits<float>::epsilon() && fabs(this->y() - right.y()) < std::numeric_limits<float>::epsilon() && fabs(this->z() - right.z()) < std::numeric_limits<float>::epsilon()); }
 		bool operator<(const Coordinate& right) const { return (!(*this == right)) && std::tie(this->__x, this->__y, this->__z) < std::tie(right.__x, right.__y, right.__z); }
 		bool operator>(const Coordinate& right) const { return (!(*this == right)) && std::tie(this->__x, this->__y, this->__z) > std::tie(right.__x, right.__y, right.__z); }
 		static Coordinate cross(const Coordinate& l, const Coordinate& r) { return Coordinate(l.y()*r.z() - l.z()*r.y(), -l.x()*r.z() + l.z()*r.x(), l.x()*r.y() - l.y()*r.x()); }
@@ -66,15 +65,15 @@ namespace geometry {
 		
 		void normalize() { const double length = this->distance(Coordinate(0.0, 0.0, 0.0)); if (length == 0) throw Error("Coordinate::operator/  division by zero\n"); this->__x /= length; this->__y /= length; this->__z /= length; }
 		Coordinate norm() { Coordinate c = *this; c.normalize(); return c; }
-		string pdb() const { stringstream outs; outs<<fixed<<right<<setprecision(3)<<setw(8)<<__x<<fixed<<right<<setprecision(3)<<setw(8)<<__y<<fixed<<right<<setprecision(3)<<setw(8)<<__z; return outs.str(); }								
-		string simple() const { stringstream outs; outs<<fixed<<setprecision(3)<<__x<<" "<<fixed<<setprecision(3)<<__y<<" "<<fixed<<setprecision(3)<<__z; return outs.str(); }
-		string with_underscores() const { stringstream outs; outs<<setprecision(3)<<__x<<"_"<<setprecision(3)<<__y<<"_"<<setprecision(3)<<__z; return outs.str(); }								
+		std::string pdb() const { std::stringstream outs; outs<<std::fixed<<std::right<<std::setprecision(3)<<std::setw(8)<<__x<<std::fixed<<std::right<<std::setprecision(3)<<std::setw(8)<<__y<<std::fixed<<std::right<<std::setprecision(3)<<std::setw(8)<<__z; return outs.str(); }								
+		std::string simple() const { std::stringstream outs; outs<<std::fixed<<std::setprecision(3)<<__x<<" "<<std::fixed<<std::setprecision(3)<<__y<<" "<<std::fixed<<std::setprecision(3)<<__z; return outs.str(); }
+		std::string with_underscores() const { std::stringstream outs; outs<<std::setprecision(3)<<__x<<"_"<<std::setprecision(3)<<__y<<"_"<<std::setprecision(3)<<__z; return outs.str(); }								
 		void rotate_inline(const Matrix&);
-		unique_ptr<Coordinate> rotate(const Matrix&);
+		std::unique_ptr<Coordinate> rotate(const Matrix&);
 		void inverse_rotate_inline(const Matrix&);
-		unique_ptr<Coordinate> inverse_rotate(const Matrix&);
-		friend ostream& operator<< (ostream& stream, const Coordinate& c) {
-			stream << setprecision(8) << "[" << c.x() << "," << c.y() << "," << c.z() << "]";
+		std::unique_ptr<Coordinate> inverse_rotate(const Matrix&);
+		friend std::ostream& operator<< (std::ostream& stream, const Coordinate& c) {
+			stream << std::setprecision(8) << "[" << c.x() << "," << c.y() << "," << c.z() << "]";
 			return stream;
 		}
 	};

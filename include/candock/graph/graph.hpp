@@ -18,25 +18,25 @@
 namespace candock {
 
 namespace graph {
-	typedef vector<vector<bool>> AdjacencyMatrix;
+	typedef std::vector<std::vector<bool>> AdjacencyMatrix;
 	
 	template<class Vertex>
 	class Graph : public molib::template_vector_container<Vertex*, Vertex> {
 	public:
-		typedef set<Vertex*> VertexSet;
-		typedef vector<Vertex*> Path;
-		typedef vector<Path> Cliques;
-		typedef set<VertexSet> Cycles;
-                typedef map<const Vertex*,vector<size_t>> VertexRingMap;
-		typedef pair<vector<node_id>, vector<node_id>> MatchedVertices;
-		typedef vector<MatchedVertices> Matches;
+		typedef std::set<Vertex*> VertexSet;
+		typedef std::vector<Vertex*> Path;
+		typedef std::vector<Path> Cliques;
+		typedef std::set<VertexSet> Cycles;
+                typedef std::map<const Vertex*,std::vector<size_t>> VertexRingMap;
+		typedef std::pair<std::vector<node_id>, std::vector<node_id>> MatchedVertices;
+		typedef std::vector<MatchedVertices> Matches;
 	private:
-		vector<unique_ptr<Vertex>> __vertices; // if graph owns the vertices, they (the unique_ptrs) are stored here
+		std::vector<std::unique_ptr<Vertex>> __vertices; // if graph owns the vertices, they (the unique_ptrs) are stored here
 		AdjacencyMatrix __conn;
-		vector<int> __num_edges;
+		std::vector<int> __num_edges;
 		void __expand(Vertex&, Path&, Cycles&, VertexSet&);
 		template<class Vertex2>
-		bool __match(vector<node_id>&, vector<node_id>&, Matches&, 
+		bool __match(std::vector<node_id>&, std::vector<node_id>&, Matches&, 
 			UllSubState<Graph<Vertex>, Graph<Vertex2>>*) const;
 		template<typename T>
 		void __init(const T&, const bool);
@@ -44,7 +44,7 @@ namespace graph {
 		Graph() {}
 		template<typename T>
 		Graph(const T &vertices, const bool ict=false) { __init(vertices, ict); }
-		Graph(vector<unique_ptr<Vertex>> vertices, const bool ict, 
+		Graph(std::vector<std::unique_ptr<Vertex>> vertices, const bool ict, 
 				const bool) : __vertices(std::move(vertices)) { // here graph owns the vertices
 			__init(__vertices, ict);
 		}
@@ -59,7 +59,7 @@ namespace graph {
                     return *__vertices[i];
                 }
 		int get_num_edges(const node_id i) const { return __num_edges[i]; } // real number of edges of a vertex
-		string get_smiles() const;
+		std::string get_smiles() const;
 		Cycles find_cycles_connected_graph();
 		Cycles find_fused_rings();
 		Cycles find_rings();
@@ -71,7 +71,7 @@ namespace graph {
 			&& m[0].first.size() == g.size() && this->size() == g.size()) 
 			return true; return false; }
 		template<class P>
-		friend ostream& operator<< (ostream& stream, const Graph<P>& g);
+		friend std::ostream& operator<< (std::ostream& stream, const Graph<P>& g);
 	};
 
 	template<typename T>
@@ -87,7 +87,7 @@ namespace graph {
 	template<class Vertex> 
 	template<class T> // vertices is any container of unique_ptr<Vertex> or Vertex*
 	void Graph<Vertex>::__init(const T &vertices, const bool ict) {
-		map<const Vertex*, node_id> idx;
+		std::map<const Vertex*, node_id> idx;
 		for (auto &v : vertices) {
 			idx[&*v] = this->size();
 			this->add(&*v);
@@ -121,7 +121,7 @@ namespace graph {
 	}
 
 	template<class Vertex>
-	typename Graph<Vertex>::Path reconstruct_path(Vertex &goal, const map<Vertex*, Vertex*> &came_from) {
+	typename Graph<Vertex>::Path reconstruct_path(Vertex &goal, const std::map<Vertex*, Vertex*> &came_from) {
 		typename Graph<Vertex>::Path path;
 		path.push_back(&goal);
 		dbgmsg("path = ");
@@ -136,10 +136,10 @@ namespace graph {
 
 	template<class Vertex>
 	typename Graph<Vertex>::Path find_path(Vertex &start, Vertex &goal) {
-		queue<Vertex*> openset;
+		std::queue<Vertex*> openset;
 		openset.push(&start);
 		typename Graph<Vertex>::VertexSet closedset;
-		map<Vertex*, Vertex*> came_from;
+		std::map<Vertex*, Vertex*> came_from;
 		while (!openset.empty()) {
 			Vertex &curr = *openset.front();
 			openset.pop();
@@ -161,7 +161,7 @@ namespace graph {
 
 	template<class Vertex>
 	template<class Vertex2>
-	bool Graph<Vertex>::__match(vector<node_id> &c1, vector<node_id> &c2, 
+	bool Graph<Vertex>::__match(std::vector<node_id> &c1, std::vector<node_id> &c2, 
 		Matches &m, UllSubState<Graph<Vertex>, Graph<Vertex2>> *s) const {
 		if (s->IsGoal()) {
 			int n=s->CoreLen();
@@ -169,9 +169,9 @@ namespace graph {
 #ifndef NDEBUG
 			for (auto &v : c1) dbgmsg(v);
 #endif
-			m.push_back(pair<vector<node_id>, vector<node_id>>(
-				vector<node_id>(c1.begin(), c1.begin() + n), 
-				vector<node_id>(c2.begin(), c2.begin() + n)));
+			m.push_back(std::pair<std::vector<node_id>, std::vector<node_id>>(
+				std::vector<node_id>(c1.begin(), c1.begin() + n), 
+				std::vector<node_id>(c2.begin(), c2.begin() + n)));
 			//~ MatchedVertices mv;
 			//~ for (int i = 0; i < n; ++i) {
 				//~ node_id nid1 = c1[i];
@@ -222,7 +222,7 @@ namespace graph {
 		dbgmsg(n);
 		dbgmsg(g1);
 		dbgmsg(g2);
-		vector<node_id> c1(n), c2(n);
+		std::vector<node_id> c1(n), c2(n);
 		Matches m;
 		__match(c1, c2, m, &s0);
 		return m;
@@ -231,9 +231,9 @@ namespace graph {
 	template<class Vertex>
 	typename Graph<Vertex>::Cliques Graph<Vertex>::max_weight_clique(const int iter) {
 		Benchmark bench;
-		unique_ptr<int[]> weight(new int[this->size()]);
+		std::unique_ptr<int[]> weight(new int[this->size()]);
 		for (int i = 0; i < this->size(); ++i) weight[i] = this->element(i).weight();
-		vector<vector<int>> qmax;
+		std::vector<std::vector<int>> qmax;
 		MNTS m(qmax, __conn, weight.get(), iter);
 		Cliques clique;
 		for (auto &rows : qmax) {
@@ -321,7 +321,7 @@ namespace graph {
 	typename Graph<Vertex>::Cycles Graph<Vertex>::find_rings() {
 		Cycles rings;
 		Cycles cycles = find_cycles_connected_graph();
-		vector<VertexSet> v(cycles.begin(), cycles.end());
+		std::vector<VertexSet> v(cycles.begin(), cycles.end());
 		sort(v.begin(), v.end(), [](const VertexSet &i, const VertexSet &j) { 
 			return i.size() < j.size(); });
 #ifndef NDEBUG
@@ -335,7 +335,7 @@ namespace graph {
 #endif
 		VertexSet mapped;
 		// go over cycles sorted by increasing size
-		for (typename vector<VertexSet>::iterator it = v.begin(); it != v.end(); it++) {
+		for (typename std::vector<VertexSet>::iterator it = v.begin(); it != v.end(); it++) {
 			VertexSet &cycle = *it;
 			VertexSet inter;
 			// find cycles that are not made out of smaller cycles
@@ -408,17 +408,17 @@ namespace graph {
 	}
 	
 	template<class Vertex>
-	string Graph<Vertex>::get_smiles() const {
-		stringstream ss;
-		map<Vertex*, int> idx;
+	std::string Graph<Vertex>::get_smiles() const {
+		std::stringstream ss;
+		std::map<Vertex*, int> idx;
 		for (auto &v : *this)
 			ss << v.get_label() << " ";
 		return ss.str();
 	}
 
 	template<class P>
-	ostream& operator<< (ostream& stream, const Graph<P>& g) {
-		map<const P*, int> idx;
+	std::ostream& operator<< (std::ostream& stream, const Graph<P>& g) {
+		std::map<const P*, int> idx;
 		int i = 0;
 		for (auto &vertex : g) idx[&vertex] = i++;
 		for (auto &vertex : g) {
@@ -428,7 +428,7 @@ namespace graph {
 					stream << "{label = " << adj_v.get_label() << " index = " << idx.at(&adj_v) << "} ";
 				}
 			}
-			stream << "]" << endl;
+			stream << "]" << std::endl;
 		}
 		if (!g.__conn.empty()) {
 			int edge_size = 0;
@@ -438,16 +438,16 @@ namespace graph {
 					if (g.__conn[idx[&v1]][idx[&v2]] == true) edge_size++;
 				}
 			}
-			stream << "p " << g.size() << " " << edge_size << endl;
+			stream << "p " << g.size() << " " << edge_size << std::endl;
 			for (size_t i = 0; i < g.size(); i++) {
 				for (size_t j = i + 1; j <g.size(); j++) {
 					//~ if (g.__conn->size() > 0 && (*g.__conn)[i][j] == true) stream << "e " << i + 1 << " " << j + 1 << endl;
-					if (g.__conn[i][j] == true) stream << "e " << i + 1 << " " << j + 1 << endl;
+					if (g.__conn[i][j] == true) stream << "e " << i + 1 << " " << j + 1 << std::endl;
 				}
 			}
 		}
 		for (auto &vertex : g) {
-			stream << "w " << idx[&vertex] << " " << vertex.weight() << endl;
+			stream << "w " << idx[&vertex] << " " << vertex.weight() << std::endl;
 		}
 		return stream;
 	}

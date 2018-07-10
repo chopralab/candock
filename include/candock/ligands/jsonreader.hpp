@@ -8,7 +8,6 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/asio/ip/host_name.hpp>
 #include <math.h>
-using namespace std;
 
 namespace candock {
 
@@ -20,11 +19,11 @@ public:
 	iterator begin() { return __root.begin(); }
 	iterator end() { return __root.end();}
 	void print_JSON_value(const Json::Value&) const;
-	void parse_JSON(const string);
+	void parse_JSON(const std::string);
 	bool print_JSON_tree(const Json::Value &root, const unsigned short depth=0);
 	const Json::Value& root() const { return __root; }
-	iterator find(const vector<pair<const string, const string>>&); // return node that has all key:value pairs, if not found, return __root.end()
-	string output_json() {
+	iterator find(const std::vector<std::pair<const std::string, const std::string>>&); // return node that has all key:value pairs, if not found, return __root.end()
+	std::string output_json() {
 		Json::FastWriter writer;
 		return writer.write(__root);
 	}

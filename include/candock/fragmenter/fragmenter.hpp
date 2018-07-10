@@ -37,7 +37,7 @@ namespace molib {
 			int size() const { return __core.size() + __join.size(); }
 
 			typedef std::vector<Fragment> Vec;
-			friend ostream& operator<<(ostream& os, const Vec& fragments);
+			friend std::ostream& operator<<(std::ostream& os, const Vec& fragments);
 		};
 	
 	private:
@@ -58,9 +58,9 @@ namespace molib {
 		Fragment::Vec identify_overlapping_rigid_segments(const Atom::Vec &atoms, Unique &u);
 		void flip_conjugated_gaff_types(const Atom::Vec &atoms);
 	};
-	ostream& operator<<(ostream& os, const AtomMatchVec& atom_match_vec);
-	ostream& operator<<(ostream& os, const AtomMatch& atom_match);
-	ostream& operator<<(ostream& os, const std::map<Bond*, Bond*>& bond_match);
+	std::ostream& operator<<(std::ostream& os, const AtomMatchVec& atom_match_vec);
+	std::ostream& operator<<(std::ostream& os, const AtomMatch& atom_match);
+	std::ostream& operator<<(std::ostream& os, const std::map<Bond*, Bond*>& bond_match);
 }
 
 }

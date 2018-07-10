@@ -1,6 +1,7 @@
 #include "candock/graph/mcqd.hpp"
 #include "candock/helper/help.hpp"
 #include <utility>
+using namespace std;
 
 namespace candock{
 namespace graph {

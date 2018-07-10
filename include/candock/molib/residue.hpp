@@ -22,10 +22,10 @@ namespace molib {
 			hetero=64
 		} res_type;
 
-		typedef tuple<char,std::string, int, char> res_tuple2;
-		typedef pair<int, char> res_pair;
-		typedef vector<Residue*> Vec;
-		typedef set<Residue*> Set;
+		typedef std::tuple<char,std::string, int, char> res_tuple2;
+		typedef std::pair<int, char> res_pair;
+		typedef std::vector<Residue*> Vec;
+		typedef std::set<Residue*> Set;
 	private:
 	std::string __resn;
 		int __resi;
@@ -33,7 +33,7 @@ namespace molib {
 		Residue::res_type __rest;
 		geometry::Coordinate __crd; // geometric center
 	public:
-		Residue(string resn, int resi, char ins_code, res_type(rest)) 
+		Residue(std::string resn, int resi, char ins_code, res_type(rest)) 
 			: __resn(resn), __resi(resi), __ins_code(ins_code), __rest(rest) {}
 		Residue(const Residue &rhs) : __resn(rhs.__resn), __resi(rhs.__resi), 
 			__ins_code(rhs.__ins_code), __rest(rhs.__rest), __crd(rhs.__crd) { 
@@ -68,7 +68,7 @@ namespace molib {
                 void compute_hydrogen();
                 void erase_hydrogen();
 
-		friend ostream& operator<< (ostream& stream, const Residue& r);
+		friend std::ostream& operator<< (std::ostream& stream, const Residue& r);
 	};
 
 

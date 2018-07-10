@@ -20,7 +20,7 @@ namespace linker {
 
 	class Partial {
 	public:
-		typedef vector<Partial> Vec;
+		typedef std::vector<Partial> Vec;
 		struct comp { bool operator()(const Partial &i, const Partial &j) 
 			{ return i.get_energy() < j.get_energy(); } };
 
@@ -60,8 +60,8 @@ namespace linker {
 		
 		static void sort(Partial::Vec &v);
 		
-		friend ostream& operator<<(ostream& os, const Partial &le);
-		friend ostream& operator<<(ostream& os, const Vec &vec_le);
+		friend std::ostream& operator<<(std::ostream& os, const Partial &le);
+		friend std::ostream& operator<<(std::ostream& os, const Vec &vec_le);
 		
 
 	};

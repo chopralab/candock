@@ -5,8 +5,6 @@
 #include <string.h>
 #include <assert.h>
 
-using namespace std;
-
 namespace candock {
 
 template<typename T>
@@ -62,13 +60,13 @@ struct Array2d {
 };
 
 template<typename T>
-ostream &operator<< (ostream &stream, const Array2d<T> &s) {
+std::ostream &operator<< (std::ostream &stream, const Array2d<T> &s) {
         for (int i = 0; i < s.szi; ++i) {
                 for (int j = 0; j < s.szj; ++j) {
                         stream << s.data[i][j];
                 }
 
-                stream << endl;
+                stream << std::endl;
         }
 
         return stream;
@@ -180,13 +178,13 @@ public:
                         data = nullptr;
                 }
         }
-        friend ostream &operator<< (ostream &stream, const Array2d<bool> &s) {
+        friend std::ostream &operator<< (std::ostream &stream, const Array2d<bool> &s) {
                 for (size_t i = 0; i < s.szi; ++i) {
                         for (size_t j = 0; j < s.szj; ++j) {
                                 stream << s.get (i, j);
                         }
 
-                        stream << endl;
+                        stream << std::endl;
                 }
 
                 return stream;

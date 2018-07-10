@@ -65,9 +65,9 @@ namespace score {
                 Score& process_distributions_file(const std::string &distributions_file);
                 Score& compile_scoring_function();
 
-                friend ostream& operator<< (ostream& stream, const vector<double> &energy);
-                friend ostream& operator<< (ostream& stream, const Score::AtomPairValues &energies);
-                friend ostream& operator<< (ostream& stream, const Score &score);
+                friend std::ostream& operator<< (std::ostream& stream, const std::vector<double> &energy);
+                friend std::ostream& operator<< (std::ostream& stream, const Score::AtomPairValues &energies);
+                friend std::ostream& operator<< (std::ostream& stream, const Score &score);
         };
 }
 

@@ -7,12 +7,9 @@
 
 #include "candock/geometry/coordinate.hpp"
 #include "candock/molib/molecule.hpp"
-#include "candock/helper/help.hpp"
 #include "candock/helper/benchmark.hpp"
 #include "candock/modeler/topology.hpp"
 #include "candock/modeler/systemtopology.hpp"
-
-using namespace std;
 
 namespace candock {
 
@@ -30,12 +27,12 @@ public:
   class MinimizationError : public Error
   {
   public:
-    MinimizationError(const string &msg) : Error(msg) {}
+    MinimizationError(const std::string &msg) : Error(msg) {}
   };
 
 private:
   const ForceField *__ffield;
-  string __fftype;
+  std::string __fftype;
   double __tolerance;
   int __max_iterations;
   bool __use_constraints;
@@ -51,7 +48,7 @@ private:
 
 public:
   Modeler(const ForceField &ffield,
-          const string &fftype = "none",
+          const std::string &fftype = "none",
           double tolerance = 0.0001,
           int max_iterations = 100,
           bool use_constraints = false,

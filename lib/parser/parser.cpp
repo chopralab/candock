@@ -12,7 +12,7 @@ namespace parser {
                         Molecule* mol = nullptr;
 
                         if (name.empty()) {
-                                log_warning << "Warning: unlabled molecule. Naming: unlabeled_" << mols.size() << endl;
+                                log_warning << "Warning: unlabled molecule. Naming: unlabeled_" << mols.size() << std::endl;
                                 mol = new Molecule(std::string("unlabled_") + std::to_string(mols.size()) );
                         } else {
                                 mol = new Molecule(name);

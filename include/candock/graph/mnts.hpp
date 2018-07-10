@@ -32,53 +32,51 @@
 #include "candock/helper/inout.hpp"
 //~ #include "graph2.hpp"
 
-using namespace std;
-
 namespace candock {
 namespace graph {
 
-typedef vector<vector<bool>> AdjacencyMatrix;
+typedef std::vector<std::vector<bool>> AdjacencyMatrix;
 
 class MNTS {
 	AdjacencyMatrix &Edge;   // adjacent matrix
-	unique_ptr<int[]> vectex;
-	unique_ptr<int[]> funch;
-	unique_ptr<int[]> address;
-	unique_ptr<int[]> tabuin;
+	std::unique_ptr<int[]> vectex;
+	std::unique_ptr<int[]> funch;
+	std::unique_ptr<int[]> address;
+	std::unique_ptr<int[]> tabuin;
 	int Max_Vtx,  Max_Iter; 
 	int f;
 	int fbest;
 	//~ const unique_ptr<int[]> &adjaclen;
 	//~ const unique_ptr<unique_ptr<int[]>[]> &adjacMatrix;
-	unique_ptr<int[]> adjaclen;
-	unique_ptr<unique_ptr<int[]>[]> adjacMatrix;
-	unique_ptr<int[]> cruset;
+	std::unique_ptr<int[]> adjaclen;
+	std::unique_ptr<std::unique_ptr<int[]>[]> adjacMatrix;
+	std::unique_ptr<int[]> cruset;
 	int len;
 	//~ int tm1;
 	int tm2;
-	unique_ptr<int[]> C0;
-	unique_ptr<int[]> C1;
+	std::unique_ptr<int[]> C0;
+	std::unique_ptr<int[]> C1;
 	const int *We;
 	//~ const vector<int> &We;
-	unique_ptr<int[]> BC;
+	std::unique_ptr<int[]> BC;
 	int len0;
 	int len1;
-	unique_ptr<int[]> TC1;
+	std::unique_ptr<int[]> TC1;
 	int Iter;
 	int TABUL;
 	int Wf;
 	int Wbest;
-	unique_ptr<int[]> FC1;
+	std::unique_ptr<int[]> FC1;
 	//~ unique_ptr<int[]> Tbest;
-	vector<vector<int>> &qmax;
+	std::vector<std::vector<int>> &qmax;
 	//~ unique_ptr<int[]> TTbest;
 	int Waim;
 	int Titer;
 	int len_best;
 	int len_W;
-	unique_ptr<int[]> Iteration;
-	unique_ptr<int[]> len_used;
-	unique_ptr<int[]> W_used;
+	std::unique_ptr<int[]> Iteration;
+	std::unique_ptr<int[]> len_used;
+	std::unique_ptr<int[]> W_used;
 	int len_improve;
 	int len_time;
 	//~ int Wmode;
@@ -101,7 +99,7 @@ class MNTS {
 	void output();
 	void max_tabu(int);
 public:
-	MNTS(vector<vector<int>> &qm, AdjacencyMatrix &conn, const int *weight, const int ii=300, const int w=100, 
+	MNTS(std::vector<std::vector<int>> &qm, AdjacencyMatrix &conn, const int *weight, const int ii=300, const int w=100, 
 		const int lni=10) : Edge(conn), Max_Vtx(conn.size()), We(weight), TABUL(7),
                 qmax(qm), Waim(w), len_best(0), len_improve(lni), len_time(int (100000000 / lni) + 1), iter(ii) {
 #ifndef NDEBUG

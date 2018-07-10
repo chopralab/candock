@@ -6,6 +6,7 @@
 #include "candock/molib/molecule.hpp"
 #include "candock/helper/help.hpp"
 #include "candock/graph/graph.hpp"
+using namespace std;
 
 namespace candock{
 namespace molib {

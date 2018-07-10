@@ -35,7 +35,7 @@ namespace molib {
 
                 void write_out();
 
-		friend ostream& operator<<(ostream& os, const USeeds& useeds);
+		friend std::ostream& operator<<(std::ostream& os, const USeeds& useeds);
 	};
 }
 

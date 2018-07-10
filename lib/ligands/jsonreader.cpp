@@ -8,6 +8,7 @@
 #include "candock/ligands/jsonreader.hpp"
 #include "candock/helper/error.hpp"
 #include "candock/helper/inout.hpp"
+using namespace std;
 
 namespace candock{
 JsonReader::iterator JsonReader::find(const vector<pair<const string, const string> > &kv) {

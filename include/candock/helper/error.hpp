@@ -3,14 +3,13 @@
 #include <string>
 #include <sstream>
 #include <exception>
-using namespace std;
 
 namespace candock {
 
-class Error : public exception {
-	const string __msg;
+class Error : public std::exception {
+	const std::string __msg;
 public:
-	Error(const string &msg) : __msg(msg) {}
+	Error(const std::string &msg) : __msg(msg) {}
 	~Error() throw() {}
 	const char* what() const noexcept {return __msg.c_str();}
 };

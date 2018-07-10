@@ -2,6 +2,7 @@
 #include "candock/helper/debug.hpp"
 #include <assert.h>
 #include <algorithm>
+using namespace std;
 
 namespace candock{
 namespace geometry {

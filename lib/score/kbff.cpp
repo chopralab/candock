@@ -4,6 +4,7 @@
 #include "candock/score/interpolation.hpp"
 #include "candock/score/powerfit.hpp"
 #include "candock/helper/path.hpp"
+using namespace std;
 
 namespace candock {
 

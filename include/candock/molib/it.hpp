@@ -33,7 +33,7 @@ public:
 
 template<class T, class P>
 class template_vector_container {
-	typedef vector<T> __vector;
+	typedef std::vector<T> __vector;
 	typedef typename __vector::iterator __iterator;
 	typedef typename __vector::const_iterator __const_iterator;
 	typedef typename __vector::const_reverse_iterator __const_reverse_iterator;
@@ -93,15 +93,15 @@ public:
 
 template<class T, class U, class V, class Z=int>
 class template_map_container {
-	typedef map<Z, unique_ptr<T> > __map;
+	typedef std::map<Z, std::unique_ptr<T> > __map;
 	typedef typename __map::iterator __iterator;
 	typedef typename __map::const_iterator __const_iterator;
 	typedef typename __map::const_reverse_iterator __const_reverse_iterator;
 	__map __m;
 	V *__br;
 public:
-	T& aadd(T *t, U *u) { t->set_br(u); __m.insert(make_pair(__m.size(), unique_ptr<T>(t))); return *__m[__m.size() - 1]; }
-	T& aadd(Z p, T *t, U *u) { t->set_br(u); __m.insert(make_pair(p, unique_ptr<T>(t))); return *__m[p]; }
+	T& aadd(T *t, U *u) { t->set_br(u); __m.insert(make_pair(__m.size(), std::unique_ptr<T>(t))); return *__m[__m.size() - 1]; }
+	T& aadd(Z p, T *t, U *u) { t->set_br(u); __m.insert(make_pair(p, std::unique_ptr<T>(t))); return *__m[p]; }
 	//~ T& aadd_no_br(Z p, T *t) { __m.insert(make_pair(p, unique_ptr<T>(t))); return *__m[p]; }
 	void clear() { __m.clear(); }
 	friend class template_map_iterator<template_map_container<T, U, V, Z>, __iterator, T>;

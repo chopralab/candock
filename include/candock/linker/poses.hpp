@@ -28,13 +28,13 @@ namespace linker {
 			void distance(double) const {} // just dummy : needed by grid
 			double radius() const { return __atom.radius(); }
 			
-			typedef vector<unique_ptr<AtomPoint>> UPVec;
-			typedef vector<AtomPoint*> PVec;
+			typedef std::vector<std::unique_ptr<AtomPoint>> UPVec;
+			typedef std::vector<AtomPoint*> PVec;
 			typedef candock::molib::Grid<AtomPoint> Grid;
 		};
 		
-		map<Segment::Id, AtomPoint::UPVec> __atompoints;
-		map<Segment::Id, AtomPoint::Grid> __grid;
+		std::map<Segment::Id, AtomPoint::UPVec> __atompoints;
+		std::map<Segment::Id, AtomPoint::Grid> __grid;
 		
 	public:
 		Poses(const Seed::Graph &seed_graph);

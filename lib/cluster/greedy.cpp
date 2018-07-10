@@ -9,6 +9,7 @@
 #include <exception>
 #include "candock/helper/logger.hpp"
 
+using namespace std;
 using namespace candock::molib;
 
 namespace candock{

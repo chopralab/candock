@@ -10,6 +10,7 @@
 #include "candock/docker/dock.hpp"
 #include <iostream>
 #include <exception>
+using namespace std;
 
 namespace candock{
 namespace docker {

@@ -1,5 +1,6 @@
 #include "candock/parser/fileparser.hpp"
 
+using namespace std;
 using namespace candock::molib;
 
 namespace candock {

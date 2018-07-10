@@ -17,7 +17,7 @@ namespace docker {
 
 		class DockedConf {
 		public:
-			typedef vector<DockedConf> Vec;
+			typedef std::vector<DockedConf> Vec;
 
 		private:
 			const Gpoints::Gpoint &__cavpoint;

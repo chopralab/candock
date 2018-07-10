@@ -6,13 +6,10 @@
 #include <vector>
 #include "candock/geometry/geometry.hpp"
 #include "candock/helper/debug.hpp"
-#include "candock/helper/help.hpp"
 #include "candock/molib/molecule.hpp"
 #include "candock/modeler/topology.hpp"
 #include "openmm/Vec3.h"
 #include "openmm/CustomNonbondedForce.h"
-
-using namespace std;
 
 namespace OpenMM
 {
@@ -63,8 +60,8 @@ class SystemTopology
         const ForceField *__ffield;
 
         int __kbforce_idx;
-        vector<bool> masked;
-        vector<double> masses;
+        std::vector<bool> masked;
+        std::vector<double> masses;
 
         class AtomPoint
         {
@@ -84,8 +81,8 @@ class SystemTopology
                 }
                 void distance(double) const {} // just dummy : needed by grid
 
-                typedef vector<unique_ptr<AtomPoint>> UPVec;
-                typedef vector<AtomPoint *> PVec;
+                typedef std::vector<std::unique_ptr<AtomPoint>> UPVec;
+                typedef std::vector<AtomPoint *> PVec;
                 typedef candock::molib::Grid<AtomPoint> Grid;
         };
 
@@ -96,7 +93,7 @@ class SystemTopology
                 int periodicity;
                 double phase, k;
         };
-        vector<vector<ForceData>> bondStretchData, bondBendData, bondTorsionData;
+        std::vector<std::vector<ForceData>> bondStretchData, bondBendData, bondTorsionData;
 
         void retype_amber_protein_atom_to_gaff(const molib::Atom &atom, int &type);
 
@@ -108,8 +105,8 @@ class SystemTopology
         void mask(Topology &topology, const molib::Atom::Vec &atoms);
         void unmask(Topology &topology, const molib::Atom::Vec &atoms);
 
-        void mask_forces(const int atom_idx, const set<int> &substruct);
-        void unmask_forces(const int atom_idx, const set<int> &substruct);
+        void mask_forces(const int atom_idx, const std::set<int> &substruct);
+        void unmask_forces(const int atom_idx, const std::set<int> &substruct);
 
         void init_integrator(SystemTopology::integrator_type type,
                              const double step_size_in_ps,
@@ -129,8 +126,8 @@ class SystemTopology
         void update_thermostat(const double temperature_in_kevin,
                                const double collision_frequency);
 
-        vector<OpenMM::Vec3> get_positions_in_nm();
-        vector<OpenMM::Vec3> get_forces();
+        std::vector<OpenMM::Vec3> get_positions_in_nm();
+        std::vector<OpenMM::Vec3> get_forces();
         double get_potential_energy();
         void minimize(const double tolerance, const int max_iterations);
         void dynamics(const int steps);

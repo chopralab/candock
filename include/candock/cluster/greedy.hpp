@@ -21,7 +21,7 @@ namespace cluster {
 		template<typename T>
 		class LinkedConf {
 		public:
-			typedef vector<unique_ptr<LinkedConf>> UPVec;
+			typedef std::vector<std::unique_ptr<LinkedConf>> UPVec;
 		private:
 			T &__molecule;
 			geometry::Point __crd;
@@ -40,8 +40,8 @@ namespace cluster {
 				}
 			};
 		};
-		friend ostream& operator<<(ostream& os, const set<const LinkedConf<molib::Molecule>*, LinkedConf<molib::Molecule>::by_energy> &confs);
-		friend ostream& operator<<(ostream& os, const set<const LinkedConf<linker::Partial>*, LinkedConf<linker::Partial>::by_energy> &confs);
+		friend std::ostream& operator<<(std::ostream& os, const std::set<const LinkedConf<molib::Molecule>*, LinkedConf<molib::Molecule>::by_energy> &confs);
+		friend std::ostream& operator<<(std::ostream& os, const std::set<const LinkedConf<linker::Partial>*, LinkedConf<linker::Partial>::by_energy> &confs);
 	public:
 		static geometry::Point::Vec greedy(const geometry::Point::Vec &initial, const double clus_rad);
 		static molib::Molecules greedy(const molib::Molecules &initial, const score::Score &score, molib::Atom::Grid &gridrec, const double clus_rad);

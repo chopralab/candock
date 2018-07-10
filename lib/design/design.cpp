@@ -7,6 +7,8 @@
 #include "candock/fragmenter/unique.hpp"
 #include "candock/helper/logger.hpp"
 
+using namespace std;
+
 namespace candock {
 
 namespace design {

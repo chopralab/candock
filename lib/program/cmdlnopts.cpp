@@ -8,6 +8,8 @@
 #include <fstream>
 #include <string>
 
+using namespace std;
+
 namespace po = boost::program_options;
 
 namespace candock {

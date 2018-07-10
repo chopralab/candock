@@ -7,6 +7,8 @@
 #include "candock/parser/fileparser.hpp"
 #include "candock/cluster/greedy.hpp"
 
+using namespace std;
+
 namespace candock{
 namespace centro {
 

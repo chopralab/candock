@@ -18,6 +18,7 @@
 #include "candock/helper/debug.hpp"
 #include "candock/helper/error.hpp"
 #include "candock/score/powerfit.hpp"
+using namespace std;
 
 namespace candock {
 namespace score {

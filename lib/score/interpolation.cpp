@@ -10,6 +10,7 @@
 #include <gsl/gsl_statistics.h>
 #include <assert.h>
 #include "candock/score/interpolation.hpp"
+using namespace std;
 
 namespace candock {
 

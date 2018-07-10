@@ -9,8 +9,6 @@
 #include "candock/parser/parser.hpp"
 #include "candock/helper/debug.hpp"
 
-using namespace std;
-
 namespace candock {
 
 namespace parser {

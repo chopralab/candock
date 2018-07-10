@@ -30,7 +30,7 @@ namespace molib {
 			} 
 		}
 		
-		void init_bio(const Assembly &asym, map<int, geometry::Matrix> &matrices, const set<char> &chains);
+		void init_bio(const Assembly &asym, std::map<int, geometry::Matrix> &matrices, const std::set<char> &chains);
 		
 		void set_number(int number) { __number = number; }
 		void set_name(const std::string &name) { __name = name; }
@@ -43,7 +43,7 @@ namespace molib {
 		Atom::Vec get_atoms(const std::string &chain_ids="", const Residue::res_type &rest=Residue::res_type::notassigned, const int model_number=-1) const;
 		Assembly& erase_properties() { for (auto &model : *this) model.erase_properties(); return *this; }
 		
-		friend ostream& operator<< (ostream& stream, const Assembly& a);
+		friend std::ostream& operator<< (std::ostream& stream, const Assembly& a);
 	};
 	
 

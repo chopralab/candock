@@ -52,7 +52,7 @@ namespace Program {
                 .compute_rotatable_bonds() // relies on hydrogens being assigned
                 .erase_hydrogen();
 
-                __protein = unique_ptr<molib::Molecule> ( new molib::Molecule (std::move (receptors[0])));
+                __protein = std::unique_ptr<molib::Molecule> ( new molib::Molecule (std::move (receptors[0])));
 
                 // Emulate the original version of candock
                 __protein->set_name (input_name.substr (0, input_name.length() - 4));
@@ -223,7 +223,7 @@ namespace Program {
                         designer.functionalize_hydrogens_with_fragments(nr,
                                                                         cmdl.get_double_option("tol_seed_dist"),
                                                                         cmdl.get_double_option("clash_coeff"),
-                                                                        make_tuple(cmdl.get_double_option("lipinski_mass"),
+                                                                        std::make_tuple(cmdl.get_double_option("lipinski_mass"),
                                                                                    cmdl.get_int_option("lipinski_hbd"),
                                                                                    cmdl.get_int_option("lipinski_nhs"),
                                                                                    cmdl.get_int_option("lipinski_ohs")
@@ -236,7 +236,7 @@ namespace Program {
                 }
 
                 if ( all_designs_out.size() == 0 ) {
-                        log_step << "No new designs, exiting" << endl;
+                        log_step << "No new designs, exiting" << std::endl;
                         return;
                 }
 
@@ -253,7 +253,7 @@ namespace Program {
                                 designer.functionalize_hydrogens_with_fragments(__prepseeds->get_top_seeds(seeds_to_add, cmdl.get_double_option("top_percent")),
                                                                                 cmdl.get_double_option("tol_seed_dist"),
                                                                                 cmdl.get_double_option("clash_coeff"),
-                                                                                make_tuple(cmdl.get_double_option("lipinski_mass"),
+                                                                                std::make_tuple(cmdl.get_double_option("lipinski_mass"),
                                                                                    cmdl.get_int_option("lipinski_hbd"),
                                                                                    cmdl.get_int_option("lipinski_nhs"),
                                                                                    cmdl.get_int_option("lipinski_ohs")
@@ -261,7 +261,7 @@ namespace Program {
                                                                                );
 
                         //const vector<string>& h_single_atoms = cmdl.get_string_vector("add_single_atoms");
-                        const vector<string>& a_single_atoms = cmdl.get_string_vector("change_terminal_atom");
+                        const std::vector<std::string>& a_single_atoms = cmdl.get_string_vector("change_terminal_atom");
 
                         if (!a_single_atoms.empty())
                                 designer.functionalize_extremes_with_single_atoms(a_single_atoms);

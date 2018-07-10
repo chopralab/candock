@@ -9,7 +9,7 @@ namespace candock {
 namespace geometry {
         typedef Coordinate Point;
         typedef Coordinate Vector3;
-        typedef map<int, geometry::Point::Vec> GridPoints;
+        typedef std::map<int, geometry::Point::Vec> GridPoints;
 
         double degrees(double);
         double radians(double);
@@ -25,8 +25,8 @@ namespace geometry {
         Point compute_geometric_center(const geometry::Point::Vec &crds);
         Point::Vec uniform_sphere(const int n);
 
-        ostream& operator<<(ostream& os, const geometry::Point::Vec &points);
-        ostream& operator<<(ostream& os, const geometry::Point::ConstSet &points);
+        std::ostream& operator<<(std::ostream& os, const geometry::Point::Vec &points);
+        std::ostream& operator<<(std::ostream& os, const geometry::Point::ConstSet &points);
 }
 
 }

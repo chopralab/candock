@@ -9,10 +9,10 @@ namespace linker {
 
         class DockedConformation {
         public:
-                typedef vector<DockedConformation> Vec;
+                typedef std::vector<DockedConformation> Vec;
         private:
-                unique_ptr<molib::Molecule> __ligand;
-                unique_ptr<molib::Molecule> __receptor;
+                std::unique_ptr<molib::Molecule> __ligand;
+                std::unique_ptr<molib::Molecule> __receptor;
                 double __energy;
                 double __potential_energy;
                 size_t __max_clq_identity;
@@ -20,8 +20,8 @@ namespace linker {
                 DockedConformation() : __ligand (nullptr), __receptor (nullptr), __energy (0), __potential_energy (0), __max_clq_identity(0) {}
 
                 DockedConformation (molib::Molecule ligand, molib::Molecule receptor, double energy, double pot, size_t id)
-                        : __ligand (unique_ptr<molib::Molecule> (new molib::Molecule (ligand))),
-                          __receptor (unique_ptr<molib::Molecule> (new molib::Molecule (receptor))),
+                        : __ligand (std::unique_ptr<molib::Molecule> (new molib::Molecule (ligand))),
+                          __receptor (std::unique_ptr<molib::Molecule> (new molib::Molecule (receptor))),
                           __energy (energy), __potential_energy (pot), __max_clq_identity(id) {}
 
                 molib::Molecule &get_ligand() {
@@ -63,7 +63,7 @@ namespace linker {
 
                 static void sort (DockedConformation::Vec &v);
 
-                friend ostream &operator<< (ostream &os, const DockedConformation &conf);
+                friend std::ostream &operator<< (std::ostream &os, const DockedConformation &conf);
         };
 
 };

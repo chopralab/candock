@@ -27,6 +27,8 @@
 #include "candock/helper/debug.hpp"
 #include "candock/helper/logger.hpp"
 
+using namespace std;
+
 namespace candock{
 namespace Inout {
 

@@ -1,14 +1,11 @@
 #ifndef STATE_H
 #define STATE_H
 #include "candock/helper/debug.hpp"
-#include "candock/helper/help.hpp"
 #include "candock/geometry/geometry.hpp"
 #include "candock/molib/bond.hpp"
 #include "candock/molib/atom.hpp"
 #include <tuple>
 #include <functional>
-
-using namespace std;
 
 namespace candock {
 
@@ -23,11 +20,11 @@ namespace linker {
 		struct comp { bool operator()(State* const i, State* const j) const
 			{ return i->get_id() < j->get_id(); } };
 
-		typedef vector<State*> Vec;
-		typedef vector<State> NVec;
-		typedef set<State*, State::comp> Set;
-		typedef vector<const State*> ConstVec;
-		typedef pair<const State*, const State*> ConstPair;
+		typedef std::vector<State*> Vec;
+		typedef std::vector<State> NVec;
+		typedef std::set<State*, State::comp> Set;
+		typedef std::vector<const State*> ConstVec;
+		typedef std::pair<const State*, const State*> ConstPair;
 		typedef int Id;
 		
 	private:
@@ -48,15 +45,15 @@ namespace linker {
 		geometry::Point::Vec& get_crds() { return __crds; }			
 		const geometry::Point& get_crd(const int i) const { return __crds[i]; }
 		bool clashes(const State &other, const double clash_coeff) const; // clashes between this and other state
-		string pdb() const;
+		std::string pdb() const;
 		void set_id(Id id) { __id = id; }
                 Id get_id() const { return __id; }
 #ifndef NDEBUG
 		void set_no(int no) { __no = no; }
 		int get_no() const { return __no; }
 #endif
-		friend ostream& operator<< (ostream& stream, const State& s);
-		friend ostream& operator<< (ostream& stream, const Vec& sv);
+		friend std::ostream& operator<< (std::ostream& stream, const State& s);
+		friend std::ostream& operator<< (std::ostream& stream, const Vec& sv);
 	};
 	
 	State::Vec operator-(const State::Set& left, const State::Set& right);

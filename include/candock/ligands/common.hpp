@@ -9,18 +9,18 @@ namespace molib {
 	class Residue;
 	class Molecules;
 }
-typedef set<pair<molib::Residue::res_tuple2, molib::Residue::res_tuple2>> ResPairSet;
-typedef map<molib::Residue::res_tuple2, molib::Residue::res_tuple2> ResMap;
-typedef set<molib::Residue::res_tuple2> ResSet;
-typedef vector<molib::Residue::res_tuple2> ResVec;
-typedef set<molib::Residue*> ResidueSet;
+typedef std::set<std::pair<molib::Residue::res_tuple2, molib::Residue::res_tuple2>> ResPairSet;
+typedef std::map<molib::Residue::res_tuple2, molib::Residue::res_tuple2> ResMap;
+typedef std::set<molib::Residue::res_tuple2> ResSet;
+typedef std::vector<molib::Residue::res_tuple2> ResVec;
+typedef std::set<molib::Residue*> ResidueSet;
 
-ostream& operator<< (ostream& stream, const ResidueSet& residues);
+std::ostream& operator<< (std::ostream& stream, const ResidueSet& residues);
 
 namespace common_ligands {
-	void output_file(molib::Molecules &mols, const string &filename);
+	void output_file(molib::Molecules &mols, const std::string &filename);
 	ResMap json_to_map(const Json::Value &aligned_residues);
-	pair<ResSet, ResSet> json_to_set(Json::Value aligned_residues);
+	std::pair<ResSet, ResSet> json_to_set(Json::Value aligned_residues);
 	ResMap json_to_map_reverse(Json::Value aligned_residues);
 };
 

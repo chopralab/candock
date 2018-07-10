@@ -1,7 +1,6 @@
 #ifndef MOLECULES_H
 #define MOLECULES_H
 #include "candock/geometry/geometry.hpp"
-#include "candock/helper/help.hpp"
 #include "candock/molib/it.hpp"
 #include "candock/molib/grid.hpp"
 #include "candock/molib/atom.hpp"
@@ -51,14 +50,14 @@ namespace molib {
 		Molecules& compute_overlapping_rigid_segments(const std::string &seeds_file="");
 		Molecules& erase_properties() { for (auto &molecule : *this) molecule.erase_properties(); return *this; }
 
-		set<int> get_idatm_types(std::set<int> previous=std::set<int>()) const;
+		std::set<int> get_idatm_types(std::set<int> previous=std::set<int>()) const;
 		
 
-		friend ostream& operator<< (ostream& stream, const Molecules& m);
+		friend std::ostream& operator<< (std::ostream& stream, const Molecules& m);
 	};
 
 
-        void create_mols_from_seeds(set<int> &added, molib::Molecules &seeds, const molib::Molecules &mols);
+        void create_mols_from_seeds(std::set<int> &added, molib::Molecules &seeds, const molib::Molecules &mols);
 
 } // molib
 

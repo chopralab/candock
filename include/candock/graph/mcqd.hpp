@@ -33,8 +33,6 @@
 #include "candock/helper/array2d.hpp"
 #include "candock/helper/error.hpp"
 
-using namespace std;
-
 namespace candock {
 namespace graph {
 
@@ -100,7 +98,7 @@ private:
  
   Vertices V;
   ColorClass *C, QMAX, Q;
-  vector<vector<unsigned short int>> QMAXES;
+  std::vector<std::vector<unsigned short int>> QMAXES;
   //~ set<pair<vector<unsigned short int>, double>, Maxclique::comp> QMAXES_WEIGHT;
  
   class StepCount {
@@ -136,8 +134,8 @@ public:
   };
   
   int steps() const { return pk; }
-  vector<vector<unsigned short int>>& mcq(const int minsz);
-  vector<vector<unsigned short int>>& mcqdyn(const int minsz);
+  std::vector<std::vector<unsigned short int>>& mcq(const int minsz);
+  std::vector<std::vector<unsigned short int>>& mcqdyn(const int minsz);
   //~ set<pair<vector<unsigned short int>, double>, Maxclique::comp>& mcqw(const int minsz);
 
 };

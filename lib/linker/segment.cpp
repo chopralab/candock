@@ -2,6 +2,7 @@
 #include "candock/molib/molecule.hpp"
 #include "candock/helper/benchmark.hpp"
 #include "candock/helper/help.hpp"
+using namespace std;
 
 namespace candock {
 

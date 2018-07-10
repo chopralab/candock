@@ -1,6 +1,7 @@
 #include "candock/molib/molecule.hpp"
 #include "candock/helper/help.hpp"
 #include <regex>
+using namespace std;
 
 namespace candock {
 namespace molib {

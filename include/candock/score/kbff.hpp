@@ -22,7 +22,7 @@ namespace score {
         KBFF& parse_objective_function(const std::string &obj_dir, const double scale_non_bond, const size_t max_step);
         KBFF& output_objective_function(const std::string &obj_dir);
 
-        friend ostream& operator<< (ostream& stream, const KBFF &kbff);
+        friend std::ostream& operator<< (std::ostream& stream, const KBFF &kbff);
     };
 }
 }

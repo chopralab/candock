@@ -11,8 +11,8 @@
 
 #else
 
-#define dbgprint(x) std::cerr << #x << ": " << x << " in "  << __FILE__ << ":" << __LINE__ << endl
-#define dbgmsg(message) std::cerr << message << " in "  << __FILE__ << ":" << __LINE__ <<endl
+#define dbgprint(x) std::cerr << #x << ": " << x << " in "  << __FILE__ << ":" << __LINE__ << std::endl
+#define dbgmsg(message) std::cerr << message << " in "  << __FILE__ << ":" << __LINE__ << std::endl
 #endif
 
 #endif

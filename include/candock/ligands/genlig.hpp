@@ -2,18 +2,17 @@
 #define GENLIG_H
 #include <iostream>
 #include "candock/molib/molecule.hpp"
-using namespace std;
 
 namespace candock {
 
 namespace genlig {
-	typedef map<int, molib::Molecules> BindingSiteClusters;
-	typedef map<int, double> BindingSiteScores;
-	void generate_ligands(const string &receptor_file, const string &receptor_chain_id, 
-		const string &json_file, const string &bio_dir, const string &lig_code,
-		const string &lig_file, const string &bsite_file);
-	pair<BindingSiteClusters, BindingSiteScores> generate_binding_site_prediction(const string &json_with_ligs_file, 
-		const string &bio_dir, const int num_bsites);
+	typedef std::map<int, molib::Molecules> BindingSiteClusters;
+	typedef std::map<int, double> BindingSiteScores;
+	void generate_ligands(const std::string &receptor_file, const std::string &receptor_chain_id, 
+		const std::string &json_file, const std::string &bio_dir, const std::string &lig_code,
+		const std::string &lig_file, const std::string &bsite_file);
+	std::pair<BindingSiteClusters, BindingSiteScores> generate_binding_site_prediction(const std::string &json_with_ligs_file, 
+		const std::string &bio_dir, const int num_bsites);
 
 }
 
@@ -21,10 +20,10 @@ namespace genlig {
 // See http://blog.mezeske.com/?p=170 for details.
 
 namespace molib {
-    ostream& operator<<(ostream& os, const map<int, molib::Molecules>& bsites);
+    std::ostream& operator<<(std::ostream& os, const std::map<int, molib::Molecules>& bsites);
 }
 
-	ostream& operator<<(ostream& os, const map<int, double>& bscores);
+	std::ostream& operator<<(std::ostream& os, const std::map<int, double>& bscores);
 }
 
 #endif

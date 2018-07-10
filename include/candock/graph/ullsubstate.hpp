@@ -19,14 +19,14 @@ namespace graph {
         template<class Graph1, class Graph2>
         class UllSubState {
                 int core_len;
-                vector<node_id> core_1;
-                vector<node_id> core_2;
+                std::vector<node_id> core_1;
+                std::vector<node_id> core_2;
                 const Graph1 &g1;
                 const Graph2 &g2;
                 const int n1, n2;
                 //~ typedef unsigned char byte;
                 typedef unsigned int byte;
-                unique_ptr<unique_ptr<byte[]>[]> M;   // Matrix encoding the compatibility of the nodes
+                std::unique_ptr<std::unique_ptr<byte[]>[]> M;   // Matrix encoding the compatibility of the nodes
                 void __refine();
         public:
                 UllSubState (const Graph1 &g1,  const Graph2 &g2);
@@ -62,10 +62,10 @@ namespace graph {
                 int CoreLen() {
                         return core_len;
                 }
-                void GetCoreSet (vector<node_id> &c1, vector<node_id> &c2);
+                void GetCoreSet (std::vector<node_id> &c1, std::vector<node_id> &c2);
                 UllSubState *Clone();
                 template<class P, class R>
-                friend ostream &operator<< (ostream &stream, UllSubState<P, R> &s);
+                friend std::ostream &operator<< (std::ostream &stream, UllSubState<P, R> &s);
         };
 
 
@@ -83,9 +83,9 @@ namespace graph {
 
 #endif
                 //~ core_len=0;
-                M = unique_ptr<unique_ptr<byte[]>[]> (new unique_ptr<byte[]>[n1]);
+                M = std::unique_ptr<std::unique_ptr<byte[]>[]> (new std::unique_ptr<byte[]>[n1]);
 
-                for (int i=0; i<n1; i++) M[i] = unique_ptr<byte[]> (new byte[n2]);
+                for (int i=0; i<n1; i++) M[i] = std::unique_ptr<byte[]> (new byte[n2]);
 
                 for (int i=0; i<n1; i++)
                         for (int j=0; j<n2; j++) {
@@ -109,11 +109,11 @@ namespace graph {
         UllSubState<Graph1, Graph2>::UllSubState (const UllSubState<Graph1, Graph2> &state) :  core_len (state.core_len), core_1 (state.core_1.size()), core_2 (state.core_2.size()), g1 (state.g1), g2 (state.g2), n1 (state.n1), n2 (state.n2) {
                 copy (state.core_1.begin(), state.core_1.end(), core_1.begin());
                 copy (state.core_2.begin(), state.core_2.end(), core_2.begin());
-                M = unique_ptr<unique_ptr<byte[]>[]> (new unique_ptr<byte[]>[n1]);
+                M = std::unique_ptr<std::unique_ptr<byte[]>[]> (new std::unique_ptr<byte[]>[n1]);
 
-                for (int i=0; i<core_len; i++) M[i] = unique_ptr<byte[]> (nullptr);
+                for (int i=0; i<core_len; i++) M[i] = std::unique_ptr<byte[]> (nullptr);
 
-                for (int i=core_len; i<n1; i++) M[i] = unique_ptr<byte[]> (new byte[n2]);
+                for (int i=core_len; i<n1; i++) M[i] = std::unique_ptr<byte[]> (new byte[n2]);
 
                 for (int i=core_len; i<n1; i++)
                         for (int j=0; j<n2; j++)
@@ -192,7 +192,7 @@ namespace graph {
          * The i-th pair of the mapping is (c1[i], c2[i])
          --------------------------------------------------------------*/
         template<class Graph1, class Graph2>
-        void UllSubState<Graph1, Graph2>::GetCoreSet (vector<node_id> &c1, vector<node_id> &c2) {
+        void UllSubState<Graph1, Graph2>::GetCoreSet (std::vector<node_id> &c1, std::vector<node_id> &c2) {
                 for (int i=0,j=0; i<n1; i++)
                         if (core_1[i] != NULL_NODE) {
                                 c1[j]=i;
@@ -252,14 +252,14 @@ namespace graph {
                 return new UllSubState (*this);
         }
         template<class P, class R>
-        ostream &operator<< (ostream &stream, UllSubState<P, R> &s) {
-                stream << "M = " << endl;
+        std::ostream &operator<< (std::ostream &stream, UllSubState<P, R> &s) {
+                stream << "M = " << std::endl;
 
                 for (int i = 0; i < s.n1; i++) {
                         for (int j = 0; j < s.n2; j++)
                                 stream << s.M[i][j];
 
-                        stream << endl;
+                        stream << std::endl;
                 }
 
                 return stream;

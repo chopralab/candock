@@ -3,6 +3,8 @@
 #include "candock/ligands/common.hpp"
 #include "candock/external/json/json.h"
 
+using namespace std;
+
 namespace candock{
 
 ostream& operator<< (ostream& stream, const ResidueSet& residues) {

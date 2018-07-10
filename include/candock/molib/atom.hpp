@@ -4,7 +4,6 @@
 #include "candock/geometry/matrix.hpp"
 #include "candock/molib/it.hpp"
 #include "candock/molib/element.hpp"
-#include "candock/helper/help.hpp"
 #include "candock/molib/grid.hpp"
 #include "candock/molib/bond.hpp"
 #include "candock/graph/graph.hpp"
@@ -16,12 +15,12 @@ namespace molib {
 	
 	class Atom : public template_vector_container<Atom*, Atom> {
 	public:
-		typedef tuple<int,std::string, unique_ptr<geometry::Coordinate>, double> atom_tuple;
-		typedef pair<Atom*, Atom*> Pair;
-		typedef vector<Atom*> Vec;
-                typedef vector<const Atom*> ConstVec;
-		typedef set<Atom*> Set;
-                typedef set<const Atom*> CSet;
+		typedef std::tuple<int,std::string, std::unique_ptr<geometry::Coordinate>, double> atom_tuple;
+		typedef std::pair<Atom*, Atom*> Pair;
+		typedef std::vector<Atom*> Vec;
+                typedef std::vector<const Atom*> ConstVec;
+		typedef std::set<Atom*> Set;
+                typedef std::set<const Atom*> CSet;
 		typedef candock::molib::Grid<Atom> Grid;
 		typedef graph::Graph<Atom> Graph;
 
@@ -34,10 +33,10 @@ namespace molib {
 	std::string __gaff_type;
 		Element __element;
 	std::string __smiles_label;
-		map<string, int> __smiles_prop;
-		map<int, int> __aps;
+		std::map<std::string, int> __smiles_prop;
+		std::map<int, int> __aps;
 		void *__br; // back reference
-		map<const Atom*, shared_ptr<Bond>> __bonds;
+		std::map<const Atom*, std::shared_ptr<Bond>> __bonds;
 		
 	public:
 		Atom(const Atom &rhs) : __atom_number(rhs.__atom_number), 
@@ -50,7 +49,7 @@ namespace molib {
 		}
 
 		Atom(const int atom_number, const std::string &smiles_label, 
-			const map<string, int> smiles_prop) : __atom_number(atom_number), 
+			const std::map<std::string, int> smiles_prop) : __atom_number(atom_number), 
 			 __element(""), __smiles_label(smiles_label), __smiles_prop(smiles_prop),
 			__br(nullptr) {}
 		Atom(const geometry::Coordinate &crd) : __crd(crd), __element("") {}
@@ -66,10 +65,10 @@ namespace molib {
 		void clear_bonds() { __bonds.clear(); }
 		BondVec get_bonds() const { BondVec bonds; for (auto &kv : __bonds) 
 			bonds.push_back(&*kv.second); return bonds; }
-		const shared_ptr<Bond>& get_shared_ptr_bond(const Atom &other) const { return __bonds.at(&other); }
+		const std::shared_ptr<Bond>& get_shared_ptr_bond(const Atom &other) const { return __bonds.at(&other); }
 		Bond& get_bond(const Atom &other) const { return *get_shared_ptr_bond(other); }
-		shared_ptr<Bond>& insert_bond(const Atom &other, const shared_ptr<Bond> &bond) { return __bonds.insert({&other, bond}).first->second; }
-		shared_ptr<Bond>& insert_bond(const Atom &other, Bond *bond) { return __bonds.insert({&other, shared_ptr<Bond>(bond)}).first->second; }
+		std::shared_ptr<Bond>& insert_bond(const Atom &other, const std::shared_ptr<Bond> &bond) { return __bonds.insert({&other, bond}).first->second; }
+		std::shared_ptr<Bond>& insert_bond(const Atom &other, Bond *bond) { return __bonds.insert({&other, std::shared_ptr<Bond>(bond)}).first->second; }
 		void erase_bond(const Atom &other) { __bonds.erase(&other); }
 		bool is_adjacent(const Atom &other) const { return __bonds.count(&other) != 0; }
 		bool is_adjacent(const std::string &atom_name) const { for (auto &other : *this) if (other.atom_name() == atom_name) return true; return false; }
@@ -101,10 +100,10 @@ namespace molib {
 		void set_element(const Element& e) { __element = e; };
 		geometry::Coordinate& crd() { return __crd; }
 		const geometry::Coordinate& crd() const { return __crd; }
-		friend ostream& operator<< (ostream& stream, const Atom& a);
+		friend std::ostream& operator<< (std::ostream& stream, const Atom& a);
 		double distance() const { return 0.0; } // just dummy : needed by grid
 		void distance(double) const {} // just dummy : needed by grid
-		const map<int, int>& get_aps() const { return __aps; }
+		const std::map<int, int>& get_aps() const { return __aps; }
 		void set_members(const std::string &str);
 		const Residue& br() const { return *static_cast<const Residue*>(__br); }
 		void set_br(void *br) { __br = br; }
@@ -126,8 +125,8 @@ namespace molib {
         BondSet get_bonds_in(const Atom::Set &atoms, bool in=true);
         BondSet get_bonds_in(const Atom::Vec &atoms, bool in=true);
 
-        ostream& operator<< (ostream& stream, const Atom::Set &atoms);
-        ostream& operator<< (ostream& stream, const Atom::Vec &atoms);
+        std::ostream& operator<< (std::ostream& stream, const Atom::Set &atoms);
+        std::ostream& operator<< (std::ostream& stream, const Atom::Vec &atoms);
 };
 
 }

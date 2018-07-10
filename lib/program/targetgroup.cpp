@@ -1,6 +1,8 @@
 #include "candock/program/targetgroup.hpp"
 #include "candock/fileout/fileout.hpp"
 
+using namespace std;
+
 namespace candock {
 namespace Program {
 

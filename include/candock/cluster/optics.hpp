@@ -17,7 +17,6 @@
 #include "candock/helper/debug.hpp"
 #include "candock/helper/benchmark.hpp"
 #include "candock/helper/logger.hpp"
-using namespace std;
 
 /* OPTICS clustering algorithm C++ implementation
  * 
@@ -29,13 +28,13 @@ namespace candock {
 
 namespace cluster {
 	//~ template <typename T> using PairwiseDistances = unordered_map<T*, unordered_map<T*, double>>;
-	template <typename T> using PairwiseDistances = map<T*, map<T*, double>>;
-	template <typename T> using Neighbors = map<T*, vector<T*>>;
-	template <typename T> using MapD = map<T*, double>;
-	template <typename T> using MapB = map<T*, bool>;
-	template <typename T> using MapI = map<T*, int>;
-	template <typename T> using Clusters = multimap<int, T*>;
-	template <typename T> using Vector = vector<T*>;
+	template <typename T> using PairwiseDistances = std::map<T*, std::map<T*, double>>;
+	template <typename T> using Neighbors = std::map<T*, std::vector<T*>>;
+	template <typename T> using MapD = std::map<T*, double>;
+	template <typename T> using MapB = std::map<T*, bool>;
+	template <typename T> using MapI = std::map<T*, int>;
+	template <typename T> using Clusters = std::multimap<int, T*>;
+	template <typename T> using Vector = std::vector<T*>;
 		
 	template<typename T, typename CompareDistanceLess = std::less<double>, typename CompareScoreLess = std::less<double>>
 	class Optics {
@@ -199,7 +198,7 @@ namespace cluster {
 			__scores(scores), __eps(eps), __min_pts(min_pts) {
 
 			Benchmark bench;
-			log_step << "starting clustering ..." << endl;
+			log_step << "starting clustering ..." << std::endl;
 
 			__JANEZ_HV = (CompareDistanceLess()(-1.0, 1.0) ? HUGE_VAL : -HUGE_VAL);
 			// make inverse pairs of pairwise distances if missing
@@ -250,7 +249,7 @@ namespace cluster {
 				<< bench.seconds_from_start() << " wallclock seconds\n";
 		}
 
-		pair<Clusters<T>, Clusters<T>> extract_dbscan(const double eps_cur,
+		std::pair<Clusters<T>, Clusters<T>> extract_dbscan(const double eps_cur,
 			const size_t max_num_clus=9999999, const bool do_sort=false) { // returns the original objects together with their cluster_ids
 
 			assert(CompareDistanceLess()(eps_cur, __eps));  // eps_cur must be < eps
@@ -334,7 +333,7 @@ namespace cluster {
 #endif
 			}
 			// renumber clusters so that the best cluster is first
-			map<int, int> added_clus;
+			std::map<int, int> added_clus;
 			int i = 0;
 			for (auto &pp : __ordered_file) {
 				const int cluster_id = __cluster_id[pp];
@@ -352,7 +351,7 @@ namespace cluster {
 				
 				auto range = clustered_points.equal_range(it->first);
 				T *rep = max_element(range.first, range.second, [this] (
-					const pair<const int, T*> &i, const pair<const int, T*> &j) { 
+					const std::pair<const int, T*> &i, const std::pair<const int, T*> &j) { 
 					return CompareScoreLess()(__scores.at(i.second), __scores.at(j.second)); })->second;
 				representative_points.insert({it->first, rep});
 				dbgmsg("\t[" << it->first << "]\t" << *rep << "\tscore="

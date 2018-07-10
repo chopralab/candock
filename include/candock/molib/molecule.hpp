@@ -27,16 +27,16 @@ namespace molib {
 	
 	class Molecule : public template_map_container<Assembly, Molecule, Molecules> {
 	public:
-		typedef vector<Molecule*> Vec;
+		typedef std::vector<Molecule*> Vec;
 		
 	private:
-		set<Residue::res_tuple2> __modified;
-		multimap<string, Residue::res_tuple2> __site;
+		std::set<Residue::res_tuple2> __modified;
+		std::multimap<std::string, Residue::res_tuple2> __site;
 	std::string __name; // usually pdb file
-		typedef map<int, geometry::Matrix> M0;
-		typedef map<int, M0> M1;
+		typedef std::map<int, geometry::Matrix> M0;
+		typedef std::map<int, M0> M1;
 		M1 __bio_rota;
-		map<int, set<char> > __bio_chain;
+		std::map<int, std::set<char> > __bio_chain;
 	public:
 		Molecule(const std::string name) : __name(name) {}
 		Molecule(const Molecule &rhs) : __modified(rhs.__modified), 
@@ -72,7 +72,7 @@ namespace molib {
                 void change_residue_name(std::mutex &mtx, int &ligand_cnt);
 
 		Assembly& asym() { return this->first(); }
-		set<int> get_idatm_types(std::set<int> previous = std::set<int>()) const;
+		std::set<int> get_idatm_types(std::set<int> previous = std::set<int>()) const;
 		Atom::Vec get_atoms(const std::string &chain_ids="", const Residue::res_type &rest=Residue::res_type::notassigned, const int model_number=-1) const;
 		Residue::Vec get_residues() const;
 
@@ -104,11 +104,11 @@ namespace molib {
 		void add_bio_rota(const int &biomolecule_number, const int &rn, const int &row, const geometry::Matrix::matrix_tuple &t) {
 			__bio_rota[biomolecule_number][rn].set_row(row, t); // needs copy constructor in geometry::Matrix
 		}
-		void add_bio_chain(const int &biomolecule_number, set<char> bio_chain) {
+		void add_bio_chain(const int &biomolecule_number, std::set<char> bio_chain) {
 			__bio_chain[biomolecule_number] = bio_chain;
 		}
 		Molecule& erase_properties() { for (auto &assembly : *this) assembly.erase_properties(); return *this; }
-		friend ostream& operator<< (ostream& stream, const Molecule& m);
+		friend std::ostream& operator<< (std::ostream& stream, const Molecule& m);
 	};
 	
 } // molib

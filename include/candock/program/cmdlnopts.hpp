@@ -61,7 +61,7 @@ namespace Program {
                 }
                 
                 std::string configuration_file() const {
-                        stringstream ss;
+                        std::stringstream ss;
                         ss << *this;
                         return ss.str();
                 }

@@ -5,26 +5,24 @@
 #include <string>
 #include <ostream>
 
-using namespace std;
-
 namespace candock {
 
 namespace help {
 	struct edge { 
-		string atom_property1;
-		string atom_property2;
-		string bond_property;
+		std::string atom_property1;
+		std::string atom_property2;
+		std::string bond_property;
         //string bond_stereo;
 	};
-	typedef vector<edge> smiles;
+	typedef std::vector<edge> smiles;
 	struct rename_rule {
 		smiles pattern;
-		vector<string> rule;
+		std::vector<std::string> rule;
 	};
-	typedef vector<rename_rule> rename_rules;
+	typedef std::vector<rename_rule> rename_rules;
 
-	ostream& operator<<(ostream& os, const smiles& edges);
-	ostream& operator<<(ostream& os, const rename_rule& rule);
+	std::ostream& operator<<(std::ostream& os, const smiles& edges);
+	std::ostream& operator<<(std::ostream& os, const rename_rule& rule);
 }
 
 }

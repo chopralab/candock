@@ -1,7 +1,6 @@
 #ifndef INTERNAL_H
 #define INTERNAL_H
 #include "candock/helper/error.hpp"
-#include "candock/helper/help.hpp"
 #include "candock/helper/debug.hpp"
 #include "candock/geometry/geometry.hpp"
 #include "candock/geometry/coordinate.hpp"
@@ -23,12 +22,12 @@ namespace molib {
 	};
 	extern const Torsion empty_torsion;
 	class Internal {
-		map<const Atom*, map<const Atom*, double>> __ic_bond;
-		map<const Atom*, map<const Atom*, map<const Atom*, double>>> __ic_angle;
-		map<const Atom*, map<const Atom*, map<const Atom*, map<const Atom*, double>>>> __ic_dihedral;
+		std::map<const Atom*, std::map<const Atom*, double>> __ic_bond;
+		std::map<const Atom*, std::map<const Atom*, std::map<const Atom*, double>>> __ic_angle;
+		std::map<const Atom*, std::map<const Atom*, std::map<const Atom*, std::map<const Atom*, double>>>> __ic_dihedral;
 		geometry::Coordinate __set_crd(const geometry::Point&, const geometry::Point&, const geometry::Point&, const double, const double, const double) const;
 
-		typedef map<const Atom*, geometry::Coordinate> AtomToCrd;
+		typedef std::map<const Atom*, geometry::Coordinate> AtomToCrd;
 
 	public:
 		Internal() {}

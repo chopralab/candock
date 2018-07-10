@@ -31,7 +31,7 @@ namespace Program {
                         }
                 }
 
-                log_note << "Linking for all molecules in " << cmdl.get_string_option ("prep") << " for " << __receptor.name() << " is complete, skipping." << endl;
+                log_note << "Linking for all molecules in " << cmdl.get_string_option ("prep") << " for " << __receptor.name() << " is complete, skipping." << std::endl;
 
                 return true;
         }
@@ -97,7 +97,7 @@ namespace Program {
                         } else {
                                 // Fix issue with getting default values....
                                 seed = std::random_device()() >> 2;
-                                log_step << "Seed for " << ligand.name() << " is " << seed << endl;
+                                log_step << "Seed for " << ligand.name() << " is " << seed << std::endl;
                         }
 
                         if (cmdl.get_int_option("jiggle_seed") != -2) {
@@ -170,23 +170,23 @@ namespace Program {
                                 fileout::print_complex_pdb (ss, docked.get_ligand(), docked.get_receptor(),
                                                         docked.get_energy(), docked.get_potential_energy(),
                                                         ++model, docked.get_max_clq_identity(), rmsd);
-                                Inout::output_file (ss.str(), p.string(), ios_base::app);
+                                Inout::output_file (ss.str(), p.string(), std::ios_base::app);
                         }
 
                         __all_top_poses.add (new molib::Molecule (docks[0].get_ligand()));
                         ffcopy.erase_topology (ligand);
-                } catch (exception &e) {
-                        log_error << "Error: skipping ligand " << ligand.name() << " with " << __receptor.name() << " due to : " << e.what() << endl;
-                        stringstream ss;
+                } catch (std::exception &e) {
+                        log_error << "Error: skipping ligand " << ligand.name() << " with " << __receptor.name() << " due to : " << e.what() << std::endl;
+                        std::stringstream ss;
                         ligand.change_residue_name ("CAN");
-                        ss << "REMARK  20 non-binder " << ligand.name() << " with " << __receptor.name() << " because " << e.what() << endl << ligand;
-                        Inout::file_open_put_stream (p.string(), ss, ios_base::app);
+                        ss << "REMARK  20 non-binder " << ligand.name() << " with " << __receptor.name() << " because " << e.what() << std::endl << ligand;
+                        Inout::file_open_put_stream (p.string(), ss, std::ios_base::app);
                 }
         }
 
         void LinkFragments::__continue_from_prev () {
 
-                log_step << "Starting to dock the fragments into originally given ligands" << endl;
+                log_step << "Starting to dock the fragments into originally given ligands" << std::endl;
 
                 if (! Inout::file_size (cmdl.get_string_option ("prep"))) {
                         log_warning << cmdl.get_string_option ("prep") << " is either blank or missing, no (initial) ligand docking will take place.";
@@ -212,7 +212,7 @@ namespace Program {
 
                                         if (Inout::file_size (p.string()) > 0) {
                                                 std::lock_guard<std::mutex> guard(additon_to_top_dock);
-                                                log_note << ligand.name() << " is alread docked to " << __receptor.name() << ", skipping." << endl;
+                                                log_note << ligand.name() << " is alread docked to " << __receptor.name() << ", skipping." << std::endl;
 
                                                 parser::FileParser conf (p.string(), parser::skip_atom | parser::first_model | parser::docked_poses_only, 1);
                                                 conf.parse_molecule (__all_top_poses);
@@ -237,7 +237,7 @@ namespace Program {
                         thread.join();
                 }
 
-                log_step << "Linking of fragments is complete" << endl;
+                log_step << "Linking of fragments is complete" << std::endl;
         }
 
         void LinkFragments::link_ligands (const molib::Molecules &ligands) {
@@ -251,7 +251,7 @@ namespace Program {
                 for (int i = 0; i < cmdl.ncpu(); ++i) {
                         threads.push_back (std::thread ([ &,this] {
                                 while (true) {
-                                        unique_lock<std::mutex> guard (counter_protect, std::defer_lock);
+                                        std::unique_lock<std::mutex> guard (counter_protect, std::defer_lock);
                                         guard.lock();
 
                                         if (j >= ligands.size())
@@ -266,7 +266,7 @@ namespace Program {
 
                                         if (Inout::file_size (p.string()) > 0) {
                                                 std::lock_guard<std::mutex> guard(additon_to_top_dock);
-                                                log_note << ligand.name() << " is alread docked to " << __receptor.name() << ", skipping." << endl;
+                                                log_note << ligand.name() << " is alread docked to " << __receptor.name() << ", skipping." << std::endl;
 
                                                 parser::FileParser conf (p.string(), parser::skip_atom | parser::first_model, 1);
                                                 conf.parse_molecule (__all_top_poses);

@@ -38,7 +38,7 @@ namespace molib {
 		Atom::Vec get_atoms(const Residue::res_type &rest=Residue::res_type::notassigned) const;
 		Chain& erase_properties() { for (auto &residue : *this) residue.erase_properties(); return *this; }
 		
-		friend ostream& operator<< (ostream& stream, const Chain& c);
+		friend std::ostream& operator<< (std::ostream& stream, const Chain& c);
 	};
 
 } // molib

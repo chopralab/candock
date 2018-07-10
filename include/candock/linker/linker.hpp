@@ -42,19 +42,19 @@ namespace linker {
 	
 		class GenericLinker {
         public:
-            typedef map<const Segment*, State*> SegStateMap;
+            typedef std::map<const Segment*, State*> SegStateMap;
             
 		protected:
-			typedef map<const molib::Atom*, Segment*> AtomToSegment;
+			typedef std::map<const molib::Atom*, Segment*> AtomToSegment;
 			
 			static const int MAX_ENERGY = 999999;
-			typedef multiset<Partial, Partial::comp> PriorityQueue;
+			typedef std::multiset<Partial, Partial::comp> PriorityQueue;
 	
 			class ConnectionError : public Error {
-				const set<State::ConstPair> __fs; 
+				const std::set<State::ConstPair> __fs; 
 			public: 
-				ConnectionError(const string &msg, const set<State::ConstPair> fs) : Error(msg), __fs(fs) {}
-				const set<State::ConstPair>& get_failed_state_pairs() const { return __fs; }
+				ConnectionError(const std::string &msg, const std::set<State::ConstPair> fs) : Error(msg), __fs(fs) {}
+				const std::set<State::ConstPair>& get_failed_state_pairs() const { return __fs; }
 			};
 			
 			molib::Internal __ic;
@@ -79,12 +79,12 @@ namespace linker {
 			
 			Segment::Graph __segment_graph;
 			Seed::Graph __seed_graph;
-			set<State::ConstPair> __blacklist;
+			std::set<State::ConstPair> __blacklist;
 			
 	
 			double __distance(const State &start, const State &goal) const;
 			State::Vec __compute_neighbors(const State &curr_state, Segment &next,
-			vector<unique_ptr<State>> &states);
+			std::vector<std::unique_ptr<State>> &states);
 			bool __clashes_receptor(const State&) const;
 			bool __clashes_ligand(const State &current, 
 				const Partial &conformation, const State &prev) const;
@@ -92,21 +92,21 @@ namespace linker {
 				const geometry::Point::Vec &crds);
 	
 			Array2d<bool> __find_compatible_state_pairs(const Seed::Graph &seed_graph, const int sz);
-			vector<vector<State::Vec>> __grow_possibles(const map<State*, State::Set> &pos);
+			std::vector<std::vector<State::Vec>> __grow_possibles(const std::map<State*, State::Set> &pos);
 	
-			bool __has_blacklisted(const State::Vec &conformation, const set<State::ConstPair> &blacklist);
+			bool __has_blacklisted(const State::Vec &conformation, const std::set<State::ConstPair> &blacklist);
 			bool __check_distances_to_seeds(const State &curr_state, 
 				const Segment &adjacent, const SegStateMap &docked_seeds);
 	
-			string to_pdb(const Partial &conformation);
-			pair<State*, Segment*> __find_good_neighbor(const Partial &curr_conformation, 
+			std::string to_pdb(const Partial &conformation);
+			std::pair<State*, Segment*> __find_good_neighbor(const Partial &curr_conformation, 
 				const SegStateMap &docked_seeds);
 			State* __is_seed(const Segment &seg, const SegStateMap &docked_seeds);
 
 			DockedConformation::Vec __minimize_final(DockedConformation::Vec &docked_conformations);
 			void __create_states(const Segment::Graph &segment_graph, const molib::NRset &top_seeds);
 			
-			virtual DockedConformation __a_star(const int segment_graph_size, const Partial &start_conformation, vector<unique_ptr<State>> &states, int iter) = 0;
+			virtual DockedConformation __a_star(const int segment_graph_size, const Partial &start_conformation,std::vector<std::unique_ptr<State>> &states, int iter) = 0;
 			virtual Partial::Vec __generate_rigid_conformations(const Seed::Graph &seed_graph) = 0;
 			virtual DockedConformation __reconstruct(const Partial &conformation) = 0;
 
@@ -144,7 +144,7 @@ namespace linker {
 		};
 		
 		class StaticLinker : public GenericLinker {
-			DockedConformation __a_star(const int segment_graph_size, const Partial &start_conformation, vector<unique_ptr<State>> &states, int iter);
+			DockedConformation __a_star(const int segment_graph_size, const Partial &start_conformation, std::vector<std::unique_ptr<State>> &states, int iter);
 			Partial::Vec __generate_rigid_conformations(const Seed::Graph &seed_graph);
 			DockedConformation __reconstruct(const Partial &conformation);
 		public:
@@ -152,7 +152,7 @@ namespace linker {
 		};
 		
 		class IterativeLinker : public GenericLinker {
-			DockedConformation __a_star(const int segment_graph_size, const Partial &start_conformation, vector<unique_ptr<State>> &states, int iter);
+			DockedConformation __a_star(const int segment_graph_size, const Partial &start_conformation, std::vector<std::unique_ptr<State>> &states, int iter);
 			Partial::Vec __generate_rigid_conformations(const Seed::Graph &seed_graph);
 			DockedConformation __reconstruct(const Partial &conformation);
 

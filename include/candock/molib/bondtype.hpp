@@ -19,9 +19,9 @@ namespace molib {
 		int aps;
 		int con;
 	};
-	typedef map<Atom*, AtomParams> ValenceState;
-	typedef vector<ValenceState> ValenceStateVec;
-	typedef map<Bond*, int> BondToOrder;
+	typedef std::map<Atom*, AtomParams> ValenceState;
+	typedef std::vector<ValenceState> ValenceStateVec;
+	typedef std::map<Bond*, int> BondToOrder;
 
         class BondOrderError : public Error {
         public: 
@@ -30,8 +30,8 @@ namespace molib {
         
 	class BondOrder {
 		static ValenceStateVec __create_valence_states(const Atom::Vec &atoms, const int max_valence_states);
-		static void __dfs(const int level, const int sum, const int tps, const vector<vector<AtomParams>> &V,
-			vector<AtomParams> &Q, vector<vector<AtomParams>> &valence_states, const int max_valence_states);
+		static void __dfs(const int level, const int sum, const int tps, const std::vector<std::vector<AtomParams>> &V,
+			std::vector<AtomParams> &Q, std::vector<std::vector<AtomParams>> &valence_states, const int max_valence_states);
 		static bool __discrepancy(const ValenceState &valence_state);
         // Windows defines the macro __success !
 		static bool __my_success(const ValenceState &valence_state);
@@ -46,9 +46,9 @@ namespace molib {
         
         void compute_chirality(const Atom::Vec &bonds);
         
-	ostream& operator<< (ostream& stream, const ValenceState& valence_state);
-	ostream& operator<< (ostream& stream, const ValenceStateVec& valence_states);
-	ostream& operator<< (ostream& os, const BondToOrder& bond_orders);       
+	std::ostream& operator<< (std::ostream& stream, const ValenceState& valence_state);
+	std::ostream& operator<< (std::ostream& stream, const ValenceStateVec& valence_states);
+	std::ostream& operator<< (std::ostream& os, const BondToOrder& bond_orders);       
 };
 
 }

@@ -1,4 +1,5 @@
 #include "candock/graph/mnts.hpp"
+using namespace std;
 
 namespace candock {
 namespace graph {

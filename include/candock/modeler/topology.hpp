@@ -6,9 +6,7 @@
 #include <vector>
 #include "candock/geometry/coordinate.hpp"
 #include "candock/helper/debug.hpp"
-#include "candock/helper/help.hpp"
 #include "candock/molib/molecule.hpp"
-using namespace std;
 
 namespace candock {
 
@@ -22,18 +20,18 @@ namespace OMMIface {
 
 	class Topology {
 	public:
-		typedef set<pair<molib::Atom*, molib::Atom*>> BondedExclusions;
-		typedef vector<pair<molib::Atom*, molib::Atom*>> Bonds;
-		typedef vector<tuple<molib::Atom*, molib::Atom*, molib::Atom*>> Angles;
-		typedef vector<tuple<molib::Atom*, molib::Atom*, molib::Atom*, molib::Atom*>> Dihedrals;
+		typedef std::set<std::pair<molib::Atom*, molib::Atom*>> BondedExclusions;
+		typedef std::vector<std::pair<molib::Atom*, molib::Atom*>> Bonds;
+		typedef std::vector<std::tuple<molib::Atom*, molib::Atom*, molib::Atom*>> Angles;
+		typedef std::vector<std::tuple<molib::Atom*, molib::Atom*, molib::Atom*, molib::Atom*>> Dihedrals;
 		molib::Atom::Vec atoms;
 		Bonds bonds;
 		Angles angles;
 		Dihedrals dihedrals, impropers;
 		BondedExclusions bonded_exclusions;
 	private:
-		map<const molib::Atom*, const int> atom_to_type;
-		map<const molib::Atom*, const int> atom_to_index;
+		std::map<const molib::Atom*, const int> atom_to_type;
+		std::map<const molib::Atom*, const int> atom_to_index;
 
 	public:
 		~Topology() { dbgmsg("calling destructor of Topology"); }
@@ -44,10 +42,10 @@ namespace OMMIface {
 		
 	};
 
-	ostream& operator<< (ostream& stream, const Topology::BondedExclusions &bonds);
-	ostream& operator<< (ostream& stream, const Topology::Bonds &bonds);
-	ostream& operator<< (ostream& stream, const Topology::Angles &angles);
-	ostream& operator<< (ostream& stream, const Topology::Dihedrals &dihedrals);
+	std::ostream& operator<< (std::ostream& stream, const Topology::BondedExclusions &bonds);
+	std::ostream& operator<< (std::ostream& stream, const Topology::Bonds &bonds);
+	std::ostream& operator<< (std::ostream& stream, const Topology::Angles &angles);
+	std::ostream& operator<< (std::ostream& stream, const Topology::Dihedrals &dihedrals);
 };
 
 }

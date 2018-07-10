@@ -47,7 +47,7 @@ namespace Program {
         }
 
         void DockFragments::__read_from_files () {
-                log_step << "All seeds are present in " << cmdl.get_string_option("top_seeds_dir") << " for " << __name << ". Docking of fragments skipped." << endl;
+                log_step << "All seeds are present in " << cmdl.get_string_option("top_seeds_dir") << " for " << __name << ". Docking of fragments skipped." << std::endl;
         }
 
         void DockFragments::__dock_fragment ( int start, const docker::Gpoints& gpoints, const docker::Gpoints& gpoints0 ) {
@@ -60,10 +60,10 @@ namespace Program {
 
                         try {
                                 if ( Inout::file_size(p.string()) > 0 ) {
-                                        log_note << "Skipping docking of seed: " << __fragmented_ligands.seeds()[j].name() << " because it is already docked!" << endl;
+                                        log_note << "Skipping docking of seed: " << __fragmented_ligands.seeds()[j].name() << " because it is already docked!" << std::endl;
                                         continue;
                                 } else {
-                                        log_note << "Docking seed: " << __fragmented_ligands.seeds()[j].name() << endl;
+                                        log_note << "Docking seed: " << __fragmented_ligands.seeds()[j].name() << std::endl;
                                 }
                                 dbgmsg(__fragmented_ligands.seeds()[j]);
                                 /* Compute all conformations of this seed with the center
@@ -94,8 +94,8 @@ namespace Program {
 
                                 Inout::output_file(dock.get_docked(), p.string()); // output docked & clustered seeds
                         }
-                        catch (exception& e) {
-                                log_warning << "skipping seed due to : " << e.what() << endl;
+                        catch (std::exception& e) {
+                                log_warning << "skipping seed due to : " << e.what() << std::endl;
                                 Inout::output_file(e.what(), p.string());
                         }
                 }
@@ -103,7 +103,7 @@ namespace Program {
 
         void DockFragments::__continue_from_prev () {
 
-                log_step << "Docking fragments into: " << __top_seeds_location  << endl;
+                log_step << "Docking fragments into: " << __top_seeds_location  << std::endl;
 
                 /* Create gridpoints for ALL centroids representing one or more binding sites
                  * 
@@ -159,7 +159,7 @@ namespace Program {
 
                                 seed_score_map.push_back( {std::stod( seed_molec.first().name()), seed.name()} );
                         } catch ( Error e) {
-                                log_warning << "Skipping seed " << seed.name() << " in " << __name << " because " << e.what() << endl;
+                                log_warning << "Skipping seed " << seed.name() << " in " << __name << " because " << e.what() << std::endl;
                         }
                 }
 
@@ -236,7 +236,7 @@ namespace Program {
         }
 
         molib::NRset DockFragments::get_seeds(const molib::Molecule &ligand, const double top_percent) const {
-                std::set<string> seeds_to_read;
+                std::set<std::string> seeds_to_read;
                 const molib::Model &model = ligand.first().first();
                 for (auto &fragment : model.get_rigid()) { // iterate over seeds
                         if (fragment.is_seed()) {

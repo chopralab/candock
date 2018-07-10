@@ -25,8 +25,8 @@ namespace docker {
                         IJK operator- (const IJK &right) const {
                                 return IJK {i - right.i, j - right.j, k - right.k};
                         }
-                        friend ostream &operator<< (ostream &os, const IJK &ijk) {
-                                os << ijk.i << " " << ijk.j << " " << ijk.k << endl;
+                        friend std::ostream &operator<< (std::ostream &os, const IJK &ijk) {
+                                os << ijk.i << " " << ijk.j << " " << ijk.k << std::endl;
                                 return os;
                         }
                 };
@@ -53,15 +53,15 @@ namespace docker {
                         void distance (double) const {} // just dummy : needed by grid
                 };
 
-                typedef vector<Gpoint> GpointVec;
-                typedef vector<Gpoint *> PGpointVec;
+                typedef std::vector<Gpoint> GpointVec;
+                typedef std::vector<Gpoint *> PGpointVec;
 
         private:
 
-                map<int, GpointVec> __gridpoints;
-                map<int, Array3d<Gpoint *>> __gmap;
+                std::map<int, GpointVec> __gridpoints;
+                std::map<int, Array3d<Gpoint *>> __gmap;
                 const score::Score *__score;
-                const set<int> *__ligand_idatm_types;
+                const std::set<int> *__ligand_idatm_types;
 
 
                 void __identify_gridpoints (const double &grid_spacing, const double &radial_check);
@@ -71,7 +71,7 @@ namespace docker {
 
         public:
                 Gpoints (const double &grid_spacing, const double &radial_check);
-                Gpoints (const score::Score &score, const set<int> &ligand_idatm_types,
+                Gpoints (const score::Score &score, const std::set<int> &ligand_idatm_types,
                          const centro::Centroids &centroids, const molib::Atom::Grid &grid,
                          const double &grid_spacing, const int &dist_cutoff,
                          const double &excluded_radius, const double &max_interatomic_distance);
@@ -92,7 +92,7 @@ namespace docker {
 
                         throw Error ("die : no gridpoints0 ?");
                 }
-                const map<int, GpointVec> &get_gridpoints() const {
+                const std::map<int, GpointVec> &get_gridpoints() const {
                         return __gridpoints;
                 }
                 const Gpoint &get_center_point() const;
@@ -104,11 +104,11 @@ namespace docker {
                         throw Error ("die : cannot get gmap for bsite #" + std::to_string (bsite_id));
                 }
 
-                friend ostream &operator<< (ostream &os, const Gpoints &gpoints);
+                friend std::ostream &operator<< (std::ostream &os, const Gpoints &gpoints);
         };
 
-        ostream &operator<< (ostream &os, const docker::Gpoints::GpointVec &points);
-        ostream &operator<< (ostream &os, const docker::Gpoints::PGpointVec &points);
+        std::ostream &operator<< (std::ostream &os, const docker::Gpoints::GpointVec &points);
+        std::ostream &operator<< (std::ostream &os, const docker::Gpoints::PGpointVec &points);
 };
 
 }

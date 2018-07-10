@@ -1,5 +1,6 @@
 #include "molecularbondextractor.hpp"
 
+using namespace std;
 using namespace candock;
 
 namespace AtomInfo {

@@ -9,11 +9,12 @@
 #include <tuple>
 #include "candock/helper/error.hpp"
 #include "candock/helper/debug.hpp"
-using namespace std;
 
 namespace candock {
 
 namespace help {
+	using namespace std;
+
 	string memusage(const string&);
 	std::tuple<double, double, double> gnuplot(const double &x1, const double &x2, const string &datapoints);
 	

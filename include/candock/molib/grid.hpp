@@ -18,7 +18,7 @@ namespace molib {
 template<class T> // T needs crd(), distance(), and distance(double) interface
 class Grid {
 public:
-        typedef vector<T *> Points;
+        typedef std::vector<T *> Points;
 private:
         Points ** *storage;
         int szi, szj, szk;
