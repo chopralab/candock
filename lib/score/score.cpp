@@ -2,6 +2,7 @@
 #include "candock/molib/molecule.hpp"
 #include "candock/helper/inout.hpp"
 #include "candock/helper/path.hpp"
+#include "candock/helper/help.hpp"
 #include <boost/filesystem/path.hpp>
 #include <boost/filesystem/operations.hpp>
 #include <functional>

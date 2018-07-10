@@ -3,6 +3,7 @@
 #include "candock/score/kbff.hpp"
 #include "candock/helper/inout.hpp"
 #include "candock/helper/error.hpp"
+#include "candock/helper/help.hpp"
 #include "candock/external/rapidxml/rapidxml.hpp"
 #include "candock/external/rapidxml/rapidxml_print.hpp"
 #include <regex>

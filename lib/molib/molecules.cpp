@@ -11,6 +11,7 @@
 #include "candock/geometry/geometry.hpp"
 #include "candock/fragmenter/fragmenter.hpp"
 #include "candock/fragmenter/unique.hpp"
+#include "candock/helper/help.hpp"
 #include "candock/molib/atom.hpp"
 #include "candock/molib/residue.hpp"
 #include "candock/molib/chain.hpp"

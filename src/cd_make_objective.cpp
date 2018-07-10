@@ -2,6 +2,7 @@
 #include "candock/program/cmdlnopts.hpp"
 #include "candock/helper/benchmark.hpp"
 #include "candock/program/target.hpp"
+#include "candock/helper/help.hpp"
 
 #include "version.hpp"
 #include "candock/drm/drm.hpp"

@@ -76,7 +76,7 @@ namespace molib {
 		int atom_number() const { return __atom_number; }
 		void set_atom_name(const std::string &atom_name) { __atom_name = atom_name; }
 		void set_atom_number(int atom_number) { __atom_number = atom_number; }
-		void set_idatm_type(const std::string &idatm_type) { __idatm_type = help::idatm_mask.at(idatm_type); }
+		void set_idatm_type(const std::string &idatm_type);
 		void set_gaff_type(const std::string &gaff_type) { __gaff_type = gaff_type; }
 		Atom& insert_property(const std::string &prop, const int count) { __smiles_prop.insert({prop, count}); return *this; }
 		Atom& add_property(const std::string &prop) { __smiles_prop[prop]++; return *this; }
@@ -90,10 +90,10 @@ namespace molib {
 		int get_num_bond_with_bond_gaff_type(const std::string &prop) const;
 		int compute_num_property(const std::string &prop) const;
 		void set_crd(const geometry::Coordinate &crd) { __crd = crd; }
-	std::string idatm_type_unmask() const { return help::idatm_unmask[__idatm_type]; }
+		std::string idatm_type_unmask() const;
 		int idatm_type() const { return __idatm_type; }
 		const std::string& sybyl_type() const { return __sybyl_type; }
-		double radius() const { return help::vdw_radius[__idatm_type]; }
+		double radius() const;
 		const std::string& gaff_type() const { return __gaff_type; }
 		const std::string& atom_name() const { return __atom_name; }
 		Element element() const { return __element; }
@@ -109,9 +109,8 @@ namespace molib {
 		void set_br(void *br) { __br = br; }
 		// the following are required for Atom::Graph :-)
 		bool compatible(const Atom &atom) const;
-                std::string get_label() const { return (__smiles_label.empty() 
-			? help::idatm_unmask[__idatm_type] : __smiles_label); }
-                int weight() const { return 0; } // dummy for graph ostream operator
+        std::string get_label() const;
+        int weight() const { return 0; } // dummy for graph ostream operator
 
 		static Graph create_graph(const Vec &atoms);
 		static Graph create_graph(const Set &atoms);

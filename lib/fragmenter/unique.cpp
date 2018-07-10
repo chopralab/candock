@@ -1,6 +1,7 @@
 #include "candock/fragmenter/unique.hpp"
 #include "candock/molib/molecule.hpp"
 #include "candock/fragmenter/fragmenter.hpp"
+#include "candock/helper/help.hpp"
 using namespace std;
 
 namespace candock{

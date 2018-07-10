@@ -18,6 +18,7 @@
 #include "candock/fragmenter/fragmenter.hpp"
 #include "candock/fragmenter/unique.hpp"
 #include "candock/helper/benchmark.hpp"
+#include "candock/helper/help.hpp"
 using namespace std;
 
 namespace candock {

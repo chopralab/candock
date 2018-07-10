@@ -11,6 +11,7 @@
 #include "candock/molib/atom.hpp"
 #include "candock/molib/residue.hpp"
 #include "candock/molib/chain.hpp"
+#include "candock/helper/help.hpp"
 using namespace std;
 
 namespace candock {
@@ -102,6 +103,26 @@ namespace molib {
 				num_h++;
 		return num_h;
 	}
+
+	void Atom::set_idatm_type(const std::string &idatm_type) {
+		__idatm_type = help::idatm_mask.at(idatm_type);
+	}
+
+	std::string Atom::idatm_type_unmask() const {
+		return help::idatm_unmask[__idatm_type];
+	}
+
+	double Atom::radius() const {
+		return help::vdw_radius[__idatm_type];
+	}
+
+	std::string Atom::get_label() const {
+		return (
+			__smiles_label.empty() 
+			? help::idatm_unmask[__idatm_type] : __smiles_label
+		);
+	}
+
 	Bond& Atom::connect(Atom &a2) {
 		Atom &a1 = *this;
 		if (!a1.is_adjacent(a2)) {

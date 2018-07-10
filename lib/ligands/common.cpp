@@ -2,6 +2,7 @@
 #include "candock/parser/fileparser.hpp"
 #include "candock/ligands/common.hpp"
 #include "candock/external/json/json.h"
+#include "candock/helper/help.hpp"
 
 using namespace std;
 

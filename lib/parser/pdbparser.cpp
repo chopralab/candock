@@ -1,4 +1,5 @@
 #include "candock/parser/fileparser.hpp"
+#include "candock/helper/help.hpp"
 
 #include <regex>
 #include <boost/algorithm/string.hpp>

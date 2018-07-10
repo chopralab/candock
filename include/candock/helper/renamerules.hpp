@@ -2,6 +2,7 @@
 #define RENAMERULES_H
 
 #include "candock/helper/smiles.hpp"
+#include "candock/helper/help.hpp"
 
 namespace candock {
 

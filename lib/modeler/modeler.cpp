@@ -5,6 +5,7 @@
 #include "candock/helper/inout.hpp"
 #include "candock/helper/debug.hpp"
 #include "candock/helper/error.hpp"
+#include "candock/helper/help.hpp"
 #include "candock/score/score.hpp"
 #include <regex>
 #include <boost/algorithm/string.hpp>
