@@ -19,7 +19,8 @@ namespace Program {
 
                 std::vector<std::string> all_names = Grep::search_stream (file, regex);
 
-                boost::filesystem::path p (__receptor.name());
+                auto prot_name = boost::filesystem::basename(__receptor.name());
+                boost::filesystem::path p (prot_name);
                 p /= cmdl.get_string_option ("docked_dir");
 
                 for (auto molec : all_names) {
@@ -205,8 +206,8 @@ namespace Program {
                                 while (lpdb2.parse_molecule (ligands)) {
 
                                         molib::Molecule &ligand = ligands.first();
-                                        
-                                        boost::filesystem::path p (__receptor.name());
+                                        auto prot_name = boost::filesystem::basename(__receptor.name());
+                                        boost::filesystem::path p (prot_name);
                                         p = p / cmdl.get_string_option ("docked_dir") / (ligand.name() + ".pdb");
 
                                         if (Inout::file_size (p.string()) > 0) {
