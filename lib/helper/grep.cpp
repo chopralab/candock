@@ -1,59 +1,62 @@
 #include "candock/helper/grep.hpp"
 
-namespace candock{
+namespace candock {
 size_t Grep::count_matches(std::istream& stream, const std::regex& regex) {
-	size_t count = 0;
+    size_t count = 0;
 
-	std::smatch what;
-	std::string line;
+    std::smatch what;
+    std::string line;
 
-	while(std::getline(stream, line)) {
-		bool result = std::regex_search(line, what, regex);
-		if(result) {
-			++count;
-		}
-	}
+    while (std::getline(stream, line)) {
+        bool result = std::regex_search(line, what, regex);
+        if (result) {
+            ++count;
+        }
+    }
 
-	return count;
+    return count;
 }
 
-size_t Grep::find_first_case_greater_than(std::istream& stream, const std::regex& regex, double limit) {
-	size_t count = 0;
+size_t Grep::find_first_case_greater_than(std::istream& stream,
+                                          const std::regex& regex,
+                                          double limit) {
+    size_t count = 0;
 
-	std::smatch what;
-	std::string line;
+    std::smatch what;
+    std::string line;
 
-	while(std::getline(stream, line)) {
-		bool result = std::regex_match(line, what, regex);
-		if(result) {
-			std::string result(what[1].first, what[1].second);
-			double value = std::stod(result);
+    while (std::getline(stream, line)) {
+        bool result = std::regex_match(line, what, regex);
+        if (result) {
+            std::string result(what[1].first, what[1].second);
+            double value = std::stod(result);
 
-			if( value > limit) {
-				break;
-			}
+            if (value > limit) {
+                break;
+            }
 
-			++count;
-		}
-	}
+            ++count;
+        }
+    }
 
-	return count;
+    return count;
 }
 
-std::vector<std::string> Grep::search_stream(std::istream& stream, const std::regex& regex) {
-	std::vector<std::string> all_matches;
+std::vector<std::string> Grep::search_stream(std::istream& stream,
+                                             const std::regex& regex) {
+    std::vector<std::string> all_matches;
 
-	std::match_results<std::string::const_iterator> what;
+    std::match_results<std::string::const_iterator> what;
 
-	std::string line;
+    std::string line;
 
-	while(std::getline(stream, line)) {
-		bool result = std::regex_search(line, what, regex);
-		if(result) {
-			all_matches.push_back(std::string( what[1].first, what[1].second));
-		}
-	}
+    while (std::getline(stream, line)) {
+        bool result = std::regex_search(line, what, regex);
+        if (result) {
+            all_matches.push_back(std::string(what[1].first, what[1].second));
+        }
+    }
 
-	return all_matches;
+    return all_matches;
 }
 }
