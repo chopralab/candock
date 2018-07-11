@@ -2,12 +2,12 @@
 #define CMDLNOPTS_H
 
 #include <boost/program_options.hpp>
-#include "candock/helper/error.hpp"
-#include "candock/program/options.hpp"
+#include <iomanip>
+#include <iostream>
 #include <thread>
 #include <vector>
-#include <iostream>
-#include <iomanip>
+#include "candock/helper/error.hpp"
+#include "candock/program/options.hpp"
 
 #include "candock/candockexport.hpp"
 
@@ -15,62 +15,57 @@ namespace candock {
 
 namespace Program {
 
-        class CANDOCK_EXPORT CmdLnOpts : public help::Options {
-                boost::program_options::variables_map __vm;
-                
-                bool __quiet;
-                std::string __program_name;
-                int __ncpu;
-                
-                void __init (int argc, char *argv[], int opts_to_parse = ALL_OPTIONS);
+class CANDOCK_EXPORT CmdLnOpts : public help::Options {
+    boost::program_options::variables_map __vm;
 
-        public:
-                CmdLnOpts(int argc, char *argv[], int opts_to_parse = ALL_OPTIONS) : __quiet (false) {
-                        __init(argc, argv, opts_to_parse);
-                }
+    bool __quiet;
+    std::string __program_name;
+    int __ncpu;
 
-		enum CMDLN_OPTS_GROUPS {
-			STARTING     = 1 << 0,
-			PROBIS       = 1 << 1,
-			LIG_FRAMGENT = 1 << 2,
-			FRAG_DOCKING = 1 << 3,
-			SCORING      = 1 << 4,
-			FORCE_FIELD  = 1 << 5,
-			LINKING      = 1 << 6,
-			DESIGN       = 1 << 7,
-			ALL_OPTIONS  = 0xFFFF
-		};
+    void __init(int argc, char* argv[], int opts_to_parse = ALL_OPTIONS);
 
-		const std::string& get_string_option (const std::string& option) const;
-		bool        get_bool_option   (const std::string& option) const;
-		int         get_int_option    (const std::string& option) const;
-		double      get_double_option (const std::string& option) const;
+   public:
+    CmdLnOpts(int argc, char* argv[], int opts_to_parse = ALL_OPTIONS)
+        : __quiet(false) {
+        __init(argc, argv, opts_to_parse);
+    }
 
-		const std::vector<std::string>& get_string_vector (const std::string& option) const;
+    enum CMDLN_OPTS_GROUPS {
+        STARTING = 1 << 0,
+        PROBIS = 1 << 1,
+        LIG_FRAMGENT = 1 << 2,
+        FRAG_DOCKING = 1 << 3,
+        SCORING = 1 << 4,
+        FORCE_FIELD = 1 << 5,
+        LINKING = 1 << 6,
+        DESIGN = 1 << 7,
+        ALL_OPTIONS = 0xFFFF
+    };
 
-                bool quiet() const {
-                        return __quiet;
-                }
+    const std::string& get_string_option(const std::string& option) const;
+    bool get_bool_option(const std::string& option) const;
+    int get_int_option(const std::string& option) const;
+    double get_double_option(const std::string& option) const;
 
-                std::string program_name() const {
-                        return __program_name;
-                }
+    const std::vector<std::string>& get_string_vector(
+        const std::string& option) const;
 
-                int ncpu() const {
-                        return __ncpu;
-                }
-                
-                std::string configuration_file() const {
-                        std::stringstream ss;
-                        ss << *this;
-                        return ss.str();
-                }
+    bool quiet() const { return __quiet; }
 
-                friend CANDOCK_EXPORT std::ostream &operator<< (std::ostream &stream, const CmdLnOpts &cmdl_);
+    std::string program_name() const { return __program_name; }
 
-	};
+    int ncpu() const { return __ncpu; }
+
+    std::string configuration_file() const {
+        std::stringstream ss;
+        ss << *this;
+        return ss.str();
+    }
+
+    friend CANDOCK_EXPORT std::ostream& operator<<(std::ostream& stream,
+                                                   const CmdLnOpts& cmdl_);
+};
 }
-
 }
 
 #endif

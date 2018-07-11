@@ -2,37 +2,44 @@
 #define CONFORMATIONS_H
 
 #include "candock/helper/array2d.hpp"
+#include "candock/docker/gpoints.hpp"
 
 namespace candock {
 
 namespace docker {
 
-	class Conformations {
-	public:
-	
-		typedef std::map<int, std::map<int, std::map<int, std::vector<int>>>> ConfMap;
-		
-	private:
+class Conformations {
+   public:
+    typedef std::map<int, std::map<int, std::map<int, std::vector<int>>>>
+        ConfMap;
 
-		const molib::Molecule &__seed;
-		
-		std::vector<Gpoints::PGpointVec> __conf_vec;
-		ConfMap __conf_map;
-		Array2d<double> __rmsd_sq;
-		
-	public:
-		Conformations(const molib::Molecule &seed, const Gpoints &gpoints, const double &conf_spin, const int num_univec);
-			
-		std::vector<Gpoints::PGpointVec> &get_conformations() { return __conf_vec; }
-		const std::vector<Gpoints::PGpointVec> &get_conformations() const { return __conf_vec; }
-		ConfMap &get_confmap() { return __conf_map; }
-		std::vector<int> &get_confs_at(const Gpoints::IJK &ijk) { return __conf_map[ijk.i][ijk.j][ijk.k]; }
-		double get_rmsd_sq(const int i, const int j) { return __rmsd_sq.data[i][j]; }
+   private:
+    const molib::Molecule& __seed;
 
-		friend std::ostream& operator<<(std::ostream& os, const Conformations &conformations);
-	};
+    std::vector<Gpoints::PGpointVec> __conf_vec;
+    ConfMap __conf_map;
+    Array2d<double> __rmsd_sq;
+
+   public:
+    Conformations(const molib::Molecule& seed, const Gpoints& gpoints,
+                  const double& conf_spin, const int num_univec);
+
+    std::vector<Gpoints::PGpointVec>& get_conformations() { return __conf_vec; }
+    const std::vector<Gpoints::PGpointVec>& get_conformations() const {
+        return __conf_vec;
+    }
+    ConfMap& get_confmap() { return __conf_map; }
+    std::vector<int>& get_confs_at(const Gpoints::IJK& ijk) {
+        return __conf_map[ijk.i][ijk.j][ijk.k];
+    }
+    double get_rmsd_sq(const int i, const int j) {
+        return __rmsd_sq.data[i][j];
+    }
+
+    friend std::ostream& operator<<(std::ostream& os,
+                                    const Conformations& conformations);
+};
 }
-
 }
 
 #endif

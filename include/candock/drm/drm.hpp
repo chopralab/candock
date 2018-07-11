@@ -2,16 +2,14 @@
 #define DRM_H
 
 #include "candock/candockexport.hpp"
+#include <string>
 
 namespace candock {
 
 class CANDOCK_EXPORT drm {
-    
-public:
+   public:
     static bool check_drm(const std::string& key_location);
-    
 };
-
 }
 
 #endif

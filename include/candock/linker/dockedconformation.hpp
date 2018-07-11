@@ -1,73 +1,71 @@
 #ifndef DOCKEDCONFORMATION_H
 #define DOCKEDCONFORMATION_H
-#include "candock/molib/molecule.hpp"
 #include <memory>
+#include "candock/molib/molecule.hpp"
 
 namespace candock {
 
 namespace linker {
 
-        class DockedConformation {
-        public:
-                typedef std::vector<DockedConformation> Vec;
-        private:
-                std::unique_ptr<molib::Molecule> __ligand;
-                std::unique_ptr<molib::Molecule> __receptor;
-                double __energy;
-                double __potential_energy;
-                size_t __max_clq_identity;
-        public:
-                DockedConformation() : __ligand (nullptr), __receptor (nullptr), __energy (0), __potential_energy (0), __max_clq_identity(0) {}
+class DockedConformation {
+   public:
+    typedef std::vector<DockedConformation> Vec;
 
-                DockedConformation (molib::Molecule ligand, molib::Molecule receptor, double energy, double pot, size_t id)
-                        : __ligand (std::unique_ptr<molib::Molecule> (new molib::Molecule (ligand))),
-                          __receptor (std::unique_ptr<molib::Molecule> (new molib::Molecule (receptor))),
-                          __energy (energy), __potential_energy (pot), __max_clq_identity(id) {}
+   private:
+    std::unique_ptr<molib::Molecule> __ligand;
+    std::unique_ptr<molib::Molecule> __receptor;
+    double __energy;
+    double __potential_energy;
+    size_t __max_clq_identity;
 
-                molib::Molecule &get_ligand() {
-                        return *__ligand;
-                }
+   public:
+    DockedConformation()
+        : __ligand(nullptr),
+          __receptor(nullptr),
+          __energy(0),
+          __potential_energy(0),
+          __max_clq_identity(0) {}
 
-                const molib::Molecule &get_ligand() const {
-                        return *__ligand;
-                }
+    DockedConformation(molib::Molecule ligand, molib::Molecule receptor,
+                       double energy, double pot, size_t id)
+        : __ligand(
+              std::unique_ptr<molib::Molecule>(new molib::Molecule(ligand))),
+          __receptor(
+              std::unique_ptr<molib::Molecule>(new molib::Molecule(receptor))),
+          __energy(energy),
+          __potential_energy(pot),
+          __max_clq_identity(id) {}
 
-                molib::Molecule &get_receptor() {
-                        return *__receptor;
-                }
+    molib::Molecule& get_ligand() { return *__ligand; }
 
-                const molib::Molecule &get_receptor() const {
-                        return *__receptor;
-                }
+    const molib::Molecule& get_ligand() const { return *__ligand; }
 
-                double get_energy() const {
-                        return __energy;
-                }
+    molib::Molecule& get_receptor() { return *__receptor; }
 
-                double get_potential_energy() const {
-                        return __potential_energy;
-                }
+    const molib::Molecule& get_receptor() const { return *__receptor; }
 
-                size_t get_max_clq_identity() const {
-                        return __max_clq_identity;
-                }
+    double get_energy() const { return __energy; }
 
-                void free_memory() {
-                        __ligand.reset(nullptr);
-                        __receptor.reset(nullptr);
-                }
+    double get_potential_energy() const { return __potential_energy; }
 
-                friend bool operator< (const DockedConformation &other, const DockedConformation &other2) {
-                        return other.get_energy() < other2.get_energy();
-                }
+    size_t get_max_clq_identity() const { return __max_clq_identity; }
 
-                static void sort (DockedConformation::Vec &v);
+    void free_memory() {
+        __ligand.reset(nullptr);
+        __receptor.reset(nullptr);
+    }
 
-                friend std::ostream &operator<< (std::ostream &os, const DockedConformation &conf);
-        };
+    friend bool operator<(const DockedConformation& other,
+                          const DockedConformation& other2) {
+        return other.get_energy() < other2.get_energy();
+    }
 
+    static void sort(DockedConformation::Vec& v);
+
+    friend std::ostream& operator<<(std::ostream& os,
+                                    const DockedConformation& conf);
 };
-
+};
 }
 
 #endif
