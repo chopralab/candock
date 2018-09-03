@@ -2,21 +2,23 @@
 
 #include <boost/filesystem.hpp>
 
-#include "candock/fragmenter/unique.hpp"
-#include "candock/helper/path.hpp"
-#include "candock/molib/molecule.hpp"
-#include "candock/parser/fileparser.hpp"
+#include "statchem/fragmenter/unique.hpp"
+#include "statchem/helper/path.hpp"
+#include "statchem/helper/logger.hpp"
+#include "statchem/molib/molecule.hpp"
+#include "statchem/parser/fileparser.hpp"
 
-#include "candock/score/kbff.hpp"
+#include "statchem/score/kbff.hpp"
 
-#include "candock/modeler/modeler.hpp"
-#include "candock/modeler/systemtopology.hpp"
+#include "statchem/modeler/modeler.hpp"
+#include "statchem/modeler/systemtopology.hpp"
 
 #include "candock/program/dockfragments.hpp"
 #include "candock/program/findcentroids.hpp"
 #include "candock/program/linkfragments.hpp"
 
-#include "candock/fileout/fileout.hpp"
+#include "statchem/fileio/fileout.hpp"
+#include "statchem/fileio/inout.hpp"
 
 namespace candock {
 namespace Program {
@@ -26,7 +28,7 @@ Target::Target(const std::string& input_name) {
      * the receptor molecule(s)
      *
      */
-    if (Inout::file_size(input_name) <= 0) {
+    if (fileio::file_size(input_name) <= 0) {
         throw Error("Provided file or directory does not exist: " + input_name);
     }
 
@@ -89,7 +91,7 @@ void Target::__initialize_score(const FragmentLigands& ligand_fragments) {
     __score
         ->define_composition(__protein->get_idatm_types(),
                              ligand_fragments.ligand_idatm_types())
-        .process_distributions_file(cmdl.get_string_option("dist"))
+        .process_distributions(cmdl.get_string_option("dist"))
         .compile_scoring_function();
 }
 
@@ -127,11 +129,11 @@ void Target::__initialize_kbforce(const FragmentLigands& ligand_fragments) {
     __ff_score
         ->define_composition(__protein->get_idatm_types(),
                              ligand_fragments.ligand_idatm_types())
-        .process_distributions_file(cmdl.get_string_option("dist"))
+        .process_distributions(cmdl.get_string_option("dist"))
         .compile_scoring_function();
 
     if (cmdl.get_string_option("obj_dir").empty()) {
-        __ff_score->compile_objective_function(cmdl.get_double_option("scale"));
+        __ff_score->compile_objective_function();
     } else {
         __ff_score->parse_objective_function(
             cmdl.get_string_option("obj"), cmdl.get_double_option("scale"), 15);
@@ -169,7 +171,7 @@ void Target::make_gridhcp(const FragmentLigands& ligand_fragments) {
     }
 
     docker::Gpoints gpoints = __prepseeds->get_gridhcp();
-    Inout::output_file(
+    fileio::output_file(
         gpoints,
         Path::join(__protein->name(), cmdl.get_string_option("gridpdb_hcp")));
 }
@@ -237,8 +239,8 @@ void Target::make_scaffolds(const std::set<std::string>& seeds_to_add,
                             cmdl.get_int_option("lipinski_nhs"),
                             cmdl.get_int_option("lipinski_ohs")));
 #ifndef NDEBUG
-        Inout::output_file(designer.get_internal_designs(),
-                           "internal_designs.pdb", ios_base::app);
+        fileio::output_file(designer.get_internal_designs(),
+                           "internal_designs.pdb", std::ios_base::app);
 #endif
         all_designs_out.add(designer.prepare_designs());
     }
@@ -278,8 +280,8 @@ void Target::design_ligands(const std::set<std::string>& seeds_to_add,
 // if (!h_single_atoms.empty())
 //        designer.functionalize_hydrogens_with_single_atoms(h_single_atoms);
 #ifndef NDEBUG
-        Inout::output_file(designer.get_internal_designs(),
-                           "internal_designs.pdb", ios_base::app);
+        fileio::output_file(designer.get_internal_designs(),
+                           "internal_designs.pdb", std::ios_base::app);
 #endif
         all_designs_out.add(designer.prepare_designs());
     }

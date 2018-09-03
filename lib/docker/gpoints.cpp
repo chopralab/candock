@@ -2,13 +2,13 @@
 #include <exception>
 #include <iostream>
 #include "candock/centro/centroids.hpp"
-#include "candock/geometry/geometry.hpp"
-#include "candock/helper/benchmark.hpp"
-#include "candock/helper/inout.hpp"
-#include "candock/helper/logger.hpp"
-#include "candock/molib/grid.hpp"
-#include "candock/molib/molecule.hpp"
-#include "candock/score/score.hpp"
+#include "statchem/geometry/geometry.hpp"
+#include "statchem/helper/benchmark.hpp"
+#include "statchem/fileio/inout.hpp"
+#include "statchem/helper/logger.hpp"
+#include "statchem/molib/grid.hpp"
+#include "statchem/molib/molecule.hpp"
+#include "statchem/score/score.hpp"
 
 using namespace std;
 

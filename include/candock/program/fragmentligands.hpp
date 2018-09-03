@@ -4,13 +4,15 @@
 #include <mutex>
 #include <set>
 
-#include "candock/molib/molecules.hpp"
-#include "candock/parser/fileparser.hpp"
+#include "statchem/molib/molecules.hpp"
+#include "statchem/parser/fileparser.hpp"
 #include "candock/program/programstep.hpp"
 
 namespace candock {
 
 namespace Program {
+
+using namespace statchem;
 
 class CANDOCK_EXPORT FragmentLigands : public ProgramStep {
     molib::Molecules __seeds;

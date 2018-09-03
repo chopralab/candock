@@ -1,22 +1,21 @@
 #ifndef CENTROIDS_H
 #define CENTROIDS_H
 
-#include "candock/geometry/coordinate.hpp"
+#include "statchem/geometry/coordinate.hpp"
 #include "candock/ligands/genlig.hpp"
 
 namespace candock {
-
 namespace centro {
 
 class Centroid {
-    geometry::Coordinate __centroid;
+    statchem::geometry::Coordinate __centroid;
     double __radial_check;
 
    public:
     Centroid() {}
-    Centroid(const geometry::Coordinate centroid, const double radial_check)
+    Centroid(const statchem::geometry::Coordinate centroid, const double radial_check)
         : __centroid(centroid), __radial_check(radial_check) {}
-    geometry::Coordinate get_centroid() const { return __centroid; }
+    statchem::geometry::Coordinate get_centroid() const { return __centroid; }
     double get_radial_check() const { return __radial_check; }
 };
 

@@ -1,19 +1,19 @@
 #ifndef STATE_H
 #define STATE_H
+
 #include <functional>
 #include <tuple>
-#include "candock/geometry/geometry.hpp"
-#include "candock/helper/debug.hpp"
-#include "candock/molib/atom.hpp"
-#include "candock/molib/bond.hpp"
+
+#include "statchem/geometry/geometry.hpp"
+#include "statchem/helper/debug.hpp"
+#include "statchem/molib/atom.hpp"
+#include "statchem/molib/bond.hpp"
 
 namespace candock {
-
-namespace molib {
-class Atom;
-};
-
 namespace linker {
+
+using namespace statchem;
+
 class Segment;
 class State {
    public:

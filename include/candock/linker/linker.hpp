@@ -2,38 +2,38 @@
 #define LINKER_H
 #include <functional>
 #include <tuple>
-#include "candock/fragmenter/fragmenter.hpp"
-#include "candock/geometry/coordinate.hpp"
-#include "candock/helper/array2d.hpp"
-#include "candock/helper/debug.hpp"
+#include "statchem/fragmenter/fragmenter.hpp"
+#include "statchem/geometry/coordinate.hpp"
+#include "statchem/helper/array2d.hpp"
+#include "statchem/helper/debug.hpp"
+#include "statchem/molib/grid.hpp"
+#include "statchem/molib/internal.hpp"
+#include "statchem/molib/it.hpp"
+
 #include "candock/linker/dockedconformation.hpp"
 #include "candock/linker/partial.hpp"
 #include "candock/linker/seed.hpp"
 #include "candock/linker/segment.hpp"
-#include "candock/molib/grid.hpp"
-#include "candock/molib/internal.hpp"
-#include "candock/molib/it.hpp"
+
+namespace statchem {
+    namespace molib {
+        class Molecule;
+        class NRset;
+    }
+    namespace OMMIface {
+        class Modeler;
+    }
+    
+    namespace score {
+        class Score;
+    }
+
+    namespace geometry {
+        class Quaternion;
+    }
+}
 
 namespace candock {
-
-namespace geometry {
-class Quaternion;
-};
-
-namespace molib {
-class Atom;
-class Molecule;
-class Molecules;
-class NRset;
-}
-
-namespace score {
-class Score;
-}
-
-namespace OMMIface {
-class Modeler;
-}
 
 namespace linker {
 class State;

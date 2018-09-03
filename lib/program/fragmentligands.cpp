@@ -3,8 +3,9 @@
 #include <boost/filesystem.hpp>
 #include <mutex>
 
-#include "candock/helper/inout.hpp"
-#include "candock/molib/molecules.hpp"
+#include "statchem/fileio/inout.hpp"
+#include "statchem/molib/molecules.hpp"
+#include "statchem/helper/logger.hpp"
 #include "candock/program/options.hpp"
 
 using namespace std;
@@ -12,14 +13,16 @@ using namespace std;
 namespace candock {
 namespace Program {
 
+using namespace statchem;
+
 bool FragmentLigands::__can_read_from_files() {
-    return (Inout::file_size(cmdl.get_string_option("seeds_pdb")) > 0 ||
-            Inout::file_size(cmdl.get_string_option("prep")) > 0) &&
-           Inout::file_size(cmdl.get_string_option("seeds")) > 0;
+    return (fileio::file_size(cmdl.get_string_option("seeds_pdb")) > 0 ||
+            fileio::file_size(cmdl.get_string_option("prep")) > 0) &&
+           fileio::file_size(cmdl.get_string_option("seeds")) > 0;
 }
 
 void FragmentLigands::__read_from_files() {
-    if (Inout::file_size(cmdl.get_string_option("prep")) > 0) {
+    if (fileio::file_size(cmdl.get_string_option("prep")) > 0) {
         parser::FileParser lpdb(cmdl.get_string_option("prep"),
                                 parser::all_models,
                                 cmdl.get_int_option("max_num_ligands"));
@@ -29,7 +32,7 @@ void FragmentLigands::__read_from_files() {
         while (lpdb.parse_molecule(ligands)) {
             __ligand_idatm_types =
                 ligands.get_idatm_types(__ligand_idatm_types);
-            if (Inout::file_size(cmdl.get_string_option("seeds_pdb")) <= 0) {
+            if (fileio::file_size(cmdl.get_string_option("seeds_pdb")) <= 0) {
                 molib::create_mols_from_seeds(__added, __seeds, ligands);
             }
             ligands.clear();
@@ -38,14 +41,14 @@ void FragmentLigands::__read_from_files() {
         __seeds.erase_properties();
     }
 
-    if (Inout::file_size(cmdl.get_string_option("seeds_pdb")) <= 0 &&
+    if (fileio::file_size(cmdl.get_string_option("seeds_pdb")) <= 0 &&
         __seeds.size() > 0) {
         log_warning << "Could not read seeds from "
                     << cmdl.get_string_option("seeds_pdb") << endl;
         log_note << "Reading fragmented files from "
                  << cmdl.get_string_option("prep") << endl;
 
-        Inout::output_file(__seeds, cmdl.get_string_option("seeds_pdb"),
+        fileio::output_file(__seeds, cmdl.get_string_option("seeds_pdb"),
                            ios_base::out);
     } else {
         add_seeds_from_file(cmdl.get_string_option("seeds_pdb"));
@@ -100,7 +103,7 @@ void FragmentLigands::__fragment_ligands(parser::FileParser& lpdb,
         molib::create_mols_from_seeds(__added, __seeds, ligands);
 
         if (write_out_for_linking)
-            Inout::output_file(ligands, cmdl.get_string_option("prep"),
+            fileio::output_file(ligands, cmdl.get_string_option("prep"),
                                ios_base::app);
 
         ligands.clear();
@@ -111,7 +114,7 @@ void FragmentLigands::__fragment_ligands(parser::FileParser& lpdb,
 void FragmentLigands::__continue_from_prev() {
     const string& ligand = cmdl.get_string_option("ligand");
 
-    if (Inout::file_size(ligand) > 0) {
+    if (fileio::file_size(ligand) > 0) {
         log_step << "Fragmenting files in " << ligand << endl;
 
         parser::FileParser lpdb(ligand, parser::all_models | parser::hydrogens,
@@ -131,7 +134,7 @@ void FragmentLigands::__continue_from_prev() {
 
     const string& fragment_bag = cmdl.get_string_option("fragment_bag");
 
-    if (Inout::file_size(fragment_bag) > 0) {
+    if (fileio::file_size(fragment_bag) > 0) {
         log_note << "Adding fragments from " << fragment_bag << endl;
 
         parser::FileParser lpdb_additional(
@@ -153,7 +156,7 @@ void FragmentLigands::__continue_from_prev() {
 
     const string& molecular_fragments = cmdl.get_string_option("fragment_mol");
 
-    if (Inout::file_size(molecular_fragments) > 0) {
+    if (fileio::file_size(molecular_fragments) > 0) {
         log_note << "Adding molecular fragments from " << molecular_fragments
                  << endl;
 
@@ -185,7 +188,7 @@ void FragmentLigands::__continue_from_prev() {
         throw Error("You have no seeds, cannot proceed!");
     }
 
-    Inout::output_file(__seeds, cmdl.get_string_option("seeds_pdb"),
+    fileio::output_file(__seeds, cmdl.get_string_option("seeds_pdb"),
                        ios_base::out);
 }
 
@@ -210,7 +213,7 @@ void FragmentLigands::add_seeds_from_file(const std::string& filename) {
 }
 
 void FragmentLigands::write_seeds_to_file(const std::string& filename) {
-    Inout::output_file(__seeds, filename, ios_base::out);
+    fileio::output_file(__seeds, filename, ios_base::out);
 }
 }
 }

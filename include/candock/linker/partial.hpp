@@ -1,21 +1,25 @@
 #ifndef CONFORMATION_H
 #define CONFORMATION_H
-#include "candock/fragmenter/fragmenter.hpp"
-#include "candock/geometry/coordinate.hpp"
-#include "candock/helper/array2d.hpp"
-#include "candock/helper/debug.hpp"
+
 #include "candock/linker/seed.hpp"
 #include "candock/linker/segment.hpp"
-#include "candock/molib/grid.hpp"
-#include "candock/molib/internal.hpp"
-#include "candock/molib/it.hpp"
+
+#include "statchem/fragmenter/fragmenter.hpp"
+#include "statchem/geometry/coordinate.hpp"
+#include "statchem/helper/array2d.hpp"
+#include "statchem/helper/debug.hpp"
+#include "statchem/molib/grid.hpp"
+#include "statchem/molib/internal.hpp"
+#include "statchem/molib/it.hpp"
 
 #include <functional>
 #include <tuple>
 
 namespace candock {
-
 namespace linker {
+
+using namespace statchem;
+
 class State;
 
 class Partial {

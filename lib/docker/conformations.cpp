@@ -2,16 +2,17 @@
 #include <exception>
 #include <iostream>
 #include "candock/docker/gpoints.hpp"
-#include "candock/geometry/geometry.hpp"
-#include "candock/geometry/quaternion.hpp"
-#include "candock/graph/mcqd.hpp"
-#include "candock/helper/array2d.hpp"
-#include "candock/helper/benchmark.hpp"
-#include "candock/helper/debug.hpp"
-#include "candock/helper/inout.hpp"
-#include "candock/helper/logger.hpp"
-#include "candock/molib/grid.hpp"
-#include "candock/molib/molecule.hpp"
+
+#include "statchem/geometry/geometry.hpp"
+#include "statchem/geometry/quaternion.hpp"
+#include "statchem/graph/mcqd.hpp"
+#include "statchem/helper/array2d.hpp"
+#include "statchem/helper/benchmark.hpp"
+#include "statchem/helper/debug.hpp"
+#include "statchem/fileio/inout.hpp"
+#include "statchem/helper/logger.hpp"
+#include "statchem/molib/grid.hpp"
+#include "statchem/molib/molecule.hpp"
 
 using namespace std;
 
@@ -88,7 +89,7 @@ Conformations::Conformations(const molib::Molecule& seed,
                << endl
                << "ATOM      1   U  BON     3    " << bondvec.pdb() << endl
                << "ENDMDL" << endl;
-            Inout::output_file(ss.str(), "unit_" + seed.name() + ".pdb",
+            statchem::fileio::output_file(ss.str(), "unit_" + seed.name() + ".pdb",
                                ios_base::app);
 #endif
 

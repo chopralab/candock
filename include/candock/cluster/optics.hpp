@@ -13,9 +13,9 @@
 #include <iomanip>
 #include <queue>
 
-#include "candock/helper/benchmark.hpp"
-#include "candock/helper/debug.hpp"
-#include "candock/helper/logger.hpp"
+#include "statchem/helper/benchmark.hpp"
+#include "statchem/helper/debug.hpp"
+#include "statchem/helper/logger.hpp"
 
 /* OPTICS clustering algorithm C++ implementation
  *
@@ -24,8 +24,10 @@
  */
 
 namespace candock {
-
 namespace cluster {
+
+using namespace statchem;
+
 //~ template <typename T> using PairwiseDistances = unordered_map<T*,
 //unordered_map<T*, double>>;
 template <typename T>
@@ -246,7 +248,7 @@ class Optics {
           __scores(scores),
           __eps(eps),
           __min_pts(min_pts) {
-        Benchmark bench;
+        statchem::Benchmark bench;
         log_step << "starting clustering ..." << std::endl;
 
         __JANEZ_HV = (CompareDistanceLess()(-1.0, 1.0) ? HUGE_VAL : -HUGE_VAL);
@@ -436,7 +438,7 @@ class Optics {
         return {clustered_points, representative_points};
     }
 };
-};
+}
 }
 
 #endif

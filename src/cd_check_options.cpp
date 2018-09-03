@@ -1,6 +1,5 @@
 #include <iostream>
-#include "candock/drm/drm.hpp"
-#include "candock/helper/logger.hpp"
+#include "statchem/helper/logger.hpp"
 #include "candock/program/cmdlnopts.hpp"
 #include "version.hpp"
 
@@ -11,13 +10,13 @@ using namespace candock;
 
 int main(int argc, char* argv[]) {
     try {
-        if (!drm::check_drm(Version::get_install_path() + "/.candock")) {
+        /*if (!drm::check_drm(Version::get_install_path() + "/.candock")) {
             throw logic_error(
                 "CANDOCK has expired. Please contact your CANDOCK distributor "
                 "to get a new version.");
-        }
+        }*/
 
-        Inout::Logger::set_all_stderr(true);
+        statchem::Logger::set_all_stderr(true);
 
         help::Options::set_options(new Program::CmdLnOpts(argc, argv));
 

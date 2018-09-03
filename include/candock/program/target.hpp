@@ -5,13 +5,13 @@
 #include "candock/program/fragmentligands.hpp"
 
 #include "candock/docker/gpoints.hpp"
-#include "candock/molib/molecules.hpp"
+#include "statchem/molib/molecules.hpp"
 
-#include "candock/modeler/forcefield.hpp"
+#include "statchem/modeler/forcefield.hpp"
 #include "candock/program/dockfragments.hpp"
 #include "candock/program/findcentroids.hpp"
 #include "candock/program/linkfragments.hpp"
-#include "candock/score/kbff.hpp"
+#include "statchem/score/kbff.hpp"
 
 #include <string>
 

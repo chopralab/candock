@@ -1,16 +1,13 @@
 #ifndef POSES_H
 #define POSES_H
 
-#include "candock/geometry/geometry.hpp"
+#include "statchem/geometry/geometry.hpp"
+#include "statchem/molib/grid.hpp"
+
 #include "candock/linker/seed.hpp"
 #include "candock/linker/segment.hpp"
-#include "candock/molib/grid.hpp"
 
 namespace candock {
-
-namespace molib {
-class Atom;
-};
 
 namespace linker {
 class State;
@@ -33,7 +30,7 @@ class Poses {
 
         typedef std::vector<std::unique_ptr<AtomPoint>> UPVec;
         typedef std::vector<AtomPoint*> PVec;
-        typedef candock::molib::Grid<AtomPoint> Grid;
+        typedef statchem::molib::Grid<AtomPoint> Grid;
     };
 
     std::map<Segment::Id, AtomPoint::UPVec> __atompoints;

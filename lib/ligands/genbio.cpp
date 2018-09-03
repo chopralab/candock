@@ -2,22 +2,26 @@
 #include <exception>
 #include <iostream>
 #include <typeinfo>
-#include "candock/geometry/matrix.hpp"
-#include "candock/helper/debug.hpp"
-#include "candock/helper/error.hpp"
-#include "candock/helper/help.hpp"
-#include "candock/helper/inout.hpp"
-#include "candock/helper/path.hpp"
+#include "statchem/geometry/matrix.hpp"
+#include "statchem/helper/debug.hpp"
+#include "statchem/helper/error.hpp"
+#include "statchem/helper/help.hpp"
+#include "statchem/fileio/inout.hpp"
+#include "statchem/helper/path.hpp"
+#include "statchem/helper/logger.hpp"
 #include "candock/ligands/common.hpp"
 #include "candock/ligands/jsonreader.hpp"
 #include "candock/ligands/nosqlreader.hpp"
-#include "candock/molib/grid.hpp"
-#include "candock/molib/molecules.hpp"
-#include "candock/parser/fileparser.hpp"
+#include "statchem/molib/grid.hpp"
+#include "statchem/molib/molecules.hpp"
+#include "statchem/parser/fileparser.hpp"
 using namespace std;
 
 namespace candock {
 namespace genbio {
+
+using namespace statchem;
+
 void remove_chains(molib::Molecules& mols,
                    const vector<string>& aligned_chains) {
     int i = 0;
@@ -266,10 +270,11 @@ void generate_biological_assemblies(const string& models, const bool hydrogens,
                             : molib::Molecule::first_bio);  // make biounits
                                                             // coordinates
                                                             // (optional)
-                mols.last().rotate(
-                    geometry::Matrix(d["alignment"][0]["rotation_matrix"],
-                                     d["alignment"][0]["translation_vector"]),
-                    true);  // inverse rotation
+                //mols.last().rotate(
+                    //geometry::Matrix(d["alignment"][0]["rotation_matrix"],
+                                     //d["alignment"][0]["translation_vector"]),
+                    //true);  // inverse rotation
+std::cout << "AASDF" << std::endl;
                 if (ralch)
                     genbio::remove_assemblies(mols.last(),
                                               chain_ids);  // remove assemblies
@@ -303,7 +308,7 @@ void generate_biological_assemblies(const string& models, const bool hydrogens,
     }
     // output bio file
     if (!bio_file.empty())
-        Inout::output_file(mols, bio_file);  // output rotated bio assemblies
+        fileio::output_file(mols, bio_file);  // output rotated bio assemblies
                                              // (or asymmetric units if NO
                                              // bioassembly)
 }

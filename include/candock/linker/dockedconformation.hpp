@@ -1,11 +1,12 @@
 #ifndef DOCKEDCONFORMATION_H
 #define DOCKEDCONFORMATION_H
 #include <memory>
-#include "candock/molib/molecule.hpp"
+#include "statchem/molib/molecule.hpp"
 
 namespace candock {
-
 namespace linker {
+
+using namespace statchem;
 
 class DockedConformation {
    public:

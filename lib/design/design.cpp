@@ -2,12 +2,13 @@
 
 #include <set>
 
-#include "candock/fragmenter/unique.hpp"
-#include "candock/helper/logger.hpp"
-#include "candock/molib/atomtype.hpp"
-#include "candock/molib/bondtype.hpp"
+#include "statchem/fragmenter/unique.hpp"
+#include "statchem/helper/logger.hpp"
+#include "statchem/molib/atomtype.hpp"
+#include "statchem/molib/bondtype.hpp"
 
 using namespace std;
+using namespace statchem;
 
 namespace candock {
 

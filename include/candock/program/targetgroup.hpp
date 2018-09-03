@@ -1,7 +1,7 @@
 #ifndef TARGETGROUP_H
 #define TARGETGROUP_H
 
-#include "candock/molib/it.hpp"
+#include "statchem/molib/it.hpp"
 #include "candock/program/target.hpp"
 
 namespace candock {

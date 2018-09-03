@@ -1,5 +1,5 @@
 #include "candock/linker/dockedconformation.hpp"
-#include "candock/molib/molecule.hpp"
+#include "statchem/molib/molecule.hpp"
 
 using namespace std;
 

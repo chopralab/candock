@@ -1,10 +1,14 @@
 #include "candock/program/targetgroup.hpp"
-#include "candock/fileout/fileout.hpp"
+#include "statchem/fileio/fileout.hpp"
+#include "statchem/fileio/inout.hpp"
+#include "statchem/helper/logger.hpp"
 
 using namespace std;
 
 namespace candock {
 namespace Program {
+
+using namespace statchem;
 
 TargetGroup::TargetGroup(const std::string& input_name) {
     // User has given blank option (ussual for case of antitargets)
@@ -12,7 +16,7 @@ TargetGroup::TargetGroup(const std::string& input_name) {
         return;
     }
 
-    for (const auto& a : Inout::files_matching_pattern(input_name, ".pdb")) {
+    for (const auto& a : fileio::files_matching_pattern(input_name, ".pdb")) {
         __targets.push_back(new Target(a));
     }
 }
@@ -96,13 +100,13 @@ void TargetGroup::make_scaffolds(const TargetGroup& antitargets,
         used_seeds << s << endl;
     }
 
-    Inout::output_file(used_seeds.str(), "new_scaffold_seeds.lst");
+    fileio::output_file(used_seeds.str(), "new_scaffold_seeds.lst");
 
     molib::Molecules all_designs;
 
     log_step << "Starting iteration #0 (making a scaffold)" << endl;
     const string design_file = "designed_0.pdb";
-    if (Inout::file_size(design_file)) {
+    if (fileio::file_size(design_file)) {
         log_note
             << design_file
             << " found -- skipping generation of new designs this iteration"
@@ -130,15 +134,15 @@ void TargetGroup::make_scaffolds(const TargetGroup& antitargets,
         .erase_hydrogen()
         .compute_overlapping_rigid_segments(cmdl.get_string_option("seeds"));
 
-    Inout::output_file(all_designs, design_file);
+    fileio::output_file(all_designs, design_file);
 
     std::stringstream ss;
     for (const auto& m : all_designs) {
-        fileout::print_mol2(ss, m);
+        fileio::print_mol2(ss, m);
     }
-    Inout::output_file(ss.str(), "designed_0.mol2");
+    fileio::output_file(ss.str(), "designed_0.mol2");
 
-    if (Inout::file_size("design_seeds.pdb"))
+    if (fileio::file_size("design_seeds.pdb"))
         ligands.add_seeds_from_file("design_seeds.pdb");
     ligands.add_seeds_from_molecules(all_designs);
     ligands.write_seeds_to_file("design_seeds.pdb");
@@ -158,7 +162,7 @@ void TargetGroup::design_ligands(const TargetGroup& antitargets,
         used_seeds << s << endl;
     }
 
-    Inout::output_file(used_seeds.str(), "lead_optimization_seeds.lst");
+    fileio::output_file(used_seeds.str(), "lead_optimization_seeds.lst");
 
     int n = 0;
     while (true) {  // Probably a bad idea
@@ -169,7 +173,7 @@ void TargetGroup::design_ligands(const TargetGroup& antitargets,
 
         molib::Molecules all_designs;
 
-        if (Inout::file_size(design_file)) {
+        if (fileio::file_size(design_file)) {
             log_note
                 << design_file
                 << " found -- skipping generation of new designs this iteration"
@@ -203,15 +207,15 @@ void TargetGroup::design_ligands(const TargetGroup& antitargets,
             .compute_overlapping_rigid_segments(
                 cmdl.get_string_option("seeds"));
 
-        Inout::output_file(all_designs, design_file);
+        fileio::output_file(all_designs, design_file);
 
         std::stringstream ss;
         for (const auto& m : all_designs) {
-            fileout::print_mol2(ss, m);
+            fileio::print_mol2(ss, m);
         }
-        Inout::output_file(ss.str(), "designed_" + std::to_string(n) + ".mol2");
+        fileio::output_file(ss.str(), "designed_" + std::to_string(n) + ".mol2");
 
-        if (Inout::file_size("design_seeds.pdb"))
+        if (fileio::file_size("design_seeds.pdb"))
             ligands.add_seeds_from_file("design_seeds.pdb");
         ligands.add_seeds_from_molecules(all_designs);
         ligands.write_seeds_to_file("design_seeds.pdb");

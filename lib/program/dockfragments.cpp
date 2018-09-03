@@ -2,10 +2,11 @@
 
 #include <boost/filesystem/path.hpp>
 
-#include "candock/helper/grep.hpp"
-#include "candock/helper/inout.hpp"
-#include "candock/helper/path.hpp"
-#include "candock/molib/atomtype.hpp"
+#include "statchem/helper/grep.hpp"
+#include "statchem/fileio/inout.hpp"
+#include "statchem/helper/path.hpp"
+#include "statchem/helper/logger.hpp"
+#include "statchem/molib/atomtype.hpp"
 #include "candock/program/options.hpp"
 
 namespace candock {
@@ -39,7 +40,7 @@ bool DockFragments::__can_read_from_files() {
         boost::filesystem::path p(__top_seeds_location);
         p = p / seed.name();
         p += ".pdb";
-        if (Inout::file_size(p.string()) <= 0) return false;
+        if (fileio::file_size(p.string()) <= 0) return false;
     }
 
     return true;
@@ -61,7 +62,7 @@ void DockFragments::__dock_fragment(int start, const docker::Gpoints& gpoints,
         p += (".pdb");
 
         try {
-            if (Inout::file_size(p.string()) > 0) {
+            if (fileio::file_size(p.string()) > 0) {
                 log_note << "Skipping docking of seed: "
                          << __fragmented_ligands.seeds()[j].name()
                          << " because it is already docked!" << std::endl;
@@ -82,7 +83,7 @@ void DockFragments::__dock_fragment(int start, const docker::Gpoints& gpoints,
                 );
 
 #ifndef NDEBUG
-            Inout::output_file(
+            fileio::output_file(
                 conf,
                 "conf_" + __fragmented_ligands.seeds()[j].name() + ".pdb");
 #endif
@@ -103,11 +104,11 @@ void DockFragments::__dock_fragment(int start, const docker::Gpoints& gpoints,
 
             dock.run();
 
-            Inout::output_file(dock.get_docked(),
+            fileio::output_file(dock.get_docked(),
                                p.string());  // output docked & clustered seeds
         } catch (std::exception& e) {
             log_warning << "skipping seed due to : " << e.what() << std::endl;
-            Inout::output_file(e.what(), p.string());
+            fileio::output_file(e.what(), p.string());
         }
     }
 }
@@ -197,7 +198,7 @@ molib::NRset DockFragments::get_negative_seeds(
         std::ifstream file(file_to_read.c_str());
 
         const size_t number_of_seeds =
-            Grep::find_first_case_greater_than(file, regex, max_value);
+            grep::find_first_case_greater_than(file, regex, max_value);
 
         parser::FileParser pdb(file_to_read.string(), parser::all_models,
                                number_of_seeds);
@@ -232,7 +233,7 @@ molib::NRset DockFragments::get_top_seeds(const std::set<std::string>& seeds,
 
         std::ifstream file(file_to_read.c_str());
 
-        const size_t number_of_seeds = Grep::count_matches(file, regex);
+        const size_t number_of_seeds = grep::count_matches(file, regex);
         const int sz = static_cast<int>(number_of_seeds * top_percent);
         dbgmsg("taking " << sz << " top seeds for seed " << fragment);
 

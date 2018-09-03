@@ -6,7 +6,7 @@
 #include <iostream>
 #include <thread>
 #include <vector>
-#include "candock/helper/error.hpp"
+#include "statchem/helper/error.hpp"
 #include "candock/program/options.hpp"
 
 #include "candock/candockexport.hpp"

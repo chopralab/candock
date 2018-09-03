@@ -1,13 +1,13 @@
 #include "candock/linker/poses.hpp"
 #include <queue>
-#include "candock/graph/mcqd.hpp"
-#include "candock/helper/array2d.hpp"
-#include "candock/helper/benchmark.hpp"
-#include "candock/helper/help.hpp"
+#include "statchem/graph/mcqd.hpp"
+#include "statchem/helper/array2d.hpp"
+#include "statchem/helper/benchmark.hpp"
+#include "statchem/helper/help.hpp"
 #include "candock/linker/segment.hpp"
 #include "candock/linker/state.hpp"
-#include "candock/molib/bond.hpp"
-#include "candock/molib/molecule.hpp"
+#include "statchem/molib/bond.hpp"
+#include "statchem/molib/molecule.hpp"
 
 using namespace std;
 

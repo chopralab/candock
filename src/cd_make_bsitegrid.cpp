@@ -1,7 +1,8 @@
-#include "candock/drm/drm.hpp"
 #include "candock/program/findcentroids.hpp"
 #include "candock/program/fragmentligands.hpp"
 #include "candock/program/target.hpp"
+#include "statchem/helper/logger.hpp"
+#include "statchem/helper/benchmark.hpp"
 #include "version.hpp"
 
 // PRODUCE A GRIDHCP FILE IN PDB FORMAT
@@ -11,20 +12,20 @@ using namespace candock;
 
 int main(int argc, char* argv[]) {
     try {
-        if (!drm::check_drm(Version::get_install_path() + "/.candock")) {
+        /*if (!drm::check_drm(Version::get_install_path() + "/.candock")) {
             throw logic_error(
                 "CANDOCK has expired. Please contact your CANDOCK distributor "
                 "to get a new version.");
-        }
+        }*/
 
-        Inout::Logger::set_all_stderr(true);
+        statchem::Logger::set_all_stderr(true);
 
         help::Options::set_options(new Program::CmdLnOpts(
             argc, argv, Program::CmdLnOpts::STARTING |
                             Program::CmdLnOpts::SCORING |
                             Program::CmdLnOpts::FRAG_DOCKING));
 
-        Benchmark main_timer;
+        statchem::Benchmark main_timer;
         main_timer.display_time("Starting");
 
         cout << Version::get_banner() << Version::get_version()

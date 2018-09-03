@@ -1,11 +1,13 @@
 #ifndef DESIGN_DESIGN_H
 #define DESIGN_DESIGN_H
 
-#include "candock/molib/nrset.hpp"
+#include "statchem/molib/nrset.hpp"
 
 namespace candock {
 
 namespace design {
+
+using namespace statchem;
 
 class Design {
     molib::Molecules __designs;

@@ -3,17 +3,21 @@
 #include <iostream>
 #include "candock/docker/conformations.hpp"
 #include "candock/docker/gpoints.hpp"
-#include "candock/geometry/geometry.hpp"
-#include "candock/helper/array1d.hpp"
-#include "candock/helper/benchmark.hpp"
-#include "candock/helper/debug.hpp"
-#include "candock/helper/inout.hpp"
-#include "candock/molib/grid.hpp"
-#include "candock/score/score.hpp"
+#include "statchem/geometry/geometry.hpp"
+#include "statchem/helper/array1d.hpp"
+#include "statchem/helper/benchmark.hpp"
+#include "statchem/helper/debug.hpp"
+#include "statchem/helper/logger.hpp"
+#include "statchem/fileio/inout.hpp"
+#include "statchem/molib/grid.hpp"
+#include "statchem/score/score.hpp"
+
 using namespace std;
 
 namespace candock {
 namespace docker {
+
+using namespace statchem;
 
 double Dock::DockedConf::compute_rmsd_sq(const Dock::DockedConf& other) const {
     const Gpoints::PGpointVec& points1 = this->get_conf0();
@@ -116,11 +120,11 @@ Dock::DockedConf::Vec Dock::__dock() {
 
                         for (size_t i = 0; i < points.size(); ++i) {
                             molib::Atom& atom = *seed_atoms[i];
-                            Docker::Gpoints::Gpoint& gpoint0 = *points[i];
-                            Docker::Gpoints::IJK confijk =
+                            docker::Gpoints::Gpoint& gpoint0 = *points[i];
+                            docker::Gpoints::IJK confijk =
                                 accepted_tmp.back().get_cavpoint().ijk() +
                                 gpoint0.ijk();
-                            Docker::Gpoints::Gpoint* pgpoint =
+                            docker::Gpoints::Gpoint* pgpoint =
                                 gmap.data[confijk.i][confijk.j][confijk.k];
 
                             atom.set_crd(pgpoint->crd());

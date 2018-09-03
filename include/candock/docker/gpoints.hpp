@@ -1,18 +1,18 @@
 #ifndef GPOINTS_H
 #define GPOINTS_H
 #include "candock/centro/centroids.hpp"
-#include "candock/geometry/geometry.hpp"
-#include "candock/helper/array1d.hpp"
-#include "candock/helper/array3d.hpp"
-#include "candock/helper/error.hpp"
+
+#include "statchem/geometry/geometry.hpp"
+#include "statchem/helper/array1d.hpp"
+#include "statchem/helper/array3d.hpp"
+#include "statchem/helper/error.hpp"
+
+#include "statchem/score/score.hpp"
 
 namespace candock {
-
-namespace score {
-class Score;
-}
-
 namespace docker {
+
+using namespace statchem;
 
 class Gpoints {
    public:

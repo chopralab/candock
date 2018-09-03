@@ -1,13 +1,13 @@
 #ifndef LINKFRAGMENTS_H
 #define LINKFRAGMENTS_H
 
-#include "candock/modeler/forcefield.hpp"
-#include "candock/molib/molecule.hpp"
-#include "candock/molib/molecules.hpp"
-#include "candock/parser/fileparser.hpp"
+#include "statchem/modeler/forcefield.hpp"
+#include "statchem/molib/molecule.hpp"
+#include "statchem/molib/molecules.hpp"
+#include "statchem/parser/fileparser.hpp"
 #include "candock/program/dockfragments.hpp"
 #include "candock/program/programstep.hpp"
-#include "candock/score/score.hpp"
+#include "statchem/score/score.hpp"
 
 namespace candock {
 

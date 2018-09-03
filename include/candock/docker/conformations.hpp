@@ -1,7 +1,7 @@
 #ifndef CONFORMATIONS_H
 #define CONFORMATIONS_H
 
-#include "candock/helper/array2d.hpp"
+#include "statchem/helper/array2d.hpp"
 #include "candock/docker/gpoints.hpp"
 
 namespace candock {

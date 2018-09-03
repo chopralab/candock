@@ -6,22 +6,25 @@
 #include <iostream>
 #include <typeinfo>
 #include "candock/cluster/optics.hpp"
-#include "candock/geometry/matrix.hpp"
-#include "candock/helper/debug.hpp"
-#include "candock/helper/error.hpp"
-#include "candock/helper/help.hpp"
-#include "candock/helper/inout.hpp"
-#include "candock/helper/path.hpp"
+#include "statchem/geometry/matrix.hpp"
+#include "statchem/helper/debug.hpp"
+#include "statchem/helper/error.hpp"
+#include "statchem/helper/help.hpp"
+#include "statchem/fileio/inout.hpp"
+#include "statchem/helper/path.hpp"
 #include "candock/ligands/common.hpp"
 #include "candock/ligands/jsonreader.hpp"
 #include "candock/ligands/nosqlreader.hpp"
-#include "candock/molib/grid.hpp"
-#include "candock/molib/nrset.hpp"
-#include "candock/parser/fileparser.hpp"
+#include "statchem/molib/grid.hpp"
+#include "statchem/molib/nrset.hpp"
+#include "statchem/parser/fileparser.hpp"
 using namespace std;
 
 namespace candock {
 namespace genclus {
+
+using namespace statchem;
+
 string remove_special_characters(string str) {
     str.erase(std::remove_if(str.begin(), str.end(),
                              [](const char& c) {
@@ -53,7 +56,7 @@ void add_to_json(JsonReader& jr,
         }
         vector<string> lig_name;
         try {
-            Inout::read_file(
+            fileio::read_file(
                 Path::join(names_dir,
                            ((residue.rest() == molib::Residue::protein ||
                              residue.rest() == molib::Residue::nucleic)
@@ -336,10 +339,11 @@ void generate_clusters_of_ligands(
                                                              // that are not
                                                              // near aligned
                                                              // residues
-            mols.rotate(
-                geometry::Matrix(d["alignment"][0]["rotation_matrix"],
-                                 d["alignment"][0]["translation_vector"]),
-                true);  // inverse rotation
+std::cout << "gerre" << std::endl;
+            //mols.rotate(
+                //geometry::Matrix(d["alignment"][0]["rotation_matrix"],
+                                 //d["alignment"][0]["translation_vector"]),
+                //true);  // inverse rotation
         } catch (exception& e) {
             nrset.erase(nrset.size() -
                         1);  // delete the last mols which is empty
@@ -403,7 +407,7 @@ void generate_clusters_of_ligands(
     add_to_json(jr, nucleic_clusters.first, "nucleic", names_dir, for_gclus);
     add_to_json(jr, hetero_clusters.first, "hetero", names_dir, for_gclus);
     add_to_json(jr, ion_clusters.first, "ion", names_dir, for_gclus);
-    Inout::file_open_put_stream(json_with_ligs_file,
+    fileio::file_open_put_stream(json_with_ligs_file,
                                 stringstream(jr.output_json()));
 }
 }

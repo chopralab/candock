@@ -1,22 +1,15 @@
 #ifndef GREEDY_CLUSTER_H
 #define GREEDY_CLUSTER_H
 
-#include "candock/geometry/geometry.hpp"
+#include "statchem/geometry/geometry.hpp"
+#include "statchem/score/score.hpp"
 #include "candock/linker/partial.hpp"
-#include "candock/score/score.hpp"
 
 namespace candock {
-
-namespace score {
-class Score;
-}
-
-namespace molib {
-class Molecule;
-class Molecules;
-}
-
 namespace cluster {
+
+using namespace statchem;
+
 class Cluster {
     template <typename T>
     class LinkedConf {

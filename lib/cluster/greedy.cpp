@@ -1,16 +1,16 @@
 #include "candock/cluster/greedy.hpp"
 #include <exception>
 #include <iostream>
-#include "candock/geometry/geometry.hpp"
-#include "candock/helper/benchmark.hpp"
-#include "candock/helper/debug.hpp"
-#include "candock/helper/logger.hpp"
-#include "candock/molib/grid.hpp"
-#include "candock/molib/molecules.hpp"
-#include "candock/score/score.hpp"
+#include "statchem/geometry/geometry.hpp"
+#include "statchem/helper/benchmark.hpp"
+#include "statchem/helper/debug.hpp"
+#include "statchem/helper/logger.hpp"
+#include "statchem/molib/grid.hpp"
+#include "statchem/molib/molecules.hpp"
+#include "statchem/score/score.hpp"
 
 using namespace std;
-using namespace candock::molib;
+using namespace statchem::molib;
 
 namespace candock {
 namespace cluster {

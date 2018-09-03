@@ -2,7 +2,7 @@
 #include <boost/program_options/cmdline.hpp>
 #include <boost/program_options/errors.hpp>
 
-#include "candock/helper/logger.hpp"
+#include "statchem/helper/logger.hpp"
 
 #include <fstream>
 #include <iostream>
@@ -14,6 +14,8 @@ namespace po = boost::program_options;
 
 namespace candock {
 namespace Program {
+
+using namespace statchem;
 
 void CmdLnOpts::__init(int argc, char* argv[], int opts_to_parse) {
     __program_name = argv[0];
@@ -414,19 +416,19 @@ void CmdLnOpts::__init(int argc, char* argv[], int opts_to_parse) {
         po::notify(__vm);
 
         if (__vm.count("verbose")) {
-            Inout::Logger::flip_mode(Inout::Severity::CD_NOTE);
+            Logger::flip_mode(Severity::CD_NOTE);
         }
 
         if (!__vm.count("quiet")) {
-            Inout::Logger::flip_mode(Inout::Severity::CD_STEP);
+            Logger::flip_mode(Severity::CD_STEP);
         }
 
         if (__vm.count("benchmark")) {
-            Inout::Logger::flip_mode(Inout::Severity::CD_BENCHMARK);
+            Logger::flip_mode(Severity::CD_BENCHMARK);
         }
 
         if (__vm.count("warnings")) {
-            Inout::Logger::flip_mode(Inout::Severity::CD_WARNING);
+            Logger::flip_mode(Severity::CD_WARNING);
         }
 
         if (!config_file.empty()) {

@@ -20,6 +20,7 @@ else (${CANDOCK_BUILD_STATIC_EXECUTABLE})
     
     set( all_needed_libraries
         candock
+        ${STATCHEM_LIBRARY}
     )
 
 endif (${CANDOCK_BUILD_STATIC_EXECUTABLE})
@@ -35,23 +36,11 @@ if (NOT WIN32)
 endif(NOT WIN32)
 
 set( program_names  check_options
-                    check_inputpdb
                     find_centroids
-                    prep_fragments
-                    make_objective
                     make_bsitegrid
                     dock_fragments
                     link_fragments
                     design_ligands
-                    convertto_mol2
-                    calc_rmsdcryst
-                    calc_rmsdtable
-                    calc_potential
-                    calc_posescore
-                    calc_posexscore
-                    calc_allscores
-                    minimize_poses
-                    dynamics_run
 )
 
 foreach( candock_program ${program_names} )

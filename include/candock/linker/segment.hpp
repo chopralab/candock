@@ -2,14 +2,16 @@
 #define SEGMENT_H
 #include <functional>
 #include <tuple>
-#include "candock/fragmenter/fragmenter.hpp"
-#include "candock/geometry/coordinate.hpp"
-#include "candock/graph/graph.hpp"
-#include "candock/helper/debug.hpp"
+
+#include "statchem/fragmenter/fragmenter.hpp"
+#include "statchem/geometry/coordinate.hpp"
+#include "statchem/graph/graph.hpp"
+#include "statchem/helper/debug.hpp"
+#include "statchem/molib/internal.hpp"
+#include "statchem/molib/it.hpp"
+#include "statchem/molib/molecule.hpp"
+
 #include "candock/linker/state.hpp"
-#include "candock/molib/internal.hpp"
-#include "candock/molib/it.hpp"
-#include "candock/molib/molecule.hpp"
 
 namespace candock {
 

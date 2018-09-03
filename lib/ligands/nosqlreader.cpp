@@ -6,14 +6,14 @@
 #include <sstream>
 #include <streambuf>
 #include <string>
-#include "candock/helper/error.hpp"
-#include "candock/helper/inout.hpp"
+#include "statchem/helper/error.hpp"
+#include "statchem/fileio/inout.hpp"
 
 namespace candock {
 void NosqlReader::parse_NOSQL(const std::string NOSQL_file) {
     std::vector<std::string> vec;
     std::smatch m;
-    Inout::read_file(NOSQL_file, vec);
+    statchem::fileio::read_file(NOSQL_file, vec);
     std::string bname = boost::filesystem::basename(NOSQL_file);
     const unsigned int num1 = __hash_num(bname);
     for (std::string& line : vec) {
@@ -32,7 +32,7 @@ void NosqlReader::parse_NOSQL(const std::string NOSQL_file) {
 void NosqlReader::parse_dir_of_NOSQL(const std::string NOSQL_dir) {
     //~ cout << NOSQL_dir << endl;
     std::vector<std::string> files =
-        Inout::files_matching_pattern(NOSQL_dir, ".nosql$");
+        statchem::fileio::files_matching_pattern(NOSQL_dir, ".nosql$");
     for (std::string& f : files) {
         //~ cout << f << endl;
         parse_NOSQL(f);

@@ -6,11 +6,14 @@
 #include <sstream>
 #include <streambuf>
 #include <string>
-#include "candock/helper/error.hpp"
-#include "candock/helper/inout.hpp"
+#include "statchem/helper/error.hpp"
+#include "statchem/fileio/inout.hpp"
 using namespace std;
 
 namespace candock {
+
+using namespace statchem;
+
 JsonReader::iterator JsonReader::find(
     const vector<pair<const string, const string> >& kv) {
     for (Json::ValueIterator itr = __root.begin(); itr != __root.end(); itr++) {
@@ -70,7 +73,7 @@ void JsonReader::parse_JSON(const string JSON_file) {
     if (std::regex_search(JSON_file, std::regex(".json$"))) {
         Json::Reader reader;
         vector<string> vec;
-        Inout::read_file(JSON_file, vec);
+        fileio::read_file(JSON_file, vec);
         ostringstream ss;
         copy(vec.begin(), vec.end(), ostream_iterator<string>(ss, ""));
         if (!reader.parse(ss.str(), __root)) {

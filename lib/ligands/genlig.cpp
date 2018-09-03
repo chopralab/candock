@@ -2,22 +2,26 @@
 #include <exception>
 #include <iostream>
 #include <typeinfo>
-#include "candock/geometry/matrix.hpp"
-#include "candock/helper/debug.hpp"
-#include "candock/helper/error.hpp"
-#include "candock/helper/help.hpp"
-#include "candock/helper/inout.hpp"
-#include "candock/helper/path.hpp"
+#include "statchem/geometry/matrix.hpp"
+#include "statchem/helper/debug.hpp"
+#include "statchem/helper/error.hpp"
+#include "statchem/helper/help.hpp"
+#include "statchem/helper/logger.hpp"
+#include "statchem/fileio/inout.hpp"
+#include "statchem/helper/path.hpp"
 #include "candock/ligands/common.hpp"
 #include "candock/ligands/jsonreader.hpp"
 #include "candock/ligands/nosqlreader.hpp"
-#include "candock/molib/grid.hpp"
-#include "candock/molib/nrset.hpp"
-#include "candock/parser/fileparser.hpp"
+#include "statchem/molib/grid.hpp"
+#include "statchem/molib/nrset.hpp"
+#include "statchem/parser/fileparser.hpp"
 using namespace std;
 
 namespace candock {
 namespace genlig {
+
+using namespace statchem;
+
 ResidueSet find_neighbor_residues(molib::Molecule& ligand,
                                   molib::Atom::Grid& grid) {
     ResidueSet neighbor_residues;
@@ -204,14 +208,15 @@ void generate_ligands(const string& receptor_file,
                     pdb_file, parser::all_models | parser::hydrogens);
                 molib::Molecules& mols =
                     nrset.add(new molib::Molecules(biopdb.parse_molecule()));
-                dbgmsg(
-                    geometry::Matrix(d["alignment"][0]["rotation_matrix"],
-                                     d["alignment"][0]["translation_vector"]));
+                //dbgmsg(
+                    //geometry::Matrix(d["alignment"][0]["rotation_matrix"],
+                                     //d["alignment"][0]["translation_vector"]));
                 dbgmsg(mols_name);
-                mols.rotate(
-                    geometry::Matrix(d["alignment"][0]["rotation_matrix"],
-                                     d["alignment"][0]["translation_vector"]),
-                    true);  // inverse rotation
+                std::cout << "here" << std::endl;
+                //mols.rotate(
+                    //geometry::Matrix(d["alignment"][0]["rotation_matrix"],
+                                     //d["alignment"][0]["translation_vector"]),
+                    //true);  // inverse rotation
                 ResMap aligned_to_query = common_ligands::json_to_map_reverse(
                     d["alignment"][0]["aligned_residues"]);
 #ifndef NDEBUG
@@ -238,8 +243,8 @@ void generate_ligands(const string& receptor_file,
                 binding_sites.add(new molib::Molecule(
                     mark(neighbor_residues, aligned_part_of_binding_site,
                          lig_code)));
-                Inout::output_file(ligands, lig_file);
-                Inout::output_file(binding_sites, bsite_file);
+                fileio::output_file(ligands, lig_file);
+                fileio::output_file(binding_sites, bsite_file);
                 break;  // the end
             }
         } catch (exception& e) {
@@ -275,10 +280,11 @@ pair<BindingSiteClusters, BindingSiteScores> generate_binding_site_prediction(
     };
     map<string, vector<LigandInfo>> ligands_by_bio_file;
     for (auto& d : jr.root()) {
-        dbgmsg(geometry::Matrix(d["alignment"][0]["rotation_matrix"],
-                                d["alignment"][0]["translation_vector"]));
-        geometry::Matrix mx(d["alignment"][0]["rotation_matrix"],
-                            d["alignment"][0]["translation_vector"]);
+        std::cout << "here" << std::endl;
+        //dbgmsg(geometry::Matrix(d["alignment"][0]["rotation_matrix"],
+        //                        d["alignment"][0]["translation_vector"]));
+        //geometry::Matrix mx(d["alignment"][0]["rotation_matrix"],
+        //                    d["alignment"][0]["translation_vector"]);
         const double z_score =
             d["alignment"][0]["scores"]["z_score"].asDouble();
         const Json::Value& hetero = d["hetero"];
@@ -310,7 +316,8 @@ pair<BindingSiteClusters, BindingSiteScores> generate_binding_site_prediction(
 
             ligands_by_bio_file[bio_file].push_back(
                 LigandInfo{cluster_number, lig_code, z_score});
-            bio_file_to_matrix[bio_file] = mx;
+                std::cout << "yip" << std::endl;
+            //bio_file_to_matrix[bio_file] = mx;
         }
     }
     // read bio PDBs
@@ -339,19 +346,18 @@ pair<BindingSiteClusters, BindingSiteScores> generate_binding_site_prediction(
     }
     return {bsites, bscores};
 }
+
 }
 
-namespace molib {
-ostream& operator<<(ostream& os, const map<int, molib::Molecules>& bsites) {
+ostream& operator<<(ostream& os, const map<int, statchem::molib::Molecules>& bsites) {
     for (auto& kv : bsites) {
         const int& cluster_number = kv.first;
-        const molib::Molecules& ligands = kv.second;
+        const statchem::molib::Molecules& ligands = kv.second;
         os << "REMARK  99 ______________________ BEGINNING CLUSTER #"
            << cluster_number << " ______________________" << endl;
         os << ligands;
     }
     return os;
-}
 }
 
 ostream& operator<<(ostream& os, const map<int, double>& bscores) {
@@ -362,4 +368,5 @@ ostream& operator<<(ostream& os, const map<int, double>& bscores) {
     }
     return os;
 }
+
 }

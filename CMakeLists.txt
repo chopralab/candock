@@ -43,6 +43,7 @@ set(CANDOCK_DRM OFF CACHE BOOL "Build DRM into Candock")
 
 find_package(Boost    REQUIRED  COMPONENTS filesystem system program_options)
 find_package(Git      REQUIRED)
+find_package(StatChem REQUIRED)
 
 set(JSONCPP_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/include/candock/external ${CMAKE_CURRENT_SOURCE_DIR}/lib/json )
 
@@ -72,39 +73,7 @@ endif(WIN32)
 
 include_directories(${Boost_INCLUDE_DIRS})
 include_directories(${JSONCPP_INCLUDE_DIR})
-
-set(CANDOCK_ADDITIONAL_LD_PATH "" CACHE PATH "Additional Library Paths")
-list(APPEND CANDOCK_ADDITIONAL_LD_PATH ${Boost_LIBRARY_DIR_RELEASE})
-
-if (NOT OPENMM_ROOT_DIR)
-    include(BuildOpenMM)
-else()
-    find_package(OpenMM REQUIRED COMPONENTS openmm)
-    list(APPEND CANDOCK_ADDITIONAL_LD_PATH ${OPENMM_ROOT_DIR}/lib/)
-endif()
-
-if (NOT GSL_ROOT_DIR)
-    include(BuildGSL)
-else()
-    find_package(GSL REQUIRED)
-    list(APPEND CANDOCK_ADDITIONAL_LD_PATH ${GSL_ROOT_DIR}/lib/)
-endif()
-
-include_directories(${OPENMM_INCLUDE_DIR})
-include_directories(${GSL_INCLUDE_DIRS})
-
-if( ${CANDOCK_DRM} )
-
-    find_package(OpenSSL REQUIRED)
-    include_directories(${OPENSSL_INCLUDE_DIR})
-
-    if( WIN32 )
-        add_definitions( /DCANDOCK_DRM )
-    else( WIN32 )
-        add_definitions( -DCANDOCK_DRM )
-    endif( WIN32 )
-    
-endif( ${CANDOCK_DRM} )
+include_directories(${STATCHEM_INCLUDE_DIRS})
 
 include_directories(BEFORE include)
 
@@ -132,7 +101,6 @@ add_subdirectory(lib)
 add_subdirectory(scripts)
 add_subdirectory(src)
 add_subdirectory(tools)
-add_subdirectory(tests)
 
 install(DIRECTORY include/ DESTINATION ${CANDOCK_VERSION}/include)
 

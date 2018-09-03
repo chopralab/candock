@@ -1,8 +1,8 @@
 #include "candock/linker/state.hpp"
-#include "candock/helper/benchmark.hpp"
-#include "candock/helper/help.hpp"
+#include "statchem/helper/benchmark.hpp"
+#include "statchem/helper/help.hpp"
 #include "candock/linker/segment.hpp"
-#include "candock/molib/molecule.hpp"
+#include "statchem/molib/molecule.hpp"
 using namespace std;
 
 namespace candock {

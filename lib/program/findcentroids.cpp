@@ -1,21 +1,48 @@
 #include "candock/program/findcentroids.hpp"
+#include "candock/program/options.hpp"
 
 #include <boost/filesystem.hpp>
 
-#include "candock/helper/inout.hpp"
 #include "candock/ligands/genclus.hpp"
-#include "candock/molib/molecules.hpp"
+#include "candock/ligands/genlig.hpp"
 #include "candock/probis/probis.hpp"
+#include "statchem/fileio/inout.hpp"
+#include "statchem/molib/molecules.hpp"
 
-#include "candock/helper/path.hpp"
-#include "candock/program/options.hpp"
+#include "statchem/helper/logger.hpp"
+#include "statchem/helper/path.hpp"
 
 #ifdef _WINDOWS
 #include <direct.h>
 #endif
 
+using namespace std;
+
+ostream& operator<<(ostream& os, const map<int, statchem::molib::Molecules>& bsites) {
+    for (auto& kv : bsites) {
+        const int& cluster_number = kv.first;
+        const statchem::molib::Molecules& ligands = kv.second;
+        os << "REMARK  99 ______________________ BEGINNING CLUSTER #"
+           << cluster_number << " ______________________" << endl;
+        os << ligands;
+    }
+    return os;
+}
+
+ostream& operator<<(ostream& os, const map<int, double>& bscores) {
+    for (auto& kv : bscores) {
+        const int& cluster_number = kv.first;
+        const double& z_score = kv.second;
+        os << cluster_number << " " << z_score << endl;
+    }
+    return os;
+}
+
 namespace candock {
+
 namespace Program {
+
+using namespace statchem;
 
 FindCentroids::FindCentroids(const std::string& filename,
                              const std::string& chain_ids,
@@ -29,7 +56,7 @@ FindCentroids::FindCentroids(const std::string& filename,
 }
 
 bool FindCentroids::__can_read_from_files() {
-    return Inout::file_size(__centroid_file) > 0;
+    return fileio::file_size(__centroid_file) > 0;
 }
 
 void FindCentroids::__read_from_files() {
@@ -44,8 +71,8 @@ void FindCentroids::__continue_from_prev() {
              << std::endl;
 
     // Creates an empty nosql file for probis local structural alignments
-    Inout::output_file("",
-                       Path::join(__out_dir, cmdl.get_string_option("nosql")));
+    fileio::output_file("",
+                        Path::join(__out_dir, cmdl.get_string_option("nosql")));
 
     // PROBIS is a bit needy and requires the directory 'bslibdb' to be in the
     // current path
@@ -105,17 +132,17 @@ void FindCentroids::__continue_from_prev() {
         Path::join(protein_dir.string(), cmdl.get_string_option("jsonwl")),
         cmdl.get_string_option("bio"), cmdl.get_int_option("num_bsites"));
 
-    Inout::output_file(binding_sites.first,
-                       Path::join(protein_dir.string(),
-                                  cmdl.get_string_option("lig_clus_file")));
-    Inout::output_file(binding_sites.second,
-                       Path::join(protein_dir.string(),
-                                  cmdl.get_string_option("z_scores_file")));
+    fileio::output_file(binding_sites.first,
+                        Path::join(protein_dir.string(),
+                                   cmdl.get_string_option("lig_clus_file")));
+    fileio::output_file(binding_sites.second,
+                        Path::join(protein_dir.string(),
+                                   cmdl.get_string_option("z_scores_file")));
 
     __result = centro::set_centroids(binding_sites.first,
                                      cmdl.get_double_option("centro_clus_rad"));
-    Inout::output_file(__result,
-                       __centroid_file);  // probis local structural alignments
+    fileio::output_file(__result,
+                        __centroid_file);  // probis local structural alignments
 }
-}
-}
+}  // namespace Program
+}  // namespace candock

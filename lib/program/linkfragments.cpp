@@ -2,22 +2,26 @@
 
 #include <boost/filesystem.hpp>
 
-#include "candock/helper/grep.hpp"
-#include "candock/helper/path.hpp"
+#include "statchem/helper/grep.hpp"
+#include "statchem/helper/path.hpp"
+#include "statchem/helper/logger.hpp"
 #include "candock/linker/linker.hpp"
-#include "candock/modeler/modeler.hpp"
+#include "statchem/modeler/modeler.hpp"
 
-#include "candock/fileout/fileout.hpp"
+#include "statchem/fileio/fileout.hpp"
+#include "statchem/fileio/inout.hpp"
 
 namespace candock {
 namespace Program {
+
+using namespace statchem;
 
 bool LinkFragments::__can_read_from_files() {
     std::regex regex;
     regex.assign("REMARK   5 MOLECULE (\\w*)");
     std::ifstream file(cmdl.get_string_option("prep"));
 
-    std::vector<std::string> all_names = Grep::search_stream(file, regex);
+    std::vector<std::string> all_names = grep::search_stream(file, regex);
 
     auto prot_name = boost::filesystem::basename(__receptor.name());
     boost::filesystem::path p(prot_name);
@@ -26,7 +30,7 @@ bool LinkFragments::__can_read_from_files() {
     for (auto molec : all_names) {
         boost::filesystem::path p2 = p / (molec + ".pdb");
 
-        if (Inout::file_size(p2.string()) <= 0) {
+        if (fileio::file_size(p2.string()) <= 0) {
             return false;
         }
     }
@@ -43,7 +47,7 @@ void LinkFragments::__read_from_files() {
     regex.assign("REMARK   5 MOLECULE (\\w*)");
     std::ifstream file(cmdl.get_string_option("prep"));
 
-    std::vector<std::string> all_names = Grep::search_stream(file, regex);
+    std::vector<std::string> all_names = grep::search_stream(file, regex);
 
     boost::filesystem::path p(__receptor.name());
     p /= cmdl.get_string_option("docked_dir");
@@ -179,11 +183,11 @@ void LinkFragments::__link_ligand(molib::Molecule& ligand) {
             std::stringstream ss;
             ss << "REMARK   4 SEED USED FOR " << ligand.name() << " IS " << seed
                << "\n";
-            fileout::print_complex_pdb(
+            fileio::print_complex_pdb(
                 ss, docked.get_ligand(), docked.get_receptor(),
                 docked.get_energy(), docked.get_potential_energy(), ++model,
                 docked.get_max_clq_identity(), rmsd);
-            Inout::output_file(ss.str(), p.string(), std::ios_base::app);
+            fileio::output_file(ss.str(), p.string(), std::ios_base::app);
         }
 
         __all_top_poses.add(new molib::Molecule(docks[0].get_ligand()));
@@ -196,7 +200,7 @@ void LinkFragments::__link_ligand(molib::Molecule& ligand) {
         ss << "REMARK  20 non-binder " << ligand.name() << " with "
            << __receptor.name() << " because " << e.what() << std::endl
            << ligand;
-        Inout::file_open_put_stream(p.string(), ss, std::ios_base::app);
+        fileio::file_open_put_stream(p.string(), ss, std::ios_base::app);
     }
 }
 
@@ -204,7 +208,7 @@ void LinkFragments::__continue_from_prev() {
     log_step << "Starting to dock the fragments into originally given ligands"
              << std::endl;
 
-    if (!Inout::file_size(cmdl.get_string_option("prep"))) {
+    if (!fileio::file_size(cmdl.get_string_option("prep"))) {
         log_warning << cmdl.get_string_option("prep")
                     << " is either blank or missing, no (initial) ligand "
                        "docking will take place.";
@@ -229,7 +233,7 @@ void LinkFragments::__continue_from_prev() {
                 p = p / cmdl.get_string_option("docked_dir") /
                     (ligand.name() + ".pdb");
 
-                if (Inout::file_size(p.string()) > 0) {
+                if (fileio::file_size(p.string()) > 0) {
                     std::lock_guard<std::mutex> guard(additon_to_top_dock);
                     log_note << ligand.name() << " is alread docked to "
                              << __receptor.name() << ", skipping." << std::endl;
@@ -288,7 +292,7 @@ void LinkFragments::link_ligands(const molib::Molecules& ligands) {
                 p = p / cmdl.get_string_option("docked_dir") /
                     (ligand.name() + ".pdb");
 
-                if (Inout::file_size(p.string()) > 0) {
+                if (fileio::file_size(p.string()) > 0) {
                     std::lock_guard<std::mutex> guard(additon_to_top_dock);
                     log_note << ligand.name() << " is alread docked to "
                              << __receptor.name() << ", skipping." << std::endl;

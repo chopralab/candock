@@ -7,8 +7,8 @@
 #include "candock/program/fragmentligands.hpp"
 
 #include "candock/docker/dock.hpp"
-#include "candock/molib/nrset.hpp"
-#include "candock/score/score.hpp"
+#include "statchem/molib/nrset.hpp"
+#include "statchem/score/score.hpp"
 
 namespace candock {
 

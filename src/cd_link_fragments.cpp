@@ -1,8 +1,8 @@
 #include <iostream>
-#include "candock/drm/drm.hpp"
 #include "candock/program/cmdlnopts.hpp"
 #include "candock/program/fragmentligands.hpp"
 #include "candock/program/target.hpp"
+#include "statchem/helper/benchmark.hpp"
 #include "version.hpp"
 
 // LINKING OF FRAGMENTS
@@ -12,18 +12,18 @@ using namespace candock;
 
 int main(int argc, char* argv[]) {
     try {
-        if (!drm::check_drm(Version::get_install_path() + "/.candock")) {
+        /*if (!drm::check_drm(Version::get_install_path() + "/.candock")) {
             throw logic_error(
                 "CANDOCK has expired. Please contact your CANDOCK distributor "
                 "to get a new version.");
-        }
+        }*/
 
         help::Options::set_options(new Program::CmdLnOpts(
             argc, argv,
             Program::CmdLnOpts::STARTING | Program::CmdLnOpts::FORCE_FIELD |
                 Program::CmdLnOpts::SCORING | Program::CmdLnOpts::LINKING));
 
-        Benchmark main_timer;
+        statchem::Benchmark main_timer;
         main_timer.display_time("started");
 
         std::cout << Version::get_banner() << Version::get_version()

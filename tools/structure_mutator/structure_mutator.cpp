@@ -1,20 +1,23 @@
+#include <iostream>
 #include <boost/program_options.hpp>
-#include "candock/design/design.hpp"
-#include "candock/fileout/fileout.hpp"
 
-#include "candock/drm/drm.hpp"
-#include "candock/fragmenter/unique.hpp"
-#include "candock/parser/fileparser.hpp"
+#include "candock/design/design.hpp"
+
+#include "statchem/fileio/fileout.hpp"
+#include "statchem/fragmenter/unique.hpp"
+#include "statchem/parser/fileparser.hpp"
+#include "statchem/helper/logger.hpp"
 #include "version.hpp"
 
 using namespace std;
 using namespace candock;
+using namespace statchem;
 
 namespace po = boost::program_options;
 
 int main(int argc, char* argv[]) {
     try {
-        Inout::Logger::set_all_stderr(true);
+        Logger::set_all_stderr(true);
 
         std::vector<std::string> inputs;
         std::vector<std::string> atom_types;
@@ -66,7 +69,7 @@ int main(int argc, char* argv[]) {
                             mol, atom_types[0]);
 
                     for (const auto& mol2 : mods)
-                        fileout::print_mol2(std::cout, mol2);
+                        fileio::print_mol2(std::cout, mol2);
                 }
 
                 mols.clear();

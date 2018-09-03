@@ -1,8 +1,8 @@
 #include "candock/probis/probis.hpp"
 #include "args.h"
-#include "candock/helper/benchmark.hpp"
-#include "candock/helper/debug.hpp"
-#include "candock/helper/error.hpp"
+#include "statchem/helper/benchmark.hpp"
+#include "statchem/helper/debug.hpp"
+#include "statchem/helper/error.hpp"
 #include "const.h"
 #include "states.h"
 
@@ -15,7 +15,7 @@ void compare_against_bslib(const string& receptor_file,
                            const string& bslib_file, const int ncpu,
                            const string& nosql_file, const string& json_file) {
     try {
-        candock::Benchmark bench;
+        statchem::Benchmark bench;
         cout << "Starting ProBiS for binding sites prediction" << endl;
         Args args;
         _longnames = true;
@@ -41,10 +41,10 @@ void compare_against_bslib(const string& receptor_file,
         cout << "Binding sites prediction took " << bench.seconds_from_start()
              << " wallclock seconds\n";
 
-    }  // .. konec try bloka
+    }
     catch (Err e) {
         cout << e.what() << endl;
-        throw candock::Error("die : something went wrong in probis ...");
+        throw statchem::Error("die : something went wrong in probis ...");
     }
 }
 };

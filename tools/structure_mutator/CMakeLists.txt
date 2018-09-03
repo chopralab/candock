@@ -4,6 +4,7 @@ add_executable( structure_mutator
 
 target_link_libraries( structure_mutator
     candock
+    ${STATCHEM_LIBRARY}
     ${Boost_LIBRARIES}
     ${OPENMM_LIBRARY}
     ${GSL_LIBRARIES}

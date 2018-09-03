@@ -3,15 +3,12 @@
 
 #include "candock/docker/conformations.hpp"
 #include "candock/docker/gpoints.hpp"
-#include "candock/molib/molecules.hpp"
+#include "statchem/molib/molecules.hpp"
 
 namespace candock {
-
-namespace molib {
-class Molecule;
-}
-
 namespace docker {
+
+using namespace statchem;
 
 class Dock {
     class DockedConf {

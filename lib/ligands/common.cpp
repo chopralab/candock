@@ -1,8 +1,8 @@
 #include "candock/ligands/common.hpp"
 #include "candock/external/json/json.h"
-#include "candock/helper/help.hpp"
-#include "candock/molib/molecule.hpp"
-#include "candock/parser/fileparser.hpp"
+#include "statchem/helper/help.hpp"
+#include "statchem/molib/molecule.hpp"
+#include "statchem/parser/fileparser.hpp"
 
 using namespace std;
 
@@ -14,6 +14,9 @@ ostream& operator<<(ostream& stream, const ResidueSet& residues) {
 }
 
 namespace common_ligands {
+
+using namespace statchem;
+
 ResMap json_to_map(const Json::Value& aligned_residues) {
     ResMap a;
     // convert Json aligned residues to a set of res_tuple2
