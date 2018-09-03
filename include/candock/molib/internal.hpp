@@ -7,11 +7,12 @@
 #include "candock/geometry/geometry.hpp"
 #include "candock/helper/debug.hpp"
 #include "candock/helper/error.hpp"
+#include "candock/molib/atom.hpp"
 
 namespace candock {
 
 namespace molib {
-class Atom;
+
 struct Torsion {
     const Atom *a1, *a2, *a3, *a4;
     Torsion(const Atom* at1, const Atom* at2, const Atom* at3, const Atom* at4)

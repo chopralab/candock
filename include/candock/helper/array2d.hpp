@@ -1,9 +1,8 @@
 #ifndef ARRAY2D_H
 #define ARRAY2D_H
 
-#include <assert.h>
-#include <stdio.h>
-#include <string.h>
+#include <cstring>
+#include <ostream>
 
 namespace candock {
 
@@ -19,7 +18,7 @@ struct Array2d {
 
         for (int i = 0; i < szi; ++i) {
             data[i] = new T[szj];
-            memset(data[i], 0, szj * sizeof(T));
+            std::memset(data[i], 0, szj * sizeof(T));
         }
     }
 
@@ -126,7 +125,7 @@ struct Array2d<bool> {
 
         for (size_t i = 0; i < byszi; ++i) {
             data[i] = new unsigned int[szj];
-            memset(data[i], 0, szj * sizeof(unsigned int));
+            std::memset(data[i], 0, szj * sizeof(unsigned int));
         }
     }
 
@@ -144,7 +143,7 @@ struct Array2d<bool> {
 
         for (size_t i = 0; i < byszi; ++i) {
             data[i] = new unsigned int[szj];
-            memcpy(data[i], other.data[i], szj * sizeof(unsigned int));
+            std::memcpy(data[i], other.data[i], szj * sizeof(unsigned int));
         }
     }
 

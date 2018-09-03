@@ -1,6 +1,8 @@
 #ifndef PCA_H
 #define PCA_H
 #include <tuple>
+#include <gsl/gsl_matrix.h>
+#include <gsl/gsl_vector.h>
 
 namespace candock {
 

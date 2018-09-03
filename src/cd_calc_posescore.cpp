@@ -79,6 +79,23 @@ int main(int argc, char* argv[]) {
                 .erase_hydrogen();
         }
 
+        if (ligand_mols.get_idatm_types().size() == 1) {
+            ligand_mols.compute_idatm_type()
+                .compute_hydrogen()
+                .compute_bond_order()
+                .compute_bond_gaff_type()
+                .refine_idatm_type()
+                .erase_hydrogen()    // needed because refine changes
+                                     // connectivities
+                .compute_hydrogen()  // needed because refine changes
+                                     // connectivities
+                .compute_ring_type()
+                .compute_gaff_type()
+                .compute_rotatable_bonds()  // relies on hydrogens being
+                                            // assigned
+                .erase_hydrogen();
+        }
+
         score
             .define_composition(receptor_mols.get_idatm_types(),
                                 ligand_mols.get_idatm_types())
@@ -102,7 +119,7 @@ int main(int argc, char* argv[]) {
                 }
             }));
 
-        for (auto& thread : threads) {
+        for (auto&& thread : threads) {
             thread.join();
         }
 
