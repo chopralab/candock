@@ -2,7 +2,6 @@
 
 : ${MCANDOCK_MOD_PATH:=$( cd $( dirname ${BASH_SOURCE[0]} ) && pwd )}
 
-
 # If NOT undefined PBS Variable
 if [[ $PBS_ENVIRONMENT == PBS_BATCH ]]
 then
