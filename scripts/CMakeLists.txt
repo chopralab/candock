@@ -32,5 +32,5 @@ install( PROGRAMS ${PROJECT_BINARY_DIR}/load_variables.sh
                   ${PROJECT_SOURCE_DIR}/scripts/extract_result.sh
                   
          DESTINATION
-                  ${CMAKE_INSTALL_PREFIX}/${CANDOCK_VERSION}/modules
+                  ${CMAKE_INSTALL_PREFIX}/modules
 )

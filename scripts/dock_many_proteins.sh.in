@@ -5,7 +5,7 @@
 #PBS -l naccesspolicy=shared
 
 : ${MCANDOCK_MOD_PATH:=$([[ $PBS_ENVIRONMENT == PBS_BATCH ]] \
-    && echo @CMAKE_INSTALL_PREFIX@/modules/v@CANDOCK_MAJOR_VERSION@.@CANDOCK_MINOR_VERSION@.@CANDOCK_TWEAK_VERSION@ \
+    && echo @CMAKE_INSTALL_PREFIX@/modules/ \
     || echo $( cd $( dirname ${BASH_SOURCE[0]} ) && pwd ) )}
 
 echo "Using modules in $MCANDOCK_MOD_PATH"
@@ -52,7 +52,7 @@ do
 
     mkdir -p $i
 
-    $MCANDOCK_PATH/bin/$MCANDOCK_VER/cd_link_fragments
+    $MCANDOCK_PATH/bin/cd_link_fragments
 
     __count=$((__count+1))
 done

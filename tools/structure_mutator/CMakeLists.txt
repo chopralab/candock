@@ -15,12 +15,12 @@ install(
         structure_mutator
 
     RUNTIME DESTINATION
-        ${CANDOCK_VERSION}/bin
+        bin
 )
 
 if( NOT WIN32 )
     install(CODE "message( STATUS \"Linking structure_mutator.sh\")
         execute_process(
-                WORKING_DIRECTORY  ${CMAKE_INSTALL_PREFIX}/${CANDOCK_VERSION}/modules
+                WORKING_DIRECTORY  ${CMAKE_INSTALL_PREFIX}/modules
                 COMMAND ${CMAKE_COMMAND} -E create_symlink module.sh structure_mutator.sh)")
 endif( NOT WIN32 )

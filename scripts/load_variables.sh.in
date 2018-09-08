@@ -7,7 +7,7 @@
 
 : ${MCANDOCK_SUP_PATH:=@CMAKE_INSTALL_PREFIX@}
 
-export @ADDITIONAL_LOOKUP@=$MCANDOCK_PATH/$MCANDOCK_VER/lib:@CANDOCK_ADDITIONAL_LD_PATH@:$@ADDITIONAL_LOOKUP@
+export @ADDITIONAL_LOOKUP@=$MCANDOCK_PATH/lib:@CANDOCK_ADDITIONAL_LD_PATH@:$@ADDITIONAL_LOOKUP@
 
 : ${CANDOCK_bslib:=$MCANDOCK_SUP_PATH/bslibdb}
 : ${CANDOCK_names:=$MCANDOCK_SUP_PATH/bslibdb/data/names}
@@ -27,7 +27,7 @@ export CANDOCK_water_xml
 export CANDOCK_gaff_xml
 export CANDOCK_gaff_dat
 
-: ${CANDOCK_dist:=$MCANDOCK_SUP_PATH/data/csd_complete_distance_distributions.txt}
+: ${CANDOCK_dist:=$MCANDOCK_SUP_PATH/data/csd_complete_distance_distributions.txt.xz}
 
 export CANDOCK_dist
 

@@ -12,10 +12,6 @@ if(${CANDOCK_BUILD_STATIC_EXECUTABLE})
         ${GSL_LIBRARIES}
     )
 
-    if ( ${CANDOCK_DRM} )
-        set( all_needed_libraries ${all_needed_libraries} ${OPENSSL_LIBRARIES} )
-    endif( ${CANDOCK_DRM} )
-
 else (${CANDOCK_BUILD_STATIC_EXECUTABLE})
     
     set( all_needed_libraries
@@ -54,19 +50,13 @@ foreach( candock_program ${program_names} )
             cd_${candock_program}
 
         RUNTIME DESTINATION
-        ${CANDOCK_VERSION}/bin
+        bin
     )
 
     if( NOT WIN32 )
         install(CODE "message( STATUS \"Linking ${candock_program}.sh\")
             execute_process(
-                  WORKING_DIRECTORY  ${CMAKE_INSTALL_PREFIX}/${CANDOCK_VERSION}/modules
+                  WORKING_DIRECTORY  ${CMAKE_INSTALL_PREFIX}/modules
                   COMMAND ${CMAKE_COMMAND} -E create_symlink module.sh ${candock_program}.sh)")
     endif( NOT WIN32 )
 endforeach( candock_program ${program_names} )
-
-if( ${CANDOCK_DRM} )
-    add_executable( drm_key_generator drm_key_generator.cpp )
-    target_link_libraries( drm_key_generator ${OPENSSL_LIBRARIES} )
-    install( TARGETS drm_key_generator RUNTIME DESTINATION ${CANDOCK_VERSION}/bin )
-endif( ${CANDOCK_DRM} )

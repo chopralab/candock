@@ -38,9 +38,6 @@ if (CANDOCK_CUDA_SUPPORT)
 
 endif(CANDOCK_CUDA_SUPPORT)
 
-#DRM Module
-set(CANDOCK_DRM OFF CACHE BOOL "Build DRM into Candock")
-
 find_package(Boost    REQUIRED  COMPONENTS filesystem system program_options)
 find_package(Git      REQUIRED)
 find_package(StatChem REQUIRED)
@@ -102,6 +99,6 @@ add_subdirectory(scripts)
 add_subdirectory(src)
 add_subdirectory(tools)
 
-install(DIRECTORY include/ DESTINATION ${CANDOCK_VERSION}/include)
+install(DIRECTORY include/ DESTINATION include)
 
 add_subdirectory(doc)

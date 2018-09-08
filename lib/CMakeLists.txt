@@ -22,10 +22,6 @@ if (NOT ${CANDOCK_BUILD_STATIC_EXECUTABLE})
                                    ${GSL_LIBRARIES}
     )
 
-    if( ${CANDOCK_DRM} )
-        set( candock_libraries_to_link ${candock_libraries_to_link} ${OPENSSL_LIBRARIES})
-    endif( ${CANDOCK_DRM} )
-
     target_link_libraries ( candock ${candock_libraries_to_link} )
 else()
     add_library(
@@ -34,28 +30,13 @@ else()
     )
 endif()
 
-if (NOT WIN32)
-    install(
-        TARGETS
-            candock
-        LIBRARY DESTINATION
-            ${CANDOCK_VERSION}/lib
-        ARCHIVE DESTINATION
-            ${CANDOCK_VERSION}/lib
-    )
-else()
-    install(
-        TARGETS
-            candock
-        RUNTIME DESTINATION
-            ${CANDOCK_VERSION}/bin/
-    )
-endif()
-
-if (${USING_INTERNAL_GSL})
-    add_dependencies(candock GSL)
-endif()
-
-if (${USING_INTERNAL_OPENMM})
-    add_dependencies(candock OpenMM_Build)
-endif()
+install(
+    TARGETS
+        candock
+    LIBRARY DESTINATION
+        lib
+    ARCHIVE DESTINATION
+        lib
+    RUNTIME DESTINATION
+        bin
+)
