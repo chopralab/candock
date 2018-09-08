@@ -44,7 +44,7 @@ class LinkFragments : public ProgramStep {
 
     virtual ~LinkFragments() {}
     void link_ligands(const molib::Molecules& ligands);
-    const molib::Molecules& top_poses() const { return __all_top_poses; }
+    const molib::Molecules& top_poses();
     void clear_top_poses() { __all_top_poses.clear(); };
 };
 }

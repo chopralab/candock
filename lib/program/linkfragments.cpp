@@ -190,7 +190,6 @@ void LinkFragments::__link_ligand(molib::Molecule& ligand) {
             fileio::output_file(ss.str(), p.string(), std::ios_base::app);
         }
 
-        __all_top_poses.add(new molib::Molecule(docks[0].get_ligand()));
         ffcopy.erase_topology(ligand);
     } catch (std::exception& e) {
         log_error << "Error: skipping ligand " << ligand.name() << " with "
@@ -234,16 +233,9 @@ void LinkFragments::__continue_from_prev() {
                     (ligand.name() + ".pdb");
 
                 if (fileio::file_size(p.string()) > 0) {
-                    std::lock_guard<std::mutex> guard(additon_to_top_dock);
                     log_note << ligand.name() << " is alread docked to "
                              << __receptor.name() << ", skipping." << std::endl;
 
-                    parser::FileParser conf(
-                        p.string(), parser::skip_atom | parser::first_model |
-                                        parser::docked_poses_only,
-                        1);
-                    conf.parse_molecule(__all_top_poses);
-                    __all_top_poses.last().set_name(ligand.name());
                     ligands.clear();
 
                     continue;
@@ -317,6 +309,13 @@ void LinkFragments::link_ligands(const molib::Molecules& ligands) {
     for (auto& thread : threads) {
         thread.join();
     }
+}
+
+// Consider changes this to reading everything from a directory...
+const molib::Molecules& LinkFragments::top_poses() {
+    __continue_from_prev();
+    __read_from_files();
+    return __all_top_poses;
 }
 }
 }
