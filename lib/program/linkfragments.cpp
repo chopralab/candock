@@ -119,6 +119,7 @@ void LinkFragments::__link_ligand(molib::Molecule& ligand) {
          *
          */
         OMMIface::Modeler modeler(ffcopy, cmdl.get_string_option("fftype"),
+                                  cmdl.get_double_option("scale"),
                                   cmdl.get_double_option("mini_tol"),
                                   cmdl.get_int_option("max_iter"), false);
 
