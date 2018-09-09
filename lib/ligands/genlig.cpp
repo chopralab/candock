@@ -22,6 +22,23 @@ namespace genlig {
 
 using namespace statchem;
 
+static geometry::Matrix make_matrix(const Json::Value& rota,
+                                    const Json::Value& trans) {
+
+    geometry::Matrix result;
+
+    for (int row = 0; row < 3; ++row) {
+        auto row0 = std::make_tuple(rota[row][0].asDouble(),
+                                    rota[row][1].asDouble(),
+                                    rota[row][2].asDouble(),
+                                    trans[row].asDouble());
+
+        result.set_row(row, row0);
+    }
+
+    return result;
+}
+
 ResidueSet find_neighbor_residues(molib::Molecule& ligand,
                                   molib::Atom::Grid& grid) {
     ResidueSet neighbor_residues;
@@ -208,15 +225,16 @@ void generate_ligands(const string& receptor_file,
                     pdb_file, parser::all_models | parser::hydrogens);
                 molib::Molecules& mols =
                     nrset.add(new molib::Molecules(biopdb.parse_molecule()));
-                //dbgmsg(
-                    //geometry::Matrix(d["alignment"][0]["rotation_matrix"],
-                                     //d["alignment"][0]["translation_vector"]));
+                dbgmsg(
+                    make_matrix(d["alignment"][0]["rotation_matrix"],
+                                d["alignment"][0]["translation_vector"])
+                );
+
                 dbgmsg(mols_name);
-                std::cout << "here" << std::endl;
-                //mols.rotate(
-                    //geometry::Matrix(d["alignment"][0]["rotation_matrix"],
-                                     //d["alignment"][0]["translation_vector"]),
-                    //true);  // inverse rotation
+                mols.rotate(
+                    make_matrix(d["alignment"][0]["rotation_matrix"],
+                                d["alignment"][0]["translation_vector"]),
+                true);  // inverse rotation
                 ResMap aligned_to_query = common_ligands::json_to_map_reverse(
                     d["alignment"][0]["aligned_residues"]);
 #ifndef NDEBUG
@@ -280,11 +298,10 @@ pair<BindingSiteClusters, BindingSiteScores> generate_binding_site_prediction(
     };
     map<string, vector<LigandInfo>> ligands_by_bio_file;
     for (auto& d : jr.root()) {
-        std::cout << "here" << std::endl;
-        //dbgmsg(geometry::Matrix(d["alignment"][0]["rotation_matrix"],
-        //                        d["alignment"][0]["translation_vector"]));
-        //geometry::Matrix mx(d["alignment"][0]["rotation_matrix"],
-        //                    d["alignment"][0]["translation_vector"]);
+        dbgmsg(make_matrix(d["alignment"][0]["rotation_matrix"],
+                           d["alignment"][0]["translation_vector"]));
+        auto mx = make_matrix(d["alignment"][0]["rotation_matrix"],
+                              d["alignment"][0]["translation_vector"]);
         const double z_score =
             d["alignment"][0]["scores"]["z_score"].asDouble();
         const Json::Value& hetero = d["hetero"];
@@ -316,8 +333,8 @@ pair<BindingSiteClusters, BindingSiteScores> generate_binding_site_prediction(
 
             ligands_by_bio_file[bio_file].push_back(
                 LigandInfo{cluster_number, lig_code, z_score});
-                std::cout << "yip" << std::endl;
-            //bio_file_to_matrix[bio_file] = mx;
+
+            bio_file_to_matrix[bio_file] = mx;
         }
     }
     // read bio PDBs

@@ -22,6 +22,22 @@ namespace genbio {
 
 using namespace statchem;
 
+static geometry::Matrix make_matrix(const Json::Value& rota,
+                                    const Json::Value& trans) {
+    geometry::Matrix result;
+
+    for (int row = 0; row < 3; ++row) {
+        auto row0 = std::make_tuple(rota[row][0].asDouble(),
+                                    rota[row][1].asDouble(),
+                                    rota[row][2].asDouble(),
+                                    trans[row].asDouble());
+
+        result.set_row(row, row0);
+    }
+
+    return result;
+}
+
 void remove_chains(molib::Molecules& mols,
                    const vector<string>& aligned_chains) {
     int i = 0;
@@ -270,11 +286,10 @@ void generate_biological_assemblies(const string& models, const bool hydrogens,
                             : molib::Molecule::first_bio);  // make biounits
                                                             // coordinates
                                                             // (optional)
-                //mols.last().rotate(
-                    //geometry::Matrix(d["alignment"][0]["rotation_matrix"],
-                                     //d["alignment"][0]["translation_vector"]),
-                    //true);  // inverse rotation
-std::cout << "AASDF" << std::endl;
+                mols.last().rotate(
+                    make_matrix(d["alignment"][0]["rotation_matrix"],
+                                d["alignment"][0]["translation_vector"]),
+                    true);  // inverse rotation
                 if (ralch)
                     genbio::remove_assemblies(mols.last(),
                                               chain_ids);  // remove assemblies

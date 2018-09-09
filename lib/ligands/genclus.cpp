@@ -25,6 +25,22 @@ namespace genclus {
 
 using namespace statchem;
 
+static geometry::Matrix make_matrix(const Json::Value& rota,
+                                    const Json::Value& trans) {
+    geometry::Matrix result;
+
+    for (int row = 0; row < 3; ++row) {
+        auto row0 = std::make_tuple(rota[row][0].asDouble(),
+                                    rota[row][1].asDouble(),
+                                    rota[row][2].asDouble(),
+                                    trans[row].asDouble());
+
+        result.set_row(row, row0);
+    }
+
+    return result;
+}
+
 string remove_special_characters(string str) {
     str.erase(std::remove_if(str.begin(), str.end(),
                              [](const char& c) {
@@ -339,11 +355,10 @@ void generate_clusters_of_ligands(
                                                              // that are not
                                                              // near aligned
                                                              // residues
-std::cout << "gerre" << std::endl;
-            //mols.rotate(
-                //geometry::Matrix(d["alignment"][0]["rotation_matrix"],
-                                 //d["alignment"][0]["translation_vector"]),
-                //true);  // inverse rotation
+            mols.rotate(
+                make_matrix(d["alignment"][0]["rotation_matrix"],
+                            d["alignment"][0]["translation_vector"]),
+                true);  // inverse rotation
         } catch (exception& e) {
             nrset.erase(nrset.size() -
                         1);  // delete the last mols which is empty
