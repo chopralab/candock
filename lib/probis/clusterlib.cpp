@@ -33,6 +33,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+#include <algorithm>
 
 #ifdef WINDOWS
 #include <windows.h>
@@ -127,8 +128,8 @@ Based on Alan J. Miller's median.f90 routine.
                 int k;
                 double xmax = x[0];
                 double xmin = x[n - 1];
-                for (k = lo; k <= j; k++) xmax = max(xmax, x[k]);
-                for (k = i; k <= hi; k++) xmin = min(xmin, x[k]);
+                for (k = lo; k <= j; k++) xmax = std::max(xmax, x[k]);
+                for (k = i; k <= hi; k++) xmin = std::min(xmin, x[k]);
                 return 0.5 * (xmin + xmax);
             }
             if (j < nl) lo = i;
@@ -451,7 +452,7 @@ void svd(int m, int n, double** u, double w[], double** v, int* ierr)
                 for (k = l; k < n; k++) u[i][k] *= scale;
             }
         }
-        anorm = max(anorm, fabs(w[i]) + fabs(rv1[i]));
+        anorm = std::max(anorm, fabs(w[i]) + fabs(rv1[i]));
     }
     /* accumulation of right-hand transformations */
     for (i = n - 1; i >= 0; i--) {
@@ -3341,11 +3342,11 @@ If a memory error occurs, pmlcluster returns NULL.
 
         /* Fix the distances */
         for (j = 0; j < js; j++)
-            distmatrix[js][j] = max(distmatrix[is][j], distmatrix[js][j]);
+            distmatrix[js][j] = std::max(distmatrix[is][j], distmatrix[js][j]);
         for (j = js + 1; j < is; j++)
-            distmatrix[j][js] = max(distmatrix[is][j], distmatrix[j][js]);
+            distmatrix[j][js] = std::max(distmatrix[is][j], distmatrix[j][js]);
         for (j = is + 1; j < n; j++)
-            distmatrix[j][js] = max(distmatrix[j][is], distmatrix[j][js]);
+            distmatrix[j][js] = std::max(distmatrix[j][is], distmatrix[j][js]);
 
         for (j = 0; j < is; j++) distmatrix[is][j] = distmatrix[n - 1][j];
         for (j = is + 1; j < n - 1; j++)
