@@ -69,7 +69,7 @@ Target::Target(const std::string& input_name) {
     // Just initialize, here (copies strings only) and do not run the
     // calculation
     Program::FindCentroids* centroids = new FindCentroids(
-        input_name, __protein->get_chain_ids(molib::Residue::protein),
+        input_name, __protein->get_chain_ids(molib::Residue::protein | molib::Residue::nucleic),
         __protein->name());
     __centroids = std::unique_ptr<Program::FindCentroids>(centroids);
 }
