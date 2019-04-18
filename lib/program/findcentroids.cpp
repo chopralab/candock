@@ -3,6 +3,15 @@
 
 #include <boost/filesystem.hpp>
 
+std::ostream& operator<<(std::ostream& os, const std::map<int, double>& bscores) {
+    for (auto& kv : bscores) {
+        const int& cluster_number = kv.first;
+        const double& z_score = kv.second;
+        os << cluster_number << " " << z_score << std::endl;
+    }
+    return os;
+}
+
 #include "candock/ligands/genclus.hpp"
 #include "candock/ligands/genlig.hpp"
 #include "candock/probis/probis.hpp"
@@ -18,6 +27,9 @@
 
 using namespace std;
 
+namespace statchem {
+namespace molib {
+
 ostream& operator<<(ostream& os, const map<int, statchem::molib::Molecules>& bsites) {
     for (auto& kv : bsites) {
         const int& cluster_number = kv.first;
@@ -28,14 +40,7 @@ ostream& operator<<(ostream& os, const map<int, statchem::molib::Molecules>& bsi
     }
     return os;
 }
-
-ostream& operator<<(ostream& os, const map<int, double>& bscores) {
-    for (auto& kv : bscores) {
-        const int& cluster_number = kv.first;
-        const double& z_score = kv.second;
-        os << cluster_number << " " << z_score << endl;
-    }
-    return os;
+}
 }
 
 namespace candock {
