@@ -101,4 +101,4 @@ add_subdirectory(tools)
 
 install(DIRECTORY include/ DESTINATION include)
 
-add_subdirectory(doc)
+# add_subdirectory(doc)
