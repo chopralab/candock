@@ -116,3 +116,4 @@ if( ${CANDOCK_DRM} )
     target_link_libraries( drm_key_generator ${OPENSSL_LIBRARIES} )
     install( TARGETS drm_key_generator RUNTIME DESTINATION bin/${CANDOCK_VERSION} )
 endif( ${CANDOCK_DRM} )
+

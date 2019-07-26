@@ -33,9 +33,11 @@ export CANDOCK_gaff_dat
 export CANDOCK_dist
 export CANDOCK_obj_dir
 
-: ${OPENMM_PLUGIN_DIR:=@OPENMM_ROOT_DIR@/lib/plugins}
+: ${OPENMM_PLUGIN_DIR:=$MCANDOCK_PATH/$MCANDOCK_VER/lib/plugins}
 
 export OPENMM_PLUGIN_DIR
+
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$MCANDOCK_PATH/lib/$MCANDOCK_VER:$MCANDOCK_PATH/lib/$MCANDOCK_VER/plugins
 
 if [[ -s candock.cfg ]]
 then

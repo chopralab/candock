@@ -5,3 +5,5 @@ set( interface_SRC
         interface.hpp)
 
 add_library(interface OBJECT ${interface_SRC})
+add_dependencies(interface kbforce gsl openmm)
+

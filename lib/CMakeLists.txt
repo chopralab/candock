@@ -89,3 +89,7 @@ else (NOT WIN32)
 endif(NOT WIN32)
 
 endif (NOT ${CANDOCK_BUILD_STATIC_EXECUTABLE})
+
+add_dependencies(candock kbforce gsl openmm)
+
+

@@ -23,4 +23,5 @@ set( linker_SRC
 include_directories( ../modeler )
 
 add_library(linker OBJECT ${linker_SRC})
+add_dependencies(linker kbforce gsl openmm)
 

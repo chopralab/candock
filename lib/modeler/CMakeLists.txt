@@ -12,3 +12,5 @@ set( modeler_SRC
 )
 
 add_library(modeler OBJECT ${modeler_SRC})
+add_dependencies(modeler kbforce gsl openmm)
+

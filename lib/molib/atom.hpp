@@ -61,8 +61,12 @@ namespace Molib {
                         __element(element.empty() ? atom_name : element) {}
 		Bond& connect(Atom &a2);
 		void clear_bonds() { __bonds.clear(); }
-		BondVec get_bonds() const { BondVec bonds; for (auto &kv : __bonds) 
-			bonds.push_back(&*kv.second); return bonds; }
+		BondVec get_bonds() const {
+			BondVec bonds;
+			for (auto &kv : __bonds) 
+				bonds.push_back(&*kv.second);
+			return bonds;
+		}
 		const shared_ptr<Bond>& get_shared_ptr_bond(const Atom &other) const { return __bonds.at(&other); }
 		Bond& get_bond(const Atom &other) const { return *get_shared_ptr_bond(other); }
 		shared_ptr<Bond>& insert_bond(const Atom &other, const shared_ptr<Bond> &bond) { return __bonds.insert({&other, bond}).first->second; }

@@ -14,6 +14,8 @@ mark_as_advanced(CANDOCK_VERSION)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake/")
 
+include(ExternalProject)
+
 set(CANDOCK_BUILD_STATIC_EXECUTABLE OFF CACHE BOOL "Build a version of candock without dynamic linking")
 
 if(${CANDOCK_BUILD_STATIC_EXECUTABLE})
@@ -43,15 +45,11 @@ if (CANDOCK_CUDA_SUPPORT)
 
 endif(CANDOCK_CUDA_SUPPORT)
 
-set(OPENMM_ROOT_DIR "/usr/local/openmm" CACHE STRING "Location of OpenMM and KBForce")
-
 #DRM Module
 set(CANDOCK_DRM OFF CACHE BOOL "Build DRM into Candock")
 
 find_package(Boost    REQUIRED  COMPONENTS filesystem system regex program_options)
-find_package(GSL      REQUIRED)
 find_package(RapidXML REQUIRED)
-find_package(OpenMM   REQUIRED  COMPONENTS openmm kbforce)
 find_package(Git      REQUIRED)
 
 if( ${CANDOCK_DRM} )
@@ -87,11 +85,14 @@ else(WIN32)
 
 endif(WIN32)
 
+include(build_OpenMM)
+include(build_kbforce)
+include(build_GSL)
+
 include_directories(${Boost_INCLUDE_DIRS})
-include_directories(${GSL_INCLUDE_DIRS})
 include_directories(${JSONCPP_INCLUDE_DIR})
 include_directories(${RAPIDXML_DIR})
-include_directories(${OPENMM_INCLUDE_DIR})
+include_directories("${CMAKE_BINARY_DIR}/stage/include")
 include_directories(lib)
 
 execute_process(
@@ -126,3 +127,4 @@ if (CANDOCK_BUILD_GUI)
 endif (CANDOCK_BUILD_GUI)
 
 add_subdirectory(doc)
+

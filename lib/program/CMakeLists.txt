@@ -19,3 +19,4 @@ set( program_SRC
         target.hpp)
 
 add_library(program OBJECT ${program_SRC})
+add_dependencies(program kbforce gsl openmm)

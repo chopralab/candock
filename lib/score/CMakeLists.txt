@@ -8,3 +8,5 @@ set( score_SRC
 )
 
 add_library(score OBJECT ${score_SRC})
+add_dependencies(score gsl)
+

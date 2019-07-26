@@ -61,9 +61,12 @@ namespace Glib {
 		Cliques max_weight_clique(const int);
 		template<class Vertex2>
 		Matches match(const Graph<Vertex2>&) const;
-		bool isomorphic(Graph &g) { Matches m = match(g); if (m.size() > 0 
-			&& m[0].first.size() == g.size() && this->size() == g.size()) 
-			return true; return false; }
+		bool isomorphic(Graph &g) {
+			Matches m = match(g);
+			if (m.size() > 0 && m[0].first.size() == g.size() && this->size() == g.size()) 
+				return true;
+			return false;
+		}
 		template<class P>
 		friend ostream& operator<< (ostream& stream, const Graph<P>& g);
 	};
