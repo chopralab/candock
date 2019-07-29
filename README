@@ -1,9 +1,0 @@
-How to compile:
-
-cmake . -Bbuild
-cd build
-make candock
-
-For release compile (with optimization):
-
-cmake3 . -Bbuild -DCMAKE_BUILD_TYPE=Release
