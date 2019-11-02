@@ -70,6 +70,7 @@ set( program_names  check_options
                     cacrystal_rmsd
                     calculate_rmsd
                     calc_potential
+                    calc_posexscore
                     rescore_docked
                     minimize_poses
                     dynamics_run
